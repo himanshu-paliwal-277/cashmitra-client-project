@@ -59,7 +59,7 @@ import PartnerKYC from './pages/partner/KYC';
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
 import CatalogManagement from './pages/admin/CatalogManagement';
-import PartnerVerification from './pages/admin/PartnerVerification';
+// import PartnerVerification from './pages/admin/PartnerVerification';
 import Reports from './pages/admin/Reports';
 import AdminLogin from './pages/admin/Login';
 import UserManagement from './pages/admin/UserManagement';

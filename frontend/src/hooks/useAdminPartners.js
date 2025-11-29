@@ -2,8 +2,7 @@ import { useState, useCallback } from 'react';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import adminService, { 
   getPartners, 
-  getPartnerById, 
-  verifyPartner,
+  getPartnerById,
   updatePartnerStatus 
 } from '../services/adminService';
 

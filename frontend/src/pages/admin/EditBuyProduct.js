@@ -688,27 +688,15 @@ const EditBuyProduct = () => {
     
     // Description
     description: '',
-    
-    // Trust Metrics
-    trustMetrics: {
-      warranty: '',
-      returnPolicy: '',
-      authenticity: true,
-      certifications: []
-    },
-    
+
     // Related Products
     relatedProducts: [],
-    
+
     // Legal
     legal: {
       termsAccepted: false,
       privacyAccepted: false
-    },
-    
-    // Status
-    isActive: true,
-    sortOrder: 0
+    }
   };
 
   const [formData, setFormData] = useState(initialFormData);

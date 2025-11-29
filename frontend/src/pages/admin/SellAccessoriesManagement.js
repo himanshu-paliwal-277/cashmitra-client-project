@@ -56,7 +56,6 @@ import {
   AlertTriangle,
   Zap,
   Shield,
-  Tool,
   Camera,
   Wifi,
   Battery,

@@ -308,11 +308,11 @@ const SellModelSelection = () => {
       <MainContent>
         <Breadcrumb>
           <a href="/">Home</a>
-          <span>></span>
+          <span>&gt;</span>
           <a href="/sell">Sell Old Mobile Phone</a>
-          <span>></span>
+          <span>&gt;</span>
           <a href={`/sell/${brandName.toLowerCase()}`}>Sell Old {brandName}</a>
-          <span>></span>
+          <span>&gt;</span>
           <span>Sell Old {brandName} {productName}</span>
         </Breadcrumb>
 

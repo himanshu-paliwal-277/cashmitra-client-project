@@ -17,7 +17,7 @@ const useRealTimeAnalytics = (timeRange = '7d', options = {}) => {
   const [error, setError] = useState(null);
 
   // WebSocket connection
-  const wsUrl = process.env.REACT_APP_WS_URL || 'ws://localhost:5000/ws';
+  const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
   
   const handleWebSocketMessage = useCallback((data) => {
     if (data.type === 'analyticsUpdate') {

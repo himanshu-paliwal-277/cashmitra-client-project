@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Prefer local API for development to test new endpoints
-const API_URL = process.env.REACT_APP_API_URL || 'https://cahsifiy-backend.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,

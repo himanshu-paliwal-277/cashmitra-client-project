@@ -296,11 +296,11 @@ const SellDeviceEvaluation = () => {
       <MainContent>
         <Breadcrumb>
           <a href="/">Home</a>
-          <span>></span>
+          <span>&gt;</span>
           <a href="/sell">Sell Old Mobile Phone</a>
-          <span>></span>
+          <span>&gt;</span>
           <a href="/sell/apple">Sell Old Apple</a>
-          <span>></span>
+          <span>&gt;</span>
           <span>Sell Old Apple iPhone 6S</span>
         </Breadcrumb>
 
