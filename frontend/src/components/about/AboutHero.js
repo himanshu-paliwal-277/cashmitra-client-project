@@ -105,7 +105,7 @@ const AboutHero = () => {
 
                   {/* Value */}
                   <div
-                    className={`text-3xl md:text-4xl font-bold bg-gradient-to-br text-black bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}
+                    className={`text-3xl md:text-4xl font-bold bg-gradient-to-br !text-black bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}
                   >
                     {stat.value}
                   </div>

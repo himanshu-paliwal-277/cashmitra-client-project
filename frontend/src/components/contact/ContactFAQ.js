@@ -1,4 +1,5 @@
 import { ChevronDown, HelpCircle } from 'lucide-react';
+import { useState } from 'react';
 
 const ContactFAQ = () => {
   const [openIndex, setOpenIndex] = useState(null);
