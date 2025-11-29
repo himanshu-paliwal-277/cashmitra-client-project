@@ -13,6 +13,11 @@ import LoginPage from './pages/auth/LoginPage';
 import SignupPage from './pages/auth/SignupPage';
 import Home from './pages/Home';
 import Help from './pages/Help';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import ReturnsRefund from './pages/ReturnsRefund';
 import CategorySelection from './pages/sell/CategorySelection';
 import BrandSelection from './pages/sell/BrandSelection';
 import ModelSelection from './pages/sell/ModelSelection';
@@ -160,6 +165,11 @@ function AppContent() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/returns" element={<ReturnsRefund />} />
           <Route path="/help" element={<Help />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />

@@ -15,6 +15,7 @@ import {
   LogOut,
   ShoppingCart,
   Search,
+  Info,
 } from 'lucide-react';
 
 const NavContainer = styled.nav`
@@ -401,6 +402,7 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) =
   const navItems = [
     { to: '/sell', label: 'Sell', icon: <Package size={20} /> },
     { to: '/buy', label: 'Buy', icon: <ShoppingCart size={20} /> },
+    { to: '/about', label: 'About', icon: <Info size={20} /> },
     { onClick: handleCartClick, label: 'Cart', icon: <ShoppingCart size={20} /> },
     { onClick: handleTrackClick, label: 'Track', icon: <Package size={20} /> },
     { onClick: handleHelpClick, label: 'Help', icon: <HelpCircle size={20} /> },
