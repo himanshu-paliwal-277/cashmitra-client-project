@@ -24,7 +24,7 @@ import {
   MessageSquare,
   Star,
   Shield,
-  Briefcase
+  Briefcase,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -64,7 +64,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -90,7 +90,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -105,7 +105,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -186,11 +186,11 @@ const ApplicationRow = styled.div`
   border-bottom: 1px solid #e5e7eb;
   align-items: center;
   transition: all 0.2s;
-  
+
   &:hover {
     background-color: #f9fafb;
   }
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -257,7 +257,7 @@ const StatusBadge = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  
+
   ${props => {
     switch (props.status) {
       case 'pending':
@@ -281,7 +281,7 @@ const PriorityBadge = styled.span`
   border-radius: 0.25rem;
   font-size: 0.75rem;
   font-weight: 600;
-  
+
   ${props => {
     switch (props.priority) {
       case 'high':
@@ -302,7 +302,16 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${props => props.primary ? '#3b82f6' : props.danger ? '#ef4444' : props.success ? '#10b981' : props.warning ? '#f59e0b' : '#6b7280'};
+  background: ${props =>
+    props.primary
+      ? '#3b82f6'
+      : props.danger
+        ? '#ef4444'
+        : props.success
+          ? '#10b981'
+          : props.warning
+            ? '#f59e0b'
+            : '#6b7280'};
   color: white;
   border: none;
   padding: 0.5rem;
@@ -311,12 +320,12 @@ const IconButton = styled.button`
   display: flex;
   align-items: center;
   transition: all 0.2s;
-  
+
   &:hover {
     opacity: 0.9;
     transform: scale(1.05);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -369,7 +378,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  
+
   &:hover {
     background: #f3f4f6;
   }
@@ -428,7 +437,7 @@ const DocumentCard = styled.div`
   padding: 1rem;
   text-align: center;
   transition: all 0.2s;
-  
+
   &:hover {
     border-color: #3b82f6;
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
@@ -488,7 +497,7 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   ${props => {
     switch (props.variant) {
       case 'success':
@@ -503,7 +512,7 @@ const Button = styled.button`
         return 'background: #f3f4f6; color: #374151; &:hover { background: #e5e7eb; }';
     }
   }}
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -522,7 +531,7 @@ const CommentTextarea = styled.textarea`
   font-size: 0.875rem;
   resize: vertical;
   min-height: 100px;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -544,7 +553,7 @@ const PartnerApplications = () => {
     pending: 0,
     under_review: 0,
     approved: 0,
-    rejected: 0
+    rejected: 0,
   });
 
   const {
@@ -554,7 +563,7 @@ const PartnerApplications = () => {
     error: hookError,
     updateApplicationStatus,
     downloadDocument,
-    fetchApplications
+    fetchApplications,
   } = useAdminPartnerApplications();
 
   useEffect(() => {
@@ -574,7 +583,7 @@ const PartnerApplications = () => {
     }
   };
 
-  const handleViewDetails = (application) => {
+  const handleViewDetails = application => {
     setSelectedApplication(application);
     setShowDetailModal(true);
     setComment('');
@@ -588,7 +597,7 @@ const PartnerApplications = () => {
     }
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'pending':
         return <Clock size={12} />;
@@ -605,7 +614,7 @@ const PartnerApplications = () => {
     }
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = priority => {
     switch (priority) {
       case 'high':
         return '#ef4444';
@@ -620,24 +629,25 @@ const PartnerApplications = () => {
 
   const canUpdateStatus = (currentStatus, newStatus) => {
     const statusFlow = {
-      'pending': ['under_review', 'rejected'],
-      'under_review': ['approved', 'rejected', 'on_hold'],
-      'on_hold': ['under_review', 'rejected'],
-      'approved': [],
-      'rejected': []
+      pending: ['under_review', 'rejected'],
+      under_review: ['approved', 'rejected', 'on_hold'],
+      on_hold: ['under_review', 'rejected'],
+      approved: [],
+      rejected: [],
     };
-    
+
     return statusFlow[currentStatus]?.includes(newStatus) || false;
   };
 
   const filteredApplications = applications.filter(application => {
-    const matchesSearch = application.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         application.applicantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         application.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch =
+      application.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.applicantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesStatus = !statusFilter || application.status === statusFilter;
     const matchesPriority = !priorityFilter || application.priority === priorityFilter;
-    
+
     return matchesSearch && matchesStatus && matchesPriority;
   });
 
@@ -675,7 +685,7 @@ const PartnerApplications = () => {
             <StatLabel>Total Applications</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#f59e0b">
             <Clock size={24} />
@@ -685,7 +695,7 @@ const PartnerApplications = () => {
             <StatLabel>Pending Review</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#3b82f6">
             <Eye size={24} />
@@ -695,7 +705,7 @@ const PartnerApplications = () => {
             <StatLabel>Under Review</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#10b981">
             <CheckCircle size={24} />
@@ -712,13 +722,10 @@ const PartnerApplications = () => {
           type="text"
           placeholder="Search by business name, applicant name, or email..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
-        
-        <FilterSelect
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
+
+        <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="">All Status</option>
           <option value="pending">Pending</option>
           <option value="under_review">Under Review</option>
@@ -726,11 +733,8 @@ const PartnerApplications = () => {
           <option value="rejected">Rejected</option>
           <option value="on_hold">On Hold</option>
         </FilterSelect>
-        
-        <FilterSelect
-          value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value)}
-        >
+
+        <FilterSelect value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
           <option value="">All Priority</option>
           <option value="high">High</option>
           <option value="medium">Medium</option>
@@ -749,27 +753,29 @@ const PartnerApplications = () => {
             <div>Status</div>
             <div>Actions</div>
           </TableHeader>
-          
+
           {filteredApplications.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <UserCheck size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
               <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
-                {searchTerm || statusFilter || priorityFilter ? 'No applications match your filters' : 'No applications found'}
+                {searchTerm || statusFilter || priorityFilter
+                  ? 'No applications match your filters'
+                  : 'No applications found'}
               </p>
             </div>
           ) : (
-            filteredApplications.map((application) => (
+            filteredApplications.map(application => (
               <ApplicationRow key={application._id}>
                 <ApplicantInfo>
                   <ApplicantName>{application.applicantName || 'N/A'}</ApplicantName>
                   <ApplicantEmail>{application.email || 'N/A'}</ApplicantEmail>
                 </ApplicantInfo>
-                
+
                 <BusinessInfo>
                   <BusinessName>{application.businessName || 'N/A'}</BusinessName>
                   <BusinessType>{application.businessType || 'N/A'}</BusinessType>
                 </BusinessInfo>
-                
+
                 <ContactInfo>
                   <ContactPhone>
                     <Phone size={12} />
@@ -780,39 +786,50 @@ const PartnerApplications = () => {
                     {application.city || 'N/A'}, {application.state || 'N/A'}
                   </ContactLocation>
                 </ContactInfo>
-                
+
                 <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
                   {new Date(application.createdAt).toLocaleDateString()}
                 </div>
-                
+
                 <PriorityBadge priority={application.priority || 'medium'}>
-                  {application.priority?.charAt(0)?.toUpperCase() + application.priority?.slice(1) || 'Medium'}
+                  {application.priority?.charAt(0)?.toUpperCase() +
+                    application.priority?.slice(1) || 'Medium'}
                 </PriorityBadge>
-                
+
                 <StatusBadge status={application.status}>
                   {getStatusIcon(application.status)}
-                  {application.status?.charAt(0)?.toUpperCase() + application.status?.slice(1) || 'Pending'}
+                  {application.status?.charAt(0)?.toUpperCase() + application.status?.slice(1) ||
+                    'Pending'}
                 </StatusBadge>
-                
+
                 <ActionButtons>
                   <IconButton primary onClick={() => handleViewDetails(application)}>
                     <Eye size={14} />
                   </IconButton>
-                  
+
                   {canUpdateStatus(application.status, 'under_review') && (
-                    <IconButton warning onClick={() => handleStatusUpdate(application._id, 'under_review')}>
+                    <IconButton
+                      warning
+                      onClick={() => handleStatusUpdate(application._id, 'under_review')}
+                    >
                       <Eye size={14} />
                     </IconButton>
                   )}
-                  
+
                   {canUpdateStatus(application.status, 'approved') && (
-                    <IconButton success onClick={() => handleStatusUpdate(application._id, 'approved')}>
+                    <IconButton
+                      success
+                      onClick={() => handleStatusUpdate(application._id, 'approved')}
+                    >
                       <CheckCircle size={14} />
                     </IconButton>
                   )}
-                  
+
                   {canUpdateStatus(application.status, 'rejected') && (
-                    <IconButton danger onClick={() => handleStatusUpdate(application._id, 'rejected')}>
+                    <IconButton
+                      danger
+                      onClick={() => handleStatusUpdate(application._id, 'rejected')}
+                    >
                       <XCircle size={14} />
                     </IconButton>
                   )}
@@ -832,7 +849,7 @@ const PartnerApplications = () => {
                 <XCircle size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             <DetailSection>
               <SectionTitle>
                 <User size={20} />
@@ -863,7 +880,7 @@ const PartnerApplications = () => {
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
-            
+
             <DetailSection>
               <SectionTitle>
                 <Building size={20} />
@@ -888,9 +905,7 @@ const PartnerApplications = () => {
                 <DetailItem>
                   <MapPin size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Address:</DetailLabel>
-                  <DetailValue>
-                    {selectedApplication.address || 'N/A'}
-                  </DetailValue>
+                  <DetailValue>{selectedApplication.address || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <MapPin size={16} style={{ color: '#6b7280' }} />
@@ -904,7 +919,7 @@ const PartnerApplications = () => {
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
-            
+
             <DetailSection>
               <SectionTitle>
                 <FileText size={20} />
@@ -921,8 +936,8 @@ const PartnerApplications = () => {
                       {doc.verified ? 'Verified' : 'Pending Verification'}
                     </DocumentStatus>
                     <DocumentActions>
-                      <IconButton 
-                        primary 
+                      <IconButton
+                        primary
                         onClick={() => handleDocumentDownload(doc._id, doc.filename)}
                       >
                         <Download size={12} />
@@ -941,19 +956,26 @@ const PartnerApplications = () => {
                 )}
               </DocumentsGrid>
             </DetailSection>
-            
+
             {selectedApplication.experience && (
               <DetailSection>
                 <SectionTitle>
                   <Star size={20} />
                   Experience & Background
                 </SectionTitle>
-                <div style={{ padding: '1rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#374151' }}>
+                <div
+                  style={{
+                    padding: '1rem',
+                    background: '#f9fafb',
+                    borderRadius: '0.5rem',
+                    color: '#374151',
+                  }}
+                >
                   {selectedApplication.experience}
                 </div>
               </DetailSection>
             )}
-            
+
             {selectedApplication.comments && selectedApplication.comments.length > 0 && (
               <DetailSection>
                 <SectionTitle>
@@ -961,13 +983,16 @@ const PartnerApplications = () => {
                   Review Comments
                 </SectionTitle>
                 {selectedApplication.comments.map((comment, index) => (
-                  <div key={index} style={{ 
-                    padding: '1rem', 
-                    background: '#f9fafb', 
-                    borderRadius: '0.5rem', 
-                    marginBottom: '0.5rem',
-                    borderLeft: '4px solid #3b82f6'
-                  }}>
+                  <div
+                    key={index}
+                    style={{
+                      padding: '1rem',
+                      background: '#f9fafb',
+                      borderRadius: '0.5rem',
+                      marginBottom: '0.5rem',
+                      borderLeft: '4px solid #3b82f6',
+                    }}
+                  >
                     <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>
                       {comment.author} - {new Date(comment.createdAt).toLocaleDateString()}
                     </div>
@@ -976,22 +1001,22 @@ const PartnerApplications = () => {
                 ))}
               </DetailSection>
             )}
-            
+
             <ActionSection>
               <h4 style={{ marginBottom: '1rem', color: '#374151' }}>Review Actions</h4>
-              
+
               <CommentSection>
                 <CommentTextarea
                   placeholder="Add review comments..."
                   value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  onChange={e => setComment(e.target.value)}
                 />
               </CommentSection>
-              
+
               <ActionButtons2>
                 {canUpdateStatus(selectedApplication.status, 'under_review') && (
-                  <Button 
-                    variant="warning" 
+                  <Button
+                    variant="warning"
                     onClick={() => {
                       handleStatusUpdate(selectedApplication._id, 'under_review', comment);
                       setShowDetailModal(false);
@@ -1001,10 +1026,10 @@ const PartnerApplications = () => {
                     Start Review
                   </Button>
                 )}
-                
+
                 {canUpdateStatus(selectedApplication.status, 'approved') && (
-                  <Button 
-                    variant="success" 
+                  <Button
+                    variant="success"
                     onClick={() => {
                       handleStatusUpdate(selectedApplication._id, 'approved', comment);
                       setShowDetailModal(false);
@@ -1014,10 +1039,10 @@ const PartnerApplications = () => {
                     Approve Application
                   </Button>
                 )}
-                
+
                 {canUpdateStatus(selectedApplication.status, 'rejected') && (
-                  <Button 
-                    variant="danger" 
+                  <Button
+                    variant="danger"
                     onClick={() => {
                       if (comment.trim()) {
                         handleStatusUpdate(selectedApplication._id, 'rejected', comment);
@@ -1031,10 +1056,10 @@ const PartnerApplications = () => {
                     Reject Application
                   </Button>
                 )}
-                
+
                 {canUpdateStatus(selectedApplication.status, 'on_hold') && (
-                  <Button 
-                    variant="warning" 
+                  <Button
+                    variant="warning"
                     onClick={() => {
                       handleStatusUpdate(selectedApplication._id, 'on_hold', comment);
                       setShowDetailModal(false);

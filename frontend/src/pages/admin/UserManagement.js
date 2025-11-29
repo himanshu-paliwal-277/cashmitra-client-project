@@ -21,7 +21,7 @@ import {
   XCircle,
   AlertCircle,
   Download,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -32,7 +32,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 100px);
-  
+
   @media (max-width: 768px) {
     max-height: calc(100vh - 80px);
   }
@@ -47,7 +47,7 @@ const Header = styled.div`
   flex-wrap: wrap;
   gap: ${theme.spacing[4]};
   flex-shrink: 0;
-  
+
   @media (max-width: 768px) {
     padding: ${theme.spacing[4]};
   }
@@ -74,7 +74,7 @@ const HeaderRight = styled.div`
   align-items: center;
   gap: ${theme.spacing[3]};
   flex-wrap: wrap;
-  
+
   @media (max-width: 768px) {
     width: 100%;
     justify-content: space-between;
@@ -84,12 +84,11 @@ const HeaderRight = styled.div`
 const SearchContainer = styled.div`
   position: relative;
   width: 300px;
-  
+
   @media (max-width: 768px) {
     width: 100%;
   }
 `;
-
 
 const SearchInput = styled.input`
   width: 100%;
@@ -98,7 +97,7 @@ const SearchInput = styled.input`
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   transition: border-color 0.2s ease;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary.main};
@@ -119,19 +118,23 @@ const Button = styled.button`
   align-items: center;
   gap: ${theme.spacing[2]};
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  background-color: ${props => props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
-  color: ${props => props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
-  border: 1px solid ${props => props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
+  background-color: ${props =>
+    props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
+  color: ${props => (props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary)};
+  border: 1px solid
+    ${props =>
+      props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    background-color: ${props => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background-color: ${props =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -146,7 +149,7 @@ const FilterContainer = styled.div`
   gap: ${theme.spacing[4]};
   flex-wrap: wrap;
   flex-shrink: 0;
-  
+
   @media (max-width: 768px) {
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
   }
@@ -159,7 +162,7 @@ const FilterSelect = styled.select`
   font-size: ${theme.typography.fontSize.sm};
   cursor: pointer;
   transition: border-color 0.2s ease;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary.main};
@@ -173,7 +176,7 @@ const StatsContainer = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: ${theme.spacing[4]};
   flex-shrink: 0;
-  
+
   @media (max-width: 768px) {
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     grid-template-columns: repeat(2, 1fr);
@@ -221,28 +224,28 @@ const TableContainer = styled.div`
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   max-height: calc(100vh - 450px);
-  
+
   @media (max-width: 768px) {
     margin: 0 -${theme.spacing[6]};
     border-radius: 0;
     max-height: calc(100vh - 400px);
   }
-  
+
   /* Custom scrollbar styles */
   &::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: ${theme.colors.grey[100]};
     border-radius: ${theme.borderRadius.md};
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: ${theme.colors.grey[300]};
     border-radius: ${theme.borderRadius.md};
-    
+
     &:hover {
       background: ${theme.colors.grey[400]};
     }
@@ -253,7 +256,7 @@ const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   min-width: 800px;
-  
+
   @media (max-width: 768px) {
     min-width: 600px;
   }
@@ -271,7 +274,7 @@ const TableHeaderCell = styled.th`
   color: ${theme.colors.text.secondary};
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
+
   @media (max-width: 768px) {
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     font-size: ${theme.typography.fontSize.xs};
@@ -280,7 +283,7 @@ const TableHeaderCell = styled.th`
 
 const TableRow = styled.tr`
   border-bottom: 1px solid ${theme.colors.border.primary};
-  
+
   &:hover {
     background-color: ${theme.colors.grey[50]};
   }
@@ -293,17 +296,17 @@ const TableCell = styled.td`
   vertical-align: middle;
   white-space: normal;
   word-wrap: break-word;
-  
+
   @media (max-width: 768px) {
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     font-size: ${theme.typography.fontSize.xs};
   }
-  
+
   &:first-child {
     min-width: 200px;
     max-width: 300px;
   }
-  
+
   &:last-child {
     width: 120px;
     white-space: nowrap;
@@ -352,7 +355,7 @@ const Badge = styled.span`
   font-weight: ${theme.typography.fontWeight.medium};
   border-radius: ${theme.borderRadius.full};
   text-transform: capitalize;
-  
+
   ${props => {
     switch (props.variant) {
       case 'admin':
@@ -396,7 +399,7 @@ const ActionButton = styled.button`
   cursor: pointer;
   color: ${theme.colors.text.secondary};
   transition: all 0.2s ease;
-  
+
   &:hover {
     background-color: ${theme.colors.grey[100]};
     color: ${theme.colors.primary.main};
@@ -449,7 +452,7 @@ const Pagination = styled.div`
   border-top: 1px solid ${theme.colors.border.primary};
   flex-shrink: 0;
   background-color: ${theme.colors.white};
-  
+
   @media (max-width: 768px) {
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     flex-direction: column;
@@ -484,7 +487,7 @@ const UserManagement = () => {
     unverified: 0,
     admins: 0,
     partners: 0,
-    regularUsers: 0
+    regularUsers: 0,
   });
 
   const fetchUsers = async () => {
@@ -495,24 +498,24 @@ const UserManagement = () => {
         limit: 10,
         search: searchTerm,
         role: roleFilter !== 'all' ? roleFilter : undefined,
-        isVerified: verificationFilter !== 'all' ? verificationFilter === 'verified' : undefined
+        isVerified: verificationFilter !== 'all' ? verificationFilter === 'verified' : undefined,
       };
-      
+
       const response = await adminService.getAllUsers(params);
       console.log('API Response:', response); // Debug log
-      
+
       // Handle different response formats
       const userData = response.users || response.data || response || [];
       const totalCount = response.pagination?.total || response.total || userData.length;
       const pages = response.pagination?.pages || response.totalPages || Math.ceil(totalCount / 10);
-      
+
       // Ensure userData is an array
       const usersArray = Array.isArray(userData) ? userData : [];
       console.log('Users Array:', usersArray); // Debug log
-      
+
       setUsers(usersArray);
       setTotalPages(pages);
-      
+
       // Calculate stats
       const statsData = {
         total: totalCount,
@@ -520,7 +523,7 @@ const UserManagement = () => {
         unverified: usersArray.filter(user => user && !user.isVerified).length,
         admins: usersArray.filter(user => user && user.role === 'admin').length,
         partners: usersArray.filter(user => user && user.role === 'partner').length,
-        regularUsers: usersArray.filter(user => user && user.role === 'user').length
+        regularUsers: usersArray.filter(user => user && user.role === 'user').length,
       };
       setStats(statsData);
     } catch (error) {
@@ -536,7 +539,7 @@ const UserManagement = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, searchTerm, roleFilter, verificationFilter]);
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteUser = async userId => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
         await adminService.deleteUser(userId);
@@ -548,7 +551,7 @@ const UserManagement = () => {
     }
   };
 
-  const getUserInitials = (name) => {
+  const getUserInitials = name => {
     return name
       .split(' ')
       .map(word => word.charAt(0))
@@ -557,11 +560,11 @@ const UserManagement = () => {
       .slice(0, 2);
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -573,21 +576,25 @@ const UserManagement = () => {
   console.log('Is users array?', Array.isArray(users));
 
   // Filter users based on search and filter criteria
-  const filteredUsers = Array.isArray(users) ? users.filter(user => {
-    if (!user || !user.name || !user.email) return false;
-    
-    const matchesSearch = searchTerm === '' || 
-                         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (user.phone && user.phone.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    const matchesVerification = verificationFilter === 'all' || 
-                               (verificationFilter === 'verified' && user.isVerified) ||
-                               (verificationFilter === 'unverified' && !user.isVerified);
-    
-    return matchesSearch && matchesRole && matchesVerification;
-  }) : [];
-  
+  const filteredUsers = Array.isArray(users)
+    ? users.filter(user => {
+        if (!user || !user.name || !user.email) return false;
+
+        const matchesSearch =
+          searchTerm === '' ||
+          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (user.phone && user.phone.toLowerCase().includes(searchTerm.toLowerCase()));
+        const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+        const matchesVerification =
+          verificationFilter === 'all' ||
+          (verificationFilter === 'verified' && user.isVerified) ||
+          (verificationFilter === 'unverified' && !user.isVerified);
+
+        return matchesSearch && matchesRole && matchesVerification;
+      })
+    : [];
+
   console.log('Filtered Users:', filteredUsers); // Debug log
   console.log('Filtered users length:', filteredUsers?.length);
   console.log('Is filteredUsers array?', Array.isArray(filteredUsers));
@@ -610,7 +617,7 @@ const UserManagement = () => {
               type="text"
               placeholder="Search users..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </SearchContainer>
           <Button onClick={fetchUsers}>
@@ -629,10 +636,7 @@ const UserManagement = () => {
           <Filter size={16} />
           <span>Filters:</span>
         </div>
-        <FilterSelect
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-        >
+        <FilterSelect value={roleFilter} onChange={e => setRoleFilter(e.target.value)}>
           <option value="all">All Roles</option>
           <option value="user">Users</option>
           <option value="partner">Partners</option>
@@ -641,7 +645,7 @@ const UserManagement = () => {
         </FilterSelect>
         <FilterSelect
           value={verificationFilter}
-          onChange={(e) => setVerificationFilter(e.target.value)}
+          onChange={e => setVerificationFilter(e.target.value)}
         >
           <option value="all">All Status</option>
           <option value="verified">Verified</option>
@@ -715,13 +719,11 @@ const UserManagement = () => {
               </TableRow>
             </TableHeader>
             <tbody>
-              {filteredUsers.map((user) => (
+              {filteredUsers.map(user => (
                 <TableRow key={user._id}>
                   <TableCell>
                     <UserInfo>
-                      <UserAvatar>
-                        {getUserInitials(user.name)}
-                      </UserAvatar>
+                      <UserAvatar>{getUserInitials(user.name)}</UserAvatar>
                       <UserDetails>
                         <UserName>{user.name}</UserName>
                         <UserEmail>{user.email}</UserEmail>
@@ -737,9 +739,13 @@ const UserManagement = () => {
                   <TableCell>
                     <Badge variant={user.isVerified ? 'verified' : 'unverified'}>
                       {user.isVerified ? (
-                        <><CheckCircle size={12} /> Verified</>
+                        <>
+                          <CheckCircle size={12} /> Verified
+                        </>
                       ) : (
-                        <><XCircle size={12} /> Unverified</>
+                        <>
+                          <XCircle size={12} /> Unverified
+                        </>
                       )}
                     </Badge>
                   </TableCell>
@@ -750,16 +756,13 @@ const UserManagement = () => {
                       <ActionButton title="View Details">
                         <Eye size={16} />
                       </ActionButton>
-                      <ActionButton 
+                      <ActionButton
                         title="Edit User"
                         onClick={() => navigate(`/admin/users/edit/${user._id}`)}
                       >
                         <Edit size={16} />
                       </ActionButton>
-                      <ActionButton 
-                        title="Delete User"
-                        onClick={() => handleDeleteUser(user._id)}
-                      >
+                      <ActionButton title="Delete User" onClick={() => handleDeleteUser(user._id)}>
                         <Trash2 size={16} />
                       </ActionButton>
                     </ActionsContainer>
@@ -774,19 +777,19 @@ const UserManagement = () => {
       {!loading && filteredUsers.length > 0 && (
         <Pagination>
           <PaginationInfo>
-            Showing {((currentPage - 1) * 10) + 1} to {Math.min(currentPage * 10, stats.total)} of {stats.total} users
+            Showing {(currentPage - 1) * 10 + 1} to {Math.min(currentPage * 10, stats.total)} of{' '}
+            {stats.total} users
           </PaginationInfo>
           <PaginationControls>
-            <Button 
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(prev => prev - 1)}
-            >
+            <Button disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>
               Previous
             </Button>
-            <span style={{ padding: `0 ${theme.spacing[3]}`, fontSize: theme.typography.fontSize.sm }}>
+            <span
+              style={{ padding: `0 ${theme.spacing[3]}`, fontSize: theme.typography.fontSize.sm }}
+            >
               Page {currentPage} of {totalPages}
             </span>
-            <Button 
+            <Button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(prev => prev + 1)}
             >

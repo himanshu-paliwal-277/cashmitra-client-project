@@ -70,7 +70,7 @@ const Performance = () => {
         <Title>Performance</Title>
         <Subtitle>Track your performance metrics and goals</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,7 +78,7 @@ const Performance = () => {
           </Icon>
           <ComingSoonTitle>Performance Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to track your 
+            This feature is currently under development. Soon you'll be able to track your
             performance metrics, set goals, and monitor your progress with detailed KPIs.
           </ComingSoonText>
         </ComingSoon>

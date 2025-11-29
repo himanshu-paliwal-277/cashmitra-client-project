@@ -7,8 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import {
-  theme } from '../../theme';
+import { theme } from '../../theme';
 import {
   Settings,
   Save,
@@ -29,7 +28,6 @@ import {
   Trash2,
 } from 'lucide-react';
 
-
 // Configuration sections and their settings
 const CONFIG_SECTIONS = {
   pricing: {
@@ -45,8 +43,8 @@ const CONFIG_SECTIONS = {
           smartphones: { multiplier: 1.0, minPrice: 50, maxPrice: 2000 },
           tablets: { multiplier: 0.8, minPrice: 30, maxPrice: 1500 },
           laptops: { multiplier: 1.2, minPrice: 100, maxPrice: 3000 },
-          accessories: { multiplier: 0.5, minPrice: 5, maxPrice: 500 }
-        }
+          accessories: { multiplier: 0.5, minPrice: 5, maxPrice: 500 },
+        },
       },
       {
         key: 'conditionMultipliers',
@@ -58,8 +56,8 @@ const CONFIG_SECTIONS = {
           good: 0.85,
           fair: 0.65,
           poor: 0.4,
-          damaged: 0.2
-        }
+          damaged: 0.2,
+        },
       },
       {
         key: 'defectPenalties',
@@ -71,8 +69,8 @@ const CONFIG_SECTIONS = {
           batteryIssue: 0.12,
           waterDamage: 0.25,
           buttonMalfunction: 0.08,
-          cameraIssue: 0.10
-        }
+          cameraIssue: 0.1,
+        },
       },
       {
         key: 'accessoryBonuses',
@@ -84,10 +82,10 @@ const CONFIG_SECTIONS = {
           originalBox: 10,
           originalEarphones: 8,
           protectiveCase: 5,
-          screenProtector: 3
-        }
-      }
-    ]
+          screenProtector: 3,
+        },
+      },
+    ],
   },
   workflow: {
     title: 'Workflow Configuration',
@@ -100,7 +98,7 @@ const CONFIG_SECTIONS = {
         description: 'How long a sell session remains active without activity',
         defaultValue: 30,
         min: 5,
-        max: 120
+        max: 120,
       },
       {
         key: 'autoSaveInterval',
@@ -109,7 +107,7 @@ const CONFIG_SECTIONS = {
         description: 'How often to automatically save session progress',
         defaultValue: 60,
         min: 10,
-        max: 300
+        max: 300,
       },
       {
         key: 'requiredSteps',
@@ -117,23 +115,31 @@ const CONFIG_SECTIONS = {
         type: 'array',
         description: 'Steps that must be completed in the sell flow',
         defaultValue: ['device', 'questionnaire', 'defects', 'accessories', 'price', 'order'],
-        options: ['device', 'questionnaire', 'defects', 'accessories', 'price', 'order', 'confirmation']
+        options: [
+          'device',
+          'questionnaire',
+          'defects',
+          'accessories',
+          'price',
+          'order',
+          'confirmation',
+        ],
       },
       {
         key: 'allowSkipSteps',
         label: 'Allow Skipping Steps',
         type: 'boolean',
         description: 'Whether users can skip optional steps in the workflow',
-        defaultValue: true
+        defaultValue: true,
       },
       {
         key: 'enableProgressSaving',
         label: 'Enable Progress Saving',
         type: 'boolean',
         description: 'Allow users to save and resume their sell session later',
-        defaultValue: true
-      }
-    ]
+        defaultValue: true,
+      },
+    ],
   },
   notifications: {
     title: 'Notification Settings',
@@ -149,8 +155,8 @@ const CONFIG_SECTIONS = {
           priceUpdates: true,
           pickupReminders: true,
           paymentConfirmation: true,
-          marketingEmails: false
-        }
+          marketingEmails: false,
+        },
       },
       {
         key: 'smsNotifications',
@@ -161,8 +167,8 @@ const CONFIG_SECTIONS = {
           orderConfirmation: true,
           pickupReminders: true,
           paymentConfirmation: true,
-          marketingMessages: false
-        }
+          marketingMessages: false,
+        },
       },
       {
         key: 'pushNotifications',
@@ -172,10 +178,10 @@ const CONFIG_SECTIONS = {
         defaultValue: {
           orderUpdates: true,
           priceAlerts: true,
-          promotions: false
-        }
-      }
-    ]
+          promotions: false,
+        },
+      },
+    ],
   },
   payment: {
     title: 'Payment Configuration',
@@ -187,7 +193,7 @@ const CONFIG_SECTIONS = {
         type: 'array',
         description: 'Payment methods available to customers',
         defaultValue: ['bank_transfer', 'upi', 'wallet', 'cash'],
-        options: ['bank_transfer', 'upi', 'wallet', 'cash', 'cheque', 'crypto']
+        options: ['bank_transfer', 'upi', 'wallet', 'cash', 'cheque', 'crypto'],
       },
       {
         key: 'minimumPayout',
@@ -196,7 +202,7 @@ const CONFIG_SECTIONS = {
         description: 'Minimum amount required for payout processing',
         defaultValue: 100,
         min: 1,
-        max: 1000
+        max: 1000,
       },
       {
         key: 'processingFee',
@@ -206,7 +212,7 @@ const CONFIG_SECTIONS = {
         defaultValue: 2.5,
         min: 0,
         max: 10,
-        step: 0.1
+        step: 0.1,
       },
       {
         key: 'paymentDelay',
@@ -215,9 +221,9 @@ const CONFIG_SECTIONS = {
         description: 'Days to wait before processing payment',
         defaultValue: 2,
         min: 0,
-        max: 14
-      }
-    ]
+        max: 14,
+      },
+    ],
   },
   pickup: {
     title: 'Pickup Configuration',
@@ -229,7 +235,7 @@ const CONFIG_SECTIONS = {
         type: 'array',
         description: 'Time slots available for device pickup',
         defaultValue: ['09:00-12:00', '12:00-15:00', '15:00-18:00', '18:00-21:00'],
-        options: ['09:00-12:00', '12:00-15:00', '15:00-18:00', '18:00-21:00', '21:00-23:00']
+        options: ['09:00-12:00', '12:00-15:00', '15:00-18:00', '18:00-21:00', '21:00-23:00'],
       },
       {
         key: 'pickupDays',
@@ -237,7 +243,7 @@ const CONFIG_SECTIONS = {
         type: 'array',
         description: 'Days of the week when pickup is available',
         defaultValue: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
-        options: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        options: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
       },
       {
         key: 'advanceBookingDays',
@@ -246,7 +252,7 @@ const CONFIG_SECTIONS = {
         description: 'How many days in advance pickup can be scheduled',
         defaultValue: 7,
         min: 1,
-        max: 30
+        max: 30,
       },
       {
         key: 'pickupRadius',
@@ -255,16 +261,16 @@ const CONFIG_SECTIONS = {
         description: 'Maximum distance for pickup service',
         defaultValue: 25,
         min: 5,
-        max: 100
+        max: 100,
       },
       {
         key: 'emergencyPickup',
         label: 'Enable Emergency Pickup',
         type: 'boolean',
         description: 'Allow same-day emergency pickup requests',
-        defaultValue: true
-      }
-    ]
+        defaultValue: true,
+      },
+    ],
   },
   security: {
     title: 'Security Settings',
@@ -277,21 +283,21 @@ const CONFIG_SECTIONS = {
         description: 'How long to retain customer data after order completion',
         defaultValue: 365,
         min: 30,
-        max: 2555 // 7 years
+        max: 2555, // 7 years
       },
       {
         key: 'encryptSensitiveData',
         label: 'Encrypt Sensitive Data',
         type: 'boolean',
         description: 'Enable encryption for sensitive customer information',
-        defaultValue: true
+        defaultValue: true,
       },
       {
         key: 'requireOTP',
         label: 'Require OTP Verification',
         type: 'boolean',
         description: 'Require OTP verification for order confirmation',
-        defaultValue: true
+        defaultValue: true,
       },
       {
         key: 'maxLoginAttempts',
@@ -300,16 +306,16 @@ const CONFIG_SECTIONS = {
         description: 'Maximum failed login attempts before account lockout',
         defaultValue: 5,
         min: 3,
-        max: 10
+        max: 10,
       },
       {
         key: 'sessionSecurity',
         label: 'Enhanced Session Security',
         type: 'boolean',
         description: 'Enable additional session security measures',
-        defaultValue: true
-      }
-    ]
+        defaultValue: true,
+      },
+    ],
   },
   ui: {
     title: 'User Interface Settings',
@@ -321,7 +327,7 @@ const CONFIG_SECTIONS = {
         type: 'select',
         description: 'Default theme for the sell interface',
         defaultValue: 'light',
-        options: ['light', 'dark', 'auto']
+        options: ['light', 'dark', 'auto'],
       },
       {
         key: 'language',
@@ -329,30 +335,30 @@ const CONFIG_SECTIONS = {
         type: 'select',
         description: 'Default language for the interface',
         defaultValue: 'en',
-        options: ['en', 'hi', 'ta', 'te', 'bn', 'mr', 'gu']
+        options: ['en', 'hi', 'ta', 'te', 'bn', 'mr', 'gu'],
       },
       {
         key: 'showProgressBar',
         label: 'Show Progress Bar',
         type: 'boolean',
         description: 'Display progress bar during sell flow',
-        defaultValue: true
+        defaultValue: true,
       },
       {
         key: 'enableAnimations',
         label: 'Enable Animations',
         type: 'boolean',
         description: 'Enable UI animations and transitions',
-        defaultValue: true
+        defaultValue: true,
       },
       {
         key: 'compactMode',
         label: 'Compact Mode',
         type: 'boolean',
         description: 'Use compact layout for smaller screens',
-        defaultValue: false
-      }
-    ]
+        defaultValue: false,
+      },
+    ],
   },
   integration: {
     title: 'Integration Settings',
@@ -367,8 +373,8 @@ const CONFIG_SECTIONS = {
           priceCheck: 'https://api.cashify.in/price-check',
           deviceInfo: 'https://api.cashify.in/device-info',
           logistics: 'https://api.cashify.in/logistics',
-          payment: 'https://api.cashify.in/payment'
-        }
+          payment: 'https://api.cashify.in/payment',
+        },
       },
       {
         key: 'webhooks',
@@ -379,15 +385,15 @@ const CONFIG_SECTIONS = {
           orderCreated: '',
           orderUpdated: '',
           paymentProcessed: '',
-          pickupScheduled: ''
-        }
+          pickupScheduled: '',
+        },
       },
       {
         key: 'enableAnalytics',
         label: 'Enable Analytics',
         type: 'boolean',
         description: 'Enable analytics tracking for sell flow',
-        defaultValue: true
+        defaultValue: true,
       },
       {
         key: 'analyticsProvider',
@@ -395,11 +401,11 @@ const CONFIG_SECTIONS = {
         type: 'select',
         description: 'Analytics service provider',
         defaultValue: 'google',
-        options: ['google', 'mixpanel', 'amplitude', 'custom']
-      }
-    ]
-  }
- };
+        options: ['google', 'mixpanel', 'amplitude', 'custom'],
+      },
+    ],
+  },
+};
 
 // Main Component
 const SellConfigurationManagement = () => {
@@ -420,7 +426,7 @@ const SellConfigurationManagement = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Initialize with default values from CONFIG_SECTIONS
       const defaultConfig = {};
       Object.entries(CONFIG_SECTIONS).forEach(([sectionKey, section]) => {
@@ -429,11 +435,11 @@ const SellConfigurationManagement = () => {
           defaultConfig[sectionKey][setting.key] = setting.defaultValue;
         });
       });
-      
+
       // In a real app, you would fetch from API
       // const response = await api.get('/admin/sell/configuration');
       // setConfig({ ...defaultConfig, ...response.data });
-      
+
       setConfig(defaultConfig);
     } catch (err) {
       setError('Failed to load configuration');
@@ -451,13 +457,13 @@ const SellConfigurationManagement = () => {
 
       // In a real app, you would save to API
       // await api.put('/admin/sell/configuration', config);
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setSaveStatus('saved');
       setHasChanges(false);
-      
+
       // Clear save status after 3 seconds
       setTimeout(() => setSaveStatus(null), 3000);
     } catch (err) {
@@ -470,7 +476,11 @@ const SellConfigurationManagement = () => {
   };
 
   const resetConfiguration = async () => {
-    if (window.confirm('Are you sure you want to reset all settings to default values? This action cannot be undone.')) {
+    if (
+      window.confirm(
+        'Are you sure you want to reset all settings to default values? This action cannot be undone.'
+      )
+    ) {
       await loadConfiguration();
       setHasChanges(false);
       setSaveStatus(null);
@@ -488,11 +498,11 @@ const SellConfigurationManagement = () => {
     URL.revokeObjectURL(url);
   };
 
-  const importConfiguration = (event) => {
+  const importConfiguration = event => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         try {
           const importedConfig = JSON.parse(e.target.result);
           setConfig(importedConfig);
@@ -511,8 +521,8 @@ const SellConfigurationManagement = () => {
       ...prev,
       [sectionKey]: {
         ...prev[sectionKey],
-        [settingKey]: value
-      }
+        [settingKey]: value,
+      },
     }));
     setHasChanges(true);
     setSaveStatus(null);
@@ -530,9 +540,13 @@ const SellConfigurationManagement = () => {
           <Input
             type={setting.type}
             value={value}
-            onChange={(e) => updateSetting(sectionKey, setting.key, 
-              setting.type === 'number' ? Number(e.target.value) : e.target.value
-            )}
+            onChange={e =>
+              updateSetting(
+                sectionKey,
+                setting.key,
+                setting.type === 'number' ? Number(e.target.value) : e.target.value
+              )
+            }
             placeholder={setting.placeholder}
           />
         );
@@ -541,7 +555,7 @@ const SellConfigurationManagement = () => {
         return (
           <Textarea
             value={value}
-            onChange={(e) => updateSetting(sectionKey, setting.key, e.target.value)}
+            onChange={e => updateSetting(sectionKey, setting.key, e.target.value)}
             placeholder={setting.placeholder}
           />
         );
@@ -550,7 +564,7 @@ const SellConfigurationManagement = () => {
         return (
           <Select
             value={value}
-            onChange={(e) => updateSetting(sectionKey, setting.key, e.target.value)}
+            onChange={e => updateSetting(sectionKey, setting.key, e.target.value)}
           >
             {setting.options.map(option => (
               <option key={option} value={option}>
@@ -566,7 +580,7 @@ const SellConfigurationManagement = () => {
             <Checkbox
               type="checkbox"
               checked={value}
-              onChange={(e) => updateSetting(sectionKey, setting.key, e.target.checked)}
+              onChange={e => updateSetting(sectionKey, setting.key, e.target.checked)}
             />
             <CheckboxLabel>Enable {setting.label}</CheckboxLabel>
           </CheckboxWrapper>
@@ -579,7 +593,7 @@ const SellConfigurationManagement = () => {
               <ArrayItem key={index}>
                 <ArrayItemInput
                   value={item}
-                  onChange={(e) => {
+                  onChange={e => {
                     const newArray = [...(value || [])];
                     newArray[index] = e.target.value;
                     updateSetting(sectionKey, setting.key, newArray);
@@ -617,7 +631,7 @@ const SellConfigurationManagement = () => {
                   <InputLabel>Key</InputLabel>
                   <Input
                     value={key}
-                    onChange={(e) => {
+                    onChange={e => {
                       const newObject = { ...value };
                       delete newObject[key];
                       newObject[e.target.value] = val;
@@ -629,7 +643,7 @@ const SellConfigurationManagement = () => {
                   <InputLabel>Value</InputLabel>
                   <Input
                     value={val}
-                    onChange={(e) => {
+                    onChange={e => {
                       const newObject = { ...value, [key]: e.target.value };
                       updateSetting(sectionKey, setting.key, newObject);
                     }}
@@ -662,7 +676,7 @@ const SellConfigurationManagement = () => {
         return (
           <Input
             value={value}
-            onChange={(e) => updateSetting(sectionKey, setting.key, e.target.value)}
+            onChange={e => updateSetting(sectionKey, setting.key, e.target.value)}
           />
         );
     }
@@ -708,8 +722,8 @@ const SellConfigurationManagement = () => {
             <RotateCcw size={16} />
             Reset
           </ActionButton>
-          <ActionButton 
-            variant="primary" 
+          <ActionButton
+            variant="primary"
             onClick={saveConfiguration}
             disabled={!hasChanges || saving}
           >
@@ -750,12 +764,8 @@ const SellConfigurationManagement = () => {
                   <section.icon size={16} />
                 </SectionIcon>
                 <SectionInfo>
-                  <SectionName active={activeSection === key}>
-                    {section.title}
-                  </SectionName>
-                  <SectionCount>
-                    {section.settings.length} settings
-                  </SectionCount>
+                  <SectionName active={activeSection === key}>{section.title}</SectionName>
+                  <SectionCount>{section.settings.length} settings</SectionCount>
                 </SectionInfo>
               </SectionItem>
             ))}
@@ -768,9 +778,7 @@ const SellConfigurationManagement = () => {
               <currentSection.icon size={24} />
               {currentSection.title}
             </ContentTitle>
-            <ContentDescription>
-              {currentSection.description}
-            </ContentDescription>
+            <ContentDescription>{currentSection.description}</ContentDescription>
           </ContentHeader>
 
           <ContentBody>
@@ -786,7 +794,7 @@ const SellConfigurationManagement = () => {
               </EmptyState>
             ) : (
               <SettingsGrid>
-                {currentSection.settings.map((setting) => (
+                {currentSection.settings.map(setting => (
                   <SettingCard key={setting.key}>
                     <SettingHeader>
                       <SettingInfo>
@@ -795,7 +803,9 @@ const SellConfigurationManagement = () => {
                       </SettingInfo>
                       <SettingActions>
                         <SettingButton
-                          onClick={() => updateSetting(activeSection, setting.key, setting.defaultValue)}
+                          onClick={() =>
+                            updateSetting(activeSection, setting.key, setting.defaultValue)
+                          }
                           title="Reset to default"
                         >
                           <RotateCcw size={14} />
@@ -857,9 +867,10 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border: 1px solid ${props => props.variant === 'primary' ? theme.colors.primary : theme.colors.border};
-  background: ${props => props.variant === 'primary' ? theme.colors.primary : 'white'};
-  color: ${props => props.variant === 'primary' ? 'white' : theme.colors.text.primary};
+  border: 1px solid
+    ${props => (props.variant === 'primary' ? theme.colors.primary : theme.colors.border)};
+  background: ${props => (props.variant === 'primary' ? theme.colors.primary : 'white')};
+  color: ${props => (props.variant === 'primary' ? 'white' : theme.colors.text.primary)};
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -867,7 +878,8 @@ const ActionButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${props => props.variant === 'primary' ? theme.colors.primaryHover : theme.colors.background};
+    background: ${props =>
+      props.variant === 'primary' ? theme.colors.primaryHover : theme.colors.background};
     transform: translateY(-1px);
   }
 
@@ -921,8 +933,8 @@ const SectionItem = styled.div`
   cursor: pointer;
   transition: all 0.2s ease;
   border-left: 3px solid transparent;
-  background: ${props => props.active ? theme.colors.background : 'transparent'};
-  border-left-color: ${props => props.active ? theme.colors.primary : 'transparent'};
+  background: ${props => (props.active ? theme.colors.background : 'transparent')};
+  border-left-color: ${props => (props.active ? theme.colors.primary : 'transparent')};
 
   &:hover {
     background: ${theme.colors.background};
@@ -936,8 +948,8 @@ const SectionIcon = styled.div`
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: ${props => props.active ? theme.colors.primary : theme.colors.background};
-  color: ${props => props.active ? 'white' : theme.colors.text.secondary};
+  background: ${props => (props.active ? theme.colors.primary : theme.colors.background)};
+  color: ${props => (props.active ? 'white' : theme.colors.text.secondary)};
   transition: all 0.2s ease;
 `;
 
@@ -948,7 +960,7 @@ const SectionInfo = styled.div`
 const SectionName = styled.div`
   font-size: 14px;
   font-weight: 500;
-  color: ${props => props.active ? theme.colors.primary : theme.colors.text.primary};
+  color: ${props => (props.active ? theme.colors.primary : theme.colors.text.primary)};
   margin-bottom: 2px;
 `;
 
@@ -1194,16 +1206,18 @@ const ArrayItemButton = styled.button`
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid ${props => props.variant === 'danger' ? theme.colors.error : theme.colors.border};
-  background: ${props => props.variant === 'danger' ? theme.colors.error : 'white'};
-  color: ${props => props.variant === 'danger' ? 'white' : theme.colors.text.secondary};
+  border: 1px solid
+    ${props => (props.variant === 'danger' ? theme.colors.error : theme.colors.border)};
+  background: ${props => (props.variant === 'danger' ? theme.colors.error : 'white')};
+  color: ${props => (props.variant === 'danger' ? 'white' : theme.colors.text.secondary)};
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${props => props.variant === 'danger' ? theme.colors.errorHover : theme.colors.background};
-    color: ${props => props.variant === 'danger' ? 'white' : theme.colors.text.primary};
+    background: ${props =>
+      props.variant === 'danger' ? theme.colors.errorHover : theme.colors.background};
+    color: ${props => (props.variant === 'danger' ? 'white' : theme.colors.text.primary)};
   }
 `;
 
@@ -1234,21 +1248,29 @@ const SaveStatus = styled.div`
   font-weight: 500;
   background: ${props => {
     switch (props.status) {
-      case 'saving': return theme.colors.warning + '20';
-      case 'saved': return theme.colors.success + '20';
-      case 'error': return theme.colors.error + '20';
-      default: return 'transparent';
+      case 'saving':
+        return theme.colors.warning + '20';
+      case 'saved':
+        return theme.colors.success + '20';
+      case 'error':
+        return theme.colors.error + '20';
+      default:
+        return 'transparent';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'saving': return theme.colors.warning;
-      case 'saved': return theme.colors.success;
-      case 'error': return theme.colors.error;
-      default: return theme.colors.text.secondary;
+      case 'saving':
+        return theme.colors.warning;
+      case 'saved':
+        return theme.colors.success;
+      case 'error':
+        return theme.colors.error;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
-  opacity: ${props => props.status ? 1 : 0};
+  opacity: ${props => (props.status ? 1 : 0)};
   transition: all 0.3s ease;
 `;
 

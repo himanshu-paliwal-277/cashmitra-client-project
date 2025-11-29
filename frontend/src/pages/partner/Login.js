@@ -18,16 +18,16 @@ import {
   FeatureList,
   FeatureItem,
   BrandSection,
-  LogoContainer
+  LogoContainer,
 } from '../../styles/AuthStyles';
 
 const PartnerLogin = () => {
   const navigate = useNavigate();
   const { login, loading, isAuthenticated } = usePartnerAuth();
-  
+
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,18 +39,18 @@ const PartnerLogin = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -74,18 +74,18 @@ const PartnerLogin = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const result = await login(formData);
-      
+
       if (result.success) {
         navigate('/partner/dashboard');
       } else {
@@ -126,9 +126,7 @@ const PartnerLogin = () => {
         </LoginHeader>
 
         <LoginForm onSubmit={handleSubmit}>
-          {errors.general && (
-            <ErrorMessage>{errors.general}</ErrorMessage>
-          )}
+          {errors.general && <ErrorMessage>{errors.general}</ErrorMessage>}
 
           <FormGroup>
             <Label htmlFor="email">Email Address</Label>
@@ -160,11 +158,7 @@ const PartnerLogin = () => {
             {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
           </FormGroup>
 
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-            isLoading={isSubmitting}
-          >
+          <Button type="submit" disabled={isSubmitting} isLoading={isSubmitting}>
             {isSubmitting ? (
               <>
                 <LoadingSpinner size="small" />
@@ -181,38 +175,22 @@ const PartnerLogin = () => {
         </Divider>
 
         <LinkText>
-          <Link to="/partner/register">
-            Create Partner Account
-          </Link>
+          <Link to="/partner/register">Create Partner Account</Link>
         </LinkText>
 
         <FeatureList>
           <h3>Partner Benefits</h3>
-          <FeatureItem>
-            📊 Real-time dashboard with analytics
-          </FeatureItem>
-          <FeatureItem>
-            💰 Flexible payout options
-          </FeatureItem>
-          <FeatureItem>
-            📱 Easy inventory management
-          </FeatureItem>
-          <FeatureItem>
-            🔒 Secure transactions
-          </FeatureItem>
-          <FeatureItem>
-            📞 Dedicated partner support
-          </FeatureItem>
+          <FeatureItem>📊 Real-time dashboard with analytics</FeatureItem>
+          <FeatureItem>💰 Flexible payout options</FeatureItem>
+          <FeatureItem>📱 Easy inventory management</FeatureItem>
+          <FeatureItem>🔒 Secure transactions</FeatureItem>
+          <FeatureItem>📞 Dedicated partner support</FeatureItem>
         </FeatureList>
 
         <LinkText style={{ marginTop: '2rem', fontSize: '0.9rem' }}>
-          <Link to="/admin/login">
-            Admin Login
-          </Link>
+          <Link to="/admin/login">Admin Login</Link>
           {' | '}
-          <Link to="/login">
-            Customer Login
-          </Link>
+          <Link to="/login">Customer Login</Link>
         </LinkText>
       </LoginCard>
     </Container>

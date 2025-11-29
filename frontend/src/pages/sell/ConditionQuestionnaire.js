@@ -5,7 +5,7 @@ import { theme } from '../../theme';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import sellService from '../../services/sellService';
-import { 
+import {
   ArrowRight,
   ArrowLeft,
   Home,
@@ -15,7 +15,7 @@ import {
   Camera,
   Upload,
   HelpCircle,
-  Loader
+  Loader,
 } from 'lucide-react';
 
 const PageContainer = styled.div`
@@ -28,7 +28,7 @@ const Container = styled.div`
   max-width: 800px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
@@ -49,7 +49,7 @@ const BreadcrumbLink = styled.a`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -140,7 +140,7 @@ const QuestionCard = styled(Card)`
   margin-bottom: ${theme.spacing[6]};
   border: 2px solid ${theme.colors.grey[200]};
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
-  
+
   &.answered {
     border-color: ${theme.colors.accent.main};
     background: ${theme.colors.accent[50]};
@@ -204,48 +204,48 @@ const OptionButton = styled.button`
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
   text-align: left;
   width: 100%;
-  
+
   &:hover {
     border-color: ${theme.colors.primary.main};
     background: ${theme.colors.primary[50]};
   }
-  
+
   &.selected {
     border-color: ${theme.colors.primary.main};
     background: ${theme.colors.primary[50]};
-    
+
     .option-icon {
       color: ${theme.colors.primary.main};
     }
   }
-  
+
   &.good {
     &.selected {
       border-color: ${theme.colors.accent.main};
       background: ${theme.colors.accent[50]};
-      
+
       .option-icon {
         color: ${theme.colors.accent.main};
       }
     }
   }
-  
+
   &.fair {
     &.selected {
       border-color: ${theme.colors.warning.main};
       background: ${theme.colors.warning[50]};
-      
+
       .option-icon {
         color: ${theme.colors.warning.main};
       }
     }
   }
-  
+
   &.poor {
     &.selected {
       border-color: ${theme.colors.error.main};
       background: ${theme.colors.error[50]};
-      
+
       .option-icon {
         color: ${theme.colors.error.main};
       }
@@ -293,10 +293,10 @@ const NavigationButtons = styled.div`
   align-items: center;
   gap: ${theme.spacing[4]};
   margin-top: ${theme.spacing[8]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -320,12 +320,12 @@ const HelpTooltip = styled.div`
   display: inline-block;
   margin-left: ${theme.spacing[2]};
   cursor: help;
-  
+
   &:hover .tooltip {
     opacity: 1;
     visibility: visible;
   }
-  
+
   .tooltip {
     position: absolute;
     bottom: 100%;
@@ -341,7 +341,7 @@ const HelpTooltip = styled.div`
     visibility: hidden;
     transition: all ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
     z-index: ${theme.zIndex.tooltip};
-    
+
     &::after {
       content: '';
       position: absolute;
@@ -359,14 +359,18 @@ const LoadingSpinner = styled.div`
   align-items: center;
   justify-content: center;
   padding: ${theme.spacing[8]};
-  
+
   .spinner {
     animation: spin 1s linear infinite;
   }
-  
+
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -382,7 +386,7 @@ const ErrorMessage = styled.div`
 const ConditionQuestionnaire = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  
+
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -390,32 +394,32 @@ const ConditionQuestionnaire = () => {
   const [questions, setQuestions] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
-  
+
   // Get URL parameters
   const category = searchParams.get('category');
   const brand = searchParams.get('brand');
   const model = searchParams.get('model');
-  
+
   useEffect(() => {
     if (!category || !brand || !model) {
       setError('Missing required parameters. Please select a device first.');
       setLoading(false);
       return;
     }
-    
+
     fetchCategories();
   }, [category, brand, model]);
-  
+
   const fetchCategories = async () => {
     try {
       const response = await sellService.getCategories();
       setCategories(response.data || []);
-      
+
       // Find categoryId from category name
-      const categoryData = response.data?.find(cat => 
-        cat.name.toLowerCase() === category.toLowerCase()
+      const categoryData = response.data?.find(
+        cat => cat.name.toLowerCase() === category.toLowerCase()
       );
-      
+
       if (categoryData) {
         await fetchConditionQuestions(categoryData._id);
       } else {
@@ -428,11 +432,11 @@ const ConditionQuestionnaire = () => {
       setLoading(false);
     }
   };
-  
-  const fetchConditionQuestions = async (categoryId) => {
+
+  const fetchConditionQuestions = async categoryId => {
     try {
       const response = await sellService.getCustomerQuestions(categoryId);
-      
+
       if (response.success && response.data) {
         // Convert grouped questions to flat array format
         const flatQuestions = [];
@@ -450,12 +454,12 @@ const ConditionQuestionnaire = () => {
                 title: option.label || option.value,
                 description: option.description || '',
                 icon: <CheckCircle size={24} />,
-                type: 'good' // Default type, can be enhanced based on option data
-              }))
+                type: 'good', // Default type, can be enhanced based on option data
+              })),
             });
           });
         });
-        
+
         setQuestions(flatQuestions);
       } else {
         // Fallback to default questions if API fails
@@ -469,7 +473,7 @@ const ConditionQuestionnaire = () => {
       setLoading(false);
     }
   };
-  
+
   // Default questions as fallback
   const defaultQuestions = [
     {
@@ -482,30 +486,30 @@ const ConditionQuestionnaire = () => {
           title: 'Excellent',
           description: 'No scratches, cracks, or dead pixels',
           icon: <CheckCircle size={24} />,
-          type: 'good'
+          type: 'good',
         },
         {
           id: 'good',
           title: 'Good',
           description: 'Minor scratches, fully functional',
           icon: <CheckCircle size={24} />,
-          type: 'good'
+          type: 'good',
         },
         {
           id: 'fair',
           title: 'Fair',
           description: 'Visible scratches but working fine',
           icon: <AlertCircle size={24} />,
-          type: 'fair'
+          type: 'fair',
         },
         {
           id: 'poor',
           title: 'Poor',
           description: 'Cracked screen or dead pixels',
           icon: <XCircle size={24} />,
-          type: 'poor'
-        }
-      ]
+          type: 'poor',
+        },
+      ],
     },
     {
       id: 'body_condition',
@@ -517,30 +521,30 @@ const ConditionQuestionnaire = () => {
           title: 'Like New',
           description: 'No dents, scratches, or wear marks',
           icon: <CheckCircle size={24} />,
-          type: 'good'
+          type: 'good',
         },
         {
           id: 'good',
           title: 'Good',
           description: 'Minor wear, no major damage',
           icon: <CheckCircle size={24} />,
-          type: 'good'
+          type: 'good',
         },
         {
           id: 'fair',
           title: 'Fair',
           description: 'Visible wear and minor dents',
           icon: <AlertCircle size={24} />,
-          type: 'fair'
+          type: 'fair',
         },
         {
           id: 'poor',
           title: 'Poor',
           description: 'Major dents, cracks, or damage',
           icon: <XCircle size={24} />,
-          type: 'poor'
-        }
-      ]
+          type: 'poor',
+        },
+      ],
     },
     {
       id: 'functionality',
@@ -552,30 +556,30 @@ const ConditionQuestionnaire = () => {
           title: 'Perfect',
           description: 'All features work flawlessly',
           icon: <CheckCircle size={24} />,
-          type: 'good'
+          type: 'good',
         },
         {
           id: 'good',
           title: 'Good',
           description: 'Minor issues, mostly functional',
           icon: <CheckCircle size={24} />,
-          type: 'good'
+          type: 'good',
         },
         {
           id: 'fair',
           title: 'Fair',
           description: 'Some features not working properly',
           icon: <AlertCircle size={24} />,
-          type: 'fair'
+          type: 'fair',
         },
         {
           id: 'poor',
           title: 'Poor',
           description: 'Major functionality issues',
           icon: <XCircle size={24} />,
-          type: 'poor'
-        }
-      ]
+          type: 'poor',
+        },
+      ],
     },
     {
       id: 'accessories',
@@ -587,61 +591,63 @@ const ConditionQuestionnaire = () => {
           title: 'Complete Box',
           description: 'Box, charger, earphones, all accessories',
           icon: <CheckCircle size={24} />,
-          type: 'good'
+          type: 'good',
         },
         {
           id: 'partial',
           title: 'Partial',
           description: 'Box and charger available',
           icon: <CheckCircle size={24} />,
-          type: 'good'
+          type: 'good',
         },
         {
           id: 'charger_only',
           title: 'Charger Only',
           description: 'Only original charger available',
           icon: <AlertCircle size={24} />,
-          type: 'fair'
+          type: 'fair',
         },
         {
           id: 'none',
           title: 'No Accessories',
           description: 'Device only, no accessories',
           icon: <XCircle size={24} />,
-          type: 'poor'
-        }
-      ]
-    }
+          type: 'poor',
+        },
+      ],
+    },
   ];
-  
+
   const handleAnswerSelect = (questionId, optionId) => {
     setAnswers(prev => ({
       ...prev,
-      [questionId]: optionId
+      [questionId]: optionId,
     }));
   };
-  
+
   const handleNext = async () => {
     const currentQuestions = questions.length > 0 ? questions : defaultQuestions;
     const allAnswered = currentQuestions.every(q => answers[q.id]);
-    
+
     // if (!allAnswered) {
     //   return;
     // }
-    
+
     setSubmitting(true);
-    
+
     try {
       const data = await sellService.submitAssessment({
         category,
         brand,
         model,
         answers,
-        productDetails
+        productDetails,
       });
-      
+
       // Navigate to quote page with assessment ID
-      navigate(`/sell/quote?assessmentId=${data.assessmentId}&category=${category}&brand=${brand}&model=${model}`);
+      navigate(
+        `/sell/quote?assessmentId=${data.assessmentId}&category=${category}&brand=${brand}&model=${model}`
+      );
     } catch (err) {
       console.error('Error submitting assessment:', err);
       setError('Failed to submit assessment. Please try again.');
@@ -649,20 +655,20 @@ const ConditionQuestionnaire = () => {
       setSubmitting(false);
     }
   };
-  
+
   const handleBack = () => {
     navigate(`/sell/model-selection?category=${category}&brand=${brand}`);
   };
-  
+
   const getProgress = () => {
     const currentQuestions = questions.length > 0 ? questions : defaultQuestions;
     const answeredCount = Object.keys(answers).length;
     return (answeredCount / currentQuestions.length) * 100;
   };
-  
+
   const currentQuestions = questions.length > 0 ? questions : defaultQuestions;
   const isComplete = currentQuestions.every(q => answers[q.id]);
-  
+
   if (loading) {
     return (
       <PageContainer>
@@ -675,7 +681,7 @@ const ConditionQuestionnaire = () => {
       </PageContainer>
     );
   }
-  
+
   return (
     <PageContainer>
       <Container>
@@ -686,20 +692,14 @@ const ConditionQuestionnaire = () => {
             Home
           </BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
-          <BreadcrumbLink href="/sell">
-            Sell Device
-          </BreadcrumbLink>
+          <BreadcrumbLink href="/sell">Sell Device</BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
           <span>Device Condition</span>
         </Breadcrumb>
-        
+
         {/* Error Message */}
-        {error && (
-          <ErrorMessage>
-            {error}
-          </ErrorMessage>
-        )}
-        
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+
         {/* Page Header */}
         <PageHeader>
           <DeviceInfo>
@@ -714,24 +714,21 @@ const ConditionQuestionnaire = () => {
               </DeviceSpecs>
             </DeviceDetails>
           </DeviceInfo>
-          
+
           <PageTitle>📋 Device Condition Assessment</PageTitle>
           <PageSubtitle>
             Please answer a few questions about your device condition to get an accurate price quote
           </PageSubtitle>
         </PageHeader>
-        
+
         {/* Progress Bar */}
         <ProgressBar>
           <ProgressFill progress={getProgress()} />
         </ProgressBar>
-        
+
         {/* Questions */}
         {currentQuestions.map((question, index) => (
-          <QuestionCard 
-            key={question.id}
-            className={answers[question.id] ? 'answered' : ''}
-          >
+          <QuestionCard key={question.id} className={answers[question.id] ? 'answered' : ''}>
             <Card.Body>
               <QuestionHeader>
                 <QuestionNumber>{index + 1}</QuestionNumber>
@@ -740,25 +737,21 @@ const ConditionQuestionnaire = () => {
                     {question.title}
                     <HelpTooltip>
                       <HelpCircle size={16} color={theme.colors.text.secondary} />
-                      <div className="tooltip">
-                        Be honest for accurate pricing
-                      </div>
+                      <div className="tooltip">Be honest for accurate pricing</div>
                     </HelpTooltip>
                   </QuestionTitle>
                   <QuestionDescription>{question.description}</QuestionDescription>
                 </QuestionContent>
               </QuestionHeader>
-              
+
               <OptionsGrid>
-                {question.options.map((option) => (
+                {question.options.map(option => (
                   <OptionButton
                     key={option.id}
                     className={`${option.type} ${answers[question.id] === option.id ? 'selected' : ''}`}
                     onClick={() => handleAnswerSelect(question.id, option.id)}
                   >
-                    <OptionIcon className="option-icon">
-                      {option.icon}
-                    </OptionIcon>
+                    <OptionIcon className="option-icon">{option.icon}</OptionIcon>
                     <OptionContent>
                       <OptionTitle>{option.title}</OptionTitle>
                       <OptionDescription>{option.description}</OptionDescription>
@@ -769,35 +762,48 @@ const ConditionQuestionnaire = () => {
             </Card.Body>
           </QuestionCard>
         ))}
-        
+
         {/* Photo Upload Section */}
         <PhotoUploadSection>
           <Camera size={48} color={theme.colors.text.secondary} />
-          <h3 style={{ margin: `${theme.spacing[4]} 0 ${theme.spacing[2]}`, color: theme.colors.text.primary }}>Upload Device Photos (Optional)</h3>
-          <p style={{ color: theme.colors.text.secondary, margin: 0 }}>Upload clear photos of your device to get a more accurate quote</p>
+          <h3
+            style={{
+              margin: `${theme.spacing[4]} 0 ${theme.spacing[2]}`,
+              color: theme.colors.text.primary,
+            }}
+          >
+            Upload Device Photos (Optional)
+          </h3>
+          <p style={{ color: theme.colors.text.secondary, margin: 0 }}>
+            Upload clear photos of your device to get a more accurate quote
+          </p>
           <UploadButton variant="secondary" leftIcon={<Upload size={20} />}>
             Upload Photos
           </UploadButton>
         </PhotoUploadSection>
-        
+
         {/* Navigation */}
         <NavigationButtons>
-          <BackButton 
-            variant="secondary" 
+          <BackButton
+            variant="secondary"
             leftIcon={<ArrowLeft size={20} />}
             onClick={handleBack}
             disabled={submitting}
           >
             Back to Model Selection
           </BackButton>
-          
-          <NextButton 
-            variant="primary" 
-            rightIcon={submitting ? <Loader size={20} className="spinner" /> : <ArrowRight size={20} />}
+
+          <NextButton
+            variant="primary"
+            rightIcon={
+              submitting ? <Loader size={20} className="spinner" /> : <ArrowRight size={20} />
+            }
             disabled={!isComplete || submitting}
             onClick={handleNext}
           >
-            {submitting ? 'Processing...' : `Get Price Quote (${Object.keys(answers).length}/${currentQuestions.length} completed)`}
+            {submitting
+              ? 'Processing...'
+              : `Get Price Quote (${Object.keys(answers).length}/${currentQuestions.length} completed)`}
           </NextButton>
         </NavigationButtons>
       </Container>

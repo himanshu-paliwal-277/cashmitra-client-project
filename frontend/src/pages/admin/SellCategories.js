@@ -26,7 +26,7 @@ import {
   Image as ImageIcon,
   AlertCircle,
   CheckCircle,
-  Loader
+  Loader,
 } from 'lucide-react';
 import { API_BASE_URL } from '../../config/api';
 
@@ -67,7 +67,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
@@ -78,7 +78,7 @@ const Content = styled.div`
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: 2rem;
-  
+
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
@@ -117,7 +117,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #f59e0b;
@@ -144,7 +144,7 @@ const CategoryItem = styled.div`
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f9fafb;
   }
@@ -157,7 +157,7 @@ const ExpandButton = styled.button`
   margin-right: 0.5rem;
   cursor: pointer;
   color: #6b7280;
-  
+
   &:hover {
     color: #374151;
   }
@@ -167,15 +167,15 @@ const CategoryIcon = styled.div`
   width: 2rem;
   height: 2rem;
   border-radius: 0.5rem;
-  background: ${props => props.isParent ? '#f59e0b' : '#f3f4f6'};
-  color: ${props => props.isParent ? 'white' : '#6b7280'};
+  background: ${props => (props.isParent ? '#f59e0b' : '#f3f4f6')};
+  color: ${props => (props.isParent ? 'white' : '#6b7280')};
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 0.75rem;
   flex-shrink: 0;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -204,7 +204,7 @@ const CategoryActions = styled.div`
   gap: 0.5rem;
   opacity: 0;
   transition: opacity 0.2s;
-  
+
   ${CategoryItem}:hover & {
     opacity: 1;
   }
@@ -218,7 +218,7 @@ const ActionButtonSmall = styled.button`
   cursor: pointer;
   color: #6b7280;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f3f4f6;
     color: #374151;
@@ -247,7 +247,7 @@ const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #f59e0b;
@@ -263,7 +263,7 @@ const Textarea = styled.textarea`
   font-size: 0.875rem;
   resize: vertical;
   min-height: 80px;
-  
+
   &:focus {
     outline: none;
     border-color: #f59e0b;
@@ -278,7 +278,7 @@ const Select = styled.select`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   background: white;
-  
+
   &:focus {
     outline: none;
     border-color: #f59e0b;
@@ -302,8 +302,10 @@ const Button = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
-  ${props => props.variant === 'primary' ? `
+
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: #f59e0b;
     color: white;
     border: none;
@@ -311,7 +313,8 @@ const Button = styled.button`
     &:hover {
       background: #d97706;
     }
-  ` : `
+  `
+      : `
     background: #f3f4f6;
     color: #374151;
     border: 1px solid #d1d5db;
@@ -326,7 +329,7 @@ const Toast = styled.div`
   position: fixed;
   top: 1rem;
   right: 1rem;
-  background: ${props => props.type === 'success' ? '#f59e0b' : '#dc2626'};
+  background: ${props => (props.type === 'success' ? '#f59e0b' : '#dc2626')};
   color: white;
   padding: 1rem 1.5rem;
   border-radius: 0.5rem;
@@ -356,7 +359,7 @@ const SellCategories = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    superCategory: ''
+    superCategory: '',
   });
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -371,7 +374,7 @@ const SellCategories = () => {
     Tablet: Tablet,
     Monitor: Monitor,
     Headphones: Headphones,
-    Camera: Camera
+    Camera: Camera,
   };
 
   useEffect(() => {
@@ -409,7 +412,7 @@ const SellCategories = () => {
     }
   };
 
-  const handleToggleExpand = (categoryId) => {
+  const handleToggleExpand = categoryId => {
     const newExpanded = new Set(expandedCategories);
     if (newExpanded.has(categoryId)) {
       newExpanded.delete(categoryId);
@@ -419,17 +422,17 @@ const SellCategories = () => {
     setExpandedCategories(newExpanded);
   };
 
-  const handleEditCategory = (category) => {
+  const handleEditCategory = category => {
     setEditingCategory(category);
     setFormData({
       name: category.name,
-      superCategory: category.superCategory?._id || category.superCategory || ''
+      superCategory: category.superCategory?._id || category.superCategory || '',
     });
     setImagePreview(category.image || '');
     setImageFile(null);
   };
 
-  const handleDeleteCategory = async (categoryId) => {
+  const handleDeleteCategory = async categoryId => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
         await adminService.deleteCategory(categoryId);
@@ -462,7 +465,7 @@ const SellCategories = () => {
         const res = await fetch(`${API_BASE_URL}/upload/image`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
-          body: fd
+          body: fd,
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.message || 'Image upload failed');
@@ -473,18 +476,18 @@ const SellCategories = () => {
         await adminService.updateCategory(editingCategory.id, {
           name: formData.name.trim(),
           image: imageUrl,
-          superCategory: formData.superCategory || null
+          superCategory: formData.superCategory || null,
         });
         showToast('Category updated successfully');
       } else {
         await adminService.createCategory({
           name: formData.name.trim(),
           image: imageUrl,
-          superCategory: formData.superCategory || null
+          superCategory: formData.superCategory || null,
         });
         showToast('Category created successfully');
       }
-      
+
       await fetchCategories();
       resetForm();
     } catch (error) {
@@ -499,7 +502,7 @@ const SellCategories = () => {
     setEditingCategory(null);
     setFormData({
       name: '',
-      superCategory: ''
+      superCategory: '',
     });
     setImageFile(null);
     setImagePreview('');
@@ -511,7 +514,7 @@ const SellCategories = () => {
 
   const mainCategories = filteredCategories.filter(category => !category.parentId);
 
-  const renderCategoryIcon = (iconName) => {
+  const renderCategoryIcon = iconName => {
     const IconComponent = categoryIcons[iconName] || Package;
     return <IconComponent size={16} />;
   };
@@ -529,31 +532,31 @@ const SellCategories = () => {
               {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </ExpandButton>
           )}
-          
-          <CategoryIcon isParent={hasChildren}>
-            {renderCategoryIcon(category.icon)}
-          </CategoryIcon>
-          
+
+          <CategoryIcon isParent={hasChildren}>{renderCategoryIcon(category.icon)}</CategoryIcon>
+
           <CategoryContent>
             <CategoryName>{category.name}</CategoryName>
             <CategoryInfo>
               {category.superCategory && (
-                <span style={{ 
-                  background: '#fef3c7', 
-                  color: '#92400e', 
-                  padding: '0.125rem 0.5rem', 
-                  borderRadius: '0.25rem', 
-                  fontSize: '0.75rem', 
-                  fontWeight: '500',
-                  marginRight: '0.5rem'
-                }}>
+                <span
+                  style={{
+                    background: '#fef3c7',
+                    color: '#92400e',
+                    padding: '0.125rem 0.5rem',
+                    borderRadius: '0.25rem',
+                    fontSize: '0.75rem',
+                    fontWeight: '500',
+                    marginRight: '0.5rem',
+                  }}
+                >
                   {category.superCategory.name}
                 </span>
               )}
               {children.length} subcategories
             </CategoryInfo>
           </CategoryContent>
-          
+
           <CategoryActions>
             <ActionButtonSmall onClick={() => handleEditCategory(category)}>
               <Edit size={14} />
@@ -563,11 +566,9 @@ const SellCategories = () => {
             </ActionButtonSmall>
           </CategoryActions>
         </CategoryItem>
-        
+
         {hasChildren && isExpanded && (
-          <div>
-            {children.map(child => renderCategory(child, level + 1))}
-          </div>
+          <div>{children.map(child => renderCategory(child, level + 1))}</div>
         )}
       </div>
     );
@@ -598,11 +599,11 @@ const SellCategories = () => {
                 type="text"
                 placeholder="Search categories..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
               />
             </SearchContainer>
           </SectionHeader>
-          
+
           <CategoryTree>
             {loading ? (
               <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
@@ -615,21 +616,19 @@ const SellCategories = () => {
             )}
           </CategoryTree>
         </Section>
-        
+
         <Section>
           <SectionHeader>
-            <SectionTitle>
-              {editingCategory ? 'Edit Category' : 'Add New Category'}
-            </SectionTitle>
+            <SectionTitle>{editingCategory ? 'Edit Category' : 'Add New Category'}</SectionTitle>
           </SectionHeader>
-          
+
           <FormContainer>
             <FormGroup>
               <Label>Category Name *</Label>
               <Input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter category name"
                 disabled={isSubmitting}
               />
@@ -639,11 +638,11 @@ const SellCategories = () => {
               <Label>Super Category (optional)</Label>
               <Select
                 value={formData.superCategory}
-                onChange={(e) => setFormData({ ...formData, superCategory: e.target.value })}
+                onChange={e => setFormData({ ...formData, superCategory: e.target.value })}
                 disabled={isSubmitting}
               >
                 <option value="">Select a super category</option>
-                {superCategories.map((superCat) => (
+                {superCategories.map(superCat => (
                   <option key={superCat._id} value={superCat._id}>
                     {superCat.name}
                   </option>
@@ -654,22 +653,22 @@ const SellCategories = () => {
             <FormGroup>
               <Label>Category Image {editingCategory ? '(optional to change)' : '*'}</Label>
               {!imagePreview ? (
-                <div 
-                  style={{ 
-                    padding: '2rem', 
-                    border: '2px dashed #d1d5db', 
-                    borderRadius: '0.5rem', 
-                    textAlign: 'center', 
+                <div
+                  style={{
+                    padding: '2rem',
+                    border: '2px dashed #d1d5db',
+                    borderRadius: '0.5rem',
+                    textAlign: 'center',
                     cursor: 'pointer',
                     background: '#f9fafb',
-                    transition: 'all 0.2s'
-                  }} 
+                    transition: 'all 0.2s',
+                  }}
                   onClick={() => document.getElementById('sellCatImageInput').click()}
-                  onMouseEnter={(e) => {
+                  onMouseEnter={e => {
                     e.currentTarget.style.borderColor = '#f59e0b';
                     e.currentTarget.style.background = '#fffbeb';
                   }}
-                  onMouseLeave={(e) => {
+                  onMouseLeave={e => {
                     e.currentTarget.style.borderColor = '#d1d5db';
                     e.currentTarget.style.background = '#f9fafb';
                   }}
@@ -681,13 +680,13 @@ const SellCategories = () => {
                   <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
                     PNG, JPG, GIF up to 10MB
                   </div>
-                  <input 
-                    id="sellCatImageInput" 
-                    type="file" 
-                    accept="image/*" 
-                    style={{ display: 'none' }} 
+                  <input
+                    id="sellCatImageInput"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
                     disabled={isSubmitting}
-                    onChange={(e) => {
+                    onChange={e => {
                       const file = e.target.files[0];
                       if (file) {
                         setImageFile(file);
@@ -695,47 +694,54 @@ const SellCategories = () => {
                         reader.onloadend = () => setImagePreview(reader.result);
                         reader.readAsDataURL(file);
                       }
-                    }} 
+                    }}
                   />
                 </div>
               ) : (
-                <div style={{ position: 'relative', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e5e7eb' }}>
-                  <img 
-                    src={imagePreview} 
-                    alt="preview" 
-                    style={{ 
-                      width: '100%', 
-                      height: '200px', 
-                      objectFit: 'cover' 
-                    }} 
+                <div
+                  style={{
+                    position: 'relative',
+                    borderRadius: '0.5rem',
+                    overflow: 'hidden',
+                    border: '1px solid #e5e7eb',
+                  }}
+                >
+                  <img
+                    src={imagePreview}
+                    alt="preview"
+                    style={{
+                      width: '100%',
+                      height: '200px',
+                      objectFit: 'cover',
+                    }}
                   />
-                  <button 
-                    type="button" 
-                    onClick={() => { 
-                      setImageFile(null); 
-                      setImagePreview(''); 
-                    }} 
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview('');
+                    }}
                     disabled={isSubmitting}
-                    style={{ 
-                      position: 'absolute', 
-                      top: '0.5rem', 
-                      right: '0.5rem', 
-                      background: '#fff', 
-                      border: '1px solid #e5e7eb', 
-                      borderRadius: '0.375rem', 
+                    style={{
+                      position: 'absolute',
+                      top: '0.5rem',
+                      right: '0.5rem',
+                      background: '#fff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '0.375rem',
                       padding: '0.5rem',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.25rem',
                       boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
                     }}
-                    onMouseEnter={(e) => {
+                    onMouseEnter={e => {
                       e.currentTarget.style.background = '#fee2e2';
                       e.currentTarget.style.borderColor = '#dc2626';
                     }}
-                    onMouseLeave={(e) => {
+                    onMouseLeave={e => {
                       e.currentTarget.style.background = '#fff';
                       e.currentTarget.style.borderColor = '#e5e7eb';
                     }}
@@ -743,19 +749,19 @@ const SellCategories = () => {
                     <X size={16} />
                     <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>Remove</span>
                   </button>
-                  <div 
-                    style={{ 
-                      position: 'absolute', 
-                      bottom: '0.5rem', 
-                      left: '0.5rem', 
-                      background: 'rgba(0, 0, 0, 0.6)', 
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '0.5rem',
+                      left: '0.5rem',
+                      background: 'rgba(0, 0, 0, 0.6)',
                       color: 'white',
                       padding: '0.25rem 0.5rem',
                       borderRadius: '0.25rem',
                       fontSize: '0.75rem',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.25rem'
+                      gap: '0.25rem',
                     }}
                   >
                     <ImageIcon size={14} />
@@ -764,7 +770,7 @@ const SellCategories = () => {
                 </div>
               )}
             </FormGroup>
-            
+
             <FormActions>
               {editingCategory && (
                 <Button onClick={resetForm} disabled={isSubmitting}>
@@ -772,16 +778,12 @@ const SellCategories = () => {
                   Cancel
                 </Button>
               )}
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 onClick={handleSaveCategory}
                 disabled={isSubmitting || !formData.name.trim()}
               >
-                {isSubmitting ? (
-                  <Loader className="animate-spin" size={16} />
-                ) : (
-                  <Save size={16} />
-                )}
+                {isSubmitting ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
                 {editingCategory ? 'Update Category' : 'Create Category'}
               </Button>
             </FormActions>

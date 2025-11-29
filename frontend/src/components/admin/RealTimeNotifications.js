@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { 
-  Bell, 
-  X, 
-  Check, 
-  AlertCircle, 
-  Info, 
-  CheckCircle, 
+import {
+  Bell,
+  X,
+  Check,
+  AlertCircle,
+  Info,
+  CheckCircle,
   XCircle,
   Package,
   DollarSign,
@@ -14,7 +14,7 @@ import {
   TrendingUp,
   Settings,
   Volume2,
-  VolumeX
+  VolumeX,
 } from 'lucide-react';
 
 // Styled Components
@@ -44,7 +44,7 @@ const NotificationBadge = styled.div`
   right: -0.25rem;
   width: 1.25rem;
   height: 1.25rem;
-  background: #EF4444;
+  background: #ef4444;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -68,7 +68,7 @@ const NotificationPanel = styled.div`
   z-index: 1000;
   margin-top: 0.5rem;
   overflow: hidden;
-  display: ${props => props.isOpen ? 'block' : 'none'};
+  display: ${props => (props.isOpen ? 'block' : 'none')};
 
   @media (max-width: 480px) {
     width: 320px;
@@ -124,7 +124,7 @@ const NotificationItem = styled.div`
   gap: 1rem;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid ${props => props.theme.colors.border};
-  background: ${props => props.isRead ? 'transparent' : props.theme.colors.blue[50]};
+  background: ${props => (props.isRead ? 'transparent' : props.theme.colors.blue[50])};
   cursor: pointer;
   transition: all 0.2s;
 
@@ -311,17 +311,17 @@ const NOTIFICATION_TYPES = {
   USER_REGISTERED: { icon: User, color: '#8B5CF6', category: 'Users' },
   INVENTORY_LOW: { icon: AlertCircle, color: '#F59E0B', category: 'Inventory' },
   SYSTEM_UPDATE: { icon: Settings, color: '#6B7280', category: 'System' },
-  ANALYTICS_ALERT: { icon: TrendingUp, color: '#3B82F6', category: 'Analytics' }
+  ANALYTICS_ALERT: { icon: TrendingUp, color: '#3B82F6', category: 'Analytics' },
 };
 
 // Main Component
-const RealTimeNotifications = ({ 
-  notifications = [], 
-  onNotificationRead, 
-  onNotificationDelete, 
+const RealTimeNotifications = ({
+  notifications = [],
+  onNotificationRead,
+  onNotificationDelete,
   onMarkAllRead,
   soundEnabled = true,
-  onSoundToggle 
+  onSoundToggle,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
@@ -331,7 +331,7 @@ const RealTimeNotifications = ({
 
   // Close panel when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (panelRef.current && !panelRef.current.contains(event.target)) {
         setIsOpen(false);
       }
@@ -348,7 +348,9 @@ const RealTimeNotifications = ({
       if (latestNotification && !latestNotification.isRead) {
         // Create audio element for notification sound
         if (!audioRef.current) {
-          audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+          audioRef.current = new Audio(
+            'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT'
+          );
         }
         audioRef.current.play().catch(() => {
           // Ignore audio play errors (browser restrictions)
@@ -365,16 +367,17 @@ const RealTimeNotifications = ({
     });
   }, [notifications]);
 
-  const showToast = (notification) => {
+  const showToast = notification => {
     const toastId = Date.now() + Math.random();
-    const notificationType = NOTIFICATION_TYPES[notification.type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
-    
+    const notificationType =
+      NOTIFICATION_TYPES[notification.type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
+
     const toast = {
       id: toastId,
       title: getNotificationTitle(notification),
       message: notification.message,
       color: notificationType.color,
-      icon: notificationType.icon
+      icon: notificationType.icon,
     };
 
     setToasts(prev => [...prev, toast]);
@@ -385,43 +388,54 @@ const RealTimeNotifications = ({
     }, 5000);
   };
 
-  const removeToast = (toastId) => {
+  const removeToast = toastId => {
     setToasts(prev => prev.filter(toast => toast.id !== toastId));
   };
 
-  const getNotificationTitle = (notification) => {
+  const getNotificationTitle = notification => {
     switch (notification.type) {
-      case 'ORDER_NEW': return 'New Order';
-      case 'ORDER_UPDATED': return 'Order Updated';
-      case 'ORDER_COMPLETED': return 'Order Completed';
-      case 'ORDER_CANCELLED': return 'Order Cancelled';
-      case 'PAYMENT_RECEIVED': return 'Payment Received';
-      case 'PAYMENT_FAILED': return 'Payment Failed';
-      case 'USER_REGISTERED': return 'New User';
-      case 'INVENTORY_LOW': return 'Low Inventory';
-      case 'SYSTEM_UPDATE': return 'System Update';
-      case 'ANALYTICS_ALERT': return 'Analytics Alert';
-      default: return 'Notification';
+      case 'ORDER_NEW':
+        return 'New Order';
+      case 'ORDER_UPDATED':
+        return 'Order Updated';
+      case 'ORDER_COMPLETED':
+        return 'Order Completed';
+      case 'ORDER_CANCELLED':
+        return 'Order Cancelled';
+      case 'PAYMENT_RECEIVED':
+        return 'Payment Received';
+      case 'PAYMENT_FAILED':
+        return 'Payment Failed';
+      case 'USER_REGISTERED':
+        return 'New User';
+      case 'INVENTORY_LOW':
+        return 'Low Inventory';
+      case 'SYSTEM_UPDATE':
+        return 'System Update';
+      case 'ANALYTICS_ALERT':
+        return 'Analytics Alert';
+      default:
+        return 'Notification';
     }
   };
 
-  const getNotificationIcon = (type) => {
+  const getNotificationIcon = type => {
     const notificationType = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
     const IconComponent = notificationType.icon;
     return <IconComponent size={20} />;
   };
 
-  const getNotificationColor = (type) => {
+  const getNotificationColor = type => {
     const notificationType = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
     return notificationType.color;
   };
 
-  const getNotificationCategory = (type) => {
+  const getNotificationCategory = type => {
     const notificationType = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
     return notificationType.category;
   };
 
-  const formatTime = (timestamp) => {
+  const formatTime = timestamp => {
     const now = new Date();
     const time = new Date(timestamp);
     const diffInMinutes = Math.floor((now - time) / (1000 * 60));
@@ -447,9 +461,7 @@ const RealTimeNotifications = ({
         <NotificationButton onClick={() => setIsOpen(!isOpen)}>
           <Bell size={20} />
           {unreadCount > 0 && (
-            <NotificationBadge>
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </NotificationBadge>
+            <NotificationBadge>{unreadCount > 99 ? '99+' : unreadCount}</NotificationBadge>
           )}
         </NotificationButton>
 
@@ -457,7 +469,7 @@ const RealTimeNotifications = ({
           <NotificationHeader>
             <NotificationTitle>Notifications</NotificationTitle>
             <NotificationActions>
-              <ActionButton 
+              <ActionButton
                 onClick={onSoundToggle}
                 title={soundEnabled ? 'Disable sound' : 'Enable sound'}
               >
@@ -488,7 +500,7 @@ const RealTimeNotifications = ({
                     cursor: 'pointer',
                     background: filter === category ? '#3B82F6' : '#F3F4F6',
                     color: filter === category ? 'white' : '#6B7280',
-                    transition: 'all 0.2s'
+                    transition: 'all 0.2s',
                   }}
                 >
                   {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -516,7 +528,7 @@ const RealTimeNotifications = ({
                   <NotificationIcon color={getNotificationColor(notification.type)}>
                     {getNotificationIcon(notification.type)}
                   </NotificationIcon>
-                  
+
                   <NotificationContent>
                     <NotificationText>{notification.message}</NotificationText>
                     <NotificationMeta>
@@ -529,7 +541,7 @@ const RealTimeNotifications = ({
 
                   <NotificationActions2>
                     <QuickAction
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         onNotificationDelete(notification.id);
                       }}

@@ -1,7 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './PartnerPermissions.css';
 import partnerPermissionService from '../../services/partnerPermissionService';
-import { Plus, Edit, Trash2, Save, X, Check, AlertCircle, Crown, Square, CheckSquare } from 'lucide-react';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  Check,
+  AlertCircle,
+  Crown,
+  Square,
+  CheckSquare,
+} from 'lucide-react';
 
 const PartnerPermissions = () => {
   const [roleTemplates, setRoleTemplates] = useState([]);
@@ -21,71 +32,231 @@ const PartnerPermissions = () => {
       advancedAnalytics: false,
       prioritySupport: false,
       customBranding: false,
-      apiAccess: false
+      apiAccess: false,
     },
     limits: {
       maxInventoryItems: 100,
       maxMonthlyTransactions: 50,
-      maxPayoutAmount: 50000
-    }
+      maxPayoutAmount: 50000,
+    },
   });
 
   // Build permissions directly from AdminLayout navigation structure
   // These permissions correspond to admin sidebar menu items
   const AVAILABLE_PERMISSIONS = useMemo(() => {
     return {
-      'Dashboard': [
-        { name: 'dashboard', label: 'Dashboard', description: 'Access to main dashboard', path: '/admin/dashboard' }
+      Dashboard: [
+        {
+          name: 'dashboard',
+          label: 'Dashboard',
+          description: 'Access to main dashboard',
+          path: '/admin/dashboard',
+        },
       ],
       'Buy Product Management': [
-        { name: 'buySuperCategories', label: 'Buy Super Categories', description: 'Manage buy super categories', path: '/admin/buy-super-categories' },
-        { name: 'buyCategories', label: 'Buy Categories', description: 'Manage buy categories', path: '/admin/buy-categories' },
-        { name: 'buyProducts', label: 'Buy Products', description: 'Manage buy products', path: '/admin/buy-products' }
+        {
+          name: 'buySuperCategories',
+          label: 'Buy Super Categories',
+          description: 'Manage buy super categories',
+          path: '/admin/buy-super-categories',
+        },
+        {
+          name: 'buyCategories',
+          label: 'Buy Categories',
+          description: 'Manage buy categories',
+          path: '/admin/buy-categories',
+        },
+        {
+          name: 'buyProducts',
+          label: 'Buy Products',
+          description: 'Manage buy products',
+          path: '/admin/buy-products',
+        },
       ],
       'Sales & Orders': [
         { name: 'sell', label: 'Sell', description: 'Manage sell operations', path: '/admin/sell' },
-        { name: 'leads', label: 'Leads', description: 'View and manage leads', path: '/admin/leads' },
-        { name: 'sellOrders', label: 'Sell Orders', description: 'Manage sell orders', path: '/admin/sell-orders' },
+        {
+          name: 'leads',
+          label: 'Leads',
+          description: 'View and manage leads',
+          path: '/admin/leads',
+        },
+        {
+          name: 'sellOrders',
+          label: 'Sell Orders',
+          description: 'Manage sell orders',
+          path: '/admin/sell-orders',
+        },
         { name: 'buy', label: 'Buy', description: 'Manage buy operations', path: '/admin/buy' },
-        { name: 'buyOrders', label: 'Buy Orders', description: 'Manage buy orders', path: '/admin/buy-orders' },
-        { name: 'pickupManagement', label: 'Pickup Management', description: 'Manage pickups', path: '/admin/pickup-management' },
-        { name: 'returns', label: 'Returns', description: 'Manage returns', path: '/admin/returns' }
+        {
+          name: 'buyOrders',
+          label: 'Buy Orders',
+          description: 'Manage buy orders',
+          path: '/admin/buy-orders',
+        },
+        {
+          name: 'pickupManagement',
+          label: 'Pickup Management',
+          description: 'Manage pickups',
+          path: '/admin/pickup-management',
+        },
+        {
+          name: 'returns',
+          label: 'Returns',
+          description: 'Manage returns',
+          path: '/admin/returns',
+        },
       ],
       'Sell Product Management': [
-        { name: 'sellSuperCategories', label: 'Sell Super Categories', description: 'Manage sell super categories', path: '/admin/sell-super-categories' },
-        { name: 'sellCategories', label: 'Sell Categories', description: 'Manage sell categories', path: '/admin/sell-categories' },
-        { name: 'sellProducts', label: 'Sell Products', description: 'Manage sell products', path: '/admin/sell-products' }
+        {
+          name: 'sellSuperCategories',
+          label: 'Sell Super Categories',
+          description: 'Manage sell super categories',
+          path: '/admin/sell-super-categories',
+        },
+        {
+          name: 'sellCategories',
+          label: 'Sell Categories',
+          description: 'Manage sell categories',
+          path: '/admin/sell-categories',
+        },
+        {
+          name: 'sellProducts',
+          label: 'Sell Products',
+          description: 'Manage sell products',
+          path: '/admin/sell-products',
+        },
       ],
       'Sell Management': [
-        { name: 'sellQuestionsManagement', label: 'Questions Management', description: 'Manage sell questions', path: '/admin/sell-questions-management' },
-        { name: 'sellDefectsManagement', label: 'Defects Management', description: 'Manage defects', path: '/admin/sell-defects-management' },
-        { name: 'sellAccessoriesManagement', label: 'Accessories Management', description: 'Manage accessories', path: '/admin/sell-accessories-management' },
-        { name: 'sellSessionsManagement', label: 'Sessions Management', description: 'Manage sessions', path: '/admin/sell-sessions-management' },
-        { name: 'sellConfigurationManagement', label: 'Configuration Management', description: 'Manage configurations', path: '/admin/sell-configuration-management' }
+        {
+          name: 'sellQuestionsManagement',
+          label: 'Questions Management',
+          description: 'Manage sell questions',
+          path: '/admin/sell-questions-management',
+        },
+        {
+          name: 'sellDefectsManagement',
+          label: 'Defects Management',
+          description: 'Manage defects',
+          path: '/admin/sell-defects-management',
+        },
+        {
+          name: 'sellAccessoriesManagement',
+          label: 'Accessories Management',
+          description: 'Manage accessories',
+          path: '/admin/sell-accessories-management',
+        },
+        {
+          name: 'sellSessionsManagement',
+          label: 'Sessions Management',
+          description: 'Manage sessions',
+          path: '/admin/sell-sessions-management',
+        },
+        {
+          name: 'sellConfigurationManagement',
+          label: 'Configuration Management',
+          description: 'Manage configurations',
+          path: '/admin/sell-configuration-management',
+        },
       ],
       'Partners & Users': [
-        { name: 'partners', label: 'Partners', description: 'Manage partners', path: '/admin/partners' },
-        { name: 'partnerApplications', label: 'Partner Applications (KYC)', description: 'Manage partner KYC applications', path: '/admin/partner-applications' },
-        { name: 'partnerList', label: 'Partner List', description: 'View partner list', path: '/admin/partner-list' },
-        { name: 'partnerPermissions', label: 'Partner Permissions', description: 'Manage partner permissions', path: '/admin/partner-permissions' },
-        { name: 'users', label: 'User Management', description: 'Manage users', path: '/admin/users' },
-        { name: 'inventoryApproval', label: 'Inventory Approval', description: 'Approve inventory', path: '/admin/inventory-approval' }
+        {
+          name: 'partners',
+          label: 'Partners',
+          description: 'Manage partners',
+          path: '/admin/partners',
+        },
+        {
+          name: 'partnerApplications',
+          label: 'Partner Applications (KYC)',
+          description: 'Manage partner KYC applications',
+          path: '/admin/partner-applications',
+        },
+        {
+          name: 'partnerList',
+          label: 'Partner List',
+          description: 'View partner list',
+          path: '/admin/partner-list',
+        },
+        {
+          name: 'partnerPermissions',
+          label: 'Partner Permissions',
+          description: 'Manage partner permissions',
+          path: '/admin/partner-permissions',
+        },
+        {
+          name: 'users',
+          label: 'User Management',
+          description: 'Manage users',
+          path: '/admin/users',
+        },
+        {
+          name: 'inventoryApproval',
+          label: 'Inventory Approval',
+          description: 'Approve inventory',
+          path: '/admin/inventory-approval',
+        },
       ],
       'Pricing & Finance': [
-        { name: 'pricing', label: 'Pricing', description: 'Manage pricing', path: '/admin/pricing' },
-        { name: 'priceTable', label: 'Price Table', description: 'View price tables', path: '/admin/price-table' },
-        { name: 'conditionAdjustments', label: 'Condition Adjustments', description: 'Manage condition adjustments', path: '/admin/condition-adjustments' },
-        { name: 'promotions', label: 'Promotions/Coupons', description: 'Manage promotions', path: '/admin/promotions' },
-        { name: 'finance', label: 'Finance', description: 'Manage finances', path: '/admin/finance' },
-        { name: 'commissionRules', label: 'Commission Rules', description: 'Manage commission rules', path: '/admin/commission-rules' },
-        { name: 'walletPayouts', label: 'Wallet & Payouts', description: 'Manage wallets and payouts', path: '/admin/wallet-payouts' }
+        {
+          name: 'pricing',
+          label: 'Pricing',
+          description: 'Manage pricing',
+          path: '/admin/pricing',
+        },
+        {
+          name: 'priceTable',
+          label: 'Price Table',
+          description: 'View price tables',
+          path: '/admin/price-table',
+        },
+        {
+          name: 'conditionAdjustments',
+          label: 'Condition Adjustments',
+          description: 'Manage condition adjustments',
+          path: '/admin/condition-adjustments',
+        },
+        {
+          name: 'promotions',
+          label: 'Promotions/Coupons',
+          description: 'Manage promotions',
+          path: '/admin/promotions',
+        },
+        {
+          name: 'finance',
+          label: 'Finance',
+          description: 'Manage finances',
+          path: '/admin/finance',
+        },
+        {
+          name: 'commissionRules',
+          label: 'Commission Rules',
+          description: 'Manage commission rules',
+          path: '/admin/commission-rules',
+        },
+        {
+          name: 'walletPayouts',
+          label: 'Wallet & Payouts',
+          description: 'Manage wallets and payouts',
+          path: '/admin/wallet-payouts',
+        },
       ],
       'Analytics & Reports': [
-        { name: 'reports', label: 'Reports', description: 'View and generate reports', path: '/admin/reports' }
+        {
+          name: 'reports',
+          label: 'Reports',
+          description: 'View and generate reports',
+          path: '/admin/reports',
+        },
       ],
-      'System': [
-        { name: 'settings', label: 'Settings', description: 'System settings', path: '/admin/settings' }
-      ]
+      System: [
+        {
+          name: 'settings',
+          label: 'Settings',
+          description: 'System settings',
+          path: '/admin/settings',
+        },
+      ],
     };
   }, []);
 
@@ -98,7 +269,7 @@ const PartnerPermissions = () => {
       setLoading(true);
       setError('');
       const response = await partnerPermissionService.getRoleTemplates();
-      
+
       if (response.success) {
         setRoleTemplates(response.data || []);
       }
@@ -125,13 +296,13 @@ const PartnerPermissions = () => {
           advancedAnalytics: false,
           prioritySupport: false,
           customBranding: false,
-          apiAccess: false
+          apiAccess: false,
         },
         limits: template.limits || {
           maxInventoryItems: 100,
           maxMonthlyTransactions: 50,
-          maxPayoutAmount: 50000
-        }
+          maxPayoutAmount: 50000,
+        },
       });
     } else {
       // Create new template
@@ -147,13 +318,13 @@ const PartnerPermissions = () => {
           advancedAnalytics: false,
           prioritySupport: false,
           customBranding: false,
-          apiAccess: false
+          apiAccess: false,
         },
         limits: {
           maxInventoryItems: 100,
           maxMonthlyTransactions: 50,
-          maxPayoutAmount: 50000
-        }
+          maxPayoutAmount: 50000,
+        },
       });
     }
     setShowModal(true);
@@ -168,27 +339,27 @@ const PartnerPermissions = () => {
     setSuccess('');
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePermissionToggle = (permission) => {
+  const handlePermissionToggle = permission => {
     setFormData(prev => ({
       ...prev,
       permissions: prev.permissions.includes(permission)
         ? prev.permissions.filter(p => p !== permission)
-        : [...prev.permissions, permission]
+        : [...prev.permissions, permission],
     }));
   };
 
-  const handleFeatureToggle = (feature) => {
+  const handleFeatureToggle = feature => {
     setFormData(prev => ({
       ...prev,
       features: {
         ...prev.features,
-        [feature]: !prev.features[feature]
-      }
+        [feature]: !prev.features[feature],
+      },
     }));
   };
 
@@ -197,12 +368,12 @@ const PartnerPermissions = () => {
       ...prev,
       limits: {
         ...prev.limits,
-        [limit]: parseInt(value) || 0
-      }
+        [limit]: parseInt(value) || 0,
+      },
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -220,7 +391,7 @@ const PartnerPermissions = () => {
 
     try {
       setLoading(true);
-      
+
       const templateData = {
         name: formData.name.toLowerCase().replace(/\s+/g, '_'),
         displayName: formData.displayName,
@@ -228,12 +399,15 @@ const PartnerPermissions = () => {
         color: formData.color,
         permissions: formData.permissions,
         features: formData.features,
-        limits: formData.limits
+        limits: formData.limits,
       };
 
       if (editingTemplate) {
         // Update existing template
-        await partnerPermissionService.updateRoleTemplate(editingTemplate.id || editingTemplate.name, templateData);
+        await partnerPermissionService.updateRoleTemplate(
+          editingTemplate.id || editingTemplate.name,
+          templateData
+        );
         setSuccess('Role template updated successfully!');
       } else {
         // Create new template
@@ -243,7 +417,7 @@ const PartnerPermissions = () => {
 
       // Reload templates
       await loadRoleTemplates();
-      
+
       // Close modal after 1 second
       setTimeout(() => {
         handleCloseModal();
@@ -256,8 +430,12 @@ const PartnerPermissions = () => {
     }
   };
 
-  const handleDelete = async (template) => {
-    if (!window.confirm(`Are you sure you want to delete the "${template.displayName || template.label}" role template?`)) {
+  const handleDelete = async template => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete the "${template.displayName || template.label}" role template?`
+      )
+    ) {
       return;
     }
 
@@ -330,14 +508,17 @@ const PartnerPermissions = () => {
               </button>
             </div>
           ) : (
-            roleTemplates.map((template) => (
-              <div 
-                key={template.id || template.name} 
+            roleTemplates.map(template => (
+              <div
+                key={template.id || template.name}
                 className="template-card"
                 style={{ borderLeft: `4px solid ${template.color || '#3b82f6'}` }}
               >
                 <div className="template-header">
-                  <div className="template-icon" style={{ background: template.color || '#3b82f6' }}>
+                  <div
+                    className="template-icon"
+                    style={{ background: template.color || '#3b82f6' }}
+                  >
                     <Crown size={20} />
                   </div>
                   <div className="template-info">
@@ -352,22 +533,20 @@ const PartnerPermissions = () => {
                     <span>Permissions</span>
                   </div>
                   <div className="stat">
-                    <strong>
-                      {Object.values(template.features || {}).filter(Boolean).length}
-                    </strong>
+                    <strong>{Object.values(template.features || {}).filter(Boolean).length}</strong>
                     <span>Features</span>
                   </div>
                 </div>
 
                 <div className="template-actions">
-                  <button 
+                  <button
                     className="btn-icon btn-edit"
                     onClick={() => handleOpenModal(template)}
                     title="Edit"
                   >
                     <Edit size={16} />
                   </button>
-                  <button 
+                  <button
                     className="btn-icon btn-delete"
                     onClick={() => handleDelete(template)}
                     title="Delete"
@@ -384,7 +563,7 @@ const PartnerPermissions = () => {
       {/* Modal */}
       {showModal && (
         <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{editingTemplate ? 'Edit Role Template' : 'Create Role Template'}</h2>
               <button className="btn-close" onClick={handleCloseModal}>
@@ -458,8 +637,10 @@ const PartnerPermissions = () => {
 
               <div className="form-section">
                 <h3>Permissions *</h3>
-                <p className="section-description">Select permissions to grant to this role (from partner sidebar menu)</p>
-                
+                <p className="section-description">
+                  Select permissions to grant to this role (from partner sidebar menu)
+                </p>
+
                 {Object.entries(AVAILABLE_PERMISSIONS).map(([category, permissions]) => (
                   <div key={category} className="permission-category">
                     <h4>{category}</h4>
@@ -467,8 +648,8 @@ const PartnerPermissions = () => {
                       {permissions.map(permission => {
                         const isChecked = formData.permissions.includes(permission.name);
                         return (
-                          <div 
-                            key={permission.name} 
+                          <div
+                            key={permission.name}
                             className={`checkbox-item ${isChecked ? 'checked' : ''}`}
                             onClick={() => handlePermissionToggle(permission.name)}
                             title={permission.description}
@@ -492,7 +673,7 @@ const PartnerPermissions = () => {
               <div className="form-section">
                 <h3>Features</h3>
                 <p className="section-description">Enable additional features for this role</p>
-                
+
                 <div className="feature-toggles">
                   {Object.entries(formData.features).map(([feature, enabled]) => (
                     <label key={feature} className="toggle-label">
@@ -512,15 +693,17 @@ const PartnerPermissions = () => {
 
               <div className="form-section">
                 <h3>Limits</h3>
-                <p className="section-description">Set usage limits for this role (0 = unlimited)</p>
-                
+                <p className="section-description">
+                  Set usage limits for this role (0 = unlimited)
+                </p>
+
                 <div className="form-row">
                   <div className="form-group">
                     <label>Max Inventory Items</label>
                     <input
                       type="number"
                       value={formData.limits.maxInventoryItems}
-                      onChange={(e) => handleLimitChange('maxInventoryItems', e.target.value)}
+                      onChange={e => handleLimitChange('maxInventoryItems', e.target.value)}
                       min="0"
                     />
                   </div>
@@ -530,7 +713,7 @@ const PartnerPermissions = () => {
                     <input
                       type="number"
                       value={formData.limits.maxMonthlyTransactions}
-                      onChange={(e) => handleLimitChange('maxMonthlyTransactions', e.target.value)}
+                      onChange={e => handleLimitChange('maxMonthlyTransactions', e.target.value)}
                       min="0"
                     />
                   </div>
@@ -540,7 +723,7 @@ const PartnerPermissions = () => {
                     <input
                       type="number"
                       value={formData.limits.maxPayoutAmount}
-                      onChange={(e) => handleLimitChange('maxPayoutAmount', e.target.value)}
+                      onChange={e => handleLimitChange('maxPayoutAmount', e.target.value)}
                       min="0"
                     />
                   </div>
@@ -548,19 +731,15 @@ const PartnerPermissions = () => {
               </div>
 
               <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn-secondary" 
+                <button
+                  type="button"
+                  className="btn-secondary"
                   onClick={handleCloseModal}
                   disabled={loading}
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
-                  className="btn-primary"
-                  disabled={loading}
-                >
+                <button type="submit" className="btn-primary" disabled={loading}>
                   {loading ? (
                     <>
                       <div className="spinner-small"></div>

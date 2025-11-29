@@ -9,11 +9,11 @@ export const MENU_ITEMS = [
         path: '/vendor/dashboard',
         label: 'Dashboard',
         icon: 'LayoutDashboard',
-        requiredPermission: 'dashboard'
-      }
-    ]
+        requiredPermission: 'dashboard',
+      },
+    ],
   },
-  
+
   // Sales & Orders Section
   {
     section: 'Sales & Orders',
@@ -23,46 +23,46 @@ export const MENU_ITEMS = [
         path: '/vendor/sell',
         label: 'Sell',
         icon: 'TrendingUp',
-        requiredPermission: 'sell'
+        requiredPermission: 'sell',
       },
       {
         name: 'leads',
         path: '/vendor/leads',
         label: 'Leads',
         icon: 'FileText',
-        requiredPermission: 'leads'
+        requiredPermission: 'leads',
       },
       {
         name: 'sell-orders',
         path: '/vendor/sell-orders',
         label: 'Sell Orders',
         icon: 'ShoppingCart',
-        requiredPermission: 'sellOrders'
+        requiredPermission: 'sellOrders',
       },
       {
         name: 'buy',
         path: '/vendor/buy',
         label: 'Buy',
         icon: 'ShoppingBag',
-        requiredPermission: 'buy'
+        requiredPermission: 'buy',
       },
       {
         name: 'buy-orders',
         path: '/vendor/buy-orders',
         label: 'Buy Orders',
         icon: 'ShoppingBag',
-        requiredPermission: 'buyOrders'
+        requiredPermission: 'buyOrders',
       },
       {
         name: 'returns',
         path: '/vendor/returns',
         label: 'Returns',
         icon: 'RotateCcw',
-        requiredPermission: 'returns'
-      }
-    ]
+        requiredPermission: 'returns',
+      },
+    ],
   },
-  
+
   // Catalog & Products Section
   {
     section: 'Catalog & Products',
@@ -72,46 +72,46 @@ export const MENU_ITEMS = [
         path: '/vendor/products',
         label: 'Products',
         icon: 'Package',
-        requiredPermission: 'products'
+        requiredPermission: 'products',
       },
       {
         name: 'catalog',
         path: '/vendor/catalog',
         label: 'Catalog',
         icon: 'Package',
-        requiredPermission: 'catalog'
+        requiredPermission: 'catalog',
       },
       {
         name: 'categories',
         path: '/vendor/categories',
         label: 'Categories',
         icon: 'FolderTree',
-        requiredPermission: 'categories'
+        requiredPermission: 'categories',
       },
       {
         name: 'brands',
         path: '/vendor/brands',
         label: 'Brands',
         icon: 'Tag',
-        requiredPermission: 'brands'
+        requiredPermission: 'brands',
       },
       {
         name: 'models',
         path: '/vendor/models',
         label: 'Models/Variants',
         icon: 'Smartphone',
-        requiredPermission: 'models'
+        requiredPermission: 'models',
       },
       {
         name: 'condition-questionnaire',
         path: '/vendor/condition-questionnaire',
         label: 'Condition Questionnaire',
         icon: 'HelpCircle',
-        requiredPermission: 'conditionQuestionnaire'
-      }
-    ]
+        requiredPermission: 'conditionQuestionnaire',
+      },
+    ],
   },
-  
+
   // Partners & Users Section
   {
     section: 'Partners & Users',
@@ -121,39 +121,39 @@ export const MENU_ITEMS = [
         path: '/vendor/partners',
         label: 'Partners',
         icon: 'Users',
-        requiredPermission: 'partners'
+        requiredPermission: 'partners',
       },
       {
         name: 'partner-applications',
         path: '/vendor/partner-applications',
         label: 'Partner Applications (KYC)',
         icon: 'UserCheck',
-        requiredPermission: 'partnerApplications'
+        requiredPermission: 'partnerApplications',
       },
       {
         name: 'partner-list',
         path: '/vendor/partner-list',
         label: 'Partner List',
         icon: 'ClipboardList',
-        requiredPermission: 'partnerList'
+        requiredPermission: 'partnerList',
       },
       {
         name: 'users',
         path: '/vendor/users',
         label: 'User Management',
         icon: 'Users',
-        requiredPermission: 'users'
+        requiredPermission: 'users',
       },
       {
         name: 'inventory-approval',
         path: '/vendor/inventory-approval',
         label: 'Inventory Approval',
         icon: 'CheckSquare',
-        requiredPermission: 'inventoryApproval'
-      }
-    ]
+        requiredPermission: 'inventoryApproval',
+      },
+    ],
   },
-  
+
   // Pricing & Finance Section
   {
     section: 'Pricing & Finance',
@@ -163,53 +163,53 @@ export const MENU_ITEMS = [
         path: '/vendor/pricing',
         label: 'Pricing',
         icon: 'DollarSign',
-        requiredPermission: 'pricing'
+        requiredPermission: 'pricing',
       },
       {
         name: 'price-table',
         path: '/vendor/price-table',
         label: 'Price Table',
         icon: 'Table',
-        requiredPermission: 'priceTable'
+        requiredPermission: 'priceTable',
       },
       {
         name: 'condition-adjustments',
         path: '/vendor/condition-adjustments',
         label: 'Condition Adjustments',
         icon: 'Sliders',
-        requiredPermission: 'conditionAdjustments'
+        requiredPermission: 'conditionAdjustments',
       },
       {
         name: 'promotions',
         path: '/vendor/promotions',
         label: 'Promotions/Coupons',
         icon: 'Gift',
-        requiredPermission: 'promotions'
+        requiredPermission: 'promotions',
       },
       {
         name: 'finance',
         path: '/vendor/finance',
         label: 'Finance',
         icon: 'Calculator',
-        requiredPermission: 'finance'
+        requiredPermission: 'finance',
       },
       {
         name: 'commission-rules',
         path: '/vendor/commission-rules',
         label: 'Commission Rules',
         icon: 'CreditCard',
-        requiredPermission: 'commissionRules'
+        requiredPermission: 'commissionRules',
       },
       {
         name: 'wallet-payouts',
         path: '/vendor/wallet-payouts',
         label: 'Wallet & Payouts',
         icon: 'Wallet',
-        requiredPermission: 'walletPayouts'
-      }
-    ]
+        requiredPermission: 'walletPayouts',
+      },
+    ],
   },
-  
+
   // Analytics & Reports Section
   {
     section: 'Analytics & Reports',
@@ -219,10 +219,10 @@ export const MENU_ITEMS = [
         path: '/vendor/reports',
         label: 'Reports',
         icon: 'BarChart3',
-        requiredPermission: 'reports'
-      }
-    ]
-  }
+        requiredPermission: 'reports',
+      },
+    ],
+  },
 ];
 
 /**
@@ -230,7 +230,7 @@ export const MENU_ITEMS = [
  * @param {Object} permissions - Vendor permissions object
  * @returns {Array} Filtered menu sections with allowed items
  */
-export const getFilteredMenuItems = (permissions) => {
+export const getFilteredMenuItems = permissions => {
   if (!permissions || typeof permissions !== 'object') {
     return [];
   }
@@ -243,7 +243,7 @@ export const getFilteredMenuItems = (permissions) => {
 
     return {
       ...section,
-      items: filteredItems
+      items: filteredItems,
     };
   }).filter(section => section.items.length > 0); // Only include sections with at least one item
 };
@@ -258,7 +258,7 @@ export const hasMenuPermission = (permissions, permissionName) => {
   if (!permissions || !permissions[permissionName]) {
     return false;
   }
-  
+
   const permission = permissions[permissionName];
   return permission.granted && permission.isActive !== false;
 };
@@ -273,7 +273,7 @@ export const isMenuItemReadOnly = (permissions, permissionName) => {
   if (!permissions || !permissions[permissionName]) {
     return true; // Default to read-only if no permission
   }
-  
+
   const permission = permissions[permissionName];
   return permission.restrictions?.readOnly || false;
 };

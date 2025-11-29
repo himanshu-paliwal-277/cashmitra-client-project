@@ -7,7 +7,10 @@ const SignupPage = () => {
     <>
       <Helmet>
         <title>Sign Up - Cashmitra</title>
-        <meta name="description" content="Create your Cashmitra account to start buying and selling devices, get instant quotes, and enjoy secure transactions." />
+        <meta
+          name="description"
+          content="Create your Cashmitra account to start buying and selling devices, get instant quotes, and enjoy secure transactions."
+        />
         <meta name="keywords" content="signup, register, create account, cashmitra, join" />
       </Helmet>
       <Signup />

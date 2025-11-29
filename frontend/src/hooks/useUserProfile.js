@@ -23,7 +23,7 @@ const useUserProfile = () => {
   };
 
   // Update user profile
-  const updateProfile = async (profileData) => {
+  const updateProfile = async profileData => {
     setLoading(true);
     setError(null);
     try {
@@ -39,19 +39,19 @@ const useUserProfile = () => {
   };
 
   // Update profile picture
-  const updateProfilePicture = async (imageFile) => {
+  const updateProfilePicture = async imageFile => {
     setLoading(true);
     setError(null);
     try {
       const formData = new FormData();
       formData.append('profilePicture', imageFile);
-      
+
       const response = await api.put('/user/profile/picture', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      
+
       setProfile(prev => ({ ...prev, profilePicture: response.data.profilePicture }));
       return response.data;
     } catch (err) {
@@ -63,7 +63,7 @@ const useUserProfile = () => {
   };
 
   // Change password
-  const changePassword = async (passwordData) => {
+  const changePassword = async passwordData => {
     setLoading(true);
     setError(null);
     try {
@@ -89,7 +89,7 @@ const useUserProfile = () => {
     fetchProfile,
     updateProfile,
     updateProfilePicture,
-    changePassword
+    changePassword,
   };
 };
 

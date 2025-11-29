@@ -32,7 +32,7 @@ import {
   Edit,
   Trash2,
   MessageSquare,
-  Send
+  Send,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -72,7 +72,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -98,7 +98,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -113,7 +113,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -178,11 +178,11 @@ const InventoryList = styled.div`
 const InventoryItem = styled.div`
   border-bottom: 1px solid #e5e7eb;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f9fafb;
   }
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -244,7 +244,7 @@ const StatusBadge = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  
+
   ${props => {
     switch (props.status) {
       case 'pending':
@@ -285,7 +285,7 @@ const ExpandButton = styled.button`
   padding: 0.5rem;
   border-radius: 0.375rem;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f3f4f6;
     color: #374151;
@@ -363,7 +363,7 @@ const GalleryImage = styled.img`
   border: 1px solid #e5e7eb;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -396,12 +396,12 @@ const ActionBtn = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -454,7 +454,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  
+
   &:hover {
     background: #f3f4f6;
   }
@@ -468,7 +468,7 @@ const TextArea = styled.textarea`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -498,7 +498,7 @@ const InventoryApproval = () => {
     pending: 0,
     approved: 0,
     rejected: 0,
-    underReview: 0
+    underReview: 0,
   });
 
   const {
@@ -507,7 +507,7 @@ const InventoryApproval = () => {
     loading: hookLoading,
     error: hookError,
     updateInventoryStatus,
-    fetchInventory
+    fetchInventory,
   } = useAdminInventoryApproval();
 
   useEffect(() => {
@@ -518,10 +518,10 @@ const InventoryApproval = () => {
 
   const handleItemAction = async () => {
     if (!selectedItem || !actionType) return;
-    
+
     try {
       await updateInventoryStatus(selectedItem._id, actionType, actionNotes);
-      
+
       setShowActionModal(false);
       setSelectedItem(null);
       setActionType('');
@@ -537,7 +537,7 @@ const InventoryApproval = () => {
     setShowActionModal(true);
   };
 
-  const toggleItemExpansion = (itemId) => {
+  const toggleItemExpansion = itemId => {
     const newExpanded = new Set(expandedItems);
     if (newExpanded.has(itemId)) {
       newExpanded.delete(itemId);
@@ -547,7 +547,7 @@ const InventoryApproval = () => {
     setExpandedItems(newExpanded);
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'pending':
         return <Clock size={12} />;
@@ -563,14 +563,15 @@ const InventoryApproval = () => {
   };
 
   const filteredInventory = inventory.filter(item => {
-    const matchesSearch = item.deviceName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.partner?.businessName?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch =
+      item.deviceName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.partner?.businessName?.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesStatus = !statusFilter || item.status === statusFilter;
     const matchesCategory = !categoryFilter || item.category === categoryFilter;
-    
+
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
@@ -614,7 +615,7 @@ const InventoryApproval = () => {
             <StatLabel>Total Submissions</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#f59e0b">
             <Clock size={24} />
@@ -624,7 +625,7 @@ const InventoryApproval = () => {
             <StatLabel>Pending Review</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#10b981">
             <CheckCircle size={24} />
@@ -634,7 +635,7 @@ const InventoryApproval = () => {
             <StatLabel>Approved</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#ef4444">
             <XCircle size={24} />
@@ -644,7 +645,7 @@ const InventoryApproval = () => {
             <StatLabel>Rejected</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#8b5cf6">
             <AlertTriangle size={24} />
@@ -661,24 +662,18 @@ const InventoryApproval = () => {
           type="text"
           placeholder="Search by device name, brand, model, or partner..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
-        
-        <FilterSelect
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
+
+        <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="">All Status</option>
           <option value="pending">Pending</option>
           <option value="under_review">Under Review</option>
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
         </FilterSelect>
-        
-        <FilterSelect
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
+
+        <FilterSelect value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
           <option value="">All Categories</option>
           <option value="smartphone">Smartphones</option>
           <option value="laptop">Laptops</option>
@@ -693,19 +688,21 @@ const InventoryApproval = () => {
           <EmptyState>
             <Package size={48} style={{ marginBottom: '1rem' }} />
             <p style={{ fontSize: '1.125rem' }}>
-              {searchTerm || statusFilter || categoryFilter ? 'No inventory items match your filters' : 'No inventory submissions found'}
+              {searchTerm || statusFilter || categoryFilter
+                ? 'No inventory items match your filters'
+                : 'No inventory submissions found'}
             </p>
           </EmptyState>
         ) : (
           <InventoryList>
-            {filteredInventory.map((item) => (
+            {filteredInventory.map(item => (
               <InventoryItem key={item._id}>
                 <ItemHeader onClick={() => toggleItemExpansion(item._id)}>
                   <ItemInfo>
-                    <DeviceImage 
-                      src={item.images?.[0] || '/api/placeholder/60/60'} 
+                    <DeviceImage
+                      src={item.images?.[0] || '/api/placeholder/60/60'}
                       alt={item.deviceName}
-                      onError={(e) => {
+                      onError={e => {
                         e.target.src = '/api/placeholder/60/60';
                       }}
                     />
@@ -722,22 +719,27 @@ const InventoryApproval = () => {
                       </PartnerInfo>
                     </DeviceDetails>
                   </ItemInfo>
-                  
+
                   <PriceInfo>
                     <Price>₹{(item.proposedPrice || 0).toLocaleString()}</Price>
                     <PriceLabel>Proposed Price</PriceLabel>
                   </PriceInfo>
-                  
+
                   <StatusBadge status={item.status}>
                     {getStatusIcon(item.status)}
-                    {item.status?.replace('_', ' ')?.charAt(0)?.toUpperCase() + item.status?.replace('_', ' ')?.slice(1) || 'Pending'}
+                    {item.status?.replace('_', ' ')?.charAt(0)?.toUpperCase() +
+                      item.status?.replace('_', ' ')?.slice(1) || 'Pending'}
                   </StatusBadge>
-                  
+
                   <ExpandButton>
-                    {expandedItems.has(item._id) ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    {expandedItems.has(item._id) ? (
+                      <ChevronUp size={20} />
+                    ) : (
+                      <ChevronDown size={20} />
+                    )}
                   </ExpandButton>
                 </ItemHeader>
-                
+
                 {expandedItems.has(item._id) && (
                   <ItemDetails>
                     <DetailsGrid>
@@ -781,7 +783,7 @@ const InventoryApproval = () => {
                           </SpecItem>
                         </SpecsList>
                       </DetailSection>
-                      
+
                       <DetailSection>
                         <SectionTitle>
                           <DollarSign size={16} />
@@ -823,19 +825,26 @@ const InventoryApproval = () => {
                         </SpecsList>
                       </DetailSection>
                     </DetailsGrid>
-                    
+
                     {item.description && (
                       <DetailSection style={{ marginBottom: '1.5rem' }}>
                         <SectionTitle>
                           <FileText size={16} />
                           Description
                         </SectionTitle>
-                        <div style={{ padding: '1rem', background: '#f9fafb', borderRadius: '0.375rem', color: '#374151' }}>
+                        <div
+                          style={{
+                            padding: '1rem',
+                            background: '#f9fafb',
+                            borderRadius: '0.375rem',
+                            color: '#374151',
+                          }}
+                        >
                           {item.description}
                         </div>
                       </DetailSection>
                     )}
-                    
+
                     {item.images && item.images.length > 0 && (
                       <DetailSection style={{ marginBottom: '1.5rem' }}>
                         <SectionTitle>
@@ -848,7 +857,7 @@ const InventoryApproval = () => {
                               key={index}
                               src={image}
                               alt={`Device ${index + 1}`}
-                              onError={(e) => {
+                              onError={e => {
                                 e.target.src = '/api/placeholder/100/100';
                               }}
                             />
@@ -856,19 +865,26 @@ const InventoryApproval = () => {
                         </ImageGallery>
                       </DetailSection>
                     )}
-                    
+
                     {item.notes && (
                       <DetailSection style={{ marginBottom: '1.5rem' }}>
                         <SectionTitle>
                           <MessageSquare size={16} />
                           Partner Notes
                         </SectionTitle>
-                        <div style={{ padding: '1rem', background: '#f9fafb', borderRadius: '0.375rem', color: '#374151' }}>
+                        <div
+                          style={{
+                            padding: '1rem',
+                            background: '#f9fafb',
+                            borderRadius: '0.375rem',
+                            color: '#374151',
+                          }}
+                        >
                           {item.notes}
                         </div>
                       </DetailSection>
                     )}
-                    
+
                     <ActionButtons>
                       {item.status === 'pending' && (
                         <>
@@ -886,7 +902,7 @@ const InventoryApproval = () => {
                           </ActionBtn>
                         </>
                       )}
-                      
+
                       {item.status === 'under_review' && (
                         <>
                           <ActionBtn approve onClick={() => openActionModal(item, 'approved')}>
@@ -899,7 +915,7 @@ const InventoryApproval = () => {
                           </ActionBtn>
                         </>
                       )}
-                      
+
                       {(item.status === 'approved' || item.status === 'rejected') && (
                         <ActionBtn onClick={() => openActionModal(item, 'pending')}>
                           <RefreshCw size={16} />
@@ -929,35 +945,52 @@ const InventoryApproval = () => {
                 <X size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             <div style={{ marginBottom: '1.5rem' }}>
               <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
                 You are about to {actionType.replace('_', ' ')} the inventory item:
               </p>
-              <div style={{ padding: '1rem', background: '#f9fafb', borderRadius: '0.5rem', marginBottom: '1rem' }}>
-                <strong>{selectedItem.deviceName}</strong><br />
-                {selectedItem.brand} {selectedItem.model} • ₹{(selectedItem.proposedPrice || 0).toLocaleString()}
+              <div
+                style={{
+                  padding: '1rem',
+                  background: '#f9fafb',
+                  borderRadius: '0.5rem',
+                  marginBottom: '1rem',
+                }}
+              >
+                <strong>{selectedItem.deviceName}</strong>
+                <br />
+                {selectedItem.brand} {selectedItem.model} • ₹
+                {(selectedItem.proposedPrice || 0).toLocaleString()}
               </div>
-              
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#374151' }}>
-                {actionType === 'approved' ? 'Approval Notes (Optional):' : 
-                 actionType === 'rejected' ? 'Rejection Reason:' :
-                 actionType === 'under_review' ? 'Review Notes (Optional):' :
-                 'Reset Notes (Optional):'}
+
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  fontWeight: '500',
+                  color: '#374151',
+                }}
+              >
+                {actionType === 'approved'
+                  ? 'Approval Notes (Optional):'
+                  : actionType === 'rejected'
+                    ? 'Rejection Reason:'
+                    : actionType === 'under_review'
+                      ? 'Review Notes (Optional):'
+                      : 'Reset Notes (Optional):'}
               </label>
               <TextArea
                 value={actionNotes}
-                onChange={(e) => setActionNotes(e.target.value)}
+                onChange={e => setActionNotes(e.target.value)}
                 placeholder={`Enter ${actionType === 'rejected' ? 'reason for rejection' : 'notes'} here...`}
                 required={actionType === 'rejected'}
               />
             </div>
-            
+
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <ActionBtn onClick={() => setShowActionModal(false)}>
-                Cancel
-              </ActionBtn>
-              <ActionBtn 
+              <ActionBtn onClick={() => setShowActionModal(false)}>Cancel</ActionBtn>
+              <ActionBtn
                 approve={actionType === 'approved'}
                 reject={actionType === 'rejected'}
                 review={actionType === 'under_review'}
@@ -965,7 +998,9 @@ const InventoryApproval = () => {
                 disabled={actionType === 'rejected' && !actionNotes.trim()}
               >
                 <Send size={16} />
-                Confirm {actionType.replace('_', ' ').charAt(0).toUpperCase() + actionType.replace('_', ' ').slice(1)}
+                Confirm{' '}
+                {actionType.replace('_', ' ').charAt(0).toUpperCase() +
+                  actionType.replace('_', ' ').slice(1)}
               </ActionBtn>
             </div>
           </ModalContent>

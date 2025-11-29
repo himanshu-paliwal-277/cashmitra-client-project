@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { 
-  ArrowLeft, 
-  Package, 
-  User, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Calendar, 
-  DollarSign, 
-  CreditCard, 
-  Truck, 
-  CheckCircle, 
-  Clock, 
+import {
+  ArrowLeft,
+  Package,
+  User,
+  MapPin,
+  Phone,
+  Mail,
+  Calendar,
+  DollarSign,
+  CreditCard,
+  Truck,
+  CheckCircle,
+  Clock,
   AlertCircle,
   Edit,
   Save,
@@ -23,7 +23,7 @@ import {
   Smartphone,
   Tag,
   TrendingUp,
-  Shield
+  Shield,
 } from 'lucide-react';
 import { adminService } from '../../services/adminService';
 
@@ -52,7 +52,7 @@ const BackButton = styled.button`
   color: #6b7280;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f9fafb;
     border-color: #d1d5db;
@@ -79,7 +79,7 @@ const ContentGrid = styled.div`
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 2rem;
-  
+
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
@@ -139,7 +139,7 @@ const ProductImage = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -267,7 +267,7 @@ const StatusBadge = styled.div`
   border-radius: 0.5rem;
   font-weight: 500;
   font-size: 0.875rem;
-  
+
   ${props => {
     switch (props.status) {
       case 'pending':
@@ -317,7 +317,7 @@ const StatusSelect = styled.select`
   color: #1f2937;
   font-weight: 500;
   cursor: pointer;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -337,12 +337,12 @@ const UpdateButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -358,7 +358,7 @@ const Timeline = styled.div`
 const TimelineItem = styled.div`
   position: relative;
   padding-bottom: 2rem;
-  
+
   &:not(:last-child)::before {
     content: '';
     position: absolute;
@@ -381,11 +381,14 @@ const TimelineIcon = styled.div`
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
-  
-  ${props => props.active ? `
+
+  ${props =>
+    props.active
+      ? `
     background: #3b82f6;
     color: white;
-  ` : `
+  `
+      : `
     background: #f3f4f6;
     color: #6b7280;
   `}
@@ -443,7 +446,7 @@ const ProgressFill = styled.div`
 const EnhancedTimelineItem = styled.div`
   position: relative;
   padding-bottom: 2rem;
-  
+
   &:not(:last-child)::before {
     content: '';
     position: absolute;
@@ -451,7 +454,7 @@ const EnhancedTimelineItem = styled.div`
     top: 2rem;
     width: 2px;
     height: calc(100% - 1rem);
-    background: ${props => props.completed ? '#10b981' : '#e5e7eb'};
+    background: ${props => (props.completed ? '#10b981' : '#e5e7eb')};
   }
 `;
 
@@ -466,9 +469,9 @@ const EnhancedTimelineIcon = styled.div`
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
-  background: ${props => props.completed ? '#10b981' : '#e5e7eb'};
-  color: ${props => props.completed ? 'white' : '#6b7280'};
-  border: 2px solid ${props => props.completed ? '#10b981' : '#e5e7eb'};
+  background: ${props => (props.completed ? '#10b981' : '#e5e7eb')};
+  color: ${props => (props.completed ? 'white' : '#6b7280')};
+  border: 2px solid ${props => (props.completed ? '#10b981' : '#e5e7eb')};
 `;
 
 const TimelineDescription = styled.div`
@@ -489,8 +492,8 @@ const OrderTypeBadge = styled.div`
   border-radius: 0.375rem;
   font-size: 0.875rem;
   font-weight: 500;
-  background: ${props => props.type === 'buy' ? '#dbeafe' : '#fef3c7'};
-  color: ${props => props.type === 'buy' ? '#1e40af' : '#92400e'};
+  background: ${props => (props.type === 'buy' ? '#dbeafe' : '#fef3c7')};
+  color: ${props => (props.type === 'buy' ? '#1e40af' : '#92400e')};
 `;
 
 const LoadingSpinner = styled.div`
@@ -498,7 +501,7 @@ const LoadingSpinner = styled.div`
   align-items: center;
   justify-content: center;
   padding: 4rem;
-  
+
   &::after {
     content: '';
     width: 2rem;
@@ -508,7 +511,7 @@ const LoadingSpinner = styled.div`
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
-  
+
   @keyframes spin {
     to {
       transform: rotate(360deg);
@@ -545,7 +548,7 @@ const OrderView = () => {
     { value: 'delivered', label: 'Delivered' },
     { value: 'completed', label: 'Completed' },
     { value: 'cancelled', label: 'Cancelled' },
-    { value: 'refunded', label: 'Refunded' }
+    { value: 'refunded', label: 'Refunded' },
   ];
 
   useEffect(() => {
@@ -567,14 +570,14 @@ const OrderView = () => {
 
   const handleStatusUpdate = async () => {
     if (!newStatus || newStatus === (order?.status || '')) return;
-    
+
     try {
       setUpdating(true);
       const response = await adminService.updateOrderStatus(orderId, newStatus);
-      
+
       // Refresh order details to get updated timeline and progress
       await fetchOrderDetails();
-      
+
       // Show success message (you can add a toast notification here)
       console.log('Order status updated successfully');
     } catch (err) {
@@ -584,20 +587,20 @@ const OrderView = () => {
     }
   };
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
-  const formatCurrency = (amount) => {
+  const formatCurrency = amount => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'INR'
+      currency: 'INR',
     }).format(amount);
   };
 
@@ -672,7 +675,7 @@ const OrderView = () => {
                   {order?.orderType?.charAt(0).toUpperCase() + order?.orderType?.slice(1) || 'N/A'}
                 </OrderTypeBadge>
               </OrderTypeSection>
-              
+
               {order?.progressPercentage !== undefined && (
                 <ProgressSection>
                   <ProgressLabel>
@@ -708,9 +711,11 @@ const OrderView = () => {
                           )}
                         </ProductImage>
                         <ProductDetails>
-                          <ProductName>{product?.name || product?.brand || 'Product Name'}</ProductName>
+                          <ProductName>
+                            {product?.name || product?.brand || 'Product Name'}
+                          </ProductName>
                           <ProductBrand>{product?.brand}</ProductBrand>
-                          
+
                           <ProductSpecs>
                             {product?.model && (
                               <SpecItem>
@@ -748,14 +753,20 @@ const OrderView = () => {
 
                           <PriceSection>
                             <Price>{formatCurrency(order?.totalAmount / item.quantity)}</Price>
-                {product?.basePrice && product.basePrice > (order?.totalAmount / item.quantity) && (
-                              <>
-                                <OriginalPrice>{formatCurrency(product.basePrice)}</OriginalPrice>
-                                <Discount>
-                    {Math.round(((product.basePrice - (order?.totalAmount / item.quantity)) / product.basePrice) * 100)}% OFF
-                  </Discount>
-                              </>
-                            )}
+                            {product?.basePrice &&
+                              product.basePrice > order?.totalAmount / item.quantity && (
+                                <>
+                                  <OriginalPrice>{formatCurrency(product.basePrice)}</OriginalPrice>
+                                  <Discount>
+                                    {Math.round(
+                                      ((product.basePrice - order?.totalAmount / item.quantity) /
+                                        product.basePrice) *
+                                        100
+                                    )}
+                                    % OFF
+                                  </Discount>
+                                </>
+                              )}
                           </PriceSection>
                         </ProductDetails>
                       </ProductSection>
@@ -775,31 +786,39 @@ const OrderView = () => {
             <CardContent>
               <InfoGrid>
                 <InfoItem>
-                  <InfoIcon><User size={20} /></InfoIcon>
+                  <InfoIcon>
+                    <User size={20} />
+                  </InfoIcon>
                   <InfoContent>
                     <InfoLabel>Customer Name</InfoLabel>
                     <InfoValue>{user?.name || 'N/A'}</InfoValue>
                   </InfoContent>
                 </InfoItem>
-                
+
                 <InfoItem>
-                  <InfoIcon><Mail size={20} /></InfoIcon>
+                  <InfoIcon>
+                    <Mail size={20} />
+                  </InfoIcon>
                   <InfoContent>
                     <InfoLabel>Email</InfoLabel>
                     <InfoValue>{user?.email || 'N/A'}</InfoValue>
                   </InfoContent>
                 </InfoItem>
-                
+
                 <InfoItem>
-                  <InfoIcon><Phone size={20} /></InfoIcon>
+                  <InfoIcon>
+                    <Phone size={20} />
+                  </InfoIcon>
                   <InfoContent>
                     <InfoLabel>Phone</InfoLabel>
                     <InfoValue>{user?.phone || 'N/A'}</InfoValue>
                   </InfoContent>
                 </InfoItem>
-                
+
                 <InfoItem>
-                  <InfoIcon><Calendar size={20} /></InfoIcon>
+                  <InfoIcon>
+                    <Calendar size={20} />
+                  </InfoIcon>
                   <InfoContent>
                     <InfoLabel>Order Date</InfoLabel>
                     <InfoValue>{formatDate(order?.createdAt)}</InfoValue>
@@ -819,40 +838,58 @@ const OrderView = () => {
               <CardContent>
                 <InfoGrid>
                   <InfoItem>
-                    <InfoIcon><MapPin size={20} /></InfoIcon>
+                    <InfoIcon>
+                      <MapPin size={20} />
+                    </InfoIcon>
                     <InfoContent>
                       <InfoLabel>Delivery Address</InfoLabel>
                       <InfoValue>
                         {order?.shippingDetails?.address ? (
                           <>
-                            {order?.shippingDetails?.address?.street}<br />
-                            {order?.shippingDetails?.address?.city}, {order?.shippingDetails?.address?.state}<br />
-                            {order?.shippingDetails?.address?.pincode}, {order?.shippingDetails?.address?.country}
+                            {order?.shippingDetails?.address?.street}
+                            <br />
+                            {order?.shippingDetails?.address?.city},{' '}
+                            {order?.shippingDetails?.address?.state}
+                            <br />
+                            {order?.shippingDetails?.address?.pincode},{' '}
+                            {order?.shippingDetails?.address?.country}
                           </>
-                        ) : 'N/A'}
+                        ) : (
+                          'N/A'
+                        )}
                       </InfoValue>
                     </InfoContent>
                   </InfoItem>
-                  
+
                   <InfoItem>
-                    <InfoIcon><Phone size={20} /></InfoIcon>
+                    <InfoIcon>
+                      <Phone size={20} />
+                    </InfoIcon>
                     <InfoContent>
                       <InfoLabel>Contact Phone</InfoLabel>
-                      <InfoValue>{order?.shippingDetails?.contactPhone || user?.phone || 'N/A'}</InfoValue>
+                      <InfoValue>
+                        {order?.shippingDetails?.contactPhone || user?.phone || 'N/A'}
+                      </InfoValue>
                     </InfoContent>
                   </InfoItem>
-                  
+
                   <InfoItem>
-                    <InfoIcon><Truck size={20} /></InfoIcon>
+                    <InfoIcon>
+                      <Truck size={20} />
+                    </InfoIcon>
                     <InfoContent>
                       <InfoLabel>Delivery Method</InfoLabel>
-                      <InfoValue>{order?.shippingDetails?.deliveryMethod || 'Standard Delivery'}</InfoValue>
+                      <InfoValue>
+                        {order?.shippingDetails?.deliveryMethod || 'Standard Delivery'}
+                      </InfoValue>
                     </InfoContent>
                   </InfoItem>
-                  
+
                   {order?.shippingDetails?.trackingId && (
                     <InfoItem>
-                      <InfoIcon><Tag size={20} /></InfoIcon>
+                      <InfoIcon>
+                        <Tag size={20} />
+                      </InfoIcon>
                       <InfoContent>
                         <InfoLabel>Tracking ID</InfoLabel>
                         <InfoValue>{order?.shippingDetails?.trackingId}</InfoValue>
@@ -876,16 +913,15 @@ const OrderView = () => {
               <StatusSection>
                 <StatusBadge status={order?.status || 'pending'}>
                   <CheckCircle size={16} />
-                  {order?.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Pending'}
+                  {order?.status
+                    ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
+                    : 'Pending'}
                 </StatusBadge>
               </StatusSection>
-              
+
               <div style={{ marginBottom: '1rem' }}>
                 <InfoLabel style={{ marginBottom: '0.5rem' }}>Update Status:</InfoLabel>
-                <StatusSelect 
-                  value={newStatus} 
-                  onChange={(e) => setNewStatus(e.target.value)}
-                >
+                <StatusSelect value={newStatus} onChange={e => setNewStatus(e.target.value)}>
                   {statusOptions.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -893,8 +929,8 @@ const OrderView = () => {
                   ))}
                 </StatusSelect>
               </div>
-              
-              <UpdateButton 
+
+              <UpdateButton
                 onClick={handleStatusUpdate}
                 disabled={updating || newStatus === (order?.status || '')}
               >
@@ -913,35 +949,45 @@ const OrderView = () => {
             <CardContent>
               <InfoGrid>
                 <InfoItem>
-                  <InfoIcon><DollarSign size={20} /></InfoIcon>
+                  <InfoIcon>
+                    <DollarSign size={20} />
+                  </InfoIcon>
                   <InfoContent>
                     <InfoLabel>Total Amount</InfoLabel>
                     <InfoValue>{formatCurrency(order?.totalAmount)}</InfoValue>
                   </InfoContent>
                 </InfoItem>
-                
+
                 <InfoItem>
-                  <InfoIcon><CreditCard size={20} /></InfoIcon>
+                  <InfoIcon>
+                    <CreditCard size={20} />
+                  </InfoIcon>
                   <InfoContent>
                     <InfoLabel>Payment Method</InfoLabel>
                     <InfoValue>{order?.paymentDetails?.method || 'N/A'}</InfoValue>
                   </InfoContent>
                 </InfoItem>
-                
+
                 <InfoItem>
-                  <InfoIcon><CheckCircle size={20} /></InfoIcon>
+                  <InfoIcon>
+                    <CheckCircle size={20} />
+                  </InfoIcon>
                   <InfoContent>
                     <InfoLabel>Payment Status</InfoLabel>
                     <InfoValue>{order?.paymentDetails?.status || 'N/A'}</InfoValue>
                   </InfoContent>
                 </InfoItem>
-                
+
                 {order?.commission && (
                   <InfoItem>
-                    <InfoIcon><TrendingUp size={20} /></InfoIcon>
+                    <InfoIcon>
+                      <TrendingUp size={20} />
+                    </InfoIcon>
                     <InfoContent>
-                      <InfoLabel>Commission ({(order?.commission?.rate * 100).toFixed(1)}%)</InfoLabel>
-                <InfoValue>{formatCurrency(order?.commission?.amount)}</InfoValue>
+                      <InfoLabel>
+                        Commission ({(order?.commission?.rate * 100).toFixed(1)}%)
+                      </InfoLabel>
+                      <InfoValue>{formatCurrency(order?.commission?.amount)}</InfoValue>
                     </InfoContent>
                   </InfoItem>
                 )}
@@ -958,7 +1004,7 @@ const OrderView = () => {
             <CardContent>
               <Timeline>
                 {order?.timeline && order.timeline.length > 0 ? (
-          order.timeline.map((item, index) => (
+                  order.timeline.map((item, index) => (
                     <EnhancedTimelineItem key={index} completed={item.completed}>
                       <EnhancedTimelineIcon completed={item.completed}>
                         {item.completed ? <CheckCircle size={12} /> : <Clock size={12} />}
@@ -973,7 +1019,7 @@ const OrderView = () => {
                     </EnhancedTimelineItem>
                   ))
                 ) : order?.statusHistory && order.statusHistory.length > 0 ? (
-          order.statusHistory.map((item, index) => (
+                  order.statusHistory.map((item, index) => (
                     <TimelineItem key={index}>
                       <TimelineIcon active={true}>
                         <CheckCircle size={12} />
@@ -982,12 +1028,8 @@ const OrderView = () => {
                         <TimelineTitle>
                           {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                         </TimelineTitle>
-                        <TimelineDate>
-                          {formatDate(item.timestamp)}
-                        </TimelineDate>
-                        {item.note && (
-                          <TimelineNote>{item.note}</TimelineNote>
-                        )}
+                        <TimelineDate>{formatDate(item.timestamp)}</TimelineDate>
+                        {item.note && <TimelineNote>{item.note}</TimelineNote>}
                       </TimelineContent>
                     </TimelineItem>
                   ))

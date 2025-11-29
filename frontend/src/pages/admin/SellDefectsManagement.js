@@ -33,7 +33,7 @@ import {
   X,
   Star,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -77,21 +77,21 @@ const Button = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &.primary {
     background-color: ${theme.colors.primary};
     color: white;
-    
+
     &:hover {
       background-color: ${theme.colors.primaryDark};
     }
   }
-  
+
   &.secondary {
     background-color: white;
     color: ${theme.colors.text.primary};
     border: 1px solid ${theme.colors.border};
-    
+
     &:hover {
       background-color: #f8fafc;
     }
@@ -117,21 +117,21 @@ const SearchInput = styled.div`
   position: relative;
   flex: 1;
   min-width: 300px;
-  
+
   input {
     width: 100%;
     padding: 0.75rem 1rem 0.75rem 2.5rem;
     border: 1px solid ${theme.colors.border};
     border-radius: 8px;
     font-size: 0.875rem;
-    
+
     &:focus {
       outline: none;
       border-color: ${theme.colors.primary};
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
   }
-  
+
   svg {
     position: absolute;
     left: 0.75rem;
@@ -150,7 +150,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
@@ -170,14 +170,14 @@ const StatCard = styled.div`
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  
+
   .stat-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1rem;
   }
-  
+
   .stat-icon {
     width: 2.5rem;
     height: 2.5rem;
@@ -185,51 +185,51 @@ const StatCard = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &.defects {
       background-color: #fef3c7;
       color: #d97706;
     }
-    
+
     &.active {
       background-color: #dcfce7;
       color: #16a34a;
     }
-    
+
     &.impact {
       background-color: #fee2e2;
       color: #dc2626;
     }
-    
+
     &.categories {
       background-color: #e0e7ff;
       color: #4f46e5;
     }
   }
-  
+
   .stat-value {
     font-size: 2rem;
     font-weight: 700;
     color: ${theme.colors.text.primary};
     margin-bottom: 0.25rem;
   }
-  
+
   .stat-label {
     color: ${theme.colors.text.secondary};
     font-size: 0.875rem;
   }
-  
+
   .stat-change {
     display: flex;
     align-items: center;
     gap: 0.25rem;
     font-size: 0.75rem;
     margin-top: 0.5rem;
-    
+
     &.positive {
       color: #16a34a;
     }
-    
+
     &.negative {
       color: #dc2626;
     }
@@ -274,7 +274,7 @@ const TableHead = styled.thead`
 
 const TableRow = styled.tr`
   border-bottom: 1px solid ${theme.colors.border};
-  
+
   &:hover {
     background-color: #f8fafc;
   }
@@ -302,27 +302,27 @@ const Badge = styled.span`
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
-  
+
   &.active {
     background-color: #dcfce7;
     color: #16a34a;
   }
-  
+
   &.inactive {
     background-color: #fee2e2;
     color: #dc2626;
   }
-  
+
   &.high {
     background-color: #fee2e2;
     color: #dc2626;
   }
-  
+
   &.medium {
     background-color: #fef3c7;
     color: #d97706;
   }
-  
+
   &.low {
     background-color: #dcfce7;
     color: #16a34a;
@@ -341,7 +341,7 @@ const ActionButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   color: ${theme.colors.text.secondary};
-  
+
   &:hover {
     background-color: #f3f4f6;
     color: ${theme.colors.text.primary};
@@ -358,9 +358,9 @@ const SellDefectsManagement = () => {
     createDefect,
     updateDefect,
     deleteDefect,
-    clearError
+    clearError,
   } = useSellDefects();
-    console.log('defects: ', defects);
+  console.log('defects: ', defects);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -384,16 +384,25 @@ const SellDefectsManagement = () => {
       search: searchTerm,
       status: statusFilter !== 'all' ? statusFilter : undefined,
       category: categoryFilter !== 'all' ? categoryFilter : undefined,
-      impact: impactFilter !== 'all' ? impactFilter : undefined
+      impact: impactFilter !== 'all' ? impactFilter : undefined,
     };
     fetchDefects(params);
-  }, [currentPage, sortBy, sortOrder, searchTerm, statusFilter, categoryFilter, impactFilter, fetchDefects]);
+  }, [
+    currentPage,
+    sortBy,
+    sortOrder,
+    searchTerm,
+    statusFilter,
+    categoryFilter,
+    impactFilter,
+    fetchDefects,
+  ]);
 
   // Use defects directly from the hook (already filtered by API)
   const filteredDefects = defects || [];
 
   // Helper function to calculate severity based on delta value
-  const getSeverity = (delta) => {
+  const getSeverity = delta => {
     const value = Math.abs(delta?.value || 0);
     if (value >= 25) return 'high';
     if (value >= 10) return 'medium';
@@ -401,24 +410,30 @@ const SellDefectsManagement = () => {
   };
 
   // Helper function to format date
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   const stats = {
     totalDefects: pagination?.total || 0,
     activeDefects: filteredDefects.filter(d => d.isActive).length,
-    avgPriceImpact: filteredDefects.length > 0 ? Math.round(filteredDefects.reduce((sum, d) => sum + Math.abs(d.delta?.value || 0), 0) / filteredDefects.length) : 0,
-    categories: [...new Set(filteredDefects.map(d => d.category))].length
+    avgPriceImpact:
+      filteredDefects.length > 0
+        ? Math.round(
+            filteredDefects.reduce((sum, d) => sum + Math.abs(d.delta?.value || 0), 0) /
+              filteredDefects.length
+          )
+        : 0,
+    categories: [...new Set(filteredDefects.map(d => d.category))].length,
   };
 
-  const handleCreateDefect = async (defectData) => {
+  const handleCreateDefect = async defectData => {
     try {
       await createDefect(defectData);
       setShowModal(false);
@@ -438,7 +453,7 @@ const SellDefectsManagement = () => {
     }
   };
 
-  const handleDeleteDefect = async (id) => {
+  const handleDeleteDefect = async id => {
     if (window.confirm('Are you sure you want to delete this defect?')) {
       try {
         await deleteDefect(id);
@@ -448,7 +463,7 @@ const SellDefectsManagement = () => {
     }
   };
 
-  const handleEditDefect = (defect) => {
+  const handleEditDefect = defect => {
     setEditingDefect(defect);
     setShowModal(true);
   };
@@ -461,7 +476,14 @@ const SellDefectsManagement = () => {
   if (loading) {
     return (
       <Container>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '50vh',
+          }}
+        >
           <RefreshCw className="animate-spin" size={24} />
           <span style={{ marginLeft: '0.5rem' }}>Loading defects...</span>
         </div>
@@ -482,13 +504,13 @@ const SellDefectsManagement = () => {
             Export
           </Button>
           <Button className="secondary" onClick={() => fetchDefects()}>
-             <RefreshCw size={16} />
-             Refresh
-           </Button>
-           <Button className="primary" onClick={handleAddDefect}>
-             <Plus size={16} />
-             Add Defect
-           </Button>
+            <RefreshCw size={16} />
+            Refresh
+          </Button>
+          <Button className="primary" onClick={handleAddDefect}>
+            <Plus size={16} />
+            Add Defect
+          </Button>
         </ActionButtons>
       </Header>
 
@@ -558,34 +580,25 @@ const SellDefectsManagement = () => {
               type="text"
               placeholder="Search defects..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </SearchInput>
-          
-          <FilterSelect
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
+
+          <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </FilterSelect>
-          
-          <FilterSelect
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
+
+          <FilterSelect value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
             <option value="all">All Categories</option>
             <option value="Display">Display</option>
             <option value="Battery">Battery</option>
             <option value="Camera">Camera</option>
             <option value="Physical">Physical</option>
           </FilterSelect>
-          
-          <FilterSelect
-            value={impactFilter}
-            onChange={(e) => setImpactFilter(e.target.value)}
-          >
+
+          <FilterSelect value={impactFilter} onChange={e => setImpactFilter(e.target.value)}>
             <option value="all">All Impact Levels</option>
             <option value="high">High Impact</option>
             <option value="medium">Medium Impact</option>
@@ -623,7 +636,7 @@ const SellDefectsManagement = () => {
             </TableRow>
           </TableHead>
           <tbody>
-            {filteredDefects.map((defect) => (
+            {filteredDefects.map(defect => (
               <TableRow key={defect._id || defect.id}>
                 <TableCell>
                   <div>
@@ -634,13 +647,15 @@ const SellDefectsManagement = () => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span style={{ 
-                    textTransform: 'capitalize',
-                    padding: '0.25rem 0.5rem',
-                    backgroundColor: '#f3f4f6',
-                    borderRadius: '4px',
-                    fontSize: '0.75rem'
-                  }}>
+                  <span
+                    style={{
+                      textTransform: 'capitalize',
+                      padding: '0.25rem 0.5rem',
+                      backgroundColor: '#f3f4f6',
+                      borderRadius: '4px',
+                      fontSize: '0.75rem',
+                    }}
+                  >
                     {defect.category}
                   </span>
                 </TableCell>
@@ -652,9 +667,7 @@ const SellDefectsManagement = () => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className={getSeverity(defect.delta)}>
-                    {getSeverity(defect.delta)}
-                  </Badge>
+                  <Badge className={getSeverity(defect.delta)}>{getSeverity(defect.delta)}</Badge>
                 </TableCell>
                 <TableCell>
                   <Badge className={defect.isActive ? 'active' : 'inactive'}>
@@ -664,7 +677,7 @@ const SellDefectsManagement = () => {
                 </TableCell>
                 <TableCell>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
-                    {(defect.variantIds && defect.variantIds.length > 0) ? (
+                    {defect.variantIds && defect.variantIds.length > 0 ? (
                       defect.variantIds.map((variantId, index) => (
                         <span
                           key={index}
@@ -673,18 +686,20 @@ const SellDefectsManagement = () => {
                             backgroundColor: '#e0e7ff',
                             color: '#4f46e5',
                             borderRadius: '4px',
-                            fontSize: '0.75rem'
+                            fontSize: '0.75rem',
                           }}
                         >
                           {variantId}
                         </span>
                       ))
                     ) : (
-                      <span style={{ 
-                        color: '#6b7280', 
-                        fontSize: '0.75rem',
-                        fontStyle: 'italic'
-                      }}>
+                      <span
+                        style={{
+                          color: '#6b7280',
+                          fontSize: '0.75rem',
+                          fontStyle: 'italic',
+                        }}
+                      >
                         All devices
                       </span>
                     )}
@@ -693,15 +708,15 @@ const SellDefectsManagement = () => {
                 <TableCell>{formatDate(defect.updatedAt)}</TableCell>
                 <TableCell>
                   <ActionMenu>
-                    <Button 
-                      className="secondary" 
+                    <Button
+                      className="secondary"
                       style={{ padding: '0.5rem', marginRight: '0.5rem' }}
                       onClick={() => handleEditDefect(defect)}
                     >
                       <Edit size={16} />
                     </Button>
-                    <Button 
-                      className="secondary" 
+                    <Button
+                      className="secondary"
                       style={{ padding: '0.5rem', backgroundColor: '#fee2e2', color: '#dc2626' }}
                       onClick={() => handleDeleteDefect(defect._id || defect.id)}
                     >
@@ -721,9 +736,8 @@ const SellDefectsManagement = () => {
           setShowModal(false);
           setEditingDefect(null);
         }}
-        onSave={editingDefect ? 
-          (data) => handleUpdateDefect(editingDefect.id, data) : 
-          handleCreateDefect
+        onSave={
+          editingDefect ? data => handleUpdateDefect(editingDefect.id, data) : handleCreateDefect
         }
         defect={editingDefect}
         loading={loading}

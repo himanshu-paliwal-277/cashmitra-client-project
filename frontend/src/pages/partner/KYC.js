@@ -20,7 +20,7 @@ import {
   Briefcase,
   Star,
   ArrowRight,
-  X
+  X,
 } from 'lucide-react';
 
 const KYCContainer = styled.div`
@@ -49,7 +49,7 @@ const StatusCard = styled.div`
   background: white;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   padding: 2rem;
   margin-bottom: 2rem;
   text-align: center;
@@ -65,18 +65,26 @@ const StatusIcon = styled.div`
   justify-content: center;
   background: ${props => {
     switch (props.status) {
-      case 'verified': return '#D1FAE5';
-      case 'pending': return '#FEF3C7';
-      case 'rejected': return '#FEE2E2';
-      default: return '#F3F4F6';
+      case 'verified':
+        return '#D1FAE5';
+      case 'pending':
+        return '#FEF3C7';
+      case 'rejected':
+        return '#FEE2E2';
+      default:
+        return '#F3F4F6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'verified': return '#065F46';
-      case 'pending': return '#92400E';
-      case 'rejected': return '#991B1B';
-      default: return '#374151';
+      case 'verified':
+        return '#065F46';
+      case 'pending':
+        return '#92400E';
+      case 'rejected':
+        return '#991B1B';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -94,8 +102,9 @@ const StatusDescription = styled.p`
 `;
 
 const Button = styled.button`
-  background: ${props => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${props => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
+  background: ${props =>
+    props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
+  color: ${props => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
   border: 1px solid ${props => props.theme.colors.primary};
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -105,12 +114,13 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   &:hover {
-    background: ${props => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
+    background: ${props =>
+      props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
     color: white;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -121,7 +131,7 @@ const ProgressSection = styled.div`
   background: white;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   padding: 2rem;
   margin-bottom: 2rem;
 `;
@@ -166,8 +176,8 @@ const StepCard = styled.div`
   border-radius: 8px;
   padding: 1.5rem;
   position: relative;
-  background: ${props => props.completed ? '#F0FDF4' : 'white'};
-  border-color: ${props => props.completed ? '#10B981' : props.theme.colors.border};
+  background: ${props => (props.completed ? '#F0FDF4' : 'white')};
+  border-color: ${props => (props.completed ? '#10B981' : props.theme.colors.border)};
 `;
 
 const StepHeader = styled.div`
@@ -181,7 +191,7 @@ const StepIcon = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background: ${props => props.completed ? '#10B981' : props.theme.colors.primary};
+  background: ${props => (props.completed ? '#10B981' : props.theme.colors.primary)};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -212,10 +222,14 @@ const StepStatus = styled.div`
   font-weight: 500;
   color: ${props => {
     switch (props.status) {
-      case 'completed': return '#10B981';
-      case 'pending': return '#F59E0B';
-      case 'rejected': return '#EF4444';
-      default: return props.theme.colors.textSecondary;
+      case 'completed':
+        return '#10B981';
+      case 'pending':
+        return '#F59E0B';
+      case 'rejected':
+        return '#EF4444';
+      default:
+        return props.theme.colors.textSecondary;
     }
   }};
 `;
@@ -224,7 +238,7 @@ const FormSection = styled.div`
   background: white;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   margin-bottom: 2rem;
 `;
 
@@ -270,12 +284,12 @@ const Input = styled.input`
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 6px;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
   }
-  
+
   &:disabled {
     background: ${props => props.theme.colors.background};
     cursor: not-allowed;
@@ -289,12 +303,12 @@ const Select = styled.select`
   font-size: 0.875rem;
   background: white;
   cursor: pointer;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
   }
-  
+
   &:disabled {
     background: ${props => props.theme.colors.background};
     cursor: not-allowed;
@@ -308,7 +322,7 @@ const UploadArea = styled.div`
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     border-color: ${props => props.theme.colors.primary};
     background: ${props => props.theme.colors.background};
@@ -380,7 +394,7 @@ const IconButton = styled.button`
   cursor: pointer;
   color: ${props => props.theme.colors.textSecondary};
   transition: all 0.2s ease;
-  
+
   &:hover {
     border-color: ${props => props.theme.colors.primary};
     color: ${props => props.theme.colors.primary};
@@ -390,7 +404,7 @@ const IconButton = styled.button`
 function PartnerKYC() {
   const [currentStep, setCurrentStep] = useState(1);
   const [kycStatus, setKycStatus] = useState('pending'); // 'not_started', 'pending', 'verified', 'rejected'
-  
+
   const [personalInfo, setPersonalInfo] = useState({
     fullName: 'Rajesh Kumar',
     email: 'rajesh@example.com',
@@ -400,16 +414,16 @@ function PartnerKYC() {
     address: '123 MG Road, Bangalore',
     city: 'Bangalore',
     state: 'Karnataka',
-    pincode: '560001'
+    pincode: '560001',
   });
-  
+
   const [businessInfo, setBusinessInfo] = useState({
     businessName: 'Kumar Electronics',
     businessType: 'retail',
     gstNumber: '29ABCDE1234F1Z5',
     panNumber: 'ABCDE1234F',
     businessAddress: '456 Commercial Street, Bangalore',
-    yearsInBusiness: '5'
+    yearsInBusiness: '5',
   });
 
   const steps = [
@@ -419,7 +433,7 @@ function PartnerKYC() {
       description: 'Basic personal details and contact information',
       icon: <User size={20} />,
       status: 'completed',
-      completed: true
+      completed: true,
     },
     {
       id: 2,
@@ -427,7 +441,7 @@ function PartnerKYC() {
       description: 'Business details and registration information',
       icon: <Building size={20} />,
       status: 'completed',
-      completed: true
+      completed: true,
     },
     {
       id: 3,
@@ -435,7 +449,7 @@ function PartnerKYC() {
       description: 'Upload required documents for verification',
       icon: <FileText size={20} />,
       status: 'pending',
-      completed: false
+      completed: false,
     },
     {
       id: 4,
@@ -443,70 +457,81 @@ function PartnerKYC() {
       description: 'Final verification and approval process',
       icon: <Shield size={20} />,
       status: 'not_started',
-      completed: false
-    }
+      completed: false,
+    },
   ];
 
   const documents = [
     {
       name: 'Aadhar Card',
       uploaded: true,
-      status: 'verified'
+      status: 'verified',
     },
     {
       name: 'PAN Card',
       uploaded: true,
-      status: 'verified'
+      status: 'verified',
     },
     {
       name: 'GST Certificate',
       uploaded: true,
-      status: 'pending'
+      status: 'pending',
     },
     {
       name: 'Bank Statement',
       uploaded: false,
-      status: 'not_uploaded'
+      status: 'not_uploaded',
     },
     {
       name: 'Business License',
       uploaded: false,
-      status: 'not_uploaded'
+      status: 'not_uploaded',
     },
     {
       name: 'Profile Photo',
       uploaded: true,
-      status: 'verified'
-    }
+      status: 'verified',
+    },
   ];
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
-      case 'verified': return <CheckCircle size={40} />;
-      case 'pending': return <Clock size={40} />;
-      case 'rejected': return <AlertCircle size={40} />;
-      default: return <Shield size={40} />;
+      case 'verified':
+        return <CheckCircle size={40} />;
+      case 'pending':
+        return <Clock size={40} />;
+      case 'rejected':
+        return <AlertCircle size={40} />;
+      default:
+        return <Shield size={40} />;
     }
   };
 
-  const getStatusText = (status) => {
+  const getStatusText = status => {
     switch (status) {
-      case 'verified': return {
-        title: 'KYC Verified',
-        description: 'Your account has been successfully verified. You can now access all partner features.'
-      };
-      case 'pending': return {
-        title: 'KYC Under Review',
-        description: 'Your documents are being reviewed. This process usually takes 2-3 business days.'
-      };
-      case 'rejected': return {
-        title: 'KYC Rejected',
-        description: 'Some documents need to be resubmitted. Please check the requirements and try again.'
-      };
-      default: return {
-        title: 'Complete Your KYC',
-        description: 'Please complete your KYC verification to access all partner features.'
-      };
+      case 'verified':
+        return {
+          title: 'KYC Verified',
+          description:
+            'Your account has been successfully verified. You can now access all partner features.',
+        };
+      case 'pending':
+        return {
+          title: 'KYC Under Review',
+          description:
+            'Your documents are being reviewed. This process usually takes 2-3 business days.',
+        };
+      case 'rejected':
+        return {
+          title: 'KYC Rejected',
+          description:
+            'Some documents need to be resubmitted. Please check the requirements and try again.',
+        };
+      default:
+        return {
+          title: 'Complete Your KYC',
+          description: 'Please complete your KYC verification to access all partner features.',
+        };
     }
   };
 
@@ -521,9 +546,7 @@ function PartnerKYC() {
       </Header>
 
       <StatusCard>
-        <StatusIcon status={kycStatus}>
-          {getStatusIcon(kycStatus)}
-        </StatusIcon>
+        <StatusIcon status={kycStatus}>{getStatusIcon(kycStatus)}</StatusIcon>
         <StatusTitle>{getStatusText(kycStatus).title}</StatusTitle>
         <StatusDescription>{getStatusText(kycStatus).description}</StatusDescription>
         {kycStatus === 'rejected' && (
@@ -541,13 +564,13 @@ function PartnerKYC() {
             {completedSteps} of {steps.length} completed
           </span>
         </ProgressHeader>
-        
+
         <ProgressBar>
           <ProgressFill progress={progress} />
         </ProgressBar>
-        
+
         <StepsContainer>
-          {steps.map((step) => (
+          {steps.map(step => (
             <StepCard key={step.id} completed={step.completed}>
               <StepHeader>
                 <StepIcon completed={step.completed}>
@@ -580,35 +603,19 @@ function PartnerKYC() {
           <FormGrid>
             <FormGroup>
               <Label>Full Name</Label>
-              <Input
-                type="text"
-                value={personalInfo.fullName}
-                disabled
-              />
+              <Input type="text" value={personalInfo.fullName} disabled />
             </FormGroup>
             <FormGroup>
               <Label>Email Address</Label>
-              <Input
-                type="email"
-                value={personalInfo.email}
-                disabled
-              />
+              <Input type="email" value={personalInfo.email} disabled />
             </FormGroup>
             <FormGroup>
               <Label>Phone Number</Label>
-              <Input
-                type="tel"
-                value={personalInfo.phone}
-                disabled
-              />
+              <Input type="tel" value={personalInfo.phone} disabled />
             </FormGroup>
             <FormGroup>
               <Label>Date of Birth</Label>
-              <Input
-                type="date"
-                value={personalInfo.dateOfBirth}
-                disabled
-              />
+              <Input type="date" value={personalInfo.dateOfBirth} disabled />
             </FormGroup>
             <FormGroup>
               <Label>Gender</Label>
@@ -620,11 +627,7 @@ function PartnerKYC() {
             </FormGroup>
             <FormGroup>
               <Label>City</Label>
-              <Input
-                type="text"
-                value={personalInfo.city}
-                disabled
-              />
+              <Input type="text" value={personalInfo.city} disabled />
             </FormGroup>
           </FormGrid>
         </FormContent>
@@ -641,11 +644,7 @@ function PartnerKYC() {
           <FormGrid>
             <FormGroup>
               <Label>Business Name</Label>
-              <Input
-                type="text"
-                value={businessInfo.businessName}
-                disabled
-              />
+              <Input type="text" value={businessInfo.businessName} disabled />
             </FormGroup>
             <FormGroup>
               <Label>Business Type</Label>
@@ -658,27 +657,15 @@ function PartnerKYC() {
             </FormGroup>
             <FormGroup>
               <Label>GST Number</Label>
-              <Input
-                type="text"
-                value={businessInfo.gstNumber}
-                disabled
-              />
+              <Input type="text" value={businessInfo.gstNumber} disabled />
             </FormGroup>
             <FormGroup>
               <Label>PAN Number</Label>
-              <Input
-                type="text"
-                value={businessInfo.panNumber}
-                disabled
-              />
+              <Input type="text" value={businessInfo.panNumber} disabled />
             </FormGroup>
             <FormGroup>
               <Label>Years in Business</Label>
-              <Input
-                type="text"
-                value={businessInfo.yearsInBusiness}
-                disabled
-              />
+              <Input type="text" value={businessInfo.yearsInBusiness} disabled />
             </FormGroup>
           </FormGrid>
         </FormContent>
@@ -704,8 +691,11 @@ function PartnerKYC() {
                   {doc.status === 'verified' && <CheckCircle size={12} />}
                   {doc.status === 'pending' && <Clock size={12} />}
                   {doc.status === 'not_uploaded' && <Upload size={12} />}
-                  {doc.status === 'verified' ? 'Verified' : 
-                   doc.status === 'pending' ? 'Pending' : 'Upload'}
+                  {doc.status === 'verified'
+                    ? 'Verified'
+                    : doc.status === 'pending'
+                      ? 'Pending'
+                      : 'Upload'}
                 </StepStatus>
                 {doc.uploaded && (
                   <DocumentActions>
@@ -723,14 +713,15 @@ function PartnerKYC() {
               </DocumentItem>
             ))}
           </DocumentList>
-          
+
           {!documents.every(doc => doc.uploaded) && (
             <UploadArea style={{ marginTop: '2rem' }}>
               <UploadIcon>
                 <Upload size={24} />
               </UploadIcon>
               <UploadText>
-                <strong>Click to upload</strong> or drag and drop<br />
+                <strong>Click to upload</strong> or drag and drop
+                <br />
                 PDF, JPG, PNG up to 10MB
               </UploadText>
             </UploadArea>

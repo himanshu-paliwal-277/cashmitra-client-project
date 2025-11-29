@@ -8,7 +8,7 @@ const useAdminBrands = () => {
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
-    inactive: 0
+    inactive: 0,
   });
 
   // Fetch all brands
@@ -22,7 +22,7 @@ const useAdminBrands = () => {
         setStats({
           total: response.data.length,
           active: response.data.filter(brand => brand.status !== 'inactive').length,
-          inactive: response.data.filter(brand => brand.status === 'inactive').length
+          inactive: response.data.filter(brand => brand.status === 'inactive').length,
         });
       }
     } catch (err) {
@@ -34,7 +34,7 @@ const useAdminBrands = () => {
   }, []);
 
   // Add new brand
-  const addBrand = useCallback(async (brandData) => {
+  const addBrand = useCallback(async brandData => {
     setLoading(true);
     setError(null);
     try {
@@ -44,7 +44,7 @@ const useAdminBrands = () => {
         setStats(prev => ({
           ...prev,
           total: prev.total + 1,
-          active: prev.active + 1
+          active: prev.active + 1,
         }));
         return { success: true, data: response.data };
       }
@@ -64,28 +64,32 @@ const useAdminBrands = () => {
     setError(null);
     try {
       console.log('editBrand called with:', { brandId, brandData });
-      
+
       // Pass current brand name for API endpoint and new brand name in data
       const updateData = {
         ...brandData,
-        currentBrandName: brandId // The current brand name to update
+        currentBrandName: brandId, // The current brand name to update
       };
-      
+
       const response = await adminService.updateBrand(brandId, updateData);
       console.log('editBrand response:', response);
-      
+
       if (response.success) {
-        setBrands(prev => prev.map(brand => 
-          brand.brand === brandId ? { 
-            ...brand, 
-            brand: brandData.brand || brandData.newBrandName || brand.brand,
-            description: brandData.description || brand.description,
-            category: brandData.category || brand.category,
-            website: brandData.website || brand.website,
-            isActive: brandData.isActive !== undefined ? brandData.isActive : brand.isActive,
-            updatedAt: new Date().toISOString()
-          } : brand
-        ));
+        setBrands(prev =>
+          prev.map(brand =>
+            brand.brand === brandId
+              ? {
+                  ...brand,
+                  brand: brandData.brand || brandData.newBrandName || brand.brand,
+                  description: brandData.description || brand.description,
+                  category: brandData.category || brand.category,
+                  website: brandData.website || brand.website,
+                  isActive: brandData.isActive !== undefined ? brandData.isActive : brand.isActive,
+                  updatedAt: new Date().toISOString(),
+                }
+              : brand
+          )
+        );
         return { success: true, data: response.data };
       }
       throw new Error(response.message || 'Failed to update brand');
@@ -100,7 +104,7 @@ const useAdminBrands = () => {
   }, []);
 
   // Remove brand
-  const removeBrand = useCallback(async (brandId) => {
+  const removeBrand = useCallback(async brandId => {
     setLoading(true);
     setError(null);
     try {
@@ -111,7 +115,7 @@ const useAdminBrands = () => {
           setStats({
             total: updated.length,
             active: updated.filter(brand => brand.status !== 'inactive').length,
-            inactive: updated.filter(brand => brand.status === 'inactive').length
+            inactive: updated.filter(brand => brand.status === 'inactive').length,
           });
           return updated;
         });
@@ -141,7 +145,7 @@ const useAdminBrands = () => {
     addBrand,
     editBrand,
     removeBrand,
-    updateBrand: editBrand // Alias for consistency
+    updateBrand: editBrand, // Alias for consistency
   };
 };
 

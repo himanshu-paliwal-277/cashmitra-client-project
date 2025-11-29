@@ -15,7 +15,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
 import {
   TrendingUp,
@@ -26,7 +26,7 @@ import {
   Calendar,
   Filter,
   Download,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
 // Styled Components
@@ -163,7 +163,7 @@ const MetricChange = styled.div`
   gap: 0.25rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: ${props => props.positive ? '#059669' : '#DC2626'};
+  color: ${props => (props.positive ? '#059669' : '#DC2626')};
 `;
 
 const ChartWrapper = styled.div`
@@ -176,14 +176,18 @@ const LoadingSpinner = styled.div`
   align-items: center;
   justify-content: center;
   height: 300px;
-  
+
   svg {
     animation: spin 1s linear infinite;
   }
-  
+
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -196,7 +200,7 @@ const CHART_COLORS = {
   purple: '#8B5CF6',
   pink: '#EC4899',
   indigo: '#6366F1',
-  teal: '#14B8A6'
+  teal: '#14B8A6',
 };
 
 const PIE_COLORS = [
@@ -205,27 +209,32 @@ const PIE_COLORS = [
   CHART_COLORS.accent,
   CHART_COLORS.danger,
   CHART_COLORS.purple,
-  CHART_COLORS.pink
+  CHART_COLORS.pink,
 ];
 
 // Custom Tooltip Component
 const CustomTooltip = ({ active, payload, label, formatter }) => {
   if (active && payload && payload.length) {
     return (
-      <div style={{
-        background: 'white',
-        padding: '12px',
-        border: '1px solid #E5E7EB',
-        borderRadius: '8px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-      }}>
+      <div
+        style={{
+          background: 'white',
+          padding: '12px',
+          border: '1px solid #E5E7EB',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        }}
+      >
         <p style={{ margin: '0 0 8px 0', fontWeight: '600' }}>{label}</p>
         {payload.map((entry, index) => (
-          <p key={index} style={{ 
-            margin: '4px 0', 
-            color: entry.color,
-            fontSize: '14px'
-          }}>
+          <p
+            key={index}
+            style={{
+              margin: '4px 0',
+              color: entry.color,
+              fontSize: '14px',
+            }}
+          >
             {entry.name}: {formatter ? formatter(entry.value) : entry.value}
           </p>
         ))}
@@ -236,12 +245,12 @@ const CustomTooltip = ({ active, payload, label, formatter }) => {
 };
 
 // Main Component
-const RealTimeCharts = ({ 
-  ordersData = [], 
-  analyticsData = {}, 
+const RealTimeCharts = ({
+  ordersData = [],
+  analyticsData = {},
   loading = false,
   onRefresh,
-  onExport 
+  onExport,
 }) => {
   const [timeRange, setTimeRange] = useState('7d');
   const [chartType, setChartType] = useState('line');
@@ -252,7 +261,7 @@ const RealTimeCharts = ({
 
     const now = new Date();
     const days = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
-    const startDate = new Date(now.getTime() - (days * 24 * 60 * 60 * 1000));
+    const startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
     // Group orders by date
     const dateGroups = {};
@@ -266,7 +275,7 @@ const RealTimeCharts = ({
             orders: 0,
             revenue: 0,
             sellOrders: 0,
-            buyOrders: 0
+            buyOrders: 0,
           };
         }
         dateGroups[dateKey].orders += 1;
@@ -282,15 +291,16 @@ const RealTimeCharts = ({
     // Fill missing dates
     const result = [];
     for (let i = 0; i < days; i++) {
-      const date = new Date(startDate.getTime() + (i * 24 * 60 * 60 * 1000));
+      const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
       const dateKey = date.toISOString().split('T')[0];
-      const displayDate = timeRange === '24h' 
-        ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-        : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      
+      const displayDate =
+        timeRange === '24h'
+          ? date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+          : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
       result.push({
         date: displayDate,
-        ...dateGroups[dateKey] || { orders: 0, revenue: 0, sellOrders: 0, buyOrders: 0 }
+        ...(dateGroups[dateKey] || { orders: 0, revenue: 0, sellOrders: 0, buyOrders: 0 }),
       });
     }
 
@@ -309,7 +319,7 @@ const RealTimeCharts = ({
     return Object.entries(statusCounts).map(([status, count]) => ({
       name: status.charAt(0).toUpperCase() + status.slice(1),
       value: count,
-      percentage: ((count / ordersData.length) * 100).toFixed(1)
+      percentage: ((count / ordersData.length) * 100).toFixed(1),
     }));
   }, [ordersData]);
 
@@ -325,7 +335,7 @@ const RealTimeCharts = ({
     return Object.entries(typeCounts).map(([type, count]) => ({
       name: type === 'sell' ? 'Sell Orders' : 'Buy Orders',
       value: count,
-      percentage: ((count / ordersData.length) * 100).toFixed(1)
+      percentage: ((count / ordersData.length) * 100).toFixed(1),
     }));
   }, [ordersData]);
 
@@ -341,19 +351,19 @@ const RealTimeCharts = ({
       totalOrders,
       totalRevenue,
       avgOrderValue,
-      completionRate
+      completionRate,
     };
   }, [ordersData]);
 
-  const formatCurrency = (value) => {
+  const formatCurrency = value => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(value);
   };
 
-  const formatNumber = (value) => {
+  const formatNumber = value => {
     return new Intl.NumberFormat('en-IN').format(value);
   };
 
@@ -379,10 +389,7 @@ const RealTimeCharts = ({
             Revenue & Orders Trend
           </ChartTitle>
           <ChartControls>
-            <TimeRangeSelect 
-              value={timeRange} 
-              onChange={(e) => setTimeRange(e.target.value)}
-            >
+            <TimeRangeSelect value={timeRange} onChange={e => setTimeRange(e.target.value)}>
               <option value="24h">Last 24 Hours</option>
               <option value="7d">Last 7 Days</option>
               <option value="30d">Last 30 Days</option>
@@ -398,10 +405,17 @@ const RealTimeCharts = ({
             </ChartButton>
           </ChartControls>
         </ChartHeader>
-        
+
         <ChartContent>
           {/* Metrics Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1rem',
+              marginBottom: '2rem',
+            }}
+          >
             <MetricCard>
               <MetricInfo>
                 <MetricIcon color={CHART_COLORS.primary}>
@@ -472,27 +486,16 @@ const RealTimeCharts = ({
               {chartType === 'line' ? (
                 <LineChart data={processedData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="#6B7280"
-                    fontSize={12}
-                  />
-                  <YAxis 
-                    yAxisId="orders"
-                    orientation="left"
-                    stroke="#6B7280"
-                    fontSize={12}
-                  />
-                  <YAxis 
+                  <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
+                  <YAxis yAxisId="orders" orientation="left" stroke="#6B7280" fontSize={12} />
+                  <YAxis
                     yAxisId="revenue"
                     orientation="right"
                     stroke="#6B7280"
                     fontSize={12}
                     tickFormatter={formatCurrency}
                   />
-                  <Tooltip 
-                    content={<CustomTooltip formatter={formatCurrency} />}
-                  />
+                  <Tooltip content={<CustomTooltip formatter={formatCurrency} />} />
                   <Legend />
                   <Line
                     yAxisId="orders"
@@ -516,18 +519,9 @@ const RealTimeCharts = ({
               ) : (
                 <AreaChart data={processedData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="#6B7280"
-                    fontSize={12}
-                  />
-                  <YAxis 
-                    stroke="#6B7280"
-                    fontSize={12}
-                  />
-                  <Tooltip 
-                    content={<CustomTooltip />}
-                  />
+                  <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
+                  <YAxis stroke="#6B7280" fontSize={12} />
+                  <Tooltip content={<CustomTooltip />} />
                   <Legend />
                   <Area
                     type="monotone"
@@ -570,7 +564,7 @@ const RealTimeCharts = ({
               </ChartButton>
             </ChartControls>
           </ChartHeader>
-          
+
           <ChartContent>
             <ChartWrapper>
               <ResponsiveContainer width="100%" height="100%">
@@ -610,27 +604,16 @@ const RealTimeCharts = ({
               </ChartButton>
             </ChartControls>
           </ChartHeader>
-          
+
           <ChartContent>
             <ChartWrapper>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={typeDistribution}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="#6B7280"
-                    fontSize={12}
-                  />
-                  <YAxis 
-                    stroke="#6B7280"
-                    fontSize={12}
-                  />
+                  <XAxis dataKey="name" stroke="#6B7280" fontSize={12} />
+                  <YAxis stroke="#6B7280" fontSize={12} />
                   <Tooltip />
-                  <Bar 
-                    dataKey="value" 
-                    fill={CHART_COLORS.primary}
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <Bar dataKey="value" fill={CHART_COLORS.primary} radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartWrapper>

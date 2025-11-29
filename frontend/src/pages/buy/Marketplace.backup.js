@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { 
-  Search, 
-  Filter, 
-  Grid, 
-  List, 
-  Star, 
-  Heart, 
-  ShoppingCart, 
-  Smartphone, 
-  Tablet, 
-  Laptop, 
-  Headphones, 
-  Watch, 
+import {
+  Search,
+  Filter,
+  Grid,
+  List,
+  Star,
+  Heart,
+  ShoppingCart,
+  Smartphone,
+  Tablet,
+  Laptop,
+  Headphones,
+  Watch,
   Camera,
   TrendingUp,
   Award,
@@ -21,7 +21,7 @@ import {
   RotateCcw,
   Eye,
   ChevronDown,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
@@ -87,7 +87,9 @@ const SuperCategoryCard = styled(Card)`
   border-radius: 16px;
   background: #fff;
   border: 1px solid #e5e7eb;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
   cursor: pointer;
 
   &:hover {
@@ -129,11 +131,11 @@ const MarketplaceContainer = styled.div`
 // Hero Section with Enhanced Design
 const HeroSection = styled.section`
   background: linear-gradient(
-    135deg, 
-    #667eea 0%, 
-    #764ba2 25%, 
-    #f093fb 50%, 
-    #f5576c 75%, 
+    135deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #f5576c 75%,
     #4facfe 100%
   );
   background-size: 400% 400%;
@@ -143,7 +145,7 @@ const HeroSection = styled.section`
   text-align: center;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -192,7 +194,7 @@ const SearchSection = styled.div`
   max-width: 700px;
   margin: 0 auto;
   position: relative;
-  
+
   .search-input {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -202,7 +204,7 @@ const SearchSection = styled.div`
     font-size: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    
+
     &:focus {
       border-color: rgba(255, 255, 255, 0.5);
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
@@ -237,7 +239,7 @@ const StatCard = styled.div`
   transition: all 0.3s ease;
   animation: ${slideInLeft} 0.6s ease-out;
   animation-delay: ${props => props.delay || '0s'};
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
@@ -271,7 +273,7 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
-  
+
   @media (max-width: 768px) {
     padding: 0 1rem;
   }
@@ -328,7 +330,7 @@ const CategoryCard = styled(Card)`
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -339,18 +341,20 @@ const CategoryCard = styled(Card)`
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     transition: left 0.5s;
   }
-  
+
   &:hover {
     transform: translateY(-8px) scale(1.02);
     border-color: ${props => props.theme.colors.primary.main};
     box-shadow: 0 20px 60px rgba(102, 126, 234, 0.25);
-    
+
     &::before {
       left: 100%;
     }
   }
-  
-  ${props => props.active && `
+
+  ${props =>
+    props.active &&
+    `
     border-color: ${props.theme.colors.primary.main};
     background: linear-gradient(135deg, #667eea10 0%, #764ba220 100%);
     transform: translateY(-4px);
@@ -370,7 +374,7 @@ const CategoryIcon = styled.div`
   color: white;
   transition: all 0.3s ease;
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-  
+
   ${CategoryCard}:hover & {
     transform: scale(1.1) rotate(5deg);
     box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
@@ -404,7 +408,7 @@ const FiltersContainer = styled.div`
   justify-content: space-between;
   flex-wrap: wrap;
   gap: ${props => props.theme.spacing.md};
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: stretch;
@@ -416,7 +420,7 @@ const FiltersLeft = styled.div`
   align-items: center;
   gap: ${props => props.theme.spacing.md};
   flex-wrap: wrap;
-  
+
   @media (max-width: 768px) {
     justify-content: center;
   }
@@ -426,7 +430,7 @@ const FiltersRight = styled.div`
   display: flex;
   align-items: center;
   gap: ${props => props.theme.spacing.md};
-  
+
   @media (max-width: 768px) {
     justify-content: center;
   }
@@ -436,14 +440,16 @@ const FilterButton = styled(Button)`
   border-radius: 25px;
   font-weight: 500;
   transition: all 0.3s ease;
-  
-  ${props => props.active && `
+
+  ${props =>
+    props.active &&
+    `
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     transform: translateY(-2px);
   `}
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
@@ -462,14 +468,16 @@ const ViewToggle = styled.div`
 const ViewButton = styled.button`
   padding: 12px 16px;
   border: none;
-  background: ${props => props.active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white'};
-  color: ${props => props.active ? 'white' : '#64748b'};
+  background: ${props =>
+    props.active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white'};
+  color: ${props => (props.active ? 'white' : '#64748b')};
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
-  
+
   &:hover {
-    background: ${props => props.active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#f8fafc'};
+    background: ${props =>
+      props.active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#f8fafc'};
   }
 `;
 
@@ -483,13 +491,13 @@ const CustomSelect = styled.select`
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  
+
   &:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   }
-  
+
   &:hover {
     border-color: #cbd5e1;
   }
@@ -507,7 +515,7 @@ const ProductsHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 3rem;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 1.5rem;
@@ -520,7 +528,7 @@ const ResultsCount = styled.p`
   color: #64748b;
   font-size: 16px;
   font-weight: 500;
-  
+
   span {
     color: #667eea;
     font-weight: 700;
@@ -529,17 +537,18 @@ const ResultsCount = styled.p`
 
 const ProductGrid = styled.div`
   display: grid;
-  grid-template-columns: ${props => props.viewMode === 'grid' ? 'repeat(auto-fill, minmax(320px, 1fr))' : '1fr'};
+  grid-template-columns: ${props =>
+    props.viewMode === 'grid' ? 'repeat(auto-fill, minmax(320px, 1fr))' : '1fr'};
   gap: 2.5rem;
   margin-bottom: 4rem;
   padding: 0 1rem;
-  
+
   @media (max-width: 768px) {
     gap: 2rem;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     margin-bottom: 3rem;
   }
-  
+
   @media (max-width: 480px) {
     gap: 1.5rem;
     grid-template-columns: 1fr;
@@ -553,7 +562,7 @@ const ProductCard = styled(Card)`
   border: 2px solid transparent;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   position: relative;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -561,16 +570,20 @@ const ProductCard = styled(Card)`
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(102, 126, 234, 0.05) 0%,
+      rgba(118, 75, 162, 0.05) 100%
+    );
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  
+
   &:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
     border-color: #667eea;
-    
+
     &::before {
       opacity: 1;
     }
@@ -586,14 +599,14 @@ const ProductImage = styled.div`
   justify-content: center;
   position: relative;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.4s ease;
   }
-  
+
   ${ProductCard}:hover & img {
     transform: scale(1.1);
   }
@@ -632,15 +645,15 @@ const WishlistButton = styled.button`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   z-index: 2;
-  
+
   &:hover {
     transform: scale(1.1);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   }
-  
+
   svg {
-    color: ${props => props.isWishlisted ? '#ef4444' : '#64748b'};
-    fill: ${props => props.isWishlisted ? '#ef4444' : 'none'};
+    color: ${props => (props.isWishlisted ? '#ef4444' : '#64748b')};
+    fill: ${props => (props.isWishlisted ? '#ef4444' : 'none')};
     transition: all 0.3s ease;
   }
 `;
@@ -649,7 +662,7 @@ const ProductInfo = styled.div`
   padding: 1.5rem;
   position: relative;
   z-index: 1;
-  
+
   @media (max-width: 768px) {
     padding: 1rem;
   }
@@ -736,7 +749,7 @@ const ActionButton = styled(Button)`
   border-radius: 12px;
   font-weight: 600;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -756,7 +769,7 @@ const LoadMoreButton = styled(Button)`
   border: none;
   color: white;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 35px rgba(102, 126, 234, 0.3);
@@ -770,7 +783,7 @@ const categoryIcons = {
   laptop: Laptop,
   headphones: Headphones,
   watch: Watch,
-  camera: Camera
+  camera: Camera,
 };
 
 // Google placeholder image URLs for different categories
@@ -780,20 +793,20 @@ const getGooglePlaceholderImage = (category, index = 0) => {
       'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop',
       'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=300&fit=crop',
       'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400&h=300&fit=crop',
-      'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400&h=300&fit=crop'
+      'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400&h=300&fit=crop',
     ],
     tablet: [
       'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=300&fit=crop',
       'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=400&h=300&fit=crop',
-      'https://images.unsplash.com/photo-1585790050230-5dd28404ccb9?w=400&h=300&fit=crop'
+      'https://images.unsplash.com/photo-1585790050230-5dd28404ccb9?w=400&h=300&fit=crop',
     ],
     laptop: [
       'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop',
       'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=300&fit=crop',
-      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop'
-    ]
+      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop',
+    ],
   };
-  
+
   const categoryImages = imageQueries[category] || imageQueries.mobile;
   return categoryImages[index % categoryImages.length];
 };
@@ -811,7 +824,7 @@ const Marketplace = () => {
   const [filters, setFilters] = useState({
     priceRange: 'all',
     condition: 'all',
-    brand: 'all'
+    brand: 'all',
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -819,7 +832,7 @@ const Marketplace = () => {
     page: 1,
     limit: 20,
     total: 0,
-    totalPages: 0
+    totalPages: 0,
   });
 
   // Super categories state
@@ -833,16 +846,22 @@ const Marketplace = () => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         // Fetch categories, brands, and initial products
         const [categoriesRes, brandsRes, productsRes] = await Promise.all([
           productService.getCategories(),
           productService.getBrands(),
-          productService.getProducts({ page: 1, limit: 20 })
+          productService.getProducts({ page: 1, limit: 20 }),
         ]);
-        
+
         // Add "All" category and set categories with icons
-        const allCategory = { id: 'all', name: 'All Categories', slug: 'all', count: '0+', icon: Grid };
+        const allCategory = {
+          id: 'all',
+          name: 'All Categories',
+          slug: 'all',
+          count: '0+',
+          icon: Grid,
+        };
         const categoriesWithIcons = [
           allCategory,
           ...(categoriesRes.data?.map(cat => ({
@@ -850,21 +869,21 @@ const Marketplace = () => {
             name: cat.name,
             slug: cat.slug,
             icon: categoryIcons[cat.slug] || Smartphone,
-            count: cat.productCount || cat.count || '0+'
-          })) || [])
+            count: cat.productCount || cat.count || '0+',
+          })) || []),
         ];
-        
+
         setCategories(categoriesWithIcons);
         setBrands(brandsRes.data || []);
         setAllProducts(productsRes.data?.products || []);
         setDisplayProducts(productsRes.data?.products || []);
-        
+
         if (productsRes.data) {
           setPagination({
             page: productsRes.data.page || 1,
             limit: productsRes.data.limit || 20,
             total: productsRes.data.total || 0,
-            totalPages: productsRes.data.totalPages || 0
+            totalPages: productsRes.data.totalPages || 0,
           });
         }
       } catch (err) {
@@ -904,33 +923,35 @@ const Marketplace = () => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         // Build query parameters
         const params = {
           page: 1, // Reset to first page when filters change
-          limit: pagination.limit
+          limit: pagination.limit,
         };
-        
+
         // Handle category filtering - use slug for API calls
         if (selectedCategory !== 'all') {
-          const selectedCat = categories.find(cat => cat.id === selectedCategory || cat.slug === selectedCategory);
+          const selectedCat = categories.find(
+            cat => cat.id === selectedCategory || cat.slug === selectedCategory
+          );
           if (selectedCat && selectedCat.slug !== 'all') {
             params.category = selectedCat.slug;
           }
         }
-        
+
         if (searchQuery.trim()) {
           params.search = searchQuery.trim();
         }
-        
+
         if (filters.brand !== 'all') {
           params.brand = filters.brand;
         }
-        
+
         if (filters.condition !== 'all') {
           params.condition = filters.condition;
         }
-        
+
         if (filters.priceRange !== 'all') {
           const [min, max] = filters.priceRange.split('-').map(Number);
           params.minPrice = min;
@@ -938,20 +959,20 @@ const Marketplace = () => {
             params.maxPrice = max;
           }
         }
-        
+
         if (sortBy !== 'popularity') {
           params.sort = sortBy;
         }
-        
+
         const response = await productService.getProducts(params);
-        
+
         if (response.success) {
           setDisplayProducts(response.data?.products || []);
           setPagination({
             page: response.data?.page || 1,
             limit: response.data?.limit || 20,
             total: response.data?.total || 0,
-            totalPages: response.data?.totalPages || 0
+            totalPages: response.data?.totalPages || 0,
           });
         } else {
           setError('Failed to load products');
@@ -963,13 +984,13 @@ const Marketplace = () => {
         setIsLoading(false);
       }
     };
-    
+
     // Debounce the API call
     const timer = setTimeout(fetchFilteredProducts, 300);
     return () => clearTimeout(timer);
   }, [selectedCategory, searchQuery, filters, sortBy, pagination.limit, categories]);
 
-  const toggleWishlist = (productId) => {
+  const toggleWishlist = productId => {
     const newWishlist = new Set(wishlist);
     if (newWishlist.has(productId)) {
       newWishlist.delete(productId);
@@ -979,12 +1000,12 @@ const Marketplace = () => {
     setWishlist(newWishlist);
   };
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = product => {
     console.log('Added to cart:', product);
     // TODO: Implement cart functionality
   };
 
-  const renderStars = (rating) => {
+  const renderStars = rating => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
@@ -1002,10 +1023,13 @@ const Marketplace = () => {
     const productTitle = `${product.brand} ${product.model}` || product.name || product.title;
     const productPrice = product.basePrice || product.price || 0;
     const originalPrice = product.originalPrice || product.basePrice || productPrice;
-    const discount = originalPrice > productPrice ? Math.round(((originalPrice - productPrice) / originalPrice) * 100) : 0;
+    const discount =
+      originalPrice > productPrice
+        ? Math.round(((originalPrice - productPrice) / originalPrice) * 100)
+        : 0;
     const rating = product.rating || product.averageRating || 4.0;
     const reviewCount = product.reviewCount || product.reviews?.length || 0;
-    
+
     return (
       <ProductCard key={productId}>
         <ProductImage>
@@ -1013,7 +1037,7 @@ const Marketplace = () => {
           {product.badge && <ProductBadge>{product.badge}</ProductBadge>}
           <WishlistButton
             isWishlisted={wishlist.has(productId)}
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               toggleWishlist(productId);
             }}
@@ -1045,7 +1069,7 @@ const Marketplace = () => {
             <ActionButton
               variant="ghost"
               size="sm"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 console.log('View product:', product.id);
               }}
@@ -1056,7 +1080,7 @@ const Marketplace = () => {
             <ActionButton
               variant="primary"
               size="sm"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 handleAddToCart(product);
               }}
@@ -1079,14 +1103,15 @@ const Marketplace = () => {
             Discover Premium Refurbished Devices
           </HeroTitle>
           <HeroSubtitle>
-            Experience cutting-edge technology at unbeatable prices with our certified pre-owned electronics
+            Experience cutting-edge technology at unbeatable prices with our certified pre-owned
+            electronics
           </HeroSubtitle>
           <SearchSection>
             <Input
               type="text"
               placeholder="Search for devices, brands, or models..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               leftIcon={<Search size={20} />}
               size="lg"
               className="search-input"
@@ -1114,7 +1139,7 @@ const Marketplace = () => {
             <StatLabel>Warranty Period</StatLabel>
           </StatCard>
         </StatsGrid>
-    </StatsSection>
+      </StatsSection>
 
       {/* Super Categories - Simple, clean, professional section */}
       <SuperCategorySection>
@@ -1126,23 +1151,25 @@ const Marketplace = () => {
             </div>
           ) : superLoading ? (
             <div style={{ textAlign: 'center', padding: '20px 0' }}>
-              <div style={{ 
-                display: 'inline-block', width: '36px', height: '36px',
-                border: '4px solid #f3f4f6', borderTop: '4px solid #667eea',
-                borderRadius: '50%', animation: 'spin 1s linear infinite'
-              }} />
+              <div
+                style={{
+                  display: 'inline-block',
+                  width: '36px',
+                  height: '36px',
+                  border: '4px solid #f3f4f6',
+                  borderTop: '4px solid #667eea',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                }}
+              />
             </div>
           ) : (
             <SuperCategoryGrid>
               {superCategories.map(sc => (
                 <SuperCategoryCard key={sc._id || sc.id}>
-                  {sc.image && (
-                    <SuperCategoryImage src={sc.image} alt={sc.name} loading="lazy" />
-                  )}
+                  {sc.image && <SuperCategoryImage src={sc.image} alt={sc.name} loading="lazy" />}
                   <SuperCategoryName>{sc.name}</SuperCategoryName>
-                  {sc.description && (
-                    <SuperCategoryDesc>{sc.description}</SuperCategoryDesc>
-                  )}
+                  {sc.description && <SuperCategoryDesc>{sc.description}</SuperCategoryDesc>}
                 </SuperCategoryCard>
               ))}
             </SuperCategoryGrid>
@@ -1154,13 +1181,17 @@ const Marketplace = () => {
         <Container>
           <SectionTitle>Shop by Category</SectionTitle>
           <CategoryGrid>
-            {categories.map((category) => {
+            {categories.map(category => {
               const IconComponent = category.icon;
               return (
                 <CategoryCard
                   key={category.id}
                   active={selectedCategory === category.id}
-                  onClick={() => setSelectedCategory(category.id === 'all' ? 'all' : category.slug || category.id)}
+                  onClick={() =>
+                    setSelectedCategory(
+                      category.id === 'all' ? 'all' : category.slug || category.id
+                    )
+                  }
                 >
                   <CategoryIcon>
                     <IconComponent size={32} />
@@ -1186,13 +1217,15 @@ const Marketplace = () => {
               >
                 All Categories
               </FilterButton>
-              <CustomSelect 
-                value={filters.brand} 
-                onChange={(e) => setFilters({...filters, brand: e.target.value})}
+              <CustomSelect
+                value={filters.brand}
+                onChange={e => setFilters({ ...filters, brand: e.target.value })}
               >
                 <option value="all">All Brands</option>
                 {brands.map(brand => (
-                  <option key={brand} value={brand}>{brand}</option>
+                  <option key={brand} value={brand}>
+                    {brand}
+                  </option>
                 ))}
               </CustomSelect>
               {/* <CustomSelect 
@@ -1207,16 +1240,10 @@ const Marketplace = () => {
             </FiltersLeft>
             <FiltersRight>
               <ViewToggle>
-                <ViewButton
-                  active={viewMode === 'grid'}
-                  onClick={() => setViewMode('grid')}
-                >
+                <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
                   <Grid size={18} />
                 </ViewButton>
-                <ViewButton
-                  active={viewMode === 'list'}
-                  onClick={() => setViewMode('list')}
-                >
+                <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
                   <List size={18} />
                 </ViewButton>
               </ViewToggle>
@@ -1229,9 +1256,10 @@ const Marketplace = () => {
         <Container>
           <ProductsHeader>
             <ResultsCount>
-              Showing <span>{displayProducts.length}</span> of <span>{allProducts.length}</span> products
+              Showing <span>{displayProducts.length}</span> of <span>{allProducts.length}</span>{' '}
+              products
             </ResultsCount>
-            <CustomSelect value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <CustomSelect value={sortBy} onChange={e => setSortBy(e.target.value)}>
               <option value="popularity">Sort by Popularity</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
@@ -1242,25 +1270,27 @@ const Marketplace = () => {
 
           {error ? (
             <div style={{ textAlign: 'center', padding: '60px 0' }}>
-              <div style={{ 
-                backgroundColor: '#fef2f2', 
-                border: '1px solid #fecaca', 
-                borderRadius: '8px', 
-                padding: '20px', 
-                maxWidth: '400px', 
-                margin: '0 auto' 
-              }}>
+              <div
+                style={{
+                  backgroundColor: '#fef2f2',
+                  border: '1px solid #fecaca',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  maxWidth: '400px',
+                  margin: '0 auto',
+                }}
+              >
                 <h3 style={{ color: '#dc2626', marginBottom: '8px' }}>Error Loading Products</h3>
                 <p style={{ color: '#991b1b', marginBottom: '16px' }}>{error}</p>
-                <button 
-                  onClick={() => window.location.reload()} 
-                  style={{ 
-                    backgroundColor: '#dc2626', 
-                    color: 'white', 
-                    border: 'none', 
-                    padding: '8px 16px', 
-                    borderRadius: '6px', 
-                    cursor: 'pointer' 
+                <button
+                  onClick={() => window.location.reload()}
+                  style={{
+                    backgroundColor: '#dc2626',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
                   }}
                 >
                   Retry
@@ -1269,15 +1299,17 @@ const Marketplace = () => {
             </div>
           ) : isLoading ? (
             <div style={{ textAlign: 'center', padding: '60px 0' }}>
-              <div style={{ 
-                display: 'inline-block', 
-                width: '40px', 
-                height: '40px', 
-                border: '4px solid #f3f4f6', 
-                borderTop: '4px solid #667eea', 
-                borderRadius: '50%', 
-                animation: 'spin 1s linear infinite' 
-              }}></div>
+              <div
+                style={{
+                  display: 'inline-block',
+                  width: '40px',
+                  height: '40px',
+                  border: '4px solid #f3f4f6',
+                  borderTop: '4px solid #667eea',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                }}
+              ></div>
               <p style={{ marginTop: '16px', color: '#64748b' }}>Loading products...</p>
             </div>
           ) : (

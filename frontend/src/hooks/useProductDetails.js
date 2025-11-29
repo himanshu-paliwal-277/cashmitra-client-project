@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import adminService from '../services/adminService';
 
-const useProductDetails = (productId) => {
+const useProductDetails = productId => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,13 +16,13 @@ const useProductDetails = (productId) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const response = await adminService.getBuyProductById(productId);
-        
+
         if (response.success && response.data) {
           console.log('response.data: ', response.data);
           const productData = response.data;
-          
+
           // Transform API data to match the expected format
           const transformedProduct = {
             _id: productData._id,
@@ -52,9 +52,9 @@ const useProductDetails = (productId) => {
             sortOrder: productData.sortOrder || 0,
             createdAt: productData.createdAt,
             updatedAt: productData.updatedAt,
-            createdBy: productData.createdBy || null
+            createdBy: productData.createdBy || null,
           };
-          
+
           setProduct(transformedProduct);
         } else {
           setError('Product not found in response');

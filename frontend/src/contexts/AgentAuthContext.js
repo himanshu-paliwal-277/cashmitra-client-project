@@ -17,7 +17,7 @@ export const AgentAuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('agentToken');
         const storedAgent = localStorage.getItem('agentUser');
-        
+
         if (token && storedAgent) {
           // Parse stored agent data
           const agentData = JSON.parse(storedAgent);
@@ -42,29 +42,29 @@ export const AgentAuthProvider = ({ children }) => {
     try {
       const response = await axios.post(`${API_URL}/agent/login`, {
         email,
-        password
+        password,
       });
 
       // Extract data from response.data.data (based on your API response structure)
       const { token, _id, name, email: agentEmail, phone, role, profileImage } = response.data.data;
-      
+
       const agentData = {
         _id,
         name,
         email: agentEmail,
         phone,
         role,
-        profileImage
+        profileImage,
       };
 
       // Store in localStorage
       localStorage.setItem('agentToken', token);
       localStorage.setItem('agentUser', JSON.stringify(agentData));
-      
+
       // Update state
       setAgent(agentData);
       setIsAuthenticated(true);
-      
+
       toast.success('Login successful!');
       return true;
     } catch (error) {
@@ -80,11 +80,11 @@ export const AgentAuthProvider = ({ children }) => {
     // Clear auth data from localStorage
     localStorage.removeItem('agentToken');
     localStorage.removeItem('agentUser');
-    
+
     // Reset state
     setAgent(null);
     setIsAuthenticated(false);
-    
+
     toast.success('Logged out successfully');
   };
 
@@ -99,14 +99,10 @@ export const AgentAuthProvider = ({ children }) => {
     isAuthenticated,
     login,
     logout,
-    getAuthHeader
+    getAuthHeader,
   };
 
-  return (
-    <AgentAuthContext.Provider value={value}>
-      {children}
-    </AgentAuthContext.Provider>
-  );
+  return <AgentAuthContext.Provider value={value}>{children}</AgentAuthContext.Provider>;
 };
 
 export const useAgentAuth = () => {

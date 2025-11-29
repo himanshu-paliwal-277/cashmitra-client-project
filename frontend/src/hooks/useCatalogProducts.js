@@ -12,9 +12,9 @@ const useCatalogProducts = (page = 1, limit = 10) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await api.get(`/admin/catalog?page=${page}&limit=${limit}`);
-      
+
       if (response.data.success) {
         setProducts(response.data.products || []);
         setTotalPages(response.data.totalPages || 0);
@@ -44,7 +44,7 @@ const useCatalogProducts = (page = 1, limit = 10) => {
     error,
     totalPages,
     totalProducts,
-    refetch
+    refetch,
   };
 };
 

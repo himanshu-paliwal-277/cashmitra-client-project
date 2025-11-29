@@ -24,7 +24,7 @@ import {
   Star,
   TrendingUp,
   Filter,
-  Settings
+  Settings,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -64,7 +64,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -90,7 +90,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -105,7 +105,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -186,11 +186,11 @@ const PartnerRow = styled.div`
   border-bottom: 1px solid #e5e7eb;
   align-items: center;
   transition: all 0.2s;
-  
+
   &:hover {
     background-color: #f9fafb;
   }
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -239,7 +239,7 @@ const StatusBadge = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  
+
   ${props => {
     switch (props.status) {
       case 'active':
@@ -262,7 +262,16 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${props => props.primary ? '#3b82f6' : props.danger ? '#ef4444' : props.success ? '#10b981' : props.warning ? '#f59e0b' : '#6b7280'};
+  background: ${props =>
+    props.primary
+      ? '#3b82f6'
+      : props.danger
+        ? '#ef4444'
+        : props.success
+          ? '#10b981'
+          : props.warning
+            ? '#f59e0b'
+            : '#6b7280'};
   color: white;
   border: none;
   padding: 0.5rem;
@@ -271,7 +280,7 @@ const IconButton = styled.button`
   display: flex;
   align-items: center;
   transition: all 0.2s;
-  
+
   &:hover {
     opacity: 0.9;
     transform: scale(1.05);
@@ -323,7 +332,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  
+
   &:hover {
     background: #f3f4f6;
   }
@@ -346,7 +355,7 @@ const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -362,7 +371,7 @@ const TextArea = styled.textarea`
   font-size: 0.875rem;
   min-height: 100px;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -377,7 +386,7 @@ const Select = styled.select`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   background: white;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -398,12 +407,15 @@ const Button = styled.button`
   cursor: pointer;
   transition: all 0.2s;
   border: none;
-  
-  ${props => props.variant === 'primary' ? `
+
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: #3b82f6;
     color: white;
     &:hover { background: #2563eb; }
-  ` : `
+  `
+      : `
     background: #f3f4f6;
     color: #374151;
     &:hover { background: #e5e7eb; }
@@ -458,9 +470,9 @@ const Partners = () => {
     total: 0,
     active: 0,
     pending: 0,
-    suspended: 0
+    suspended: 0,
   });
-  
+
   const [formData, setFormData] = useState({
     userId: '',
     shopName: '',
@@ -469,7 +481,7 @@ const Partners = () => {
       city: '',
       state: '',
       pincode: '',
-      country: 'India'
+      country: 'India',
     },
     gstNumber: '',
     shopPhone: '',
@@ -480,10 +492,10 @@ const Partners = () => {
       accountNumber: '',
       ifscCode: '',
       bankName: '',
-      accountHolderName: ''
+      accountHolderName: '',
     },
     upiId: '',
-    roleTemplate: 'basic' // Add role template field with default value
+    roleTemplate: 'basic', // Add role template field with default value
   });
 
   const {
@@ -495,7 +507,7 @@ const Partners = () => {
     addPartner,
     editPartner,
     removePartner,
-    updatePartnerStatus
+    updatePartnerStatus,
   } = useAdminPartners();
 
   // Fetch partners on component mount
@@ -530,7 +542,7 @@ const Partners = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     console.log('sdf');
     e.preventDefault();
     try {
@@ -539,7 +551,7 @@ const Partners = () => {
       } else {
         await addPartner(formData);
       }
-      
+
       setShowModal(false);
       setEditingPartner(null);
       resetForm();
@@ -548,7 +560,7 @@ const Partners = () => {
     }
   };
 
-  const handleDelete = async (partnerId) => {
+  const handleDelete = async partnerId => {
     if (window.confirm('Are you sure you want to delete this partner?')) {
       try {
         await removePartner(partnerId);
@@ -566,7 +578,7 @@ const Partners = () => {
     }
   };
 
-  const handleEdit = (partner) => {
+  const handleEdit = partner => {
     setEditingPartner(partner);
     setFormData({
       userId: partner.user?._id || '',
@@ -576,7 +588,7 @@ const Partners = () => {
         city: partner.shopAddress?.city || '',
         state: partner.shopAddress?.state || '',
         pincode: partner.shopAddress?.pincode || '',
-        country: partner.shopAddress?.country || 'India'
+        country: partner.shopAddress?.country || 'India',
       },
       gstNumber: partner.gstNumber || '',
       shopPhone: partner.shopPhone || '',
@@ -587,14 +599,14 @@ const Partners = () => {
         accountNumber: partner.bankDetails?.accountNumber || '',
         ifscCode: partner.bankDetails?.ifscCode || '',
         bankName: partner.bankDetails?.bankName || '',
-        accountHolderName: partner.bankDetails?.accountHolderName || ''
+        accountHolderName: partner.bankDetails?.accountHolderName || '',
       },
-      upiId: partner.upiId || ''
+      upiId: partner.upiId || '',
     });
     setShowModal(true);
   };
 
-  const handleViewDetails = (partner) => {
+  const handleViewDetails = partner => {
     setSelectedPartner(partner);
     setShowDetailModal(true);
   };
@@ -608,7 +620,7 @@ const Partners = () => {
         city: '',
         state: '',
         pincode: '',
-        country: 'India'
+        country: 'India',
       },
       gstNumber: '',
       shopPhone: '',
@@ -619,13 +631,13 @@ const Partners = () => {
         accountNumber: '',
         ifscCode: '',
         bankName: '',
-        accountHolderName: ''
+        accountHolderName: '',
       },
-      upiId: ''
+      upiId: '',
     });
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'approved':
         return <CheckCircle size={12} />;
@@ -639,15 +651,16 @@ const Partners = () => {
   };
 
   const filteredPartners = partners.filter(partner => {
-    const matchesSearch = partner.shopName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         partner.shopEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         partner.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         partner.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         partner.gstNumber?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch =
+      partner.shopName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partner.shopEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partner.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partner.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partner.gstNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesStatus = !statusFilter || partner.verificationStatus === statusFilter;
     const matchesType = !typeFilter; // No business type in partner model, so ignore this filter for now
-    
+
     return matchesSearch && matchesStatus && matchesType;
   });
 
@@ -669,7 +682,12 @@ const Partners = () => {
           <Users size={32} />
           Partners Management
         </Title>
-        <ActionButton onClick={() => { resetForm(); setShowModal(true); }}>
+        <ActionButton
+          onClick={() => {
+            resetForm();
+            setShowModal(true);
+          }}
+        >
           <Plus size={20} />
           Add Partner
         </ActionButton>
@@ -685,7 +703,7 @@ const Partners = () => {
             <StatLabel>Total Partners</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#10b981">
             <CheckCircle size={24} />
@@ -695,7 +713,7 @@ const Partners = () => {
             <StatLabel>Approved Partners</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#f59e0b">
             <Clock size={24} />
@@ -705,7 +723,7 @@ const Partners = () => {
             <StatLabel>Pending Approval</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#ef4444">
             <XCircle size={24} />
@@ -722,23 +740,17 @@ const Partners = () => {
           type="text"
           placeholder="Search partners by shop name, email, or GST number..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
-        
-        <FilterSelect
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
+
+        <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="">All Status</option>
           <option value="approved">Approved</option>
           <option value="pending">Pending</option>
           <option value="rejected">Rejected</option>
         </FilterSelect>
-        
-        <FilterSelect
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-        >
+
+        <FilterSelect value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
           <option value="">All Types</option>
           <option value="individual">Individual</option>
           <option value="business">Business</option>
@@ -757,48 +769,47 @@ const Partners = () => {
             <div>Status</div>
             <div>Actions</div>
           </TableHeader>
-          
+
           {filteredPartners.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <Users size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
               <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
-                {searchTerm || statusFilter || typeFilter ? 'No partners match your filters' : 'No partners found'}
+                {searchTerm || statusFilter || typeFilter
+                  ? 'No partners match your filters'
+                  : 'No partners found'}
               </p>
             </div>
           ) : (
-            filteredPartners.map((partner) => (
+            filteredPartners.map(partner => (
               <PartnerRow key={partner._id}>
                 <PartnerInfo>
                   <PartnerAvatar>
-                    {partner.shopName?.charAt(0)?.toUpperCase() || partner.user?.name?.charAt(0)?.toUpperCase() || 'P'}
+                    {partner.shopName?.charAt(0)?.toUpperCase() ||
+                      partner.user?.name?.charAt(0)?.toUpperCase() ||
+                      'P'}
                   </PartnerAvatar>
                   <PartnerDetails>
                     <PartnerName>{partner.shopName || 'No Shop Name'}</PartnerName>
-                    <PartnerEmail>{partner.user?.name} ({partner.user?.email})</PartnerEmail>
+                    <PartnerEmail>
+                      {partner.user?.name} ({partner.user?.email})
+                    </PartnerEmail>
                   </PartnerDetails>
                 </PartnerInfo>
-                
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                  Individual
-                </div>
-                
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                  Not set
-                </div>
-                
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                  0
-                </div>
-                
-                <div style={{ color: '#059669', fontSize: '0.875rem', fontWeight: '600' }}>
-                  ₹0
-                </div>
-                
+
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Individual</div>
+
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>Not set</div>
+
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>0</div>
+
+                <div style={{ color: '#059669', fontSize: '0.875rem', fontWeight: '600' }}>₹0</div>
+
                 <StatusBadge status={partner.verificationStatus}>
                   {getStatusIcon(partner.verificationStatus)}
-                  {partner.verificationStatus?.charAt(0)?.toUpperCase() + partner.verificationStatus?.slice(1) || 'Pending'}
+                  {partner.verificationStatus?.charAt(0)?.toUpperCase() +
+                    partner.verificationStatus?.slice(1) || 'Pending'}
                 </StatusBadge>
-                
+
                 <ActionButtons>
                   <IconButton success onClick={() => handleViewDetails(partner)}>
                     <Eye size={14} />
@@ -806,7 +817,17 @@ const Partners = () => {
                   <IconButton primary onClick={() => handleEdit(partner)}>
                     <Edit size={14} />
                   </IconButton>
-                  <IconButton style={{ background: '#8b5cf6' }} onClick={() => navigate('/admin/partner-permissions', { state: { partnerId: partner._id, partnerName: partner.user?.name || 'Partner' } })}>
+                  <IconButton
+                    style={{ background: '#8b5cf6' }}
+                    onClick={() =>
+                      navigate('/admin/partner-permissions', {
+                        state: {
+                          partnerId: partner._id,
+                          partnerName: partner.user?.name || 'Partner',
+                        },
+                      })
+                    }
+                  >
                     <Settings size={14} />
                   </IconButton>
                   {partner.verificationStatus === 'pending' && (
@@ -833,14 +854,17 @@ const Partners = () => {
         <Modal>
           <ModalContent>
             <ModalHeader>
-              <ModalTitle>
-                {editingPartner ? 'Edit Partner' : 'Add New Partner'}
-              </ModalTitle>
-              <CloseButton onClick={() => { setShowModal(false); setEditingPartner(null); }}>
+              <ModalTitle>{editingPartner ? 'Edit Partner' : 'Add New Partner'}</ModalTitle>
+              <CloseButton
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingPartner(null);
+                }}
+              >
                 <X size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             <form onSubmit={handleSubmit}>
               {!editingPartner && (
                 <FormGroup>
@@ -852,11 +876,11 @@ const Partners = () => {
                   ) : (
                     <Select
                       value={formData.userId}
-                      onChange={(e) => setFormData({ ...formData, userId: e.target.value })}
+                      onChange={e => setFormData({ ...formData, userId: e.target.value })}
                       required
                     >
                       <option value="">Select a user</option>
-                      {users.map((user) => (
+                      {users.map(user => (
                         <option key={user._id} value={user._id}>
                           {user.name} ({user.email})
                         </option>
@@ -865,71 +889,81 @@ const Partners = () => {
                   )}
                 </FormGroup>
               )}
-              
+
               <FormGroup>
                 <Label>Shop Name *</Label>
                 <Input
                   type="text"
                   value={formData.shopName}
-                  onChange={(e) => setFormData({ ...formData, shopName: e.target.value })}
+                  onChange={e => setFormData({ ...formData, shopName: e.target.value })}
                   required
                   placeholder="Enter shop name"
                 />
               </FormGroup>
-              
+
               <div style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ marginBottom: '1rem', color: '#374151', fontSize: '1.125rem' }}>Shop Address</h3>
+                <h3 style={{ marginBottom: '1rem', color: '#374151', fontSize: '1.125rem' }}>
+                  Shop Address
+                </h3>
                 <div style={{ display: 'grid', gap: '1rem' }}>
                   <FormGroup>
                     <Label>Street Address *</Label>
                     <Input
                       type="text"
                       value={formData.shopAddress.street}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        shopAddress: { ...formData.shopAddress, street: e.target.value }
-                      })}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          shopAddress: { ...formData.shopAddress, street: e.target.value },
+                        })
+                      }
                       required
                       placeholder="Street address"
                     />
                   </FormGroup>
-                  
+
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
                     <FormGroup>
                       <Label>City</Label>
                       <Input
                         type="text"
                         value={formData.shopAddress.city}
-                        onChange={(e) => setFormData({ 
-                          ...formData, 
-                          shopAddress: { ...formData.shopAddress, city: e.target.value }
-                        })}
+                        onChange={e =>
+                          setFormData({
+                            ...formData,
+                            shopAddress: { ...formData.shopAddress, city: e.target.value },
+                          })
+                        }
                         placeholder="City"
                       />
                     </FormGroup>
-                    
+
                     <FormGroup>
                       <Label>State</Label>
                       <Input
                         type="text"
                         value={formData.shopAddress.state}
-                        onChange={(e) => setFormData({ 
-                          ...formData, 
-                          shopAddress: { ...formData.shopAddress, state: e.target.value }
-                        })}
+                        onChange={e =>
+                          setFormData({
+                            ...formData,
+                            shopAddress: { ...formData.shopAddress, state: e.target.value },
+                          })
+                        }
                         placeholder="State"
                       />
                     </FormGroup>
-                    
+
                     <FormGroup>
                       <Label>Pincode *</Label>
                       <Input
                         type="text"
                         value={formData.shopAddress.pincode}
-                        onChange={(e) => setFormData({ 
-                          ...formData, 
-                          shopAddress: { ...formData.shopAddress, pincode: e.target.value }
-                        })}
+                        onChange={e =>
+                          setFormData({
+                            ...formData,
+                            shopAddress: { ...formData.shopAddress, pincode: e.target.value },
+                          })
+                        }
                         required
                         placeholder="6-digit pincode"
                         maxLength="6"
@@ -938,45 +972,47 @@ const Partners = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <FormGroup>
                   <Label>Shop Phone *</Label>
                   <Input
                     type="tel"
                     value={formData.shopPhone}
-                    onChange={(e) => setFormData({ ...formData, shopPhone: e.target.value })}
+                    onChange={e => setFormData({ ...formData, shopPhone: e.target.value })}
                     required
                     placeholder="Shop phone number"
                   />
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Shop Email *</Label>
                   <Input
                     type="email"
                     value={formData.shopEmail}
-                    onChange={(e) => setFormData({ ...formData, shopEmail: e.target.value })}
+                    onChange={e => setFormData({ ...formData, shopEmail: e.target.value })}
                     required
                     placeholder="Shop email address"
                   />
                 </FormGroup>
               </div>
-              
+
               <FormGroup>
                 <Label>GST Number *</Label>
                 <Input
                   type="text"
                   value={formData.gstNumber}
-                  onChange={(e) => setFormData({ ...formData, gstNumber: e.target.value })}
+                  onChange={e => setFormData({ ...formData, gstNumber: e.target.value })}
                   required
                   placeholder="15-digit GST number"
                   maxLength="15"
                 />
               </FormGroup>
-              
+
               <div style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ marginBottom: '1rem', color: '#374151', fontSize: '1.125rem' }}>Bank Details</h3>
+                <h3 style={{ marginBottom: '1rem', color: '#374151', fontSize: '1.125rem' }}>
+                  Bank Details
+                </h3>
                 <div style={{ display: 'grid', gap: '1rem' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <FormGroup>
@@ -984,74 +1020,85 @@ const Partners = () => {
                       <Input
                         type="text"
                         value={formData.bankDetails.accountNumber}
-                        onChange={(e) => setFormData({ 
-                          ...formData, 
-                          bankDetails: { ...formData.bankDetails, accountNumber: e.target.value }
-                        })}
+                        onChange={e =>
+                          setFormData({
+                            ...formData,
+                            bankDetails: { ...formData.bankDetails, accountNumber: e.target.value },
+                          })
+                        }
                         placeholder="Bank account number"
                       />
                     </FormGroup>
-                    
+
                     <FormGroup>
                       <Label>IFSC Code</Label>
                       <Input
                         type="text"
                         value={formData.bankDetails.ifscCode}
-                        onChange={(e) => setFormData({ 
-                          ...formData, 
-                          bankDetails: { ...formData.bankDetails, ifscCode: e.target.value }
-                        })}
+                        onChange={e =>
+                          setFormData({
+                            ...formData,
+                            bankDetails: { ...formData.bankDetails, ifscCode: e.target.value },
+                          })
+                        }
                         placeholder="IFSC code"
                         maxLength="11"
                       />
                     </FormGroup>
                   </div>
-                  
+
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <FormGroup>
                       <Label>Bank Name</Label>
                       <Input
                         type="text"
                         value={formData.bankDetails.bankName}
-                        onChange={(e) => setFormData({ 
-                          ...formData, 
-                          bankDetails: { ...formData.bankDetails, bankName: e.target.value }
-                        })}
+                        onChange={e =>
+                          setFormData({
+                            ...formData,
+                            bankDetails: { ...formData.bankDetails, bankName: e.target.value },
+                          })
+                        }
                         placeholder="Bank name"
                       />
                     </FormGroup>
-                    
+
                     <FormGroup>
                       <Label>Account Holder Name</Label>
                       <Input
                         type="text"
                         value={formData.bankDetails.accountHolderName}
-                        onChange={(e) => setFormData({ 
-                          ...formData, 
-                          bankDetails: { ...formData.bankDetails, accountHolderName: e.target.value }
-                        })}
+                        onChange={e =>
+                          setFormData({
+                            ...formData,
+                            bankDetails: {
+                              ...formData.bankDetails,
+                              accountHolderName: e.target.value,
+                            },
+                          })
+                        }
                         placeholder="Account holder name"
                       />
                     </FormGroup>
                   </div>
                 </div>
               </div>
-              
+
               <FormGroup>
                 <Label>UPI ID</Label>
                 <Input
                   type="email"
                   value={formData.upiId}
-                  onChange={(e) => setFormData({ ...formData, upiId: e.target.value })}
+                  onChange={e => setFormData({ ...formData, upiId: e.target.value })}
                   placeholder="UPI ID (email format)"
                 />
               </FormGroup>
-              
+
               <FormGroup>
                 <Label>Role Template *</Label>
                 <Select
                   value={formData.roleTemplate}
-                  onChange={(e) => setFormData({ ...formData, roleTemplate: e.target.value })}
+                  onChange={e => setFormData({ ...formData, roleTemplate: e.target.value })}
                   required
                 >
                   <option value="basic">Basic Partner</option>
@@ -1060,9 +1107,15 @@ const Partners = () => {
                   <option value="custom">Custom Permissions</option>
                 </Select>
               </FormGroup>
-              
+
               <ModalActions>
-                <Button type="button" onClick={() => { setShowModal(false); setEditingPartner(null); }}>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingPartner(null);
+                  }}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" variant="primary">
@@ -1084,7 +1137,7 @@ const Partners = () => {
                 <X size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             <DetailSection>
               <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Personal Information</h3>
               <DetailGrid>
@@ -1101,18 +1154,22 @@ const Partners = () => {
                 <DetailItem>
                   <Phone size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Phone:</DetailLabel>
-                  <DetailValue>{selectedPartner.user?.phone || selectedPartner.shopPhone || 'N/A'}</DetailValue>
+                  <DetailValue>
+                    {selectedPartner.user?.phone || selectedPartner.shopPhone || 'N/A'}
+                  </DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Calendar size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Joined:</DetailLabel>
                   <DetailValue>
-                    {selectedPartner.createdAt ? new Date(selectedPartner.createdAt).toLocaleDateString() : 'N/A'}
+                    {selectedPartner.createdAt
+                      ? new Date(selectedPartner.createdAt).toLocaleDateString()
+                      : 'N/A'}
                   </DetailValue>
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
-            
+
             <DetailSection>
               <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Business Information</h3>
               <DetailGrid>
@@ -1134,8 +1191,11 @@ const Partners = () => {
                   <DetailValue>{selectedPartner.panNumber || 'N/A'}</DetailValue>
                 </DetailItem>
               </DetailGrid>
-              
-              {(selectedPartner.shopAddress?.street || selectedPartner.shopAddress?.city || selectedPartner.shopAddress?.state || selectedPartner.shopAddress?.pincode) && (
+
+              {(selectedPartner.shopAddress?.street ||
+                selectedPartner.shopAddress?.city ||
+                selectedPartner.shopAddress?.state ||
+                selectedPartner.shopAddress?.pincode) && (
                 <DetailItem style={{ gridColumn: '1 / -1' }}>
                   <MapPin size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Address:</DetailLabel>
@@ -1143,12 +1203,13 @@ const Partners = () => {
                     {selectedPartner.shopAddress?.street && `${selectedPartner.shopAddress.street}`}
                     {selectedPartner.shopAddress?.city && `, ${selectedPartner.shopAddress.city}`}
                     {selectedPartner.shopAddress?.state && `, ${selectedPartner.shopAddress.state}`}
-                    {selectedPartner.shopAddress?.pincode && ` - ${selectedPartner.shopAddress.pincode}`}
+                    {selectedPartner.shopAddress?.pincode &&
+                      ` - ${selectedPartner.shopAddress.pincode}`}
                   </DetailValue>
                 </DetailItem>
               )}
             </DetailSection>
-            
+
             <DetailSection>
               <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Performance Metrics</h3>
               <DetailGrid>
@@ -1164,22 +1225,34 @@ const Partners = () => {
                 <DetailItem>
                   <Star size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Commission Rate:</DetailLabel>
-                  <DetailValue>{selectedPartner.commissionRate ? `${selectedPartner.commissionRate}%` : 'Not set'}</DetailValue>
+                  <DetailValue>
+                    {selectedPartner.commissionRate
+                      ? `${selectedPartner.commissionRate}%`
+                      : 'Not set'}
+                  </DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <DetailLabel>Status:</DetailLabel>
                   <StatusBadge status={selectedPartner.verificationStatus}>
                     {getStatusIcon(selectedPartner.verificationStatus)}
-                    {selectedPartner.verificationStatus?.charAt(0)?.toUpperCase() + selectedPartner.verificationStatus?.slice(1) || 'Pending'}
+                    {selectedPartner.verificationStatus?.charAt(0)?.toUpperCase() +
+                      selectedPartner.verificationStatus?.slice(1) || 'Pending'}
                   </StatusBadge>
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
-            
+
             {selectedPartner.notes && (
               <DetailSection>
                 <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Notes</h3>
-                <div style={{ padding: '1rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#374151' }}>
+                <div
+                  style={{
+                    padding: '1rem',
+                    background: '#f9fafb',
+                    borderRadius: '0.5rem',
+                    color: '#374151',
+                  }}
+                >
                   {selectedPartner.notes}
                 </div>
               </DetailSection>

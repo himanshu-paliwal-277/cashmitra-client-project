@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import useAdminSell from '../../hooks/useAdminSell';
-import { TrendingUp, Plus, Search, Filter, Eye, Edit, Trash2, X, Calendar, User, Package, CreditCard, MapPin, Clock } from 'lucide-react';
+import {
+  TrendingUp,
+  Plus,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Trash2,
+  X,
+  Calendar,
+  User,
+  Package,
+  CreditCard,
+  MapPin,
+  Clock,
+} from 'lucide-react';
 
 const Container = styled.div`
   padding: 2rem;
@@ -39,7 +54,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -65,7 +80,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -83,7 +98,7 @@ const FilterButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #e5e7eb;
   }
@@ -135,7 +150,7 @@ const TableHeader = styled.thead`
 
 const TableRow = styled.tr`
   border-bottom: 1px solid #e5e7eb;
-  
+
   &:hover {
     background: #f9fafb;
   }
@@ -171,7 +186,7 @@ const IconButton = styled.button`
   cursor: pointer;
   color: #6b7280;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f3f4f6;
     color: #374151;
@@ -185,18 +200,26 @@ const StatusBadge = styled.span`
   font-weight: 600;
   background: ${props => {
     switch (props.status) {
-      case 'pending': return '#fef3c7';
-      case 'approved': return '#d1fae5';
-      case 'rejected': return '#fee2e2';
-      default: return '#f3f4f6';
+      case 'pending':
+        return '#fef3c7';
+      case 'approved':
+        return '#d1fae5';
+      case 'rejected':
+        return '#fee2e2';
+      default:
+        return '#f3f4f6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'pending': return '#92400e';
-      case 'approved': return '#065f46';
-      case 'rejected': return '#991b1b';
-      default: return '#374151';
+      case 'pending':
+        return '#92400e';
+      case 'approved':
+        return '#065f46';
+      case 'rejected':
+        return '#991b1b';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -249,7 +272,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   color: #6b7280;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f3f4f6;
     color: #374151;
@@ -262,7 +285,7 @@ const ModalBody = styled.div`
 
 const DetailSection = styled.div`
   margin-bottom: 2rem;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -322,7 +345,7 @@ const StatusHistoryItem = styled.div`
   background: #f9fafb;
   border-radius: 0.5rem;
   margin-bottom: 0.5rem;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -334,10 +357,14 @@ const StatusDot = styled.div`
   border-radius: 50%;
   background: ${props => {
     switch (props.status) {
-      case 'pending': return '#f59e0b';
-      case 'approved': return '#10b981';
-      case 'rejected': return '#ef4444';
-      default: return '#6b7280';
+      case 'pending':
+        return '#f59e0b';
+      case 'approved':
+        return '#10b981';
+      case 'rejected':
+        return '#ef4444';
+      default:
+        return '#6b7280';
     }
   }};
 `;
@@ -352,7 +379,7 @@ const Sell = () => {
     total: 0,
     pending: 0,
     approved: 0,
-    avgQuote: 0
+    avgQuote: 0,
   });
 
   const {
@@ -360,7 +387,7 @@ const Sell = () => {
     stats: hookStats,
     loading: hookLoading,
     error: hookError,
-    updateOrderStatus
+    updateOrderStatus,
   } = useAdminSell();
 
   useEffect(() => {
@@ -372,13 +399,16 @@ const Sell = () => {
       const totalOrders = orders.length;
       const pendingOrders = orders.filter(order => order.status === 'pending').length;
       const approvedOrders = orders.filter(order => order.status === 'approved').length;
-      const avgAmount = orders.length > 0 ? orders.reduce((sum, order) => sum + order.totalAmount, 0) / orders.length : 0;
-      
+      const avgAmount =
+        orders.length > 0
+          ? orders.reduce((sum, order) => sum + order.totalAmount, 0) / orders.length
+          : 0;
+
       setStats({
         total: totalOrders,
         pending: pendingOrders,
         approved: approvedOrders,
-        avgQuote: avgAmount
+        avgQuote: avgAmount,
       });
     } else {
       setSellOrders(hookSellOrders || []);
@@ -394,21 +424,22 @@ const Sell = () => {
     { label: 'Average Quote', value: `₹${stats.avgQuote.toLocaleString()}`, color: '#8b5cf6' },
   ];
 
-  const filteredOrders = sellOrders.filter(order =>
-    (order.assessmentId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (order.notes || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (order._id || '').toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOrders = sellOrders.filter(
+    order =>
+      (order.assessmentId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.notes || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order._id || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
-  const handleViewOrder = (order) => {
+  const handleViewOrder = order => {
     setSelectedOrder(order);
     setShowModal(true);
   };
@@ -445,7 +476,7 @@ const Sell = () => {
           type="text"
           placeholder="Search by assessment ID, order ID, or notes..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
         <FilterButton>
           <Filter size={16} />
@@ -481,12 +512,15 @@ const Sell = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredOrders.map((order) => (
+              filteredOrders.map(order => (
                 <TableRow key={order._id}>
                   <TableCell>{order.assessmentId || 'N/A'}</TableCell>
                   <TableCell>{order.orderType || 'N/A'}</TableCell>
                   <TableCell>₹{(order.totalAmount || 0).toLocaleString()}</TableCell>
-                  <TableCell>₹{(order.commission?.amount || 0).toLocaleString()} ({((order.commission?.rate || 0) * 100).toFixed(1)}%)</TableCell>
+                  <TableCell>
+                    ₹{(order.commission?.amount || 0).toLocaleString()} (
+                    {((order.commission?.rate || 0) * 100).toFixed(1)}%)
+                  </TableCell>
                   <TableCell>{order.paymentDetails?.method || 'N/A'}</TableCell>
                   <TableCell>
                     <StatusBadge status={order.status}>
@@ -511,7 +545,7 @@ const Sell = () => {
       {/* Order Details Modal */}
       {showModal && selectedOrder && (
         <ModalOverlay onClick={handleCloseModal}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
+          <ModalContent onClick={e => e.stopPropagation()}>
             <ModalHeader>
               <ModalTitle>Order Details</ModalTitle>
               <CloseButton onClick={handleCloseModal}>
@@ -542,7 +576,8 @@ const Sell = () => {
                     <DetailLabel>Status</DetailLabel>
                     <DetailValue>
                       <StatusBadge status={selectedOrder.status}>
-                        {selectedOrder.status.charAt(0).toUpperCase() + selectedOrder.status.slice(1)}
+                        {selectedOrder.status.charAt(0).toUpperCase() +
+                          selectedOrder.status.slice(1)}
                       </StatusBadge>
                     </DetailValue>
                   </DetailItem>
@@ -566,11 +601,15 @@ const Sell = () => {
                 <DetailGrid>
                   <DetailItem>
                     <DetailLabel>Commission Rate</DetailLabel>
-                    <DetailValue>{((selectedOrder.commission?.rate || 0) * 100).toFixed(1)}%</DetailValue>
+                    <DetailValue>
+                      {((selectedOrder.commission?.rate || 0) * 100).toFixed(1)}%
+                    </DetailValue>
                   </DetailItem>
                   <DetailItem>
                     <DetailLabel>Commission Amount</DetailLabel>
-                    <DetailValue>₹{(selectedOrder.commission?.amount || 0).toLocaleString()}</DetailValue>
+                    <DetailValue>
+                      ₹{(selectedOrder.commission?.amount || 0).toLocaleString()}
+                    </DetailValue>
                   </DetailItem>
                 </DetailGrid>
               </DetailSection>
@@ -590,8 +629,10 @@ const Sell = () => {
                     <DetailLabel>Payment Status</DetailLabel>
                     <DetailValue>
                       <StatusBadge status={selectedOrder.paymentDetails?.status || 'unknown'}>
-                        {(selectedOrder.paymentDetails?.status || 'Unknown').charAt(0).toUpperCase() + 
-                         (selectedOrder.paymentDetails?.status || 'Unknown').slice(1)}
+                        {(selectedOrder.paymentDetails?.status || 'Unknown')
+                          .charAt(0)
+                          .toUpperCase() +
+                          (selectedOrder.paymentDetails?.status || 'Unknown').slice(1)}
                       </StatusBadge>
                     </DetailValue>
                   </DetailItem>
@@ -607,7 +648,9 @@ const Sell = () => {
                 <DetailGrid>
                   <DetailItem>
                     <DetailLabel>Country</DetailLabel>
-                    <DetailValue>{selectedOrder.shippingDetails?.address?.country || 'N/A'}</DetailValue>
+                    <DetailValue>
+                      {selectedOrder.shippingDetails?.address?.country || 'N/A'}
+                    </DetailValue>
                   </DetailItem>
                 </DetailGrid>
               </DetailSection>
@@ -663,13 +706,13 @@ const Sell = () => {
                       <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>
                         {history.status.charAt(0).toUpperCase() + history.status.slice(1)}
                       </div>
-                      <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}>
+                      <div
+                        style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.25rem' }}
+                      >
                         {formatDate(history.timestamp)}
                       </div>
                       {history.note && (
-                        <div style={{ fontSize: '0.875rem', color: '#374151' }}>
-                          {history.note}
-                        </div>
+                        <div style={{ fontSize: '0.875rem', color: '#374151' }}>{history.note}</div>
                       )}
                     </div>
                   </StatusHistoryItem>

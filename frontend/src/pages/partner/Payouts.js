@@ -15,7 +15,7 @@ import {
   Filter,
   Plus,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
 } from 'lucide-react';
 
 const PayoutsContainer = styled.div`
@@ -44,8 +44,9 @@ const HeaderActions = styled.div`
 `;
 
 const Button = styled.button`
-  background: ${props => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${props => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
+  background: ${props =>
+    props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
+  color: ${props => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
   border: 1px solid ${props => props.theme.colors.primary};
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -55,9 +56,10 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   &:hover {
-    background: ${props => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
+    background: ${props =>
+      props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
     color: white;
   }
 `;
@@ -74,7 +76,7 @@ const StatCard = styled.div`
   padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
 `;
@@ -119,7 +121,7 @@ const StatChange = styled.div`
   align-items: center;
   gap: 0.25rem;
   font-size: 0.875rem;
-  color: ${props => props.positive ? '#10B981' : '#EF4444'};
+  color: ${props => (props.positive ? '#10B981' : '#EF4444')};
   justify-content: flex-end;
 `;
 
@@ -128,7 +130,7 @@ const ContentGrid = styled.div`
   grid-template-columns: 2fr 1fr;
   gap: 2rem;
   margin-bottom: 2rem;
-  
+
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
@@ -138,7 +140,7 @@ const Card = styled.div`
   background: white;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 `;
 
 const CardHeader = styled.div`
@@ -173,7 +175,7 @@ const FilterSelect = styled.select`
   background: white;
   cursor: pointer;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
@@ -186,7 +188,7 @@ const PayoutItem = styled.div`
   align-items: center;
   padding: 1rem 0;
   border-bottom: 1px solid ${props => props.theme.colors.border};
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -232,20 +234,30 @@ const StatusBadge = styled.span`
   gap: 0.25rem;
   background: ${props => {
     switch (props.status) {
-      case 'completed': return '#D1FAE5';
-      case 'pending': return '#FEF3C7';
-      case 'processing': return '#DBEAFE';
-      case 'failed': return '#FEE2E2';
-      default: return '#F3F4F6';
+      case 'completed':
+        return '#D1FAE5';
+      case 'pending':
+        return '#FEF3C7';
+      case 'processing':
+        return '#DBEAFE';
+      case 'failed':
+        return '#FEE2E2';
+      default:
+        return '#F3F4F6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'completed': return '#065F46';
-      case 'pending': return '#92400E';
-      case 'processing': return '#1E40AF';
-      case 'failed': return '#991B1B';
-      default: return '#374151';
+      case 'completed':
+        return '#065F46';
+      case 'pending':
+        return '#92400E';
+      case 'processing':
+        return '#1E40AF';
+      case 'failed':
+        return '#991B1B';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -260,12 +272,12 @@ const PaymentMethod = styled.div`
   margin-bottom: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     border-color: ${props => props.theme.colors.primary};
     background: ${props => props.theme.colors.background};
   }
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -336,7 +348,7 @@ function Payouts() {
       change: '+12.5%',
       positive: true,
       icon: <DollarSign size={24} />,
-      color: '#10B981'
+      color: '#10B981',
     },
     {
       label: 'This Month',
@@ -344,7 +356,7 @@ function Payouts() {
       change: '+8.3%',
       positive: true,
       icon: <TrendingUp size={24} />,
-      color: '#3B82F6'
+      color: '#3B82F6',
     },
     {
       label: 'Pending Payouts',
@@ -352,7 +364,7 @@ function Payouts() {
       change: '-2.1%',
       positive: false,
       icon: <Clock size={24} />,
-      color: '#F59E0B'
+      color: '#F59E0B',
     },
     {
       label: 'Available Balance',
@@ -360,8 +372,8 @@ function Payouts() {
       change: '+15.2%',
       positive: true,
       icon: <Wallet size={24} />,
-      color: '#8B5CF6'
-    }
+      color: '#8B5CF6',
+    },
   ];
 
   const payouts = [
@@ -371,7 +383,7 @@ function Payouts() {
       amount: '₹25,680',
       method: 'Bank Transfer',
       status: 'completed',
-      transactionId: 'TXN123456789'
+      transactionId: 'TXN123456789',
     },
     {
       id: 'PAY-002',
@@ -379,7 +391,7 @@ function Payouts() {
       amount: '₹18,450',
       method: 'UPI',
       status: 'completed',
-      transactionId: 'TXN123456788'
+      transactionId: 'TXN123456788',
     },
     {
       id: 'PAY-003',
@@ -387,7 +399,7 @@ function Payouts() {
       amount: '₹32,100',
       method: 'Bank Transfer',
       status: 'processing',
-      transactionId: 'TXN123456787'
+      transactionId: 'TXN123456787',
     },
     {
       id: 'PAY-004',
@@ -395,7 +407,7 @@ function Payouts() {
       amount: '₹12,450',
       method: 'Wallet',
       status: 'pending',
-      transactionId: 'TXN123456786'
+      transactionId: 'TXN123456786',
     },
     {
       id: 'PAY-005',
@@ -403,8 +415,8 @@ function Payouts() {
       amount: '₹8,920',
       method: 'Bank Transfer',
       status: 'failed',
-      transactionId: 'TXN123456785'
-    }
+      transactionId: 'TXN123456785',
+    },
   ];
 
   const paymentMethods = [
@@ -413,22 +425,22 @@ function Payouts() {
       details: 'HDFC Bank ****1234',
       icon: <Building2 size={20} />,
       color: '#3B82F6',
-      isDefault: true
+      isDefault: true,
     },
     {
       type: 'UPI',
       details: 'partner@paytm',
       icon: <CreditCard size={20} />,
       color: '#10B981',
-      isDefault: false
+      isDefault: false,
     },
     {
       type: 'Digital Wallet',
       details: 'Paytm Wallet',
       icon: <Wallet size={20} />,
       color: '#8B5CF6',
-      isDefault: false
-    }
+      isDefault: false,
+    },
   ];
 
   const filteredPayouts = payouts.filter(payout => {
@@ -436,13 +448,18 @@ function Payouts() {
     return matchesStatus;
   });
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
-      case 'completed': return <CheckCircle size={12} />;
-      case 'pending': return <Clock size={12} />;
-      case 'processing': return <Clock size={12} />;
-      case 'failed': return <AlertCircle size={12} />;
-      default: return null;
+      case 'completed':
+        return <CheckCircle size={12} />;
+      case 'pending':
+        return <Clock size={12} />;
+      case 'processing':
+        return <Clock size={12} />;
+      case 'failed':
+        return <AlertCircle size={12} />;
+      default:
+        return null;
     }
   };
 
@@ -466,9 +483,7 @@ function Payouts() {
         {stats.map((stat, index) => (
           <StatCard key={index}>
             <StatHeader>
-              <StatIcon color={stat.color}>
-                {stat.icon}
-              </StatIcon>
+              <StatIcon color={stat.color}>{stat.icon}</StatIcon>
               <StatInfo>
                 <StatValue>{stat.value}</StatValue>
                 <StatLabel>{stat.label}</StatLabel>
@@ -493,20 +508,14 @@ function Payouts() {
           </CardHeader>
           <CardContent>
             <FilterSection>
-              <FilterSelect
-                value={timeFilter}
-                onChange={(e) => setTimeFilter(e.target.value)}
-              >
+              <FilterSelect value={timeFilter} onChange={e => setTimeFilter(e.target.value)}>
                 <option value="all">All Time</option>
                 <option value="month">This Month</option>
                 <option value="quarter">This Quarter</option>
                 <option value="year">This Year</option>
               </FilterSelect>
-              
-              <FilterSelect
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
+
+              <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
                 <option value="all">All Status</option>
                 <option value="completed">Completed</option>
                 <option value="pending">Pending</option>
@@ -514,16 +523,16 @@ function Payouts() {
                 <option value="failed">Failed</option>
               </FilterSelect>
             </FilterSection>
-            
+
             {filteredPayouts.length > 0 ? (
-              filteredPayouts.map((payout) => (
+              filteredPayouts.map(payout => (
                 <PayoutItem key={payout.id}>
                   <PayoutInfo>
                     <PayoutDate>
                       {new Date(payout.date).toLocaleDateString('en-IN', {
                         year: 'numeric',
                         month: 'short',
-                        day: 'numeric'
+                        day: 'numeric',
                       })}
                     </PayoutDate>
                     <PayoutDetails>
@@ -562,9 +571,7 @@ function Payouts() {
           <CardContent>
             {paymentMethods.map((method, index) => (
               <PaymentMethod key={index}>
-                <MethodIcon color={method.color}>
-                  {method.icon}
-                </MethodIcon>
+                <MethodIcon color={method.color}>{method.icon}</MethodIcon>
                 <MethodInfo>
                   <MethodTitle>{method.type}</MethodTitle>
                   <MethodDetails>{method.details}</MethodDetails>

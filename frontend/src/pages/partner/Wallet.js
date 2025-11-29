@@ -70,7 +70,7 @@ const WalletPage = () => {
         <Title>Wallet</Title>
         <Subtitle>Manage your earnings and financial transactions</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,7 +78,7 @@ const WalletPage = () => {
           </Icon>
           <ComingSoonTitle>Wallet Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to view your balance, 
+            This feature is currently under development. Soon you'll be able to view your balance,
             transaction history, and manage your earnings with detailed financial insights.
           </ComingSoonText>
         </ComingSoon>

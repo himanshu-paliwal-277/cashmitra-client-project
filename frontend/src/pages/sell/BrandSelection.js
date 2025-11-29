@@ -6,13 +6,7 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import useAdminBrands from '../../hooks/useAdminBrands';
 import useAdminCategories from '../../hooks/useAdminCategories';
-import { 
-  ArrowRight,
-  ArrowLeft,
-  Home,
-  Loader,
-  Search
-} from 'lucide-react';
+import { ArrowRight, ArrowLeft, Home, Loader, Search } from 'lucide-react';
 
 const PageContainer = styled.div`
   min-height: calc(100vh - 72px);
@@ -24,11 +18,11 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 0 ${theme.spacing[8]};
   }
@@ -49,7 +43,7 @@ const BreadcrumbLink = styled.a`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -69,7 +63,7 @@ const PageTitle = styled.h1`
   font-weight: ${theme.typography.fontWeight.semibold};
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[4]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     font-size: ${theme.typography.fontSize['2xl']};
   }
@@ -97,12 +91,12 @@ const SearchInput = styled.input`
   font-size: ${theme.typography.fontSize.base};
   background: ${theme.colors.white};
   transition: border-color ${theme.transitions.duration.normal};
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary.main};
   }
-  
+
   &::placeholder {
     color: ${theme.colors.text.hint};
   }
@@ -121,7 +115,7 @@ const BrandGrid = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: ${theme.spacing[4]};
   margin-bottom: ${theme.spacing[8]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: ${theme.spacing[3]};
@@ -132,13 +126,13 @@ const BrandCard = styled(Card)`
   cursor: pointer;
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
   border: 2px solid transparent;
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: ${theme.shadows.xl};
     border-color: ${theme.colors.primary.main};
   }
-  
+
   &.selected {
     border-color: ${theme.colors.primary.main};
     background: ${theme.colors.primary[50]};
@@ -179,10 +173,10 @@ const NavigationButtons = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: ${theme.spacing[4]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -232,13 +226,13 @@ const BrandSelection = ({ onBrandSelect, onBack }) => {
     if (brands && selectedCategory) {
       console.log('selectedCategory: ', selectedCategory);
       console.log('brands: ', brands);
-      let filtered = brands.filter(brand => 
-        brand.categories && brand.categories.includes(selectedCategory.name)
+      let filtered = brands.filter(
+        brand => brand.categories && brand.categories.includes(selectedCategory.name)
       );
 
       if (searchQuery) {
-        filtered = filtered.filter(brand =>
-          brand.brand && brand.brand.toLowerCase().includes(searchQuery.toLowerCase())
+        filtered = filtered.filter(
+          brand => brand.brand && brand.brand.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
 
@@ -246,7 +240,7 @@ const BrandSelection = ({ onBrandSelect, onBack }) => {
     }
   }, [brands, selectedCategory, searchQuery]);
 
-  const handleBrandClick = (brand) => {
+  const handleBrandClick = brand => {
     setSelectedBrand(brand);
   };
 
@@ -265,7 +259,7 @@ const BrandSelection = ({ onBrandSelect, onBack }) => {
     navigate('/sell');
   };
 
-  const getBrandInitials = (brandName) => {
+  const getBrandInitials = brandName => {
     return brandName
       .split(' ')
       .map(word => word.charAt(0))
@@ -274,13 +268,13 @@ const BrandSelection = ({ onBrandSelect, onBack }) => {
       .toUpperCase();
   };
 
-  const getBrandColor = (brandName) => {
+  const getBrandColor = brandName => {
     const colors = [
       theme.colors.primary.main,
       theme.colors.accent.main,
       theme.colors.warning.main,
       theme.colors.error.main,
-      theme.colors.success.main
+      theme.colors.success.main,
     ];
     const index = brandName.length % colors.length;
     return colors[index];
@@ -290,7 +284,14 @@ const BrandSelection = ({ onBrandSelect, onBack }) => {
     return (
       <PageContainer>
         <Container>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '400px',
+            }}
+          >
             <Loader size={48} className="animate-spin" />
           </div>
         </Container>
@@ -321,21 +322,20 @@ const BrandSelection = ({ onBrandSelect, onBack }) => {
             Home
           </BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
-          <BreadcrumbLink href="/sell">
-            Sell Device
-          </BreadcrumbLink>
+          <BreadcrumbLink href="/sell">Sell Device</BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
           <span>{selectedCategory?.name || 'Select Brand'}</span>
         </Breadcrumb>
-        
+
         {/* Page Header */}
         <PageHeader>
           <PageTitle>Select your {selectedCategory?.name || 'device'} brand</PageTitle>
           <PageSubtitle>
-            Choose the brand of your {selectedCategory?.name?.toLowerCase() || 'device'} to continue with the selling process.
+            Choose the brand of your {selectedCategory?.name?.toLowerCase() || 'device'} to continue
+            with the selling process.
           </PageSubtitle>
         </PageHeader>
-        
+
         {/* Search */}
         <SearchContainer>
           <SearchIcon>
@@ -345,21 +345,21 @@ const BrandSelection = ({ onBrandSelect, onBack }) => {
             type="text"
             placeholder="Search brands..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
           />
         </SearchContainer>
-        
+
         {/* Brand Grid */}
         <BrandGrid>
-          {filteredBrands.map((brand) => (
-            <BrandCard 
-              key={brand._id} 
+          {filteredBrands.map(brand => (
+            <BrandCard
+              key={brand._id}
               onClick={() => handleBrandClick(brand)}
               className={selectedBrand?._id === brand._id ? 'selected' : ''}
               hoverable
             >
               <Card.Body size="md">
-                <BrandLogo 
+                <BrandLogo
                   bgColor={getBrandColor(brand.brand) + '20'}
                   textColor={getBrandColor(brand.brand)}
                 >
@@ -375,23 +375,21 @@ const BrandSelection = ({ onBrandSelect, onBack }) => {
         {filteredBrands.length === 0 && !loading && (
           <div style={{ textAlign: 'center', padding: '2rem' }}>
             <p style={{ color: theme.colors.text.secondary }}>
-              {searchQuery ? 'No brands found matching your search.' : 'No brands available for this category.'}
+              {searchQuery
+                ? 'No brands found matching your search.'
+                : 'No brands available for this category.'}
             </p>
           </div>
         )}
-        
+
         {/* Navigation */}
         <NavigationButtons>
-          <BackButton 
-            variant="secondary" 
-            leftIcon={<ArrowLeft size={20} />}
-            onClick={handleBack}
-          >
+          <BackButton variant="secondary" leftIcon={<ArrowLeft size={20} />} onClick={handleBack}>
             Back to Categories
           </BackButton>
-          
-          <NextButton 
-            variant="primary" 
+
+          <NextButton
+            variant="primary"
             rightIcon={<ArrowRight size={20} />}
             disabled={!selectedBrand}
             onClick={handleNext}

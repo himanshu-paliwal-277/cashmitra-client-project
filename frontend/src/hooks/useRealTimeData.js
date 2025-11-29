@@ -42,42 +42,48 @@ export const useRealTimeData = (type, id = null, options = {}) => {
   }, []);
 
   // Handle data updates
-  const handleDataUpdate = useCallback((newData) => {
-    if (!mountedRef.current) return;
-    
-    setData(newData);
-    setLastUpdated(new Date().toISOString());
-    setError(null);
-    retryCountRef.current = 0;
-    
-    if (onUpdate) {
-      onUpdate(newData);
-    }
-  }, [onUpdate]);
+  const handleDataUpdate = useCallback(
+    newData => {
+      if (!mountedRef.current) return;
+
+      setData(newData);
+      setLastUpdated(new Date().toISOString());
+      setError(null);
+      retryCountRef.current = 0;
+
+      if (onUpdate) {
+        onUpdate(newData);
+      }
+    },
+    [onUpdate]
+  );
 
   // Handle errors
-  const handleError = useCallback((err) => {
-    if (!mountedRef.current) return;
-    
-    console.error('Real-time data error:', err);
-    setError(err.message || 'Connection error');
-    setConnected(false);
-    
-    if (onError) {
-      onError(err);
-    }
-  }, [onError]);
+  const handleError = useCallback(
+    err => {
+      if (!mountedRef.current) return;
+
+      console.error('Real-time data error:', err);
+      setError(err.message || 'Connection error');
+      setConnected(false);
+
+      if (onError) {
+        onError(err);
+      }
+    },
+    [onError]
+  );
 
   // Fetch initial data
   const fetchInitialData = useCallback(async () => {
     if (!mountedRef.current) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       let result;
-      
+
       switch (type) {
         case 'categories':
           if (id) {
@@ -102,7 +108,7 @@ export const useRealTimeData = (type, id = null, options = {}) => {
         default:
           throw new Error(`Unsupported data type: ${type}`);
       }
-      
+
       if (result.success) {
         handleDataUpdate(result.data);
       } else {
@@ -122,26 +128,26 @@ export const useRealTimeData = (type, id = null, options = {}) => {
     if (!enableWebSocket || !id || type !== 'categories') {
       return false;
     }
-    
+
     try {
       const ws = productCategoriesAPI.subscribeToCategoryUpdates(
         id,
-        (updateData) => {
+        updateData => {
           if (!mountedRef.current) return;
-          
+
           setConnected(true);
           handleDataUpdate(updateData);
         },
-        (err) => {
+        err => {
           if (!mountedRef.current) return;
-          
+
           handleError(err);
-          
+
           // Retry connection with exponential backoff
           if (retryCountRef.current < maxRetries) {
             const delay = Math.pow(2, retryCountRef.current) * 1000;
             retryCountRef.current++;
-            
+
             setTimeout(() => {
               if (mountedRef.current) {
                 setupWebSocket();
@@ -153,7 +159,7 @@ export const useRealTimeData = (type, id = null, options = {}) => {
           }
         }
       );
-      
+
       wsRef.current = ws;
       return true;
     } catch (err) {
@@ -167,13 +173,13 @@ export const useRealTimeData = (type, id = null, options = {}) => {
     if (pollingRef.current) {
       clearInterval(pollingRef.current);
     }
-    
+
     const poll = async () => {
       if (!mountedRef.current) return;
-      
+
       try {
         let result;
-        
+
         switch (type) {
           case 'categories':
             if (id) {
@@ -198,7 +204,7 @@ export const useRealTimeData = (type, id = null, options = {}) => {
           default:
             return;
         }
-        
+
         if (result.success && result.data) {
           // Only update if data has changed
           const hasChanges = JSON.stringify(result.data) !== JSON.stringify(data);
@@ -211,14 +217,14 @@ export const useRealTimeData = (type, id = null, options = {}) => {
         console.warn('Polling error:', err);
       }
     };
-    
+
     pollingRef.current = setInterval(poll, pollingInterval);
   }, [type, id, pollingInterval, lastUpdated, data, handleDataUpdate]);
 
   // Start real-time updates
   const start = useCallback(() => {
     cleanup();
-    
+
     // Try WebSocket first, fall back to polling
     const wsConnected = setupWebSocket();
     if (!wsConnected) {
@@ -239,15 +245,15 @@ export const useRealTimeData = (type, id = null, options = {}) => {
   // Initialize
   useEffect(() => {
     mountedRef.current = true;
-    
+
     // Fetch initial data
     fetchInitialData();
-    
+
     // Start real-time updates if enabled
     if (autoStart) {
       start();
     }
-    
+
     return () => {
       mountedRef.current = false;
       cleanup();

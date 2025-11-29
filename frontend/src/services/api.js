@@ -11,11 +11,11 @@ const api = axios.create({
 
 // Add a request interceptor to include auth token
 api.interceptors.request.use(
-  (config) => {
+  config => {
     const adminToken = localStorage.getItem('adminToken');
     const vendorToken = localStorage.getItem('vendorToken');
     const userToken = localStorage.getItem('authToken');
-    
+
     if (adminToken) {
       config.headers.Authorization = `Bearer ${adminToken}`;
     } else if (vendorToken) {
@@ -25,7 +25,7 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 );
 
 export default api;

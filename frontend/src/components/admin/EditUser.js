@@ -15,11 +15,11 @@ const EditUser = () => {
     phone: '',
     role: 'user',
     isVerified: false,
-    roleTemplate: '' // For partner role
+    roleTemplate: '', // For partner role
   });
   const [passwordData, setPasswordData] = useState({
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [errors, setErrors] = useState({});
   const [passwordErrors, setPasswordErrors] = useState({});
@@ -58,7 +58,7 @@ const EditUser = () => {
         phone: user.phone || '',
         role: user.role || 'user',
         isVerified: user.isVerified || false,
-        roleTemplate: user.roleTemplate || ''
+        roleTemplate: user.roleTemplate || '',
       });
     } catch (error) {
       console.error('Error fetching user:', error);
@@ -69,11 +69,11 @@ const EditUser = () => {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
     // Clear error when user starts typing
     if (errors[name]) {
@@ -104,9 +104,9 @@ const EditUser = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -118,7 +118,7 @@ const EditUser = () => {
         email: formData.email,
         phone: formData.phone,
         role: formData.role,
-        isVerified: formData.isVerified
+        isVerified: formData.isVerified,
       };
 
       // Add roleTemplate only if role is partner and a template is selected
@@ -138,7 +138,9 @@ const EditUser = () => {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    if (
+      !window.confirm('Are you sure you want to delete this user? This action cannot be undone.')
+    ) {
       return;
     }
 
@@ -155,11 +157,11 @@ const EditUser = () => {
     }
   };
 
-  const handlePasswordChange = (e) => {
+  const handlePasswordChange = e => {
     const { name, value } = e.target;
     setPasswordData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Clear error when user starts typing
     if (passwordErrors[name]) {
@@ -186,9 +188,9 @@ const EditUser = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handlePasswordSubmit = async (e) => {
+  const handlePasswordSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validatePasswordForm()) {
       return;
     }
@@ -196,12 +198,12 @@ const EditUser = () => {
     setPasswordLoading(true);
     try {
       await adminService.updateUserPassword(userId, {
-        newPassword: passwordData.newPassword
+        newPassword: passwordData.newPassword,
       });
       alert('Password updated successfully!');
       setPasswordData({
         newPassword: '',
-        confirmPassword: ''
+        confirmPassword: '',
       });
       setPasswordErrors({});
     } catch (error) {
@@ -228,17 +230,10 @@ const EditUser = () => {
       <div className="edit-user-header">
         <h2>Edit User</h2>
         <div className="header-actions">
-          <button 
-            className="btn-danger"
-            onClick={handleDelete}
-            disabled={loading}
-          >
+          <button className="btn-danger" onClick={handleDelete} disabled={loading}>
             Delete User
           </button>
-          <button 
-            className="btn-secondary"
-            onClick={() => navigate('/admin/users')}
-          >
+          <button className="btn-secondary" onClick={() => navigate('/admin/users')}>
             Back to Users
           </button>
         </div>
@@ -293,12 +288,7 @@ const EditUser = () => {
 
             <div className="form-group">
               <label htmlFor="role">Role</label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleInputChange}
-              >
+              <select id="role" name="role" value={formData.role} onChange={handleInputChange}>
                 <option value="user">User</option>
                 <option value="partner">Partner</option>
                 <option value="admin">Admin</option>
@@ -320,7 +310,7 @@ const EditUser = () => {
                   disabled={loadingTemplates}
                 >
                   <option value="">Select a role template (optional)</option>
-                  {roleTemplates.map((template) => (
+                  {roleTemplates.map(template => (
                     <option key={template._id || template.id} value={template._id || template.name}>
                       {template.displayName} - {template.permissions?.length || 0} permissions
                     </option>
@@ -349,18 +339,14 @@ const EditUser = () => {
           </div>
 
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="btn-secondary"
               onClick={() => navigate('/admin/users')}
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
-              className="btn-primary"
-              disabled={loading}
-            >
+            <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Updating...' : 'Update User'}
             </button>
           </div>
@@ -369,8 +355,10 @@ const EditUser = () => {
         {/* Password Change Section */}
         <div className="password-section">
           <h3>Change Password</h3>
-          <p className="section-description">Update the user's password. The user will need to use this new password to log in.</p>
-          
+          <p className="section-description">
+            Update the user's password. The user will need to use this new password to log in.
+          </p>
+
           <form onSubmit={handlePasswordSubmit} className="password-form">
             <div className="form-row">
               <div className="form-group">
@@ -384,7 +372,9 @@ const EditUser = () => {
                   className={passwordErrors.newPassword ? 'error' : ''}
                   placeholder="Enter new password (min. 6 characters)"
                 />
-                {passwordErrors.newPassword && <span className="error-message">{passwordErrors.newPassword}</span>}
+                {passwordErrors.newPassword && (
+                  <span className="error-message">{passwordErrors.newPassword}</span>
+                )}
               </div>
 
               <div className="form-group">
@@ -398,13 +388,15 @@ const EditUser = () => {
                   className={passwordErrors.confirmPassword ? 'error' : ''}
                   placeholder="Confirm new password"
                 />
-                {passwordErrors.confirmPassword && <span className="error-message">{passwordErrors.confirmPassword}</span>}
+                {passwordErrors.confirmPassword && (
+                  <span className="error-message">{passwordErrors.confirmPassword}</span>
+                )}
               </div>
             </div>
 
             <div className="form-actions">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn-secondary"
                 onClick={() => {
                   setPasswordData({ newPassword: '', confirmPassword: '' });
@@ -414,11 +406,7 @@ const EditUser = () => {
               >
                 Clear
               </button>
-              <button 
-                type="submit" 
-                className="btn-primary"
-                disabled={passwordLoading}
-              >
+              <button type="submit" className="btn-primary" disabled={passwordLoading}>
                 {passwordLoading ? 'Updating Password...' : 'Update Password'}
               </button>
             </div>

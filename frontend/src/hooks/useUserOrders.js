@@ -26,7 +26,7 @@ const useUserOrders = () => {
   };
 
   // Get specific order by ID
-  const getOrderById = async (orderId) => {
+  const getOrderById = async orderId => {
     setLoading(true);
     setError(null);
     try {
@@ -46,9 +46,9 @@ const useUserOrders = () => {
     setError(null);
     try {
       const response = await api.put(`/user/orders/${orderId}/cancel`, { reason });
-      setOrders(prev => 
-        prev.map(order => 
-          order.id === orderId 
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderId
             ? { ...order, status: 'cancelled', cancellationReason: reason }
             : order
         )
@@ -68,12 +68,8 @@ const useUserOrders = () => {
     setError(null);
     try {
       const response = await api.post(`/user/orders/${orderId}/return`, returnData);
-      setOrders(prev => 
-        prev.map(order => 
-          order.id === orderId 
-            ? { ...order, returnStatus: 'requested' }
-            : order
-        )
+      setOrders(prev =>
+        prev.map(order => (order.id === orderId ? { ...order, returnStatus: 'requested' } : order))
       );
       return response.data;
     } catch (err) {
@@ -85,7 +81,7 @@ const useUserOrders = () => {
   };
 
   // Track order
-  const trackOrder = async (orderId) => {
+  const trackOrder = async orderId => {
     setLoading(true);
     setError(null);
     try {
@@ -100,14 +96,14 @@ const useUserOrders = () => {
   };
 
   // Download invoice
-  const downloadInvoice = async (orderId) => {
+  const downloadInvoice = async orderId => {
     setLoading(true);
     setError(null);
     try {
       const response = await api.get(`/user/orders/${orderId}/invoice`, {
-        responseType: 'blob'
+        responseType: 'blob',
       });
-      
+
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -117,7 +113,7 @@ const useUserOrders = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      
+
       return true;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to download invoice');
@@ -126,7 +122,7 @@ const useUserOrders = () => {
       setLoading(false);
     }
   };
-// console.log('orders', orders);
+  // console.log('orders', orders);
   // Auto-fetch orders on mount
   useEffect(() => {
     fetchOrders();
@@ -141,7 +137,7 @@ const useUserOrders = () => {
     cancelOrder,
     requestReturn,
     trackOrder,
-    downloadInvoice
+    downloadInvoice,
   };
 };
 

@@ -21,14 +21,13 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     const userData = localStorage.getItem('userData');
-    
+
     if (token && userData) {
       try {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
       } catch (err) {
         console.error('Error parsing user data:', err);
-       
       }
     }
     setLoading(false);
@@ -38,7 +37,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -56,7 +55,7 @@ export const AuthProvider = ({ children }) => {
       // Store token and user data
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('userData', JSON.stringify(data));
-      
+
       setUser(data);
       return { success: true, user: data };
     } catch (err) {
@@ -67,11 +66,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = async (userData) => {
+  const signup = async userData => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
@@ -89,7 +88,7 @@ export const AuthProvider = ({ children }) => {
       // Auto-login after successful signup
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('userData', JSON.stringify(data));
-      
+
       setUser(data);
       return { success: true, user: data };
     } catch (err) {
@@ -107,7 +106,7 @@ export const AuthProvider = ({ children }) => {
     setError(null);
   };
 
-  const updateUser = (updatedUserData) => {
+  const updateUser = updatedUserData => {
     const updatedUser = { ...user, ...updatedUserData };
     setUser(updatedUser);
     localStorage.setItem('userData', JSON.stringify(updatedUser));
@@ -125,7 +124,7 @@ export const AuthProvider = ({ children }) => {
     setError(null);
   };
 
-  const setOrderData = (orderData) => {
+  const setOrderData = orderData => {
     setCurrentOrder(orderData);
   };
 
@@ -149,11 +148,7 @@ export const AuthProvider = ({ children }) => {
     clearOrderData,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;

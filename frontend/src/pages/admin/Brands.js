@@ -12,7 +12,7 @@ import {
   X,
   Save,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
 } from 'lucide-react';
 
 // Keyframes for loading spinner
@@ -58,7 +58,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -84,7 +84,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -99,7 +99,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -119,7 +119,7 @@ const BrandCard = styled.div`
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -136,7 +136,7 @@ const BrandLogo = styled.div`
   justify-content: center;
   margin: 0 auto 1rem;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -212,8 +212,8 @@ const StatusBadge = styled.span`
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: ${props => props.active ? '#dcfce7' : '#fee2e2'};
-  color: ${props => props.active ? '#166534' : '#dc2626'};
+  background: ${props => (props.active ? '#dcfce7' : '#fee2e2')};
+  color: ${props => (props.active ? '#166534' : '#dc2626')};
   display: inline-block;
   margin-bottom: 1rem;
 `;
@@ -225,7 +225,7 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${props => props.primary ? '#3b82f6' : props.danger ? '#ef4444' : '#6b7280'};
+  background: ${props => (props.primary ? '#3b82f6' : props.danger ? '#ef4444' : '#6b7280')};
   color: white;
   border: none;
   padding: 0.5rem;
@@ -236,7 +236,7 @@ const IconButton = styled.button`
   gap: 0.25rem;
   font-size: 0.75rem;
   transition: all 0.2s;
-  
+
   &:hover {
     opacity: 0.9;
     transform: scale(1.05);
@@ -288,7 +288,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  
+
   &:hover {
     background: #f3f4f6;
   }
@@ -311,7 +311,7 @@ const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -327,7 +327,7 @@ const TextArea = styled.textarea`
   font-size: 0.875rem;
   min-height: 100px;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -342,7 +342,7 @@ const Select = styled.select`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   background: white;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -363,7 +363,7 @@ const FileInputLabel = styled.label`
   cursor: pointer;
   transition: all 0.2s;
   color: #6b7280;
-  
+
   &:hover {
     border-color: #3b82f6;
     color: #3b82f6;
@@ -380,7 +380,7 @@ const LogoPreview = styled.div`
   justify-content: center;
   margin: 1rem auto;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -405,8 +405,10 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
-  ${props => props.variant === 'primary' ? `
+
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     color: white;
     
@@ -414,7 +416,8 @@ const Button = styled.button`
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     }
-  ` : `
+  `
+      : `
     background: #f3f4f6;
     color: #374151;
     
@@ -422,7 +425,7 @@ const Button = styled.button`
       background: #e5e7eb;
     }
   `}
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -474,14 +477,14 @@ const Brands = () => {
   const [logoPreview, setLogoPreview] = useState('');
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     category: '',
     description: '',
     website: '',
     isActive: true,
-    logo: null
+    logo: null,
   });
 
   const {
@@ -491,7 +494,7 @@ const Brands = () => {
     addBrand,
     editBrand,
     removeBrand,
-    fetchBrands
+    fetchBrands,
   } = useAdminBrands();
 
   useEffect(() => {
@@ -507,11 +510,11 @@ const Brands = () => {
         const response = await adminService.getCategories();
         if (response.data && Array.isArray(response.data)) {
           // Extract category names for brand category dropdown
-          const categoryNames = response.data
-            .filter(cat => cat.isActive)
-            .map(cat => cat.name);
-          
-          setCategories(categoryNames.length > 0 ? categoryNames : ['Mobile Phones', 'Tablets', 'Laptops']);
+          const categoryNames = response.data.filter(cat => cat.isActive).map(cat => cat.name);
+
+          setCategories(
+            categoryNames.length > 0 ? categoryNames : ['Mobile Phones', 'Tablets', 'Laptops']
+          );
         }
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -527,30 +530,30 @@ const Brands = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = 'Brand name is required';
     } else if (formData.name.length < 2) {
       newErrors.name = 'Brand name must be at least 2 characters';
     }
-    
+
     if (!formData.category) {
       newErrors.category = 'Category is required';
     }
-    
+
     if (formData.website && !isValidUrl(formData.website)) {
       newErrors.website = 'Please enter a valid URL';
     }
-    
+
     if (formData.description && formData.description.length > 500) {
       newErrors.description = 'Description must be less than 500 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
-  const isValidUrl = (string) => {
+
+  const isValidUrl = string => {
     try {
       new URL(string);
       return true;
@@ -559,16 +562,16 @@ const Brands = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsSubmitting(true);
     setErrors({});
-    
+
     try {
       // Prepare data as regular object, not FormData
       const submitData = {
@@ -576,9 +579,9 @@ const Brands = () => {
         category: formData.category,
         description: formData.description?.trim() || '',
         website: formData.website?.trim() || '',
-        isActive: formData.isActive
+        isActive: formData.isActive,
       };
-      
+
       if (editingBrand) {
         // For editing, we need to pass the current brand name for URL and new name in data
         submitData.currentBrandName = editingBrand.brand;
@@ -586,7 +589,7 @@ const Brands = () => {
       } else {
         await addBrand(submitData);
       }
-      
+
       setShowModal(false);
       setEditingBrand(null);
       resetForm();
@@ -598,7 +601,7 @@ const Brands = () => {
     }
   };
 
-  const handleDelete = async (brandId) => {
+  const handleDelete = async brandId => {
     if (window.confirm('Are you sure you want to delete this brand?')) {
       try {
         await removeBrand(brandId);
@@ -608,7 +611,7 @@ const Brands = () => {
     }
   };
 
-  const handleEdit = (brand) => {
+  const handleEdit = brand => {
     setEditingBrand(brand);
     setFormData({
       name: brand.brand || '',
@@ -616,18 +619,18 @@ const Brands = () => {
       description: brand.description || '',
       website: brand.website || '',
       isActive: brand.isActive !== false,
-      logo: null
+      logo: null,
     });
     setLogoPreview(brand.logo || '');
     setShowModal(true);
   };
 
-  const handleLogoChange = (e) => {
+  const handleLogoChange = e => {
     const file = e.target.files[0];
     if (file) {
       setFormData({ ...formData, logo: file });
       const reader = new FileReader();
-      reader.onload = (e) => setLogoPreview(e.target.result);
+      reader.onload = e => setLogoPreview(e.target.result);
       reader.readAsDataURL(file);
     }
   };
@@ -639,13 +642,13 @@ const Brands = () => {
       description: '',
       website: '',
       isActive: true,
-      logo: null
+      logo: null,
     });
     setLogoPreview('');
     setErrors({});
     setIsSubmitting(false);
   };
-  
+
   const handleInputChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
     // Clear error when user starts typing
@@ -656,22 +659,24 @@ const Brands = () => {
 
   const filteredAndSortedBrands = React.useMemo(() => {
     let filtered = brands.filter(brand => {
-      const matchesSearch = brand.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           brand.description?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = !statusFilter || 
-                           (statusFilter === 'active' && brand.isActive !== false) ||
-                           (statusFilter === 'inactive' && brand.isActive === false);
-      
+      const matchesSearch =
+        brand.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        brand.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus =
+        !statusFilter ||
+        (statusFilter === 'active' && brand.isActive !== false) ||
+        (statusFilter === 'inactive' && brand.isActive === false);
+
       const matchesCategory = !categoryFilter || brand.category === categoryFilter;
-      
+
       return matchesSearch && matchesStatus && matchesCategory;
     });
-    
+
     // Sort the filtered results
     filtered.sort((a, b) => {
       let aValue, bValue;
-      
+
       switch (sortBy) {
         case 'name':
           aValue = a.brand?.toLowerCase() || '';
@@ -697,17 +702,17 @@ const Brands = () => {
           aValue = a.brand?.toLowerCase() || '';
           bValue = b.brand?.toLowerCase() || '';
       }
-      
+
       if (typeof aValue === 'string') {
         return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
       } else {
         return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
       }
     });
-    
+
     return filtered;
   }, [brands, searchTerm, statusFilter, categoryFilter, sortBy, sortOrder]);
-  
+
   const availableCategories = React.useMemo(() => {
     const categories = [...new Set(brands.map(brand => brand.category).filter(Boolean))];
     return categories.sort();
@@ -731,7 +736,12 @@ const Brands = () => {
           <Tag size={32} />
           Brands Management
         </Title>
-        <ActionButton onClick={() => { resetForm(); setShowModal(true); }}>
+        <ActionButton
+          onClick={() => {
+            resetForm();
+            setShowModal(true);
+          }}
+        >
           <Plus size={20} />
           Add Brand
         </ActionButton>
@@ -742,22 +752,16 @@ const Brands = () => {
           type="text"
           placeholder="Search brands by name or description..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
-        
-        <FilterSelect
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
+
+        <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </FilterSelect>
-        
-        <FilterSelect
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
+
+        <FilterSelect value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
           <option value="">All Categories</option>
           {availableCategories.map(category => (
             <option key={category} value={category}>
@@ -765,22 +769,16 @@ const Brands = () => {
             </option>
           ))}
         </FilterSelect>
-        
-        <FilterSelect
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
+
+        <FilterSelect value={sortBy} onChange={e => setSortBy(e.target.value)}>
           <option value="name">Sort by Name</option>
           <option value="category">Sort by Category</option>
           <option value="products">Sort by Products</option>
           <option value="models">Sort by Models</option>
           <option value="status">Sort by Status</option>
         </FilterSelect>
-        
-        <FilterSelect
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-        >
+
+        <FilterSelect value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
         </FilterSelect>
@@ -790,7 +788,9 @@ const Brands = () => {
         <div style={{ textAlign: 'center', padding: '4rem' }}>
           <Tag size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
           <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
-            {searchTerm || statusFilter || categoryFilter ? 'No brands match your filters' : 'No brands found'}
+            {searchTerm || statusFilter || categoryFilter
+              ? 'No brands match your filters'
+              : 'No brands found'}
           </p>
           {(searchTerm || statusFilter || categoryFilter) && (
             <button
@@ -806,7 +806,7 @@ const Brands = () => {
                 color: 'white',
                 border: 'none',
                 borderRadius: '0.375rem',
-                cursor: 'pointer'
+                cursor: 'pointer',
               }}
             >
               Clear Filters
@@ -815,7 +815,7 @@ const Brands = () => {
         </div>
       ) : (
         <BrandsGrid>
-          {filteredAndSortedBrands.map((brand) => (
+          {filteredAndSortedBrands.map(brand => (
             <BrandCard key={brand._id}>
               <BrandLogo>
                 {brand.logo ? (
@@ -824,23 +824,24 @@ const Brands = () => {
                   <Tag size={32} style={{ color: '#9ca3af' }} />
                 )}
               </BrandLogo>
-              
+
               <BrandInfo>
                 <BrandName>{brand.brand}</BrandName>
                 <BrandDescription>
                   {brand.description || 'No description available'}
                 </BrandDescription>
                 <CategoriesContainer>
-                  {brand.categories && brand.categories.map((category, index) => (
-                    <CategoryTag key={index}>{category}</CategoryTag>
-                  ))}
+                  {brand.categories &&
+                    brand.categories.map((category, index) => (
+                      <CategoryTag key={index}>{category}</CategoryTag>
+                    ))}
                 </CategoriesContainer>
               </BrandInfo>
-              
+
               <StatusBadge active={brand.isActive !== false}>
                 {brand.isActive !== false ? 'Active' : 'Inactive'}
               </StatusBadge>
-              
+
               <BrandStats>
                 <StatItem>
                   <StatValue>{brand.productCount || 0}</StatValue>
@@ -851,12 +852,12 @@ const Brands = () => {
                   <StatLabel>Models</StatLabel>
                 </StatItem>
               </BrandStats>
-              
+
               {brand.website && (
                 <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                  <a 
-                    href={brand.website} 
-                    target="_blank" 
+                  <a
+                    href={brand.website}
+                    target="_blank"
                     rel="noopener noreferrer"
                     style={{ color: '#3b82f6', fontSize: '0.875rem', textDecoration: 'none' }}
                   >
@@ -864,7 +865,7 @@ const Brands = () => {
                   </a>
                 </div>
               )}
-              
+
               <ActionButtons>
                 <IconButton primary onClick={() => handleEdit(brand)}>
                   <Edit size={16} />
@@ -884,43 +885,42 @@ const Brands = () => {
         <Modal>
           <ModalContent>
             <ModalHeader>
-              <ModalTitle>
-                {editingBrand ? 'Edit Brand' : 'Add New Brand'}
-              </ModalTitle>
-              <CloseButton onClick={() => { setShowModal(false); setEditingBrand(null); }}>
+              <ModalTitle>{editingBrand ? 'Edit Brand' : 'Add New Brand'}</ModalTitle>
+              <CloseButton
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingBrand(null);
+                }}
+              >
                 <X size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             <form onSubmit={handleSubmit}>
-              {errors.submit && (
-                <AlertMessage>{errors.submit}</AlertMessage>
-              )}
-              
+              {errors.submit && <AlertMessage>{errors.submit}</AlertMessage>}
+
               <FormGroup>
                 <Label>Brand Name *</Label>
                 <Input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={e => handleInputChange('name', e.target.value)}
                   required
                   style={{
-                    borderColor: errors.name ? '#dc2626' : '#d1d5db'
+                    borderColor: errors.name ? '#dc2626' : '#d1d5db',
                   }}
                 />
-                {errors.name && (
-                  <ErrorMessage>{errors.name}</ErrorMessage>
-                )}
+                {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
               </FormGroup>
-              
+
               <FormGroup>
                 <Label>Category *</Label>
                 <Select
                   value={formData.category}
-                  onChange={(e) => handleInputChange('category', e.target.value)}
+                  onChange={e => handleInputChange('category', e.target.value)}
                   required
                   style={{
-                    borderColor: errors.category ? '#dc2626' : '#d1d5db'
+                    borderColor: errors.category ? '#dc2626' : '#d1d5db',
                   }}
                 >
                   <option value="">Select Category</option>
@@ -934,45 +934,39 @@ const Brands = () => {
                     ))
                   )}
                 </Select>
-                {errors.category && (
-                  <ErrorMessage>{errors.category}</ErrorMessage>
-                )}
+                {errors.category && <ErrorMessage>{errors.category}</ErrorMessage>}
               </FormGroup>
-              
+
               <FormGroup>
                 <Label>Description</Label>
                 <TextArea
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={e => handleInputChange('description', e.target.value)}
                   placeholder="Brand description..."
                   style={{
-                    borderColor: errors.description ? '#dc2626' : '#d1d5db'
+                    borderColor: errors.description ? '#dc2626' : '#d1d5db',
                   }}
                 />
-                {errors.description && (
-                  <ErrorMessage>{errors.description}</ErrorMessage>
-                )}
+                {errors.description && <ErrorMessage>{errors.description}</ErrorMessage>}
                 <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
                   {formData.description.length}/500 characters
                 </div>
               </FormGroup>
-              
+
               <FormGroup>
                 <Label>Website URL</Label>
                 <Input
                   type="url"
                   value={formData.website}
-                  onChange={(e) => handleInputChange('website', e.target.value)}
+                  onChange={e => handleInputChange('website', e.target.value)}
                   placeholder="https://example.com"
                   style={{
-                    borderColor: errors.website ? '#dc2626' : '#d1d5db'
+                    borderColor: errors.website ? '#dc2626' : '#d1d5db',
                   }}
                 />
-                {errors.website && (
-                  <ErrorMessage>{errors.website}</ErrorMessage>
-                )}
+                {errors.website && <ErrorMessage>{errors.website}</ErrorMessage>}
               </FormGroup>
-              
+
               <FormGroup>
                 <Label>Brand Logo</Label>
                 <FileInput
@@ -985,43 +979,39 @@ const Brands = () => {
                   <Upload size={16} />
                   {formData.logo ? 'Change Logo' : 'Upload Logo'}
                 </FileInputLabel>
-                
+
                 {logoPreview && (
                   <LogoPreview>
                     <img src={logoPreview} alt="Logo preview" />
                   </LogoPreview>
                 )}
               </FormGroup>
-              
+
               <FormGroup>
                 <Label>Status</Label>
                 <Select
                   value={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'true' })}
+                  onChange={e => setFormData({ ...formData, isActive: e.target.value === 'true' })}
                 >
                   <option value="true">Active</option>
                   <option value="false">Inactive</option>
                 </Select>
               </FormGroup>
-              
+
               <ModalActions>
-                <Button 
-                  type="button" 
-                  onClick={() => { setShowModal(false); setEditingBrand(null); }}
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingBrand(null);
+                  }}
                   disabled={isSubmitting}
                 >
                   Cancel
                 </Button>
-                <Button 
-                  type="submit" 
-                  variant="primary"
-                  disabled={isSubmitting}
-                >
+                <Button type="submit" variant="primary" disabled={isSubmitting}>
                   {isSubmitting ? (
-                    <>
-                     
-                      {editingBrand ? 'Updating...' : 'Adding...'}
-                    </>
+                    <>{editingBrand ? 'Updating...' : 'Adding...'}</>
                   ) : (
                     <>
                       <Save size={16} />

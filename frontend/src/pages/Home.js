@@ -24,16 +24,20 @@ import {
   Users,
   Award,
   TrendingUp,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 
 const HeroSection = styled.section`
-  background: linear-gradient(135deg, ${theme.colors.primary[50]} 0%, ${theme.colors.accent[50]} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary[50]} 0%,
+    ${theme.colors.accent[50]} 100%
+  );
   padding: ${theme.spacing[16]} 0 ${theme.spacing[20]};
   text-align: center;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -44,10 +48,15 @@ const HeroSection = styled.section`
     background: radial-gradient(circle, ${theme.colors.primary.main}10 0%, transparent 70%);
     animation: float 20s ease-in-out infinite;
   }
-  
+
   @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-20px) rotate(180deg); }
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-20px) rotate(180deg);
+    }
   }
 `;
 
@@ -57,11 +66,11 @@ const HeroContent = styled.div`
   padding: 0 ${theme.spacing[4]};
   position: relative;
   z-index: 1;
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 0 ${theme.spacing[8]};
   }
@@ -73,11 +82,11 @@ const HeroTitle = styled.h1`
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[6]};
   line-height: ${theme.typography.lineHeight.tight};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     font-size: ${theme.typography.fontSize['4xl']};
   }
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     font-size: ${theme.typography.fontSize['3xl']};
   }
@@ -91,7 +100,7 @@ const HeroSubtitle = styled.p`
   margin-left: auto;
   margin-right: auto;
   line-height: ${theme.typography.lineHeight.relaxed};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     font-size: ${theme.typography.fontSize.lg};
   }
@@ -132,11 +141,11 @@ const SectionContainer = styled.div`
   max-width: 1350px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 0 ${theme.spacing[8]};
   }
@@ -171,7 +180,7 @@ const CategoryCard = styled(Card)`
   text-align: center;
   cursor: pointer;
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: ${theme.shadows.xl};
@@ -205,7 +214,7 @@ const StepsGrid = styled.div`
 const StepCard = styled.div`
   text-align: center;
   position: relative;
-  
+
   &:not(:last-child)::after {
     content: '';
     position: absolute;
@@ -214,7 +223,7 @@ const StepCard = styled.div`
     width: ${theme.spacing[8]};
     height: 2px;
     background: ${theme.colors.primary.main};
-    
+
     @media (max-width: ${theme.breakpoints.md}) {
       display: none;
     }
@@ -225,7 +234,11 @@ const StepNumber = styled.div`
   width: 80px;
   height: 80px;
   margin: 0 auto ${theme.spacing[4]};
-  background: linear-gradient(135deg, ${theme.colors.primary.main} 0%, ${theme.colors.primary.dark} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary.main} 0%,
+    ${theme.colors.primary.dark} 100%
+  );
   border-radius: ${theme.borderRadius.full};
   display: flex;
   align-items: center;
@@ -274,7 +287,11 @@ const TestimonialAuthor = styled.div`
 const AuthorAvatar = styled.div`
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, ${theme.colors.primary.main} 0%, ${theme.colors.accent.main} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary.main} 0%,
+    ${theme.colors.accent.main} 100%
+  );
   border-radius: ${theme.borderRadius.full};
   display: flex;
   align-items: center;
@@ -289,7 +306,7 @@ const AuthorInfo = styled.div`
     font-size: ${theme.typography.fontSize.base};
     font-weight: ${theme.typography.fontWeight.medium};
   }
-  
+
   p {
     margin: 0;
     font-size: ${theme.typography.fontSize.sm};
@@ -314,7 +331,7 @@ const ProductCard = styled(Card)`
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
   position: relative;
   overflow: hidden;
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: ${theme.shadows.xl};
@@ -332,7 +349,7 @@ const ProductImage = styled.div`
   justify-content: center;
   position: relative;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -377,10 +394,10 @@ const LaptopCard = styled.div`
   cursor: pointer;
   padding: 16px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  
-  &:hover { 
-    box-shadow: 0 12px 32px rgba(0,0,0,0.12); 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  &:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
     transform: translateY(-4px);
     border-color: #3b82f6;
   }
@@ -388,48 +405,48 @@ const LaptopCard = styled.div`
 
 /* Floating badges */
 const CardBadgeLeft = styled.div`
-  position: absolute; 
-  top: 12px; 
+  position: absolute;
+  top: 12px;
   left: 12px;
-  display: inline-flex; 
-  align-items: center; 
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
   padding: 8px 12px;
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   color: #e2e8f0;
-  border-radius: 12px; 
-  font-size: 11px; 
+  border-radius: 12px;
+  font-size: 11px;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 2;
-  
-  .bold { 
-    color: #ffffff; 
+
+  .bold {
+    color: #ffffff;
     font-weight: 800;
   }
 `;
 
 const BadgeDot = styled.span`
-  display: grid; 
+  display: grid;
   place-items: center;
-  width: 20px; 
-  height: 20px; 
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
-  color: #ffffff; 
+  color: #ffffff;
   font-weight: 900;
   font-size: 12px;
 `;
 
 const CardBadgeRight = styled.div`
-  position: absolute; 
-  top: 12px; 
+  position: absolute;
+  top: 12px;
   right: 12px;
-  padding: 8px 12px; 
-  font-weight: 700; 
+  padding: 8px 12px;
+  font-weight: 700;
   font-size: 11px;
-  color: #dc2626; 
-  background: #fef2f2; 
+  color: #dc2626;
+  background: #fef2f2;
   border: 1px solid #fecaca;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
@@ -438,23 +455,23 @@ const CardBadgeRight = styled.div`
 
 /* Image box */
 const ImageBox = styled.div`
-  height: 180px; 
-  display: flex; 
-  align-items: center; 
+  height: 180px;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); 
-  border-radius: 12px; 
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
   overflow: hidden;
   margin-top: 8px;
   border: 1px solid #e2e8f0;
-  
-  img { 
-    max-height: 150px; 
-    width: auto; 
+
+  img {
+    max-height: 150px;
+    width: auto;
     object-fit: contain;
     transition: transform 0.3s ease;
   }
-  
+
   &:hover img {
     transform: scale(1.05);
   }
@@ -463,73 +480,73 @@ const ImageBox = styled.div`
 /* Chips / pills */
 const OffChip = styled.div`
   margin-top: 12px;
-  display: inline-flex; 
+  display: inline-flex;
   align-items: center;
-  font-weight: 800; 
+  font-weight: 800;
   font-size: 12px;
-  color: #92400e; 
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); 
+  color: #92400e;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   border: 1px solid #f59e0b;
-  padding: 8px 12px; 
+  padding: 8px 12px;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);
 `;
 
 const BluePill = styled.div`
-  display: inline-flex; 
-  align-items: center; 
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
-  padding: 8px 12px; 
-  border-radius: 10px; 
-  font-size: 12px; 
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: 700;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); 
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: #fff;
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
 `;
 
 const RatingPill = styled(BluePill)`
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); 
-  color: #92400e; 
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
   border: 1px solid #f59e0b;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
-  
-  svg { 
-    color: #f59e0b; 
+
+  svg {
+    color: #f59e0b;
   }
 `;
 
 /* Text */
 const TitleClamp = styled.div`
   margin-top: 12px;
-  font-size: 15px; 
-  font-weight: 700; 
-  color: #1e293b; 
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
   line-height: 1.3;
-  display: -webkit-box; 
-  -webkit-line-clamp: 2; 
-  -webkit-box-orient: vertical; 
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: 40px;
 `;
 
 /* Rows */
 const Row = styled.div`
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
   gap: ${({ gap }) => gap || '8px'};
 `;
 
 const PriceRow = styled(Row)`
-  margin-top: 8px; 
-  margin-bottom: 8px; 
-  gap: 10px; 
+  margin-top: 8px;
+  margin-bottom: 8px;
+  gap: 10px;
   align-items: baseline;
 `;
 
 const PercentOff = styled.span`
-  color: #dc2626; 
-  font-weight: 800; 
+  color: #dc2626;
+  font-weight: 800;
   font-size: 14px;
   background: #fef2f2;
   padding: 2px 6px;
@@ -537,40 +554,40 @@ const PercentOff = styled.span`
 `;
 
 const PriceStrong = styled.span`
-  color: #1e293b; 
-  font-weight: 800; 
+  color: #1e293b;
+  font-weight: 800;
   font-size: 20px;
 `;
 
 const PriceMRP = styled.span`
-  color: #9ca3af; 
-  text-decoration: line-through; 
-  font-size: 13px; 
+  color: #9ca3af;
+  text-decoration: line-through;
+  font-size: 13px;
   font-weight: 600;
 `;
 
 const GoldRow = styled.div`
-  display: inline-flex; 
-  align-items: center; 
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); 
-  border: 1px solid #f59e0b; 
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #f59e0b;
   color: #92400e;
-  border-radius: 10px; 
-  padding: 10px 12px; 
-  font-weight: 700; 
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 700;
   font-size: 12px;
   box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);
   margin-top: 4px;
-  
-  .muted { 
-    font-weight: 600; 
-    opacity: 0.8; 
+
+  .muted {
+    font-weight: 600;
+    opacity: 0.8;
   }
 `;
 
 const GoldWord = styled.span`
-  color: #d97706; 
+  color: #d97706;
   font-weight: 800;
   text-shadow: 0 1px 2px rgba(217, 119, 6, 0.1);
 `;
@@ -655,7 +672,7 @@ const Home = () => {
       icon: <Smartphone size={40} />,
       color: theme.colors.primary.main,
       sellPath: '/sell?category=mobile',
-      buyPath: '/buy?category=mobile'
+      buyPath: '/buy?category=mobile',
     },
     {
       id: 'tablet',
@@ -664,7 +681,7 @@ const Home = () => {
       icon: <Tablet size={40} />,
       color: theme.colors.accent.main,
       sellPath: '/sell?category=tablet',
-      buyPath: '/buy?category=tablet'
+      buyPath: '/buy?category=tablet',
     },
     {
       id: 'laptop',
@@ -673,73 +690,84 @@ const Home = () => {
       icon: <Laptop size={40} />,
       color: theme.colors.warning.main,
       sellPath: '/sell?category=laptop',
-      buyPath: '/buy?category=laptop'
-    }
+      buyPath: '/buy?category=laptop',
+    },
   ];
 
   const steps = [
     {
       number: 1,
       title: 'Select Device',
-      description: 'Choose your device category, brand, and model from our extensive catalog'
+      description: 'Choose your device category, brand, and model from our extensive catalog',
     },
     {
       number: 2,
       title: 'Get Quote',
-      description: 'Answer a few questions about your device condition to get an instant price quote'
+      description:
+        'Answer a few questions about your device condition to get an instant price quote',
     },
     {
       number: 3,
       title: 'Schedule Pickup',
-      description: 'Book a free pickup slot at your convenience from verified local partners'
+      description: 'Book a free pickup slot at your convenience from verified local partners',
     },
     {
       number: 4,
       title: 'Get Paid',
-      description: 'Receive instant payment once your device is verified at the partner shop'
-    }
+      description: 'Receive instant payment once your device is verified at the partner shop',
+    },
   ];
 
   const testimonials = [
     {
       id: 1,
-      text: "Sold my iPhone 12 in just 2 hours! The process was so smooth and the price was better than other platforms.",
-      author: "Priya Sharma",
-      location: "Mumbai",
+      text: 'Sold my iPhone 12 in just 2 hours! The process was so smooth and the price was better than other platforms.',
+      author: 'Priya Sharma',
+      location: 'Mumbai',
       rating: 5,
-      avatar: "PS"
+      avatar: 'PS',
     },
     {
       id: 2,
-      text: "Great experience selling my MacBook. The pickup was on time and payment was instant. Highly recommended!",
-      author: "Rahul Kumar",
-      location: "Delhi",
+      text: 'Great experience selling my MacBook. The pickup was on time and payment was instant. Highly recommended!',
+      author: 'Rahul Kumar',
+      location: 'Delhi',
       rating: 5,
-      avatar: "RK"
+      avatar: 'RK',
     },
     {
       id: 3,
-      text: "Trustworthy platform with verified partners. Got the exact quoted price for my Samsung Galaxy.",
-      author: "Anita Patel",
-      location: "Bangalore",
+      text: 'Trustworthy platform with verified partners. Got the exact quoted price for my Samsung Galaxy.',
+      author: 'Anita Patel',
+      location: 'Bangalore',
       rating: 5,
-      avatar: "AP"
-    }
+      avatar: 'AP',
+    },
   ];
 
   // Fetch real-time catalog products
-  const { products: catalogProducts, loading: catalogLoading, error: catalogError } = useCatalogProducts(1, 10);
+  const {
+    products: catalogProducts,
+    loading: catalogLoading,
+    error: catalogError,
+  } = useCatalogProducts(1, 10);
 
   // Filter products by category
-  const mobileProductsFromAPI = catalogProducts.filter(product => product.category === 'mobile').slice(0, 5);
-  const laptopProductsFromAPI = catalogProducts.filter(product => product.category === 'laptop').slice(0, 5);
+  const mobileProductsFromAPI = catalogProducts
+    .filter(product => product.category === 'mobile')
+    .slice(0, 5);
+  const laptopProductsFromAPI = catalogProducts
+    .filter(product => product.category === 'laptop')
+    .slice(0, 5);
 
   // Fallback to static data if API fails or no products
-  const smartValueProducts = mobileProductsFromAPI.length > 0 ? mobileProductsFromAPI : mobileProducts.slice(0, 5);
-  const refurbishedLaptops = laptopProductsFromAPI.length > 0 ? laptopProductsFromAPI : laptopProducts.slice(0, 5);
+  const smartValueProducts =
+    mobileProductsFromAPI.length > 0 ? mobileProductsFromAPI : mobileProducts.slice(0, 5);
+  const refurbishedLaptops =
+    laptopProductsFromAPI.length > 0 ? laptopProductsFromAPI : laptopProducts.slice(0, 5);
 
   // Helper function to get product image
-  const getProductImage = (product) => {
+  const getProductImage = product => {
     if (product.images && product.images.length > 0) {
       return product.images[0];
     }
@@ -754,7 +782,7 @@ const Home = () => {
   };
 
   // Helper function to format product for display
-  const formatProductForDisplay = (product) => {
+  const formatProductForDisplay = product => {
     if (product._id) {
       // API product
       return {
@@ -768,7 +796,7 @@ const Home = () => {
         rating: 4.5,
         reviews: Math.floor(Math.random() * 100) + 50,
         specs: `${product.variant?.ram || 'N/A'} RAM, ${product.variant?.storage || 'N/A'} Storage`,
-        badge: product.isActive ? 'Available' : 'Out of Stock'
+        badge: product.isActive ? 'Available' : 'Out of Stock',
       };
     }
     // Static product (fallback)
@@ -789,11 +817,10 @@ const Home = () => {
       {/* Hero Section */}
       <HeroSection>
         <HeroContent>
-          <HeroTitle>
-            Sell your device in minutes
-          </HeroTitle>
+          <HeroTitle>Sell your device in minutes</HeroTitle>
           <HeroSubtitle>
-            Get the best price for your mobile, tablet, or laptop through our network of verified local partner shops. Safe, fast, and hassle-free.
+            Get the best price for your mobile, tablet, or laptop through our network of verified
+            local partner shops. Safe, fast, and hassle-free.
           </HeroSubtitle>
           <HeroActions>
             <Button
@@ -804,11 +831,7 @@ const Home = () => {
             >
               Start Selling
             </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => navigate('/buy')}
-            >
+            <Button variant="secondary" size="lg" onClick={() => navigate('/buy')}>
               Browse Devices
             </Button>
           </HeroActions>
@@ -837,17 +860,14 @@ const Home = () => {
       {/* <PhoneList /> */}
 
       {/* Category Selection */}
-     
+
       {/* Buy Products Section */}
       <BuyProductsList />
 
       {/* How It Works */}
 
-
-    
       {/* Refurbished Laptops Section */}
       {/* Refurbished Laptops Section (updated UI) */}
-
 
       <HowItWorksSection>
         <SectionContainer>
@@ -856,7 +876,7 @@ const Home = () => {
             Simple 4-step process to sell your device safely and get paid instantly
           </SectionSubtitle>
           <StepsGrid>
-            {steps.map((step) => (
+            {steps.map(step => (
               <StepCard key={step.number}>
                 <StepNumber>{step.number}</StepNumber>
                 <h3>{step.title}</h3>
@@ -874,7 +894,7 @@ const Home = () => {
             Join thousands of satisfied customers who have sold their devices through Cashmitra
           </SectionSubtitle>
           <TestimonialGrid>
-            {testimonials.map((testimonial) => (
+            {testimonials.map(testimonial => (
               <TestimonialCard key={testimonial.id}>
                 <Card.Body>
                   <StarRating>

@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import { 
-  X, 
-  Shield, 
-  User, 
-  Settings, 
-  Save, 
-  RefreshCw, 
-  AlertCircle, 
-  CheckCircle, 
-  Clock, 
-  Eye, 
+import {
+  X,
+  Shield,
+  User,
+  Settings,
+  Save,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Eye,
   EyeOff,
   Package,
   ShoppingCart,
@@ -24,7 +24,7 @@ import {
   ChevronRight,
   Search,
   Filter,
-  MoreVertical
+  MoreVertical,
 } from 'lucide-react';
 import partnerPermissionService from '../../services/partnerPermissionService';
 import { PARTNER_MENU_ITEMS, PARTNER_ROLE_TEMPLATES } from '../../utils/partnerMenuPermissions';
@@ -39,7 +39,7 @@ const SidebarContainer = styled.div`
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-left: 1px solid #e2e8f0;
   box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
-  transform: translateX(${props => props.$isOpen ? '0' : '100%'});
+  transform: translateX(${props => (props.$isOpen ? '0' : '100%')});
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   display: flex;
@@ -55,7 +55,7 @@ const SidebarHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -91,7 +91,7 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  
+
   &:hover {
     background-color: #f1f5f9;
     color: #374151;
@@ -159,13 +159,13 @@ const SearchInput = styled.input`
   font-size: 0.875rem;
   background: white;
   transition: all 0.2s;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
-  
+
   &::placeholder {
     color: #9ca3af;
   }
@@ -206,21 +206,21 @@ const RoleTemplateGrid = styled.div`
 
 const RoleTemplateButton = styled.button`
   padding: 0.5rem;
-  border: 1px solid ${props => props.$isActive ? '#3b82f6' : '#e2e8f0'};
+  border: 1px solid ${props => (props.$isActive ? '#3b82f6' : '#e2e8f0')};
   border-radius: 0.5rem;
-  background: ${props => props.$isActive ? '#eff6ff' : 'white'};
-  color: ${props => props.$isActive ? '#3b82f6' : '#64748b'};
+  background: ${props => (props.$isActive ? '#eff6ff' : 'white')};
+  color: ${props => (props.$isActive ? '#3b82f6' : '#64748b')};
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   text-align: center;
-  
+
   &:hover {
     border-color: #3b82f6;
     background: #f8fafc;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -236,7 +236,7 @@ const PermissionsSection = styled.div`
 
 const PermissionCategory = styled.div`
   border-bottom: 1px solid #f1f5f9;
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -251,7 +251,7 @@ const CategoryHeader = styled.div`
   justify-content: space-between;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f1f5f9;
   }
@@ -269,11 +269,11 @@ const CategoryTitle = styled.div`
 const CategoryToggle = styled.div`
   color: #64748b;
   transition: transform 0.2s;
-  transform: rotate(${props => props.$isExpanded ? '90deg' : '0deg'});
+  transform: rotate(${props => (props.$isExpanded ? '90deg' : '0deg')});
 `;
 
 const PermissionsList = styled.div`
-  display: ${props => props.$isExpanded ? 'block' : 'none'};
+  display: ${props => (props.$isExpanded ? 'block' : 'none')};
 `;
 
 const PermissionItem = styled.div`
@@ -282,11 +282,11 @@ const PermissionItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   &:hover {
     background: #fafbfc;
   }
@@ -313,21 +313,21 @@ const PermissionToggle = styled.button`
   height: 1.25rem;
   border-radius: 0.625rem;
   border: none;
-  background: ${props => props.$isEnabled ? '#10b981' : '#e5e7eb'};
+  background: ${props => (props.$isEnabled ? '#10b981' : '#e5e7eb')};
   position: relative;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   &::after {
     content: '';
     position: absolute;
     top: 0.125rem;
-    left: ${props => props.$isEnabled ? '1.375rem' : '0.125rem'};
+    left: ${props => (props.$isEnabled ? '1.375rem' : '0.125rem')};
     width: 1rem;
     height: 1rem;
     background: white;
@@ -348,10 +348,10 @@ const ActionButtons = styled.div`
 const ActionButton = styled.button`
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 1px solid ${props => props.$variant === 'primary' ? '#3b82f6' : '#e2e8f0'};
+  border: 1px solid ${props => (props.$variant === 'primary' ? '#3b82f6' : '#e2e8f0')};
   border-radius: 0.5rem;
-  background: ${props => props.$variant === 'primary' ? '#3b82f6' : 'white'};
-  color: ${props => props.$variant === 'primary' ? 'white' : '#374151'};
+  background: ${props => (props.$variant === 'primary' ? '#3b82f6' : 'white')};
+  color: ${props => (props.$variant === 'primary' ? 'white' : '#374151')};
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -360,12 +360,12 @@ const ActionButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  
+
   &:hover {
-    background: ${props => props.$variant === 'primary' ? '#2563eb' : '#f8fafc'};
+    background: ${props => (props.$variant === 'primary' ? '#2563eb' : '#f8fafc')};
     transform: translateY(-1px);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -383,18 +383,26 @@ const StatusIndicator = styled.div`
   font-weight: 500;
   background: ${props => {
     switch (props.$status) {
-      case 'success': return '#dcfce7';
-      case 'error': return '#fef2f2';
-      case 'loading': return '#fef3c7';
-      default: return '#f3f4f6';
+      case 'success':
+        return '#dcfce7';
+      case 'error':
+        return '#fef2f2';
+      case 'loading':
+        return '#fef3c7';
+      default:
+        return '#f3f4f6';
     }
   }};
   color: ${props => {
     switch (props.$status) {
-      case 'success': return '#166534';
-      case 'error': return '#dc2626';
-      case 'loading': return '#d97706';
-      default: return '#374151';
+      case 'success':
+        return '#166534';
+      case 'error':
+        return '#dc2626';
+      case 'loading':
+        return '#d97706';
+      default:
+        return '#374151';
     }
   }};
   margin-bottom: 1rem;
@@ -413,21 +421,21 @@ const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpd
   // Load partner permissions
   const loadPermissions = useCallback(async () => {
     if (!selectedPartner) return;
-    
+
     try {
       setLoading(true);
       setStatus({ type: 'loading', message: 'Loading permissions...' });
-      
+
       const response = await partnerPermissionService.getPartnerPermissions(selectedPartner.id);
       const permissionsData = response.data?.permissions || {};
       const roleData = response.data?.roleTemplate || 'basic';
-      
+
       setPermissions(permissionsData);
       setOriginalPermissions(permissionsData);
       setRoleTemplate(roleData);
       setHasChanges(false);
       setStatus({ type: 'success', message: 'Permissions loaded successfully' });
-      
+
       // Auto-expand first category
       if (PARTNER_MENU_ITEMS.length > 0) {
         setExpandedCategories({ [PARTNER_MENU_ITEMS[0].section]: true });
@@ -450,38 +458,41 @@ const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpd
 
   // Check for changes
   useEffect(() => {
-    const hasPermissionChanges = JSON.stringify(permissions) !== JSON.stringify(originalPermissions);
+    const hasPermissionChanges =
+      JSON.stringify(permissions) !== JSON.stringify(originalPermissions);
     setHasChanges(hasPermissionChanges);
   }, [permissions, originalPermissions]);
 
   // Handle permission toggle
-  const handlePermissionToggle = (permissionKey) => {
+  const handlePermissionToggle = permissionKey => {
     setPermissions(prev => ({
       ...prev,
       [permissionKey]: {
         ...prev[permissionKey],
-        granted: !prev[permissionKey]?.granted
-      }
+        granted: !prev[permissionKey]?.granted,
+      },
     }));
   };
 
   // Handle role template change
-  const handleRoleTemplateChange = async (templateKey) => {
+  const handleRoleTemplateChange = async templateKey => {
     if (!selectedPartner) return;
-    
+
     try {
       setLoading(true);
       setStatus({ type: 'loading', message: 'Applying role template...' });
-      
+
       await partnerPermissionService.applyRoleTemplate(selectedPartner.id, templateKey);
-      
+
       // Reload permissions to get updated data
       await loadPermissions();
-      
+
       setRoleTemplate(templateKey);
       setStatus({ type: 'success', message: 'Role template applied successfully' });
-      toast.success(`Role template "${PARTNER_ROLE_TEMPLATES[templateKey]?.label}" applied successfully`);
-      
+      toast.success(
+        `Role template "${PARTNER_ROLE_TEMPLATES[templateKey]?.label}" applied successfully`
+      );
+
       // Notify parent component
       if (onPermissionsUpdate) {
         onPermissionsUpdate(selectedPartner.id, templateKey);
@@ -498,21 +509,21 @@ const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpd
   // Save permissions
   const handleSavePermissions = async () => {
     if (!selectedPartner || !hasChanges) return;
-    
+
     try {
       setLoading(true);
       setStatus({ type: 'loading', message: 'Saving permissions...' });
-      
+
       await partnerPermissionService.updatePartnerPermissions(selectedPartner.id, {
         permissions,
-        roleTemplate
+        roleTemplate,
       });
-      
+
       setOriginalPermissions(permissions);
       setHasChanges(false);
       setStatus({ type: 'success', message: 'Permissions saved successfully' });
       toast.success('Partner permissions updated successfully');
-      
+
       // Notify parent component
       if (onPermissionsUpdate) {
         onPermissionsUpdate(selectedPartner.id, roleTemplate);
@@ -534,33 +545,34 @@ const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpd
   };
 
   // Toggle category expansion
-  const toggleCategory = (categoryName) => {
+  const toggleCategory = categoryName => {
     setExpandedCategories(prev => ({
       ...prev,
-      [categoryName]: !prev[categoryName]
+      [categoryName]: !prev[categoryName],
     }));
   };
 
   // Filter permissions based on search
   const filteredMenuItems = PARTNER_MENU_ITEMS.map(section => ({
     ...section,
-    items: section.items.filter(item => 
-      item.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    items: section.items.filter(
+      item =>
+        item.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+    ),
   })).filter(section => section.items.length > 0);
 
   // Get category icon
-  const getCategoryIcon = (sectionName) => {
+  const getCategoryIcon = sectionName => {
     const iconMap = {
-      'Main': Shield,
+      Main: Shield,
       'Inventory & Products': Package,
       'Sales & Orders': ShoppingCart,
       'Finance & Payouts': Wallet,
       'Analytics & Reports': BarChart3,
       'KYC & Verification': UserCheck,
       'Support & Communication': HelpCircle,
-      'Settings': Settings
+      Settings: Settings,
     };
     return iconMap[sectionName] || Settings;
   };
@@ -589,7 +601,9 @@ const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpd
           </PartnerAvatar>
           <PartnerDetails>
             <PartnerName>{selectedPartner.shopName || selectedPartner.name}</PartnerName>
-            <PartnerRole>{PARTNER_ROLE_TEMPLATES[roleTemplate]?.label || 'Basic Partner'}</PartnerRole>
+            <PartnerRole>
+              {PARTNER_ROLE_TEMPLATES[roleTemplate]?.label || 'Basic Partner'}
+            </PartnerRole>
           </PartnerDetails>
         </PartnerInfo>
 
@@ -632,16 +646,16 @@ const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpd
             type="text"
             placeholder="Search permissions..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
         </SearchContainer>
 
         {/* Permissions */}
         <PermissionsSection>
-          {filteredMenuItems.map((section) => {
+          {filteredMenuItems.map(section => {
             const IconComponent = getCategoryIcon(section.section);
             const isExpanded = expandedCategories[section.section];
-            
+
             return (
               <PermissionCategory key={section.section}>
                 <CategoryHeader onClick={() => toggleCategory(section.section)}>
@@ -653,12 +667,12 @@ const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpd
                     <ChevronRight size={16} />
                   </CategoryToggle>
                 </CategoryHeader>
-                
+
                 <PermissionsList $isExpanded={isExpanded}>
-                  {section.items.map((item) => {
+                  {section.items.map(item => {
                     const permissionData = permissions[item.requiredPermission];
                     const isEnabled = permissionData?.granted || false;
-                    
+
                     return (
                       <PermissionItem key={item.requiredPermission}>
                         <PermissionInfo>
@@ -682,10 +696,7 @@ const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpd
 
       {/* Action Buttons */}
       <ActionButtons>
-        <ActionButton
-          onClick={handleResetPermissions}
-          disabled={loading || !hasChanges}
-        >
+        <ActionButton onClick={handleResetPermissions} disabled={loading || !hasChanges}>
           <RefreshCw size={16} />
           Reset
         </ActionButton>

@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  ShoppingCart, 
-  Package, 
-  DollarSign, 
-  Users, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
+import {
+  TrendingUp,
+  TrendingDown,
+  ShoppingCart,
+  Package,
+  DollarSign,
+  Users,
+  Clock,
+  CheckCircle,
+  XCircle,
   AlertCircle,
   RefreshCw,
   Wifi,
@@ -18,7 +18,7 @@ import {
   Search,
   Eye,
   Edit,
-  MoreHorizontal
+  MoreHorizontal,
 } from 'lucide-react';
 import { useRealTimeOrders, useRealTimeAnalytics } from '../../hooks/useRealTimeOrders';
 
@@ -53,8 +53,8 @@ const ConnectionStatus = styled.div`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  background: ${props => props.connected ? '#D1FAE5' : '#FEE2E2'};
-  color: ${props => props.connected ? '#065F46' : '#991B1B'};
+  background: ${props => (props.connected ? '#D1FAE5' : '#FEE2E2')};
+  color: ${props => (props.connected ? '#065F46' : '#991B1B')};
 `;
 
 const Controls = styled.div`
@@ -139,14 +139,14 @@ const StatChange = styled.div`
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: ${props => props.positive ? '#059669' : '#DC2626'};
+  color: ${props => (props.positive ? '#059669' : '#DC2626')};
 `;
 
 const ContentGrid = styled.div`
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 2rem;
-  
+
   @media (max-width: 1200px) {
     grid-template-columns: 1fr;
   }
@@ -253,22 +253,34 @@ const OrderStatus = styled.span`
   font-weight: 500;
   background: ${props => {
     switch (props.status) {
-      case 'pending': return '#FEF3C7';
-      case 'processing': return '#DBEAFE';
-      case 'shipped': return '#E0E7FF';
-      case 'delivered': return '#D1FAE5';
-      case 'cancelled': return '#FEE2E2';
-      default: return '#F3F4F6';
+      case 'pending':
+        return '#FEF3C7';
+      case 'processing':
+        return '#DBEAFE';
+      case 'shipped':
+        return '#E0E7FF';
+      case 'delivered':
+        return '#D1FAE5';
+      case 'cancelled':
+        return '#FEE2E2';
+      default:
+        return '#F3F4F6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'pending': return '#92400E';
-      case 'processing': return '#1E40AF';
-      case 'shipped': return '#5B21B6';
-      case 'delivered': return '#065F46';
-      case 'cancelled': return '#991B1B';
-      default: return '#374151';
+      case 'pending':
+        return '#92400E';
+      case 'processing':
+        return '#1E40AF';
+      case 'shipped':
+        return '#5B21B6';
+      case 'delivered':
+        return '#065F46';
+      case 'cancelled':
+        return '#991B1B';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -350,14 +362,18 @@ const LoadingSpinner = styled.div`
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  
+
   svg {
     animation: spin 1s linear infinite;
   }
-  
+
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -366,8 +382,8 @@ const ErrorMessage = styled.div`
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
-  background: #FEE2E2;
-  color: #991B1B;
+  background: #fee2e2;
+  color: #991b1b;
   border-radius: 0.5rem;
   margin: 1rem;
 `;
@@ -387,15 +403,15 @@ const RealTimeDashboard = () => {
     connected: ordersConnected,
     lastUpdated: ordersLastUpdated,
     refresh: refreshOrders,
-    updateOrderStatus
+    updateOrderStatus,
   } = useRealTimeOrders(orderTypeFilter, {
     pollingInterval: 5000,
-    onUpdate: (newOrders) => {
+    onUpdate: newOrders => {
       console.log('Orders updated:', newOrders.length);
     },
-    onError: (error) => {
+    onError: error => {
       console.error('Orders error:', error);
-    }
+    },
   });
 
   const {
@@ -403,36 +419,38 @@ const RealTimeDashboard = () => {
     loading: analyticsLoading,
     error: analyticsError,
     lastUpdated: analyticsLastUpdated,
-    refresh: refreshAnalytics
+    refresh: refreshAnalytics,
   } = useRealTimeAnalytics({
     pollingInterval: 30000,
-    dateRange: 'today'
+    dateRange: 'today',
   });
 
   // Filter orders based on search and status
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
+    const matchesSearch =
       order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.items?.[0]?.product?.brand?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
   // Generate recent activity
-  const recentActivity = orders
-    .slice(0, 10)
-    .map(order => ({
-      id: order._id,
-      type: order.orderType,
-      status: order.status,
-      text: `${order.orderType === 'sell' ? 'Sell' : 'Buy'} order ${order._id.slice(-6)} ${order.status}`,
-      time: new Date(order.updatedAt || order.createdAt).toLocaleTimeString(),
-      color: order.status === 'delivered' ? '#059669' : 
-             order.status === 'cancelled' ? '#DC2626' : '#3B82F6'
-    }));
+  const recentActivity = orders.slice(0, 10).map(order => ({
+    id: order._id,
+    type: order.orderType,
+    status: order.status,
+    text: `${order.orderType === 'sell' ? 'Sell' : 'Buy'} order ${order._id.slice(-6)} ${order.status}`,
+    time: new Date(order.updatedAt || order.createdAt).toLocaleTimeString(),
+    color:
+      order.status === 'delivered'
+        ? '#059669'
+        : order.status === 'cancelled'
+          ? '#DC2626'
+          : '#3B82F6',
+  }));
 
   const handleRefresh = async () => {
     await Promise.all([refreshOrders(), refreshAnalytics()]);
@@ -446,15 +464,15 @@ const RealTimeDashboard = () => {
     }
   };
 
-  const formatCurrency = (amount) => {
+  const formatCurrency = amount => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
-  const formatTime = (timestamp) => {
+  const formatTime = timestamp => {
     if (!timestamp) return 'Never';
     return new Date(timestamp).toLocaleTimeString();
   };
@@ -469,15 +487,12 @@ const RealTimeDashboard = () => {
             {ordersConnected ? 'Connected' : 'Disconnected'}
           </ConnectionStatus>
         </div>
-        
+
         <Controls>
           <div style={{ fontSize: '0.875rem', color: '#6B7280' }}>
             Last updated: {formatTime(ordersLastUpdated)}
           </div>
-          <RefreshButton 
-            onClick={handleRefresh} 
-            disabled={ordersLoading || analyticsLoading}
-          >
+          <RefreshButton onClick={handleRefresh} disabled={ordersLoading || analyticsLoading}>
             <RefreshCw size={16} />
             Refresh
           </RefreshButton>
@@ -554,20 +569,17 @@ const RealTimeDashboard = () => {
                 type="text"
                 placeholder="Search orders..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
               />
               <FilterSelect
                 value={orderTypeFilter}
-                onChange={(e) => setOrderTypeFilter(e.target.value)}
+                onChange={e => setOrderTypeFilter(e.target.value)}
               >
                 <option value="all">All Types</option>
                 <option value="sell">Sell Orders</option>
                 <option value="buy">Buy Orders</option>
               </FilterSelect>
-              <FilterSelect
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
+              <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
                 <option value="processing">Processing</option>
@@ -592,36 +604,40 @@ const RealTimeDashboard = () => {
               </ErrorMessage>
             )}
 
-            {!ordersLoading && !ordersError && filteredOrders.map(order => (
-              <OrderItem key={order._id}>
-                <OrderInfo>
-                  <OrderId>#{order._id.slice(-8).toUpperCase()}</OrderId>
-                  <OrderDetails>
-                    <span>{order.orderType === 'sell' ? 'Sell' : 'Buy'} Order</span>
-                    <span>{order.user?.name || 'Unknown User'}</span>
-                    <span>{order.items?.[0]?.product?.brand} {order.items?.[0]?.product?.model}</span>
-                    <span>{formatCurrency(order.totalAmount)}</span>
-                    <span>{new Date(order.createdAt).toLocaleDateString()}</span>
-                  </OrderDetails>
-                </OrderInfo>
-                
-                <OrderStatus status={order.status}>
-                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                </OrderStatus>
-                
-                <OrderActions>
-                  <ActionButton title="View Details">
-                    <Eye size={16} />
-                  </ActionButton>
-                  <ActionButton title="Edit Order">
-                    <Edit size={16} />
-                  </ActionButton>
-                  <ActionButton title="More Actions">
-                    <MoreHorizontal size={16} />
-                  </ActionButton>
-                </OrderActions>
-              </OrderItem>
-            ))}
+            {!ordersLoading &&
+              !ordersError &&
+              filteredOrders.map(order => (
+                <OrderItem key={order._id}>
+                  <OrderInfo>
+                    <OrderId>#{order._id.slice(-8).toUpperCase()}</OrderId>
+                    <OrderDetails>
+                      <span>{order.orderType === 'sell' ? 'Sell' : 'Buy'} Order</span>
+                      <span>{order.user?.name || 'Unknown User'}</span>
+                      <span>
+                        {order.items?.[0]?.product?.brand} {order.items?.[0]?.product?.model}
+                      </span>
+                      <span>{formatCurrency(order.totalAmount)}</span>
+                      <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+                    </OrderDetails>
+                  </OrderInfo>
+
+                  <OrderStatus status={order.status}>
+                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                  </OrderStatus>
+
+                  <OrderActions>
+                    <ActionButton title="View Details">
+                      <Eye size={16} />
+                    </ActionButton>
+                    <ActionButton title="Edit Order">
+                      <Edit size={16} />
+                    </ActionButton>
+                    <ActionButton title="More Actions">
+                      <MoreHorizontal size={16} />
+                    </ActionButton>
+                  </OrderActions>
+                </OrderItem>
+              ))}
 
             {!ordersLoading && !ordersError && filteredOrders.length === 0 && (
               <div style={{ padding: '2rem', textAlign: 'center', color: '#6B7280' }}>
@@ -636,14 +652,18 @@ const RealTimeDashboard = () => {
           <SectionHeader>
             <SectionTitle>Recent Activity</SectionTitle>
           </SectionHeader>
-          
+
           <ActivityList>
             {recentActivity.map((activity, index) => (
               <ActivityItem key={activity.id + index}>
                 <ActivityIcon color={activity.color}>
-                  {activity.status === 'delivered' ? <CheckCircle size={16} /> :
-                   activity.status === 'cancelled' ? <XCircle size={16} /> :
-                   <Package size={16} />}
+                  {activity.status === 'delivered' ? (
+                    <CheckCircle size={16} />
+                  ) : activity.status === 'cancelled' ? (
+                    <XCircle size={16} />
+                  ) : (
+                    <Package size={16} />
+                  )}
                 </ActivityIcon>
                 <ActivityContent>
                   <ActivityText>{activity.text}</ActivityText>
@@ -651,7 +671,7 @@ const RealTimeDashboard = () => {
                 </ActivityContent>
               </ActivityItem>
             ))}
-            
+
             {recentActivity.length === 0 && (
               <div style={{ padding: '2rem', textAlign: 'center', color: '#6B7280' }}>
                 No recent activity

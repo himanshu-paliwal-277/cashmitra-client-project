@@ -11,14 +11,14 @@ const useAdminConditionQuestionnaire = () => {
     totalItems: 0,
     itemsPerPage: 10,
     hasNextPage: false,
-    hasPrevPage: false
+    hasPrevPage: false,
   });
   const [stats, setStats] = useState({
     totalQuestionnaires: 0,
     activeQuestionnaires: 0,
     totalResponses: 0,
     avgCompletionTime: 0,
-    categoriesCount: 0
+    categoriesCount: 0,
   });
 
   // Fetch questionnaires
@@ -31,9 +31,9 @@ const useAdminConditionQuestionnaire = () => {
       const questionnaireList = data.data?.questionnaires || [];
       const backendStats = data.data?.stats || {};
       const backendPagination = data.data?.pagination || {};
-      
+
       setQuestionnaires(questionnaireList);
-      
+
       // Update pagination
       setPagination({
         currentPage: backendPagination.currentPage || 1,
@@ -41,16 +41,16 @@ const useAdminConditionQuestionnaire = () => {
         totalItems: backendPagination.totalItems || 0,
         itemsPerPage: backendPagination.itemsPerPage || 10,
         hasNextPage: backendPagination.hasNextPage || false,
-        hasPrevPage: backendPagination.hasPrevPage || false
+        hasPrevPage: backendPagination.hasPrevPage || false,
       });
-      
+
       // Update stats with new structure
       setStats({
         totalQuestionnaires: backendStats.totalQuestionnaires || 0,
         activeQuestionnaires: backendStats.activeQuestionnaires || 0,
         totalResponses: backendStats.totalResponses || 0,
         avgCompletionTime: backendStats.avgCompletionTime || 0,
-        categoriesCount: backendStats.categoriesCount || 0
+        categoriesCount: backendStats.categoriesCount || 0,
       });
     } catch (err) {
       setError(err.message || 'Failed to fetch questionnaires');
@@ -61,109 +61,132 @@ const useAdminConditionQuestionnaire = () => {
   }, []);
 
   // Update questionnaire status
-  const updateQuestionnaireStatus = useCallback(async (questionnaireId, isActive) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await adminService.updateConditionQuestionnaire(questionnaireId, { isActive });
-      
-      // Refresh the data
-      await fetchQuestionnaires();
-      return { success: true };
-    } catch (err) {
-      setError(err.message || 'Failed to update questionnaire status');
-      console.error('Error updating questionnaire status:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchQuestionnaires]);
+  const updateQuestionnaireStatus = useCallback(
+    async (questionnaireId, isActive) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await adminService.updateConditionQuestionnaire(questionnaireId, {
+          isActive,
+        });
+
+        // Refresh the data
+        await fetchQuestionnaires();
+        return { success: true };
+      } catch (err) {
+        setError(err.message || 'Failed to update questionnaire status');
+        console.error('Error updating questionnaire status:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchQuestionnaires]
+  );
 
   // Create new questionnaire
-  const createQuestionnaire = useCallback(async (questionnaireData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await adminService.createConditionQuestionnaire(questionnaireData);
-      
-      // Refresh the data
-      await fetchQuestionnaires();
-      return { success: true, data: result.data };
-    } catch (err) {
-      setError(err.message || 'Failed to create questionnaire');
-      console.error('Error creating questionnaire:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchQuestionnaires]);
+  const createQuestionnaire = useCallback(
+    async questionnaireData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await adminService.createConditionQuestionnaire(questionnaireData);
+
+        // Refresh the data
+        await fetchQuestionnaires();
+        return { success: true, data: result.data };
+      } catch (err) {
+        setError(err.message || 'Failed to create questionnaire');
+        console.error('Error creating questionnaire:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchQuestionnaires]
+  );
 
   // Update questionnaire
-  const updateQuestionnaire = useCallback(async (questionnaireId, questionnaireData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await adminService.updateConditionQuestionnaire(questionnaireId, questionnaireData);
-      
-      // Refresh the data
-      await fetchQuestionnaires();
-      return { success: true, data: result.data };
-    } catch (err) {
-      setError(err.message || 'Failed to update questionnaire');
-      console.error('Error updating questionnaire:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchQuestionnaires]);
+  const updateQuestionnaire = useCallback(
+    async (questionnaireId, questionnaireData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await adminService.updateConditionQuestionnaire(
+          questionnaireId,
+          questionnaireData
+        );
+
+        // Refresh the data
+        await fetchQuestionnaires();
+        return { success: true, data: result.data };
+      } catch (err) {
+        setError(err.message || 'Failed to update questionnaire');
+        console.error('Error updating questionnaire:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchQuestionnaires]
+  );
 
   // Delete questionnaire
-  const deleteQuestionnaire = useCallback(async (questionnaireId, forceDelete = false) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await adminService.deleteConditionQuestionnaire(questionnaireId, forceDelete);
-      
-      // Refresh the data
-      await fetchQuestionnaires();
-      return { success: true, message: result.message };
-    } catch (err) {
-      setError(err.message || 'Failed to delete questionnaire');
-      console.error('Error deleting questionnaire:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchQuestionnaires]);
+  const deleteQuestionnaire = useCallback(
+    async (questionnaireId, forceDelete = false) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await adminService.deleteConditionQuestionnaire(
+          questionnaireId,
+          forceDelete
+        );
+
+        // Refresh the data
+        await fetchQuestionnaires();
+        return { success: true, message: result.message };
+      } catch (err) {
+        setError(err.message || 'Failed to delete questionnaire');
+        console.error('Error deleting questionnaire:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchQuestionnaires]
+  );
 
   // Duplicate questionnaire
-  const duplicateQuestionnaire = useCallback(async (questionnaire) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const duplicateData = {
-        ...questionnaire,
-        title: `${questionnaire.title} (Copy)`,
-        _id: undefined, // Remove ID to create new
-        createdBy: undefined,
-        updatedBy: undefined,
-        createdAt: undefined,
-        updatedAt: undefined
-      };
-      
-      const result = await adminService.createConditionQuestionnaire(duplicateData);
-      
-      // Refresh the data
-      await fetchQuestionnaires();
-      return { success: true, data: result.data };
-    } catch (err) {
-      setError(err.message || 'Failed to duplicate questionnaire');
-      console.error('Error duplicating questionnaire:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchQuestionnaires]);
+  const duplicateQuestionnaire = useCallback(
+    async questionnaire => {
+      setLoading(true);
+      setError(null);
+      try {
+        const duplicateData = {
+          ...questionnaire,
+          title: `${questionnaire.title} (Copy)`,
+          _id: undefined, // Remove ID to create new
+          createdBy: undefined,
+          updatedBy: undefined,
+          createdAt: undefined,
+          updatedAt: undefined,
+        };
+
+        const result = await adminService.createConditionQuestionnaire(duplicateData);
+
+        // Refresh the data
+        await fetchQuestionnaires();
+        return { success: true, data: result.data };
+      } catch (err) {
+        setError(err.message || 'Failed to duplicate questionnaire');
+        console.error('Error duplicating questionnaire:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchQuestionnaires]
+  );
 
   // Refresh questionnaires (alias for fetchQuestionnaires)
   const refreshQuestionnaires = useCallback(() => {
@@ -171,17 +194,20 @@ const useAdminConditionQuestionnaire = () => {
   }, [fetchQuestionnaires]);
 
   // Get questionnaire by ID (from local state)
-  const getQuestionnaireById = useCallback((questionnaireId) => {
-    return questionnaires.find(questionnaire => questionnaire._id === questionnaireId);
-  }, [questionnaires]);
+  const getQuestionnaireById = useCallback(
+    questionnaireId => {
+      return questionnaires.find(questionnaire => questionnaire._id === questionnaireId);
+    },
+    [questionnaires]
+  );
 
   // Fetch questionnaire by ID from backend
-  const fetchQuestionnaireById = useCallback(async (questionnaireId) => {
+  const fetchQuestionnaireById = useCallback(async questionnaireId => {
     setLoading(true);
     setError(null);
     try {
       const result = await adminService.getConditionQuestionnaireById(questionnaireId);
-      
+
       return { success: true, data: result.data };
     } catch (err) {
       setError(err.message || 'Failed to fetch questionnaire');
@@ -211,7 +237,7 @@ const useAdminConditionQuestionnaire = () => {
     duplicateQuestionnaire,
     refreshQuestionnaires,
     getQuestionnaireById,
-    fetchQuestionnaireById
+    fetchQuestionnaireById,
   };
 };
 

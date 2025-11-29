@@ -36,7 +36,7 @@ import {
   ToggleRight,
   Calendar,
   User,
-  BarChart3
+  BarChart3,
 } from 'lucide-react';
 
 const spin = keyframes`
@@ -89,7 +89,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: ${props => {
@@ -98,15 +98,15 @@ const ActionButton = styled.button`
       return '0 4px 12px rgba(59, 130, 246, 0.4)';
     }};
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
   }
-  
+
   svg {
-    animation: ${props => props.loading ? `${spin} 1s linear infinite` : 'none'};
+    animation: ${props => (props.loading ? `${spin} 1s linear infinite` : 'none')};
   }
 `;
 
@@ -134,11 +134,12 @@ const AlertMessage = styled.div`
     if (props.type === 'success') return '#f0fdf4';
     return '#fef3c7';
   }};
-  border: 1px solid ${props => {
-    if (props.type === 'error') return '#fecaca';
-    if (props.type === 'success') return '#bbf7d0';
-    return '#fed7aa';
-  }};
+  border: 1px solid
+    ${props => {
+      if (props.type === 'error') return '#fecaca';
+      if (props.type === 'success') return '#bbf7d0';
+      return '#fed7aa';
+    }};
   color: ${props => {
     if (props.type === 'error') return '#dc2626';
     if (props.type === 'success') return '#059669';
@@ -161,7 +162,7 @@ const ClearFiltersButton = styled.button`
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #e5e7eb;
     color: #374151;
@@ -187,7 +188,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -202,7 +203,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -264,7 +265,7 @@ const QuestionnaireCard = styled.div`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -307,7 +308,7 @@ const CategoryBadge = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  
+
   ${props => {
     switch (props.category) {
       case 'smartphone':
@@ -336,8 +337,8 @@ const StatusToggle = styled.button`
   padding: 0.5rem;
   border-radius: 0.375rem;
   transition: all 0.2s;
-  color: ${props => props.active ? '#10b981' : '#ef4444'};
-  
+  color: ${props => (props.active ? '#10b981' : '#ef4444')};
+
   &:hover {
     background: #f3f4f6;
   }
@@ -410,12 +411,12 @@ const IconButton = styled.button`
   display: flex;
   align-items: center;
   transition: all 0.2s;
-  
+
   &:hover {
     opacity: 0.9;
     transform: scale(1.05);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -468,7 +469,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  
+
   &:hover {
     background: #f3f4f6;
   }
@@ -491,7 +492,7 @@ const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -507,7 +508,7 @@ const TextArea = styled.textarea`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -522,7 +523,7 @@ const Select = styled.select`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   background: white;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -618,13 +619,13 @@ const PaginationControls = styled.div`
 `;
 
 const PaginationButton = styled.button`
-  background: ${props => props.disabled ? '#f3f4f6' : '#3b82f6'};
-  color: ${props => props.disabled ? '#9ca3af' : 'white'};
+  background: ${props => (props.disabled ? '#f3f4f6' : '#3b82f6')};
+  color: ${props => (props.disabled ? '#9ca3af' : 'white')};
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
   font-size: 0.875rem;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -642,7 +643,7 @@ const PageNumber = styled.span`
   font-weight: 500;
 `;
 
-const getCategoryIcon = (category) => {
+const getCategoryIcon = category => {
   switch (category) {
     case 'smartphone':
       return <Smartphone size={16} />;
@@ -689,15 +690,15 @@ const ConditionQuestionnaire = () => {
       estimatedTime: 5,
       difficulty: 'easy',
       tags: [],
-      instructions: ''
+      instructions: '',
     },
-    questions: []
+    questions: [],
   });
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
     inactive: 0,
-    totalQuestions: 0
+    totalQuestions: 0,
   });
 
   const {
@@ -712,7 +713,7 @@ const ConditionQuestionnaire = () => {
     updateQuestionnaire,
     deleteQuestionnaire,
     duplicateQuestionnaire,
-    refreshQuestionnaires
+    refreshQuestionnaires,
   } = useAdminConditionQuestionnaire();
 
   useEffect(() => {
@@ -722,7 +723,7 @@ const ConditionQuestionnaire = () => {
   }, [hookQuestionnaires, hookStats, hookLoading]);
 
   // Pagination handlers
-  const handlePageChange = (page) => {
+  const handlePageChange = page => {
     if (page >= 1 && page <= pagination.totalPages) {
       fetchQuestionnaires({ page });
     }
@@ -742,7 +743,7 @@ const ConditionQuestionnaire = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.title?.trim()) {
       newErrors.title = 'Title is required';
     } else if (formData.title.trim().length < 3) {
@@ -750,7 +751,7 @@ const ConditionQuestionnaire = () => {
     } else if (formData.title.trim().length > 100) {
       newErrors.title = 'Title must be less than 100 characters';
     }
-    
+
     if (!formData.description?.trim()) {
       newErrors.description = 'Description is required';
     } else if (formData.description.trim().length < 10) {
@@ -758,11 +759,11 @@ const ConditionQuestionnaire = () => {
     } else if (formData.description.trim().length > 500) {
       newErrors.description = 'Description must be less than 500 characters';
     }
-    
+
     if (!formData.category?.trim()) {
       newErrors.category = 'Category is required';
     }
-    
+
     // Allow creating questionnaires without questions initially
     // Questions can be added later through editing
     if (formData.questions && formData.questions.length > 0) {
@@ -773,12 +774,16 @@ const ConditionQuestionnaire = () => {
         if (!question.type) {
           newErrors[`question_${index}_type`] = 'Question type is required';
         }
-        if (['multiple_choice', 'checkbox'].includes(question.type) && (!question.options || question.options.length < 2)) {
-          newErrors[`question_${index}_options`] = 'At least 2 options are required for this question type';
+        if (
+          ['multiple_choice', 'checkbox'].includes(question.type) &&
+          (!question.options || question.options.length < 2)
+        ) {
+          newErrors[`question_${index}_options`] =
+            'At least 2 options are required for this question type';
         }
       });
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -808,9 +813,9 @@ const ConditionQuestionnaire = () => {
     }
   };
 
-  const handleDelete = async (questionnaireId) => {
+  const handleDelete = async questionnaireId => {
     if (!window.confirm('Are you sure you want to delete this questionnaire?')) return;
-    
+
     try {
       await deleteQuestionnaire(questionnaireId);
     } catch (error) {
@@ -818,7 +823,7 @@ const ConditionQuestionnaire = () => {
     }
   };
 
-  const handleDuplicate = async (questionnaire) => {
+  const handleDuplicate = async questionnaire => {
     try {
       await duplicateQuestionnaire(questionnaire);
     } catch (error) {
@@ -833,7 +838,7 @@ const ConditionQuestionnaire = () => {
     setSubmitError('');
     setSubmitSuccess('');
     setIsSubmitting(false);
-    
+
     if (type === 'create') {
       setFormData({
         title: '',
@@ -849,20 +854,50 @@ const ConditionQuestionnaire = () => {
           estimatedTime: 5,
           difficulty: 'easy',
           tags: [],
-          instructions: ''
+          instructions: '',
         },
-        questions: [{
-          id: `question_${Date.now()}_0`,
-          title: 'What is the overall condition of the device?',
-          type: 'single_choice',
-          required: true,
-          options: [
-            { id: 'excellent', title: 'Excellent - Like new', description: '', type: 'excellent', priceImpact: 10, sortOrder: 0 },
-            { id: 'good', title: 'Good - Minor wear', description: '', type: 'good', priceImpact: 0, sortOrder: 1 },
-            { id: 'fair', title: 'Fair - Noticeable wear', description: '', type: 'fair', priceImpact: -10, sortOrder: 2 },
-            { id: 'poor', title: 'Poor - Significant damage', description: '', type: 'poor', priceImpact: -20, sortOrder: 3 }
-          ]
-        }]
+        questions: [
+          {
+            id: `question_${Date.now()}_0`,
+            title: 'What is the overall condition of the device?',
+            type: 'single_choice',
+            required: true,
+            options: [
+              {
+                id: 'excellent',
+                title: 'Excellent - Like new',
+                description: '',
+                type: 'excellent',
+                priceImpact: 10,
+                sortOrder: 0,
+              },
+              {
+                id: 'good',
+                title: 'Good - Minor wear',
+                description: '',
+                type: 'good',
+                priceImpact: 0,
+                sortOrder: 1,
+              },
+              {
+                id: 'fair',
+                title: 'Fair - Noticeable wear',
+                description: '',
+                type: 'fair',
+                priceImpact: -10,
+                sortOrder: 2,
+              },
+              {
+                id: 'poor',
+                title: 'Poor - Significant damage',
+                description: '',
+                type: 'poor',
+                priceImpact: -20,
+                sortOrder: 3,
+              },
+            ],
+          },
+        ],
       });
     } else if (type === 'edit' && questionnaire) {
       // Transform questionnaire data to match form structure
@@ -880,23 +915,24 @@ const ConditionQuestionnaire = () => {
           estimatedTime: questionnaire.metadata?.estimatedTime || 5,
           difficulty: questionnaire.metadata?.difficulty || 'easy',
           tags: questionnaire.metadata?.tags || [],
-          instructions: questionnaire.metadata?.instructions || ''
+          instructions: questionnaire.metadata?.instructions || '',
         },
-        questions: questionnaire.questions?.map(q => ({
-          ...q,
-          options: q.options?.map(opt => ({
-            id: opt.id,
-            title: opt.title || opt.text || '',
-            description: opt.description || '',
-            type: opt.type || 'good',
-            priceImpact: opt.priceImpact || opt.value || 0,
-            sortOrder: opt.sortOrder || 0
-          }))
-        })) || []
+        questions:
+          questionnaire.questions?.map(q => ({
+            ...q,
+            options: q.options?.map(opt => ({
+              id: opt.id,
+              title: opt.title || opt.text || '',
+              description: opt.description || '',
+              type: opt.type || 'good',
+              priceImpact: opt.priceImpact || opt.value || 0,
+              sortOrder: opt.sortOrder || 0,
+            })),
+          })) || [],
       };
       setFormData(transformedQuestionnaire);
     }
-    
+
     setShowModal(true);
   };
 
@@ -910,18 +946,18 @@ const ConditionQuestionnaire = () => {
     setIsSubmitting(false);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     // if (!validateForm()) {
     //   setSubmitError('Please fix the errors above');
     //   return;
     // }
-    
+
     setIsSubmitting(true);
     setSubmitError('');
     setSubmitSuccess('');
-    
+
     try {
       const cleanedData = {
         title: formData.title?.trim(),
@@ -937,50 +973,54 @@ const ConditionQuestionnaire = () => {
           estimatedTime: formData.metadata?.estimatedTime || 5,
           difficulty: formData.metadata?.difficulty || 'easy',
           tags: Array.isArray(formData.metadata?.tags) ? formData.metadata.tags : [],
-          instructions: formData.metadata?.instructions || ''
+          instructions: formData.metadata?.instructions || '',
         },
-        questions: Array.isArray(formData.questions) ? formData.questions.map((q, index) => {
-          const cleanedQuestion = {
-            id: q.id || `question_${Date.now()}_${index}`,
-            title: q.title?.trim() || '',
-            type: q.type || 'single_choice',
-            required: q.required !== false
-          };
-          
-          if (q.type === 'single_choice' || q.type === 'multiple_choice') {
-            const cleanedOptions = (Array.isArray(q.options) ? q.options : []).map(opt => ({
-              id: opt.id || `option_${Date.now()}_${Math.random()}`,
-              title: opt.title?.trim() || '',
-              description: opt.description?.trim() || '',
-              type: opt.type || 'good',
-              priceImpact: typeof opt.priceImpact === 'number' ? opt.priceImpact : 0,
-              sortOrder: typeof opt.sortOrder === 'number' ? opt.sortOrder : 0
-            })).filter(opt => opt.title);
-            
-            // Ensure at least one option exists for choice questions
-            if (cleanedOptions.length === 0) {
-              cleanedOptions.push({
-                id: `option_${Date.now()}_0`,
-                title: 'Option 1',
-                description: '',
-                type: 'good',
-                priceImpact: 0,
-                sortOrder: 0
-              });
-            }
-            
-            cleanedQuestion.options = cleanedOptions;
-          } else {
-            cleanedQuestion.options = [];
-          }
-          
-          return cleanedQuestion;
-        }) : []
+        questions: Array.isArray(formData.questions)
+          ? formData.questions.map((q, index) => {
+              const cleanedQuestion = {
+                id: q.id || `question_${Date.now()}_${index}`,
+                title: q.title?.trim() || '',
+                type: q.type || 'single_choice',
+                required: q.required !== false,
+              };
+
+              if (q.type === 'single_choice' || q.type === 'multiple_choice') {
+                const cleanedOptions = (Array.isArray(q.options) ? q.options : [])
+                  .map(opt => ({
+                    id: opt.id || `option_${Date.now()}_${Math.random()}`,
+                    title: opt.title?.trim() || '',
+                    description: opt.description?.trim() || '',
+                    type: opt.type || 'good',
+                    priceImpact: typeof opt.priceImpact === 'number' ? opt.priceImpact : 0,
+                    sortOrder: typeof opt.sortOrder === 'number' ? opt.sortOrder : 0,
+                  }))
+                  .filter(opt => opt.title);
+
+                // Ensure at least one option exists for choice questions
+                if (cleanedOptions.length === 0) {
+                  cleanedOptions.push({
+                    id: `option_${Date.now()}_0`,
+                    title: 'Option 1',
+                    description: '',
+                    type: 'good',
+                    priceImpact: 0,
+                    sortOrder: 0,
+                  });
+                }
+
+                cleanedQuestion.options = cleanedOptions;
+              } else {
+                cleanedQuestion.options = [];
+              }
+
+              return cleanedQuestion;
+            })
+          : [],
       };
-      
+
       // Debug: Log the data being sent to backend
       console.log('Sending questionnaire data to backend:', JSON.stringify(cleanedData, null, 2));
-      
+
       if (modalType === 'create') {
         const result = await createQuestionnaire(cleanedData);
         if (result) {
@@ -992,15 +1032,14 @@ const ConditionQuestionnaire = () => {
           setSubmitSuccess('Questionnaire updated successfully!');
         }
       }
-      
+
       setTimeout(() => {
         closeModal();
         refreshQuestionnaires();
       }, 1500);
-      
     } catch (error) {
       console.error('Error saving questionnaire:', error);
-      
+
       // Handle backend validation errors
       if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
         const backendErrors = error.response.data.errors.map(err => err.message || err).join('; ');
@@ -1015,7 +1054,7 @@ const ConditionQuestionnaire = () => {
     }
   };
 
-  const toggleQuestionExpansion = (questionId) => {
+  const toggleQuestionExpansion = questionId => {
     const newExpanded = new Set(expandedQuestions);
     if (newExpanded.has(questionId)) {
       newExpanded.delete(questionId);
@@ -1027,22 +1066,24 @@ const ConditionQuestionnaire = () => {
 
   const filteredAndSortedQuestionnaires = React.useMemo(() => {
     let filtered = questionnaires.filter(questionnaire => {
-      const matchesSearch = questionnaire.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           questionnaire.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           questionnaire.category?.toLowerCase().includes(searchTerm.toLowerCase());
-      
+      const matchesSearch =
+        questionnaire.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        questionnaire.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        questionnaire.category?.toLowerCase().includes(searchTerm.toLowerCase());
+
       const matchesCategory = !categoryFilter || questionnaire.category === categoryFilter;
-      const matchesStatus = statusFilter === '' || 
-                           (statusFilter === 'active' && questionnaire.isActive) ||
-                           (statusFilter === 'inactive' && !questionnaire.isActive);
-      
+      const matchesStatus =
+        statusFilter === '' ||
+        (statusFilter === 'active' && questionnaire.isActive) ||
+        (statusFilter === 'inactive' && !questionnaire.isActive);
+
       return matchesSearch && matchesCategory && matchesStatus;
     });
-    
+
     // Sort the filtered results
     filtered.sort((a, b) => {
       let aValue, bValue;
-      
+
       switch (sortBy) {
         case 'title':
           aValue = a.title?.toLowerCase() || '';
@@ -1068,18 +1109,28 @@ const ConditionQuestionnaire = () => {
           aValue = a.title?.toLowerCase() || '';
           bValue = b.title?.toLowerCase() || '';
       }
-      
+
       if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
-    
+
     return filtered;
   }, [questionnaires, searchTerm, categoryFilter, statusFilter, sortBy, sortOrder]);
-  
+
   const availableCategories = React.useMemo(() => {
     // Backend expects these categories (matching your data)
-    return ['mobile', 'tablet', 'laptop', 'smartphone', 'smartwatch', 'headphones', 'camera', 'gaming', 'general'];
+    return [
+      'mobile',
+      'tablet',
+      'laptop',
+      'smartphone',
+      'smartwatch',
+      'headphones',
+      'camera',
+      'gaming',
+      'general',
+    ];
   }, []);
 
   if (loading) {
@@ -1122,7 +1173,7 @@ const ConditionQuestionnaire = () => {
             <StatLabel>Total Questionnaires</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#10b981">
             <Check size={24} />
@@ -1132,7 +1183,7 @@ const ConditionQuestionnaire = () => {
             <StatLabel>Active Questionnaires</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#8b5cf6">
             <BarChart3 size={24} />
@@ -1142,7 +1193,7 @@ const ConditionQuestionnaire = () => {
             <StatLabel>Total Responses</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#f59e0b">
             <Calendar size={24} />
@@ -1152,7 +1203,7 @@ const ConditionQuestionnaire = () => {
             <StatLabel>Avg Completion Time</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#06b6d4">
             <Settings size={24} />
@@ -1169,13 +1220,10 @@ const ConditionQuestionnaire = () => {
           type="text"
           placeholder="Search questionnaires by title, description, or category..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
-        
-        <FilterSelect
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
+
+        <FilterSelect value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
           <option value="">All Categories</option>
           {availableCategories.map(category => (
             <option key={category} value={category}>
@@ -1183,35 +1231,26 @@ const ConditionQuestionnaire = () => {
             </option>
           ))}
         </FilterSelect>
-        
-        <FilterSelect
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
+
+        <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </FilterSelect>
-        
-        <FilterSelect
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
+
+        <FilterSelect value={sortBy} onChange={e => setSortBy(e.target.value)}>
           <option value="title">Sort by Title</option>
           <option value="category">Sort by Category</option>
           <option value="questions">Sort by Questions Count</option>
           <option value="status">Sort by Status</option>
           <option value="created">Sort by Created Date</option>
         </FilterSelect>
-        
-        <FilterSelect
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-        >
+
+        <FilterSelect value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
         </FilterSelect>
-        
+
         <ClearFiltersButton onClick={clearFilters}>
           <X size={16} />
           Clear Filters
@@ -1222,7 +1261,9 @@ const ConditionQuestionnaire = () => {
         <EmptyState>
           <FileText size={48} style={{ marginBottom: '1rem' }} />
           <p style={{ fontSize: '1.125rem' }}>
-            {searchTerm || categoryFilter || statusFilter ? 'No questionnaires match your filters' : 'No questionnaires found'}
+            {searchTerm || categoryFilter || statusFilter
+              ? 'No questionnaires match your filters'
+              : 'No questionnaires found'}
           </p>
           <ActionButton onClick={() => openModal('create')} style={{ marginTop: '1rem' }}>
             <Plus size={20} />
@@ -1237,125 +1278,119 @@ const ConditionQuestionnaire = () => {
               {submitError}
             </ErrorMessage>
           )}
-          
+
           {submitSuccess && (
             <SuccessMessage>
               <CheckCircle size={16} />
               {submitSuccess}
             </SuccessMessage>
           )}
-          
+
           <QuestionnaireGrid>
-        {filteredAndSortedQuestionnaires.map((questionnaire) => (
-            <QuestionnaireCard key={questionnaire._id}>
-              <CardHeader>
-                <CardInfo>
-                  <CardTitle>
-                    {getCategoryIcon(questionnaire.category)}
-                    {questionnaire.title || 'Untitled Questionnaire'}
-                  </CardTitle>
-                  <CardSubtitle>
-                    {questionnaire.description || 'No description provided'}
-                  </CardSubtitle>
-                  <CategoryBadge category={questionnaire.category}>
-                    {questionnaire.category?.charAt(0)?.toUpperCase() + questionnaire.category?.slice(1) || 'General'}
-                  </CategoryBadge>
-                </CardInfo>
-                <StatusToggle 
-                  active={questionnaire.isActive}
-                  onClick={() => handleStatusToggle(questionnaire._id, questionnaire.isActive)}
-                >
-                  {questionnaire.isActive ? (
-                    <ToggleRight size={20} />
-                  ) : (
-                    <ToggleLeft size={20} />
-                  )}
-                  {questionnaire.isActive ? 'Active' : 'Inactive'}
-                </StatusToggle>
-              </CardHeader>
-              
-              <CardContent>
-                <QuestionCount>
-                  <CountItem>
-                    <CountValue>{questionnaire.questions?.length || 0}</CountValue>
-                    <CountLabel>Questions</CountLabel>
-                  </CountItem>
-                  <CountItem>
-                    <CountValue>
-                      {questionnaire.questions?.filter(q => q.required).length || 0}
-                    </CountValue>
-                    <CountLabel>Required</CountLabel>
-                  </CountItem>
-                  <CountItem>
-                    <CountValue>
-                      {questionnaire.questions?.filter(q => q.type === 'multiple_choice').length || 0}
-                    </CountValue>
-                    <CountLabel>Multiple Choice</CountLabel>
-                  </CountItem>
-                </QuestionCount>
-                
-                <MetaInfo>
-                  <MetaItem>
-                    <Calendar size={14} />
-                    Created {new Date(questionnaire.createdAt).toLocaleDateString()}
-                  </MetaItem>
-                  <MetaItem>
-                    <User size={14} />
-                    {questionnaire.createdBy?.name || questionnaire.createdBy || 'Admin'}
-                  </MetaItem>
-                </MetaInfo>
-                
-                <ActionButtons>
-                  <IconButton primary onClick={() => openModal('view', questionnaire)}>
-                    <Eye size={14} />
-                  </IconButton>
-                  
-                  <IconButton success onClick={() => openModal('edit', questionnaire)}>
-                    <Edit size={14} />
-                  </IconButton>
-                  
-                  <IconButton warning onClick={() => handleDuplicate(questionnaire)}>
-                    <Copy size={14} />
-                  </IconButton>
-                  
-                  <IconButton danger onClick={() => handleDelete(questionnaire._id)}>
-                    <Trash2 size={14} />
-                  </IconButton>
-                </ActionButtons>
-              </CardContent>
-            </QuestionnaireCard>
-          ))}
-        </QuestionnaireGrid>
-        
-        {/* Pagination Controls */}
-        {questionnaires.length > 0 && pagination && (
-          <PaginationContainer>
-            <PaginationInfo>
-              Showing {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} to {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)} of {pagination.totalItems} questionnaires
-            </PaginationInfo>
-            <PaginationControls>
-              <PaginationButton 
-                onClick={handlePrevPage} 
-                disabled={!pagination.hasPrevPage}
-              >
-                <ChevronLeft size={16} />
-                Previous
-              </PaginationButton>
-              
-              <PageNumber>
-                Page {pagination.currentPage} of {pagination.totalPages}
-              </PageNumber>
-              
-              <PaginationButton 
-                onClick={handleNextPage} 
-                disabled={!pagination.hasNextPage}
-              >
-                Next
-                <ChevronRight size={16} />
-              </PaginationButton>
-            </PaginationControls>
-          </PaginationContainer>
-        )}
+            {filteredAndSortedQuestionnaires.map(questionnaire => (
+              <QuestionnaireCard key={questionnaire._id}>
+                <CardHeader>
+                  <CardInfo>
+                    <CardTitle>
+                      {getCategoryIcon(questionnaire.category)}
+                      {questionnaire.title || 'Untitled Questionnaire'}
+                    </CardTitle>
+                    <CardSubtitle>
+                      {questionnaire.description || 'No description provided'}
+                    </CardSubtitle>
+                    <CategoryBadge category={questionnaire.category}>
+                      {questionnaire.category?.charAt(0)?.toUpperCase() +
+                        questionnaire.category?.slice(1) || 'General'}
+                    </CategoryBadge>
+                  </CardInfo>
+                  <StatusToggle
+                    active={questionnaire.isActive}
+                    onClick={() => handleStatusToggle(questionnaire._id, questionnaire.isActive)}
+                  >
+                    {questionnaire.isActive ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
+                    {questionnaire.isActive ? 'Active' : 'Inactive'}
+                  </StatusToggle>
+                </CardHeader>
+
+                <CardContent>
+                  <QuestionCount>
+                    <CountItem>
+                      <CountValue>{questionnaire.questions?.length || 0}</CountValue>
+                      <CountLabel>Questions</CountLabel>
+                    </CountItem>
+                    <CountItem>
+                      <CountValue>
+                        {questionnaire.questions?.filter(q => q.required).length || 0}
+                      </CountValue>
+                      <CountLabel>Required</CountLabel>
+                    </CountItem>
+                    <CountItem>
+                      <CountValue>
+                        {questionnaire.questions?.filter(q => q.type === 'multiple_choice')
+                          .length || 0}
+                      </CountValue>
+                      <CountLabel>Multiple Choice</CountLabel>
+                    </CountItem>
+                  </QuestionCount>
+
+                  <MetaInfo>
+                    <MetaItem>
+                      <Calendar size={14} />
+                      Created {new Date(questionnaire.createdAt).toLocaleDateString()}
+                    </MetaItem>
+                    <MetaItem>
+                      <User size={14} />
+                      {questionnaire.createdBy?.name || questionnaire.createdBy || 'Admin'}
+                    </MetaItem>
+                  </MetaInfo>
+
+                  <ActionButtons>
+                    <IconButton primary onClick={() => openModal('view', questionnaire)}>
+                      <Eye size={14} />
+                    </IconButton>
+
+                    <IconButton success onClick={() => openModal('edit', questionnaire)}>
+                      <Edit size={14} />
+                    </IconButton>
+
+                    <IconButton warning onClick={() => handleDuplicate(questionnaire)}>
+                      <Copy size={14} />
+                    </IconButton>
+
+                    <IconButton danger onClick={() => handleDelete(questionnaire._id)}>
+                      <Trash2 size={14} />
+                    </IconButton>
+                  </ActionButtons>
+                </CardContent>
+              </QuestionnaireCard>
+            ))}
+          </QuestionnaireGrid>
+
+          {/* Pagination Controls */}
+          {questionnaires.length > 0 && pagination && (
+            <PaginationContainer>
+              <PaginationInfo>
+                Showing {(pagination.currentPage - 1) * pagination.itemsPerPage + 1} to{' '}
+                {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)}{' '}
+                of {pagination.totalItems} questionnaires
+              </PaginationInfo>
+              <PaginationControls>
+                <PaginationButton onClick={handlePrevPage} disabled={!pagination.hasPrevPage}>
+                  <ChevronLeft size={16} />
+                  Previous
+                </PaginationButton>
+
+                <PageNumber>
+                  Page {pagination.currentPage} of {pagination.totalPages}
+                </PageNumber>
+
+                <PaginationButton onClick={handleNextPage} disabled={!pagination.hasNextPage}>
+                  Next
+                  <ChevronRight size={16} />
+                </PaginationButton>
+              </PaginationControls>
+            </PaginationContainer>
+          )}
         </>
       )}
 
@@ -1372,33 +1407,55 @@ const ConditionQuestionnaire = () => {
                 <X size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             {modalType === 'view' && selectedQuestionnaire ? (
               <div>
                 <FormGroup>
                   <Label>Title</Label>
-                  <div style={{ padding: '0.75rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#374151' }}>
+                  <div
+                    style={{
+                      padding: '0.75rem',
+                      background: '#f9fafb',
+                      borderRadius: '0.5rem',
+                      color: '#374151',
+                    }}
+                  >
                     {selectedQuestionnaire.title}
                   </div>
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Description</Label>
-                  <div style={{ padding: '0.75rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#374151' }}>
+                  <div
+                    style={{
+                      padding: '0.75rem',
+                      background: '#f9fafb',
+                      borderRadius: '0.5rem',
+                      color: '#374151',
+                    }}
+                  >
                     {selectedQuestionnaire.description || 'No description provided'}
                   </div>
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Category</Label>
-                  <div style={{ padding: '0.75rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#374151' }}>
+                  <div
+                    style={{
+                      padding: '0.75rem',
+                      background: '#f9fafb',
+                      borderRadius: '0.5rem',
+                      color: '#374151',
+                    }}
+                  >
                     <CategoryBadge category={selectedQuestionnaire.category}>
                       {getCategoryIcon(selectedQuestionnaire.category)}
-                      {selectedQuestionnaire.category?.charAt(0)?.toUpperCase() + selectedQuestionnaire.category?.slice(1) || 'General'}
+                      {selectedQuestionnaire.category?.charAt(0)?.toUpperCase() +
+                        selectedQuestionnaire.category?.slice(1) || 'General'}
                     </CategoryBadge>
                   </div>
                 </FormGroup>
-                
+
                 {selectedQuestionnaire.questions && selectedQuestionnaire.questions.length > 0 && (
                   <FormGroup>
                     <Label>Questions ({selectedQuestionnaire.questions.length})</Label>
@@ -1407,36 +1464,66 @@ const ConditionQuestionnaire = () => {
                         <QuestionSection key={index}>
                           <QuestionHeader onClick={() => toggleQuestionExpansion(index)}>
                             <div>
-                              <QuestionText>Q{index + 1}: {question.text}</QuestionText>
+                              <QuestionText>
+                                Q{index + 1}: {question.text}
+                              </QuestionText>
                               <QuestionType>
-                                {question.type?.replace('_', ' ')?.toUpperCase()} 
+                                {question.type?.replace('_', ' ')?.toUpperCase()}
                                 {question.required && ' • Required'}
                               </QuestionType>
                             </div>
-                            {expandedQuestions.has(index) ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            {expandedQuestions.has(index) ? (
+                              <ChevronUp size={16} />
+                            ) : (
+                              <ChevronDown size={16} />
+                            )}
                           </QuestionHeader>
-                          
+
                           {expandedQuestions.has(index) && (
                             <QuestionContent>
                               {question.description && (
-                                <div style={{ marginBottom: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+                                <div
+                                  style={{
+                                    marginBottom: '1rem',
+                                    color: '#6b7280',
+                                    fontSize: '0.875rem',
+                                  }}
+                                >
                                   {question.description}
                                 </div>
                               )}
-                              
+
                               {question.options && question.options.length > 0 && (
                                 <div>
-                                  <div style={{ marginBottom: '0.5rem', fontWeight: '500', color: '#374151' }}>Options:</div>
+                                  <div
+                                    style={{
+                                      marginBottom: '0.5rem',
+                                      fontWeight: '500',
+                                      color: '#374151',
+                                    }}
+                                  >
+                                    Options:
+                                  </div>
                                   <OptionsList>
                                     {question.options.map((option, optIndex) => (
-                                      <OptionTag key={optIndex}>{option.title || option.text || option}</OptionTag>
+                                      <OptionTag key={optIndex}>
+                                        {option.title || option.text || option}
+                                      </OptionTag>
                                     ))}
                                   </OptionsList>
                                 </div>
                               )}
-                              
+
                               {question.validation && (
-                                <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#fef3c7', borderRadius: '0.375rem', fontSize: '0.875rem' }}>
+                                <div
+                                  style={{
+                                    marginTop: '1rem',
+                                    padding: '0.75rem',
+                                    background: '#fef3c7',
+                                    borderRadius: '0.375rem',
+                                    fontSize: '0.875rem',
+                                  }}
+                                >
                                   <strong>Validation:</strong> {JSON.stringify(question.validation)}
                                 </div>
                               )}
@@ -1456,19 +1543,19 @@ const ConditionQuestionnaire = () => {
                     {submitError}
                   </ErrorMessage>
                 )}
-                
+
                 <FormGroup>
                   <Label>Title *</Label>
                   <Input
                     type="text"
                     value={formData.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    onChange={e => handleInputChange('title', e.target.value)}
                     name="title"
                     placeholder="Enter questionnaire title"
                     required
                     disabled={modalType === 'view'}
                     style={{
-                      borderColor: errors.title ? '#dc2626' : '#d1d5db'
+                      borderColor: errors.title ? '#dc2626' : '#d1d5db',
                     }}
                   />
                   {errors.title && (
@@ -1478,17 +1565,17 @@ const ConditionQuestionnaire = () => {
                     </ErrorMessage>
                   )}
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Description</Label>
                   <TextArea
                     value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    onChange={e => handleInputChange('description', e.target.value)}
                     name="description"
                     placeholder="Enter questionnaire description"
                     disabled={modalType === 'view'}
                     style={{
-                      borderColor: errors.description ? '#dc2626' : '#d1d5db'
+                      borderColor: errors.description ? '#dc2626' : '#d1d5db',
                     }}
                   />
                   {errors.description && (
@@ -1501,17 +1588,17 @@ const ConditionQuestionnaire = () => {
                     {formData.description.length}/500 characters
                   </div>
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Category *</Label>
                   <Select
                     value={formData.category}
-                    onChange={(e) => handleInputChange('category', e.target.value)}
+                    onChange={e => handleInputChange('category', e.target.value)}
                     name="category"
                     required
                     disabled={modalType === 'view'}
                     style={{
-                      borderColor: errors.category ? '#dc2626' : '#d1d5db'
+                      borderColor: errors.category ? '#dc2626' : '#d1d5db',
                     }}
                   >
                     <option value="">Select Category</option>
@@ -1528,110 +1615,144 @@ const ConditionQuestionnaire = () => {
                     </ErrorMessage>
                   )}
                 </FormGroup>
-                
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <FormGroup>
                     <Label>Subcategory</Label>
                     <Input
                       type="text"
                       value={formData.subcategory}
-                      onChange={(e) => handleInputChange('subcategory', e.target.value)}
+                      onChange={e => handleInputChange('subcategory', e.target.value)}
                       name="subcategory"
                       placeholder="Enter subcategory (optional)"
                       disabled={modalType === 'view'}
                     />
                   </FormGroup>
-                  
+
                   <FormGroup>
                     <Label>Version</Label>
                     <Input
                       type="text"
                       value={formData.version}
-                      onChange={(e) => handleInputChange('version', e.target.value)}
+                      onChange={e => handleInputChange('version', e.target.value)}
                       name="version"
                       placeholder="e.g., 1.0.0"
                       disabled={modalType === 'view'}
                     />
                   </FormGroup>
                 </div>
-                
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <FormGroup>
                     <Label>Brand</Label>
                     <Input
                       type="text"
                       value={formData.brand}
-                      onChange={(e) => handleInputChange('brand', e.target.value)}
+                      onChange={e => handleInputChange('brand', e.target.value)}
                       name="brand"
                       placeholder="Enter brand (optional)"
                       disabled={modalType === 'view'}
                     />
                   </FormGroup>
-                  
+
                   <FormGroup>
                     <Label>Model</Label>
                     <Input
                       type="text"
                       value={formData.model}
-                      onChange={(e) => handleInputChange('model', e.target.value)}
+                      onChange={e => handleInputChange('model', e.target.value)}
                       name="model"
                       placeholder="Enter model (optional)"
                       disabled={modalType === 'view'}
                     />
                   </FormGroup>
                 </div>
-                
+
                 <FormGroup>
                   <Label>Settings</Label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '0.5rem' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '1rem',
+                      marginTop: '0.5rem',
+                    }}
+                  >
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontSize: '0.875rem',
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={formData.isActive}
-                        onChange={(e) => handleInputChange('isActive', e.target.checked)}
+                        onChange={e => handleInputChange('isActive', e.target.checked)}
                         disabled={modalType === 'view'}
                       />
                       Active
                     </label>
-                    
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+
+                    <label
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontSize: '0.875rem',
+                      }}
+                    >
                       <input
                         type="checkbox"
                         checked={formData.isDefault}
-                        onChange={(e) => handleInputChange('isDefault', e.target.checked)}
+                        onChange={e => handleInputChange('isDefault', e.target.checked)}
                         disabled={modalType === 'view'}
                       />
                       Set as Default
                     </label>
                   </div>
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Metadata</Label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '0.5rem' }}>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '1rem',
+                      marginTop: '0.5rem',
+                    }}
+                  >
                     <div>
-                      <Label style={{ fontSize: '0.75rem', color: '#6b7280' }}>Estimated Time (minutes)</Label>
+                      <Label style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                        Estimated Time (minutes)
+                      </Label>
                       <Input
                         type="number"
                         value={formData.metadata?.estimatedTime || 5}
-                        onChange={(e) => handleInputChange('metadata', {
-                          ...formData.metadata,
-                          estimatedTime: parseInt(e.target.value) || 5
-                        })}
+                        onChange={e =>
+                          handleInputChange('metadata', {
+                            ...formData.metadata,
+                            estimatedTime: parseInt(e.target.value) || 5,
+                          })
+                        }
                         min="1"
                         max="60"
                         disabled={modalType === 'view'}
                       />
                     </div>
-                    
+
                     <div>
                       <Label style={{ fontSize: '0.75rem', color: '#6b7280' }}>Difficulty</Label>
                       <Select
                         value={formData.metadata?.difficulty || 'easy'}
-                        onChange={(e) => handleInputChange('metadata', {
-                          ...formData.metadata,
-                          difficulty: e.target.value
-                        })}
+                        onChange={e =>
+                          handleInputChange('metadata', {
+                            ...formData.metadata,
+                            difficulty: e.target.value,
+                          })
+                        }
                         disabled={modalType === 'view'}
                       >
                         <option value="easy">Easy</option>
@@ -1640,28 +1761,37 @@ const ConditionQuestionnaire = () => {
                       </Select>
                     </div>
                   </div>
-                  
+
                   <div style={{ marginTop: '1rem' }}>
                     <Label style={{ fontSize: '0.75rem', color: '#6b7280' }}>Instructions</Label>
                     <TextArea
                       value={formData.metadata?.instructions || ''}
-                      onChange={(e) => handleInputChange('metadata', {
-                        ...formData.metadata,
-                        instructions: e.target.value
-                      })}
+                      onChange={e =>
+                        handleInputChange('metadata', {
+                          ...formData.metadata,
+                          instructions: e.target.value,
+                        })
+                      }
                       placeholder="Special instructions for this questionnaire..."
                       disabled={modalType === 'view'}
                       style={{ minHeight: '60px' }}
                     />
                   </div>
                 </FormGroup>
-                
+
                 {/* Questions Management Section */}
                 {modalType !== 'view' && (
                   <FormGroup>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '1rem',
+                      }}
+                    >
                       <Label>Questions</Label>
-                      <ActionButton 
+                      <ActionButton
                         onClick={() => {
                           const newQuestion = {
                             id: `question_${Date.now()}_${formData.questions.length}`,
@@ -1669,13 +1799,27 @@ const ConditionQuestionnaire = () => {
                             type: 'single_choice',
                             required: true,
                             options: [
-            { id: 'option1', title: 'Option 1', description: '', type: 'good', priceImpact: 0, sortOrder: 0 },
-            { id: 'option2', title: 'Option 2', description: '', type: 'good', priceImpact: 0, sortOrder: 1 }
-          ]
+                              {
+                                id: 'option1',
+                                title: 'Option 1',
+                                description: '',
+                                type: 'good',
+                                priceImpact: 0,
+                                sortOrder: 0,
+                              },
+                              {
+                                id: 'option2',
+                                title: 'Option 2',
+                                description: '',
+                                type: 'good',
+                                priceImpact: 0,
+                                sortOrder: 1,
+                              },
+                            ],
                           };
                           setFormData(prev => ({
                             ...prev,
-                            questions: [...prev.questions, newQuestion]
+                            questions: [...prev.questions, newQuestion],
                           }));
                         }}
                         variant="secondary"
@@ -1685,7 +1829,7 @@ const ConditionQuestionnaire = () => {
                         Add Question
                       </ActionButton>
                     </div>
-                    
+
                     {formData.questions.map((question, questionIndex) => (
                       <QuestionSection key={questionIndex} style={{ marginBottom: '1rem' }}>
                         <QuestionHeader>
@@ -1693,7 +1837,7 @@ const ConditionQuestionnaire = () => {
                             <Input
                               type="text"
                               value={question.title}
-                              onChange={(e) => {
+                              onChange={e => {
                                 const updatedQuestions = [...formData.questions];
                                 updatedQuestions[questionIndex].title = e.target.value;
                                 setFormData(prev => ({ ...prev, questions: updatedQuestions }));
@@ -1701,17 +1845,34 @@ const ConditionQuestionnaire = () => {
                               placeholder="Enter question text"
                               style={{ marginBottom: '0.5rem', fontSize: '0.875rem' }}
                             />
-                            
+
                             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                               <Select
                                 value={question.type}
-                                onChange={(e) => {
+                                onChange={e => {
                                   const updatedQuestions = [...formData.questions];
                                   updatedQuestions[questionIndex].type = e.target.value;
-                                  if (e.target.value === 'single_choice' || e.target.value === 'multiple_choice') {
+                                  if (
+                                    e.target.value === 'single_choice' ||
+                                    e.target.value === 'multiple_choice'
+                                  ) {
                                     updatedQuestions[questionIndex].options = [
-                                      { id: 'option1', title: 'Option 1', description: '', type: 'good', priceImpact: 0, sortOrder: 0 },
-                                      { id: 'option2', title: 'Option 2', description: '', type: 'good', priceImpact: 0, sortOrder: 1 }
+                                      {
+                                        id: 'option1',
+                                        title: 'Option 1',
+                                        description: '',
+                                        type: 'good',
+                                        priceImpact: 0,
+                                        sortOrder: 0,
+                                      },
+                                      {
+                                        id: 'option2',
+                                        title: 'Option 2',
+                                        description: '',
+                                        type: 'good',
+                                        priceImpact: 0,
+                                        sortOrder: 1,
+                                      },
                                     ];
                                   } else {
                                     updatedQuestions[questionIndex].options = [];
@@ -1726,12 +1887,19 @@ const ConditionQuestionnaire = () => {
                                 <option value="number">Number Input</option>
                                 <option value="boolean">Yes/No</option>
                               </Select>
-                              
-                              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem' }}>
+
+                              <label
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.5rem',
+                                  fontSize: '0.875rem',
+                                }}
+                              >
                                 <input
                                   type="checkbox"
                                   checked={question.required}
-                                  onChange={(e) => {
+                                  onChange={e => {
                                     const updatedQuestions = [...formData.questions];
                                     updatedQuestions[questionIndex].required = e.target.checked;
                                     setFormData(prev => ({ ...prev, questions: updatedQuestions }));
@@ -1741,10 +1909,12 @@ const ConditionQuestionnaire = () => {
                               </label>
                             </div>
                           </div>
-                          
+
                           <ActionButton
                             onClick={() => {
-                              const updatedQuestions = formData.questions.filter((_, index) => index !== questionIndex);
+                              const updatedQuestions = formData.questions.filter(
+                                (_, index) => index !== questionIndex
+                              );
                               setFormData(prev => ({ ...prev, questions: updatedQuestions }));
                             }}
                             variant="secondary"
@@ -1753,18 +1923,37 @@ const ConditionQuestionnaire = () => {
                             <Trash2 size={16} />
                           </ActionButton>
                         </QuestionHeader>
-                        
-                        {(question.type === 'single_choice' || question.type === 'multiple_choice') && (
+
+                        {(question.type === 'single_choice' ||
+                          question.type === 'multiple_choice') && (
                           <QuestionContent>
-                            <div style={{ marginBottom: '0.5rem', fontWeight: '500', color: '#374151', fontSize: '0.875rem' }}>Options:</div>
+                            <div
+                              style={{
+                                marginBottom: '0.5rem',
+                                fontWeight: '500',
+                                color: '#374151',
+                                fontSize: '0.875rem',
+                              }}
+                            >
+                              Options:
+                            </div>
                             {question.options.map((option, optionIndex) => (
-                              <div key={optionIndex} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
+                              <div
+                                key={optionIndex}
+                                style={{
+                                  display: 'flex',
+                                  gap: '0.5rem',
+                                  marginBottom: '0.5rem',
+                                  alignItems: 'center',
+                                }}
+                              >
                                 <Input
                                   type="text"
                                   value={option.title}
-                                  onChange={(e) => {
+                                  onChange={e => {
                                     const updatedQuestions = [...formData.questions];
-                                    updatedQuestions[questionIndex].options[optionIndex].title = e.target.value;
+                                    updatedQuestions[questionIndex].options[optionIndex].title =
+                                      e.target.value;
                                     setFormData(prev => ({ ...prev, questions: updatedQuestions }));
                                   }}
                                   placeholder="Option text"
@@ -1772,9 +1961,10 @@ const ConditionQuestionnaire = () => {
                                 />
                                 <Select
                                   value={option.type}
-                                  onChange={(e) => {
+                                  onChange={e => {
                                     const updatedQuestions = [...formData.questions];
-                                    updatedQuestions[questionIndex].options[optionIndex].type = e.target.value;
+                                    updatedQuestions[questionIndex].options[optionIndex].type =
+                                      e.target.value;
                                     setFormData(prev => ({ ...prev, questions: updatedQuestions }));
                                   }}
                                   style={{ width: '100px', fontSize: '0.875rem' }}
@@ -1787,9 +1977,11 @@ const ConditionQuestionnaire = () => {
                                 <Input
                                   type="number"
                                   value={option.priceImpact}
-                                  onChange={(e) => {
+                                  onChange={e => {
                                     const updatedQuestions = [...formData.questions];
-                                    updatedQuestions[questionIndex].options[optionIndex].priceImpact = parseInt(e.target.value) || 0;
+                                    updatedQuestions[questionIndex].options[
+                                      optionIndex
+                                    ].priceImpact = parseInt(e.target.value) || 0;
                                     setFormData(prev => ({ ...prev, questions: updatedQuestions }));
                                   }}
                                   placeholder="Price Impact"
@@ -1798,7 +1990,9 @@ const ConditionQuestionnaire = () => {
                                 <ActionButton
                                   onClick={() => {
                                     const updatedQuestions = [...formData.questions];
-                                    updatedQuestions[questionIndex].options = updatedQuestions[questionIndex].options.filter((_, index) => index !== optionIndex);
+                                    updatedQuestions[questionIndex].options = updatedQuestions[
+                                      questionIndex
+                                    ].options.filter((_, index) => index !== optionIndex);
                                     setFormData(prev => ({ ...prev, questions: updatedQuestions }));
                                   }}
                                   variant="secondary"
@@ -1817,13 +2011,17 @@ const ConditionQuestionnaire = () => {
                                   description: '',
                                   type: 'good',
                                   priceImpact: 0,
-                                  sortOrder: updatedQuestions[questionIndex].options.length
+                                  sortOrder: updatedQuestions[questionIndex].options.length,
                                 };
                                 updatedQuestions[questionIndex].options.push(newOption);
                                 setFormData(prev => ({ ...prev, questions: updatedQuestions }));
                               }}
                               variant="secondary"
-                              style={{ padding: '0.5rem 1rem', fontSize: '0.875rem', marginTop: '0.5rem' }}
+                              style={{
+                                padding: '0.5rem 1rem',
+                                fontSize: '0.875rem',
+                                marginTop: '0.5rem',
+                              }}
                             >
                               <Plus size={14} />
                               Add Option
@@ -1834,33 +2032,27 @@ const ConditionQuestionnaire = () => {
                     ))}
                   </FormGroup>
                 )}
-                
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '2rem' }}>
-                  <ActionButton 
-                    onClick={closeModal} 
-                    variant="secondary"
-                    disabled={isSubmitting}
-                  >
+
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '1rem',
+                    justifyContent: 'flex-end',
+                    marginTop: '2rem',
+                  }}
+                >
+                  <ActionButton onClick={closeModal} variant="secondary" disabled={isSubmitting}>
                     Cancel
                   </ActionButton>
-                  
+
                   {modalType !== 'view' && (
-                    <ActionButton 
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                      variant="primary"
-                    >
-                      {isSubmitting ? (
-                        <RefreshCw size={16}  />
-                      ) : (
-                        <Save size={16} />
-                      )}
-                      {isSubmitting 
-                        ? 'Saving...' 
-                        : modalType === 'create' 
-                          ? 'Create Questionnaire' 
-                          : 'Save Changes'
-                      }
+                    <ActionButton onClick={handleSubmit} disabled={isSubmitting} variant="primary">
+                      {isSubmitting ? <RefreshCw size={16} /> : <Save size={16} />}
+                      {isSubmitting
+                        ? 'Saving...'
+                        : modalType === 'create'
+                          ? 'Create Questionnaire'
+                          : 'Save Changes'}
                     </ActionButton>
                   )}
                 </div>

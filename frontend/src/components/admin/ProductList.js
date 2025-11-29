@@ -28,7 +28,7 @@ import {
   Tag,
   DollarSign,
   Calendar,
-  BarChart3
+  BarChart3,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -42,7 +42,7 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: ${theme.spacing[6]};
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: ${theme.spacing[4]};
@@ -64,7 +64,7 @@ const HeaderActions = styled.div`
   display: flex;
   gap: ${theme.spacing[3]};
   align-items: center;
-  
+
   @media (max-width: 768px) {
     flex-wrap: wrap;
   }
@@ -129,11 +129,11 @@ const FiltersGrid = styled.div`
   grid-template-columns: 2fr 1fr 1fr 1fr auto;
   gap: ${theme.spacing[4]};
   align-items: end;
-  
+
   @media (max-width: 1024px) {
     grid-template-columns: 1fr 1fr;
   }
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -150,13 +150,13 @@ const SearchInput = styled.input`
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   transition: border-color 0.2s ease;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary.main};
     box-shadow: 0 0 0 3px ${theme.colors.primary[100]};
   }
-  
+
   &::placeholder {
     color: ${theme.colors.text.secondary};
   }
@@ -178,7 +178,7 @@ const Select = styled.select`
   font-size: ${theme.typography.fontSize.sm};
   background-color: ${theme.colors.white};
   cursor: pointer;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary.main};
@@ -203,17 +203,17 @@ const ViewToggle = styled.div`
 
 const ViewButton = styled.button`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  background: ${props => props.active ? theme.colors.primary.main : theme.colors.white};
-  color: ${props => props.active ? theme.colors.white : theme.colors.text.secondary};
+  background: ${props => (props.active ? theme.colors.primary.main : theme.colors.white)};
+  color: ${props => (props.active ? theme.colors.white : theme.colors.text.secondary)};
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &:hover {
-    background: ${props => props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props => (props.active ? theme.colors.primary[600] : theme.colors.grey[50])};
   }
 `;
 
@@ -254,12 +254,12 @@ const ProductGrid = styled.div`
   padding: ${theme.spacing[6]};
   max-height: 70vh;
   overflow-y: auto;
-  
+
   @media (max-width: 1024px) {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: ${theme.spacing[4]};
   }
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: ${theme.spacing[3]};
@@ -272,12 +272,12 @@ const ProductCard = styled.div`
   overflow: hidden;
   transition: all 0.2s ease;
   background: ${theme.colors.white};
-  
+
   &:hover {
     box-shadow: ${theme.shadows.md};
     transform: translateY(-2px);
   }
-  
+
   @media (max-width: 768px) {
     &:hover {
       transform: none;
@@ -293,7 +293,7 @@ const ProductImage = styled.div`
   justify-content: center;
   position: relative;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -307,10 +307,14 @@ const ProductBadge = styled.div`
   right: ${theme.spacing[2]};
   background: ${props => {
     switch (props.type) {
-      case 'featured': return theme.colors.warning[500];
-      case 'new': return theme.colors.success[500];
-      case 'bestseller': return theme.colors.primary.main;
-      default: return theme.colors.grey[500];
+      case 'featured':
+        return theme.colors.warning[500];
+      case 'new':
+        return theme.colors.success[500];
+      case 'bestseller':
+        return theme.colors.primary.main;
+      default:
+        return theme.colors.grey[500];
     }
   }};
   color: ${theme.colors.white};
@@ -323,7 +327,7 @@ const ProductBadge = styled.div`
 
 const ProductContent = styled.div`
   padding: ${theme.spacing[4]};
-  
+
   @media (max-width: 768px) {
     padding: ${theme.spacing[3]};
   }
@@ -429,15 +433,15 @@ const ProductStatus = styled.div`
   font-size: ${theme.typography.fontSize.xs};
   font-weight: ${theme.typography.fontWeight.medium};
   text-transform: uppercase;
-  background: ${props => props.isActive ? theme.colors.success[100] : theme.colors.grey[100]};
-  color: ${props => props.isActive ? theme.colors.success[700] : theme.colors.grey[700]};
+  background: ${props => (props.isActive ? theme.colors.success[100] : theme.colors.grey[100])};
+  color: ${props => (props.isActive ? theme.colors.success[700] : theme.colors.grey[700])};
   margin-bottom: ${theme.spacing[2]};
 `;
 
 const ProductActions = styled.div`
   display: flex;
   gap: ${theme.spacing[2]};
-  
+
   @media (max-width: 480px) {
     flex-direction: column;
     gap: ${theme.spacing[2]};
@@ -449,25 +453,35 @@ const ActionButton = styled.button`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
   background: ${props => {
     switch (props.variant) {
-      case 'primary': return theme.colors.primary.main;
-      case 'danger': return theme.colors.error.main;
-      default: return 'transparent';
+      case 'primary':
+        return theme.colors.primary.main;
+      case 'danger':
+        return theme.colors.error.main;
+      default:
+        return 'transparent';
     }
   }};
   color: ${props => {
     switch (props.variant) {
-      case 'primary': return theme.colors.white;
-      case 'danger': return theme.colors.white;
-      default: return theme.colors.text.primary;
+      case 'primary':
+        return theme.colors.white;
+      case 'danger':
+        return theme.colors.white;
+      default:
+        return theme.colors.text.primary;
     }
   }};
-  border: 1px solid ${props => {
-    switch (props.variant) {
-      case 'primary': return theme.colors.primary.main;
-      case 'danger': return theme.colors.error.main;
-      default: return theme.colors.border.primary;
-    }
-  }};
+  border: 1px solid
+    ${props => {
+      switch (props.variant) {
+        case 'primary':
+          return theme.colors.primary.main;
+        case 'danger':
+          return theme.colors.error.main;
+        default:
+          return theme.colors.border.primary;
+      }
+    }};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
@@ -477,22 +491,25 @@ const ActionButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: ${theme.spacing[1]};
-  
+
   &:hover {
     background: ${props => {
       switch (props.variant) {
-        case 'primary': return theme.colors.primary[600];
-        case 'danger': return theme.colors.error[600];
-        default: return theme.colors.grey[50];
+        case 'primary':
+          return theme.colors.primary[600];
+        case 'danger':
+          return theme.colors.error[600];
+        default:
+          return theme.colors.grey[50];
       }
     }};
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   @media (max-width: 480px) {
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     font-size: ${theme.typography.fontSize.base};
@@ -504,19 +521,23 @@ const Button = styled.button`
   align-items: center;
   gap: ${theme.spacing[2]};
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  background-color: ${props => props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
-  color: ${props => props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
-  border: 1px solid ${props => props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
+  background-color: ${props =>
+    props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
+  color: ${props => (props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary)};
+  border: 1px solid
+    ${props =>
+      props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    background-color: ${props => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background-color: ${props =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -555,10 +576,14 @@ const LoadingSpinner = styled.div`
   border-top: 3px solid ${theme.colors.primary.main};
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  
+
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -569,9 +594,11 @@ const Alert = styled.div`
   padding: ${theme.spacing[4]};
   border-radius: ${theme.borderRadius.md};
   margin-bottom: ${theme.spacing[4]};
-  background-color: ${props => props.type === 'error' ? theme.colors.error[50] : theme.colors.success[50]};
-  border: 1px solid ${props => props.type === 'error' ? theme.colors.error[200] : theme.colors.success[200]};
-  color: ${props => props.type === 'error' ? theme.colors.error[700] : theme.colors.success[700]};
+  background-color: ${props =>
+    props.type === 'error' ? theme.colors.error[50] : theme.colors.success[50]};
+  border: 1px solid
+    ${props => (props.type === 'error' ? theme.colors.error[200] : theme.colors.success[200])};
+  color: ${props => (props.type === 'error' ? theme.colors.error[700] : theme.colors.success[700])};
 `;
 
 const ProductList = () => {
@@ -586,15 +613,15 @@ const ProductList = () => {
     total: 0,
     active: 0,
     outOfStock: 0,
-    totalValue: 0
+    totalValue: 0,
   });
-  
+
   const [filters, setFilters] = useState({
     search: '',
     category: '',
     status: '',
     sortBy: 'createdAt',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
   });
 
   useEffect(() => {
@@ -608,13 +635,13 @@ const ProductList = () => {
       const response = await adminService.getCatalog(filters);
       console.log('response: ', response);
       setProducts(response.products || []);
-      
+
       // Calculate stats
       const total = response.products?.length || 0;
       const active = response.products?.filter(p => p.status === 'active').length || 0;
       const outOfStock = response.products?.filter(p => p.stock <= 0).length || 0;
-      const totalValue = response.products?.reduce((sum, p) => sum + (p.price * p.stock), 0) || 0;
-      
+      const totalValue = response.products?.reduce((sum, p) => sum + p.price * p.stock, 0) || 0;
+
       setStats({ total, active, outOfStock, totalValue });
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -637,7 +664,7 @@ const ProductList = () => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleDeleteProduct = async (productId) => {
+  const handleDeleteProduct = async productId => {
     if (!window.confirm('Are you sure you want to delete this product?')) {
       return;
     }
@@ -662,7 +689,7 @@ const ProductList = () => {
     }
   };
 
-  const formatPrice = (price) => {
+  const formatPrice = price => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
@@ -671,37 +698,42 @@ const ProductList = () => {
     }).format(price);
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
-  const getBadgeType = (product) => {
+  const getBadgeType = product => {
     if (product.featured) return 'featured';
     if (product.newArrival) return 'new';
     if (product.bestSeller) return 'bestseller';
     return null;
   };
 
-  const getBadgeText = (type) => {
+  const getBadgeText = type => {
     switch (type) {
-      case 'featured': return 'Featured';
-      case 'new': return 'New';
-      case 'bestseller': return 'Best Seller';
-      default: return '';
+      case 'featured':
+        return 'Featured';
+      case 'new':
+        return 'New';
+      case 'bestseller':
+        return 'Best Seller';
+      default:
+        return '';
     }
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product?.name?.toLowerCase().includes(filters.search.toLowerCase()) ||
-    product?.brand?.toLowerCase().includes(filters.search.toLowerCase());
+    const matchesSearch =
+      product?.name?.toLowerCase().includes(filters.search.toLowerCase()) ||
+      product?.brand?.toLowerCase().includes(filters.search.toLowerCase());
     const matchesCategory = !filters.category || product.category === filters.category;
     const matchesStatus = !filters.status || product.status === filters.status;
-    
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
   console.log('filteredProducts: ', filteredProducts);
@@ -710,12 +742,12 @@ const ProductList = () => {
     const { sortBy, sortOrder } = filters;
     let aValue = a[sortBy];
     let bValue = b[sortBy];
-    
+
     if (sortBy === 'price') {
       aValue = parseFloat(aValue);
       bValue = parseFloat(bValue);
     }
-    
+
     if (sortOrder === 'asc') {
       return aValue > bValue ? 1 : -1;
     } else {
@@ -763,7 +795,7 @@ const ProductList = () => {
             <StatLabel>Total Products</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color={theme.colors.success[100]} textColor={theme.colors.success[600]}>
             <CheckCircle size={24} />
@@ -773,7 +805,7 @@ const ProductList = () => {
             <StatLabel>Active Products</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color={theme.colors.warning[100]} textColor={theme.colors.warning[600]}>
             <AlertCircle size={24} />
@@ -783,7 +815,7 @@ const ProductList = () => {
             <StatLabel>Out of Stock</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color={theme.colors.success[100]} textColor={theme.colors.success[600]}>
             <DollarSign size={24} />
@@ -807,16 +839,16 @@ const ProductList = () => {
                 type="text"
                 placeholder="Search by name, brand, or SKU..."
                 value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
+                onChange={e => handleFilterChange('search', e.target.value)}
               />
             </SearchContainer>
           </div>
-          
+
           <div>
             <Label>Category</Label>
             <Select
               value={filters.category}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
+              onChange={e => handleFilterChange('category', e.target.value)}
             >
               <option value="">All Categories</option>
               {categories.map(category => (
@@ -826,12 +858,12 @@ const ProductList = () => {
               ))}
             </Select>
           </div>
-          
+
           <div>
             <Label>Status</Label>
             <Select
               value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
+              onChange={e => handleFilterChange('status', e.target.value)}
             >
               <option value="">All Status</option>
               <option value="active">Active</option>
@@ -839,12 +871,12 @@ const ProductList = () => {
               <option value="draft">Draft</option>
             </Select>
           </div>
-          
+
           <div>
             <Label>Sort By</Label>
             <Select
               value={`${filters.sortBy}-${filters.sortOrder}`}
-              onChange={(e) => {
+              onChange={e => {
                 const [sortBy, sortOrder] = e.target.value.split('-');
                 handleFilterChange('sortBy', sortBy);
                 handleFilterChange('sortOrder', sortOrder);
@@ -858,18 +890,12 @@ const ProductList = () => {
               <option value="price-desc">Price High-Low</option>
             </Select>
           </div>
-          
+
           <ViewToggle>
-            <ViewButton 
-              active={viewMode === 'grid'} 
-              onClick={() => setViewMode('grid')}
-            >
+            <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
               <Grid size={16} />
             </ViewButton>
-            <ViewButton 
-              active={viewMode === 'list'} 
-              onClick={() => setViewMode('list')}
-            >
+            <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
               <List size={16} />
             </ViewButton>
           </ViewToggle>
@@ -878,9 +904,7 @@ const ProductList = () => {
 
       <ProductsContainer>
         <ProductsHeader>
-          <ProductsTitle>
-            Products ({sortedProducts.length})
-          </ProductsTitle>
+          <ProductsTitle>Products ({sortedProducts.length})</ProductsTitle>
           <ProductsActions>
             <Button onClick={fetchProducts}>
               <RefreshCw size={16} />
@@ -900,8 +924,8 @@ const ProductList = () => {
             </EmptyIcon>
             <h3>No products found</h3>
             <p>Get started by adding your first product to the inventory.</p>
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               onClick={() => navigate('/admin/products/create')}
               style={{ marginTop: theme.spacing[4] }}
             >
@@ -917,29 +941,32 @@ const ProductList = () => {
                 <ProductCard key={product._id || product.id}>
                   <ProductImage>
                     {product.images && product.images.length > 0 ? (
-                      <img src={product.images[0]} alt={`${product.brand} ${product.series} ${product.model}`} />
+                      <img
+                        src={product.images[0]}
+                        alt={`${product.brand} ${product.series} ${product.model}`}
+                      />
                     ) : (
                       <ImageIcon size={48} color={theme.colors.text.secondary} />
                     )}
                     {badgeType && (
-                      <ProductBadge type={badgeType}>
-                        {getBadgeText(badgeType)}
-                      </ProductBadge>
+                      <ProductBadge type={badgeType}>{getBadgeText(badgeType)}</ProductBadge>
                     )}
                   </ProductImage>
-                  
+
                   <ProductContent>
                     <ProductStatus isActive={product.isActive}>
                       {product.isActive ? 'Active' : 'Inactive'}
                     </ProductStatus>
-                    
+
                     <ProductBrand>{product.brand}</ProductBrand>
-                    <ProductName>{product.series} {product.model}</ProductName>
-                    
+                    <ProductName>
+                      {product.series} {product.model}
+                    </ProductName>
+
                     <ProductPrice>
                       <CurrentPrice>{formatPrice(product.basePrice)}</CurrentPrice>
                     </ProductPrice>
-                    
+
                     {product.variant && (
                       <ProductVariant>
                         <VariantTitle>Variant Details</VariantTitle>
@@ -977,36 +1004,44 @@ const ProductList = () => {
                         </VariantInfo>
                       </ProductVariant>
                     )}
-                    
+
                     {product.specifications && (
                       <ProductSpecs>
                         <SpecsTitle>Key Specifications</SpecsTitle>
                         <SpecsList>
-                          {Object.entries(product.specifications).slice(0, 3).map(([key, value]) => (
-                            <div key={key}>
-                              <strong>{key}:</strong> {value}
-                            </div>
-                          ))}
+                          {Object.entries(product.specifications)
+                            .slice(0, 3)
+                            .map(([key, value]) => (
+                              <div key={key}>
+                                <strong>{key}:</strong> {value}
+                              </div>
+                            ))}
                         </SpecsList>
                       </ProductSpecs>
                     )}
-                    
+
                     <ProductMeta>
                       <span>Category: {product.category}</span>
                       <span>Created: {formatDate(product.createdAt)}</span>
                     </ProductMeta>
-                    
+
                     <ProductActions>
-                      <ActionButton onClick={() => navigate(`/admin/products/${product._id || product.id}`)}>
+                      <ActionButton
+                        onClick={() => navigate(`/admin/products/${product._id || product.id}`)}
+                      >
                         <Eye size={14} />
                         View
                       </ActionButton>
-                      <ActionButton onClick={() => navigate(`/admin/products/${product._id || product.id}/edit`)}>
+                      <ActionButton
+                        onClick={() =>
+                          navigate(`/admin/products/${product._id || product.id}/edit`)
+                        }
+                      >
                         <Edit size={14} />
                         Edit
                       </ActionButton>
-                      <ActionButton 
-                        variant="danger" 
+                      <ActionButton
+                        variant="danger"
                         onClick={() => handleDeleteProduct(product._id || product.id)}
                       >
                         <Trash2 size={14} />

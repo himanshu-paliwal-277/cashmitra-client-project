@@ -31,7 +31,7 @@ import {
   Building,
   Navigation,
   Star,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -339,7 +339,7 @@ const NavigationButtons = styled.div`
 
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -348,10 +348,11 @@ const NavigationButtons = styled.div`
 
 const NavButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[6]};
-  border: ${props => props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
+  border: ${props =>
+    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.variant === 'primary' ? theme.colors.primary.main : 'white'};
-  color: ${props => props.variant === 'primary' ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.variant === 'primary' ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.variant === 'primary' ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.base};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -365,7 +366,8 @@ const NavButton = styled.button`
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.md};
-    background: ${props => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -387,33 +389,33 @@ const LoadingState = styled.div`
 
 const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) => {
   const { sellOrders } = hooks;
-  
+
   const [formData, setFormData] = useState({
     // Personal Information
     fullName: '',
     email: '',
     phone: '',
-    
+
     // Address Information
     addressLine1: '',
     addressLine2: '',
     city: '',
     state: '',
     pincode: '',
-    
+
     // Pickup Information
     pickupMethod: 'home_pickup', // home_pickup, store_dropoff
     pickupDate: '',
     pickupTimeSlot: '',
-    
+
     // Payment Information
     paymentMethod: 'bank_transfer', // bank_transfer, upi, cash
     bankAccountNumber: '',
     ifscCode: '',
     upiId: '',
-    
+
     // Additional Information
-    specialInstructions: ''
+    specialInstructions: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -424,7 +426,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
     { value: '09:00-12:00', label: '9:00 AM - 12:00 PM' },
     { value: '12:00-15:00', label: '12:00 PM - 3:00 PM' },
     { value: '15:00-18:00', label: '3:00 PM - 6:00 PM' },
-    { value: '18:00-21:00', label: '6:00 PM - 9:00 PM' }
+    { value: '18:00-21:00', label: '6:00 PM - 9:00 PM' },
   ];
 
   // Get minimum date (tomorrow)
@@ -443,7 +445,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
@@ -536,30 +538,33 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
         customerInfo: {
           fullName: formData.fullName,
           email: formData.email,
-          phone: formData.phone
+          phone: formData.phone,
         },
         address: {
           line1: formData.addressLine1,
           line2: formData.addressLine2,
           city: formData.city,
           state: formData.state,
-          pincode: formData.pincode
+          pincode: formData.pincode,
         },
         pickup: {
           method: formData.pickupMethod,
           date: formData.pickupDate,
-          timeSlot: formData.pickupTimeSlot
+          timeSlot: formData.pickupTimeSlot,
         },
         payment: {
           method: formData.paymentMethod,
-          bankAccount: formData.paymentMethod === 'bank_transfer' ? {
-            accountNumber: formData.bankAccountNumber,
-            ifscCode: formData.ifscCode
-          } : null,
-          upiId: formData.paymentMethod === 'upi' ? formData.upiId : null
+          bankAccount:
+            formData.paymentMethod === 'bank_transfer'
+              ? {
+                  accountNumber: formData.bankAccountNumber,
+                  ifscCode: formData.ifscCode,
+                }
+              : null,
+          upiId: formData.paymentMethod === 'upi' ? formData.upiId : null,
         },
         specialInstructions: formData.specialInstructions,
-        priceData
+        priceData,
       };
 
       const result = await sellOrders.createOrder(orderData);
@@ -606,7 +611,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
               <Input
                 type="text"
                 value={formData.fullName}
-                onChange={(e) => handleInputChange('fullName', e.target.value)}
+                onChange={e => handleInputChange('fullName', e.target.value)}
                 placeholder="Enter your full name"
               />
               {errors.fullName && (
@@ -624,7 +629,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
               <Input
                 type="email"
                 value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
+                onChange={e => handleInputChange('email', e.target.value)}
                 placeholder="Enter your email address"
               />
               {errors.email && (
@@ -642,7 +647,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
               <Input
                 type="tel"
                 value={formData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
+                onChange={e => handleInputChange('phone', e.target.value)}
                 placeholder="Enter your phone number"
               />
               {errors.phone && (
@@ -670,7 +675,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
               <Input
                 type="text"
                 value={formData.addressLine1}
-                onChange={(e) => handleInputChange('addressLine1', e.target.value)}
+                onChange={e => handleInputChange('addressLine1', e.target.value)}
                 placeholder="House/Flat number, Street name"
               />
               {errors.addressLine1 && (
@@ -686,7 +691,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
               <Input
                 type="text"
                 value={formData.addressLine2}
-                onChange={(e) => handleInputChange('addressLine2', e.target.value)}
+                onChange={e => handleInputChange('addressLine2', e.target.value)}
                 placeholder="Area, Landmark (Optional)"
               />
             </FormGroup>
@@ -698,7 +703,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
               <Input
                 type="text"
                 value={formData.city}
-                onChange={(e) => handleInputChange('city', e.target.value)}
+                onChange={e => handleInputChange('city', e.target.value)}
                 placeholder="Enter your city"
               />
               {errors.city && (
@@ -716,7 +721,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
               <Input
                 type="text"
                 value={formData.state}
-                onChange={(e) => handleInputChange('state', e.target.value)}
+                onChange={e => handleInputChange('state', e.target.value)}
                 placeholder="Enter your state"
               />
               {errors.state && (
@@ -734,7 +739,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
               <Input
                 type="text"
                 value={formData.pincode}
-                onChange={(e) => handleInputChange('pincode', e.target.value)}
+                onChange={e => handleInputChange('pincode', e.target.value)}
                 placeholder="Enter 6-digit pincode"
                 maxLength={6}
               />
@@ -767,7 +772,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
                   name="pickupMethod"
                   value="home_pickup"
                   checked={formData.pickupMethod === 'home_pickup'}
-                  onChange={(e) => handleInputChange('pickupMethod', e.target.value)}
+                  onChange={e => handleInputChange('pickupMethod', e.target.value)}
                 />
                 <RadioIcon>
                   <Home size={20} />
@@ -784,7 +789,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
                   name="pickupMethod"
                   value="store_dropoff"
                   checked={formData.pickupMethod === 'store_dropoff'}
-                  onChange={(e) => handleInputChange('pickupMethod', e.target.value)}
+                  onChange={e => handleInputChange('pickupMethod', e.target.value)}
                 />
                 <RadioIcon>
                   <Building size={20} />
@@ -811,7 +816,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
                   <Input
                     type="date"
                     value={formData.pickupDate}
-                    onChange={(e) => handleInputChange('pickupDate', e.target.value)}
+                    onChange={e => handleInputChange('pickupDate', e.target.value)}
                     min={getMinDate()}
                     max={getMaxDate()}
                   />
@@ -829,7 +834,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
                   </Label>
                   <Select
                     value={formData.pickupTimeSlot}
-                    onChange={(e) => handleInputChange('pickupTimeSlot', e.target.value)}
+                    onChange={e => handleInputChange('pickupTimeSlot', e.target.value)}
                   >
                     <option value="">Select time slot</option>
                     {timeSlots.map(slot => (
@@ -869,7 +874,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
                   name="paymentMethod"
                   value="bank_transfer"
                   checked={formData.paymentMethod === 'bank_transfer'}
-                  onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
+                  onChange={e => handleInputChange('paymentMethod', e.target.value)}
                 />
                 <RadioIcon>
                   <CreditCard size={20} />
@@ -886,7 +891,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
                   name="paymentMethod"
                   value="upi"
                   checked={formData.paymentMethod === 'upi'}
-                  onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
+                  onChange={e => handleInputChange('paymentMethod', e.target.value)}
                 />
                 <RadioIcon>
                   <Smartphone size={20} />
@@ -903,7 +908,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
                   name="paymentMethod"
                   value="cash"
                   checked={formData.paymentMethod === 'cash'}
-                  onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
+                  onChange={e => handleInputChange('paymentMethod', e.target.value)}
                 />
                 <RadioIcon>
                   <DollarSign size={20} />
@@ -930,7 +935,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
                   <Input
                     type="text"
                     value={formData.bankAccountNumber}
-                    onChange={(e) => handleInputChange('bankAccountNumber', e.target.value)}
+                    onChange={e => handleInputChange('bankAccountNumber', e.target.value)}
                     placeholder="Enter account number"
                   />
                   {errors.bankAccountNumber && (
@@ -948,7 +953,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
                   <Input
                     type="text"
                     value={formData.ifscCode}
-                    onChange={(e) => handleInputChange('ifscCode', e.target.value.toUpperCase())}
+                    onChange={e => handleInputChange('ifscCode', e.target.value.toUpperCase())}
                     placeholder="Enter IFSC code"
                     maxLength={11}
                   />
@@ -976,7 +981,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
                 <Input
                   type="text"
                   value={formData.upiId}
-                  onChange={(e) => handleInputChange('upiId', e.target.value)}
+                  onChange={e => handleInputChange('upiId', e.target.value)}
                   placeholder="yourname@upi"
                 />
                 {errors.upiId && (
@@ -1001,7 +1006,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
             <Label>Special Instructions</Label>
             <TextArea
               value={formData.specialInstructions}
-              onChange={(e) => handleInputChange('specialInstructions', e.target.value)}
+              onChange={e => handleInputChange('specialInstructions', e.target.value)}
               placeholder="Any special instructions for pickup or device handling (Optional)"
               maxLength={500}
             />
@@ -1033,8 +1038,8 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
         <InfoContent>
           <InfoTitle>Secure & Guaranteed</InfoTitle>
           <InfoText>
-            Your payment is guaranteed once we verify your device condition. 
-            We ensure secure handling of your personal data and device.
+            Your payment is guaranteed once we verify your device condition. We ensure secure
+            handling of your personal data and device.
           </InfoText>
         </InfoContent>
       </InfoBox>
@@ -1045,11 +1050,7 @@ const OrderPlacement = ({ sessionData, priceData, onComplete, onError, hooks }) 
           Back
         </NavButton>
 
-        <NavButton
-          variant="primary"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-        >
+        <NavButton variant="primary" onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? (
             <>
               <Loader size={16} className="animate-spin" />

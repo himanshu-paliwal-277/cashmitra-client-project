@@ -19,22 +19,22 @@ const useSellOrders = () => {
     page: 1,
     limit: 10,
     total: 0,
-    totalPages: 0
+    totalPages: 0,
   });
 
   // Create new order
-  const createOrder = useCallback(async (orderData) => {
+  const createOrder = useCallback(async orderData => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await api.post('/sell-orders', orderData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       setCurrentOrder(response.data.order);
       return response.data;
     } catch (err) {
@@ -53,10 +53,10 @@ const useSellOrders = () => {
       const token = localStorage.getItem('token');
       const response = await api.get('/sell-orders/user', {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       setUserOrders(response.data.orders || []);
       return response.data.orders || [];
     } catch (err) {
@@ -68,17 +68,17 @@ const useSellOrders = () => {
   }, []);
 
   // Get order by ID
-  const getOrder = useCallback(async (orderId) => {
+  const getOrder = useCallback(async orderId => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await api.get(`/sell-orders/user/${orderId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       setCurrentOrder(response.data.order);
       return response.data.order;
     } catch (err) {
@@ -98,13 +98,13 @@ const useSellOrders = () => {
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
-        ...filters
+        ...filters,
       });
 
       const response = await api.get(`/sell-orders/admin?${queryParams}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       setOrders(response.data.orders || []);
@@ -112,9 +112,9 @@ const useSellOrders = () => {
         page: response.data.page || 1,
         limit: response.data.limit || 10,
         total: response.data.total || 0,
-        totalPages: response.data.totalPages || 0
+        totalPages: response.data.totalPages || 0,
       });
-      
+
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch orders');
@@ -125,36 +125,39 @@ const useSellOrders = () => {
   }, []);
 
   // Admin: Update order status
-  const updateOrderStatus = useCallback(async (orderId, statusData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put(`/sell-orders/admin/${orderId}/status`, statusData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+  const updateOrderStatus = useCallback(
+    async (orderId, statusData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put(`/sell-orders/admin/${orderId}/status`, statusData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Update orders list
+        setOrders(prev =>
+          prev.map(order => (order._id === orderId ? { ...order, ...response.data.order } : order))
+        );
+
+        // Update current order if it matches
+        if (currentOrder?._id === orderId) {
+          setCurrentOrder(response.data.order);
         }
-      });
-      
-      // Update orders list
-      setOrders(prev => prev.map(order => 
-        order._id === orderId ? { ...order, ...response.data.order } : order
-      ));
-      
-      // Update current order if it matches
-      if (currentOrder?._id === orderId) {
-        setCurrentOrder(response.data.order);
+
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update order status');
+        throw err;
+      } finally {
+        setLoading(false);
       }
-      
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update order status');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [currentOrder]);
+    },
+    [currentOrder]
+  );
 
   // Admin: Assign staff to order
   const assignStaff = useCallback(async (orderId, staffData) => {
@@ -164,16 +167,16 @@ const useSellOrders = () => {
       const token = localStorage.getItem('adminToken');
       const response = await api.put(`/sell-orders/admin/${orderId}/assign-staff`, staffData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       // Update orders list
-      setOrders(prev => prev.map(order => 
-        order._id === orderId ? { ...order, ...response.data.order } : order
-      ));
-      
+      setOrders(prev =>
+        prev.map(order => (order._id === orderId ? { ...order, ...response.data.order } : order))
+      );
+
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to assign staff');
@@ -191,16 +194,16 @@ const useSellOrders = () => {
       const token = localStorage.getItem('adminToken');
       const response = await api.put(`/sell-orders/admin/${orderId}/pickup`, pickupData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       // Update orders list
-      setOrders(prev => prev.map(order => 
-        order._id === orderId ? { ...order, ...response.data.order } : order
-      ));
-      
+      setOrders(prev =>
+        prev.map(order => (order._id === orderId ? { ...order, ...response.data.order } : order))
+      );
+
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update pickup details');
@@ -211,17 +214,17 @@ const useSellOrders = () => {
   }, []);
 
   // Admin: Get orders by status
-  const getOrdersByStatus = useCallback(async (status) => {
+  const getOrdersByStatus = useCallback(async status => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-orders/admin/status/${status}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       return response.data.orders || [];
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch orders by status');
@@ -239,10 +242,10 @@ const useSellOrders = () => {
       const token = localStorage.getItem('adminToken');
       const response = await api.get('/sell-orders/admin/statistics', {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       setStatistics(response.data.statistics);
       return response.data.statistics;
     } catch (err) {
@@ -254,31 +257,34 @@ const useSellOrders = () => {
   }, []);
 
   // Admin: Delete order
-  const deleteOrder = useCallback(async (orderId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      await api.delete(`/sell-orders/admin/${orderId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+  const deleteOrder = useCallback(
+    async orderId => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        await api.delete(`/sell-orders/admin/${orderId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Remove from orders list
+        setOrders(prev => prev.filter(order => order._id !== orderId));
+
+        // Clear current order if it was deleted
+        if (currentOrder?._id === orderId) {
+          setCurrentOrder(null);
         }
-      });
-      
-      // Remove from orders list
-      setOrders(prev => prev.filter(order => order._id !== orderId));
-      
-      // Clear current order if it was deleted
-      if (currentOrder?._id === orderId) {
-        setCurrentOrder(null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete order');
+        throw err;
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete order');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [currentOrder]);
+    },
+    [currentOrder]
+  );
 
   // Get order status options
   const getStatusOptions = useCallback(() => {
@@ -287,7 +293,7 @@ const useSellOrders = () => {
       { value: 'confirmed', label: 'Confirmed', color: 'blue' },
       { value: 'picked_up', label: 'Picked Up', color: 'purple' },
       { value: 'paid', label: 'Paid', color: 'green' },
-      { value: 'cancelled', label: 'Cancelled', color: 'red' }
+      { value: 'cancelled', label: 'Cancelled', color: 'red' },
     ];
   }, []);
 
@@ -336,7 +342,7 @@ const useSellOrders = () => {
 
     // Utilities
     getStatusOptions,
-    clearError
+    clearError,
   };
 };
 

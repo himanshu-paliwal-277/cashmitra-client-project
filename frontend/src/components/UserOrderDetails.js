@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Package, 
-  User, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Calendar, 
-  DollarSign, 
-  CreditCard, 
-  Truck, 
-  CheckCircle, 
-  Clock, 
+import {
+  ArrowLeft,
+  Package,
+  User,
+  MapPin,
+  Phone,
+  Mail,
+  Calendar,
+  DollarSign,
+  CreditCard,
+  Truck,
+  CheckCircle,
+  Clock,
   AlertCircle,
   Smartphone,
   Star,
   Shield,
-  Eye
+  Eye,
 } from 'lucide-react';
 import useUserOrders from '../hooks/useUserOrders';
 import './UserOrderDetails.css';
@@ -48,24 +48,24 @@ const UserOrderDetails = () => {
     }
   }, [orderId]);
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
-  const formatCurrency = (amount) => {
+  const formatCurrency = amount => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'INR'
+      currency: 'INR',
     }).format(amount);
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'pending':
         return <Clock size={16} />;
@@ -86,17 +86,17 @@ const UserOrderDetails = () => {
     }
   };
 
-  const getProgressPercentage = (status) => {
+  const getProgressPercentage = status => {
     const statusMap = {
-      'pending': 10,
-      'confirmed': 25,
-      'processing': 40,
-      'verified': 55,
-      'shipped': 75,
-      'delivered': 90,
-      'completed': 100,
-      'cancelled': 0,
-      'refunded': 0
+      pending: 10,
+      confirmed: 25,
+      processing: 40,
+      verified: 55,
+      shipped: 75,
+      delivered: 90,
+      completed: 100,
+      cancelled: 0,
+      refunded: 0,
     };
     return statusMap[status] || 0;
   };
@@ -166,7 +166,9 @@ const UserOrderDetails = () => {
         <div className="status-info">
           <div className={`status-badge status-${order?.status}`}>
             {getStatusIcon(order?.status)}
-            <span>{order?.status?.charAt(0).toUpperCase() + order?.status?.slice(1) || 'Pending'}</span>
+            <span>
+              {order?.status?.charAt(0).toUpperCase() + order?.status?.slice(1) || 'Pending'}
+            </span>
           </div>
           <div className="order-date">
             <Calendar size={16} />
@@ -179,10 +181,7 @@ const UserOrderDetails = () => {
             <span>{progressPercentage}%</span>
           </div>
           <div className="progress-bar">
-            <div 
-              className="progress-fill" 
-              style={{ width: `${progressPercentage}%` }}
-            ></div>
+            <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
           </div>
         </div>
       </div>
@@ -211,9 +210,11 @@ const UserOrderDetails = () => {
                           )}
                         </div>
                         <div className="product-details">
-                          <h3 className="product-name">{product?.name || product?.brand || 'Product Name'}</h3>
+                          <h3 className="product-name">
+                            {product?.name || product?.brand || 'Product Name'}
+                          </h3>
                           <p className="product-brand">{product?.brand}</p>
-                          
+
                           <div className="product-specs">
                             {product?.model && (
                               <div className="spec-item">
@@ -250,15 +251,25 @@ const UserOrderDetails = () => {
                           </div>
 
                           <div className="price-section">
-                            <div className="price">{formatCurrency(order?.totalAmount / item.quantity)}</div>
-                            {product?.basePrice && product.basePrice > (order?.totalAmount / item.quantity) && (
-                              <>
-                                <div className="original-price">{formatCurrency(product.basePrice)}</div>
-                                <div className="discount">
-                                  {Math.round(((product.basePrice - (order?.totalAmount / item.quantity)) / product.basePrice) * 100)}% OFF
-                                </div>
-                              </>
-                            )}
+                            <div className="price">
+                              {formatCurrency(order?.totalAmount / item.quantity)}
+                            </div>
+                            {product?.basePrice &&
+                              product.basePrice > order?.totalAmount / item.quantity && (
+                                <>
+                                  <div className="original-price">
+                                    {formatCurrency(product.basePrice)}
+                                  </div>
+                                  <div className="discount">
+                                    {Math.round(
+                                      ((product.basePrice - order?.totalAmount / item.quantity) /
+                                        product.basePrice) *
+                                        100
+                                    )}
+                                    % OFF
+                                  </div>
+                                </>
+                              )}
                           </div>
                         </div>
                       </div>
@@ -288,16 +299,20 @@ const UserOrderDetails = () => {
                         {order.shippingDetails.address?.street && (
                           <div>{order.shippingDetails.address.street}</div>
                         )}
-                        {order.shippingDetails.address?.city && order.shippingDetails.address?.state && (
-                          <div>{order.shippingDetails.address.city}, {order.shippingDetails.address.state}</div>
-                        )}
+                        {order.shippingDetails.address?.city &&
+                          order.shippingDetails.address?.state && (
+                            <div>
+                              {order.shippingDetails.address.city},{' '}
+                              {order.shippingDetails.address.state}
+                            </div>
+                          )}
                         {order.shippingDetails.address?.zipCode && (
                           <div>{order.shippingDetails.address.zipCode}</div>
                         )}
                       </div>
                     </div>
                   </div>
-                  
+
                   {order?.shippingDetails?.trackingId && (
                     <div className="info-item">
                       <div className="info-icon">
@@ -305,11 +320,13 @@ const UserOrderDetails = () => {
                       </div>
                       <div className="info-content">
                         <div className="info-label">Tracking ID</div>
-                        <div className="info-value tracking-id">{order.shippingDetails.trackingId}</div>
+                        <div className="info-value tracking-id">
+                          {order.shippingDetails.trackingId}
+                        </div>
                       </div>
                     </div>
                   )}
-                  
+
                   {order?.shippingDetails?.estimatedDelivery && (
                     <div className="info-item">
                       <div className="info-icon">
@@ -317,7 +334,9 @@ const UserOrderDetails = () => {
                       </div>
                       <div className="info-content">
                         <div className="info-label">Estimated Delivery</div>
-                        <div className="info-value">{formatDate(order.shippingDetails.estimatedDelivery)}</div>
+                        <div className="info-value">
+                          {formatDate(order.shippingDetails.estimatedDelivery)}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -345,9 +364,7 @@ const UserOrderDetails = () => {
                           {item.status?.charAt(0).toUpperCase() + item.status?.slice(1)}
                         </div>
                         <div className="timeline-date">{formatDate(item.timestamp)}</div>
-                        {item.notes && (
-                          <div className="timeline-note">{item.notes}</div>
-                        )}
+                        {item.notes && <div className="timeline-note">{item.notes}</div>}
                       </div>
                     </div>
                   ))}
@@ -380,7 +397,7 @@ const UserOrderDetails = () => {
                   <span>{formatCurrency(order?.totalAmount || 0)}</span>
                 </div>
               </div>
-              
+
               {order?.paymentDetails && (
                 <div className="payment-method">
                   <div className="info-item">
@@ -423,7 +440,9 @@ const UserOrderDetails = () => {
                   </div>
                   <div className="commission-item">
                     <span>Cashback Amount</span>
-                    <span className="commission-amount">{formatCurrency(order.commission.amount || 0)}</span>
+                    <span className="commission-amount">
+                      {formatCurrency(order.commission.amount || 0)}
+                    </span>
                   </div>
                 </div>
               </div>

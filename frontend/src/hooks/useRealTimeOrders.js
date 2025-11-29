@@ -9,7 +9,7 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
     autoStart = true,
     onUpdate = null,
     onError = null,
-    filters = {}
+    filters = {},
   } = options;
 
   const [orders, setOrders] = useState([]);
@@ -19,13 +19,13 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
     totalOrders: 0,
     totalAmount: 0,
     avgOrderValue: 0,
-    statusBreakdown: {}
+    statusBreakdown: {},
   });
   const [pagination, setPagination] = useState({
     current: 1,
     total: 1,
     count: 0,
-    totalRecords: 0
+    totalRecords: 0,
   });
   const [connected, setConnected] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -37,23 +37,23 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
 
   // WebSocket connection
   const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
-  
-  const handleWebSocketMessage = useCallback((data) => {
+
+  const handleWebSocketMessage = useCallback(data => {
     if (data.type === 'orderUpdate') {
       setOrders(prevOrders => {
         const updatedOrders = [...prevOrders];
         const existingIndex = updatedOrders.findIndex(order => order._id === data.order._id);
-        
+
         if (existingIndex >= 0) {
           updatedOrders[existingIndex] = data.order;
         } else {
           // Add new order to the beginning
           updatedOrders.unshift(data.order);
         }
-        
+
         return updatedOrders;
       });
-      
+
       // Update statistics if provided
       if (data.statistics) {
         setStatistics(data.statistics);
@@ -65,7 +65,7 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
 
   const { isConnected, subscribe, unsubscribe } = useWebSocket(wsUrl, {
     onMessage: handleWebSocketMessage,
-    autoConnect: true
+    autoConnect: true,
   });
 
   // Cleanup function
@@ -82,7 +82,7 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
   }, []);
 
   // Calculate stats from orders
-  const calculateStats = useCallback((ordersData) => {
+  const calculateStats = useCallback(ordersData => {
     const stats = {
       total: ordersData.length,
       pending: 0,
@@ -102,79 +102,88 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
   }, []);
 
   // Handle data updates
-  const handleDataUpdate = useCallback((newOrders) => {
-    if (!mountedRef.current) return;
-    
-    setOrders(newOrders);
-    setStatistics(calculateStats(newOrders));
-    setLastUpdated(new Date().toISOString());
-    setError(null);
-    retryCountRef.current = 0;
-    
-    if (onUpdate) {
-      onUpdate(newOrders);
-    }
-  }, [onUpdate, calculateStats]);
+  const handleDataUpdate = useCallback(
+    newOrders => {
+      if (!mountedRef.current) return;
+
+      setOrders(newOrders);
+      setStatistics(calculateStats(newOrders));
+      setLastUpdated(new Date().toISOString());
+      setError(null);
+      retryCountRef.current = 0;
+
+      if (onUpdate) {
+        onUpdate(newOrders);
+      }
+    },
+    [onUpdate, calculateStats]
+  );
 
   // Handle errors
-  const handleError = useCallback((err) => {
-    if (!mountedRef.current) return;
-    
-    console.error('Real-time orders error:', err);
-    setError(err.message || 'Connection error');
-    setConnected(false);
-    
-    if (onError) {
-      onError(err);
-    }
-  }, [onError]);
+  const handleError = useCallback(
+    err => {
+      if (!mountedRef.current) return;
+
+      console.error('Real-time orders error:', err);
+      setError(err.message || 'Connection error');
+      setConnected(false);
+
+      if (onError) {
+        onError(err);
+      }
+    },
+    [onError]
+  );
 
   // Fetch initial data
-  const fetchOrders = useCallback(async (params = {}) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const queryParams = new URLSearchParams({
-        type: orderType,
-        limit: options.limit || 50,
-        page: params.page || 1,
-        ...params
-      });
+  const fetchOrders = useCallback(
+    async (params = {}) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const response = await fetch(`/api/realtime/orders?${queryParams}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
+        const queryParams = new URLSearchParams({
+          type: orderType,
+          limit: options.limit || 50,
+          page: params.page || 1,
+          ...params,
+        });
+
+        const response = await fetch(`/api/realtime/orders?${queryParams}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch orders');
         }
-      });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch orders');
-      }
+        const result = await response.json();
 
-      const result = await response.json();
-      
-      if (result.success) {
-        setOrders(result.data.orders);
-        setStatistics(result.data.statistics);
-        setPagination(result.data.pagination);
-      } else {
-        throw new Error(result.message || 'Failed to fetch orders');
+        if (result.success) {
+          setOrders(result.data.orders);
+          setStatistics(result.data.statistics);
+          setPagination(result.data.pagination);
+        } else {
+          throw new Error(result.message || 'Failed to fetch orders');
+        }
+      } catch (err) {
+        console.error('Error fetching orders:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Error fetching orders:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [orderType, options.limit]);
+    },
+    [orderType, options.limit]
+  );
 
   // Subscribe to real-time updates
   useEffect(() => {
     if (isConnected) {
       subscribe('orders');
-      
+
       return () => {
         unsubscribe('orders');
       };
@@ -195,24 +204,36 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
   }, [cleanup]);
 
   // Refresh data
-  const refresh = useCallback((params = {}) => {
-    return fetchOrders(params);
-  }, [fetchOrders]);
+  const refresh = useCallback(
+    (params = {}) => {
+      return fetchOrders(params);
+    },
+    [fetchOrders]
+  );
 
   // Filter orders
-  const filterOrders = useCallback((filters) => {
-    return fetchOrders(filters);
-  }, [fetchOrders]);
+  const filterOrders = useCallback(
+    filters => {
+      return fetchOrders(filters);
+    },
+    [fetchOrders]
+  );
 
   // Search orders
-  const searchOrders = useCallback((searchTerm) => {
-    return fetchOrders({ search: searchTerm });
-  }, [fetchOrders]);
+  const searchOrders = useCallback(
+    searchTerm => {
+      return fetchOrders({ search: searchTerm });
+    },
+    [fetchOrders]
+  );
 
   // Change page
-  const changePage = useCallback((page) => {
-    return fetchOrders({ page });
-  }, [fetchOrders]);
+  const changePage = useCallback(
+    page => {
+      return fetchOrders({ page });
+    },
+    [fetchOrders]
+  );
 
   return {
     orders,
@@ -225,7 +246,7 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
     refresh,
     filterOrders,
     searchOrders,
-    changePage
+    changePage,
   };
 };
 

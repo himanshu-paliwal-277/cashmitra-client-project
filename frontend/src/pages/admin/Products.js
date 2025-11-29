@@ -14,7 +14,7 @@ import {
   Upload,
   X,
   Save,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -54,7 +54,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -80,7 +80,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -95,7 +95,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -115,7 +115,7 @@ const ProductCard = styled.div`
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -132,7 +132,7 @@ const ProductImage = styled.div`
   justify-content: center;
   margin-bottom: 1rem;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -196,7 +196,7 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${props => props.primary ? '#3b82f6' : props.danger ? '#ef4444' : '#6b7280'};
+  background: ${props => (props.primary ? '#3b82f6' : props.danger ? '#ef4444' : '#6b7280')};
   color: white;
   border: none;
   padding: 0.5rem;
@@ -207,7 +207,7 @@ const IconButton = styled.button`
   gap: 0.25rem;
   font-size: 0.75rem;
   transition: all 0.2s;
-  
+
   &:hover {
     opacity: 0.9;
     transform: scale(1.05);
@@ -221,18 +221,26 @@ const StatusBadge = styled.span`
   font-weight: 600;
   background: ${props => {
     switch (props.status) {
-      case 'active': return '#dcfce7';
-      case 'inactive': return '#fee2e2';
-      case 'out_of_stock': return '#fef3c7';
-      default: return '#f3f4f6';
+      case 'active':
+        return '#dcfce7';
+      case 'inactive':
+        return '#fee2e2';
+      case 'out_of_stock':
+        return '#fef3c7';
+      default:
+        return '#f3f4f6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'active': return '#166534';
-      case 'inactive': return '#dc2626';
-      case 'out_of_stock': return '#d97706';
-      default: return '#374151';
+      case 'active':
+        return '#166534';
+      case 'inactive':
+        return '#dc2626';
+      case 'out_of_stock':
+        return '#d97706';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -282,7 +290,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  
+
   &:hover {
     background: #f3f4f6;
   }
@@ -305,7 +313,7 @@ const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -321,7 +329,7 @@ const TextArea = styled.textarea`
   font-size: 0.875rem;
   min-height: 100px;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -336,7 +344,7 @@ const Select = styled.select`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   background: white;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -357,12 +365,15 @@ const Button = styled.button`
   cursor: pointer;
   transition: all 0.2s;
   border: none;
-  
-  ${props => props.variant === 'primary' ? `
+
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: #3b82f6;
     color: white;
     &:hover { background: #2563eb; }
-  ` : `
+  `
+      : `
     background: #f3f4f6;
     color: #374151;
     &:hover { background: #e5e7eb; }
@@ -379,7 +390,7 @@ const Products = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -391,7 +402,7 @@ const Products = () => {
     sku: '',
     stock: '',
     status: 'active',
-    images: []
+    images: [],
   });
 
   const {
@@ -402,16 +413,12 @@ const Products = () => {
     addProduct,
     editProduct,
     removeProduct,
-    fetchProducts
+    fetchProducts,
   } = useAdminCatalog();
 
-  const {
-    brands: hookBrands
-  } = useAdminBrands();
+  const { brands: hookBrands } = useAdminBrands();
 
-  const {
-    categories: hookCategories
-  } = useAdminCategories();
+  const { categories: hookCategories } = useAdminCategories();
 
   useEffect(() => {
     setProducts(hookProducts);
@@ -427,7 +434,7 @@ const Products = () => {
     setCategories(hookCategories);
   }, [hookCategories]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     try {
       if (editingProduct) {
@@ -435,7 +442,7 @@ const Products = () => {
       } else {
         await addProduct(formData);
       }
-      
+
       setShowModal(false);
       setEditingProduct(null);
       resetForm();
@@ -444,7 +451,7 @@ const Products = () => {
     }
   };
 
-  const handleDelete = async (productId) => {
+  const handleDelete = async productId => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await removeProduct(productId);
@@ -454,7 +461,7 @@ const Products = () => {
     }
   };
 
-  const handleEdit = (product) => {
+  const handleEdit = product => {
     setEditingProduct(product);
     setFormData({
       name: product.name || '',
@@ -467,7 +474,7 @@ const Products = () => {
       sku: product.sku || '',
       stock: product.stock || '',
       status: product.status || 'active',
-      images: product.images || []
+      images: product.images || [],
     });
     setShowModal(true);
   };
@@ -484,18 +491,19 @@ const Products = () => {
       sku: '',
       stock: '',
       status: 'active',
-      images: []
+      images: [],
     });
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.sku?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch =
+      product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.sku?.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesCategory = !categoryFilter || product.category?._id === categoryFilter;
     const matchesStatus = !statusFilter || product.status === statusFilter;
-    
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
@@ -517,7 +525,12 @@ const Products = () => {
           <Package size={32} />
           Products Management
         </Title>
-        <ActionButton onClick={() => { resetForm(); setShowModal(true); }}>
+        <ActionButton
+          onClick={() => {
+            resetForm();
+            setShowModal(true);
+          }}
+        >
           <Plus size={20} />
           Add Product
         </ActionButton>
@@ -528,13 +541,10 @@ const Products = () => {
           type="text"
           placeholder="Search products by name, model, or SKU..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
-        
-        <FilterSelect
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
+
+        <FilterSelect value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
           <option value="">All Categories</option>
           {categories.map(category => (
             <option key={category._id} value={category._id}>
@@ -542,11 +552,8 @@ const Products = () => {
             </option>
           ))}
         </FilterSelect>
-        
-        <FilterSelect
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
+
+        <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
@@ -558,12 +565,14 @@ const Products = () => {
         <div style={{ textAlign: 'center', padding: '4rem' }}>
           <Package size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
           <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
-            {searchTerm || categoryFilter || statusFilter ? 'No products match your filters' : 'No products found'}
+            {searchTerm || categoryFilter || statusFilter
+              ? 'No products match your filters'
+              : 'No products found'}
           </p>
         </div>
       ) : (
         <ProductsGrid>
-          {filteredProducts.map((product) => (
+          {filteredProducts.map(product => (
             <ProductCard key={product._id}>
               <ProductImage>
                 {product.images && product.images.length > 0 ? (
@@ -572,15 +581,22 @@ const Products = () => {
                   <Package size={48} style={{ color: '#9ca3af' }} />
                 )}
               </ProductImage>
-              
+
               <ProductInfo>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '1rem',
+                  }}
+                >
                   <ProductName>{product.name}</ProductName>
                   <StatusBadge status={product.status}>
                     {product.status?.charAt(0).toUpperCase() + product.status?.slice(1)}
                   </StatusBadge>
                 </div>
-                
+
                 <ProductDetails>
                   <DetailRow>
                     <DetailLabel>Brand:</DetailLabel>
@@ -603,16 +619,22 @@ const Products = () => {
                     <DetailValue>{product.stock || 0}</DetailValue>
                   </DetailRow>
                 </ProductDetails>
-                
+
                 <PriceSection>
                   <Price>₹{(product.price || 0).toLocaleString()}</Price>
                   {product.comparePrice && product.comparePrice > product.price && (
-                    <div style={{ fontSize: '0.875rem', color: '#6b7280', textDecoration: 'line-through' }}>
+                    <div
+                      style={{
+                        fontSize: '0.875rem',
+                        color: '#6b7280',
+                        textDecoration: 'line-through',
+                      }}
+                    >
                       ₹{product.comparePrice.toLocaleString()}
                     </div>
                   )}
                 </PriceSection>
-                
+
                 <ActionButtons>
                   <IconButton primary onClick={() => handleEdit(product)}>
                     <Edit size={16} />
@@ -633,40 +655,43 @@ const Products = () => {
         <Modal>
           <ModalContent>
             <ModalHeader>
-              <ModalTitle>
-                {editingProduct ? 'Edit Product' : 'Add New Product'}
-              </ModalTitle>
-              <CloseButton onClick={() => { setShowModal(false); setEditingProduct(null); }}>
+              <ModalTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</ModalTitle>
+              <CloseButton
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingProduct(null);
+                }}
+              >
                 <X size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             <form onSubmit={handleSubmit}>
               <FormGroup>
                 <Label>Product Name *</Label>
                 <Input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
               </FormGroup>
-              
+
               <FormGroup>
                 <Label>Description</Label>
                 <TextArea
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={e => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Product description..."
                 />
               </FormGroup>
-              
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <FormGroup>
                   <Label>Category *</Label>
                   <Select
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onChange={e => setFormData({ ...formData, category: e.target.value })}
                     required
                   >
                     <option value="">Select Category</option>
@@ -677,12 +702,12 @@ const Products = () => {
                     ))}
                   </Select>
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Brand *</Label>
                   <Select
                     value={formData.brand}
-                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                    onChange={e => setFormData({ ...formData, brand: e.target.value })}
                     required
                   >
                     <option value="">Select Brand</option>
@@ -694,71 +719,77 @@ const Products = () => {
                   </Select>
                 </FormGroup>
               </div>
-              
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <FormGroup>
                   <Label>Model</Label>
                   <Input
                     type="text"
                     value={formData.model}
-                    onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                    onChange={e => setFormData({ ...formData, model: e.target.value })}
                   />
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>SKU</Label>
                   <Input
                     type="text"
                     value={formData.sku}
-                    onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                    onChange={e => setFormData({ ...formData, sku: e.target.value })}
                   />
                 </FormGroup>
               </div>
-              
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
                 <FormGroup>
                   <Label>Price *</Label>
                   <Input
                     type="number"
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    onChange={e => setFormData({ ...formData, price: e.target.value })}
                     required
                   />
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Compare Price</Label>
                   <Input
                     type="number"
                     value={formData.comparePrice}
-                    onChange={(e) => setFormData({ ...formData, comparePrice: e.target.value })}
+                    onChange={e => setFormData({ ...formData, comparePrice: e.target.value })}
                   />
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Stock</Label>
                   <Input
                     type="number"
                     value={formData.stock}
-                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                    onChange={e => setFormData({ ...formData, stock: e.target.value })}
                   />
                 </FormGroup>
               </div>
-              
+
               <FormGroup>
                 <Label>Status</Label>
                 <Select
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
                 >
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                   <option value="out_of_stock">Out of Stock</option>
                 </Select>
               </FormGroup>
-              
+
               <ModalActions>
-                <Button type="button" onClick={() => { setShowModal(false); setEditingProduct(null); }}>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingProduct(null);
+                  }}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" variant="primary">

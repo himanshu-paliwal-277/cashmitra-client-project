@@ -27,7 +27,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Store,
-  Package2
+  Package2,
 } from 'lucide-react';
 import { useRealTimeOrders } from '../../hooks/useRealTimeOrders';
 
@@ -102,14 +102,15 @@ const FilterButton = styled.button`
   padding: 0.75rem 1rem;
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 0.5rem;
-  background: ${props => props.active ? props.theme.colors.primary : props.theme.colors.white};
-  color: ${props => props.active ? 'white' : props.theme.colors.text};
+  background: ${props => (props.active ? props.theme.colors.primary : props.theme.colors.white)};
+  color: ${props => (props.active ? 'white' : props.theme.colors.text)};
   cursor: pointer;
   font-size: 0.875rem;
   transition: all 0.2s;
 
   &:hover {
-    background: ${props => props.active ? props.theme.colors.primary : props.theme.colors.gray[50]};
+    background: ${props =>
+      props.active ? props.theme.colors.primary : props.theme.colors.gray[50]};
   }
 `;
 
@@ -137,7 +138,7 @@ const ActionButton = styled.button`
 `;
 
 const FiltersPanel = styled.div`
-  display: ${props => props.isOpen ? 'block' : 'none'};
+  display: ${props => (props.isOpen ? 'block' : 'none')};
   background: ${props => props.theme.colors.white};
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 0.75rem;
@@ -315,24 +316,38 @@ const OrderStatus = styled.span`
   gap: 0.25rem;
   background: ${props => {
     switch (props.status) {
-      case 'pending': return '#FEF3C7';
-      case 'confirmed': return '#DBEAFE';
-      case 'processing': return '#E0E7FF';
-      case 'shipped': return '#C7D2FE';
-      case 'delivered': return '#D1FAE5';
-      case 'cancelled': return '#FEE2E2';
-      default: return '#F3F4F6';
+      case 'pending':
+        return '#FEF3C7';
+      case 'confirmed':
+        return '#DBEAFE';
+      case 'processing':
+        return '#E0E7FF';
+      case 'shipped':
+        return '#C7D2FE';
+      case 'delivered':
+        return '#D1FAE5';
+      case 'cancelled':
+        return '#FEE2E2';
+      default:
+        return '#F3F4F6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'pending': return '#92400E';
-      case 'confirmed': return '#1E40AF';
-      case 'processing': return '#5B21B6';
-      case 'shipped': return '#4338CA';
-      case 'delivered': return '#065F46';
-      case 'cancelled': return '#991B1B';
-      default: return '#374151';
+      case 'pending':
+        return '#92400E';
+      case 'confirmed':
+        return '#1E40AF';
+      case 'processing':
+        return '#5B21B6';
+      case 'shipped':
+        return '#4338CA';
+      case 'delivered':
+        return '#065F46';
+      case 'cancelled':
+        return '#991B1B';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -407,14 +422,18 @@ const LoadingSpinner = styled.div`
   align-items: center;
   justify-content: center;
   padding: 4rem;
-  
+
   svg {
     animation: spin 1s linear infinite;
   }
-  
+
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -471,15 +490,22 @@ const StatLabel = styled.div`
 `;
 
 // Status Icons
-const getStatusIcon = (status) => {
+const getStatusIcon = status => {
   switch (status) {
-    case 'pending': return <Clock size={12} />;
-    case 'confirmed': return <CheckCircle size={12} />;
-    case 'processing': return <Package2 size={12} />;
-    case 'shipped': return <Truck size={12} />;
-    case 'delivered': return <CheckCircle size={12} />;
-    case 'cancelled': return <XCircle size={12} />;
-    default: return <AlertCircle size={12} />;
+    case 'pending':
+      return <Clock size={12} />;
+    case 'confirmed':
+      return <CheckCircle size={12} />;
+    case 'processing':
+      return <Package2 size={12} />;
+    case 'shipped':
+      return <Truck size={12} />;
+    case 'delivered':
+      return <CheckCircle size={12} />;
+    case 'cancelled':
+      return <XCircle size={12} />;
+    default:
+      return <AlertCircle size={12} />;
   }
 };
 
@@ -491,7 +517,7 @@ const RealTimePurchaseOrders = () => {
   const [sortDirection, setSortDirection] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  
+
   // Filter states
   const [filters, setFilters] = useState({
     status: 'all',
@@ -500,31 +526,24 @@ const RealTimePurchaseOrders = () => {
     minAmount: '',
     maxAmount: '',
     partner: '',
-    product: ''
+    product: '',
   });
 
   // Real-time orders hook
-  const {
-    orders,
-    stats,
-    loading,
-    error,
-    connected,
-    lastUpdated,
-    refresh,
-    updateOrderStatus
-  } = useRealTimeOrders('buy', {
-    pollingInterval: 5000,
-    onUpdate: (newOrders) => {
-      console.log('Purchase orders updated:', newOrders.length);
-    }
-  });
+  const { orders, stats, loading, error, connected, lastUpdated, refresh, updateOrderStatus } =
+    useRealTimeOrders('buy', {
+      pollingInterval: 5000,
+      onUpdate: newOrders => {
+        console.log('Purchase orders updated:', newOrders.length);
+      },
+    });
 
   // Filter and sort orders
   const filteredAndSortedOrders = useMemo(() => {
     let filtered = orders.filter(order => {
       // Search filter
-      const searchMatch = !searchTerm || 
+      const searchMatch =
+        !searchTerm ||
         order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.partner?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.partner?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -540,21 +559,30 @@ const RealTimePurchaseOrders = () => {
       const dateToMatch = !filters.dateTo || orderDate <= new Date(filters.dateTo);
 
       // Amount filter
-      const amountMatch = 
+      const amountMatch =
         (!filters.minAmount || order.totalAmount >= parseFloat(filters.minAmount)) &&
         (!filters.maxAmount || order.totalAmount <= parseFloat(filters.maxAmount));
 
       // Partner filter
-      const partnerMatch = !filters.partner || 
+      const partnerMatch =
+        !filters.partner ||
         order.partner?.name?.toLowerCase().includes(filters.partner.toLowerCase());
 
       // Product filter
-      const productMatch = !filters.product ||
+      const productMatch =
+        !filters.product ||
         order.items?.[0]?.product?.brand?.toLowerCase().includes(filters.product.toLowerCase()) ||
         order.items?.[0]?.product?.model?.toLowerCase().includes(filters.product.toLowerCase());
 
-      return searchMatch && statusMatch && dateFromMatch && dateToMatch && 
-             amountMatch && partnerMatch && productMatch;
+      return (
+        searchMatch &&
+        statusMatch &&
+        dateFromMatch &&
+        dateToMatch &&
+        amountMatch &&
+        partnerMatch &&
+        productMatch
+      );
     });
 
     // Sort orders
@@ -598,7 +626,7 @@ const RealTimePurchaseOrders = () => {
     currentPage * pageSize
   );
 
-  const handleSort = (field) => {
+  const handleSort = field => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -620,7 +648,7 @@ const RealTimePurchaseOrders = () => {
       minAmount: '',
       maxAmount: '',
       partner: '',
-      product: ''
+      product: '',
     });
     setSearchTerm('');
     setCurrentPage(1);
@@ -634,19 +662,19 @@ const RealTimePurchaseOrders = () => {
     }
   };
 
-  const formatCurrency = (amount) => {
+  const formatCurrency = amount => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     return new Date(date).toLocaleDateString('en-IN', {
       day: '2-digit',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
@@ -666,7 +694,7 @@ const RealTimePurchaseOrders = () => {
             Total Orders
           </StatLabel>
         </StatCard>
-        
+
         <StatCard>
           <StatValue>{stats?.pending || 0}</StatValue>
           <StatLabel>
@@ -674,7 +702,7 @@ const RealTimePurchaseOrders = () => {
             Pending
           </StatLabel>
         </StatCard>
-        
+
         <StatCard>
           <StatValue>{stats?.processing || 0}</StatValue>
           <StatLabel>
@@ -682,7 +710,7 @@ const RealTimePurchaseOrders = () => {
             Processing
           </StatLabel>
         </StatCard>
-        
+
         <StatCard>
           <StatValue>{formatCurrency(stats?.totalValue || 0)}</StatValue>
           <StatLabel>
@@ -697,7 +725,7 @@ const RealTimePurchaseOrders = () => {
           <ShoppingCart size={28} />
           Purchase Orders
         </Title>
-        
+
         <Controls>
           <SearchContainer>
             <SearchIcon>
@@ -707,23 +735,20 @@ const RealTimePurchaseOrders = () => {
               type="text"
               placeholder="Search orders, partners, products..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </SearchContainer>
-          
-          <FilterButton 
-            active={showFilters}
-            onClick={() => setShowFilters(!showFilters)}
-          >
+
+          <FilterButton active={showFilters} onClick={() => setShowFilters(!showFilters)}>
             <Filter size={16} />
             Filters
           </FilterButton>
-          
+
           <ActionButton onClick={refresh} disabled={loading}>
             <RefreshCw size={16} />
             Refresh
           </ActionButton>
-          
+
           <ActionButton onClick={exportOrders}>
             <Download size={16} />
             Export
@@ -738,7 +763,7 @@ const RealTimePurchaseOrders = () => {
             <FilterLabel>Status</FilterLabel>
             <FilterSelect
               value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
+              onChange={e => handleFilterChange('status', e.target.value)}
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -755,7 +780,7 @@ const RealTimePurchaseOrders = () => {
             <FilterInput
               type="date"
               value={filters.dateFrom}
-              onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+              onChange={e => handleFilterChange('dateFrom', e.target.value)}
             />
           </FilterGroup>
 
@@ -764,7 +789,7 @@ const RealTimePurchaseOrders = () => {
             <FilterInput
               type="date"
               value={filters.dateTo}
-              onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+              onChange={e => handleFilterChange('dateTo', e.target.value)}
             />
           </FilterGroup>
 
@@ -774,7 +799,7 @@ const RealTimePurchaseOrders = () => {
               type="number"
               placeholder="₹0"
               value={filters.minAmount}
-              onChange={(e) => handleFilterChange('minAmount', e.target.value)}
+              onChange={e => handleFilterChange('minAmount', e.target.value)}
             />
           </FilterGroup>
 
@@ -784,7 +809,7 @@ const RealTimePurchaseOrders = () => {
               type="number"
               placeholder="₹100000"
               value={filters.maxAmount}
-              onChange={(e) => handleFilterChange('maxAmount', e.target.value)}
+              onChange={e => handleFilterChange('maxAmount', e.target.value)}
             />
           </FilterGroup>
 
@@ -794,15 +819,13 @@ const RealTimePurchaseOrders = () => {
               type="text"
               placeholder="Partner name"
               value={filters.partner}
-              onChange={(e) => handleFilterChange('partner', e.target.value)}
+              onChange={e => handleFilterChange('partner', e.target.value)}
             />
           </FilterGroup>
         </FilterGrid>
-        
+
         <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-          <ActionButton onClick={clearFilters}>
-            Clear Filters
-          </ActionButton>
+          <ActionButton onClick={clearFilters}>Clear Filters</ActionButton>
           <div style={{ fontSize: '0.875rem', color: '#6B7280', alignSelf: 'center' }}>
             Showing {filteredAndSortedOrders.length} of {orders.length} orders
           </div>
@@ -852,111 +875,108 @@ const RealTimePurchaseOrders = () => {
                 No purchase orders found
               </div>
               <div>
-                {searchTerm || Object.values(filters).some(f => f && f !== 'all') 
+                {searchTerm || Object.values(filters).some(f => f && f !== 'all')
                   ? 'Try adjusting your search or filters'
-                  : 'No purchase orders available at the moment'
-                }
+                  : 'No purchase orders available at the moment'}
               </div>
             </EmptyState>
           )}
 
-          {!loading && paginatedOrders.map(order => (
-            <OrderRow key={order._id}>
-              <OrderCell>
-                <OrderId>#{order._id.slice(-8).toUpperCase()}</OrderId>
-                <OrderMeta>{formatDate(order.createdAt)}</OrderMeta>
-              </OrderCell>
+          {!loading &&
+            paginatedOrders.map(order => (
+              <OrderRow key={order._id}>
+                <OrderCell>
+                  <OrderId>#{order._id.slice(-8).toUpperCase()}</OrderId>
+                  <OrderMeta>{formatDate(order.createdAt)}</OrderMeta>
+                </OrderCell>
 
-              <OrderCell>
-                <PartnerInfo>
-                  <PartnerName>
-                    <Store size={14} />
-                    {order.partner?.name || 'Unknown Partner'}
-                  </PartnerName>
-                  <PartnerContact>
-                    <Mail size={12} />
-                    {order.partner?.email || 'No email'}
-                  </PartnerContact>
-                </PartnerInfo>
-              </OrderCell>
+                <OrderCell>
+                  <PartnerInfo>
+                    <PartnerName>
+                      <Store size={14} />
+                      {order.partner?.name || 'Unknown Partner'}
+                    </PartnerName>
+                    <PartnerContact>
+                      <Mail size={12} />
+                      {order.partner?.email || 'No email'}
+                    </PartnerContact>
+                  </PartnerInfo>
+                </OrderCell>
 
-              <OrderCell className="hide-mobile">
-                <ProductInfo>
-                  <ProductName>
-                    {order.items?.[0]?.product?.brand} {order.items?.[0]?.product?.model}
-                  </ProductName>
-                  <ProductDetails>
-                    Condition: {order.items?.[0]?.condition || 'N/A'}
-                    {order.items?.length > 1 && ` +${order.items.length - 1} more`}
-                  </ProductDetails>
-                </ProductInfo>
-              </OrderCell>
+                <OrderCell className="hide-mobile">
+                  <ProductInfo>
+                    <ProductName>
+                      {order.items?.[0]?.product?.brand} {order.items?.[0]?.product?.model}
+                    </ProductName>
+                    <ProductDetails>
+                      Condition: {order.items?.[0]?.condition || 'N/A'}
+                      {order.items?.length > 1 && ` +${order.items.length - 1} more`}
+                    </ProductDetails>
+                  </ProductInfo>
+                </OrderCell>
 
-              <OrderCell>
-                <Amount>{formatCurrency(order.totalAmount)}</Amount>
-              </OrderCell>
+                <OrderCell>
+                  <Amount>{formatCurrency(order.totalAmount)}</Amount>
+                </OrderCell>
 
-              <OrderCell>
-                <OrderStatus status={order.status}>
-                  {getStatusIcon(order.status)}
-                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                </OrderStatus>
-              </OrderCell>
+                <OrderCell>
+                  <OrderStatus status={order.status}>
+                    {getStatusIcon(order.status)}
+                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                  </OrderStatus>
+                </OrderCell>
 
-              <OrderCell className="hide-mobile">
-                {formatDate(order.createdAt)}
-              </OrderCell>
+                <OrderCell className="hide-mobile">{formatDate(order.createdAt)}</OrderCell>
 
-              <OrderCell>
-                <OrderActions>
-                  <QuickAction title="View Details">
-                    <Eye size={16} />
-                  </QuickAction>
-                  <QuickAction title="Edit Order">
-                    <Edit size={16} />
-                  </QuickAction>
-                  <QuickAction title="More Actions">
-                    <MoreHorizontal size={16} />
-                  </QuickAction>
-                </OrderActions>
-              </OrderCell>
-            </OrderRow>
-          ))}
+                <OrderCell>
+                  <OrderActions>
+                    <QuickAction title="View Details">
+                      <Eye size={16} />
+                    </QuickAction>
+                    <QuickAction title="Edit Order">
+                      <Edit size={16} />
+                    </QuickAction>
+                    <QuickAction title="More Actions">
+                      <MoreHorizontal size={16} />
+                    </QuickAction>
+                  </OrderActions>
+                </OrderCell>
+              </OrderRow>
+            ))}
         </TableBody>
 
         {/* Pagination */}
         {!loading && paginatedOrders.length > 0 && (
           <Pagination>
             <PaginationInfo>
-              Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, filteredAndSortedOrders.length)} of {filteredAndSortedOrders.length} orders
+              Showing {(currentPage - 1) * pageSize + 1} to{' '}
+              {Math.min(currentPage * pageSize, filteredAndSortedOrders.length)} of{' '}
+              {filteredAndSortedOrders.length} orders
             </PaginationInfo>
-            
+
             <PaginationControls>
-              <PaginationButton
-                onClick={() => setCurrentPage(1)}
-                disabled={currentPage === 1}
-              >
+              <PaginationButton onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
                 <ChevronsLeft size={16} />
               </PaginationButton>
-              
+
               <PaginationButton
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 1}
               >
                 <ChevronLeft size={16} />
               </PaginationButton>
-              
+
               <span style={{ padding: '0 1rem', fontSize: '0.875rem' }}>
                 Page {currentPage} of {totalPages}
               </span>
-              
+
               <PaginationButton
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
                 <ChevronRight size={16} />
               </PaginationButton>
-              
+
               <PaginationButton
                 onClick={() => setCurrentPage(totalPages)}
                 disabled={currentPage === totalPages}

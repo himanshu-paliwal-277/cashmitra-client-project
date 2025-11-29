@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { DollarSign, Plus, Search, Filter, Eye, Edit, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import {
+  DollarSign,
+  Plus,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Trash2,
+  TrendingUp,
+  TrendingDown,
+} from 'lucide-react';
 
 const Container = styled.div`
   padding: 2rem;
@@ -38,7 +48,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
@@ -61,14 +71,14 @@ const TabsList = styled.div`
 const Tab = styled.button`
   flex: 1;
   padding: 1rem 1.5rem;
-  background: ${props => props.active ? '#f9fafb' : 'white'};
+  background: ${props => (props.active ? '#f9fafb' : 'white')};
   border: none;
-  border-bottom: 2px solid ${props => props.active ? '#8b5cf6' : 'transparent'};
-  font-weight: ${props => props.active ? '600' : '500'};
-  color: ${props => props.active ? '#8b5cf6' : '#6b7280'};
+  border-bottom: 2px solid ${props => (props.active ? '#8b5cf6' : 'transparent')};
+  font-weight: ${props => (props.active ? '600' : '500')};
+  color: ${props => (props.active ? '#8b5cf6' : '#6b7280')};
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f9fafb;
   }
@@ -93,7 +103,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #8b5cf6;
@@ -111,7 +121,7 @@ const FilterButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #e5e7eb;
   }
@@ -129,7 +139,7 @@ const PricingCard = styled.div`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -156,7 +166,7 @@ const PriceChange = styled.div`
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: ${props => props.positive ? '#10b981' : '#ef4444'};
+  color: ${props => (props.positive ? '#10b981' : '#ef4444')};
 `;
 
 const PriceDetails = styled.div`
@@ -192,8 +202,8 @@ const ActionButtons = styled.div`
 
 const IconButton = styled.button`
   flex: 1;
-  background: ${props => props.primary ? '#8b5cf6' : '#f3f4f6'};
-  color: ${props => props.primary ? 'white' : '#6b7280'};
+  background: ${props => (props.primary ? '#8b5cf6' : '#f3f4f6')};
+  color: ${props => (props.primary ? 'white' : '#6b7280')};
   border: none;
   padding: 0.75rem;
   border-radius: 0.375rem;
@@ -205,10 +215,10 @@ const IconButton = styled.button`
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s;
-  
+
   &:hover {
-    background: ${props => props.primary ? '#7c3aed' : '#e5e7eb'};
-    color: ${props => props.primary ? 'white' : '#374151'};
+    background: ${props => (props.primary ? '#7c3aed' : '#e5e7eb')};
+    color: ${props => (props.primary ? 'white' : '#374151')};
   }
 `;
 
@@ -230,7 +240,7 @@ const TableHeader = styled.thead`
 
 const TableRow = styled.tr`
   border-bottom: 1px solid #e5e7eb;
-  
+
   &:hover {
     background: #f9fafb;
   }
@@ -326,7 +336,7 @@ const Pricing = () => {
         adjustedAt: '2024-01-14 15:45',
       },
     ];
-    
+
     setTimeout(() => {
       setPriceData(mockPriceData);
       setAdjustments(mockAdjustments);
@@ -334,9 +344,10 @@ const Pricing = () => {
     }, 1000);
   }, []);
 
-  const filteredPriceData = priceData.filter(item =>
-    item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.brand.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPriceData = priceData.filter(
+    item =>
+      item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.brand.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredAdjustments = adjustments.filter(item =>
@@ -358,16 +369,10 @@ const Pricing = () => {
 
       <TabsContainer>
         <TabsList>
-          <Tab 
-            active={activeTab === 'price-table'} 
-            onClick={() => setActiveTab('price-table')}
-          >
+          <Tab active={activeTab === 'price-table'} onClick={() => setActiveTab('price-table')}>
             Price Table
           </Tab>
-          <Tab 
-            active={activeTab === 'adjustments'} 
-            onClick={() => setActiveTab('adjustments')}
-          >
+          <Tab active={activeTab === 'adjustments'} onClick={() => setActiveTab('adjustments')}>
             Condition Adjustments
           </Tab>
         </TabsList>
@@ -378,7 +383,7 @@ const Pricing = () => {
               type="text"
               placeholder="Search by product or brand..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
             <FilterButton>
               <Filter size={16} />
@@ -390,7 +395,7 @@ const Pricing = () => {
             <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
           ) : activeTab === 'price-table' ? (
             <PricingGrid>
-              {filteredPriceData.map((item) => (
+              {filteredPriceData.map(item => (
                 <PricingCard key={item.id}>
                   <ProductHeader>
                     <ProductName>{item.product}</ProductName>
@@ -399,7 +404,7 @@ const Pricing = () => {
                       {Math.abs(item.change)}%
                     </PriceChange>
                   </ProductHeader>
-                  
+
                   <PriceDetails>
                     <PriceRow>
                       <ConditionLabel>Excellent</ConditionLabel>
@@ -418,11 +423,11 @@ const Pricing = () => {
                       <PriceValue>₹{item.prices.poor.toLocaleString()}</PriceValue>
                     </PriceRow>
                   </PriceDetails>
-                  
+
                   <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1rem' }}>
                     Last updated: {item.lastUpdated}
                   </div>
-                  
+
                   <ActionButtons>
                     <IconButton primary>
                       <Edit size={16} />
@@ -459,7 +464,7 @@ const Pricing = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredAdjustments.map((adjustment) => (
+                    filteredAdjustments.map(adjustment => (
                       <TableRow key={adjustment.id}>
                         <TableCell>{adjustment.product}</TableCell>
                         <TableCell>{adjustment.condition}</TableCell>

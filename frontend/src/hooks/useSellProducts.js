@@ -17,7 +17,7 @@ const useSellProducts = () => {
     page: 1,
     limit: 10,
     total: 0,
-    totalPages: 0
+    totalPages: 0,
   });
 
   // Fetch all products (pagination removed)
@@ -28,13 +28,13 @@ const useSellProducts = () => {
       const token = localStorage.getItem('adminToken');
       // Remove page and limit from query params since pagination is removed
       const queryParams = new URLSearchParams({
-        ...filters
+        ...filters,
       });
 
       const response = await api.get(`/sell-products?${queryParams}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       // Handle the new simple array response format
@@ -44,7 +44,7 @@ const useSellProducts = () => {
         page: 1,
         limit: response.data.data?.length || 0,
         total: response.data.data?.length || 0,
-        totalPages: 1
+        totalPages: 1,
       });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch products');
@@ -54,15 +54,15 @@ const useSellProducts = () => {
   }, []);
 
   // Fetch single product by ID
-  const fetchProduct = useCallback(async (productId) => {
+  const fetchProduct = useCallback(async productId => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-products/${productId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       return response.data;
     } catch (err) {
@@ -74,85 +74,94 @@ const useSellProducts = () => {
   }, []);
 
   // Create new product
-  const createProduct = useCallback(async (productData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.post('/sell-products', productData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh products list
-      await fetchProducts();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create product');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchProducts]);
+  const createProduct = useCallback(
+    async productData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.post('/sell-products', productData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh products list
+        await fetchProducts();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create product');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchProducts]
+  );
 
   // Update product
-  const updateProduct = useCallback(async (productId, productData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put(`/sell-products/${productId}`, productData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh products list
-      await fetchProducts();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update product');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchProducts]);
+  const updateProduct = useCallback(
+    async (productId, productData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put(`/sell-products/${productId}`, productData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh products list
+        await fetchProducts();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update product');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchProducts]
+  );
 
   // Delete product
-  const deleteProduct = useCallback(async (productId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      await api.delete(`/sell-products/${productId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      // Refresh products list
-      await fetchProducts();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete product');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchProducts]);
+  const deleteProduct = useCallback(
+    async productId => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        await api.delete(`/sell-products/${productId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Refresh products list
+        await fetchProducts();
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete product');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchProducts]
+  );
 
   // Fetch variants for a product
-  const fetchVariants = useCallback(async (productId) => {
+  const fetchVariants = useCallback(async productId => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-products/${productId}/variants`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setVariants(response.data.variants || []);
       return response.data.variants || [];
@@ -165,74 +174,87 @@ const useSellProducts = () => {
   }, []);
 
   // Create variant
-  const createVariant = useCallback(async (productId, variantData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.post(`/sell-products/${productId}/variants`, variantData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh variants list
-      await fetchVariants(productId);
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create variant');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchVariants]);
+  const createVariant = useCallback(
+    async (productId, variantData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.post(`/sell-products/${productId}/variants`, variantData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh variants list
+        await fetchVariants(productId);
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create variant');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchVariants]
+  );
 
   // Update variant
-  const updateVariant = useCallback(async (productId, variantId, variantData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put(`/sell-products/${productId}/variants/${variantId}`, variantData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh variants list
-      await fetchVariants(productId);
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update variant');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchVariants]);
+  const updateVariant = useCallback(
+    async (productId, variantId, variantData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put(
+          `/sell-products/${productId}/variants/${variantId}`,
+          variantData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        // Refresh variants list
+        await fetchVariants(productId);
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update variant');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchVariants]
+  );
 
   // Delete variant
-  const deleteVariant = useCallback(async (productId, variantId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      await api.delete(`/sell-products/${productId}/variants/${variantId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      // Refresh variants list
-      await fetchVariants(productId);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete variant');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchVariants]);
+  const deleteVariant = useCallback(
+    async (productId, variantId) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        await api.delete(`/sell-products/${productId}/variants/${variantId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Refresh variants list
+        await fetchVariants(productId);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete variant');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchVariants]
+  );
 
   // Public methods for customer access
   const getPublicProducts = useCallback(async (filters = {}) => {
@@ -250,7 +272,7 @@ const useSellProducts = () => {
     }
   }, []);
 
-  const getPublicProduct = useCallback(async (productId) => {
+  const getPublicProduct = useCallback(async productId => {
     setLoading(true);
     setError(null);
     try {
@@ -298,7 +320,7 @@ const useSellProducts = () => {
     getPublicProduct,
 
     // Utilities
-    clearError
+    clearError,
   };
 };
 

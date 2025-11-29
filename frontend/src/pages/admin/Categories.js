@@ -13,7 +13,7 @@ import {
   ChevronRight,
   ChevronDown,
   Folder,
-  FolderOpen
+  FolderOpen,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -53,7 +53,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -79,7 +79,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -97,11 +97,11 @@ const CategoriesContainer = styled.div`
 const CategoryItem = styled.div`
   border-bottom: 1px solid #e5e7eb;
   transition: all 0.2s;
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   &:hover {
     background-color: #f9fafb;
   }
@@ -147,8 +147,8 @@ const StatusBadge = styled.span`
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: ${props => props.active ? '#dcfce7' : '#fee2e2'};
-  color: ${props => props.active ? '#166534' : '#dc2626'};
+  background: ${props => (props.active ? '#dcfce7' : '#fee2e2')};
+  color: ${props => (props.active ? '#166534' : '#dc2626')};
 `;
 
 const ActionButtons = styled.div`
@@ -157,7 +157,7 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${props => props.primary ? '#3b82f6' : props.danger ? '#ef4444' : '#6b7280'};
+  background: ${props => (props.primary ? '#3b82f6' : props.danger ? '#ef4444' : '#6b7280')};
   color: white;
   border: none;
   padding: 0.5rem;
@@ -166,7 +166,7 @@ const IconButton = styled.button`
   display: flex;
   align-items: center;
   transition: all 0.2s;
-  
+
   &:hover {
     opacity: 0.9;
     transform: scale(1.05);
@@ -223,7 +223,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  
+
   &:hover {
     background: #f3f4f6;
   }
@@ -246,7 +246,7 @@ const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -262,7 +262,7 @@ const TextArea = styled.textarea`
   font-size: 0.875rem;
   min-height: 100px;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -277,7 +277,7 @@ const Select = styled.select`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   background: white;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -298,12 +298,15 @@ const Button = styled.button`
   cursor: pointer;
   transition: all 0.2s;
   border: none;
-  
-  ${props => props.variant === 'primary' ? `
+
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: #3b82f6;
     color: white;
     &:hover { background: #2563eb; }
-  ` : `
+  `
+      : `
     background: #f3f4f6;
     color: #374151;
     &:hover { background: #e5e7eb; }
@@ -317,9 +320,9 @@ const Categories = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState(new Set());
-  
+
   const [formData, setFormData] = useState({
-    name: ''
+    name: '',
   });
 
   const {
@@ -329,7 +332,7 @@ const Categories = () => {
     addCategory,
     editCategory,
     removeCategory,
-    fetchCategories
+    fetchCategories,
   } = useAdminCategories();
 
   useEffect(() => {
@@ -337,7 +340,7 @@ const Categories = () => {
     setLoading(hookLoading);
   }, [hookCategories, hookLoading]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     try {
       if (editingCategory) {
@@ -345,7 +348,7 @@ const Categories = () => {
       } else {
         await addCategory(formData);
       }
-      
+
       setShowModal(false);
       setEditingCategory(null);
       resetForm();
@@ -354,8 +357,12 @@ const Categories = () => {
     }
   };
 
-  const handleDelete = async (categoryId) => {
-    if (window.confirm('Are you sure you want to delete this category? This will also delete all subcategories.')) {
+  const handleDelete = async categoryId => {
+    if (
+      window.confirm(
+        'Are you sure you want to delete this category? This will also delete all subcategories.'
+      )
+    ) {
       try {
         await removeCategory(categoryId);
       } catch (error) {
@@ -364,21 +371,21 @@ const Categories = () => {
     }
   };
 
-  const handleEdit = (category) => {
+  const handleEdit = category => {
     setEditingCategory(category);
     setFormData({
-      name: category.name || ''
+      name: category.name || '',
     });
     setShowModal(true);
   };
 
   const resetForm = () => {
     setFormData({
-      name: ''
+      name: '',
     });
   };
 
-  const toggleExpanded = (categoryId) => {
+  const toggleExpanded = categoryId => {
     const newExpanded = new Set(expandedCategories);
     if (newExpanded.has(categoryId)) {
       newExpanded.delete(categoryId);
@@ -403,35 +410,48 @@ const Categories = () => {
       <React.Fragment key={category._id}>
         <CategoryItem>
           <CategoryHeader>
-            <div style={{ marginLeft: `${level * 1.5}rem`, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div
+              style={{
+                marginLeft: `${level * 1.5}rem`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
               {hasChildren && (
                 <CategoryIcon onClick={() => toggleExpanded(category._id)}>
                   {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                 </CategoryIcon>
               )}
               <CategoryIcon>
-                {hasChildren ? (isExpanded ? <FolderOpen size={16} /> : <Folder size={16} />) : <Folder size={16} />}
+                {hasChildren ? (
+                  isExpanded ? (
+                    <FolderOpen size={16} />
+                  ) : (
+                    <Folder size={16} />
+                  )
+                ) : (
+                  <Folder size={16} />
+                )}
               </CategoryIcon>
             </div>
-            
+
             <CategoryInfo>
               <CategoryName>
                 {category.name}
-                {level > 0 && <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>(Subcategory)</span>}
+                {level > 0 && (
+                  <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>(Subcategory)</span>
+                )}
               </CategoryName>
-              
-              <CategoryDetail>
-                {category.description || 'No description'}
-              </CategoryDetail>
-              
-              <CategoryDetail>
-                Products: {category.productCount || 0}
-              </CategoryDetail>
-              
+
+              <CategoryDetail>{category.description || 'No description'}</CategoryDetail>
+
+              <CategoryDetail>Products: {category.productCount || 0}</CategoryDetail>
+
               <StatusBadge active={category.isActive !== false}>
                 {category.isActive !== false ? 'Active' : 'Inactive'}
               </StatusBadge>
-              
+
               <ActionButtons>
                 <IconButton primary onClick={() => handleEdit(category)}>
                   <Edit size={14} />
@@ -443,11 +463,9 @@ const Categories = () => {
             </CategoryInfo>
           </CategoryHeader>
         </CategoryItem>
-        
+
         {hasChildren && isExpanded && (
-          <SubCategories>
-            {children.map(child => renderCategory(child, level + 1))}
-          </SubCategories>
+          <SubCategories>{children.map(child => renderCategory(child, level + 1))}</SubCategories>
         )}
       </React.Fragment>
     );
@@ -455,8 +473,10 @@ const Categories = () => {
 
   const filteredCategories = categories.filter(category => {
     if (!searchTerm) return !category.parentCategory; // Show only root categories when no search
-    return category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           category.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    return (
+      category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   });
 
   const rootCategories = searchTerm ? filteredCategories : buildCategoryTree(categories);
@@ -479,7 +499,12 @@ const Categories = () => {
           <FolderTree size={32} />
           Categories Management
         </Title>
-        <ActionButton onClick={() => { resetForm(); setShowModal(true); }}>
+        <ActionButton
+          onClick={() => {
+            resetForm();
+            setShowModal(true);
+          }}
+        >
           <Plus size={20} />
           Add Category
         </ActionButton>
@@ -490,7 +515,7 @@ const Categories = () => {
           type="text"
           placeholder="Search categories by name or description..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
       </FilterSection>
 
@@ -511,27 +536,36 @@ const Categories = () => {
         <Modal>
           <ModalContent>
             <ModalHeader>
-              <ModalTitle>
-                {editingCategory ? 'Edit Category' : 'Add New Category'}
-              </ModalTitle>
-              <CloseButton onClick={() => { setShowModal(false); setEditingCategory(null); }}>
+              <ModalTitle>{editingCategory ? 'Edit Category' : 'Add New Category'}</ModalTitle>
+              <CloseButton
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingCategory(null);
+                }}
+              >
                 <X size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             <form onSubmit={handleSubmit}>
               <FormGroup>
                 <Label>Category Name *</Label>
                 <Input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
               </FormGroup>
-              
+
               <ModalActions>
-                <Button type="button" onClick={() => { setShowModal(false); setEditingCategory(null); }}>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingCategory(null);
+                  }}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" variant="primary">

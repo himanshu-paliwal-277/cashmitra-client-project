@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Trash2,
   Plus,
@@ -16,18 +16,18 @@ import {
   MapPin,
   CheckCircle,
   Plus as PlusIcon,
-} from "lucide-react";
+} from 'lucide-react';
 
-import Button from "../../components/ui/Button";
-import Card from "../../components/ui/Card";
-import Input from "../../components/ui/Input";
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+import Input from '../../components/ui/Input';
 
-import { useCart } from "../../contexts/CartContext";
-import { useAuth } from "../../contexts/AuthContext";
-import useUserAddresses from "../../hooks/useUserAddresses";
-import api from "../../services/api";
+import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
+import useUserAddresses from '../../hooks/useUserAddresses';
+import api from '../../services/api';
 
-import "./cart.css";
+import './cart.css';
 
 const Cart = ({ onBack }) => {
   const navigate = useNavigate();
@@ -46,17 +46,13 @@ const Cart = ({ onBack }) => {
   } = useCart();
 
   // ------- Promo (unchanged UI) -------
-  const [promoCode, setPromoCode] = useState("");
+  const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState(null);
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
   const [localError, setLocalError] = useState(null);
 
   // ------- Addresses like Checkout -------
-  const {
-    addresses = [],
-    loading: addressLoading,
-    addAddress,
-  } = useUserAddresses();
+  const { addresses = [], loading: addressLoading, addAddress } = useUserAddresses();
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const openAddressModal = () => setShowAddressForm(true);
@@ -64,40 +60,40 @@ const Cart = ({ onBack }) => {
 
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress) {
-      const def = addresses.find((a) => a.isDefault) || addresses[0];
+      const def = addresses.find(a => a.isDefault) || addresses[0];
       setSelectedAddress(def._id || def.id);
     }
   }, [addresses, selectedAddress]);
 
   const [addrForm, setAddrForm] = useState({
-    title: "",
-    fullName: "",
-    phone: "",
-    email: "",
-    addressType: "home",
-    street: "",
-    addressLine2: "",
-    city: "",
-    state: "",
-    pincode: "",
+    title: '',
+    fullName: '',
+    phone: '',
+    email: '',
+    addressType: 'home',
+    street: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    pincode: '',
     isDefault: false,
   });
-  const handleAddr = (k, v) => setAddrForm((p) => ({ ...p, [k]: v }));
+  const handleAddr = (k, v) => setAddrForm(p => ({ ...p, [k]: v }));
 
-  const handleSaveAddress = async (e) => {
+  const handleSaveAddress = async e => {
     e?.preventDefault?.();
     await addAddress(addrForm);
     setAddrForm({
-      title: "",
-      fullName: "",
-      phone: "",
-      email: "",
-      addressType: "home",
-      street: "",
-      addressLine2: "",
-      city: "",
-      state: "",
-      pincode: "",
+      title: '',
+      fullName: '',
+      phone: '',
+      email: '',
+      addressType: 'home',
+      street: '',
+      addressLine2: '',
+      city: '',
+      state: '',
+      pincode: '',
       isDefault: false,
     });
     closeAddressModal();
@@ -108,7 +104,7 @@ const Cart = ({ onBack }) => {
     if (user && cartItems && cartItems.length > 0) {
       syncWithServer();
     }
-  }, [user,]);
+  }, [user]);
 
   // ------- Quantity / remove -------
   const handleQuantityChange = async (id, q) => {
@@ -117,30 +113,30 @@ const Cart = ({ onBack }) => {
       setLocalError(null);
       await updateQuantity(id, q);
     } catch {
-      setLocalError("Failed to update quantity. Please try again.");
+      setLocalError('Failed to update quantity. Please try again.');
     }
   };
-  const handleRemoveItem = async (id) => {
+  const handleRemoveItem = async id => {
     try {
       setLocalError(null);
       await removeFromCart(id);
     } catch {
-      setLocalError("Failed to remove item. Please try again.");
+      setLocalError('Failed to remove item. Please try again.');
     }
   };
-  const moveToWishlist = (id) => handleRemoveItem(id);
+  const moveToWishlist = id => handleRemoveItem(id);
 
   // ------- Promo UI logic (unchanged) -------
   const applyPromoCode = async () => {
     setIsApplyingPromo(true);
     setLocalError(null);
     try {
-      await new Promise((r) => setTimeout(r, 900));
-      if (promoCode.toLowerCase() === "save10") {
-        setAppliedPromo({ code: "SAVE10", discount: 10 });
-        setPromoCode("");
+      await new Promise(r => setTimeout(r, 900));
+      if (promoCode.toLowerCase() === 'save10') {
+        setAppliedPromo({ code: 'SAVE10', discount: 10 });
+        setPromoCode('');
       } else {
-        setLocalError("Invalid promo code. Please try again.");
+        setLocalError('Invalid promo code. Please try again.');
       }
     } finally {
       setIsApplyingPromo(false);
@@ -151,36 +147,32 @@ const Cart = ({ onBack }) => {
   // ------- Price calc (as before) -------
   const subtotal = getCartTotal();
   const originalTotal = (cartItems || []).reduce(
-    (sum, item) => sum + ((item.originalPrice || item.price) * item.quantity),
+    (sum, item) => sum + (item.originalPrice || item.price) * item.quantity,
     0
   );
   const savings = Math.max(originalTotal - subtotal, 0);
-  const promoDiscount = appliedPromo
-    ? Math.round((subtotal * appliedPromo.discount) / 100)
-    : 0;
+  const promoDiscount = appliedPromo ? Math.round((subtotal * appliedPromo.discount) / 100) : 0;
   const shipping = subtotal > 50000 ? 0 : 500;
   const total = subtotal - promoDiscount + shipping;
 
   const features = [
-    { icon: Shield, text: "32 Points Quality Checks" },
-    { icon: RotateCcw, text: "15 Days Refund*" },
-    { icon: Truck, text: "Upto 12 Months Warranty*" },
+    { icon: Shield, text: '32 Points Quality Checks' },
+    { icon: RotateCcw, text: '15 Days Refund*' },
+    { icon: Truck, text: 'Upto 12 Months Warranty*' },
   ];
 
   // ------- helpers for Place Order (same as Checkout) -------
-  const formatPhone = (p) => {
-    if (!p) return "";
-    const d = p.replace(/\D/g, "");
-    if (d.startsWith("91") && d.length === 12) return d.substring(2);
+  const formatPhone = p => {
+    if (!p) return '';
+    const d = p.replace(/\D/g, '');
+    if (d.startsWith('91') && d.length === 12) return d.substring(2);
     if (d.length > 10) return d.slice(-10);
     return d;
   };
 
   const sortedCart = useMemo(() => {
     const arr = Array.isArray(cartItems) ? cartItems : [];
-    return [...arr].sort(
-      (a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0)
-    );
+    return [...arr].sort((a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
   }, [cartItems]);
 
   const [placing, setPlacing] = useState(false);
@@ -188,29 +180,25 @@ const Cart = ({ onBack }) => {
     try {
       setPlacing(true);
 
-      const selectedAddr = addresses.find(
-        (a) => (a._id || a.id) === selectedAddress
-      );
-      if (!selectedAddr) throw new Error("Please select a delivery address");
+      const selectedAddr = addresses.find(a => (a._id || a.id) === selectedAddress);
+      if (!selectedAddr) throw new Error('Please select a delivery address');
 
       // Robust cart extraction (same safety as in Checkout)
       let processed = cartItems;
-      if (!Array.isArray(cartItems) && cartItems && typeof cartItems === "object") {
+      if (!Array.isArray(cartItems) && cartItems && typeof cartItems === 'object') {
         const keys = Object.keys(cartItems);
-        if (keys.length && keys.every((k) => !isNaN(k))) {
+        if (keys.length && keys.every(k => !isNaN(k))) {
           processed = Object.values(cartItems);
         }
       }
       if (!Array.isArray(processed) || processed.length === 0) {
-        throw new Error("Cart is empty or invalid");
+        throw new Error('Cart is empty or invalid');
       }
 
-      const items = processed.map((it) => {
+      const items = processed.map(it => {
         const inventoryId = it.inventoryId || it.productId;
         if (!inventoryId)
-          throw new Error(
-            `Invalid item: missing inventoryId for ${it.name || "unknown"}`
-          );
+          throw new Error(`Invalid item: missing inventoryId for ${it.name || 'unknown'}`);
         return { inventoryId, quantity: parseInt(it.quantity) || 1 };
       });
 
@@ -223,20 +211,20 @@ const Cart = ({ onBack }) => {
           pincode: selectedAddr.pincode,
           phone: formatPhone(selectedAddr.phone),
         },
-        paymentMethod: "card", // or capture choice later on Checkout
+        paymentMethod: 'card', // or capture choice later on Checkout
       };
 
-      const resp = await api.post("/sales/orders", orderData);
+      const resp = await api.post('/sales/orders', orderData);
 
       if (resp.data?.success) {
         setOrderData(resp.data.data.order);
         await clearCart();
-        navigate("/buy/order-confirmation", {
+        navigate('/buy/order-confirmation', {
           state: { orderData: resp.data.data.order },
         });
       }
     } catch (e) {
-      alert(e.message || "Failed to place order. Please try again.");
+      alert(e.message || 'Failed to place order. Please try again.');
     } finally {
       setPlacing(false);
     }
@@ -278,9 +266,7 @@ const Cart = ({ onBack }) => {
   }
 
   // ------- Main UI -------
-  const activeAddress = addresses.find(
-    (a) => (a._id || a.id) === selectedAddress
-  );
+  const activeAddress = addresses.find(a => (a._id || a.id) === selectedAddress);
 
   return (
     <div className="cart-page">
@@ -315,24 +301,22 @@ const Cart = ({ onBack }) => {
               </div>
               <div className="addr-strip__text">
                 <div className="addr-strip__title">
-                  Delivers to{" "}
+                  Delivers to{' '}
                   <b>
                     {activeAddress?.addressType
                       ? activeAddress.addressType[0].toUpperCase() +
                         activeAddress.addressType.slice(1)
-                      : "Address"}
+                      : 'Address'}
                   </b>
                 </div>
                 <div className="addr-strip__line">
                   {addressLoading
-                    ? "Loading address…"
+                    ? 'Loading address…'
                     : activeAddress
-                    ? `${activeAddress.street}${
-                        activeAddress.addressLine2 ? `, ${activeAddress.addressLine2}` : ""
-                      }, ${activeAddress.city}, ${activeAddress.state}, ${
-                        activeAddress.pincode
-                      }`
-                    : "No address selected"}
+                      ? `${activeAddress.street}${
+                          activeAddress.addressLine2 ? `, ${activeAddress.addressLine2}` : ''
+                        }, ${activeAddress.city}, ${activeAddress.state}, ${activeAddress.pincode}`
+                      : 'No address selected'}
                 </div>
               </div>
             </div>
@@ -347,7 +331,7 @@ const Cart = ({ onBack }) => {
           <div className="cart-grid">
             {/* LEFT: items */}
             <div className="cart-items">
-              {sortedCart.map((item) => {
+              {sortedCart.map(item => {
                 const id = item.inventoryId || item.productId || item.id;
                 return (
                   <Card className="item-card" key={id}>
@@ -362,33 +346,25 @@ const Cart = ({ onBack }) => {
                       <div className="item__img">
                         <img src={item.image} alt={item.name || item.title} />
                         <div className="assured">
-                          <span className="assured__dot">ⓒ</span> CASHIFY{" "}
-                          <b>ASSURED</b>
+                          <span className="assured__dot">ⓒ</span> CASHIFY <b>ASSURED</b>
                         </div>
                       </div>
 
                       <div className="item__info">
                         <div className="cond-chip">
-                          {item.condition?.label || item.badge || "Good"}
+                          {item.condition?.label || item.badge || 'Good'}
                         </div>
 
                         <h3 className="item__title">{item.name || item.title}</h3>
                         <div className="item__sub">
-                          {item.brand && item.model
-                            ? `${item.brand} • ${item.model}`
-                            : item.specs}
+                          {item.brand && item.model ? `${item.brand} • ${item.model}` : item.specs}
                         </div>
 
                         <div className="price-row">
-                          <div className="price-now">
-                            ₹{(item.price || 0).toLocaleString()}
-                          </div>
-                          {item.originalPrice &&
-                            item.originalPrice !== item.price && (
-                              <div className="price-mrp">
-                                ₹{item.originalPrice.toLocaleString()}
-                              </div>
-                            )}
+                          <div className="price-now">₹{(item.price || 0).toLocaleString()}</div>
+                          {item.originalPrice && item.originalPrice !== item.price && (
+                            <div className="price-mrp">₹{item.originalPrice.toLocaleString()}</div>
+                          )}
                         </div>
 
                         <div className="subtle-row">
@@ -402,9 +378,7 @@ const Cart = ({ onBack }) => {
                             <button
                               className="qty__btn"
                               disabled={item.quantity <= 1}
-                              onClick={() =>
-                                handleQuantityChange(id, item.quantity - 1)
-                              }
+                              onClick={() => handleQuantityChange(id, item.quantity - 1)}
                             >
                               <Minus size={14} />
                             </button>
@@ -412,18 +386,13 @@ const Cart = ({ onBack }) => {
                               className="qty__input"
                               type="number"
                               value={item.quantity}
-                              onChange={(e) =>
-                                handleQuantityChange(
-                                  id,
-                                  parseInt(e.target.value) || 1
-                                )
+                              onChange={e =>
+                                handleQuantityChange(id, parseInt(e.target.value) || 1)
                               }
                             />
                             <button
                               className="qty__btn"
-                              onClick={() =>
-                                handleQuantityChange(id, item.quantity + 1)
-                              }
+                              onClick={() => handleQuantityChange(id, item.quantity + 1)}
                             >
                               <Plus size={14} />
                             </button>
@@ -456,9 +425,7 @@ const Cart = ({ onBack }) => {
                           <button
                             className="qty__btn"
                             disabled={item.quantity <= 1}
-                            onClick={() =>
-                              handleQuantityChange(id, item.quantity - 1)
-                            }
+                            onClick={() => handleQuantityChange(id, item.quantity - 1)}
                           >
                             <Minus size={14} />
                           </button>
@@ -466,18 +433,11 @@ const Cart = ({ onBack }) => {
                             className="qty__input"
                             type="number"
                             value={item.quantity}
-                            onChange={(e) =>
-                              handleQuantityChange(
-                                id,
-                                parseInt(e.target.value) || 1
-                              )
-                            }
+                            onChange={e => handleQuantityChange(id, parseInt(e.target.value) || 1)}
                           />
                           <button
                             className="qty__btn"
-                            onClick={() =>
-                              handleQuantityChange(id, item.quantity + 1)
-                            }
+                            onClick={() => handleQuantityChange(id, item.quantity + 1)}
                           >
                             <Plus size={14} />
                           </button>
@@ -533,7 +493,7 @@ const Cart = ({ onBack }) => {
                       type="text"
                       placeholder="Enter coupon"
                       value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value)}
+                      onChange={e => setPromoCode(e.target.value)}
                       size="sm"
                     />
                     <Button
@@ -543,7 +503,7 @@ const Cart = ({ onBack }) => {
                       disabled={!promoCode.trim() || isApplyingPromo}
                       loading={isApplyingPromo}
                     >
-                      {isApplyingPromo ? "Applying..." : "Apply"}
+                      {isApplyingPromo ? 'Applying...' : 'Apply'}
                     </Button>
                   </div>
                 )}
@@ -563,15 +523,13 @@ const Cart = ({ onBack }) => {
                 {appliedPromo && (
                   <div className="row">
                     <span>Coupon ({appliedPromo.code})</span>
-                    <span className="green">
-                      -₹{promoDiscount.toLocaleString()}
-                    </span>
+                    <span className="green">-₹{promoDiscount.toLocaleString()}</span>
                   </div>
                 )}
 
                 <div className="row">
                   <span>Delivery Charges</span>
-                  <span>{shipping === 0 ? "Free" : `₹${shipping}`}</span>
+                  <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
                 </div>
 
                 <div className="row total">
@@ -592,7 +550,7 @@ const Cart = ({ onBack }) => {
                 onClick={handlePlaceOrder}
                 disabled={placing || !activeAddress}
               >
-                {placing ? "Placing…" : "Place Order"}
+                {placing ? 'Placing…' : 'Place Order'}
                 {!placing && <ArrowRight size={18} />}
               </Button>
 
@@ -613,8 +571,7 @@ const Cart = ({ onBack }) => {
               </div>
 
               <div className="payment-safe">
-                <span className="shield">🛡️</span> Your payment is 100% safe
-                with us
+                <span className="shield">🛡️</span> Your payment is 100% safe with us
               </div>
             </Card>
           </div>
@@ -624,7 +581,7 @@ const Cart = ({ onBack }) => {
       {/* ADD ADDRESS MODAL (same look/fields as your Checkout) */}
       {showAddressForm && (
         <div className="addr-modal-overlay" onClick={closeAddressModal}>
-          <div className="addr-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="addr-modal" onClick={e => e.stopPropagation()}>
             <div className="addr-modal-head">
               <h3>Add New Address</h3>
               <button className="addr-close" onClick={closeAddressModal}>
@@ -651,7 +608,7 @@ const Cart = ({ onBack }) => {
                     required
                     placeholder="e.g., Home, Office"
                     value={addrForm.title}
-                    onChange={(e) => handleAddr("title", e.target.value)}
+                    onChange={e => handleAddr('title', e.target.value)}
                   />
                 </div>
 
@@ -665,7 +622,7 @@ const Cart = ({ onBack }) => {
                       required
                       placeholder="Enter full name"
                       value={addrForm.fullName}
-                      onChange={(e) => handleAddr("fullName", e.target.value)}
+                      onChange={e => handleAddr('fullName', e.target.value)}
                     />
                   </div>
 
@@ -677,9 +634,7 @@ const Cart = ({ onBack }) => {
                       className="select"
                       required
                       value={addrForm.addressType}
-                      onChange={(e) =>
-                        handleAddr("addressType", e.target.value)
-                      }
+                      onChange={e => handleAddr('addressType', e.target.value)}
                     >
                       <option value="home">🏠 Home</option>
                       <option value="work">🏢 Work</option>
@@ -710,7 +665,7 @@ const Cart = ({ onBack }) => {
                       pattern="[0-9]{10}"
                       placeholder="10-digit mobile"
                       value={addrForm.phone}
-                      onChange={(e) => handleAddr("phone", e.target.value)}
+                      onChange={e => handleAddr('phone', e.target.value)}
                     />
                   </div>
 
@@ -721,7 +676,7 @@ const Cart = ({ onBack }) => {
                       type="email"
                       placeholder="(optional)"
                       value={addrForm.email}
-                      onChange={(e) => handleAddr("email", e.target.value)}
+                      onChange={e => handleAddr('email', e.target.value)}
                     />
                   </div>
                 </div>
@@ -745,7 +700,7 @@ const Cart = ({ onBack }) => {
                     required
                     placeholder="House/Flat, Building, Street"
                     value={addrForm.street}
-                    onChange={(e) => handleAddr("street", e.target.value)}
+                    onChange={e => handleAddr('street', e.target.value)}
                   />
                 </div>
 
@@ -755,9 +710,7 @@ const Cart = ({ onBack }) => {
                     className="input"
                     placeholder="Area / Landmark (optional)"
                     value={addrForm.addressLine2}
-                    onChange={(e) =>
-                      handleAddr("addressLine2", e.target.value)
-                    }
+                    onChange={e => handleAddr('addressLine2', e.target.value)}
                   />
                 </div>
 
@@ -770,7 +723,7 @@ const Cart = ({ onBack }) => {
                       className="input"
                       required
                       value={addrForm.city}
-                      onChange={(e) => handleAddr("city", e.target.value)}
+                      onChange={e => handleAddr('city', e.target.value)}
                     />
                   </div>
 
@@ -782,7 +735,7 @@ const Cart = ({ onBack }) => {
                       className="input"
                       required
                       value={addrForm.state}
-                      onChange={(e) => handleAddr("state", e.target.value)}
+                      onChange={e => handleAddr('state', e.target.value)}
                     />
                   </div>
                 </div>
@@ -797,7 +750,7 @@ const Cart = ({ onBack }) => {
                     pattern="[0-9]{6}"
                     maxLength={6}
                     value={addrForm.pincode}
-                    onChange={(e) => handleAddr("pincode", e.target.value)}
+                    onChange={e => handleAddr('pincode', e.target.value)}
                     placeholder="6-digit pincode"
                   />
                 </div>
@@ -809,7 +762,7 @@ const Cart = ({ onBack }) => {
                   className="checkbox"
                   type="checkbox"
                   checked={addrForm.isDefault}
-                  onChange={(e) => handleAddr("isDefault", e.target.checked)}
+                  onChange={e => handleAddr('isDefault', e.target.checked)}
                 />
                 <label htmlFor="isDefault" className="checkbox-label">
                   Set as default address
@@ -817,11 +770,7 @@ const Cart = ({ onBack }) => {
               </div>
 
               <div className="addr-actions">
-                <button
-                  type="button"
-                  className="btn ghost"
-                  onClick={closeAddressModal}
-                >
+                <button type="button" className="btn ghost" onClick={closeAddressModal}>
                   Cancel
                 </button>
                 <button type="submit" className="btn primary">

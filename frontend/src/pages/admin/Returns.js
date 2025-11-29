@@ -20,7 +20,7 @@ import {
   Filter,
   Download,
   MessageSquare,
-  X
+  X,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -60,7 +60,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -86,7 +86,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -101,7 +101,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -182,11 +182,11 @@ const ReturnRow = styled.div`
   border-bottom: 1px solid #e5e7eb;
   align-items: center;
   transition: all 0.2s;
-  
+
   &:hover {
     background-color: #f9fafb;
   }
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -251,7 +251,7 @@ const StatusBadge = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  
+
   ${props => {
     switch (props.status) {
       case 'requested':
@@ -280,7 +280,16 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${props => props.primary ? '#3b82f6' : props.danger ? '#ef4444' : props.success ? '#10b981' : props.warning ? '#f59e0b' : '#6b7280'};
+  background: ${props =>
+    props.primary
+      ? '#3b82f6'
+      : props.danger
+        ? '#ef4444'
+        : props.success
+          ? '#10b981'
+          : props.warning
+            ? '#f59e0b'
+            : '#6b7280'};
   color: white;
   border: none;
   padding: 0.5rem;
@@ -289,12 +298,12 @@ const IconButton = styled.button`
   display: flex;
   align-items: center;
   transition: all 0.2s;
-  
+
   &:hover {
     opacity: 0.9;
     transform: scale(1.05);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -347,7 +356,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  
+
   &:hover {
     background: #f3f4f6;
   }
@@ -392,7 +401,7 @@ const TimelineContainer = styled.div`
 const TimelineItem = styled.div`
   position: relative;
   padding-bottom: 1.5rem;
-  
+
   &:before {
     content: '';
     position: absolute;
@@ -402,7 +411,7 @@ const TimelineItem = styled.div`
     height: calc(100% - 0.5rem);
     background: #e5e7eb;
   }
-  
+
   &:last-child:before {
     display: none;
   }
@@ -468,7 +477,7 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   ${props => {
     switch (props.variant) {
       case 'success':
@@ -483,7 +492,7 @@ const Button = styled.button`
         return 'background: #f3f4f6; color: #374151; &:hover { background: #e5e7eb; }';
     }
   }}
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -503,7 +512,7 @@ const Returns = () => {
     requested: 0,
     approved: 0,
     completed: 0,
-    rejected: 0
+    rejected: 0,
   });
 
   const {
@@ -511,7 +520,7 @@ const Returns = () => {
     stats: hookStats,
     loading: hookLoading,
     error: hookError,
-    updateReturnStatus
+    updateReturnStatus,
   } = useAdminReturns();
 
   useEffect(() => {
@@ -535,12 +544,12 @@ const Returns = () => {
     }
   };
 
-  const handleViewDetails = (returnItem) => {
+  const handleViewDetails = returnItem => {
     setSelectedReturn(returnItem);
     setShowDetailModal(true);
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'requested':
         return <Clock size={12} />;
@@ -561,7 +570,7 @@ const Returns = () => {
     }
   };
 
-  const getTimelineColor = (status) => {
+  const getTimelineColor = status => {
     switch (status) {
       case 'requested':
         return '#f59e0b';
@@ -584,29 +593,30 @@ const Returns = () => {
 
   const canUpdateStatus = (currentStatus, newStatus) => {
     const statusFlow = {
-      'requested': ['approved', 'rejected'],
-      'approved': ['picked_up', 'cancelled'],
-      'picked_up': ['inspecting', 'cancelled'],
-      'inspecting': ['completed', 'rejected'],
-      'completed': [],
-      'rejected': [],
-      'cancelled': []
+      requested: ['approved', 'rejected'],
+      approved: ['picked_up', 'cancelled'],
+      picked_up: ['inspecting', 'cancelled'],
+      inspecting: ['completed', 'rejected'],
+      completed: [],
+      rejected: [],
+      cancelled: [],
     };
-    
+
     return statusFlow[currentStatus]?.includes(newStatus) || false;
   };
 
   const filteredReturns = returns.filter(returnItem => {
-    const matchesSearch = returnItem.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         returnItem.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         returnItem.product?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch =
+      returnItem.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      returnItem.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      returnItem.product?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesStatus = !statusFilter || returnItem.status === statusFilter;
-    
-    const matchesDate = !dateFilter || (
-      new Date(returnItem.createdAt).toDateString() === new Date(dateFilter).toDateString()
-    );
-    
+
+    const matchesDate =
+      !dateFilter ||
+      new Date(returnItem.createdAt).toDateString() === new Date(dateFilter).toDateString();
+
     return matchesSearch && matchesStatus && matchesDate;
   });
 
@@ -644,7 +654,7 @@ const Returns = () => {
             <StatLabel>Total Returns</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#f59e0b">
             <Clock size={24} />
@@ -654,7 +664,7 @@ const Returns = () => {
             <StatLabel>Pending Approval</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#3b82f6">
             <CheckCircle size={24} />
@@ -664,7 +674,7 @@ const Returns = () => {
             <StatLabel>Approved</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#10b981">
             <CheckCircle size={24} />
@@ -681,13 +691,10 @@ const Returns = () => {
           type="text"
           placeholder="Search by order ID, customer, or product..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
-        
-        <FilterSelect
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
+
+        <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="">All Status</option>
           <option value="requested">Requested</option>
           <option value="approved">Approved</option>
@@ -697,17 +704,17 @@ const Returns = () => {
           <option value="rejected">Rejected</option>
           <option value="cancelled">Cancelled</option>
         </FilterSelect>
-        
+
         <input
           type="date"
           value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
+          onChange={e => setDateFilter(e.target.value)}
           style={{
             padding: '0.75rem 1rem',
             border: '1px solid #d1d5db',
             borderRadius: '0.5rem',
             fontSize: '0.875rem',
-            background: 'white'
+            background: 'white',
           }}
         />
       </FilterSection>
@@ -723,74 +730,89 @@ const Returns = () => {
             <div>Status</div>
             <div>Actions</div>
           </TableHeader>
-          
+
           {filteredReturns.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <RotateCcw size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
               <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
-                {searchTerm || statusFilter || dateFilter ? 'No returns match your filters' : 'No returns found'}
+                {searchTerm || statusFilter || dateFilter
+                  ? 'No returns match your filters'
+                  : 'No returns found'}
               </p>
             </div>
           ) : (
-            filteredReturns.map((returnItem) => (
+            filteredReturns.map(returnItem => (
               <ReturnRow key={returnItem._id}>
                 <OrderInfo>
                   <OrderId>#{returnItem.orderId}</OrderId>
-                  <OrderDate>
-                    {new Date(returnItem.createdAt).toLocaleDateString()}
-                  </OrderDate>
+                  <OrderDate>{new Date(returnItem.createdAt).toLocaleDateString()}</OrderDate>
                 </OrderInfo>
-                
+
                 <CustomerInfo>
                   <CustomerName>{returnItem.customer?.name || 'N/A'}</CustomerName>
-                  <CustomerContact>{returnItem.customer?.phone || returnItem.customer?.email || 'N/A'}</CustomerContact>
+                  <CustomerContact>
+                    {returnItem.customer?.phone || returnItem.customer?.email || 'N/A'}
+                  </CustomerContact>
                 </CustomerInfo>
-                
+
                 <ProductInfo>
                   <ProductName>{returnItem.product?.name || 'N/A'}</ProductName>
                   <ProductDetails>
                     {returnItem.product?.brand} • {returnItem.product?.model}
                   </ProductDetails>
                 </ProductInfo>
-                
+
                 <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
                   {returnItem.reason || 'Not specified'}
                 </div>
-                
+
                 <div style={{ color: '#059669', fontSize: '0.875rem', fontWeight: '600' }}>
                   ₹{(returnItem.refundAmount || 0).toLocaleString()}
                 </div>
-                
+
                 <StatusBadge status={returnItem.status}>
                   {getStatusIcon(returnItem.status)}
-                  {returnItem.status?.charAt(0)?.toUpperCase() + returnItem.status?.slice(1) || 'Requested'}
+                  {returnItem.status?.charAt(0)?.toUpperCase() + returnItem.status?.slice(1) ||
+                    'Requested'}
                 </StatusBadge>
-                
+
                 <ActionButtons>
                   <IconButton primary onClick={() => handleViewDetails(returnItem)}>
                     <Eye size={14} />
                   </IconButton>
-                  
+
                   {canUpdateStatus(returnItem.status, 'approved') && (
-                    <IconButton success onClick={() => handleStatusUpdate(returnItem._id, 'approved')}>
+                    <IconButton
+                      success
+                      onClick={() => handleStatusUpdate(returnItem._id, 'approved')}
+                    >
                       <CheckCircle size={14} />
                     </IconButton>
                   )}
-                  
+
                   {canUpdateStatus(returnItem.status, 'rejected') && (
-                    <IconButton danger onClick={() => handleStatusUpdate(returnItem._id, 'rejected')}>
+                    <IconButton
+                      danger
+                      onClick={() => handleStatusUpdate(returnItem._id, 'rejected')}
+                    >
                       <XCircle size={14} />
                     </IconButton>
                   )}
-                  
+
                   {canUpdateStatus(returnItem.status, 'picked_up') && (
-                    <IconButton warning onClick={() => handleStatusUpdate(returnItem._id, 'picked_up')}>
+                    <IconButton
+                      warning
+                      onClick={() => handleStatusUpdate(returnItem._id, 'picked_up')}
+                    >
                       <Truck size={14} />
                     </IconButton>
                   )}
-                  
+
                   {canUpdateStatus(returnItem.status, 'completed') && (
-                    <IconButton success onClick={() => handleStatusUpdate(returnItem._id, 'completed')}>
+                    <IconButton
+                      success
+                      onClick={() => handleStatusUpdate(returnItem._id, 'completed')}
+                    >
                       <CheckCircle size={14} />
                     </IconButton>
                   )}
@@ -810,7 +832,7 @@ const Returns = () => {
                 <X size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             <DetailSection>
               <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Return Information</h3>
               <DetailGrid>
@@ -838,7 +860,7 @@ const Returns = () => {
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
-            
+
             <DetailSection>
               <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Customer Information</h3>
               <DetailGrid>
@@ -863,7 +885,7 @@ const Returns = () => {
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
-            
+
             <DetailSection>
               <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Product Information</h3>
               <DetailGrid>
@@ -886,7 +908,7 @@ const Returns = () => {
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
-            
+
             <DetailSection>
               <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Return Timeline</h3>
               <TimelineContainer>
@@ -898,45 +920,50 @@ const Returns = () => {
                       {new Date(selectedReturn.createdAt).toLocaleString()}
                     </TimelineDate>
                     <TimelineDescription>
-                      Customer initiated return request for {selectedReturn.reason || 'unspecified reason'}
+                      Customer initiated return request for{' '}
+                      {selectedReturn.reason || 'unspecified reason'}
                     </TimelineDescription>
                   </TimelineContent>
                 </TimelineItem>
-                
+
                 {selectedReturn.statusHistory?.map((history, index) => (
                   <TimelineItem key={index}>
                     <TimelineIcon color={getTimelineColor(history.status)} />
                     <TimelineContent>
                       <TimelineTitle>
-                        Status Updated to {history.status?.charAt(0)?.toUpperCase() + history.status?.slice(1)}
+                        Status Updated to{' '}
+                        {history.status?.charAt(0)?.toUpperCase() + history.status?.slice(1)}
                       </TimelineTitle>
-                      <TimelineDate>
-                        {new Date(history.updatedAt).toLocaleString()}
-                      </TimelineDate>
-                      {history.notes && (
-                        <TimelineDescription>{history.notes}</TimelineDescription>
-                      )}
+                      <TimelineDate>{new Date(history.updatedAt).toLocaleString()}</TimelineDate>
+                      {history.notes && <TimelineDescription>{history.notes}</TimelineDescription>}
                     </TimelineContent>
                   </TimelineItem>
                 ))}
               </TimelineContainer>
             </DetailSection>
-            
+
             {selectedReturn.notes && (
               <DetailSection>
                 <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Additional Notes</h3>
-                <div style={{ padding: '1rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#374151' }}>
+                <div
+                  style={{
+                    padding: '1rem',
+                    background: '#f9fafb',
+                    borderRadius: '0.5rem',
+                    color: '#374151',
+                  }}
+                >
                   {selectedReturn.notes}
                 </div>
               </DetailSection>
             )}
-            
+
             <ActionSection>
               <h4 style={{ marginBottom: '1rem', color: '#374151' }}>Quick Actions</h4>
               <ActionButtons2>
                 {canUpdateStatus(selectedReturn.status, 'approved') && (
-                  <Button 
-                    variant="success" 
+                  <Button
+                    variant="success"
                     onClick={() => {
                       handleStatusUpdate(selectedReturn._id, 'approved');
                       setShowDetailModal(false);
@@ -946,10 +973,10 @@ const Returns = () => {
                     Approve Return
                   </Button>
                 )}
-                
+
                 {canUpdateStatus(selectedReturn.status, 'picked_up') && (
-                  <Button 
-                    variant="warning" 
+                  <Button
+                    variant="warning"
                     onClick={() => {
                       handleStatusUpdate(selectedReturn._id, 'picked_up');
                       setShowDetailModal(false);
@@ -959,10 +986,10 @@ const Returns = () => {
                     Mark as Picked Up
                   </Button>
                 )}
-                
+
                 {canUpdateStatus(selectedReturn.status, 'inspecting') && (
-                  <Button 
-                    variant="warning" 
+                  <Button
+                    variant="warning"
                     onClick={() => {
                       handleStatusUpdate(selectedReturn._id, 'inspecting');
                       setShowDetailModal(false);
@@ -972,10 +999,10 @@ const Returns = () => {
                     Start Inspection
                   </Button>
                 )}
-                
+
                 {canUpdateStatus(selectedReturn.status, 'completed') && (
-                  <Button 
-                    variant="success" 
+                  <Button
+                    variant="success"
                     onClick={() => {
                       handleStatusUpdate(selectedReturn._id, 'completed');
                       setShowDetailModal(false);
@@ -985,10 +1012,10 @@ const Returns = () => {
                     Complete Return
                   </Button>
                 )}
-                
+
                 {canUpdateStatus(selectedReturn.status, 'rejected') && (
-                  <Button 
-                    variant="danger" 
+                  <Button
+                    variant="danger"
                     onClick={() => {
                       const reason = prompt('Please provide a reason for rejection:');
                       if (reason) {
@@ -1001,10 +1028,10 @@ const Returns = () => {
                     Reject Return
                   </Button>
                 )}
-                
+
                 {canUpdateStatus(selectedReturn.status, 'cancelled') && (
-                  <Button 
-                    variant="danger" 
+                  <Button
+                    variant="danger"
                     onClick={() => {
                       handleStatusUpdate(selectedReturn._id, 'cancelled');
                       setShowDetailModal(false);

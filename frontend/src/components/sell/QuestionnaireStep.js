@@ -19,7 +19,7 @@ import {
   Loader,
   X,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -84,25 +84,32 @@ const QuestionCard = styled.div`
   overflow: hidden;
   transition: all ${theme.transitions.duration.normal};
 
-  ${props => props.isAnswered && `
+  ${props =>
+    props.isAnswered &&
+    `
     border-color: ${theme.colors.accent.main};
     box-shadow: 0 0 0 1px ${theme.colors.accent.main}20;
   `}
 
-  ${props => props.isRequired && !props.isAnswered && `
+  ${props =>
+    props.isRequired &&
+    !props.isAnswered &&
+    `
     border-color: ${theme.colors.error.main};
   `}
 `;
 
 const QuestionHeader = styled.div`
   padding: ${theme.spacing[5]};
-  cursor: ${props => props.expandable ? 'pointer' : 'default'};
+  cursor: ${props => (props.expandable ? 'pointer' : 'default')};
   display: flex;
   align-items: flex-start;
   gap: ${theme.spacing[3]};
   transition: background-color ${theme.transitions.duration.normal};
 
-  ${props => props.expandable && `
+  ${props =>
+    props.expandable &&
+    `
     &:hover {
       background: ${theme.colors.grey[50]};
     }
@@ -117,7 +124,7 @@ const QuestionIcon = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  
+
   ${props => {
     if (props.isAnswered) {
       return `
@@ -188,8 +195,10 @@ const ExpandToggle = styled.div`
   height: 24px;
   color: ${theme.colors.text.secondary};
   transition: transform ${theme.transitions.duration.normal};
-  
-  ${props => props.expanded && `
+
+  ${props =>
+    props.expanded &&
+    `
     transform: rotate(180deg);
   `}
 `;
@@ -203,7 +212,7 @@ const OptionsGrid = styled.div`
   display: grid;
   gap: ${theme.spacing[3]};
   margin-top: ${theme.spacing[4]};
-  
+
   ${props => {
     const optionsCount = props.optionsCount || 0;
     if (optionsCount <= 2) {
@@ -231,21 +240,23 @@ const OptionCard = styled.div`
   align-items: center;
   gap: ${theme.spacing[3]};
 
-  ${props => props.selected && `
+  ${props =>
+    props.selected &&
+    `
     border-color: ${theme.colors.accent.main};
     background: ${theme.colors.accent[50]};
   `}
 
   &:hover {
     border-color: ${theme.colors.accent.main};
-    background: ${props => props.selected ? theme.colors.accent[50] : theme.colors.accent[25]};
+    background: ${props => (props.selected ? theme.colors.accent[50] : theme.colors.accent[25])};
   }
 `;
 
 const OptionRadio = styled.div`
   width: 20px;
   height: 20px;
-  border: 2px solid ${props => props.selected ? theme.colors.accent.main : theme.colors.grey[300]};
+  border: 2px solid ${props => (props.selected ? theme.colors.accent.main : theme.colors.grey[300])};
   border-radius: ${theme.borderRadius.full};
   display: flex;
   align-items: center;
@@ -253,7 +264,9 @@ const OptionRadio = styled.div`
   flex-shrink: 0;
   transition: all ${theme.transitions.duration.normal};
 
-  ${props => props.selected && `
+  ${props =>
+    props.selected &&
+    `
     &::after {
       content: '';
       width: 8px;
@@ -286,18 +299,26 @@ const OptionImpact = styled.div`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
   background: ${props => {
     switch (props.impact) {
-      case 'positive': return theme.colors.accent[50];
-      case 'negative': return theme.colors.error[50];
-      case 'neutral': return theme.colors.grey[50];
-      default: return theme.colors.grey[50];
+      case 'positive':
+        return theme.colors.accent[50];
+      case 'negative':
+        return theme.colors.error[50];
+      case 'neutral':
+        return theme.colors.grey[50];
+      default:
+        return theme.colors.grey[50];
     }
   }};
   color: ${props => {
     switch (props.impact) {
-      case 'positive': return theme.colors.accent.main;
-      case 'negative': return theme.colors.error.main;
-      case 'neutral': return theme.colors.text.secondary;
-      default: return theme.colors.text.secondary;
+      case 'positive':
+        return theme.colors.accent.main;
+      case 'negative':
+        return theme.colors.error.main;
+      case 'neutral':
+        return theme.colors.text.secondary;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
   border-radius: ${theme.borderRadius.sm};
@@ -317,7 +338,7 @@ const NavigationButtons = styled.div`
 
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -326,10 +347,11 @@ const NavigationButtons = styled.div`
 
 const NavButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[6]};
-  border: ${props => props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
+  border: ${props =>
+    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.variant === 'primary' ? theme.colors.primary.main : 'white'};
-  color: ${props => props.variant === 'primary' ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.variant === 'primary' ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.variant === 'primary' ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.base};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -343,7 +365,8 @@ const NavButton = styled.button`
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.md};
-    background: ${props => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -409,7 +432,7 @@ const ErrorState = styled.div`
 
 const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
   const { sellQuestions } = hooks;
-  
+
   const [answers, setAnswers] = useState(sessionData.answers || {});
   const [expandedQuestions, setExpandedQuestions] = useState(new Set());
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -419,7 +442,7 @@ const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
   useEffect(() => {
     if (sessionData.selectedProduct) {
       sellQuestions.fetchPublicQuestions({
-        productId: sessionData.selectedProduct
+        productId: sessionData.selectedProduct,
       });
     }
   }, [sessionData.selectedProduct]);
@@ -438,12 +461,13 @@ const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
   const requiredQuestions = questions.filter(q => q.required);
   const requiredAnsweredCount = requiredQuestions.filter(q => answers[q._id]).length;
   const progress = questions.length > 0 ? (answeredCount / questions.length) * 100 : 0;
-  const canProceed = requiredQuestions.length === 0 || requiredAnsweredCount === requiredQuestions.length;
+  const canProceed =
+    requiredQuestions.length === 0 || requiredAnsweredCount === requiredQuestions.length;
 
   const handleAnswerSelect = (questionId, optionId) => {
     const newAnswers = {
       ...answers,
-      [questionId]: optionId
+      [questionId]: optionId,
     };
     setAnswers(newAnswers);
 
@@ -455,7 +479,7 @@ const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
     }
   };
 
-  const toggleQuestionExpansion = (questionId) => {
+  const toggleQuestionExpansion = questionId => {
     const newExpanded = new Set(expandedQuestions);
     if (newExpanded.has(questionId)) {
       newExpanded.delete(questionId);
@@ -471,17 +495,20 @@ const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
     }
   };
 
-  const getOptionImpact = (option) => {
+  const getOptionImpact = option => {
     if (option.priceImpact > 0) return 'positive';
     if (option.priceImpact < 0) return 'negative';
     return 'neutral';
   };
 
-  const getImpactIcon = (impact) => {
+  const getImpactIcon = impact => {
     switch (impact) {
-      case 'positive': return Star;
-      case 'negative': return AlertCircle;
-      default: return Info;
+      case 'positive':
+        return Star;
+      case 'negative':
+        return AlertCircle;
+      default:
+        return Info;
     }
   };
 
@@ -513,9 +540,7 @@ const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
           <CheckCircle size={32} />
         </CompletionIcon>
         <CompletionTitle>No Questions Required</CompletionTitle>
-        <CompletionText>
-          Great! No additional questions are needed for this device.
-        </CompletionText>
+        <CompletionText>Great! No additional questions are needed for this device.</CompletionText>
         <NavButton variant="primary" onClick={() => onComplete({ answers: {} })}>
           Continue
           <ArrowRight size={16} />
@@ -533,7 +558,8 @@ const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
         <CompletionTitle>Questions Completed!</CompletionTitle>
         <CompletionText>
           You've answered {answeredCount} of {questions.length} questions.
-          {requiredQuestions.length > 0 && ` All ${requiredQuestions.length} required questions are complete.`}
+          {requiredQuestions.length > 0 &&
+            ` All ${requiredQuestions.length} required questions are complete.`}
         </CompletionText>
         <NavButton variant="primary" onClick={handleComplete}>
           Continue to Next Step
@@ -555,7 +581,8 @@ const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
         </ProgressBar>
         <ProgressText>
           {answeredCount} of {questions.length} questions answered
-          {requiredQuestions.length > 0 && ` • ${requiredAnsweredCount}/${requiredQuestions.length} required`}
+          {requiredQuestions.length > 0 &&
+            ` • ${requiredAnsweredCount}/${requiredQuestions.length} required`}
         </ProgressText>
       </ProgressHeader>
 
@@ -566,34 +593,23 @@ const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
           const selectedOption = question.options?.find(opt => opt._id === answers[question._id]);
 
           return (
-            <QuestionCard
-              key={question._id}
-              isAnswered={isAnswered}
-              isRequired={question.required}
-            >
+            <QuestionCard key={question._id} isAnswered={isAnswered} isRequired={question.required}>
               <QuestionHeader
                 expandable={!isAnswered}
                 onClick={() => !isAnswered && toggleQuestionExpansion(question._id)}
               >
-                <QuestionIcon
-                  isAnswered={isAnswered}
-                  isRequired={question.required && !isAnswered}
-                >
+                <QuestionIcon isAnswered={isAnswered} isRequired={question.required && !isAnswered}>
                   {isAnswered ? <CheckCircle size={20} /> : <HelpCircle size={20} />}
                 </QuestionIcon>
 
                 <QuestionContent>
                   <QuestionTitle>
                     {question.text}
-                    {question.required && !isAnswered && (
-                      <RequiredBadge>Required</RequiredBadge>
-                    )}
+                    {question.required && !isAnswered && <RequiredBadge>Required</RequiredBadge>}
                   </QuestionTitle>
-                  
+
                   {question.description && (
-                    <QuestionDescription>
-                      {question.description}
-                    </QuestionDescription>
+                    <QuestionDescription>{question.description}</QuestionDescription>
                   )}
 
                   {isAnswered && selectedOption && (
@@ -626,13 +642,11 @@ const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
                           onClick={() => handleAnswerSelect(question._id, option._id)}
                         >
                           <OptionRadio selected={isSelected} />
-                          
+
                           <OptionContent>
                             <OptionTitle>{option.text}</OptionTitle>
                             {option.description && (
-                              <OptionDescription>
-                                {option.description}
-                              </OptionDescription>
+                              <OptionDescription>{option.description}</OptionDescription>
                             )}
                             {option.priceImpact !== 0 && (
                               <OptionImpact impact={impact}>
@@ -658,15 +672,19 @@ const QuestionnaireStep = ({ sessionData, onComplete, onError, hooks }) => {
           Review Answers
         </NavButton>
 
-        <div style={{ textAlign: 'center', color: theme.colors.text.secondary, fontSize: theme.typography.fontSize.sm }}>
-          {canProceed ? 'Ready to continue' : `${requiredQuestions.length - requiredAnsweredCount} required questions remaining`}
+        <div
+          style={{
+            textAlign: 'center',
+            color: theme.colors.text.secondary,
+            fontSize: theme.typography.fontSize.sm,
+          }}
+        >
+          {canProceed
+            ? 'Ready to continue'
+            : `${requiredQuestions.length - requiredAnsweredCount} required questions remaining`}
         </div>
 
-        <NavButton
-          variant="primary"
-          onClick={handleComplete}
-          disabled={!canProceed}
-        >
+        <NavButton variant="primary" onClick={handleComplete} disabled={!canProceed}>
           Continue
           <ArrowRight size={16} />
         </NavButton>

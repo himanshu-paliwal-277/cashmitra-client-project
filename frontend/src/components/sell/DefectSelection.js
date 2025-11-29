@@ -27,7 +27,7 @@ import {
   Volume2,
   Wifi,
   Camera,
-  Battery
+  Battery,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -143,8 +143,8 @@ const FilterButton = styled.button`
   padding: ${theme.spacing[2]} ${theme.spacing[4]};
   border: 1px solid ${theme.colors.grey[300]};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.active ? theme.colors.primary.main : 'white'};
-  color: ${props => props.active ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.active ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.active ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -155,7 +155,7 @@ const FilterButton = styled.button`
 
   &:hover {
     border-color: ${theme.colors.primary.main};
-    background: ${props => props.active ? theme.colors.primary[600] : theme.colors.primary[50]};
+    background: ${props => (props.active ? theme.colors.primary[600] : theme.colors.primary[50])};
   }
 `;
 
@@ -183,16 +183,16 @@ const CategoryTabs = styled.div`
   gap: ${theme.spacing[2]};
   overflow-x: auto;
   padding-bottom: ${theme.spacing[2]};
-  
+
   &::-webkit-scrollbar {
     height: 4px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: ${theme.colors.grey[100]};
     border-radius: ${theme.borderRadius.full};
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: ${theme.colors.grey[300]};
     border-radius: ${theme.borderRadius.full};
@@ -201,10 +201,10 @@ const CategoryTabs = styled.div`
 
 const CategoryTab = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: 1px solid ${props => props.active ? theme.colors.primary.main : theme.colors.grey[300]};
+  border: 1px solid ${props => (props.active ? theme.colors.primary.main : theme.colors.grey[300])};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.active ? theme.colors.primary[50] : 'white'};
-  color: ${props => props.active ? theme.colors.primary.main : theme.colors.text.primary};
+  background: ${props => (props.active ? theme.colors.primary[50] : 'white')};
+  color: ${props => (props.active ? theme.colors.primary.main : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -228,19 +228,21 @@ const DefectsGrid = styled.div`
 
 const DefectCard = styled.div`
   background: white;
-  border: 1px solid ${props => props.selected ? theme.colors.error.main : theme.colors.grey[200]};
+  border: 1px solid ${props => (props.selected ? theme.colors.error.main : theme.colors.grey[200])};
   border-radius: ${theme.borderRadius.lg};
   overflow: hidden;
   transition: all ${theme.transitions.duration.normal};
   cursor: pointer;
 
-  ${props => props.selected && `
+  ${props =>
+    props.selected &&
+    `
     background: ${theme.colors.error[50]};
     box-shadow: 0 0 0 1px ${theme.colors.error.main}20;
   `}
 
   &:hover {
-    border-color: ${props => props.selected ? theme.colors.error[600] : theme.colors.error.main};
+    border-color: ${props => (props.selected ? theme.colors.error[600] : theme.colors.error.main)};
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.md};
   }
@@ -261,8 +263,8 @@ const DefectIcon = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: ${props => props.selected ? theme.colors.error.main : theme.colors.grey[100]};
-  color: ${props => props.selected ? 'white' : theme.colors.text.secondary};
+  background: ${props => (props.selected ? theme.colors.error.main : theme.colors.grey[100])};
+  color: ${props => (props.selected ? 'white' : theme.colors.text.secondary)};
   transition: all ${theme.transitions.duration.normal};
 `;
 
@@ -290,20 +292,20 @@ const DefectImpact = styled.div`
   gap: ${theme.spacing[1]};
   font-size: ${theme.typography.fontSize.xs};
   font-weight: ${theme.typography.fontWeight.medium};
-  color: ${props => props.impact < 0 ? theme.colors.error.main : theme.colors.text.secondary};
+  color: ${props => (props.impact < 0 ? theme.colors.error.main : theme.colors.text.secondary)};
 `;
 
 const DefectCheckbox = styled.div`
   width: 20px;
   height: 20px;
-  border: 2px solid ${props => props.selected ? theme.colors.error.main : theme.colors.grey[300]};
+  border: 2px solid ${props => (props.selected ? theme.colors.error.main : theme.colors.grey[300])};
   border-radius: ${theme.borderRadius.sm};
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: all ${theme.transitions.duration.normal};
-  background: ${props => props.selected ? theme.colors.error.main : 'white'};
+  background: ${props => (props.selected ? theme.colors.error.main : 'white')};
   color: white;
 `;
 
@@ -314,18 +316,26 @@ const SeverityBadge = styled.div`
   font-weight: ${theme.typography.fontWeight.medium};
   background: ${props => {
     switch (props.severity) {
-      case 'critical': return theme.colors.error[50];
-      case 'major': return theme.colors.warning[50];
-      case 'minor': return theme.colors.grey[50];
-      default: return theme.colors.grey[50];
+      case 'critical':
+        return theme.colors.error[50];
+      case 'major':
+        return theme.colors.warning[50];
+      case 'minor':
+        return theme.colors.grey[50];
+      default:
+        return theme.colors.grey[50];
     }
   }};
   color: ${props => {
     switch (props.severity) {
-      case 'critical': return theme.colors.error.main;
-      case 'major': return theme.colors.warning.main;
-      case 'minor': return theme.colors.text.secondary;
-      default: return theme.colors.text.secondary;
+      case 'critical':
+        return theme.colors.error.main;
+      case 'major':
+        return theme.colors.warning.main;
+      case 'minor':
+        return theme.colors.text.secondary;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
 `;
@@ -339,7 +349,7 @@ const NavigationButtons = styled.div`
 
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -348,10 +358,11 @@ const NavigationButtons = styled.div`
 
 const NavButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[6]};
-  border: ${props => props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
+  border: ${props =>
+    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.variant === 'primary' ? theme.colors.primary.main : 'white'};
-  color: ${props => props.variant === 'primary' ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.variant === 'primary' ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.variant === 'primary' ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.base};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -365,7 +376,8 @@ const NavButton = styled.button`
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.md};
-    background: ${props => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -445,12 +457,12 @@ const CATEGORY_ICONS = {
   audio: Volume2,
   connectivity: Wifi,
   performance: Zap,
-  physical: AlertTriangle
+  physical: AlertTriangle,
 };
 
 const DefectSelection = ({ sessionData, onComplete, onError, hooks }) => {
   const { sellDefects } = hooks;
-  
+
   const [selectedDefects, setSelectedDefects] = useState(sessionData.selectedDefects || []);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -461,7 +473,7 @@ const DefectSelection = ({ sessionData, onComplete, onError, hooks }) => {
   useEffect(() => {
     if (sessionData.selectedProduct) {
       sellDefects.fetchPublicDefects({
-        productId: sessionData.selectedProduct
+        productId: sessionData.selectedProduct,
       });
     }
   }, [sessionData.selectedProduct]);
@@ -472,25 +484,24 @@ const DefectSelection = ({ sessionData, onComplete, onError, hooks }) => {
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(defect =>
-        defect.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        defect.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        defect.category?.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        defect =>
+          defect.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          defect.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          defect.category?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(defect => 
-        defect.category?.toLowerCase() === selectedCategory.toLowerCase()
+      filtered = filtered.filter(
+        defect => defect.category?.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
 
     // Filter by selection status
     if (showOnlySelected) {
-      filtered = filtered.filter(defect => 
-        selectedDefects.includes(defect._id)
-      );
+      filtered = filtered.filter(defect => selectedDefects.includes(defect._id));
     }
 
     // Sort defects
@@ -509,7 +520,14 @@ const DefectSelection = ({ sessionData, onComplete, onError, hooks }) => {
     });
 
     return filtered;
-  }, [sellDefects.publicDefects, searchTerm, selectedCategory, showOnlySelected, sortBy, selectedDefects]);
+  }, [
+    sellDefects.publicDefects,
+    searchTerm,
+    selectedCategory,
+    showOnlySelected,
+    sortBy,
+    selectedDefects,
+  ]);
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -530,7 +548,7 @@ const DefectSelection = ({ sessionData, onComplete, onError, hooks }) => {
     }, 0);
   }, [selectedDefects, sellDefects.publicDefects]);
 
-  const handleDefectToggle = (defectId) => {
+  const handleDefectToggle = defectId => {
     setSelectedDefects(prev => {
       if (prev.includes(defectId)) {
         return prev.filter(id => id !== defectId);
@@ -576,7 +594,8 @@ const DefectSelection = ({ sessionData, onComplete, onError, hooks }) => {
       <Header>
         <HeaderTitle>Check for Defects</HeaderTitle>
         <HeaderSubtitle>
-          Select any issues or defects with your device. Being honest helps us provide the most accurate valuation.
+          Select any issues or defects with your device. Being honest helps us provide the most
+          accurate valuation.
         </HeaderSubtitle>
         <SelectionSummary>
           <SummaryItem>
@@ -605,29 +624,20 @@ const DefectSelection = ({ sessionData, onComplete, onError, hooks }) => {
             type="text"
             placeholder="Search defects..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
         </SearchContainer>
 
         <FiltersContainer>
-          <FilterButton
-            active={sortBy === 'severity'}
-            onClick={() => setSortBy('severity')}
-          >
+          <FilterButton active={sortBy === 'severity'} onClick={() => setSortBy('severity')}>
             <AlertTriangle size={14} />
             Severity
           </FilterButton>
-          <FilterButton
-            active={sortBy === 'impact'}
-            onClick={() => setSortBy('impact')}
-          >
+          <FilterButton active={sortBy === 'impact'} onClick={() => setSortBy('impact')}>
             <Minus size={14} />
             Impact
           </FilterButton>
-          <FilterButton
-            active={sortBy === 'name'}
-            onClick={() => setSortBy('name')}
-          >
+          <FilterButton active={sortBy === 'name'} onClick={() => setSortBy('name')}>
             Name
           </FilterButton>
 
@@ -639,10 +649,7 @@ const DefectSelection = ({ sessionData, onComplete, onError, hooks }) => {
       </SearchAndFilters>
 
       <CategoryTabs>
-        <CategoryTab
-          active={selectedCategory === 'all'}
-          onClick={() => setSelectedCategory('all')}
-        >
+        <CategoryTab active={selectedCategory === 'all'} onClick={() => setSelectedCategory('all')}>
           All Categories
         </CategoryTab>
         {categories.map(category => {
@@ -707,13 +714,16 @@ const DefectSelection = ({ sessionData, onComplete, onError, hooks }) => {
 
                       <DefectContent>
                         <DefectTitle>{defect.name}</DefectTitle>
-                        <DefectDescription>
-                          {defect.description}
-                        </DefectDescription>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <DefectDescription>{defect.description}</DefectDescription>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
                           <DefectImpact impact={defect.priceImpact}>
-                            <Minus size={12} />
-                            ₹{Math.abs(defect.priceImpact || 0).toLocaleString()}
+                            <Minus size={12} />₹{Math.abs(defect.priceImpact || 0).toLocaleString()}
                           </DefectImpact>
                           <SeverityBadge severity={defect.severity}>
                             {defect.severity}
@@ -739,14 +749,19 @@ const DefectSelection = ({ sessionData, onComplete, onError, hooks }) => {
           Back
         </NavButton>
 
-        <div style={{ textAlign: 'center', color: theme.colors.text.secondary, fontSize: theme.typography.fontSize.sm }}>
-          {selectedDefects.length === 0 ? 'No defects selected' : `${selectedDefects.length} defects selected`}
+        <div
+          style={{
+            textAlign: 'center',
+            color: theme.colors.text.secondary,
+            fontSize: theme.typography.fontSize.sm,
+          }}
+        >
+          {selectedDefects.length === 0
+            ? 'No defects selected'
+            : `${selectedDefects.length} defects selected`}
         </div>
 
-        <NavButton
-          variant="primary"
-          onClick={handleComplete}
-        >
+        <NavButton variant="primary" onClick={handleComplete}>
           Continue
           <ArrowRight size={16} />
         </NavButton>

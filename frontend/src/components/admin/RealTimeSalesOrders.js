@@ -16,7 +16,7 @@ import {
   Phone,
   Calendar,
   DollarSign,
-  Package
+  Package,
 } from 'lucide-react';
 
 const OrdersContainer = styled.div`
@@ -87,9 +87,7 @@ const RealTimeSalesOrders = () => {
         <EmptyIcon>
           <ShoppingCart />
         </EmptyIcon>
-        <EmptyText>
-          {loading ? 'Loading sales orders...' : 'No sales orders available'}
-        </EmptyText>
+        <EmptyText>{loading ? 'Loading sales orders...' : 'No sales orders available'}</EmptyText>
       </EmptyState>
     </OrdersContainer>
   );

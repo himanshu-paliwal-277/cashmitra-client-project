@@ -36,7 +36,7 @@ import {
   ThumbsDown,
   MoreVertical,
   Copy,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -50,7 +50,7 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: ${theme.spacing[6]};
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: ${theme.spacing[4]};
@@ -71,7 +71,7 @@ const BackButton = styled.button`
   transition: all 0.2s ease;
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
-  
+
   &:hover {
     background: ${theme.colors.grey[50]};
   }
@@ -81,7 +81,7 @@ const HeaderActions = styled.div`
   display: flex;
   gap: ${theme.spacing[3]};
   align-items: center;
-  
+
   @media (max-width: 768px) {
     flex-wrap: wrap;
   }
@@ -94,45 +94,62 @@ const Button = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
   background-color: ${props => {
     switch (props.variant) {
-      case 'primary': return theme.colors.primary.main;
-      case 'danger': return theme.colors.error.main;
-      case 'success': return theme.colors.success.main;
-      default: return 'transparent';
+      case 'primary':
+        return theme.colors.primary.main;
+      case 'danger':
+        return theme.colors.error.main;
+      case 'success':
+        return theme.colors.success.main;
+      default:
+        return 'transparent';
     }
   }};
   color: ${props => {
     switch (props.variant) {
-      case 'primary': return theme.colors.white;
-      case 'danger': return theme.colors.white;
-      case 'success': return theme.colors.white;
-      default: return theme.colors.text.primary;
+      case 'primary':
+        return theme.colors.white;
+      case 'danger':
+        return theme.colors.white;
+      case 'success':
+        return theme.colors.white;
+      default:
+        return theme.colors.text.primary;
     }
   }};
-  border: 1px solid ${props => {
-    switch (props.variant) {
-      case 'primary': return theme.colors.primary.main;
-      case 'danger': return theme.colors.error.main;
-      case 'success': return theme.colors.success.main;
-      default: return theme.colors.border.primary;
-    }
-  }};
+  border: 1px solid
+    ${props => {
+      switch (props.variant) {
+        case 'primary':
+          return theme.colors.primary.main;
+        case 'danger':
+          return theme.colors.error.main;
+        case 'success':
+          return theme.colors.success.main;
+        default:
+          return theme.colors.border.primary;
+      }
+    }};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background-color: ${props => {
       switch (props.variant) {
-        case 'primary': return theme.colors.primary[600];
-        case 'danger': return theme.colors.error[600];
-        case 'success': return theme.colors.success[600];
-        default: return theme.colors.grey[50];
+        case 'primary':
+          return theme.colors.primary[600];
+        case 'danger':
+          return theme.colors.error[600];
+        case 'success':
+          return theme.colors.success[600];
+        default:
+          return theme.colors.grey[50];
       }
     }};
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -143,7 +160,7 @@ const MainContent = styled.div`
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: ${theme.spacing[6]};
-  
+
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
@@ -171,7 +188,7 @@ const MainImage = styled.div`
   align-items: center;
   justify-content: center;
   position: relative;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -184,7 +201,7 @@ const ImageNavigation = styled.div`
   top: 50%;
   transform: translateY(-50%);
   ${props => props.direction}: ${theme.spacing[4]};
-  
+
   button {
     width: 40px;
     height: 40px;
@@ -197,7 +214,7 @@ const ImageNavigation = styled.div`
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    
+
     &:hover {
       background: rgba(0, 0, 0, 0.7);
     }
@@ -218,16 +235,17 @@ const Thumbnail = styled.div`
   border-radius: ${theme.borderRadius.md};
   overflow: hidden;
   cursor: pointer;
-  border: 2px solid ${props => props.active ? theme.colors.primary.main : theme.colors.border.primary};
+  border: 2px solid
+    ${props => (props.active ? theme.colors.primary.main : theme.colors.border.primary)};
   transition: all 0.2s ease;
   flex-shrink: 0;
-  
+
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   &:hover {
     border-color: ${theme.colors.primary.main};
   }
@@ -305,14 +323,14 @@ const Discount = styled.span`
 
 const ProductDescription = styled.div`
   margin-bottom: ${theme.spacing[6]};
-  
+
   h3 {
     font-size: ${theme.typography.fontSize.lg};
     font-weight: ${theme.typography.fontWeight.semibold};
     color: ${theme.colors.text.primary};
     margin: 0 0 ${theme.spacing[3]} 0;
   }
-  
+
   p {
     color: ${theme.colors.text.secondary};
     line-height: 1.6;
@@ -379,18 +397,26 @@ const StatusBadge = styled.div`
   font-weight: ${theme.typography.fontWeight.medium};
   background: ${props => {
     switch (props.status) {
-      case 'active': return theme.colors.success[100];
-      case 'inactive': return theme.colors.error[100];
-      case 'draft': return theme.colors.warning[100];
-      default: return theme.colors.grey[100];
+      case 'active':
+        return theme.colors.success[100];
+      case 'inactive':
+        return theme.colors.error[100];
+      case 'draft':
+        return theme.colors.warning[100];
+      default:
+        return theme.colors.grey[100];
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'active': return theme.colors.success[700];
-      case 'inactive': return theme.colors.error[700];
-      case 'draft': return theme.colors.warning[700];
-      default: return theme.colors.grey[700];
+      case 'active':
+        return theme.colors.success[700];
+      case 'inactive':
+        return theme.colors.error[700];
+      case 'draft':
+        return theme.colors.warning[700];
+      default:
+        return theme.colors.grey[700];
     }
   }};
 `;
@@ -406,7 +432,7 @@ const InfoItem = styled.div`
   align-items: center;
   padding: ${theme.spacing[2]} 0;
   border-bottom: 1px solid ${theme.colors.border.primary};
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -438,10 +464,14 @@ const LoadingSpinner = styled.div`
   border-top: 3px solid ${theme.colors.primary.main};
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  
+
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -452,9 +482,11 @@ const Alert = styled.div`
   padding: ${theme.spacing[4]};
   border-radius: ${theme.borderRadius.md};
   margin-bottom: ${theme.spacing[4]};
-  background-color: ${props => props.type === 'error' ? theme.colors.error[50] : theme.colors.success[50]};
-  border: 1px solid ${props => props.type === 'error' ? theme.colors.error[200] : theme.colors.success[200]};
-  color: ${props => props.type === 'error' ? theme.colors.error[700] : theme.colors.success[700]};
+  background-color: ${props =>
+    props.type === 'error' ? theme.colors.error[50] : theme.colors.success[50]};
+  border: 1px solid
+    ${props => (props.type === 'error' ? theme.colors.error[200] : theme.colors.success[200])};
+  color: ${props => (props.type === 'error' ? theme.colors.error[700] : theme.colors.success[700])};
 `;
 
 const VariantSection = styled.div`
@@ -614,30 +646,34 @@ const ProductDetail = () => {
     }
   };
 
-  const formatPrice = (price) => {
+  const formatPrice = price => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      minimumFractionDigits: 0
+      minimumFractionDigits: 0,
     }).format(price);
   };
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     return new Date(date).toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
-      case 'active': return <CheckCircle size={16} />;
-      case 'inactive': return <AlertCircle size={16} />;
-      case 'draft': return <Clock size={16} />;
-      default: return <AlertCircle size={16} />;
+      case 'active':
+        return <CheckCircle size={16} />;
+      case 'inactive':
+        return <AlertCircle size={16} />;
+      case 'draft':
+        return <Clock size={16} />;
+      default:
+        return <AlertCircle size={16} />;
     }
   };
 
@@ -651,17 +687,13 @@ const ProductDetail = () => {
 
   const nextImage = () => {
     if (product?.images && product.images.length > 1) {
-      setCurrentImageIndex((prev) => 
-        prev === product.images.length - 1 ? 0 : prev + 1
-      );
+      setCurrentImageIndex(prev => (prev === product.images.length - 1 ? 0 : prev + 1));
     }
   };
 
   const prevImage = () => {
     if (product?.images && product.images.length > 1) {
-      setCurrentImageIndex((prev) => 
-        prev === 0 ? product.images.length - 1 : prev - 1
-      );
+      setCurrentImageIndex(prev => (prev === 0 ? product.images.length - 1 : prev - 1));
     }
   };
 
@@ -734,14 +766,11 @@ const ProductDetail = () => {
           <ImageGallery>
             <MainImage>
               {product.images && product.images.length > 0 ? (
-                <img 
-                  src={product.images[currentImageIndex]} 
-                  alt={product.name} 
-                />
+                <img src={product.images[currentImageIndex]} alt={product.name} />
               ) : (
                 <ImageIcon size={64} color={theme.colors.text.secondary} />
               )}
-              
+
               {product.images && product.images.length > 1 && (
                 <>
                   <ImageNavigation direction="left">
@@ -757,12 +786,12 @@ const ProductDetail = () => {
                 </>
               )}
             </MainImage>
-            
+
             {product.images && product.images.length > 1 && (
               <ImageThumbnails>
                 {product.images.map((image, index) => (
-                  <Thumbnail 
-                    key={index} 
+                  <Thumbnail
+                    key={index}
                     active={index === currentImageIndex}
                     onClick={() => setCurrentImageIndex(index)}
                   >
@@ -776,15 +805,17 @@ const ProductDetail = () => {
           <ProductInfo>
             <ProductHeader>
               <ProductBrand>{product.brand}</ProductBrand>
-              <ProductName>{product.series} {product.model}</ProductName>
-              
+              <ProductName>
+                {product.series} {product.model}
+              </ProductName>
+
               {product.rating && (
                 <ProductRating>
                   <Stars>
                     {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        size={16} 
+                      <Star
+                        key={i}
+                        size={16}
                         fill={i < Math.floor(product.rating) ? '#FFB800' : 'none'}
                         color="#FFB800"
                       />
@@ -795,15 +826,13 @@ const ProductDetail = () => {
                   </RatingText>
                 </ProductRating>
               )}
-              
+
               <ProductPrice>
                 <CurrentPrice>{formatPrice(product.basePrice)}</CurrentPrice>
                 {product.originalPrice && product.originalPrice > product.basePrice && (
                   <>
                     <OriginalPrice>{formatPrice(product.originalPrice)}</OriginalPrice>
-                    {discount > 0 && (
-                      <Discount>{discount}% OFF</Discount>
-                    )}
+                    {discount > 0 && <Discount>{discount}% OFF</Discount>}
                   </>
                 )}
               </ProductPrice>
@@ -825,12 +854,16 @@ const ProductDetail = () => {
 
             {product.depreciation && (
               <DepreciationSection>
-                <h3 style={{ 
-                  fontSize: theme.typography.fontSize.lg,
-                  fontWeight: theme.typography.fontWeight.semibold,
-                  color: theme.colors.text.primary,
-                  margin: `0 0 ${theme.spacing[4]} 0`
-                }}>Depreciation Information</h3>
+                <h3
+                  style={{
+                    fontSize: theme.typography.fontSize.lg,
+                    fontWeight: theme.typography.fontWeight.semibold,
+                    color: theme.colors.text.primary,
+                    margin: `0 0 ${theme.spacing[4]} 0`,
+                  }}
+                >
+                  Depreciation Information
+                </h3>
                 <DepreciationGrid>
                   <DepreciationCard>
                     <InfoItem>
@@ -850,12 +883,16 @@ const ProductDetail = () => {
 
             {product.conditionFactors && (
               <ConditionFactorsSection>
-                <h3 style={{ 
-                  fontSize: theme.typography.fontSize.lg,
-                  fontWeight: theme.typography.fontWeight.semibold,
-                  color: theme.colors.text.primary,
-                  margin: `0 0 ${theme.spacing[4]} 0`
-                }}>Condition Factors</h3>
+                <h3
+                  style={{
+                    fontSize: theme.typography.fontSize.lg,
+                    fontWeight: theme.typography.fontWeight.semibold,
+                    color: theme.colors.text.primary,
+                    margin: `0 0 ${theme.spacing[4]} 0`,
+                  }}
+                >
+                  Condition Factors
+                </h3>
                 {Object.entries(product.conditionFactors).map(([category, conditions]) => (
                   <ConditionCategory key={category}>
                     <ConditionTitle>{category.replace(/([A-Z])/g, ' $1')}</ConditionTitle>
@@ -881,16 +918,22 @@ const ProductDetail = () => {
 
             {product.specifications && Object.keys(product.specifications).length > 0 && (
               <div>
-                <h3 style={{ 
-                  fontSize: theme.typography.fontSize.lg,
-                  fontWeight: theme.typography.fontWeight.semibold,
-                  color: theme.colors.text.primary,
-                  margin: `0 0 ${theme.spacing[4]} 0`
-                }}>Specifications</h3>
+                <h3
+                  style={{
+                    fontSize: theme.typography.fontSize.lg,
+                    fontWeight: theme.typography.fontWeight.semibold,
+                    color: theme.colors.text.primary,
+                    margin: `0 0 ${theme.spacing[4]} 0`,
+                  }}
+                >
+                  Specifications
+                </h3>
                 <SpecificationsGrid>
                   {Object.entries(product.specifications).map(([key, value]) => (
                     <SpecItem key={key}>
-                      <SpecLabel>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</SpecLabel>
+                      <SpecLabel>
+                        {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                      </SpecLabel>
                       <SpecValue>{value}</SpecValue>
                     </SpecItem>
                   ))}
@@ -902,94 +945,96 @@ const ProductDetail = () => {
 
         <Sidebar>
           <SidebarCard>
-              <SidebarTitle>
-                <Package size={20} />
-                Product Status
-              </SidebarTitle>
-              <StatusBadge status={product.isActive ? 'active' : 'inactive'}>
-                {getStatusIcon(product.isActive ? 'active' : 'inactive')}
-                {product.isActive ? 'Active' : 'Inactive'}
-              </StatusBadge>
-            </SidebarCard>
+            <SidebarTitle>
+              <Package size={20} />
+              Product Status
+            </SidebarTitle>
+            <StatusBadge status={product.isActive ? 'active' : 'inactive'}>
+              {getStatusIcon(product.isActive ? 'active' : 'inactive')}
+              {product.isActive ? 'Active' : 'Inactive'}
+            </StatusBadge>
+          </SidebarCard>
 
-            <SidebarCard>
-              <SidebarTitle>
-                <BarChart3 size={20} />
-                Product Information
-              </SidebarTitle>
-              <InfoGrid>
-                <InfoItem>
-                  <InfoLabel>Product ID</InfoLabel>
-                  <InfoValue>{product._id || 'N/A'}</InfoValue>
-                </InfoItem>
-                <InfoItem>
-                  <InfoLabel>Category</InfoLabel>
-                  <InfoValue>{product.category?.charAt(0).toUpperCase() + product.category?.slice(1) || 'N/A'}</InfoValue>
-                </InfoItem>
-                <InfoItem>
-                  <InfoLabel>Brand</InfoLabel>
-                  <InfoValue>{product.brand || 'N/A'}</InfoValue>
-                </InfoItem>
-                <InfoItem>
-                  <InfoLabel>Series</InfoLabel>
-                  <InfoValue>{product.series || 'N/A'}</InfoValue>
-                </InfoItem>
-                <InfoItem>
-                  <InfoLabel>Model</InfoLabel>
-                  <InfoValue>{product.model || 'N/A'}</InfoValue>
-                </InfoItem>
-                <InfoItem>
-                  <InfoLabel>Base Price</InfoLabel>
-                  <InfoValue>{formatPrice(product.basePrice)}</InfoValue>
-                </InfoItem>
-              </InfoGrid>
-            </SidebarCard>
+          <SidebarCard>
+            <SidebarTitle>
+              <BarChart3 size={20} />
+              Product Information
+            </SidebarTitle>
+            <InfoGrid>
+              <InfoItem>
+                <InfoLabel>Product ID</InfoLabel>
+                <InfoValue>{product._id || 'N/A'}</InfoValue>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>Category</InfoLabel>
+                <InfoValue>
+                  {product.category?.charAt(0).toUpperCase() + product.category?.slice(1) || 'N/A'}
+                </InfoValue>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>Brand</InfoLabel>
+                <InfoValue>{product.brand || 'N/A'}</InfoValue>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>Series</InfoLabel>
+                <InfoValue>{product.series || 'N/A'}</InfoValue>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>Model</InfoLabel>
+                <InfoValue>{product.model || 'N/A'}</InfoValue>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>Base Price</InfoLabel>
+                <InfoValue>{formatPrice(product.basePrice)}</InfoValue>
+              </InfoItem>
+            </InfoGrid>
+          </SidebarCard>
 
           {product.createdBy && (
-              <SidebarCard>
-                <SidebarTitle>
-                  <User size={20} />
-                  Created By
-                </SidebarTitle>
-                <InfoGrid>
-                  <InfoItem>
-                    <InfoLabel>Name</InfoLabel>
-                    <InfoValue>{product.createdBy.name || 'N/A'}</InfoValue>
-                  </InfoItem>
-                  <InfoItem>
-                    <InfoLabel>Email</InfoLabel>
-                    <InfoValue>{product.createdBy.email || 'N/A'}</InfoValue>
-                  </InfoItem>
-                  <InfoItem>
-                    <InfoLabel>User ID</InfoLabel>
-                    <InfoValue>{product.createdBy._id || 'N/A'}</InfoValue>
-                  </InfoItem>
-                </InfoGrid>
-              </SidebarCard>
-            )}
-
             <SidebarCard>
               <SidebarTitle>
-                <Calendar size={20} />
-                Timeline
+                <User size={20} />
+                Created By
               </SidebarTitle>
               <InfoGrid>
                 <InfoItem>
-                  <InfoLabel>Created</InfoLabel>
-                  <InfoValue>{formatDate(product.createdAt)}</InfoValue>
+                  <InfoLabel>Name</InfoLabel>
+                  <InfoValue>{product.createdBy.name || 'N/A'}</InfoValue>
                 </InfoItem>
                 <InfoItem>
-                  <InfoLabel>Last Updated</InfoLabel>
-                  <InfoValue>{formatDate(product.updatedAt)}</InfoValue>
+                  <InfoLabel>Email</InfoLabel>
+                  <InfoValue>{product.createdBy.email || 'N/A'}</InfoValue>
                 </InfoItem>
-                {product.publishedAt && (
-                  <InfoItem>
-                    <InfoLabel>Published</InfoLabel>
-                    <InfoValue>{formatDate(product.publishedAt)}</InfoValue>
-                  </InfoItem>
-                )}
+                <InfoItem>
+                  <InfoLabel>User ID</InfoLabel>
+                  <InfoValue>{product.createdBy._id || 'N/A'}</InfoValue>
+                </InfoItem>
               </InfoGrid>
             </SidebarCard>
+          )}
+
+          <SidebarCard>
+            <SidebarTitle>
+              <Calendar size={20} />
+              Timeline
+            </SidebarTitle>
+            <InfoGrid>
+              <InfoItem>
+                <InfoLabel>Created</InfoLabel>
+                <InfoValue>{formatDate(product.createdAt)}</InfoValue>
+              </InfoItem>
+              <InfoItem>
+                <InfoLabel>Last Updated</InfoLabel>
+                <InfoValue>{formatDate(product.updatedAt)}</InfoValue>
+              </InfoItem>
+              {product.publishedAt && (
+                <InfoItem>
+                  <InfoLabel>Published</InfoLabel>
+                  <InfoValue>{formatDate(product.publishedAt)}</InfoValue>
+                </InfoItem>
+              )}
+            </InfoGrid>
+          </SidebarCard>
 
           {product.seo && (
             <SidebarCard>

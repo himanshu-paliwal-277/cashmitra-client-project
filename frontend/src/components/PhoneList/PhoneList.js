@@ -22,18 +22,18 @@ const PhoneList = () => {
 
       // First, get all categories to find the mobile/phone category
       const categoriesResponse = await productCategoriesAPI.getCategories();
-      
+
       if (categoriesResponse.success && categoriesResponse.data?.data) {
         const categoryList = categoriesResponse.data.data;
         setCategories(categoryList);
-        
+
         // Find mobile/phone category
-        const mobileCategory = categoryList.find(cat => 
-          cat.name && (
-            cat.name.toLowerCase().includes('mobile') ||
-            cat.name.toLowerCase().includes('phone') ||
-            cat.name.toLowerCase().includes('smartphone')
-          )
+        const mobileCategory = categoryList.find(
+          cat =>
+            cat.name &&
+            (cat.name.toLowerCase().includes('mobile') ||
+              cat.name.toLowerCase().includes('phone') ||
+              cat.name.toLowerCase().includes('smartphone'))
         );
 
         if (mobileCategory) {
@@ -44,7 +44,7 @@ const PhoneList = () => {
               page: 1,
               limit: 12,
               sort: 'createdAt',
-              order: 'desc'
+              order: 'desc',
             }
           );
 
@@ -76,7 +76,7 @@ const PhoneList = () => {
     try {
       // Try to search for mobile products
       const searchResponse = await productCategoriesAPI.searchProducts('mobile phone', {
-        limit: 12
+        limit: 12,
       });
 
       if (searchResponse.success && searchResponse.data?.data) {
@@ -103,7 +103,7 @@ const PhoneList = () => {
         rating: 4.8,
         reviews: 234,
         isActive: true,
-        description: '256GB, Natural Titanium'
+        description: '256GB, Natural Titanium',
       },
       {
         _id: 'fallback-2',
@@ -115,7 +115,7 @@ const PhoneList = () => {
         rating: 4.7,
         reviews: 189,
         isActive: true,
-        description: '256GB, Titanium Black'
+        description: '256GB, Titanium Black',
       },
       {
         _id: 'fallback-3',
@@ -127,24 +127,24 @@ const PhoneList = () => {
         rating: 4.6,
         reviews: 156,
         isActive: true,
-        description: '256GB, Silky Black'
-      }
+        description: '256GB, Silky Black',
+      },
     ];
   };
 
-  const formatPrice = (price) => {
+  const formatPrice = price => {
     if (!price) return 'Price not available';
     return `₹${price.toLocaleString('en-IN')}`;
   };
 
-  const getProductImage = (product) => {
+  const getProductImage = product => {
     if (product.images && product.images.length > 0) {
       return product.images[0];
     }
     return '/api/placeholder/280/200';
   };
 
-  const handleProductClick = (productId) => {
+  const handleProductClick = productId => {
     navigate(`/product/${productId}`);
   };
 
@@ -171,7 +171,9 @@ const PhoneList = () => {
       <div className="phone-list-container">
         <div className="section-header">
           <h2 className="section-title">Latest Cell Phones</h2>
-          <p className="section-subtitle">Discover the newest smartphones with cutting-edge technology</p>
+          <p className="section-subtitle">
+            Discover the newest smartphones with cutting-edge technology
+          </p>
         </div>
         <div className="loading-grid">
           {[...Array(6)].map((_, index) => (
@@ -213,46 +215,40 @@ const PhoneList = () => {
       </div>
 
       <div className="phones-grid">
-        {phones.map((phone) => (
-          <div 
-            key={phone._id} 
-            className="phone-card"
-            onClick={() => handleProductClick(phone._id)}
-          >
+        {phones.map(phone => (
+          <div key={phone._id} className="phone-card" onClick={() => handleProductClick(phone._id)}>
             <div className="phone-image-container">
-              <img 
-                src={getProductImage(phone)} 
+              <img
+                src={getProductImage(phone)}
                 alt={phone.name || 'Phone'}
                 className="phone-image"
-                onError={(e) => {
+                onError={e => {
                   e.target.src = '/api/placeholder/280/200';
                 }}
               />
-              
+
               {/* Status Badge */}
-              {phone.isActive && (
-                <div className="status-badge available">Available</div>
-              )}
-              
+              {phone.isActive && <div className="status-badge available">Available</div>}
+
               {/* Action Buttons */}
               <div className="phone-actions">
-                <button 
+                <button
                   className="action-btn"
-                  onClick={(e) => handleWishlist(e, phone)}
+                  onClick={e => handleWishlist(e, phone)}
                   title="Add to Wishlist"
                 >
                   <Heart size={16} />
                 </button>
-                <button 
+                <button
                   className="action-btn"
-                  onClick={(e) => handleQuickView(e, phone)}
+                  onClick={e => handleQuickView(e, phone)}
                   title="Quick View"
                 >
                   <Eye size={16} />
                 </button>
-                <button 
+                <button
                   className="action-btn primary"
-                  onClick={(e) => handleAddToCart(e, phone)}
+                  onClick={e => handleAddToCart(e, phone)}
                   title="Add to Cart"
                 >
                   <ShoppingCart size={16} />
@@ -263,44 +259,45 @@ const PhoneList = () => {
             <div className="phone-info">
               <div className="phone-brand">{phone.brand || 'Unknown Brand'}</div>
               <h3 className="phone-name">{phone.name || 'Unknown Model'}</h3>
-              
-              {phone.description && (
-                <p className="phone-description">{phone.description}</p>
-              )}
-              
-              <div className="phone-category">
-                {phone.categoryId?.name || 'Smartphone'}
-              </div>
+
+              {phone.description && <p className="phone-description">{phone.description}</p>}
+
+              <div className="phone-category">{phone.categoryId?.name || 'Smartphone'}</div>
 
               <div className="phone-rating">
                 <div className="rating-stars">
                   {[...Array(5)].map((_, index) => (
-                    <Star 
-                      key={index} 
-                      size={14} 
+                    <Star
+                      key={index}
+                      size={14}
                       className={index < Math.floor(phone.rating || 4.5) ? 'star filled' : 'star'}
                     />
                   ))}
                 </div>
                 <span className="rating-text">
-                  {phone.rating || 4.5} ({phone.reviews || Math.floor(Math.random() * 200) + 50} reviews)
+                  {phone.rating || 4.5} ({phone.reviews || Math.floor(Math.random() * 200) + 50}{' '}
+                  reviews)
                 </span>
               </div>
 
               <div className="phone-price">
-                <span className="current-price">
-                  {formatPrice(phone.pricing?.discountedPrice)}
-                </span>
-                {phone.pricing?.originalPrice && phone.pricing.originalPrice > phone.pricing.discountedPrice && (
-                  <>
-                    <span className="original-price">
-                      {formatPrice(phone.pricing.originalPrice)}
-                    </span>
-                    <span className="discount-badge">
-                      {Math.round(((phone.pricing.originalPrice - phone.pricing.discountedPrice) / phone.pricing.originalPrice) * 100)}% OFF
-                    </span>
-                  </>
-                )}
+                <span className="current-price">{formatPrice(phone.pricing?.discountedPrice)}</span>
+                {phone.pricing?.originalPrice &&
+                  phone.pricing.originalPrice > phone.pricing.discountedPrice && (
+                    <>
+                      <span className="original-price">
+                        {formatPrice(phone.pricing.originalPrice)}
+                      </span>
+                      <span className="discount-badge">
+                        {Math.round(
+                          ((phone.pricing.originalPrice - phone.pricing.discountedPrice) /
+                            phone.pricing.originalPrice) *
+                            100
+                        )}
+                        % OFF
+                      </span>
+                    </>
+                  )}
               </div>
             </div>
           </div>
@@ -309,10 +306,7 @@ const PhoneList = () => {
 
       {phones.length > 0 && (
         <div className="view-all-container">
-          <button 
-            className="view-all-btn"
-            onClick={() => navigate('/buy?category=mobile')}
-          >
+          <button className="view-all-btn" onClick={() => navigate('/buy?category=mobile')}>
             View All Cell Phones
           </button>
         </div>

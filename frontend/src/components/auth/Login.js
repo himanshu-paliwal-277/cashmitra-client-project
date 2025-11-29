@@ -12,7 +12,11 @@ const LoginContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, ${theme.colors.primary[50]} 0%, ${theme.colors.accent[50]} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary[50]} 0%,
+    ${theme.colors.accent[50]} 100%
+  );
   padding: ${theme.spacing[4]};
 `;
 
@@ -33,7 +37,11 @@ const Logo = styled.div`
 const LogoIcon = styled.div`
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, ${theme.colors.primary.main} 0%, ${theme.colors.accent.main} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary.main} 0%,
+    ${theme.colors.accent.main} 100%
+  );
   border-radius: ${theme.borderRadius.lg};
   display: flex;
   align-items: center;
@@ -84,7 +92,7 @@ const PasswordToggle = styled.button`
   cursor: pointer;
   padding: ${theme.spacing[1]};
   border-radius: ${theme.borderRadius.sm};
-  
+
   &:hover {
     color: ${theme.colors.text.primary};
     background: ${theme.colors.grey[100]};
@@ -108,7 +116,7 @@ const ForgotPassword = styled(Link)`
   text-decoration: none;
   font-size: ${theme.typography.fontSize.sm};
   text-align: right;
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -121,12 +129,12 @@ const SignupLink = styled.div`
   border-top: 1px solid ${theme.colors.grey[200]};
   font-size: ${theme.typography.fontSize.sm};
   color: ${theme.colors.text.secondary};
-  
+
   a {
     color: ${theme.colors.primary.main};
     text-decoration: none;
     font-weight: ${theme.typography.fontWeight.medium};
-    
+
     &:hover {
       text-decoration: underline;
     }
@@ -140,57 +148,57 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  
+
   const { login, loading, error, clearError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const from = location.state?.from?.pathname || '/';
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.email) {
       errors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Please enter a valid email address';
     }
-    
+
     if (!formData.password) {
       errors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       errors.password = 'Password must be at least 6 characters';
     }
-    
+
     return errors;
   };
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear validation error for this field
     if (validationErrors[name]) {
       setValidationErrors(prev => ({ ...prev, [name]: '' }));
     }
-    
+
     // Clear auth error
     if (error) {
       clearError();
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       return;
     }
-    
+
     const result = await login(formData.email, formData.password);
-    
+
     if (result.success) {
       navigate(from, { replace: true });
     }
@@ -208,7 +216,7 @@ const Login = () => {
           <Title>Welcome Back</Title>
           <Subtitle>Sign in to your Cashmitra account</Subtitle>
         </Logo>
-        
+
         <Form onSubmit={handleSubmit}>
           {error && (
             <ErrorMessage>
@@ -216,7 +224,7 @@ const Login = () => {
               {error}
             </ErrorMessage>
           )}
-          
+
           <InputGroup>
             <Input
               type="email"
@@ -229,7 +237,7 @@ const Login = () => {
               autoComplete="email"
               required
             />
-            
+
             <PasswordInputWrapper>
               <Input
                 type={showPassword ? 'text' : 'password'}
@@ -251,11 +259,9 @@ const Login = () => {
               </PasswordToggle>
             </PasswordInputWrapper>
           </InputGroup>
-          
-          <ForgotPassword to="/forgot-password">
-            Forgot your password?
-          </ForgotPassword>
-          
+
+          <ForgotPassword to="/forgot-password">Forgot your password?</ForgotPassword>
+
           <Button
             type="submit"
             variant="primary"
@@ -267,7 +273,7 @@ const Login = () => {
             {loading ? 'Signing In...' : 'Sign In'}
           </Button>
         </Form>
-        
+
         <SignupLink>
           Don't have an account? <Link to="/signup">Sign up</Link>
         </SignupLink>

@@ -8,7 +8,7 @@ import Input from '../../components/ui/Input';
 import useAdminModels from '../../hooks/useAdminModels';
 import useAdminBrands from '../../hooks/useAdminBrands';
 import useAdminCategories from '../../hooks/useAdminCategories';
-import { 
+import {
   ArrowRight,
   ArrowLeft,
   Home,
@@ -19,7 +19,7 @@ import {
   Cpu,
   HardDrive,
   Camera,
-  Loader
+  Loader,
 } from 'lucide-react';
 
 const PageContainer = styled.div`
@@ -32,11 +32,11 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 0 ${theme.spacing[8]};
   }
@@ -57,7 +57,7 @@ const BreadcrumbLink = styled.a`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -98,7 +98,7 @@ const PageTitle = styled.h1`
   font-weight: ${theme.typography.fontWeight.semibold};
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[3]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     font-size: ${theme.typography.fontSize['2xl']};
   }
@@ -121,7 +121,7 @@ const ModelGrid = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: ${theme.spacing[4]};
   margin-bottom: ${theme.spacing[8]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     grid-template-columns: 1fr;
   }
@@ -131,13 +131,13 @@ const ModelCard = styled(Card)`
   cursor: pointer;
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
   border: 2px solid transparent;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.lg};
     border-color: ${theme.colors.primary.main};
   }
-  
+
   &.selected {
     border-color: ${theme.colors.primary.main};
     background: ${theme.colors.primary[50]};
@@ -183,7 +183,7 @@ const SpecItem = styled.div`
   gap: ${theme.spacing[1]};
   font-size: ${theme.typography.fontSize.sm};
   color: ${theme.colors.text.secondary};
-  
+
   svg {
     color: ${theme.colors.primary.main};
   }
@@ -239,10 +239,10 @@ const NavigationButtons = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: ${theme.spacing[4]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -282,7 +282,6 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
   // Set selected category and brand based on URL params
   useEffect(() => {
     if (categories && categoryId) {
-      
       console.log('categories: ', categories);
       const category = categories.find(cat => cat.name === categoryId);
       setSelectedCategory(category);
@@ -299,9 +298,8 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
     // console.log('selectedBrand: ', selectedBrand);
     // console.log('selectedCategory: ', selectedCategory);
     if (models && selectedCategory && selectedBrand) {
-      let filtered = models.filter(model => 
-        model.category === selectedCategory.name && 
-        model.brand === selectedBrand.brand
+      let filtered = models.filter(
+        model => model.category === selectedCategory.name && model.brand === selectedBrand.brand
       );
 
       if (searchQuery) {
@@ -313,26 +311,28 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
       setFilteredModels(filtered);
     }
   }, [models, selectedCategory, selectedBrand, searchQuery]);
-  
+
   // Filter models based on search query
   console.log('filteredModels: ', filteredModels);
   const currentModels = filteredModels.filter(model =>
     model.brand.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  
+
   const popularModels = currentModels.filter(model => model.popular);
   const allModels = currentModels;
-  
-  const handleModelClick = (model) => {
+
+  const handleModelClick = model => {
     setSelectedModel(model);
   };
-  
+
   const handleNext = () => {
     if (selectedModel && onModelSelect) {
       onModelSelect(selectedModel);
     }
     // Navigate to condition questionnaire
-    navigate(`/sell/condition?category=${categoryId}&brand=${brandId}&model=${selectedModel.model}`);
+    navigate(
+      `/sell/condition?category=${categoryId}&brand=${brandId}&model=${selectedModel.model}`
+    );
   };
 
   const handleBack = () => {
@@ -341,20 +341,27 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
     }
     navigate(`/sell/brand?category=${categoryId}`);
   };
-  
-  const formatPrice = (price) => {
+
+  const formatPrice = price => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(price);
   };
-  
+
   if (loading) {
     return (
       <PageContainer>
         <Container>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '400px',
+            }}
+          >
             <Loader size={48} className="animate-spin" />
           </div>
         </Container>
@@ -375,8 +382,8 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
     );
   }
 
-  const renderModelCard = (model) => (
-    <ModelCard 
+  const renderModelCard = model => (
+    <ModelCard
       key={model._id}
       onClick={() => handleModelClick(model)}
       className={selectedModel?._id === model._id ? 'selected' : ''}
@@ -388,7 +395,7 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
           Popular
         </PopularBadge>
       )}
-      
+
       <Card.Body>
         <ModelHeader>
           <ModelName>{model.model}</ModelName>
@@ -397,7 +404,7 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
             {model.year || 'Latest'}
           </ModelYear>
         </ModelHeader>
-        
+
         <ModelSpecs>
           <SpecItem>
             <HardDrive size={16} />
@@ -416,7 +423,7 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
             {model.processor || 'N/A'}
           </SpecItem>
         </ModelSpecs>
-        
+
         <PriceRange>
           <PriceLabel>Expected Price Range</PriceLabel>
           <PriceValue>
@@ -426,7 +433,7 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
       </Card.Body>
     </ModelCard>
   );
-  
+
   return (
     <PageContainer>
       <Container>
@@ -437,9 +444,7 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
             Home
           </BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
-          <BreadcrumbLink href="/sell">
-            Sell Device
-          </BreadcrumbLink>
+          <BreadcrumbLink href="/sell">Sell Device</BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
           <BreadcrumbLink href={`/sell/brand?category=${categoryId}`}>
             {selectedCategory?.name || 'Category'}
@@ -447,7 +452,7 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
           <span>{selectedBrand?.name}</span>
         </Breadcrumb>
-        
+
         {/* Page Header */}
         <PageHeader>
           <BrandInfo>
@@ -458,48 +463,47 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
               <PageTitle>Select your {selectedBrand?.name} model</PageTitle>
             </div>
           </BrandInfo>
-          <PageSubtitle>
-            Choose the exact model to get the most accurate price quote
-          </PageSubtitle>
+          <PageSubtitle>Choose the exact model to get the most accurate price quote</PageSubtitle>
         </PageHeader>
-        
+
         {/* Search */}
         <SearchSection>
           <Input
             placeholder={`Search ${selectedBrand?.name} models...`}
             leftIcon={<Search size={20} />}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
           />
         </SearchSection>
-        
+
         {/* Popular Models */}
         {!searchQuery && popularModels.length > 0 && (
           <div style={{ marginBottom: theme.spacing[8] }}>
-            <SectionTitle>
-              ⭐ Popular Models
-            </SectionTitle>
-            <ModelGrid>
-              {popularModels.map(renderModelCard)}
-            </ModelGrid>
+            <SectionTitle>⭐ Popular Models</SectionTitle>
+            <ModelGrid>{popularModels.map(renderModelCard)}</ModelGrid>
           </div>
         )}
-        
+
         {/* All Models */}
         <div style={{ marginBottom: theme.spacing[8] }}>
           <SectionTitle>
-            {searchQuery ? `Search Results (${allModels.length})` : `📱 All ${selectedBrand?.name} Models`}
+            {searchQuery
+              ? `Search Results (${allModels.length})`
+              : `📱 All ${selectedBrand?.name} Models`}
           </SectionTitle>
-          <ModelGrid>
-            {allModels.map(renderModelCard)}
-          </ModelGrid>
-          
+          <ModelGrid>{allModels.map(renderModelCard)}</ModelGrid>
+
           {allModels.length === 0 && (
             <Card>
               <Card.Body>
                 <div style={{ textAlign: 'center', padding: theme.spacing[8] }}>
                   <p>No models found matching "{searchQuery}"</p>
-                  <p style={{ color: theme.colors.text.secondary, fontSize: theme.typography.fontSize.sm }}>
+                  <p
+                    style={{
+                      color: theme.colors.text.secondary,
+                      fontSize: theme.typography.fontSize.sm,
+                    }}
+                  >
                     Try a different search term or contact support if your model is not listed.
                   </p>
                 </div>
@@ -507,19 +511,15 @@ const ModelSelection = ({ onModelSelect, onBack }) => {
             </Card>
           )}
         </div>
-        
+
         {/* Navigation */}
         <NavigationButtons>
-          <BackButton 
-            variant="secondary" 
-            leftIcon={<ArrowLeft size={20} />}
-            onClick={handleBack}
-          >
+          <BackButton variant="secondary" leftIcon={<ArrowLeft size={20} />} onClick={handleBack}>
             Back to Brands
           </BackButton>
-          
-          <NextButton 
-            variant="primary" 
+
+          <NextButton
+            variant="primary"
             rightIcon={<ArrowRight size={20} />}
             disabled={!selectedModel}
             onClick={handleNext}

@@ -28,11 +28,11 @@ const HeaderContent = styled.div`
 const Logo = styled.div`
   font-size: 24px;
   font-weight: bold;
-  color: #00C853;
+  color: #00c853;
 `;
 
 const LoginButton = styled.button`
-  background: #00C853;
+  background: #00c853;
   color: white;
   border: none;
   padding: 8px 20px;
@@ -51,16 +51,16 @@ const Breadcrumb = styled.div`
   font-size: 14px;
   color: #666;
   margin-bottom: 20px;
-  
+
   a {
     color: #666;
     text-decoration: none;
-    
+
     &:hover {
-      color: #00C853;
+      color: #00c853;
     }
   }
-  
+
   span {
     margin: 0 8px;
   }
@@ -82,7 +82,7 @@ const ContentWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: 40px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -93,7 +93,7 @@ const DefectsSection = styled.div`
   background: white;
   border-radius: 12px;
   padding: 40px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const SectionTitle = styled.h3`
@@ -120,7 +120,7 @@ const CategoryHeader = styled.div`
   padding-bottom: 8px;
   border-bottom: 2px solid #e0e0e0;
   text-transform: capitalize;
-  
+
   &:first-child {
     margin-top: 0;
   }
@@ -131,14 +131,14 @@ const DefectOption = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  border: 2px solid ${props => props.selected ? '#00C853' : '#e9ecef'};
-  background: ${props => props.selected ? '#f0fff4' : 'white'};
+  border: 2px solid ${props => (props.selected ? '#00C853' : '#e9ecef')};
+  background: ${props => (props.selected ? '#f0fff4' : 'white')};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    border-color: #00C853;
+    border-color: #00c853;
     background: #f0fff4;
   }
 `;
@@ -159,13 +159,13 @@ const DefectIcon = styled.div`
 const DefectLabel = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: ${props => props.selected ? '#00C853' : '#333'};
+  color: ${props => (props.selected ? '#00C853' : '#333')};
   text-align: center;
 `;
 
 const ContinueButton = styled.button`
   width: 100%;
-  background: #00C853;
+  background: #00c853;
   color: white;
   border: none;
   padding: 16px 24px;
@@ -174,7 +174,7 @@ const ContinueButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   margin-top: 20px;
-  
+
   &:hover {
     background: #00a844;
   }
@@ -184,7 +184,7 @@ const Sidebar = styled.div`
   background: white;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: fit-content;
 `;
 
@@ -197,7 +197,7 @@ const SidebarImage = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   img {
     max-width: 100%;
     max-height: 100%;
@@ -233,19 +233,19 @@ const ProgressIndicator = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
-  
+
   .step {
     width: 8px;
     height: 8px;
     border-radius: 50%;
     background: #e9ecef;
     margin-right: 8px;
-    
+
     &.active {
-      background: #00C853;
+      background: #00c853;
     }
   }
-  
+
   .label {
     font-size: 14px;
     color: #666;
@@ -255,16 +255,12 @@ const ProgressIndicator = styled.div`
 const SellScreenDefects = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { product,
-        answers,
-        productId,
-        variantId,
-        selectedVariant,
-        deviceEvaluation } = location.state || {};
-  
+  const { product, answers, productId, variantId, selectedVariant, deviceEvaluation } =
+    location.state || {};
+
   // Use deviceEvaluation if answers is not available (coming from SellDeviceEvaluation)
   const evaluationData = answers || deviceEvaluation || {};
-  console.log({answers})
+  console.log({ answers });
   const [selectedDefects, setSelectedDefects] = useState([]);
   const [selectedDefectsDetails, setSelectedDefectsDetails] = useState([]); // Store complete defect information
   const [defectOptions, setDefectOptions] = useState([]);
@@ -273,7 +269,7 @@ const SellScreenDefects = () => {
   const [error, setError] = useState(null);
 
   // Helper function to get category-specific icons
-  const getCategoryIcon = (category) => {
+  const getCategoryIcon = category => {
     const categoryIcons = {
       screen: '📱',
       body: '🔨',
@@ -283,7 +279,7 @@ const SellScreenDefects = () => {
       connectivity: '📶',
       buttons: '🔘',
       charging: '🔌',
-      default: '🔧'
+      default: '🔧',
     };
     return categoryIcons[category] || categoryIcons.default;
   };
@@ -301,18 +297,18 @@ const SellScreenDefects = () => {
       try {
         setLoading(true);
         const response = await sellService.getCustomerDefects(product.data.categoryId._id);
-        
+
         console.log('API Response:', response); // Debug logging
-        
+
         // Handle the API response structure
         let defects = [];
         let groupedDefectsFromAPI = {};
-        
+
         // Handle the actual API response format: {defects: Array, grouped: Object}
         if (response && response.defects && Array.isArray(response.defects)) {
           defects = response.defects;
           console.log('Using defects from response.defects:', defects.length, 'items');
-          
+
           // Use grouped data from API if available
           if (response.grouped && typeof response.grouped === 'object') {
             groupedDefectsFromAPI = response.grouped;
@@ -323,7 +319,7 @@ const SellScreenDefects = () => {
           if (response.data.defects && Array.isArray(response.data.defects)) {
             defects = response.data.defects;
             console.log('Using defects from response.data.defects:', defects.length, 'items');
-            
+
             if (response.data.grouped && typeof response.data.grouped === 'object') {
               groupedDefectsFromAPI = response.data.grouped;
               console.log('Using grouped defects from API:', Object.keys(groupedDefectsFromAPI));
@@ -344,9 +340,9 @@ const SellScreenDefects = () => {
           console.warn('Unexpected API response format:', response);
           defects = []; // Use empty array instead of throwing error
         }
-        
+
         let transformedDefects = [];
-        
+
         if (defects && Array.isArray(defects) && defects.length > 0) {
           // Transform flat defects array
           transformedDefects = defects.map(defect => ({
@@ -355,7 +351,7 @@ const SellScreenDefects = () => {
             icon: defect.icon || getCategoryIcon(defect.category),
             category: defect.category || 'other',
             delta: defect.delta,
-            order: defect.order || 0
+            order: defect.order || 0,
           }));
         }
 
@@ -369,7 +365,7 @@ const SellScreenDefects = () => {
 
         // Use grouped defects from API if available, otherwise create our own
         let finalGroupedDefects = {};
-        
+
         if (Object.keys(groupedDefectsFromAPI).length > 0) {
           // Transform API grouped defects to match our UI format
           finalGroupedDefects = Object.keys(groupedDefectsFromAPI).reduce((acc, category) => {
@@ -379,7 +375,7 @@ const SellScreenDefects = () => {
               icon: defect.icon || getCategoryIcon(defect.category),
               category: defect.category || category,
               delta: defect.delta,
-              order: defect.order || 0
+              order: defect.order || 0,
             }));
             return acc;
           }, {});
@@ -399,17 +395,17 @@ const SellScreenDefects = () => {
         // Add "No Defects" option at the beginning
         const defectOptionsWithNoDefects = [
           { id: 'no-defects', label: 'No Defects', icon: '✓', category: 'none', order: -1 },
-          ...transformedDefects
+          ...transformedDefects,
         ];
 
         setDefectOptions(defectOptionsWithNoDefects);
         setGroupedDefects(finalGroupedDefects);
-        
+
         console.log('Processed defects:', defectOptionsWithNoDefects); // Debug logging
       } catch (err) {
         console.error('Error fetching defects:', err);
         setError('Failed to load defects');
-        
+
         // Fallback to hardcoded defects if API fails
         const fallbackDefects = [
           { id: 'no-defects', label: 'No Defects', icon: '✓' },
@@ -419,7 +415,7 @@ const SellScreenDefects = () => {
           { id: 'cracked-screen', label: 'Cracked Screen', icon: '💔' },
           { id: 'body-damage', label: 'Body Damage', icon: '🔨' },
           { id: 'water-damage', label: 'Water Damage', icon: '💧' },
-          { id: 'button-issues', label: 'Button Issues', icon: '🔘' }
+          { id: 'button-issues', label: 'Button Issues', icon: '🔘' },
         ];
         setDefectOptions(fallbackDefects);
       } finally {
@@ -430,38 +426,43 @@ const SellScreenDefects = () => {
     fetchDefects();
   }, [product?._id]);
 
-  const handleDefectToggle = (defectId) => {
+  const handleDefectToggle = defectId => {
     if (defectId === 'no-defects') {
       setSelectedDefects(['no-defects']);
-      setSelectedDefectsDetails([{
-        id: 'no-defects',
-        label: 'No Defects',
-        icon: '✓',
-        category: 'none',
-        delta: 0,
-        questionText: 'Screen/Body Condition',
-        answerText: 'No Defects',
-        questionType: 'defect_selection',
-        section: 'screen_defects'
-      }]);
+      setSelectedDefectsDetails([
+        {
+          id: 'no-defects',
+          label: 'No Defects',
+          icon: '✓',
+          category: 'none',
+          delta: 0,
+          questionText: 'Screen/Body Condition',
+          answerText: 'No Defects',
+          questionType: 'defect_selection',
+          section: 'screen_defects',
+        },
+      ]);
     } else {
       setSelectedDefects(prev => {
         const filtered = prev.filter(id => id !== 'no-defects');
         if (filtered.includes(defectId)) {
           // Remove defect
           const newSelected = filtered.filter(id => id !== defectId);
-          
+
           // Update detailed defects
-          setSelectedDefectsDetails(prevDetails => 
+          setSelectedDefectsDetails(prevDetails =>
             prevDetails.filter(defect => defect.id !== defectId)
           );
-          
+
           return newSelected;
         } else {
           // Add defect
-          const defectToAdd = defectOptions.find(d => d.id === defectId) || 
-                             Object.values(groupedDefects).flat().find(d => d.id === defectId);
-          
+          const defectToAdd =
+            defectOptions.find(d => d.id === defectId) ||
+            Object.values(groupedDefects)
+              .flat()
+              .find(d => d.id === defectId);
+
           if (defectToAdd) {
             // Update detailed defects
             setSelectedDefectsDetails(prevDetails => [
@@ -475,11 +476,11 @@ const SellScreenDefects = () => {
                 questionText: 'Screen/Body Condition',
                 answerText: defectToAdd.label,
                 questionType: 'defect_selection',
-                section: 'screen_defects'
-              }
+                section: 'screen_defects',
+              },
             ]);
           }
-          
+
           return [...filtered, defectId];
         }
       });
@@ -490,31 +491,38 @@ const SellScreenDefects = () => {
     console.log('Product object:', product); // Debug logging
     console.log('Product ID:', product?._id); // Debug logging
     console.log('Selected defects details:', selectedDefectsDetails); // Debug logging for defect details
-    
+
     // Use product.id as fallback if _id is not available
     const productId = product?._id || product?.data.id;
-    
+
     if (!productId) {
       console.error('No product ID found. Product object:', product);
       alert('Product information is missing. Please go back and select a product again.');
       return;
     }
-    
+
     navigate(`/sell/accessories/${productId}`, {
-      state: { 
-        selectedVariant, 
-        product, 
-        answers: evaluationData, 
+      state: {
+        selectedVariant,
+        product,
+        answers: evaluationData,
         screenDefects: selectedDefectsDetails,
-        screenDefectsDetails: selectedDefectsDetails // Pass complete defect information
-      }
+        screenDefectsDetails: selectedDefectsDetails, // Pass complete defect information
+      },
     });
   };
 
   if (!product) {
     return (
       <Container>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '50vh',
+          }}
+        >
           Product information not found
         </div>
       </Container>
@@ -557,7 +565,7 @@ const SellScreenDefects = () => {
             </ProgressIndicator>
 
             <SectionTitle>Select screen/body defects (if any)</SectionTitle>
-            
+
             {loading ? (
               <div style={{ textAlign: 'center', padding: '40px' }}>
                 <div style={{ fontSize: '18px', color: '#666' }}>Loading defects...</div>
@@ -567,12 +575,10 @@ const SellScreenDefects = () => {
                 <div style={{ fontSize: '16px', color: '#e74c3c', marginBottom: '10px' }}>
                   {error}
                 </div>
-                <div style={{ fontSize: '14px', color: '#666' }}>
-                  Using fallback options
-                </div>
+                <div style={{ fontSize: '14px', color: '#666' }}>Using fallback options</div>
               </div>
             ) : null}
-            
+
             <DefectGrid>
               {/* No Defects option */}
               <DefectOption
@@ -590,7 +596,7 @@ const SellScreenDefects = () => {
               {Object.entries(groupedDefects).map(([category, categoryDefects]) => (
                 <React.Fragment key={category}>
                   <CategoryHeader>{category}</CategoryHeader>
-                  {categoryDefects.map((defect) => (
+                  {categoryDefects.map(defect => (
                     <DefectOption
                       key={defect.id}
                       selected={selectedDefects.includes(defect.id)}
@@ -606,9 +612,7 @@ const SellScreenDefects = () => {
               ))}
             </DefectGrid>
 
-            <ContinueButton onClick={handleContinue}>
-              Continue
-            </ContinueButton>
+            <ContinueButton onClick={handleContinue}>Continue</ContinueButton>
           </DefectsSection>
 
           <Sidebar>
@@ -619,9 +623,11 @@ const SellScreenDefects = () => {
                 <div style={{ color: '#999' }}>No Image</div>
               )}
             </SidebarImage>
-            
-            <SidebarTitle>Apple iPhone 6S ({selectedVariant?.label || selectedVariant || 'Unknown Variant'})</SidebarTitle>
-            
+
+            <SidebarTitle>
+              Apple iPhone 6S ({selectedVariant?.label || selectedVariant || 'Unknown Variant'})
+            </SidebarTitle>
+
             <SidebarSection>
               <SidebarSectionTitle>Get Upto</SidebarSectionTitle>
               <SidebarText style={{ color: '#00C853', fontSize: '18px', fontWeight: '600' }}>
@@ -631,36 +637,42 @@ const SellScreenDefects = () => {
 
             <SidebarSection>
               <SidebarSectionTitle>Device Evaluation</SidebarSectionTitle>
-              {evaluationData && Object.entries(evaluationData).map(([questionId, answer], index) => {
-                console.log('Rendering answer:', { questionId, answer, type: typeof answer });
-                
-                // Handle both old format (simple strings) and new format (objects)
-                if (typeof answer === 'string') {
-                  // Old format from SellDeviceEvaluation
-                  const questionLabels = {
-                    calls: 'Calls',
-                    touchScreen: 'Touch Screen', 
-                    originalScreen: 'Original Screen'
-                  };
-                  const answerLabels = {
-                    yes: 'Working',
-                    no: 'Not Working'
-                  };
-                  return (
-                    <SidebarText key={questionId}>
-                      {questionLabels[questionId] || questionId}: {answerLabels[answer] || answer}
-                    </SidebarText>
-                  );
-                } else if (answer && typeof answer === 'object' && answer.questionText && answer.answerText) {
-                  // New format from ProductCondition
-                  return (
-                    <SidebarText key={questionId}>
-                      {String(answer.questionText)}: {String(answer.answerText)}
-                    </SidebarText>
-                  );
-                }
-                return null;
-              })}
+              {evaluationData &&
+                Object.entries(evaluationData).map(([questionId, answer], index) => {
+                  console.log('Rendering answer:', { questionId, answer, type: typeof answer });
+
+                  // Handle both old format (simple strings) and new format (objects)
+                  if (typeof answer === 'string') {
+                    // Old format from SellDeviceEvaluation
+                    const questionLabels = {
+                      calls: 'Calls',
+                      touchScreen: 'Touch Screen',
+                      originalScreen: 'Original Screen',
+                    };
+                    const answerLabels = {
+                      yes: 'Working',
+                      no: 'Not Working',
+                    };
+                    return (
+                      <SidebarText key={questionId}>
+                        {questionLabels[questionId] || questionId}: {answerLabels[answer] || answer}
+                      </SidebarText>
+                    );
+                  } else if (
+                    answer &&
+                    typeof answer === 'object' &&
+                    answer.questionText &&
+                    answer.answerText
+                  ) {
+                    // New format from ProductCondition
+                    return (
+                      <SidebarText key={questionId}>
+                        {String(answer.questionText)}: {String(answer.answerText)}
+                      </SidebarText>
+                    );
+                  }
+                  return null;
+                })}
             </SidebarSection>
 
             <SidebarSection>
@@ -673,8 +685,12 @@ const SellScreenDefects = () => {
                     <div>
                       <SidebarText>{selectedDefects.length} defect(s) selected</SidebarText>
                       {selectedDefectsDetails.map((defect, index) => (
-                        <SidebarText key={defect.id} style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>
-                          • {defect.label} {defect.delta !== 0 && `(${defect.delta > 0 ? '+' : ''}₹${defect.delta})`}
+                        <SidebarText
+                          key={defect.id}
+                          style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}
+                        >
+                          • {defect.label}{' '}
+                          {defect.delta !== 0 && `(${defect.delta > 0 ? '+' : ''}₹${defect.delta})`}
                         </SidebarText>
                       ))}
                     </div>

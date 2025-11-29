@@ -28,7 +28,7 @@ import {
   X,
   ChevronUp,
   ChevronDown,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 import adminService from '../../services/adminService';
 
@@ -64,9 +64,9 @@ const HeaderActions = styled.div`
 `;
 
 const ActionButton = styled.button`
-  background: ${props => props.variant === 'primary' ? '#f59e0b' : 'white'};
-  color: ${props => props.variant === 'primary' ? 'white' : '#374151'};
-  border: 1px solid ${props => props.variant === 'primary' ? '#f59e0b' : '#d1d5db'};
+  background: ${props => (props.variant === 'primary' ? '#f59e0b' : 'white')};
+  color: ${props => (props.variant === 'primary' ? 'white' : '#374151')};
+  border: 1px solid ${props => (props.variant === 'primary' ? '#f59e0b' : '#d1d5db')};
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 600;
@@ -79,7 +79,7 @@ const ActionButton = styled.button`
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background: ${props => props.variant === 'primary' ? '#d97706' : '#f9fafb'};
+    background: ${props => (props.variant === 'primary' ? '#d97706' : '#f9fafb')};
   }
 
   &:disabled {
@@ -201,13 +201,13 @@ const ViewToggle = styled.div`
 const ViewButton = styled.button`
   padding: 0.75rem;
   border: none;
-  background: ${props => props.active ? '#f59e0b' : 'white'};
-  color: ${props => props.active ? 'white' : '#6b7280'};
+  background: ${props => (props.active ? '#f59e0b' : 'white')};
+  color: ${props => (props.active ? 'white' : '#6b7280')};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: ${props => props.active ? '#d97706' : '#f9fafb'};
+    background: ${props => (props.active ? '#d97706' : '#f9fafb')};
   }
 `;
 
@@ -287,24 +287,38 @@ const QuestionMeta = styled.div`
 const QuestionBadge = styled.div`
   background: ${props => {
     switch (props.type) {
-      case 'radio': return '#dcfce7';
-      case 'checkbox': return '#dbeafe';
-      case 'select': return '#fef3c7';
-      case 'multiselect': return '#f3e8ff';
-      case 'slider': return '#ffedd5';
-      case 'toggle': return '#ffe4e6';
-      default: return '#f3f4f6';
+      case 'radio':
+        return '#dcfce7';
+      case 'checkbox':
+        return '#dbeafe';
+      case 'select':
+        return '#fef3c7';
+      case 'multiselect':
+        return '#f3e8ff';
+      case 'slider':
+        return '#ffedd5';
+      case 'toggle':
+        return '#ffe4e6';
+      default:
+        return '#f3f4f6';
     }
   }};
   color: ${props => {
     switch (props.type) {
-      case 'radio': return '#166534';
-      case 'checkbox': return '#1e40af';
-      case 'select': return '#92400e';
-      case 'multiselect': return '#6b21a8';
-      case 'slider': return '#c2410c';
-      case 'toggle': return '#be123c';
-      default: return '#374151';
+      case 'radio':
+        return '#166534';
+      case 'checkbox':
+        return '#1e40af';
+      case 'select':
+        return '#92400e';
+      case 'multiselect':
+        return '#6b21a8';
+      case 'slider':
+        return '#c2410c';
+      case 'toggle':
+        return '#be123c';
+      default:
+        return '#374151';
     }
   }};
   padding: 0.25rem 0.5rem;
@@ -431,8 +445,8 @@ const StatusBadge = styled.span`
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: capitalize;
-  background: ${props => props.status === 'active' ? '#dcfce7' : '#fee2e2'};
-  color: ${props => props.status === 'active' ? '#166534' : '#dc2626'};
+  background: ${props => (props.status === 'active' ? '#dcfce7' : '#fee2e2')};
+  color: ${props => (props.status === 'active' ? '#166534' : '#dc2626')};
 `;
 
 const LoadingSpinner = styled.div`
@@ -546,7 +560,7 @@ const SellQuestionsManagement = () => {
     updateQuestion,
     deleteQuestion,
     reorderQuestions,
-    clearError
+    clearError,
   } = useSellQuestions();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -568,7 +582,7 @@ const SellQuestionsManagement = () => {
     { id: 'select', name: 'Select Dropdown' },
     { id: 'multiselect', name: 'Multi-Select' },
     { id: 'slider', name: 'Slider' },
-    { id: 'toggle', name: 'Toggle' }
+    { id: 'toggle', name: 'Toggle' },
   ];
 
   // Fetch categories
@@ -581,35 +595,36 @@ const SellQuestionsManagement = () => {
     }
   };
 
-  const deriveType = (q) => q.uiType || 'radio';
-  const deriveStatus = (q) => (q && typeof q.isActive === 'boolean' ? (q.isActive ? 'active' : 'inactive') : 'inactive');
-  const getDisplayOptions = (q) => Array.isArray(q?.options) ? q.options : [];
+  const deriveType = q => q.uiType || 'radio';
+  const deriveStatus = q =>
+    q && typeof q.isActive === 'boolean' ? (q.isActive ? 'active' : 'inactive') : 'inactive';
+  const getDisplayOptions = q => (Array.isArray(q?.options) ? q.options : []);
 
   const stats = [
-    { 
-      label: 'Total Questions', 
-      value: pagination.total || 0, 
-      icon: HelpCircle, 
-      color: '#f59e0b' 
+    {
+      label: 'Total Questions',
+      value: pagination.total || 0,
+      icon: HelpCircle,
+      color: '#f59e0b',
     },
-    { 
-      label: 'Active Questions', 
-      value: questions.filter(q => deriveStatus(q) === 'active').length, 
-      icon: TrendingUp, 
-      color: '#10b981' 
+    {
+      label: 'Active Questions',
+      value: questions.filter(q => deriveStatus(q) === 'active').length,
+      icon: TrendingUp,
+      color: '#10b981',
     },
-    { 
-      label: 'Total Options', 
-      value: questions.reduce((sum, q) => sum + getDisplayOptions(q).length, 0), 
-      icon: Tag, 
-      color: '#3b82f6' 
+    {
+      label: 'Total Options',
+      value: questions.reduce((sum, q) => sum + getDisplayOptions(q).length, 0),
+      icon: Tag,
+      color: '#3b82f6',
     },
-    { 
-      label: 'Question Types', 
-      value: new Set(questions.map(q => deriveType(q))).size, 
-      icon: Grid, 
-      color: '#8b5cf6' 
-    }
+    {
+      label: 'Question Types',
+      value: new Set(questions.map(q => deriveType(q))).size,
+      icon: Grid,
+      color: '#8b5cf6',
+    },
   ];
 
   useEffect(() => {
@@ -625,7 +640,7 @@ const SellQuestionsManagement = () => {
         isActive: selectedStatus ? selectedStatus === 'active' : undefined,
         categoryId: selectedCategory,
         sortBy,
-        sortOrder
+        sortOrder,
       };
       await getAllQuestions(currentPage, 12, filters);
     } catch (error) {
@@ -643,12 +658,12 @@ const SellQuestionsManagement = () => {
     setIsQuestionModalOpen(true);
   };
 
-  const handleEditQuestion = (question) => {
+  const handleEditQuestion = question => {
     setSelectedQuestion(question);
     setIsQuestionModalOpen(true);
   };
 
-  const handleSaveQuestion = async (questionData) => {
+  const handleSaveQuestion = async questionData => {
     try {
       if (selectedQuestion) {
         await updateQuestion(selectedQuestion._id, questionData);
@@ -669,8 +684,10 @@ const SellQuestionsManagement = () => {
     setSelectedQuestion(null);
   };
 
-  const handleDeleteQuestion = async (questionId) => {
-    if (window.confirm('Are you sure you want to delete this question? This action cannot be undone.')) {
+  const handleDeleteQuestion = async questionId => {
+    if (
+      window.confirm('Are you sure you want to delete this question? This action cannot be undone.')
+    ) {
       try {
         await deleteQuestion(questionId);
         fetchQuestions();
@@ -680,7 +697,7 @@ const SellQuestionsManagement = () => {
     }
   };
 
-  const handleSort = (field) => {
+  const handleSort = field => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -692,18 +709,23 @@ const SellQuestionsManagement = () => {
   const handleReorder = async (questionId, direction) => {
     try {
       const currentIndex = questions.findIndex(q => q._id === questionId);
-      const newOrder = direction === 'up' ? questions[currentIndex].order - 1 : questions[currentIndex].order + 1;
-      
+      const newOrder =
+        direction === 'up' ? questions[currentIndex].order - 1 : questions[currentIndex].order + 1;
+
       if (newOrder >= 1 && newOrder <= questions.length) {
-        const otherQuestion = questions.find(q => q.order === newOrder && q.section === questions[currentIndex].section && (q.categoryId?._id || q.categoryId) === (questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId));
+        const otherQuestion = questions.find(
+          q =>
+            q.order === newOrder &&
+            q.section === questions[currentIndex].section &&
+            (q.categoryId?._id || q.categoryId) ===
+              (questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId)
+        );
         if (otherQuestion) {
           await reorderQuestions({
-            categoryId: questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId,
+            categoryId:
+              questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId,
             section: questions[currentIndex].section,
-            questionIds: [
-              questionId,
-              otherQuestion._id
-            ]
+            questionIds: [questionId, otherQuestion._id],
           });
         }
         fetchQuestions();
@@ -713,7 +735,7 @@ const SellQuestionsManagement = () => {
     }
   };
 
-  const renderQuestionCard = (question) => (
+  const renderQuestionCard = question => (
     <QuestionCard key={question._id}>
       <QuestionHeader>
         <QuestionInfo>
@@ -721,12 +743,19 @@ const SellQuestionsManagement = () => {
           <QuestionMeta>
             <span>Order: {question.order}</span>
             <span>•</span>
-            <span>Category: {(question.categoryId?.name || question.categoryId) || 'Unknown'}</span>
+            <span>Category: {question.categoryId?.name || question.categoryId || 'Unknown'}</span>
             <span>•</span>
             <span>{getDisplayOptions(question).length} options</span>
           </QuestionMeta>
         </QuestionInfo>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.5rem',
+            alignItems: 'flex-end',
+          }}
+        >
           <QuestionBadge type={deriveType(question)}>
             {questionTypes.find(t => t.id === deriveType(question))?.name || deriveType(question)}
           </QuestionBadge>
@@ -746,14 +775,14 @@ const SellQuestionsManagement = () => {
           </OrderControls>
         </div>
       </QuestionHeader>
-      
+
       <QuestionContent>
         {question.description && (
           <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem' }}>
             {question.description}
           </div>
         )}
-        
+
         {getDisplayOptions(question).length > 0 && (
           <OptionsContainer>
             <OptionsTitle>
@@ -761,14 +790,18 @@ const SellQuestionsManagement = () => {
               Options ({getDisplayOptions(question).length})
             </OptionsTitle>
             <OptionsList>
-              {getDisplayOptions(question).slice(0, 3).map((option, index) => (
-                <OptionItem key={index}>
-                  <OptionText>{option.label}</OptionText>
-                  <OptionValue>
-                    {option.delta ? `${option.delta.sign}${option.delta.value}${option.delta.type === 'percent' ? '%' : ''}` : option.value}
-                  </OptionValue>
-                </OptionItem>
-              ))}
+              {getDisplayOptions(question)
+                .slice(0, 3)
+                .map((option, index) => (
+                  <OptionItem key={index}>
+                    <OptionText>{option.label}</OptionText>
+                    <OptionValue>
+                      {option.delta
+                        ? `${option.delta.sign}${option.delta.value}${option.delta.type === 'percent' ? '%' : ''}`
+                        : option.value}
+                    </OptionValue>
+                  </OptionItem>
+                ))}
               {getDisplayOptions(question).length > 3 && (
                 <OptionItem>
                   <OptionText style={{ fontStyle: 'italic' }}>
@@ -788,15 +821,11 @@ const SellQuestionsManagement = () => {
           <Eye size={14} />
           View
         </ActionButtonSmall>
-        <ActionButtonSmall
-          onClick={() => handleEditQuestion(question)}
-        >
+        <ActionButtonSmall onClick={() => handleEditQuestion(question)}>
           <Edit size={14} />
           Edit
         </ActionButtonSmall>
-        <ActionButtonSmall
-          onClick={() => handleDeleteQuestion(question._id)}
-        >
+        <ActionButtonSmall onClick={() => handleDeleteQuestion(question._id)}>
           <Trash2 size={14} />
           Delete
         </ActionButtonSmall>
@@ -809,18 +838,26 @@ const SellQuestionsManagement = () => {
       <thead>
         <tr>
           <TableHeader onClick={() => handleSort('order')}>
-            Order {sortBy === 'order' && (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+            Order{' '}
+            {sortBy === 'order' &&
+              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
           </TableHeader>
           <TableHeader onClick={() => handleSort('title')}>
-            Question {sortBy === 'title' && (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+            Question{' '}
+            {sortBy === 'title' &&
+              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
           </TableHeader>
           <TableHeader onClick={() => handleSort('uiType')}>
-            Type {sortBy === 'uiType' && (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+            Type{' '}
+            {sortBy === 'uiType' &&
+              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
           </TableHeader>
           <TableHeader>Category</TableHeader>
           <TableHeader>Options</TableHeader>
           <TableHeader onClick={() => handleSort('isActive')}>
-            Status {sortBy === 'isActive' && (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+            Status{' '}
+            {sortBy === 'isActive' &&
+              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
           </TableHeader>
           <TableHeader>Actions</TableHeader>
         </tr>
@@ -857,17 +894,14 @@ const SellQuestionsManagement = () => {
             </TableCell>
             <TableCell>
               <QuestionBadge type={deriveType(question)}>
-                {questionTypes.find(t => t.id === deriveType(question))?.name || deriveType(question)}
+                {questionTypes.find(t => t.id === deriveType(question))?.name ||
+                  deriveType(question)}
               </QuestionBadge>
             </TableCell>
-            <TableCell>
-              {(question.categoryId?.name || question.categoryId) || 'Unknown'}
-            </TableCell>
+            <TableCell>{question.categoryId?.name || question.categoryId || 'Unknown'}</TableCell>
             <TableCell>{getDisplayOptions(question).length}</TableCell>
             <TableCell>
-              <StatusBadge status={deriveStatus(question)}>
-                {deriveStatus(question)}
-              </StatusBadge>
+              <StatusBadge status={deriveStatus(question)}>{deriveStatus(question)}</StatusBadge>
             </TableCell>
             <TableCell>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -876,14 +910,10 @@ const SellQuestionsManagement = () => {
                 >
                   <Eye size={14} />
                 </ActionButtonSmall>
-                <ActionButtonSmall
-                  onClick={() => handleEditQuestion(question)}
-                >
+                <ActionButtonSmall onClick={() => handleEditQuestion(question)}>
                   <Edit size={14} />
                 </ActionButtonSmall>
-                <ActionButtonSmall
-                  onClick={() => handleDeleteQuestion(question._id)}
-                >
+                <ActionButtonSmall onClick={() => handleDeleteQuestion(question._id)}>
                   <Trash2 size={14} />
                 </ActionButtonSmall>
               </div>
@@ -897,7 +927,7 @@ const SellQuestionsManagement = () => {
   const renderPagination = () => {
     const totalPages = pagination.totalPages || 1;
     const pages = [];
-    
+
     for (let i = 1; i <= Math.min(totalPages, 5); i++) {
       pages.push(
         <PaginationButton
@@ -913,9 +943,9 @@ const SellQuestionsManagement = () => {
     return (
       <Pagination>
         <PaginationInfo>
-          Showing {((currentPage - 1) * pagination.limit) + 1} to{' '}
-          {Math.min(currentPage * pagination.limit, pagination.total)} of{' '}
-          {pagination.total} questions
+          Showing {(currentPage - 1) * pagination.limit + 1} to{' '}
+          {Math.min(currentPage * pagination.limit, pagination.total)} of {pagination.total}{' '}
+          questions
         </PaginationInfo>
         <PaginationControls>
           <PaginationButton
@@ -974,7 +1004,10 @@ const SellQuestionsManagement = () => {
         <ErrorMessage>
           <AlertCircle size={16} />
           {error}
-          <button onClick={clearError} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit' }}>
+          <button
+            onClick={clearError}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit' }}
+          >
             <X size={16} />
           </button>
         </ErrorMessage>
@@ -1004,15 +1037,12 @@ const SellQuestionsManagement = () => {
               type="text"
               placeholder="Search questions by title or description..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              onChange={e => setSearchTerm(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && handleSearch()}
             />
           </SearchContainer>
-          
-          <FilterSelect
-            value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
-          >
+
+          <FilterSelect value={selectedType} onChange={e => setSelectedType(e.target.value)}>
             <option value="">All Types</option>
             {questionTypes.map(type => (
               <option key={type.id} value={type.id}>
@@ -1023,7 +1053,7 @@ const SellQuestionsManagement = () => {
 
           <FilterSelect
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={e => setSelectedCategory(e.target.value)}
           >
             <option value="">All Categories</option>
             {categories.map(category => (
@@ -1033,10 +1063,7 @@ const SellQuestionsManagement = () => {
             ))}
           </FilterSelect>
 
-          <FilterSelect
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-          >
+          <FilterSelect value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)}>
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -1048,16 +1075,10 @@ const SellQuestionsManagement = () => {
           </ActionButton>
 
           <ViewToggle>
-            <ViewButton
-              active={viewMode === 'grid'}
-              onClick={() => setViewMode('grid')}
-            >
+            <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
               <Grid size={16} />
             </ViewButton>
-            <ViewButton
-              active={viewMode === 'list'}
-              onClick={() => setViewMode('list')}
-            >
+            <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
               <List size={16} />
             </ViewButton>
           </ViewToggle>
@@ -1066,9 +1087,7 @@ const SellQuestionsManagement = () => {
 
       <QuestionsSection>
         <SectionHeader>
-          <SectionTitle>
-            Questions ({pagination.total || 0})
-          </SectionTitle>
+          <SectionTitle>Questions ({pagination.total || 0})</SectionTitle>
         </SectionHeader>
 
         {questions.length === 0 ? (
@@ -1082,9 +1101,7 @@ const SellQuestionsManagement = () => {
         ) : (
           <>
             {viewMode === 'grid' ? (
-              <QuestionsGrid>
-                {questions.map(renderQuestionCard)}
-              </QuestionsGrid>
+              <QuestionsGrid>{questions.map(renderQuestionCard)}</QuestionsGrid>
             ) : (
               renderQuestionTable()
             )}

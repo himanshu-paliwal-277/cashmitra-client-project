@@ -43,6 +43,6 @@ export const useAdminReports = () => {
     loading,
     error,
     fetchSalesReport,
-    fetchInventoryReport
+    fetchInventoryReport,
   };
 };

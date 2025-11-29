@@ -1,5 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { MapPin, Plus, Edit2, Trash2, Home, Building, User, Phone, Mail, RefreshCw } from 'lucide-react';
+import {
+  MapPin,
+  Plus,
+  Edit2,
+  Trash2,
+  Home,
+  Building,
+  User,
+  Phone,
+  Mail,
+  RefreshCw,
+} from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -15,7 +26,7 @@ const SavedAddresses = () => {
     addAddress,
     updateAddress,
     deleteAddress: deleteAddressHook,
-    setDefaultAddress
+    setDefaultAddress,
   } = useUserAddresses();
 
   const [saving, setSaving] = useState(false);
@@ -32,7 +43,7 @@ const SavedAddresses = () => {
     city: '',
     state: '',
     pincode: '',
-    isDefault: false
+    isDefault: false,
   });
 
   const resetForm = () => {
@@ -48,7 +59,7 @@ const SavedAddresses = () => {
       city: '',
       state: '',
       pincode: '',
-      isDefault: false
+      isDefault: false,
     });
   };
 
@@ -57,7 +68,7 @@ const SavedAddresses = () => {
     setIsModalOpen(true);
   };
 
-  const handleEditAddress = (address) => {
+  const handleEditAddress = address => {
     setEditingAddress(address);
     setFormData({
       title: address.title || '',
@@ -70,12 +81,12 @@ const SavedAddresses = () => {
       city: address.city || '',
       state: address.state || '',
       pincode: address.pincode || '',
-      isDefault: Boolean(address.isDefault)
+      isDefault: Boolean(address.isDefault),
     });
     setIsModalOpen(true);
   };
 
-  const handleDeleteAddress = async (addressId) => {
+  const handleDeleteAddress = async addressId => {
     if (!window.confirm('Are you sure you want to delete this address?')) return;
     try {
       await deleteAddressHook(addressId);
@@ -90,7 +101,7 @@ const SavedAddresses = () => {
   }, []);
 
   useEffect(() => {
-    const onEsc = (e) => e.key === 'Escape' && setIsModalOpen(false);
+    const onEsc = e => e.key === 'Escape' && setIsModalOpen(false);
     if (isModalOpen) document.addEventListener('keydown', onEsc);
     return () => document.removeEventListener('keydown', onEsc);
   }, [isModalOpen]);
@@ -111,20 +122,20 @@ const SavedAddresses = () => {
     }
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = e => {
     e.preventDefault();
     saveAddress();
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-  const getAddressTypeIcon = (type) => {
+  const getAddressTypeIcon = type => {
     switch (type) {
       case 'home':
         return <Home size={18} />;
@@ -135,7 +146,7 @@ const SavedAddresses = () => {
     }
   };
 
-  const getAddressTypeLabel = (type) => {
+  const getAddressTypeLabel = type => {
     switch (type) {
       case 'home':
         return 'Home';
@@ -168,7 +179,7 @@ const SavedAddresses = () => {
           </div>
         ) : addresses?.length > 0 ? (
           <div className="addr-grid">
-            {addresses.map((address) => {
+            {addresses.map(address => {
               const id = address._id || address.id;
               const type = address.addressType || address.type || 'home';
               return (
@@ -181,7 +192,11 @@ const SavedAddresses = () => {
                       <span>{address.title || getAddressTypeLabel(type)}</span>
                     </div>
                     <div className="addr-actions">
-                      <button className="icon-btn" aria-label="Edit address" onClick={() => handleEditAddress(address)}>
+                      <button
+                        className="icon-btn"
+                        aria-label="Edit address"
+                        onClick={() => handleEditAddress(address)}
+                      >
                         <Edit2 size={16} />
                       </button>
                       <button
@@ -246,7 +261,7 @@ const SavedAddresses = () => {
           aria-labelledby="addr-modal-title"
           onClick={closeModal}
         >
-          <div className="addr-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="addr-modal" onClick={e => e.stopPropagation()}>
             <header className="addr-modal-header">
               <h2 id="addr-modal-title">{editingAddress ? 'Edit Address' : 'Add New Address'}</h2>
               <button className="addr-close" aria-label="Close" onClick={closeModal}>
@@ -263,7 +278,9 @@ const SavedAddresses = () => {
                 </div>
 
                 <div className="addr-field">
-                  <label htmlFor="title" className="addr-label required">Address Title</label>
+                  <label htmlFor="title" className="addr-label required">
+                    Address Title
+                  </label>
                   <input
                     id="title"
                     name="title"
@@ -277,7 +294,9 @@ const SavedAddresses = () => {
 
                 <div className="addr-row">
                   <div className="addr-field">
-                    <label htmlFor="fullName" className="addr-label required">Full Name</label>
+                    <label htmlFor="fullName" className="addr-label required">
+                      Full Name
+                    </label>
                     <input
                       id="fullName"
                       name="fullName"
@@ -290,7 +309,9 @@ const SavedAddresses = () => {
                   </div>
 
                   <div className="addr-field">
-                    <label htmlFor="addressType" className="addr-label required">Address Type</label>
+                    <label htmlFor="addressType" className="addr-label required">
+                      Address Type
+                    </label>
                     <select
                       id="addressType"
                       name="addressType"
@@ -316,7 +337,9 @@ const SavedAddresses = () => {
 
                 <div className="addr-row">
                   <div className="addr-field">
-                    <label htmlFor="phone" className="addr-label required">Phone Number</label>
+                    <label htmlFor="phone" className="addr-label required">
+                      Phone Number
+                    </label>
                     <input
                       id="phone"
                       name="phone"
@@ -332,7 +355,9 @@ const SavedAddresses = () => {
                   </div>
 
                   <div className="addr-field">
-                    <label htmlFor="email" className="addr-label">Email Address</label>
+                    <label htmlFor="email" className="addr-label">
+                      Email Address
+                    </label>
                     <input
                       id="email"
                       name="email"
@@ -354,7 +379,9 @@ const SavedAddresses = () => {
                 </div>
 
                 <div className="addr-field">
-                  <label htmlFor="street" className="addr-label required">Street Address</label>
+                  <label htmlFor="street" className="addr-label required">
+                    Street Address
+                  </label>
                   <input
                     id="street"
                     name="street"
@@ -367,7 +394,9 @@ const SavedAddresses = () => {
                 </div>
 
                 <div className="addr-field">
-                  <label htmlFor="addressLine2" className="addr-label">Address Line 2</label>
+                  <label htmlFor="addressLine2" className="addr-label">
+                    Address Line 2
+                  </label>
                   <input
                     id="addressLine2"
                     name="addressLine2"
@@ -380,7 +409,9 @@ const SavedAddresses = () => {
 
                 <div className="addr-row">
                   <div className="addr-field">
-                    <label htmlFor="city" className="addr-label required">City</label>
+                    <label htmlFor="city" className="addr-label required">
+                      City
+                    </label>
                     <input
                       id="city"
                       name="city"
@@ -393,7 +424,9 @@ const SavedAddresses = () => {
                   </div>
 
                   <div className="addr-field">
-                    <label htmlFor="state" className="addr-label required">State</label>
+                    <label htmlFor="state" className="addr-label required">
+                      State
+                    </label>
                     <input
                       id="state"
                       name="state"
@@ -407,7 +440,9 @@ const SavedAddresses = () => {
                 </div>
 
                 <div className="addr-field">
-                  <label htmlFor="pincode" className="addr-label required">Pincode</label>
+                  <label htmlFor="pincode" className="addr-label required">
+                    Pincode
+                  </label>
                   <input
                     id="pincode"
                     name="pincode"
@@ -444,8 +479,10 @@ const SavedAddresses = () => {
                       <RefreshCw size={16} className="spin" />
                       Saving...
                     </>
+                  ) : editingAddress ? (
+                    'Update Address'
                   ) : (
-                    editingAddress ? 'Update Address' : 'Save Address'
+                    'Save Address'
                   )}
                 </Button>
               </footer>

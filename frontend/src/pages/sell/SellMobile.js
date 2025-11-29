@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { theme } from '../../theme';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import { 
+import {
   ArrowRight,
   ArrowLeft,
   Home,
@@ -11,7 +11,7 @@ import {
   Star,
   TrendingUp,
   Shield,
-  Clock
+  Clock,
 } from 'lucide-react';
 import useAdminBrands from '../../hooks/useAdminBrands';
 import useAdminCategories from '../../hooks/useAdminCategories';
@@ -26,11 +26,11 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 0 ${theme.spacing[8]};
   }
@@ -51,7 +51,7 @@ const BreadcrumbLink = styled.a`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -75,7 +75,7 @@ const CategoryIcon = styled.div`
   align-items: center;
   justify-content: center;
   margin: 0 auto ${theme.spacing[4]};
-  
+
   svg {
     color: ${theme.colors.primary.main};
   }
@@ -86,7 +86,7 @@ const PageTitle = styled.h1`
   font-weight: ${theme.typography.fontWeight.semibold};
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[3]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     font-size: ${theme.typography.fontSize['2xl']};
   }
@@ -120,7 +120,7 @@ const FeatureIcon = styled.div`
   align-items: center;
   justify-content: center;
   margin: 0 auto ${theme.spacing[3]};
-  
+
   svg {
     color: ${theme.colors.accent.main};
   }
@@ -144,7 +144,7 @@ const BrandGrid = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: ${theme.spacing[4]};
   margin-bottom: ${theme.spacing[8]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -156,13 +156,13 @@ const BrandCard = styled(Card)`
   border: 2px solid transparent;
   text-align: center;
   padding: ${theme.spacing[4]};
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.lg};
     border-color: ${theme.colors.primary.main};
   }
-  
+
   &.selected {
     border-color: ${theme.colors.primary.main};
     background: ${theme.colors.primary[50]};
@@ -203,10 +203,10 @@ const NavigationButtons = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: ${theme.spacing[4]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -229,48 +229,58 @@ const SellMobile = ({ onBrandSelect, onBack }) => {
   const [selectedBrand, setSelectedBrand] = useState(null);
   const { brands, loading: brandsLoading, fetchBrands } = useAdminBrands();
   const { categories, loading: categoriesLoading, fetchCategories } = useAdminCategories();
-  
+
   // Filter brands for mobile category
   const mobileBrands = brands.filter(brand => {
     // Check if brand has mobile category or if it's associated with mobile products
-    return brand.categoryName === 'Mobile' || brand.categoryName === 'Mobile Phones' || 
-           brand.name === 'Apple' || brand.name === 'Samsung' || brand.name === 'OnePlus' || 
-           brand.name === 'Google' || brand.name === 'Xiaomi' || brand.name === 'Oppo' || brand.name === 'Vivo';
+    return (
+      brand.categoryName === 'Mobile' ||
+      brand.categoryName === 'Mobile Phones' ||
+      brand.name === 'Apple' ||
+      brand.name === 'Samsung' ||
+      brand.name === 'OnePlus' ||
+      brand.name === 'Google' ||
+      brand.name === 'Xiaomi' ||
+      brand.name === 'Oppo' ||
+      brand.name === 'Vivo'
+    );
   });
-  
+
   useEffect(() => {
     fetchBrands();
     fetchCategories();
   }, [fetchBrands, fetchCategories]);
-  
+
   const features = [
     {
       icon: <TrendingUp size={24} />,
       title: 'Best Market Price',
-      description: 'Get the highest value for your mobile phone with our competitive pricing algorithm.'
+      description:
+        'Get the highest value for your mobile phone with our competitive pricing algorithm.',
     },
     {
       icon: <Shield size={24} />,
       title: 'Secure Process',
-      description: 'Safe and secure transaction with data wiping and certified refurbishment process.'
+      description:
+        'Safe and secure transaction with data wiping and certified refurbishment process.',
     },
     {
       icon: <Clock size={24} />,
       title: 'Quick Pickup',
-      description: 'Free doorstep pickup within 24 hours. No hassle, no waiting time.'
-    }
+      description: 'Free doorstep pickup within 24 hours. No hassle, no waiting time.',
+    },
   ];
-  
-  const handleBrandSelect = (brand) => {
+
+  const handleBrandSelect = brand => {
     setSelectedBrand(brand);
   };
-  
+
   const handleNext = () => {
     if (selectedBrand && onBrandSelect) {
       onBrandSelect(selectedBrand, 'mobile');
     }
   };
-  
+
   if (brandsLoading || categoriesLoading) {
     return (
       <PageContainer>
@@ -282,7 +292,7 @@ const SellMobile = ({ onBrandSelect, onBack }) => {
       </PageContainer>
     );
   }
-  
+
   return (
     <PageContainer>
       <Container>
@@ -292,67 +302,54 @@ const SellMobile = ({ onBrandSelect, onBack }) => {
             Home
           </BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
-          <BreadcrumbLink href="/sell">
-            Sell
-          </BreadcrumbLink>
+          <BreadcrumbLink href="/sell">Sell</BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
           <span>Mobile</span>
         </Breadcrumb>
-        
+
         <PageHeader>
           <CategoryIcon>
             <Smartphone size={40} />
           </CategoryIcon>
           <PageTitle>Sell Your Mobile Phone</PageTitle>
           <PageSubtitle>
-            Turn your old mobile phone into instant cash. Get the best price with our 
-            transparent evaluation process and free doorstep pickup service.
+            Turn your old mobile phone into instant cash. Get the best price with our transparent
+            evaluation process and free doorstep pickup service.
           </PageSubtitle>
         </PageHeader>
-        
+
         <FeatureGrid>
           {features.map((feature, index) => (
             <FeatureCard key={index}>
-              <FeatureIcon>
-                {feature.icon}
-              </FeatureIcon>
+              <FeatureIcon>{feature.icon}</FeatureIcon>
               <FeatureTitle>{feature.title}</FeatureTitle>
               <FeatureDescription>{feature.description}</FeatureDescription>
             </FeatureCard>
           ))}
         </FeatureGrid>
-        
+
         <SectionTitle>Select Your Mobile Brand</SectionTitle>
-        
+
         <BrandGrid>
-          {mobileBrands.map((brand) => (
+          {mobileBrands.map(brand => (
             <BrandCard
               key={brand._id || brand.id}
               className={selectedBrand?.name === brand.name ? 'selected' : ''}
               onClick={() => handleBrandSelect(brand)}
             >
-              <BrandLogo>
-                {brand.name?.charAt(0).toUpperCase()}
-              </BrandLogo>
+              <BrandLogo>{brand.name?.charAt(0).toUpperCase()}</BrandLogo>
               <BrandName>{brand.name}</BrandName>
             </BrandCard>
           ))}
         </BrandGrid>
-        
+
         <NavigationButtons>
-          <BackButton
-            variant="outline"
-            onClick={onBack}
-          >
+          <BackButton variant="outline" onClick={onBack}>
             <ArrowLeft size={20} />
             Back to Categories
           </BackButton>
-          
-          <NextButton
-            variant="primary"
-            disabled={!selectedBrand}
-            onClick={handleNext}
-          >
+
+          <NextButton variant="primary" disabled={!selectedBrand} onClick={handleNext}>
             Continue to Models
             <ArrowRight size={20} />
           </NextButton>

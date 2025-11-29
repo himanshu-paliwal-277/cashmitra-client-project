@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { 
-  Menu, 
-  X, 
-  LayoutDashboard, 
-  Users, 
-  Package, 
-  BarChart3, 
-  Settings, 
-  LogOut, 
+import {
+  Menu,
+  X,
+  LayoutDashboard,
+  Users,
+  Package,
+  BarChart3,
+  Settings,
+  LogOut,
   ChevronDown,
   FolderTree,
   ShoppingCart,
@@ -42,7 +42,7 @@ import {
   Target,
   Bell,
   MessageSquare,
-  User
+  User,
 } from 'lucide-react';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
 
@@ -63,10 +63,10 @@ const Sidebar = styled.aside`
   left: 0;
   height: 100vh;
   z-index: 1000;
-  transform: ${props => props.$isOpen ? 'translateX(0)' : 'translateX(-100%)'};
+  transform: ${props => (props.$isOpen ? 'translateX(0)' : 'translateX(-100%)')};
   transition: transform 0.3s ease;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  
+
   @media (min-width: 1024px) {
     position: static;
     transform: translateX(0);
@@ -81,7 +81,7 @@ const SidebarHeader = styled.div`
   justify-content: space-between;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -116,17 +116,17 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   &:hover {
     background-color: #f1f5f9;
     color: #374151;
     transform: scale(1.05);
   }
-  
+
   &:active {
     transform: scale(0.95);
   }
-  
+
   @media (min-width: 1024px) {
     display: none;
   }
@@ -138,20 +138,20 @@ const SidebarNav = styled.nav`
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #e2e8f0 transparent;
-  
+
   &::-webkit-scrollbar {
     width: 4px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #e2e8f0;
     border-radius: 2px;
   }
-  
+
   &::-webkit-scrollbar-thumb:hover {
     background: #cbd5e1;
   }
@@ -159,7 +159,7 @@ const SidebarNav = styled.nav`
 
 const NavSection = styled.div`
   margin-bottom: 2rem;
-  
+
   &:last-child {
     margin-bottom: 1rem;
   }
@@ -174,7 +174,7 @@ const SectionTitle = styled.h3`
   margin: 0 0 1rem 0;
   padding: 0 1.5rem;
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -191,22 +191,22 @@ const NavItem = styled(Link)`
   align-items: center;
   padding: 0.875rem 1.5rem;
   margin: 0.25rem 1rem;
-  color: ${props => props.$active ? '#3b82f6' : '#64748b'};
+  color: ${props => (props.$active ? '#3b82f6' : '#64748b')};
   text-decoration: none;
-  font-weight: ${props => props.$active ? '600' : '500'};
+  font-weight: ${props => (props.$active ? '600' : '500')};
   font-size: 0.875rem;
-  background-color: ${props => props.$active ? 'rgba(59, 130, 246, 0.1)' : 'transparent'};
+  background-color: ${props => (props.$active ? 'rgba(59, 130, 246, 0.1)' : 'transparent')};
   border-radius: 0.5rem;
-  border-left: ${props => props.$active ? '3px solid #3b82f6' : '3px solid transparent'};
+  border-left: ${props => (props.$active ? '3px solid #3b82f6' : '3px solid transparent')};
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  
+
   &:hover {
     background-color: rgba(59, 130, 246, 0.05);
     color: #3b82f6;
     transform: translateX(2px);
   }
-  
+
   &:active {
     transform: translateX(1px);
   }
@@ -234,19 +234,23 @@ const MobileMenuButton = styled.button`
   justify-content: center;
   margin-bottom: 1.5rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
   &:hover {
     background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
     color: #1f2937;
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   @media (min-width: 1024px) {
     display: none;
   }
@@ -261,7 +265,7 @@ const MainContent = styled.main`
   background-color: #fafbfc;
   min-height: 100vh;
   overflow-y: auto;
-  
+
   @media (max-width: 1023px) {
     margin-left: 0;
     padding: 1.5rem 1rem;
@@ -276,8 +280,8 @@ const Overlay = styled.div`
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
-  display: ${props => props.$isOpen ? 'block' : 'none'};
-  
+  display: ${props => (props.$isOpen ? 'block' : 'none')};
+
   @media (min-width: 1024px) {
     display: none;
   }
@@ -338,7 +342,7 @@ const LogoutButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     background: linear-gradient(135deg, #dc2626, #b91c1c);
     transform: translateY(-1px);
@@ -384,22 +388,20 @@ const PartnerLayout = () => {
     '/partner/commission/rules': 'commissionRules',
     '/partner/payouts': 'walletPayouts',
     '/partner/reports': 'reports',
-    '/partner/settings': 'settings'
+    '/partner/settings': 'settings',
   };
 
   const navigationItems = [
     {
       section: 'Main',
-      items: [
-        { path: '/partner/dashboard', icon: LayoutDashboard, label: 'Dashboard' }
-      ]
+      items: [{ path: '/partner/dashboard', icon: LayoutDashboard, label: 'Dashboard' }],
     },
     {
       section: 'Buy Product List',
       items: [
         { path: '/partner/buy/categories', icon: FolderTree, label: 'Categories' },
-        { path: '/partner/buy/products', icon: Package, label: 'Products' }
-      ]
+        { path: '/partner/buy/products', icon: Package, label: 'Products' },
+      ],
     },
     {
       section: 'Sales & Orders',
@@ -410,15 +412,15 @@ const PartnerLayout = () => {
         { path: '/partner/buy', icon: ShoppingBag, label: 'Buy' },
         { path: '/partner/buy/orders', icon: CheckSquare, label: 'Buy Orders' },
         { path: '/partner/pickup/management', icon: Truck, label: 'Pickup Management' },
-        { path: '/partner/returns', icon: RotateCcw, label: 'Returns' }
-      ]
+        { path: '/partner/returns', icon: RotateCcw, label: 'Returns' },
+      ],
     },
     {
       section: 'Sell Product List',
       items: [
         { path: '/partner/sell/categories', icon: FolderTree, label: 'Categories' },
-        { path: '/partner/sell/products', icon: Package, label: 'Products' }
-      ]
+        { path: '/partner/sell/products', icon: Package, label: 'Products' },
+      ],
     },
     {
       section: 'Sell Management',
@@ -427,19 +429,27 @@ const PartnerLayout = () => {
         { path: '/partner/condition/defects', icon: AlertTriangle, label: 'Defects' },
         { path: '/partner/condition/accessories', icon: Smartphone, label: 'Accessories' },
         { path: '/partner/condition/sessions', icon: Clock, label: 'Sessions' },
-        { path: '/partner/condition/configuration', icon: Settings, label: 'Configuration Management' }
-      ]
+        {
+          path: '/partner/condition/configuration',
+          icon: Settings,
+          label: 'Configuration Management',
+        },
+      ],
     },
     {
       section: 'Partners & Users',
       items: [
         { path: '/partner/partners', icon: Users, label: 'Partners' },
-        { path: '/partner/partner/applications', icon: UserCheck, label: 'Partner Applications (KYC)' },
+        {
+          path: '/partner/partner/applications',
+          icon: UserCheck,
+          label: 'Partner Applications (KYC)',
+        },
         { path: '/partner/partner/list', icon: Users, label: 'Partner List' },
         { path: '/partner/partner/permissions', icon: Shield, label: 'Partner Permissions' },
         { path: '/partner/users', icon: Users, label: 'User Management' },
-        { path: '/partner/inventory/approval', icon: CheckSquare, label: 'Inventory Approval' }
-      ]
+        { path: '/partner/inventory/approval', icon: CheckSquare, label: 'Inventory Approval' },
+      ],
     },
     {
       section: 'Pricing & Finance',
@@ -450,21 +460,17 @@ const PartnerLayout = () => {
         { path: '/partner/promotions', icon: Gift, label: 'Promotions/Coupons' },
         { path: '/partner/finance', icon: Calculator, label: 'Finance' },
         { path: '/partner/commission/rules', icon: DollarSign, label: 'Commission Rules' },
-        { path: '/partner/payouts', icon: CreditCard, label: 'Wallet & Payouts' }
-      ]
+        { path: '/partner/payouts', icon: CreditCard, label: 'Wallet & Payouts' },
+      ],
     },
     {
       section: 'Analytics & Reports',
-      items: [
-        { path: '/partner/reports', icon: BarChart3, label: 'Reports' }
-      ]
+      items: [{ path: '/partner/reports', icon: BarChart3, label: 'Reports' }],
     },
     {
       section: 'System',
-      items: [
-        { path: '/partner/settings', icon: Settings, label: 'Settings' }
-      ]
-    }
+      items: [{ path: '/partner/settings', icon: Settings, label: 'Settings' }],
+    },
   ];
 
   const handleLogout = () => {
@@ -481,18 +487,18 @@ const PartnerLayout = () => {
             <X size={20} />
           </CloseButton>
         </SidebarHeader>
-        
+
         <SidebarNav>
           {navigationItems.map((section, sectionIndex) => {
             // Filter items based on permissions
             const filteredItems = section.items.filter(item => {
               const permissionKey = permissionMap[item.path];
-              
+
               // If no permission key defined or no roleTemplate, show all items (for backward compatibility)
               if (!permissionKey || !roleTemplate) {
                 return true;
               }
-              
+
               // Check if partner has permission for this menu item
               return roleTemplate.permissions && roleTemplate.permissions.includes(permissionKey);
             });
@@ -508,13 +514,15 @@ const PartnerLayout = () => {
                 {filteredItems.map((item, itemIndex) => {
                   const IconComponent = item.icon;
                   return (
-                    <NavItem 
+                    <NavItem
                       key={itemIndex}
-                      to={item.path} 
+                      to={item.path}
                       $active={location.pathname === item.path}
                       onClick={() => setSidebarOpen(false)}
                     >
-                      <NavIcon><IconComponent size={18} /></NavIcon>
+                      <NavIcon>
+                        <IconComponent size={18} />
+                      </NavIcon>
                       {item.label}
                     </NavItem>
                   );
@@ -522,32 +530,32 @@ const PartnerLayout = () => {
               </NavSection>
             );
           })}
-           
-           <NavSection>
-             <NavItem 
-               as="button"
-               onClick={handleLogout}
-               style={{ 
-                 background: 'none', 
-                 border: 'none', 
-                 width: '100%', 
-                 textAlign: 'left',
-                 cursor: 'pointer',
-                 color: '#64748b',
-                 fontSize: '0.875rem'
-               }}
-             >
-               <NavIcon><LogOut size={18} /></NavIcon>
-               Logout
-             </NavItem>
-           </NavSection>
+
+          <NavSection>
+            <NavItem
+              as="button"
+              onClick={handleLogout}
+              style={{
+                background: 'none',
+                border: 'none',
+                width: '100%',
+                textAlign: 'left',
+                cursor: 'pointer',
+                color: '#64748b',
+                fontSize: '0.875rem',
+              }}
+            >
+              <NavIcon>
+                <LogOut size={18} />
+              </NavIcon>
+              Logout
+            </NavItem>
+          </NavSection>
         </SidebarNav>
 
         <UserSection>
           <UserInfo>
-            <UserAvatar>
-              {partner?.name?.charAt(0)?.toUpperCase() || 'P'}
-            </UserAvatar>
+            <UserAvatar>{partner?.name?.charAt(0)?.toUpperCase() || 'P'}</UserAvatar>
             <UserDetails>
               <UserName>{partner?.name || 'Partner'}</UserName>
               <UserRole>{partner?.shopName || 'Partner Shop'}</UserRole>

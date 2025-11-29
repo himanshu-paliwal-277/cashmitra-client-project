@@ -27,20 +27,20 @@ const BuyProductsList = () => {
     }
   };
 
-  const handleProductClick = (productId) => {
+  const handleProductClick = productId => {
     navigate(`/buy/product-details/${productId}`);
   };
 
-  const renderStars = (rating) => {
+  const renderStars = rating => {
     const r = Math.floor(rating || 0);
     return Array.from({ length: 5 }, (_, i) => (
       <Star key={i} size={12} className={i < r ? 'star-filled' : 'star-empty'} />
     ));
   };
 
-  const assuredChipVisible = (p) => true; // show for all, or replace with your condition
+  const assuredChipVisible = p => true; // show for all, or replace with your condition
 
-  const rupee = (n) => (typeof n === 'number' ? n.toLocaleString() : n);
+  const rupee = n => (typeof n === 'number' ? n.toLocaleString() : n);
 
   return (
     <section className="buy-products-section">
@@ -69,7 +69,9 @@ const BuyProductsList = () => {
           <div className="error-state">
             <h3>Oops! Something went wrong</h3>
             <p>{error}</p>
-            <button onClick={fetchProducts} className="retry-button">Try Again</button>
+            <button onClick={fetchProducts} className="retry-button">
+              Try Again
+            </button>
           </div>
         ) : products.length === 0 ? (
           <div className="empty-state">
@@ -78,12 +80,15 @@ const BuyProductsList = () => {
           </div>
         ) : (
           <div className="products-grid">
-            {products.map((p) => {
+            {products.map(p => {
               const rating = p.rating?.average ?? 4.6;
               const mrp = p.pricing?.mrp ?? 0;
               const discounted = p.pricing?.discountedPrice ?? mrp;
-              const percent = p.pricing?.discountPercent ?? (mrp > 0 ? Math.round(((mrp - discounted) / mrp) * 100) : 0);
-              const discountAmount = p.pricing?.discountAmount ?? (mrp - discounted > 0 ? mrp - discounted : 0);
+              const percent =
+                p.pricing?.discountPercent ??
+                (mrp > 0 ? Math.round(((mrp - discounted) / mrp) * 100) : 0);
+              const discountAmount =
+                p.pricing?.discountAmount ?? (mrp - discounted > 0 ? mrp - discounted : 0);
               const goldPrice = Math.max(0, Math.round(discounted * 0.93)); // “with GOLD” line (tweak if you have real value)
 
               return (
@@ -96,7 +101,9 @@ const BuyProductsList = () => {
                   {assuredChipVisible(p) && (
                     <div className="assured-chip">
                       <span className="assured-logo">Ⓒ</span>
-                      CASHIFY<br />ASSURED
+                      CASHIFY
+                      <br />
+                      ASSURED
                     </div>
                   )}
 
@@ -115,7 +122,9 @@ const BuyProductsList = () => {
 
                   {/* Name */}
                   <div className="content">
-                    <h3 className="name">{p.name} {p.isRefurbished ? '- Refurbished' : ''}</h3>
+                    <h3 className="name">
+                      {p.name} {p.isRefurbished ? '- Refurbished' : ''}
+                    </h3>
 
                     {/* Pills: Phone Fest + Rating */}
                     <div className="pills">
@@ -129,9 +138,7 @@ const BuyProductsList = () => {
                     <div className="price-row">
                       {percent > 0 && <span className="percent">-{percent}%</span>}
                       <span className="price">₹{rupee(discounted)}</span>
-                      {mrp > discounted && (
-                        <span className="mrp">₹{rupee(mrp)}</span>
-                      )}
+                      {mrp > discounted && <span className="mrp">₹{rupee(mrp)}</span>}
                     </div>
 
                     {/* Gold price */}

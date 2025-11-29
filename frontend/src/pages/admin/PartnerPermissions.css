@@ -146,7 +146,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Templates Grid */
@@ -530,7 +532,7 @@
   background: #f8fafc;
 }
 
-.toggle-label input[type="checkbox"] {
+.toggle-label input[type='checkbox'] {
   display: none;
 }
 
@@ -556,11 +558,11 @@
   transition: transform 0.2s;
 }
 
-.toggle-label input[type="checkbox"]:checked + .toggle-switch {
+.toggle-label input[type='checkbox']:checked + .toggle-switch {
   background: #3b82f6;
 }
 
-.toggle-label input[type="checkbox"]:checked + .toggle-switch::after {
+.toggle-label input[type='checkbox']:checked + .toggle-switch::after {
   transform: translateX(20px);
 }
 

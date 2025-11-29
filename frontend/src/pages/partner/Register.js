@@ -15,7 +15,7 @@ import {
   Divider,
   LinkText,
   BrandSection,
-  LogoContainer
+  LogoContainer,
 } from '../../styles/AuthStyles';
 import styled from 'styled-components';
 import { theme } from '../../theme';
@@ -28,7 +28,7 @@ const TwoColumnGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: ${theme.spacing[4]};
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -36,22 +36,24 @@ const TwoColumnGrid = styled.div`
 
 const Select = styled.select`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: 2px solid ${props => props.hasError ? theme.colors.error.main : theme.colors.grey[300]};
+  border: 2px solid ${props => (props.hasError ? theme.colors.error.main : theme.colors.grey[300])};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.base};
   transition: all 0.2s ease;
   background: ${theme.colors.white};
-  
+
   &:focus {
     outline: none;
-    border-color: ${props => props.hasError ? theme.colors.error.main : theme.colors.primary.main};
-    box-shadow: 0 0 0 3px ${props => props.hasError ? theme.colors.error[100] : theme.colors.primary[100]};
+    border-color: ${props =>
+      props.hasError ? theme.colors.error.main : theme.colors.primary.main};
+    box-shadow: 0 0 0 3px
+      ${props => (props.hasError ? theme.colors.error[100] : theme.colors.primary[100])};
   }
 `;
 
 const Textarea = styled.textarea`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: 2px solid ${props => props.hasError ? theme.colors.error.main : theme.colors.grey[300]};
+  border: 2px solid ${props => (props.hasError ? theme.colors.error.main : theme.colors.grey[300])};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.base};
   transition: all 0.2s ease;
@@ -59,13 +61,15 @@ const Textarea = styled.textarea`
   min-height: 100px;
   resize: vertical;
   font-family: inherit;
-  
+
   &:focus {
     outline: none;
-    border-color: ${props => props.hasError ? theme.colors.error.main : theme.colors.primary.main};
-    box-shadow: 0 0 0 3px ${props => props.hasError ? theme.colors.error[100] : theme.colors.primary[100]};
+    border-color: ${props =>
+      props.hasError ? theme.colors.error.main : theme.colors.primary.main};
+    box-shadow: 0 0 0 3px
+      ${props => (props.hasError ? theme.colors.error[100] : theme.colors.primary[100])};
   }
-  
+
   &::placeholder {
     color: ${theme.colors.text.secondary};
   }
@@ -86,11 +90,11 @@ const CheckboxLabel = styled.label`
   font-size: ${theme.typography.fontSize.sm};
   color: ${theme.colors.text.secondary};
   line-height: 1.5;
-  
+
   a {
     color: ${theme.colors.primary.main};
     text-decoration: none;
-    
+
     &:hover {
       text-decoration: underline;
     }
@@ -100,7 +104,7 @@ const CheckboxLabel = styled.label`
 const PartnerRegister = () => {
   const navigate = useNavigate();
   const { register, loading } = usePartnerAuth();
-  
+
   const [formData, setFormData] = useState({
     // Personal Information
     name: '',
@@ -108,7 +112,7 @@ const PartnerRegister = () => {
     phone: '',
     password: '',
     confirmPassword: '',
-    
+
     // Business Information
     businessName: '',
     businessType: 'individual',
@@ -118,32 +122,32 @@ const PartnerRegister = () => {
     pincode: '',
     gstNumber: '',
     panNumber: '',
-    
+
     // Additional Information
     experience: '',
     expectedVolume: '',
     referralSource: '',
-    
+
     // Agreements
     agreeToTerms: false,
-    agreeToPrivacy: false
+    agreeToPrivacy: false,
   });
-  
+
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
@@ -201,7 +205,10 @@ const PartnerRegister = () => {
       newErrors.pincode = 'Please enter a valid 6-digit pincode';
     }
 
-    if (formData.gstNumber && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(formData.gstNumber)) {
+    if (
+      formData.gstNumber &&
+      !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(formData.gstNumber)
+    ) {
       newErrors.gstNumber = 'Please enter a valid GST number';
     }
 
@@ -222,18 +229,18 @@ const PartnerRegister = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const result = await register(formData);
-      
+
       if (result.success) {
         navigate('/partner/dashboard');
       } else {
@@ -274,16 +281,14 @@ const PartnerRegister = () => {
         </LoginHeader>
 
         <LoginForm onSubmit={handleSubmit}>
-          {errors.general && (
-            <ErrorMessage>{errors.general}</ErrorMessage>
-          )}
+          {errors.general && <ErrorMessage>{errors.general}</ErrorMessage>}
 
           {/* Personal Information */}
           <div>
             <h3 style={{ margin: '0 0 1rem', color: theme.colors.text.primary }}>
               Personal Information
             </h3>
-            
+
             <TwoColumnGrid>
               <FormGroup>
                 <Label htmlFor="name">Full Name *</Label>
@@ -380,7 +385,7 @@ const PartnerRegister = () => {
             <h3 style={{ margin: '2rem 0 1rem', color: theme.colors.text.primary }}>
               Business Information
             </h3>
-            
+
             <FormGroup>
               <Label htmlFor="businessName">Business Name *</Label>
               <Input
@@ -486,7 +491,7 @@ const PartnerRegister = () => {
             <h3 style={{ margin: '2rem 0 1rem', color: theme.colors.text.primary }}>
               Additional Information
             </h3>
-            
+
             <TwoColumnGrid>
               <FormGroup>
                 <Label htmlFor="experience">Experience in Electronics</Label>
@@ -570,11 +575,7 @@ const PartnerRegister = () => {
             {errors.agreeToPrivacy && <ErrorMessage>{errors.agreeToPrivacy}</ErrorMessage>}
           </div>
 
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-            isLoading={isSubmitting}
-          >
+          <Button type="submit" disabled={isSubmitting} isLoading={isSubmitting}>
             {isSubmitting ? (
               <>
                 <LoadingSpinner size="small" />
@@ -591,9 +592,7 @@ const PartnerRegister = () => {
         </Divider>
 
         <LinkText>
-          <Link to="/partner/login">
-            Sign In to Partner Portal
-          </Link>
+          <Link to="/partner/login">Sign In to Partner Portal</Link>
         </LinkText>
       </RegisterCard>
     </Container>

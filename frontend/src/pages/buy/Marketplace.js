@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { 
-  Search, 
-  Grid, 
-  List, 
-  Star, 
-  Heart, 
-  ShoppingCart, 
-  Smartphone, 
-  Tablet, 
-  Laptop, 
-  Headphones, 
-  Watch, 
+import {
+  Search,
+  Grid,
+  List,
+  Star,
+  Heart,
+  ShoppingCart,
+  Smartphone,
+  Tablet,
+  Laptop,
+  Headphones,
+  Watch,
   Camera,
   Award,
   Shield,
   Truck,
   RotateCcw,
   Eye,
-  Package
+  Package,
 } from 'lucide-react';
 import productService from '../../services/productService';
 import { getBuyCategories, getBuyProducts } from '../../services/productService';
@@ -38,10 +38,10 @@ const categoryIcons = {
   watch: Watch,
   smartwatch: Watch,
   camera: Camera,
-  default: Package
+  default: Package,
 };
 
-const getCategoryIcon = (categoryName) => {
+const getCategoryIcon = categoryName => {
   const nameLower = categoryName?.toLowerCase() || '';
   for (const [key, Icon] of Object.entries(categoryIcons)) {
     if (nameLower.includes(key)) {
@@ -66,13 +66,13 @@ const Marketplace = () => {
   const [wishlist, setWishlist] = useState(new Set());
   const [filters, setFilters] = useState({
     brand: 'all',
-    condition: 'all'
+    condition: 'all',
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
-    total: 0
+    total: 0,
   });
 
   // Fetch categories on mount
@@ -116,7 +116,7 @@ const Marketplace = () => {
 
         const params = {
           page: 1,
-          limit: 20
+          limit: 20,
         };
 
         if (selectedCategory && selectedCategory !== 'all') {
@@ -140,7 +140,7 @@ const Marketplace = () => {
         setProducts(response.products || []);
         setPagination({
           page: response.pagination?.page || 1,
-          total: response.pagination?.total || 0
+          total: response.pagination?.total || 0,
         });
       } catch (err) {
         console.error('Error fetching buy products:', err);
@@ -154,10 +154,10 @@ const Marketplace = () => {
     return () => clearTimeout(timer);
   }, [selectedCategory, searchQuery, filters, sortBy]);
 
-  const handleCategoryClick = (category) => {
+  const handleCategoryClick = category => {
     const categoryValue = category._id === 'all' ? 'all' : category.name;
     setSelectedCategory(categoryValue);
-    
+
     // Update URL
     if (categoryValue === 'all') {
       navigate('/buy');
@@ -166,7 +166,7 @@ const Marketplace = () => {
     }
   };
 
-  const toggleWishlist = (productId) => {
+  const toggleWishlist = productId => {
     const newWishlist = new Set(wishlist);
     if (newWishlist.has(productId)) {
       newWishlist.delete(productId);
@@ -176,7 +176,7 @@ const Marketplace = () => {
     setWishlist(newWishlist);
   };
 
-  const handleProductClick = (productId) => {
+  const handleProductClick = productId => {
     navigate(`/buy/product-details/${productId}`);
   };
 
@@ -186,7 +186,7 @@ const Marketplace = () => {
     // TODO: Implement cart functionality
   };
 
-  const renderStars = (rating) => {
+  const renderStars = rating => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
@@ -197,19 +197,24 @@ const Marketplace = () => {
     ));
   };
 
-  const renderProduct = (product) => {
+  const renderProduct = product => {
     const productId = product._id || product.id;
     // Handle image structure from API
-    const productImage = product.images?.main || 
+    const productImage =
+      product.images?.main ||
       product.images?.thumbnail ||
-      (Array.isArray(product.images) ? product.images[0] : null) || 
+      (Array.isArray(product.images) ? product.images[0] : null) ||
       'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop';
     const productTitle = product.name || `${product.brand} ${product.model}`;
     // Use pricing object from API
-    const productPrice = product.pricing?.discountedPrice || product.basePrice || product.price || 0;
+    const productPrice =
+      product.pricing?.discountedPrice || product.basePrice || product.price || 0;
     const originalPrice = product.pricing?.mrp || product.originalPrice || productPrice;
-    const discount = product.pricing?.discountPercent || 
-      (originalPrice > productPrice ? Math.round(((originalPrice - productPrice) / originalPrice) * 100) : 0);
+    const discount =
+      product.pricing?.discountPercent ||
+      (originalPrice > productPrice
+        ? Math.round(((originalPrice - productPrice) / originalPrice) * 100)
+        : 0);
     const rating = product.rating?.average || product.rating || 0;
     const reviewCount = product.rating?.totalReviews || product.reviewCount || 0;
     // Get variant info
@@ -217,22 +222,20 @@ const Marketplace = () => {
     const condition = product.conditionOptions?.[0]?.label;
 
     return (
-      <div 
-        key={productId} 
+      <div
+        key={productId}
         className="marketplace-product-card"
         onClick={() => handleProductClick(productId)}
       >
         <div className="marketplace-product-image">
           <img src={productImage} alt={productTitle} loading="lazy" />
-          {condition && (
-            <span className="marketplace-product-badge">{condition}</span>
-          )}
+          {condition && <span className="marketplace-product-badge">{condition}</span>}
           {product.isRefurbished && !condition && (
             <span className="marketplace-product-badge">Refurbished</span>
           )}
           <button
             className={`marketplace-wishlist-btn ${wishlist.has(productId) ? 'active' : ''}`}
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               toggleWishlist(productId);
             }}
@@ -255,17 +258,17 @@ const Marketplace = () => {
             <div>
               <span className="marketplace-price-current">₹{productPrice.toLocaleString()}</span>
               {discount > 0 && (
-                <span className="marketplace-price-original">₹{originalPrice.toLocaleString()}</span>
+                <span className="marketplace-price-original">
+                  ₹{originalPrice.toLocaleString()}
+                </span>
               )}
             </div>
-            {discount > 0 && (
-              <span className="marketplace-discount">{discount}% OFF</span>
-            )}
+            {discount > 0 && <span className="marketplace-discount">{discount}% OFF</span>}
           </div>
           <div className="marketplace-product-actions">
-            <button 
+            <button
               className="marketplace-btn marketplace-btn-secondary"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 handleProductClick(productId);
               }}
@@ -273,9 +276,9 @@ const Marketplace = () => {
               <Eye size={16} />
               View
             </button>
-            <button 
+            <button
               className="marketplace-btn marketplace-btn-primary"
-              onClick={(e) => handleAddToCart(e, product)}
+              onClick={e => handleAddToCart(e, product)}
             >
               <ShoppingCart size={16} />
               Add
@@ -299,7 +302,7 @@ const Marketplace = () => {
               type="text"
               placeholder="Search for devices, brands, or models..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
@@ -331,11 +334,12 @@ const Marketplace = () => {
         <section className="marketplace-categories">
           <h2 className="marketplace-section-title">Shop by Category</h2>
           <div className="marketplace-categories-grid">
-            {categories.map((category) => {
+            {categories.map(category => {
               const IconComponent = getCategoryIcon(category.name);
-              const isActive = selectedCategory === category.name || 
+              const isActive =
+                selectedCategory === category.name ||
                 (selectedCategory === 'all' && category._id === 'all');
-              
+
               return (
                 <div
                   key={category._id}
@@ -343,9 +347,9 @@ const Marketplace = () => {
                   onClick={() => handleCategoryClick(category)}
                 >
                   {category.image ? (
-                    <img 
-                      src={category.image} 
-                      alt={category.name} 
+                    <img
+                      src={category.image}
+                      alt={category.name}
                       className="marketplace-category-image"
                     />
                   ) : (
@@ -364,7 +368,10 @@ const Marketplace = () => {
             <p className="marketplace-results-count">
               Showing <span>{products.length}</span> of <span>{pagination.total}</span> products
               {selectedCategory !== 'all' && (
-                <> in <span>{selectedCategory}</span></>
+                <>
+                  {' '}
+                  in <span>{selectedCategory}</span>
+                </>
               )}
             </p>
           </div>
@@ -372,17 +379,19 @@ const Marketplace = () => {
             <select
               className="marketplace-filter-select"
               value={filters.brand}
-              onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
+              onChange={e => setFilters({ ...filters, brand: e.target.value })}
             >
               <option value="all">All Brands</option>
-              {brands.map((brand) => (
-                <option key={brand} value={brand}>{brand}</option>
+              {brands.map(brand => (
+                <option key={brand} value={brand}>
+                  {brand}
+                </option>
               ))}
             </select>
             <select
               className="marketplace-filter-select"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={e => setSortBy(e.target.value)}
             >
               <option value="popularity">Sort by Popularity</option>
               <option value="price-low">Price: Low to High</option>
@@ -435,9 +444,7 @@ const Marketplace = () => {
 
             {products.length >= 12 && (
               <div className="marketplace-load-more">
-                <button className="marketplace-load-more-btn">
-                  Load More Products
-                </button>
+                <button className="marketplace-load-more-btn">Load More Products</button>
               </div>
             )}
           </>

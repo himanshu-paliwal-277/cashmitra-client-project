@@ -18,7 +18,7 @@ import {
   HardDrive,
   Monitor,
   Battery,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 
 // Keyframes for loading spinner
@@ -31,10 +31,14 @@ const Container = styled.div`
   padding: 2rem;
   background-color: #f8fafc;
   min-height: 100vh;
-  
+
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -69,7 +73,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -95,7 +99,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -110,7 +114,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -127,11 +131,11 @@ const ModelsContainer = styled.div`
 const ModelItem = styled.div`
   border-bottom: 1px solid #e5e7eb;
   transition: all 0.2s;
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   &:hover {
     background-color: #f9fafb;
   }
@@ -184,8 +188,8 @@ const StatusBadge = styled.span`
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: ${props => props.active ? '#dcfce7' : '#fee2e2'};
-  color: ${props => props.active ? '#166534' : '#dc2626'};
+  background: ${props => (props.active ? '#dcfce7' : '#fee2e2')};
+  color: ${props => (props.active ? '#166534' : '#dc2626')};
 `;
 
 const ActionButtons = styled.div`
@@ -194,7 +198,8 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${props => props.primary ? '#3b82f6' : props.danger ? '#ef4444' : props.success ? '#10b981' : '#6b7280'};
+  background: ${props =>
+    props.primary ? '#3b82f6' : props.danger ? '#ef4444' : props.success ? '#10b981' : '#6b7280'};
   color: white;
   border: none;
   padding: 0.5rem;
@@ -203,7 +208,7 @@ const IconButton = styled.button`
   display: flex;
   align-items: center;
   transition: all 0.2s;
-  
+
   &:hover {
     opacity: 0.9;
     transform: scale(1.05);
@@ -228,7 +233,7 @@ const VariantCard = styled.div`
   padding: 1rem;
   border: 1px solid #e5e7eb;
   transition: all 0.2s;
-  
+
   &:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
@@ -308,7 +313,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  
+
   &:hover {
     background: #f3f4f6;
   }
@@ -331,7 +336,7 @@ const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -347,7 +352,7 @@ const TextArea = styled.textarea`
   font-size: 0.875rem;
   min-height: 100px;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -362,7 +367,7 @@ const Select = styled.select`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   background: white;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -394,7 +399,7 @@ const AddVariantButton = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   &:hover {
     background: #059669;
   }
@@ -417,8 +422,10 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
-  ${props => props.variant === 'primary' ? `
+
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     color: white;
     
@@ -426,7 +433,8 @@ const Button = styled.button`
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     }
-  ` : `
+  `
+      : `
     background: #f3f4f6;
     color: #374151;
     
@@ -434,7 +442,7 @@ const Button = styled.button`
       background: #e5e7eb;
     }
   `}
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -480,7 +488,7 @@ const ClearFiltersButton = styled.button`
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #4b5563;
   }
@@ -501,22 +509,24 @@ const Models = () => {
   const [expandedModels, setExpandedModels] = useState(new Set());
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
     description: '',
     releaseYear: new Date().getFullYear(),
     isActive: true,
-    variants: [{
-      name: '',
-      storage: '',
-      ram: '',
-      color: '',
-      price: '',
-      comparePrice: '',
-      sku: ''
-    }]
+    variants: [
+      {
+        name: '',
+        storage: '',
+        ram: '',
+        color: '',
+        price: '',
+        comparePrice: '',
+        sku: '',
+      },
+    ],
   });
 
   const {
@@ -526,16 +536,12 @@ const Models = () => {
     addModel,
     editModel,
     removeModel,
-    fetchModels
+    fetchModels,
   } = useAdminModels();
 
-  const {
-    brands: hookBrands
-  } = useAdminBrands();
+  const { brands: hookBrands } = useAdminBrands();
 
-  const {
-    categories: hookCategories
-  } = useAdminCategories();
+  const { categories: hookCategories } = useAdminCategories();
 
   useEffect(() => {
     setModels(hookModels);
@@ -554,7 +560,7 @@ const Models = () => {
   // Validation functions
   const validateForm = () => {
     const newErrors = {};
-    
+
     // Model name validation
     if (!formData.name.trim()) {
       newErrors.name = 'Model name is required';
@@ -563,17 +569,17 @@ const Models = () => {
     } else if (formData.name.trim().length > 100) {
       newErrors.name = 'Model name must be less than 100 characters';
     }
-    
+
     // Brand validation
     if (!formData.brand) {
       newErrors.brand = 'Brand is required';
     }
-    
+
     // Description validation
     if (formData.description && formData.description.length > 1000) {
       newErrors.description = 'Description must be less than 1000 characters';
     }
-    
+
     // Release year validation
     const currentYear = new Date().getFullYear();
     if (!formData.releaseYear) {
@@ -581,7 +587,7 @@ const Models = () => {
     } else if (formData.releaseYear < 1990 || formData.releaseYear > currentYear + 2) {
       newErrors.releaseYear = `Release year must be between 1990 and ${currentYear + 2}`;
     }
-    
+
     // Variants validation
     if (!formData.variants || formData.variants.length === 0) {
       newErrors.variants = 'At least one variant is required';
@@ -598,14 +604,14 @@ const Models = () => {
         }
       });
     }
-    
+
     return newErrors;
   };
-  
-  const handleSubmit = async (e) => {
+
+  const handleSubmit = async e => {
     e.preventDefault();
     console.log('Submitting form with data:', formData);
-    
+
     // Validate form
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
@@ -613,10 +619,10 @@ const Models = () => {
       setErrors(formErrors);
       return;
     }
-    
+
     setIsSubmitting(true);
     setErrors({});
-    
+
     try {
       // Trim and clean data
       const modelData = {
@@ -625,21 +631,23 @@ const Models = () => {
         description: formData.description?.trim() || '',
         releaseYear: parseInt(formData.releaseYear),
         isActive: formData.isActive,
-        variants: Array.isArray(formData.variants) ? formData.variants.map(variant => ({
-          ...variant,
-          name: variant.name?.trim() || '',
-          storage: variant.storage?.trim() || '',
-          ram: variant.ram?.trim() || '',
-          color: variant.color?.trim() || '',
-          sku: variant.sku?.trim() || '',
-          price: variant.price ? parseFloat(variant.price) : 0,
-          comparePrice: variant.comparePrice ? parseFloat(variant.comparePrice) : null
-        })) : []
+        variants: Array.isArray(formData.variants)
+          ? formData.variants.map(variant => ({
+              ...variant,
+              name: variant.name?.trim() || '',
+              storage: variant.storage?.trim() || '',
+              ram: variant.ram?.trim() || '',
+              color: variant.color?.trim() || '',
+              sku: variant.sku?.trim() || '',
+              price: variant.price ? parseFloat(variant.price) : 0,
+              comparePrice: variant.comparePrice ? parseFloat(variant.comparePrice) : null,
+            }))
+          : [],
       };
-      
+
       console.log('Sending model data:', modelData);
       console.log('Edit mode:', !!editingModel, 'Model ID:', editingModel?.model);
-      
+
       if (editingModel) {
         const result = await editModel(editingModel.model, modelData);
         console.log('Edit result:', result);
@@ -653,27 +661,30 @@ const Models = () => {
           throw new Error(result.error || 'Failed to create model');
         }
       }
-      
+
       console.log('Model saved successfully');
       setShowModal(false);
       setEditingModel(null);
       resetForm();
     } catch (error) {
       console.error('Error saving model:', error);
-      
+
       // Handle validation errors from backend
       if (error.response?.data?.errors) {
         const backendErrors = {};
         error.response.data.errors.forEach((err, index) => {
           backendErrors[`backend_error_${index}`] = err.message;
         });
-        setErrors({ 
+        setErrors({
           submit: 'Validation failed. Please check the fields below.',
-          ...backendErrors
+          ...backendErrors,
         });
       } else {
-        setErrors({ 
-          submit: error.response?.data?.message || error.message || 'Failed to save model. Please try again.' 
+        setErrors({
+          submit:
+            error.response?.data?.message ||
+            error.message ||
+            'Failed to save model. Please try again.',
         });
       }
     } finally {
@@ -681,7 +692,7 @@ const Models = () => {
     }
   };
 
-  const handleDelete = async (modelId) => {
+  const handleDelete = async modelId => {
     if (window.confirm('Are you sure you want to delete this model and all its variants?')) {
       try {
         await removeModel(modelId);
@@ -691,31 +702,36 @@ const Models = () => {
     }
   };
 
-  const handleEdit = (model) => {
+  const handleEdit = model => {
     console.log('Editing model:', model);
     setEditingModel(model);
-    
+
     // Find the brand by name, not ID
     const brandName = model.brand || '';
     console.log('Selected brand name:', brandName);
-    
+
     const editFormData = {
       name: model.model || '',
       brand: brandName,
       description: model.description || '',
       releaseYear: model.releaseYear || new Date().getFullYear(),
       isActive: model.isActive !== false,
-      variants: Array.isArray(model.variants) && model.variants.length > 0 ? model.variants : [{
-        name: '',
-        storage: '',
-        ram: '',
-        color: '',
-        price: '',
-        comparePrice: '',
-        sku: ''
-      }]
+      variants:
+        Array.isArray(model.variants) && model.variants.length > 0
+          ? model.variants
+          : [
+              {
+                name: '',
+                storage: '',
+                ram: '',
+                color: '',
+                price: '',
+                comparePrice: '',
+                sku: '',
+              },
+            ],
     };
-    
+
     console.log('Setting form data for edit:', editFormData);
     setFormData(editFormData);
     setShowModal(true);
@@ -728,19 +744,19 @@ const Models = () => {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
-  
+
   const handleVariantChange = (index, field, value) => {
     const updatedVariants = [...formData.variants];
     updatedVariants[index] = { ...updatedVariants[index], [field]: value };
     setFormData(prev => ({ ...prev, variants: updatedVariants }));
-    
+
     // Clear variant field error when user starts typing
     const errorKey = `variant_${index}_${field}`;
     if (errors[errorKey]) {
       setErrors(prev => ({ ...prev, [errorKey]: '' }));
     }
   };
-  
+
   // Add closeModal function
   const closeModal = () => {
     setShowModal(false);
@@ -751,15 +767,17 @@ const Models = () => {
       description: '',
       releaseYear: new Date().getFullYear(),
       isActive: true,
-      variants: [{
-        name: '',
-        storage: '',
-        ram: '',
-        color: '',
-        price: '',
-        comparePrice: '',
-        sku: ''
-      }]
+      variants: [
+        {
+          name: '',
+          storage: '',
+          ram: '',
+          color: '',
+          price: '',
+          comparePrice: '',
+          sku: '',
+        },
+      ],
     });
     setErrors({});
     setIsSubmitting(false);
@@ -772,21 +790,23 @@ const Models = () => {
       description: '',
       releaseYear: new Date().getFullYear(),
       isActive: true,
-      variants: [{
-        name: '',
-        storage: '',
-        ram: '',
-        color: '',
-        price: '',
-        comparePrice: '',
-        sku: ''
-      }]
+      variants: [
+        {
+          name: '',
+          storage: '',
+          ram: '',
+          color: '',
+          price: '',
+          comparePrice: '',
+          sku: '',
+        },
+      ],
     });
     setErrors({});
     setIsSubmitting(false);
   };
 
-  const toggleExpanded = (modelName) => {
+  const toggleExpanded = modelName => {
     const newExpanded = new Set(expandedModels);
     if (newExpanded.has(modelName)) {
       newExpanded.delete(modelName);
@@ -799,19 +819,22 @@ const Models = () => {
   const addVariant = () => {
     setFormData({
       ...formData,
-      variants: [...formData.variants, {
-        name: '',
-        storage: '',
-        ram: '',
-        color: '',
-        price: '',
-        comparePrice: '',
-        sku: ''
-      }]
+      variants: [
+        ...formData.variants,
+        {
+          name: '',
+          storage: '',
+          ram: '',
+          color: '',
+          price: '',
+          comparePrice: '',
+          sku: '',
+        },
+      ],
     });
   };
 
-  const removeVariant = (index) => {
+  const removeVariant = index => {
     if (formData.variants.length > 1) {
       const newVariants = formData.variants.filter((_, i) => i !== index);
       setFormData({ ...formData, variants: newVariants });
@@ -827,21 +850,22 @@ const Models = () => {
   // Memoized filtered and sorted models
   const filteredAndSortedModels = React.useMemo(() => {
     let filtered = models.filter(model => {
-      const matchesSearch = searchTerm === '' || 
+      const matchesSearch =
+        searchTerm === '' ||
         model.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         model.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         model.brand?.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       const matchesBrand = brandFilter === '' || model.brand === brandFilter;
       const matchesCategory = categoryFilter === '' || model.category === categoryFilter;
-      
+
       return matchesSearch && matchesBrand && matchesCategory;
     });
-    
+
     // Sort the filtered results
     filtered.sort((a, b) => {
       let aValue, bValue;
-      
+
       switch (sortBy) {
         case 'name':
           aValue = a.model?.toLowerCase() || '';
@@ -867,23 +891,23 @@ const Models = () => {
           aValue = a.model?.toLowerCase() || '';
           bValue = b.model?.toLowerCase() || '';
       }
-      
+
       if (typeof aValue === 'string') {
         return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
       } else {
         return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
       }
     });
-    
+
     return filtered;
   }, [models, searchTerm, brandFilter, categoryFilter, sortBy, sortOrder]);
-  
+
   // Memoized available brands from models
   const availableBrands = React.useMemo(() => {
     const brandSet = new Set(models.map(model => model.brand).filter(Boolean));
     return Array.from(brandSet).sort();
   }, [models]);
-  
+
   // Memoized available categories from models
   const availableCategories = React.useMemo(() => {
     const categorySet = new Set(models.map(model => model.category).filter(Boolean));
@@ -908,7 +932,12 @@ const Models = () => {
           <Smartphone size={32} />
           Models & Variants
         </Title>
-        <ActionButton onClick={() => { resetForm(); setShowModal(true); }}>
+        <ActionButton
+          onClick={() => {
+            resetForm();
+            setShowModal(true);
+          }}
+        >
           <Plus size={20} />
           Add Model
         </ActionButton>
@@ -919,13 +948,10 @@ const Models = () => {
           type="text"
           placeholder="Search models by name or brand..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
-        
-        <FilterSelect
-          value={brandFilter}
-          onChange={(e) => setBrandFilter(e.target.value)}
-        >
+
+        <FilterSelect value={brandFilter} onChange={e => setBrandFilter(e.target.value)}>
           <option value="">All Brands</option>
           {availableBrands.map(brand => (
             <option key={brand} value={brand}>
@@ -933,11 +959,8 @@ const Models = () => {
             </option>
           ))}
         </FilterSelect>
-        
-        <FilterSelect
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
+
+        <FilterSelect value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
           <option value="">All Categories</option>
           {availableCategories.map(category => (
             <option key={category} value={category}>
@@ -945,26 +968,20 @@ const Models = () => {
             </option>
           ))}
         </FilterSelect>
-        
-        <FilterSelect
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
+
+        <FilterSelect value={sortBy} onChange={e => setSortBy(e.target.value)}>
           <option value="name">Sort by Name</option>
           <option value="brand">Sort by Brand</option>
           <option value="releaseYear">Sort by Year</option>
           <option value="variants">Sort by Variants</option>
           <option value="status">Sort by Status</option>
         </FilterSelect>
-        
-        <FilterSelect
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-        >
+
+        <FilterSelect value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
         </FilterSelect>
-        
+
         {(searchTerm || brandFilter || categoryFilter) && (
           <ClearFiltersButton
             onClick={() => {
@@ -983,26 +1000,32 @@ const Models = () => {
           <div style={{ textAlign: 'center', padding: '4rem' }}>
             <Smartphone size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
             <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
-              {searchTerm || brandFilter || categoryFilter ? 'No models match your filters' : 'No models found'}
+              {searchTerm || brandFilter || categoryFilter
+                ? 'No models match your filters'
+                : 'No models found'}
             </p>
           </div>
         ) : (
           filteredAndSortedModels.map((model, index) => {
             const isExpanded = expandedModels.has(model.model);
             const hasVariants = model.variantCount > 0;
-            
+
             return (
               <React.Fragment key={model.model || index}>
                 <ModelItem>
                   <ModelHeader>
                     <ModelIcon onClick={() => hasVariants && toggleExpanded(model.model)}>
                       {hasVariants ? (
-                        isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />
+                        isExpanded ? (
+                          <ChevronDown size={16} />
+                        ) : (
+                          <ChevronRight size={16} />
+                        )
                       ) : (
                         <Smartphone size={16} />
                       )}
                     </ModelIcon>
-                    
+
                     <ModelInfo>
                       <ModelName>
                         {model.model}
@@ -1010,23 +1033,15 @@ const Models = () => {
                           {model.brand} • {model.category}
                         </ModelSubtitle>
                       </ModelName>
-                      
-                      <ModelDetail>
-                        {model.category || 'No Category'}
-                      </ModelDetail>
-                      
-                      <ModelDetail>
-                        {model.productCount || 0} Products
-                      </ModelDetail>
-                      
-                      <ModelDetail>
-                        {model.variantCount || 0} Variants
-                      </ModelDetail>
-                      
-                      <StatusBadge active={true}>
-                        Active
-                      </StatusBadge>
-                      
+
+                      <ModelDetail>{model.category || 'No Category'}</ModelDetail>
+
+                      <ModelDetail>{model.productCount || 0} Products</ModelDetail>
+
+                      <ModelDetail>{model.variantCount || 0} Variants</ModelDetail>
+
+                      <StatusBadge active={true}>Active</StatusBadge>
+
                       <ActionButtons>
                         <IconButton success onClick={() => toggleExpanded(model.model)}>
                           <Eye size={14} />
@@ -1041,13 +1056,18 @@ const Models = () => {
                     </ModelInfo>
                   </ModelHeader>
                 </ModelItem>
-                
+
                 {hasVariants && isExpanded && (
                   <VariantsSection>
                     <h4 style={{ margin: '0 0 1rem 0', color: '#374151' }}>Model Variants</h4>
                     <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
-                      <p>This model has {model.variantCount} variant{model.variantCount !== 1 ? 's' : ''}.</p>
-                      <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>Variant details are not available in the current view.</p>
+                      <p>
+                        This model has {model.variantCount} variant
+                        {model.variantCount !== 1 ? 's' : ''}.
+                      </p>
+                      <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                        Variant details are not available in the current view.
+                      </p>
                     </div>
                   </VariantsSection>
                 )}
@@ -1061,21 +1081,19 @@ const Models = () => {
         <Modal>
           <ModalContent>
             <ModalHeader>
-              <ModalTitle>
-                {editingModel ? 'Edit Model' : 'Add New Model'}
-              </ModalTitle>
+              <ModalTitle>{editingModel ? 'Edit Model' : 'Add New Model'}</ModalTitle>
               <CloseButton onClick={closeModal}>
                 <X size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             {errors.submit && (
               <AlertMessage>
                 <AlertCircle size={16} />
                 {errors.submit}
               </AlertMessage>
             )}
-            
+
             <form onSubmit={handleSubmit}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <FormGroup>
@@ -1083,9 +1101,9 @@ const Models = () => {
                   <Input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    onChange={e => handleInputChange('name', e.target.value)}
                     style={{
-                      borderColor: errors.name ? '#dc2626' : '#d1d5db'
+                      borderColor: errors.name ? '#dc2626' : '#d1d5db',
                     }}
                     required
                   />
@@ -1096,17 +1114,17 @@ const Models = () => {
                     </ErrorMessage>
                   )}
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Release Year *</Label>
                   <Input
                     type="number"
                     value={formData.releaseYear}
-                    onChange={(e) => handleInputChange('releaseYear', parseInt(e.target.value) || '')}
+                    onChange={e => handleInputChange('releaseYear', parseInt(e.target.value) || '')}
                     min="1990"
                     max={new Date().getFullYear() + 2}
                     style={{
-                      borderColor: errors.releaseYear ? '#dc2626' : '#d1d5db'
+                      borderColor: errors.releaseYear ? '#dc2626' : '#d1d5db',
                     }}
                     required
                   />
@@ -1118,15 +1136,15 @@ const Models = () => {
                   )}
                 </FormGroup>
               </div>
-              
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <FormGroup>
                   <Label>Brand *</Label>
                   <Select
                     value={formData.brand}
-                    onChange={(e) => handleInputChange('brand', e.target.value)}
+                    onChange={e => handleInputChange('brand', e.target.value)}
                     style={{
-                      borderColor: errors.brand ? '#dc2626' : '#d1d5db'
+                      borderColor: errors.brand ? '#dc2626' : '#d1d5db',
                     }}
                     required
                   >
@@ -1144,53 +1162,71 @@ const Models = () => {
                     </ErrorMessage>
                   )}
                 </FormGroup>
-                
+
                 <FormGroup>
                   <Label>Status</Label>
                   <Select
                     value={formData.isActive}
-                    onChange={(e) => handleInputChange('isActive', e.target.value === 'true')}
+                    onChange={e => handleInputChange('isActive', e.target.value === 'true')}
                   >
                     <option value="true">Active</option>
                     <option value="false">Inactive</option>
                   </Select>
                 </FormGroup>
               </div>
-              
+
               {/* Display backend validation errors */}
               {Object.keys(errors).some(key => key.startsWith('backend_error_')) && (
-                <div style={{ 
-                  backgroundColor: '#fef2f2', 
-                  border: '1px solid #fecaca', 
-                  borderRadius: '0.375rem', 
-                  padding: '0.75rem', 
-                  marginBottom: '1rem' 
-                }}>
-                  <h4 style={{ color: '#dc2626', fontSize: '0.875rem', fontWeight: '600', margin: '0 0 0.5rem 0' }}>
+                <div
+                  style={{
+                    backgroundColor: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '0.375rem',
+                    padding: '0.75rem',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <h4
+                    style={{
+                      color: '#dc2626',
+                      fontSize: '0.875rem',
+                      fontWeight: '600',
+                      margin: '0 0 0.5rem 0',
+                    }}
+                  >
                     Validation Errors:
                   </h4>
                   {Object.keys(errors)
                     .filter(key => key.startsWith('backend_error_'))
                     .map(key => (
-                      <div key={key} style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                      <div
+                        key={key}
+                        style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '0.25rem' }}
+                      >
                         • {errors[key]}
                       </div>
-                    ))
-                  }
+                    ))}
                 </div>
               )}
-              
+
               <FormGroup>
                 <Label>Description</Label>
                 <TextArea
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={e => handleInputChange('description', e.target.value)}
                   placeholder="Model description and specifications..."
                   style={{
-                    borderColor: errors.description ? '#dc2626' : '#d1d5db'
+                    borderColor: errors.description ? '#dc2626' : '#d1d5db',
                   }}
                 />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '0.25rem',
+                  }}
+                >
                   {errors.description && (
                     <ErrorMessage>
                       <AlertCircle size={12} />
@@ -1202,7 +1238,7 @@ const Models = () => {
                   </div>
                 </div>
               </FormGroup>
-              
+
               <VariantsFormSection>
                 <VariantFormHeader>
                   <h4 style={{ margin: 0, color: '#374151' }}>Model Variants *</h4>
@@ -1211,17 +1247,32 @@ const Models = () => {
                     Add Variant
                   </AddVariantButton>
                 </VariantFormHeader>
-                
+
                 {errors.variants && (
                   <ErrorMessage style={{ marginBottom: '1rem' }}>
                     <AlertCircle size={12} />
                     {errors.variants}
                   </ErrorMessage>
                 )}
-                
+
                 {formData.variants.map((variant, index) => (
-                  <div key={index} style={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: '0.375rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <div
+                    key={index}
+                    style={{
+                      marginBottom: '1rem',
+                      padding: '1rem',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '0.375rem',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '1rem',
+                      }}
+                    >
                       <h5 style={{ margin: 0, color: '#6b7280' }}>Variant {index + 1}</h5>
                       {formData.variants.length > 1 && (
                         <IconButton danger type="button" onClick={() => removeVariant(index)}>
@@ -1229,17 +1280,17 @@ const Models = () => {
                         </IconButton>
                       )}
                     </div>
-                    
+
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                       <div>
                         <Label>Variant Name *</Label>
                         <Input
                           type="text"
                           value={variant.name}
-                          onChange={(e) => handleVariantChange(index, 'name', e.target.value)}
+                          onChange={e => handleVariantChange(index, 'name', e.target.value)}
                           placeholder="e.g., 128GB Space Gray"
                           style={{
-                            borderColor: errors[`variant_${index}_name`] ? '#dc2626' : '#d1d5db'
+                            borderColor: errors[`variant_${index}_name`] ? '#dc2626' : '#d1d5db',
                           }}
                         />
                         {errors[`variant_${index}_name`] && (
@@ -1249,61 +1300,75 @@ const Models = () => {
                           </ErrorMessage>
                         )}
                       </div>
-                      
+
                       <div>
                         <Label>SKU</Label>
                         <Input
                           type="text"
                           value={variant.sku}
-                          onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}
+                          onChange={e => handleVariantChange(index, 'sku', e.target.value)}
                           placeholder="Product SKU"
                         />
                       </div>
                     </div>
-                    
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr 1fr',
+                        gap: '1rem',
+                        marginTop: '1rem',
+                      }}
+                    >
                       <div>
                         <Label>Storage</Label>
                         <Input
                           type="text"
                           value={variant.storage}
-                          onChange={(e) => handleVariantChange(index, 'storage', e.target.value)}
+                          onChange={e => handleVariantChange(index, 'storage', e.target.value)}
                           placeholder="e.g., 128GB"
                         />
                       </div>
-                      
+
                       <div>
                         <Label>RAM</Label>
                         <Input
                           type="text"
                           value={variant.ram}
-                          onChange={(e) => handleVariantChange(index, 'ram', e.target.value)}
+                          onChange={e => handleVariantChange(index, 'ram', e.target.value)}
                           placeholder="e.g., 8GB"
                         />
                       </div>
-                      
+
                       <div>
                         <Label>Color</Label>
                         <Input
                           type="text"
                           value={variant.color}
-                          onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
+                          onChange={e => handleVariantChange(index, 'color', e.target.value)}
                           placeholder="e.g., Space Gray"
                         />
                       </div>
                     </div>
-                    
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '1rem',
+                        marginTop: '1rem',
+                      }}
+                    >
                       <div>
                         <Label>Price *</Label>
                         <Input
                           type="number"
                           value={variant.price}
-                          onChange={(e) => handleVariantChange(index, 'price', e.target.value)}
+                          onChange={e => handleVariantChange(index, 'price', e.target.value)}
                           min="0"
                           step="0.01"
                           style={{
-                            borderColor: errors[`variant_${index}_price`] ? '#dc2626' : '#d1d5db'
+                            borderColor: errors[`variant_${index}_price`] ? '#dc2626' : '#d1d5db',
                           }}
                           required
                         />
@@ -1314,17 +1379,19 @@ const Models = () => {
                           </ErrorMessage>
                         )}
                       </div>
-                      
+
                       <div>
                         <Label>Compare Price</Label>
                         <Input
                           type="number"
                           value={variant.comparePrice}
-                          onChange={(e) => handleVariantChange(index, 'comparePrice', e.target.value)}
+                          onChange={e => handleVariantChange(index, 'comparePrice', e.target.value)}
                           min="0"
                           step="0.01"
                           style={{
-                            borderColor: errors[`variant_${index}_comparePrice`] ? '#dc2626' : '#d1d5db'
+                            borderColor: errors[`variant_${index}_comparePrice`]
+                              ? '#dc2626'
+                              : '#d1d5db',
                           }}
                         />
                         {errors[`variant_${index}_comparePrice`] && (
@@ -1338,31 +1405,29 @@ const Models = () => {
                   </div>
                 ))}
               </VariantsFormSection>
-              
+
               <ModalActions>
-                <Button 
-                  type="button" 
+                <Button
+                  type="button"
                   onClick={closeModal}
                   disabled={isSubmitting}
                   variant="secondary"
                 >
                   Cancel
                 </Button>
-                <Button 
-                  type="submit" 
-                  variant="primary"
-                  disabled={isSubmitting}
-                >
+                <Button type="submit" variant="primary" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
-                      <div style={{
-                        width: '16px',
-                        height: '16px',
-                        border: '2px solid transparent',
-                        borderTop: '2px solid currentColor',
-                        borderRadius: '50%',
-                        animation: 'spin 1s linear infinite'
-                      }} />
+                      <div
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          border: '2px solid transparent',
+                          borderTop: '2px solid currentColor',
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite',
+                        }}
+                      />
                       {editingModel ? 'Updating...' : 'Creating...'}
                     </>
                   ) : (

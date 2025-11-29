@@ -26,11 +26,11 @@ const TopNav = styled.div`
   .nav-links {
     display: flex;
     gap: ${theme.spacing[4]};
-    
+
     a {
       color: ${theme.colors.text.secondary};
       text-decoration: none;
-      
+
       &:hover {
         color: ${theme.colors.primary.main};
       }
@@ -53,7 +53,7 @@ const MainContent = styled.div`
   margin: 0 auto;
   padding: ${theme.spacing[4]};
   gap: ${theme.spacing[6]};
-  
+
   @media (max-width: ${theme.breakpoints.lg}) {
     flex-direction: column;
     padding: ${theme.spacing[2]};
@@ -77,7 +77,7 @@ const ProductImage = styled.div`
   justify-content: center;
   font-size: 48px;
   color: ${theme.colors.text.secondary};
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -124,7 +124,7 @@ const FeatureItem = styled.div`
   align-items: center;
   gap: ${theme.spacing[1]};
   flex: 1;
-  
+
   .icon {
     width: 40px;
     height: 40px;
@@ -136,7 +136,7 @@ const FeatureItem = styled.div`
     color: ${theme.colors.primary.main};
     font-size: 20px;
   }
-  
+
   .label {
     font-size: ${theme.typography.fontSize.sm};
     text-align: center;
@@ -166,11 +166,11 @@ const PriceRow = styled.div`
   justify-content: space-between;
   align-items: center;
   font-size: ${theme.typography.fontSize.sm};
-  
+
   .label {
     color: ${theme.colors.text.secondary};
   }
-  
+
   .value {
     font-weight: ${theme.typography.fontWeight.medium};
     color: ${theme.colors.text.primary};
@@ -182,7 +182,7 @@ const TotalRow = styled(PriceRow)`
   padding-top: ${theme.spacing[3]};
   margin-top: ${theme.spacing[2]};
   font-size: ${theme.typography.fontSize.base};
-  
+
   .value {
     font-weight: ${theme.typography.fontWeight.bold};
     color: ${theme.colors.text.primary};
@@ -197,7 +197,7 @@ const SellNowBtn = styled(Button)`
   font-weight: ${theme.typography.fontWeight.semibold};
   border-radius: ${theme.borderRadius.md};
   border: none;
-  
+
   &:hover {
     background: ${theme.colors.success[600]};
   }
@@ -226,23 +226,23 @@ const OfferItem = styled.label`
   border-radius: ${theme.borderRadius.md};
   cursor: pointer;
   margin-bottom: ${theme.spacing[2]};
-  
-  input[type="radio"] {
+
+  input[type='radio'] {
     margin: 0;
   }
-  
+
   .offer-content {
     flex: 1;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .offer-brand {
     display: flex;
     align-items: center;
     gap: ${theme.spacing[2]};
-    
+
     .logo {
       width: 32px;
       height: 32px;
@@ -255,21 +255,21 @@ const OfferItem = styled.label`
       font-weight: ${theme.typography.fontWeight.bold};
     }
   }
-  
+
   .offer-extra {
     text-align: right;
-    
+
     .percent {
       font-size: ${theme.typography.fontSize.sm};
       color: ${theme.colors.text.secondary};
     }
-    
+
     .amount {
       font-size: ${theme.typography.fontSize.base};
       font-weight: ${theme.typography.fontWeight.medium};
       color: ${theme.colors.text.primary};
     }
-    
+
     .tcs {
       font-size: ${theme.typography.fontSize.xs};
       color: ${theme.colors.text.hint};
@@ -285,7 +285,7 @@ const BottomSection = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
     gap: ${theme.spacing[3]};
@@ -304,7 +304,7 @@ const WhatsappToggle = styled.div`
 const PaymentOptions = styled.div`
   display: flex;
   gap: ${theme.spacing[2]};
-  
+
   .option {
     width: 40px;
     height: 40px;
@@ -322,7 +322,7 @@ const PriceQuote = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const { assessmentData, product } = location.state || {};
   const [priceData, setPriceData] = useState(null);
   const [productDetails, setProductDetails] = useState(null);
@@ -335,11 +335,11 @@ const PriceQuote = () => {
   const brand = searchParams.get('brand');
   const model = searchParams.get('model');
 
-  const calculatePrice = (data) => {
+  const calculatePrice = data => {
     const basePrice = data.selectedVariant?.basePrice || 0;
     let percentDelta = 0;
     let absDelta = 0;
-console.log('basePrice',basePrice)
+    console.log('basePrice', basePrice);
     // Process answers
     Object.values(data.answers || {}).forEach(ans => {
       if (ans.delta) {
@@ -377,7 +377,7 @@ console.log('basePrice',basePrice)
     });
 
     const adjustedPrice = Math.round(basePrice * (1 + percentDelta / 100) + absDelta);
-   console.log('adjustedPrice',adjustedPrice)
+    console.log('adjustedPrice', adjustedPrice);
     return adjustedPrice;
   };
 
@@ -385,7 +385,7 @@ console.log('basePrice',basePrice)
   const offers = offerSessionData?.offers || [
     { id: 'amazon', brand: 'a', percent: 2, tcs: true },
     { id: 'flipkart', brand: 'F', percent: 3.5, tcs: true },
-    { id: 'croma', brand: 'C', percent: 1, tcs: true }
+    { id: 'croma', brand: 'C', percent: 1, tcs: true },
   ];
 
   useEffect(() => {
@@ -399,12 +399,12 @@ console.log('basePrice',basePrice)
         quotedPrice,
         processingFee,
         pickupCharge,
-        totalAmount
+        totalAmount,
       });
 
       setProductDetails({
         ...product.data,
-        variant: assessmentData.selectedVariant.label
+        variant: assessmentData.selectedVariant.label,
       });
 
       // Call sell offer session API
@@ -413,30 +413,31 @@ console.log('basePrice',basePrice)
   }, [assessmentData, product]);
 
   const createOfferSession = async () => {
-    console.log('assessmentData',assessmentData)
-    console.log('product',product)
+    console.log('assessmentData', assessmentData);
+    console.log('product', product);
     if (!assessmentData || !product) return;
     setIsLoadingOffers(true);
     try {
       // Extract the variant ID from assessment data
       const variantId = assessmentData.selectedVariant?.id || assessmentData.selectedVariant?._id;
       const userData = JSON.parse(localStorage.getItem('userData'));
-      
+
       const offerData = {
         userId: userData?.id || userData?._id,
         productId: product.data?.id || product.data?._id,
         variantId: variantId,
         answers: assessmentData.answers || {},
         defects: assessmentData.selectedDefects?.map(d => d.key || d.id) || [],
-        accessories: assessmentData.selectedAccessories?.map(a => {
-          // Handle different data structures:
-          // - If it's a full object, use _id or id
-          // - If it's already a string/ID, use it directly
-          if (typeof a === 'object' && a !== null) {
-            return a._id || a.id || a.key;
-          }
-          return a;
-        }) || []
+        accessories:
+          assessmentData.selectedAccessories?.map(a => {
+            // Handle different data structures:
+            // - If it's a full object, use _id or id
+            // - If it's already a string/ID, use it directly
+            if (typeof a === 'object' && a !== null) {
+              return a._id || a.id || a.key;
+            }
+            return a;
+          }) || [],
       };
 
       console.log('Sending offer data:', offerData);
@@ -449,11 +450,11 @@ console.log('basePrice',basePrice)
     }
   };
 
-  const formatPrice = (price) => {
+  const formatPrice = price => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(price);
   };
 
@@ -461,43 +462,43 @@ console.log('basePrice',basePrice)
     navigate(`/sell?category=${category}&brand=${brand}&model=${model}`);
   };
 
-const handleSellNow = async () => {
-  try {
-    // Create offer session first and wait for the response
-    // await createOfferSession();
-    
-    navigate('/sell/pickup', {
-      state: { 
-        assessmentData, 
-        product, 
-        sessionId: offerSessionData?.sessionId, // Add sessionId from the API response
-        priceData: {
-          quotedPrice: calculatePrice(assessmentData),
-          processingFee: 49,
-          pickupCharge: 0,
-          totalAmount: calculatePrice(assessmentData) - 49
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error creating session before navigation:', error);
-    // Still navigate but without sessionId if there's an error
-    navigate('/sell/pickup', {
-      state: { 
-        assessmentData, 
-        product, 
-        priceData: {
-          quotedPrice: calculatePrice(assessmentData),
-          processingFee: 49,
-          pickupCharge: 0,
-          totalAmount: calculatePrice(assessmentData) - 49
-        }
-      }
-    });
-  }
-};
+  const handleSellNow = async () => {
+    try {
+      // Create offer session first and wait for the response
+      // await createOfferSession();
 
-  const handleOfferChange = (offerId) => {
+      navigate('/sell/pickup', {
+        state: {
+          assessmentData,
+          product,
+          sessionId: offerSessionData?.sessionId, // Add sessionId from the API response
+          priceData: {
+            quotedPrice: calculatePrice(assessmentData),
+            processingFee: 49,
+            pickupCharge: 0,
+            totalAmount: calculatePrice(assessmentData) - 49,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Error creating session before navigation:', error);
+      // Still navigate but without sessionId if there's an error
+      navigate('/sell/pickup', {
+        state: {
+          assessmentData,
+          product,
+          priceData: {
+            quotedPrice: calculatePrice(assessmentData),
+            processingFee: 49,
+            pickupCharge: 0,
+            totalAmount: calculatePrice(assessmentData) - 49,
+          },
+        },
+      });
+    }
+  };
+
+  const handleOfferChange = offerId => {
     setSelectedOffer(offerId);
   };
 
@@ -507,24 +508,27 @@ const handleSellNow = async () => {
 
   return (
     <PageContainer>
-     
-      
       <MainContent>
         <ProductSection>
           <ProductImage>
             <img src={productDetails.images?.[0] || ''} alt={productDetails.name} />
           </ProductImage>
-          
+
           <ProductInfo>
             <ProductName>
               Apple {productDetails.name} ({productDetails.variant})
             </ProductName>
             <SellingPrice>{formatPrice(priceData.quotedPrice)}</SellingPrice>
-            <RecalculateBtn variant="outline" onClick={() => { /* Recalculate logic */ }}>
+            <RecalculateBtn
+              variant="outline"
+              onClick={() => {
+                /* Recalculate logic */
+              }}
+            >
               Recalculate
             </RecalculateBtn>
           </ProductInfo>
-          
+
           <FeaturesRow>
             <FeatureItem>
               <div className="icon">⚡</div>
@@ -540,7 +544,7 @@ const handleSellNow = async () => {
             </FeatureItem>
           </FeaturesRow>
         </ProductSection>
-        
+
         <PriceSummarySection>
           <PriceSummaryBox>
             <div style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: theme.spacing[3] }}>
@@ -572,7 +576,7 @@ const handleSellNow = async () => {
                 Loading offers...
               </div>
             ) : (
-              offers.map((offer) => (
+              offers.map(offer => (
                 <OfferItem key={offer.id}>
                   <input
                     type="radio"
@@ -588,7 +592,9 @@ const handleSellNow = async () => {
                     </div>
                     <div className="offer-extra">
                       <div className="percent">+{offer.percent}%</div>
-                      <div className="amount">₹{Math.round(priceData.quotedPrice * offer.percent / 100)}</div>
+                      <div className="amount">
+                        ₹{Math.round((priceData.quotedPrice * offer.percent) / 100)}
+                      </div>
                       {offer.tcs && <div className="tcs">TCS applicable</div>}
                     </div>
                   </div>

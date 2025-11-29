@@ -9,16 +9,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { adminService } from '../../services/adminService';
 import cloudinaryService from '../../services/cloudinaryService';
-import {
-  X,
-  Save,
-  Upload,
-  Image as ImageIcon,
-  Plus,
-  Trash2,
-  AlertCircle,
-  Tag
-} from 'lucide-react';
+import { X, Save, Upload, Image as ImageIcon, Plus, Trash2, AlertCircle, Tag } from 'lucide-react';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -241,8 +232,10 @@ const Button = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
-  ${props => props.variant === 'primary' ? `
+
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: #f59e0b;
     color: white;
     border: none;
@@ -255,7 +248,8 @@ const Button = styled.button`
       background: #9ca3af;
       cursor: not-allowed;
     }
-  ` : `
+  `
+      : `
     background: white;
     color: #374151;
     border: 1px solid #d1d5db;
@@ -382,13 +376,7 @@ const TagChip = styled.div`
   }
 `;
 
-const ProductModal = ({ 
-  isOpen, 
-  onClose, 
-  product = null, 
-  onSave, 
-  loading = false 
-}) => {
+const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false }) => {
   const [formData, setFormData] = useState({
     name: '',
     categoryId: '',
@@ -396,7 +384,7 @@ const ProductModal = ({
     images: [],
     status: 'active',
     variants: [],
-    tags: []
+    tags: [],
   });
   const [error, setError] = useState('');
   const [categories, setCategories] = useState([]);
@@ -420,7 +408,7 @@ const ProductModal = ({
     if (isOpen) {
       fetchCategories();
     }
-    
+
     if (product) {
       setFormData({
         name: product.name || '',
@@ -429,7 +417,7 @@ const ProductModal = ({
         images: product.images || [],
         status: product.status || 'active',
         variants: product.variants || [],
-        tags: product.tags || []
+        tags: product.tags || [],
       });
     } else {
       setFormData({
@@ -439,7 +427,7 @@ const ProductModal = ({
         images: [],
         status: 'active',
         variants: [],
-        tags: []
+        tags: [],
       });
     }
     setError('');
@@ -448,13 +436,13 @@ const ProductModal = ({
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     setError('');
   };
 
   // Generate slug from name
-  const generateSlug = (name) => {
+  const generateSlug = name => {
     return name
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
@@ -463,15 +451,16 @@ const ProductModal = ({
       .trim('-');
   };
 
-  const handleNameChange = (value) => {
+  const handleNameChange = value => {
     handleInputChange('name', value);
-    if (!product) { // Only auto-generate slug for new products
+    if (!product) {
+      // Only auto-generate slug for new products
       handleInputChange('slug', generateSlug(value));
     }
   };
 
   // Image upload handling
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = async e => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
@@ -483,15 +472,20 @@ const ProductModal = ({
         const imageUrls = uploadResult.successful.map(img => img.url.trim().replace(/["`]/g, ''));
         setFormData(prev => ({
           ...prev,
-          images: [...prev.images, ...imageUrls]
+          images: [...prev.images, ...imageUrls],
         }));
-        
+
         // Show success message if some failed
         if (uploadResult.failed && uploadResult.failed.length > 0) {
-          setError(`${uploadResult.totalUploaded} images uploaded successfully, ${uploadResult.totalFailed} failed`);
+          setError(
+            `${uploadResult.totalUploaded} images uploaded successfully, ${uploadResult.totalFailed} failed`
+          );
         }
       } else {
-        setError('Failed to upload images: ' + (uploadResult.error || 'No images were uploaded successfully'));
+        setError(
+          'Failed to upload images: ' +
+            (uploadResult.error || 'No images were uploaded successfully')
+        );
       }
     } catch (error) {
       setError('Failed to upload images: ' + error.message);
@@ -500,10 +494,10 @@ const ProductModal = ({
     }
   };
 
-  const removeImage = (index) => {
+  const removeImage = index => {
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
@@ -512,20 +506,20 @@ const ProductModal = ({
     if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
       setFormData(prev => ({
         ...prev,
-        tags: [...prev.tags, tagInput.trim()]
+        tags: [...prev.tags, tagInput.trim()],
       }));
       setTagInput('');
     }
   };
 
-  const removeTag = (tagToRemove) => {
+  const removeTag = tagToRemove => {
     setFormData(prev => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter(tag => tag !== tagToRemove),
     }));
   };
 
-  const handleTagInputKeyPress = (e) => {
+  const handleTagInputKeyPress = e => {
     if (e.key === 'Enter') {
       e.preventDefault();
       addTag();
@@ -543,29 +537,29 @@ const ProductModal = ({
           basePrice: '',
           isActive: true,
           // Use a temporary ID for frontend management only
-          tempId: Date.now().toString()
-        }
-      ]
+          tempId: Date.now().toString(),
+        },
+      ],
     }));
   };
 
-  const removeVariant = (variantId) => {
+  const removeVariant = variantId => {
     setFormData(prev => ({
       ...prev,
-      variants: prev.variants.filter(v => (v._id || v.tempId) !== variantId)
+      variants: prev.variants.filter(v => (v._id || v.tempId) !== variantId),
     }));
   };
 
   const updateVariant = (variantId, field, value) => {
     setFormData(prev => ({
       ...prev,
-      variants: prev.variants.map(v => 
+      variants: prev.variants.map(v =>
         (v._id || v.tempId) === variantId ? { ...v, [field]: value } : v
-      )
+      ),
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError('');
 
@@ -578,7 +572,7 @@ const ProductModal = ({
       setError('Category is required');
       return;
     }
-    
+
     // Ensure slug is generated if not present
     let slug = formData.slug.trim();
     if (!slug) {
@@ -606,16 +600,16 @@ const ProductModal = ({
           const cleanedVariant = {
             label: variant.label,
             basePrice: parseFloat(variant.basePrice),
-            isActive: variant.isActive
+            isActive: variant.isActive,
           };
           // Only include _id if it exists and is a valid ObjectId (for updates)
           if (variant._id && variant._id.length === 24) {
             cleanedVariant._id = variant._id;
           }
           return cleanedVariant;
-        })
+        }),
       };
-      
+
       await onSave(cleanedData);
       onClose();
     } catch (err) {
@@ -626,12 +620,10 @@ const ProductModal = ({
   if (!isOpen) return null;
 
   return (
-    <ModalOverlay onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <ModalOverlay onClick={e => e.target === e.currentTarget && onClose()}>
       <ModalContent>
         <ModalHeader>
-          <ModalTitle>
-            {product ? 'Edit Product' : 'Add New Product'}
-          </ModalTitle>
+          <ModalTitle>{product ? 'Edit Product' : 'Add New Product'}</ModalTitle>
           <CloseButton onClick={onClose}>
             <X size={20} />
           </CloseButton>
@@ -652,7 +644,7 @@ const ProductModal = ({
                 <Input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => handleNameChange(e.target.value)}
+                  onChange={e => handleNameChange(e.target.value)}
                   placeholder="Enter product name"
                   required
                 />
@@ -663,7 +655,7 @@ const ProductModal = ({
                 <Input
                   type="text"
                   value={formData.slug}
-                  onChange={(e) => handleInputChange('slug', e.target.value)}
+                  onChange={e => handleInputChange('slug', e.target.value)}
                   placeholder="product-slug"
                   required
                 />
@@ -673,14 +665,14 @@ const ProductModal = ({
                 <Label>Category *</Label>
                 <Select
                   value={formData.categoryId}
-                  onChange={(e) => handleInputChange('categoryId', e.target.value)}
+                  onChange={e => handleInputChange('categoryId', e.target.value)}
                   required
                   disabled={categoriesLoading}
                 >
                   <option value="">
                     {categoriesLoading ? 'Loading categories...' : 'Select category'}
                   </option>
-                  {categories.map((category) => (
+                  {categories.map(category => (
                     <option key={category._id} value={category._id}>
                       {category.name}
                     </option>
@@ -692,7 +684,7 @@ const ProductModal = ({
                 <Label>Status</Label>
                 <Select
                   value={formData.status}
-                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  onChange={e => handleInputChange('status', e.target.value)}
                 >
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
@@ -704,7 +696,10 @@ const ProductModal = ({
             <FormGroup style={{ marginTop: '1.5rem' }}>
               <Label>Product Images</Label>
               <ImageUploadContainer>
-                <ImageUploadButton type="button" onClick={() => document.getElementById('image-upload').click()}>
+                <ImageUploadButton
+                  type="button"
+                  onClick={() => document.getElementById('image-upload').click()}
+                >
                   <Upload size={16} />
                   {imageUploading ? 'Uploading...' : 'Upload Images'}
                 </ImageUploadButton>
@@ -718,7 +713,7 @@ const ProductModal = ({
                   disabled={imageUploading}
                 />
               </ImageUploadContainer>
-              
+
               {formData.images.length > 0 && (
                 <ImagePreviewContainer>
                   {formData.images.map((image, index) => (
@@ -740,7 +735,7 @@ const ProductModal = ({
                 <Input
                   type="text"
                   value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
+                  onChange={e => setTagInput(e.target.value)}
                   onKeyPress={handleTagInputKeyPress}
                   placeholder="Enter tag and press Enter"
                 />
@@ -749,7 +744,7 @@ const ProductModal = ({
                   Add
                 </Button>
               </TagInputContainer>
-              
+
               {formData.tags.length > 0 && (
                 <TagsContainer>
                   {formData.tags.map((tag, index) => (
@@ -765,7 +760,14 @@ const ProductModal = ({
             </FormGroup>
 
             <VariantsSection>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '1rem',
+                }}
+              >
                 <SectionTitle>Product Variants</SectionTitle>
                 <AddVariantButton type="button" onClick={addVariant}>
                   <Plus size={16} />
@@ -776,11 +778,9 @@ const ProductModal = ({
               {formData.variants.map((variant, index) => (
                 <VariantCard key={variant._id || variant.tempId}>
                   <VariantHeader>
-                    <span style={{ fontWeight: '600', color: '#374151' }}>
-                      Variant {index + 1}
-                    </span>
-                    <RemoveVariantButton 
-                      type="button" 
+                    <span style={{ fontWeight: '600', color: '#374151' }}>Variant {index + 1}</span>
+                    <RemoveVariantButton
+                      type="button"
                       onClick={() => removeVariant(variant._id || variant.tempId)}
                     >
                       <Trash2 size={12} />
@@ -794,7 +794,9 @@ const ProductModal = ({
                       <Input
                         type="text"
                         value={variant.label}
-                        onChange={(e) => updateVariant(variant._id || variant.tempId, 'label', e.target.value)}
+                        onChange={e =>
+                          updateVariant(variant._id || variant.tempId, 'label', e.target.value)
+                        }
                         placeholder="e.g., 128GB Black, 256GB White"
                         required
                       />
@@ -805,7 +807,9 @@ const ProductModal = ({
                       <Input
                         type="number"
                         value={variant.basePrice}
-                        onChange={(e) => updateVariant(variant._id || variant.tempId, 'basePrice', e.target.value)}
+                        onChange={e =>
+                          updateVariant(variant._id || variant.tempId, 'basePrice', e.target.value)
+                        }
                         placeholder="Variant base price"
                         min="0"
                         step="0.01"
@@ -817,7 +821,13 @@ const ProductModal = ({
                       <Label>Active</Label>
                       <Select
                         value={variant.isActive}
-                        onChange={(e) => updateVariant(variant._id || variant.tempId, 'isActive', e.target.value === 'true')}
+                        onChange={e =>
+                          updateVariant(
+                            variant._id || variant.tempId,
+                            'isActive',
+                            e.target.value === 'true'
+                          )
+                        }
                       >
                         <option value={true}>Active</option>
                         <option value={false}>Inactive</option>
@@ -835,7 +845,7 @@ const ProductModal = ({
             </Button>
             <Button type="submit" variant="primary" disabled={loading || imageUploading}>
               <Save size={16} />
-              {loading ? 'Saving...' : (product ? 'Update Product' : 'Create Product')}
+              {loading ? 'Saving...' : product ? 'Update Product' : 'Create Product'}
             </Button>
           </ModalFooter>
         </form>

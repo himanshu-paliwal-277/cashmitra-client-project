@@ -16,7 +16,7 @@ const useSellAccessories = () => {
     page: 1,
     limit: 10,
     total: 0,
-    totalPages: 0
+    totalPages: 0,
   });
 
   // Fetch all accessories with pagination
@@ -28,13 +28,13 @@ const useSellAccessories = () => {
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
-        ...filters
+        ...filters,
       });
 
       const response = await api.get(`/sell-accessories?${queryParams}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       // Handle different response structures
@@ -46,7 +46,7 @@ const useSellAccessories = () => {
           page: 1,
           limit: responseData.length,
           total: responseData.length,
-          totalPages: 1
+          totalPages: 1,
         });
       } else if (responseData && Array.isArray(responseData.accessories)) {
         // If accessories are nested in response.data.accessories
@@ -55,7 +55,7 @@ const useSellAccessories = () => {
           page: responseData.page || 1,
           limit: responseData.limit || 10,
           total: responseData.total || 0,
-          totalPages: responseData.totalPages || 0
+          totalPages: responseData.totalPages || 0,
         });
       } else if (responseData && Array.isArray(responseData.data)) {
         // If accessories are nested in response.data.data
@@ -64,7 +64,7 @@ const useSellAccessories = () => {
           page: responseData.page || 1,
           limit: responseData.limit || 10,
           total: responseData.total || 0,
-          totalPages: responseData.totalPages || 0
+          totalPages: responseData.totalPages || 0,
         });
       } else {
         // Fallback to empty array
@@ -73,7 +73,7 @@ const useSellAccessories = () => {
           page: 1,
           limit: 10,
           total: 0,
-          totalPages: 0
+          totalPages: 0,
         });
       }
     } catch (err) {
@@ -84,15 +84,15 @@ const useSellAccessories = () => {
   }, []);
 
   // Fetch single accessory by ID
-  const fetchAccessory = useCallback(async (accessoryId) => {
+  const fetchAccessory = useCallback(async accessoryId => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-accessories/${accessoryId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       return response.data;
     } catch (err) {
@@ -104,148 +104,170 @@ const useSellAccessories = () => {
   }, []);
 
   // Create new accessory
-  const createAccessory = useCallback(async (accessoryData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.post('/sell-accessories', accessoryData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh accessories list
-      await fetchAccessories();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create accessory');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchAccessories]);
+  const createAccessory = useCallback(
+    async accessoryData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.post('/sell-accessories', accessoryData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh accessories list
+        await fetchAccessories();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create accessory');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchAccessories]
+  );
 
   // Update accessory
-  const updateAccessory = useCallback(async (accessoryId, accessoryData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put(`/sell-accessories/${accessoryId}`, accessoryData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh accessories list
-      await fetchAccessories();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update accessory');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchAccessories]);
+  const updateAccessory = useCallback(
+    async (accessoryId, accessoryData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put(`/sell-accessories/${accessoryId}`, accessoryData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh accessories list
+        await fetchAccessories();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update accessory');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchAccessories]
+  );
 
   // Delete accessory
-  const deleteAccessory = useCallback(async (accessoryId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      await api.delete(`/sell-accessories/${accessoryId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      // Refresh accessories list
-      await fetchAccessories();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete accessory');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchAccessories]);
+  const deleteAccessory = useCallback(
+    async accessoryId => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        await api.delete(`/sell-accessories/${accessoryId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Refresh accessories list
+        await fetchAccessories();
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete accessory');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchAccessories]
+  );
 
   // Bulk create accessories
-  const bulkCreateAccessories = useCallback(async (accessoriesData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.post('/sell-accessories/bulk', accessoriesData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh accessories list
-      await fetchAccessories();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create accessories');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchAccessories]);
+  const bulkCreateAccessories = useCallback(
+    async accessoriesData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.post('/sell-accessories/bulk', accessoriesData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh accessories list
+        await fetchAccessories();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create accessories');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchAccessories]
+  );
 
   // Reorder accessories
-  const reorderAccessories = useCallback(async (reorderData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put('/sell-accessories/reorder', reorderData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh accessories list
-      await fetchAccessories();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to reorder accessories');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchAccessories]);
+  const reorderAccessories = useCallback(
+    async reorderData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put('/sell-accessories/reorder', reorderData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh accessories list
+        await fetchAccessories();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to reorder accessories');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchAccessories]
+  );
 
   // Toggle accessory active status
-  const toggleAccessoryStatus = useCallback(async (accessoryId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.patch(`/sell-accessories/${accessoryId}/toggle`, {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      // Refresh accessories list
-      await fetchAccessories();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to toggle accessory status');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchAccessories]);
+  const toggleAccessoryStatus = useCallback(
+    async accessoryId => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.patch(
+          `/sell-accessories/${accessoryId}/toggle`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Refresh accessories list
+        await fetchAccessories();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to toggle accessory status');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchAccessories]
+  );
 
   // Public methods for customer access
-  const getPublicAccessories = useCallback(async (productId) => {
+  const getPublicAccessories = useCallback(async productId => {
     setLoading(true);
     setError(null);
     try {
@@ -259,7 +281,7 @@ const useSellAccessories = () => {
     }
   }, []);
 
-  const getPublicAccessory = useCallback(async (accessoryId) => {
+  const getPublicAccessory = useCallback(async accessoryId => {
     setLoading(true);
     setError(null);
     try {
@@ -305,7 +327,7 @@ const useSellAccessories = () => {
     getPublicAccessory,
 
     // Utilities
-    clearError
+    clearError,
   };
 };
 

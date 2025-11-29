@@ -42,7 +42,7 @@ import {
   ExternalLink,
   MessageSquare,
   Star,
-  Timer
+  Timer,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -86,21 +86,21 @@ const Button = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &.primary {
     background-color: ${theme.colors.primary};
     color: white;
-    
+
     &:hover {
       background-color: ${theme.colors.primaryDark};
     }
   }
-  
+
   &.secondary {
     background-color: white;
     color: ${theme.colors.text.primary};
     border: 1px solid ${theme.colors.border};
-    
+
     &:hover {
       background-color: #f8fafc;
     }
@@ -126,21 +126,21 @@ const SearchInput = styled.div`
   position: relative;
   flex: 1;
   min-width: 300px;
-  
+
   input {
     width: 100%;
     padding: 0.75rem 1rem 0.75rem 2.5rem;
     border: 1px solid ${theme.colors.border};
     border-radius: 8px;
     font-size: 0.875rem;
-    
+
     &:focus {
       outline: none;
       border-color: ${theme.colors.primary};
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
   }
-  
+
   svg {
     position: absolute;
     left: 0.75rem;
@@ -159,7 +159,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
@@ -179,14 +179,14 @@ const StatCard = styled.div`
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  
+
   .stat-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1rem;
   }
-  
+
   .stat-icon {
     width: 2.5rem;
     height: 2.5rem;
@@ -194,51 +194,51 @@ const StatCard = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &.sessions {
       background-color: #e0e7ff;
       color: #4f46e5;
     }
-    
+
     &.active {
       background-color: #dcfce7;
       color: #16a34a;
     }
-    
+
     &.completed {
       background-color: #e0e7ff;
       color: #4f46e5;
     }
-    
+
     &.expired {
       background-color: #fee2e2;
       color: #dc2626;
     }
   }
-  
+
   .stat-value {
     font-size: 2rem;
     font-weight: 700;
     color: ${theme.colors.text.primary};
     margin-bottom: 0.25rem;
   }
-  
+
   .stat-label {
     color: ${theme.colors.text.secondary};
     font-size: 0.875rem;
   }
-  
+
   .stat-change {
     display: flex;
     align-items: center;
     gap: 0.25rem;
     font-size: 0.75rem;
     margin-top: 0.5rem;
-    
+
     &.positive {
       color: #16a34a;
     }
-    
+
     &.negative {
       color: #dc2626;
     }
@@ -283,7 +283,7 @@ const TableHead = styled.thead`
 
 const TableRow = styled.tr`
   border-bottom: 1px solid ${theme.colors.border};
-  
+
   &:hover {
     background-color: #f8fafc;
   }
@@ -311,22 +311,22 @@ const Badge = styled.span`
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
-  
+
   &.active {
     background-color: #dcfce7;
     color: #16a34a;
   }
-  
+
   &.completed {
     background-color: #e0e7ff;
     color: #4f46e5;
   }
-  
+
   &.expired {
     background-color: #fee2e2;
     color: #dc2626;
   }
-  
+
   &.pending {
     background-color: #fef3c7;
     color: #d97706;
@@ -345,7 +345,7 @@ const ActionButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   color: ${theme.colors.text.secondary};
-  
+
   &:hover {
     background-color: #f3f4f6;
     color: ${theme.colors.text.primary};
@@ -356,7 +356,7 @@ const DeviceInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   .device-image {
     width: 2rem;
     height: 2rem;
@@ -366,13 +366,13 @@ const DeviceInfo = styled.div`
     align-items: center;
     justify-content: center;
   }
-  
+
   .device-details {
     .device-name {
       font-weight: 500;
       font-size: 0.875rem;
     }
-    
+
     .device-model {
       font-size: 0.75rem;
       color: ${theme.colors.text.secondary};
@@ -384,7 +384,7 @@ const UserInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   .user-avatar {
     width: 2rem;
     height: 2rem;
@@ -397,13 +397,13 @@ const UserInfo = styled.div`
     font-weight: 500;
     font-size: 0.75rem;
   }
-  
+
   .user-details {
     .user-name {
       font-weight: 500;
       font-size: 0.875rem;
     }
-    
+
     .user-contact {
       font-size: 0.75rem;
       color: ${theme.colors.text.secondary};
@@ -433,7 +433,9 @@ const ModalContent = styled.div`
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 `;
 
 const ModalHeader = styled.div`
@@ -441,7 +443,7 @@ const ModalHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  
+
   h2 {
     font-size: 1.5rem;
     font-weight: 600;
@@ -457,7 +459,7 @@ const CloseButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   color: ${theme.colors.text.secondary};
-  
+
   &:hover {
     background-color: #f3f4f6;
     color: ${theme.colors.text.primary};
@@ -475,7 +477,7 @@ const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  
+
   &.full-width {
     grid-column: 1 / -1;
   }
@@ -492,7 +494,7 @@ const Input = styled.input`
   border: 1px solid ${theme.colors.border};
   border-radius: 8px;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
@@ -506,7 +508,7 @@ const Select = styled.select`
   border-radius: 8px;
   font-size: 0.875rem;
   background: white;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
@@ -521,7 +523,7 @@ const TextArea = styled.textarea`
   font-size: 0.875rem;
   min-height: 100px;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
@@ -569,17 +571,17 @@ const PaginationButton = styled.button`
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover:not(:disabled) {
     background-color: #f8fafc;
     border-color: ${theme.colors.primary};
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   &.active {
     background-color: ${theme.colors.primary};
     color: white;
@@ -598,7 +600,7 @@ const ItemsPerPageSelect = styled.select`
   border-radius: 6px;
   font-size: 0.875rem;
   background: white;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
@@ -611,7 +613,7 @@ const MultiSelectContainer = styled.div`
   min-height: 2.5rem;
   padding: 0.5rem;
   background: white;
-  
+
   &:focus-within {
     border-color: ${theme.colors.primary};
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
@@ -642,7 +644,7 @@ const MultiSelectRemove = styled.button`
   align-items: center;
   justify-content: center;
   border-radius: 2px;
-  
+
   &:hover {
     background-color: rgba(255, 255, 255, 0.2);
   }
@@ -654,7 +656,7 @@ const MultiSelectDropdown = styled.select`
   border: none;
   background: transparent;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
   }
@@ -670,7 +672,7 @@ const SellSessionsManagement = () => {
     deleteSession,
     extendSession,
     cleanExpiredSessions,
-    clearError
+    clearError,
   } = useSellSessions();
 
   // Products hook
@@ -679,22 +681,14 @@ const SellSessionsManagement = () => {
     variants,
     loading: productsLoading,
     fetchProducts,
-    fetchVariants
+    fetchVariants,
   } = useSellProducts();
 
   // Defects hook
-  const {
-    defects,
-    loading: defectsLoading,
-    fetchDefects
-  } = useSellDefects();
+  const { defects, loading: defectsLoading, fetchDefects } = useSellDefects();
 
   // Accessories hook
-  const {
-    accessories,
-    loading: accessoriesLoading,
-    fetchAccessories
-  } = useSellAccessories();
+  const { accessories, loading: accessoriesLoading, fetchAccessories } = useSellAccessories();
 
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -702,11 +696,11 @@ const SellSessionsManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [deviceFilter, setDeviceFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  
+
   // Modal state for Create Session
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createFormData, setCreateFormData] = useState({
@@ -714,7 +708,7 @@ const SellSessionsManagement = () => {
     variantId: '',
     answers: {},
     defects: [],
-    accessories: []
+    accessories: [],
   });
 
   // State for dropdown options - variants now comes from hook
@@ -750,7 +744,7 @@ const SellSessionsManagement = () => {
       sessionDuration: '2 days',
       pickupScheduled: true,
       pickupDate: '2024-01-25',
-      notes: 'Customer interested, follow up required'
+      notes: 'Customer interested, follow up required',
     },
     {
       id: 'SES002',
@@ -771,7 +765,7 @@ const SellSessionsManagement = () => {
       sessionDuration: '6 days',
       pickupScheduled: true,
       pickupDate: '2024-01-24',
-      notes: 'Deal completed successfully'
+      notes: 'Deal completed successfully',
     },
     {
       id: 'SES003',
@@ -792,7 +786,7 @@ const SellSessionsManagement = () => {
       sessionDuration: '7 days',
       pickupScheduled: false,
       pickupDate: null,
-      notes: 'Customer did not respond'
+      notes: 'Customer did not respond',
     },
     {
       id: 'SES004',
@@ -813,8 +807,8 @@ const SellSessionsManagement = () => {
       sessionDuration: '1 day',
       pickupScheduled: false,
       pickupDate: null,
-      notes: 'Waiting for customer confirmation'
-    }
+      notes: 'Waiting for customer confirmation',
+    },
   ];
 
   useEffect(() => {
@@ -826,12 +820,13 @@ const SellSessionsManagement = () => {
   }, []);
 
   const filteredSessions = sessions.filter(session => {
-    const matchesSearch = session.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         session.deviceModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         session.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      session.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      session.deviceModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      session.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || session.status === statusFilter;
     const matchesDevice = deviceFilter === 'all' || session.deviceType === deviceFilter;
-    
+
     return matchesSearch && matchesStatus && matchesDevice;
   });
 
@@ -850,10 +845,10 @@ const SellSessionsManagement = () => {
     totalSessions: sessions.length,
     activeSessions: sessions.filter(s => s.status === 'active').length,
     completedSessions: sessions.filter(s => s.status === 'completed').length,
-    expiredSessions: sessions.filter(s => s.status === 'expired').length
+    expiredSessions: sessions.filter(s => s.status === 'expired').length,
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'active':
         return <Clock size={12} />;
@@ -884,14 +879,14 @@ const SellSessionsManagement = () => {
       variantId: '',
       answers: {},
       defects: [],
-      accessories: []
+      accessories: [],
     });
   };
 
   const handleCreateFormChange = (field, value) => {
     setCreateFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
 
     // When product changes, fetch its variants
@@ -901,14 +896,14 @@ const SellSessionsManagement = () => {
   };
 
   // Handle product selection and fetch variants
-  const handleProductChange = async (productId) => {
+  const handleProductChange = async productId => {
     if (productId) {
       try {
         await fetchVariants(productId);
         // Reset variant selection when product changes
         setCreateFormData(prev => ({
           ...prev,
-          variantId: ''
+          variantId: '',
         }));
       } catch (error) {
         console.error('Error fetching variants:', error);
@@ -917,20 +912,20 @@ const SellSessionsManagement = () => {
     // Don't reset variants here since they come from the hook
   };
 
-  const handleSubmitCreateSession = async (e) => {
+  const handleSubmitCreateSession = async e => {
     e.preventDefault();
-    
+
     // Validation
     if (!createFormData.productId) {
       alert('Please select a product');
       return;
     }
-    
+
     if (!createFormData.variantId) {
       alert('Please select a variant');
       return;
     }
-    
+
     try {
       // Call the actual API
       const sessionData = {
@@ -938,12 +933,12 @@ const SellSessionsManagement = () => {
         variantId: createFormData.variantId,
         answers: createFormData.answers,
         defects: createFormData.defects,
-        accessories: createFormData.accessories
+        accessories: createFormData.accessories,
       };
 
       // Use the createSession from the hook
       const result = await createSession(sessionData);
-      
+
       if (result) {
         // Session created successfully
         alert('Session created successfully!');
@@ -960,7 +955,14 @@ const SellSessionsManagement = () => {
   if (loading) {
     return (
       <Container>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '50vh',
+          }}
+        >
           <RefreshCw className="animate-spin" size={24} />
           <span style={{ marginLeft: '0.5rem' }}>Loading sessions...</span>
         </div>
@@ -1057,35 +1059,26 @@ const SellSessionsManagement = () => {
               type="text"
               placeholder="Search sessions..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </SearchInput>
-          
-          <FilterSelect
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
+
+          <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="completed">Completed</option>
             <option value="expired">Expired</option>
             <option value="pending">Pending</option>
           </FilterSelect>
-          
-          <FilterSelect
-            value={deviceFilter}
-            onChange={(e) => setDeviceFilter(e.target.value)}
-          >
+
+          <FilterSelect value={deviceFilter} onChange={e => setDeviceFilter(e.target.value)}>
             <option value="all">All Devices</option>
             <option value="Mobile">Mobile</option>
             <option value="Laptop">Laptop</option>
             <option value="Tablet">Tablet</option>
           </FilterSelect>
-          
-          <FilterSelect
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-          >
+
+          <FilterSelect value={dateFilter} onChange={e => setDateFilter(e.target.value)}>
             <option value="all">All Time</option>
             <option value="today">Today</option>
             <option value="week">This Week</option>
@@ -1124,16 +1117,14 @@ const SellSessionsManagement = () => {
             </TableRow>
           </TableHead>
           <tbody>
-            {paginatedSessions.map((session) => (
+            {paginatedSessions.map(session => (
               <TableRow key={session.id}>
                 <TableCell>
                   <div style={{ fontWeight: '500' }}>{session.id}</div>
                 </TableCell>
                 <TableCell>
                   <UserInfo>
-                    <div className="user-avatar">
-                      {session.userName.charAt(0)}
-                    </div>
+                    <div className="user-avatar">{session.userName.charAt(0)}</div>
                     <div className="user-details">
                       <div className="user-name">{session.userName}</div>
                       <div className="user-contact">{session.userPhone}</div>
@@ -1146,15 +1137,18 @@ const SellSessionsManagement = () => {
                       <Package size={16} />
                     </div>
                     <div className="device-details">
-                      <div className="device-name">{session.deviceBrand} {session.deviceModel}</div>
-                      <div className="device-model">{session.deviceType} • {session.deviceCondition}</div>
+                      <div className="device-name">
+                        {session.deviceBrand} {session.deviceModel}
+                      </div>
+                      <div className="device-model">
+                        {session.deviceType} • {session.deviceCondition}
+                      </div>
                     </div>
                   </DeviceInfo>
                 </TableCell>
                 <TableCell>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                    <DollarSign size={14} />
-                    ₹{session.offerPrice.toLocaleString()}
+                    <DollarSign size={14} />₹{session.offerPrice.toLocaleString()}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -1187,274 +1181,288 @@ const SellSessionsManagement = () => {
           </tbody>
         </Table>
 
-         {/* Pagination Controls */}
-         <PaginationContainer>
-           <PaginationInfo>
-             Showing {startIndex + 1} to {Math.min(endIndex, filteredSessions.length)} of {filteredSessions.length} sessions
-           </PaginationInfo>
-           
-           <PaginationControls>
-             <ItemsPerPageSelect
-               value={itemsPerPage}
-               onChange={(e) => setItemsPerPage(Number(e.target.value))}
-             >
-               <option value={5}>5 per page</option>
-               <option value={10}>10 per page</option>
-               <option value={25}>25 per page</option>
-               <option value={50}>50 per page</option>
-             </ItemsPerPageSelect>
-             
-             <PageNumbers>
-               <PaginationButton
-                 onClick={() => setCurrentPage(1)}
-                 disabled={currentPage === 1}
-               >
-                 First
-               </PaginationButton>
-               
-               <PaginationButton
-                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                 disabled={currentPage === 1}
-               >
-                 Previous
-               </PaginationButton>
-               
-               {/* Page Numbers */}
-               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                 let pageNum;
-                 if (totalPages <= 5) {
-                   pageNum = i + 1;
-                 } else if (currentPage <= 3) {
-                   pageNum = i + 1;
-                 } else if (currentPage >= totalPages - 2) {
-                   pageNum = totalPages - 4 + i;
-                 } else {
-                   pageNum = currentPage - 2 + i;
-                 }
-                 
-                 return (
-                   <PaginationButton
-                     key={pageNum}
-                     onClick={() => setCurrentPage(pageNum)}
-                     className={currentPage === pageNum ? 'active' : ''}
-                   >
-                     {pageNum}
-                   </PaginationButton>
-                 );
-               })}
-               
-               <PaginationButton
-                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                 disabled={currentPage === totalPages}
-               >
-                 Next
-               </PaginationButton>
-               
-               <PaginationButton
-                 onClick={() => setCurrentPage(totalPages)}
-                 disabled={currentPage === totalPages}
-               >
-                 Last
-               </PaginationButton>
-             </PageNumbers>
-           </PaginationControls>
-         </PaginationContainer>
-       </SessionsTable>
+        {/* Pagination Controls */}
+        <PaginationContainer>
+          <PaginationInfo>
+            Showing {startIndex + 1} to {Math.min(endIndex, filteredSessions.length)} of{' '}
+            {filteredSessions.length} sessions
+          </PaginationInfo>
 
-       {/* Create Session Modal */}
-       {showCreateModal && (
-         <ModalOverlay onClick={handleCloseCreateModal}>
-           <ModalContent onClick={(e) => e.stopPropagation()}>
-             <ModalHeader>
-               <h2>Create New Session</h2>
-               <CloseButton onClick={handleCloseCreateModal}>
-                 <XCircle size={20} />
-               </CloseButton>
-             </ModalHeader>
+          <PaginationControls>
+            <ItemsPerPageSelect
+              value={itemsPerPage}
+              onChange={e => setItemsPerPage(Number(e.target.value))}
+            >
+              <option value={5}>5 per page</option>
+              <option value={10}>10 per page</option>
+              <option value={25}>25 per page</option>
+              <option value={50}>50 per page</option>
+            </ItemsPerPageSelect>
 
-             <form onSubmit={handleSubmitCreateSession}>
-               <FormGrid>
-                 <FormGroup>
-                   <Label>Product *</Label>
-                   <Select
-                     value={createFormData.productId}
-                     onChange={(e) => handleCreateFormChange('productId', e.target.value)}
-                     required
-                     disabled={productsLoading}
-                   >
-                     <option value="">
-                       {productsLoading ? 'Loading products...' : 'Select Product'}
-                     </option>
-                     {products.map(product => (
-                       <option key={product._id} value={product._id}>
-                         {product.name}
-                       </option>
-                     ))}
-                   </Select>
-                 </FormGroup>
+            <PageNumbers>
+              <PaginationButton onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
+                First
+              </PaginationButton>
 
-                 <FormGroup>
-                   <Label>Variant *</Label>
-                   <Select
-                     value={createFormData.variantId}
-                     onChange={(e) => handleCreateFormChange('variantId', e.target.value)}
-                     required
-                     disabled={!createFormData.productId || variants.length === 0}
-                   >
-                     <option value="">
-                       {!createFormData.productId 
-                         ? 'Select product first' 
-                         : variants.length === 0 
-                         ? 'No variants available' 
-                         : 'Select Variant'
-                       }
-                     </option>
-                     {variants.map(variant => (
-                       <option key={variant._id} value={variant._id}>
-                         {variant.label} - ₹{variant.basePrice}
-                       </option>
-                     ))}
-                   </Select>
-                 </FormGroup>
+              <PaginationButton
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </PaginationButton>
 
-                 <FormGroup className="full-width">
-                   <Label>Answers (JSON)</Label>
-                   <TextArea
-                     value={typeof createFormData.answers === 'string' 
-                       ? createFormData.answers 
-                       : JSON.stringify(createFormData.answers, null, 2)
-                     }
-                     onChange={(e) => {
-                       try {
-                         const parsed = JSON.parse(e.target.value);
-                         handleCreateFormChange('answers', parsed);
-                       } catch {
-                         handleCreateFormChange('answers', e.target.value);
-                       }
-                     }}
-                     placeholder='{"condition": "excellent", "accessories": ["charger", "box"]}'
-                     rows="4"
-                   />
-                   <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
-                     Enter answers as JSON object (optional)
-                   </small>
-                 </FormGroup>
+              {/* Page Numbers */}
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
 
-                 <FormGroup className="full-width">
-                   <Label>Defects</Label>
-                   <MultiSelectContainer>
-                     <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-                       {createFormData.defects.map((defectId) => {
-                         const defect = defects.find(d => d._id === defectId);
-                         return (
-                           <MultiSelectItem key={defectId}>
-                             {defect ? defect.title : defectId}
-                             <MultiSelectRemove
-                               type="button"
-                               onClick={() => {
-                                 const updatedDefects = createFormData.defects.filter(id => id !== defectId);
-                                 handleCreateFormChange('defects', updatedDefects);
-                               }}
-                             >
-                               ×
-                             </MultiSelectRemove>
-                           </MultiSelectItem>
-                         );
-                       })}
-                     </div>
-                     <MultiSelectDropdown
-                       value=""
-                       onChange={(e) => {
-                         if (e.target.value && !createFormData.defects.includes(e.target.value)) {
-                           const updatedDefects = [...createFormData.defects, e.target.value];
-                           handleCreateFormChange('defects', updatedDefects);
-                         }
-                         e.target.value = '';
-                       }}
-                       disabled={defectsLoading}
-                     >
-                       <option value="">
-                         {defectsLoading ? 'Loading defects...' : 'Select defects to add'}
-                       </option>
-                       {defects
-                         .filter(defect => !createFormData.defects.includes(defect._id))
-                         .map(defect => (
-                           <option key={defect._id} value={defect._id}>
-                             {defect.title} {defect.delta && `(${defect.delta.sign}${defect.delta.value}${defect.delta.type === 'abs' ? '₹' : '%'})`}
-                           </option>
-                         ))}
-                     </MultiSelectDropdown>
-                   </MultiSelectContainer>
-                   <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
-                     Select defects that apply to this device (optional)
-                   </small>
-                 </FormGroup>
+                return (
+                  <PaginationButton
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={currentPage === pageNum ? 'active' : ''}
+                  >
+                    {pageNum}
+                  </PaginationButton>
+                );
+              })}
 
-                 <FormGroup className="full-width">
-                   <Label>Accessories</Label>
-                   <MultiSelectContainer>
-                     <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-                       {createFormData.accessories.map((accessoryId) => {
-                         const accessory = accessories.find(a => a._id === accessoryId);
-                         return (
-                           <MultiSelectItem key={accessoryId}>
-                             {accessory ? accessory.title : accessoryId}
-                             <MultiSelectRemove
-                               type="button"
-                               onClick={() => {
-                                 const updatedAccessories = createFormData.accessories.filter(id => id !== accessoryId);
-                                 handleCreateFormChange('accessories', updatedAccessories);
-                               }}
-                             >
-                               ×
-                             </MultiSelectRemove>
-                           </MultiSelectItem>
-                         );
-                       })}
-                     </div>
-                     <MultiSelectDropdown
-                       value=""
-                       onChange={(e) => {
-                         if (e.target.value && !createFormData.accessories.includes(e.target.value)) {
-                           const updatedAccessories = [...createFormData.accessories, e.target.value];
-                           handleCreateFormChange('accessories', updatedAccessories);
-                         }
-                         e.target.value = '';
-                       }}
-                       disabled={accessoriesLoading}
-                     >
-                       <option value="">
-                         {accessoriesLoading ? 'Loading accessories...' : 'Select accessories to add'}
-                       </option>
-                       {accessories
-                         .filter(accessory => !createFormData.accessories.includes(accessory._id))
-                         .map(accessory => (
-                           <option key={accessory._id} value={accessory._id}>
-                             {accessory.title} {accessory.delta && `(${accessory.delta.sign}${accessory.delta.value}${accessory.delta.type === 'abs' ? '₹' : '%'})`}
-                           </option>
-                         ))}
-                     </MultiSelectDropdown>
-                   </MultiSelectContainer>
-                   <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
-                     Select accessories included with this device (optional)
-                   </small>
-                 </FormGroup>
-               </FormGrid>
+              <PaginationButton
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </PaginationButton>
 
-               <ModalActions>
-                 <Button type="button" className="secondary" onClick={handleCloseCreateModal}>
-                   Cancel
-                 </Button>
-                 <Button type="submit" className="primary">
-                   Create Session
-                 </Button>
-               </ModalActions>
-             </form>
-           </ModalContent>
-         </ModalOverlay>
-       )}
-     </Container>
-   );
- };
+              <PaginationButton
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+              >
+                Last
+              </PaginationButton>
+            </PageNumbers>
+          </PaginationControls>
+        </PaginationContainer>
+      </SessionsTable>
+
+      {/* Create Session Modal */}
+      {showCreateModal && (
+        <ModalOverlay onClick={handleCloseCreateModal}>
+          <ModalContent onClick={e => e.stopPropagation()}>
+            <ModalHeader>
+              <h2>Create New Session</h2>
+              <CloseButton onClick={handleCloseCreateModal}>
+                <XCircle size={20} />
+              </CloseButton>
+            </ModalHeader>
+
+            <form onSubmit={handleSubmitCreateSession}>
+              <FormGrid>
+                <FormGroup>
+                  <Label>Product *</Label>
+                  <Select
+                    value={createFormData.productId}
+                    onChange={e => handleCreateFormChange('productId', e.target.value)}
+                    required
+                    disabled={productsLoading}
+                  >
+                    <option value="">
+                      {productsLoading ? 'Loading products...' : 'Select Product'}
+                    </option>
+                    {products.map(product => (
+                      <option key={product._id} value={product._id}>
+                        {product.name}
+                      </option>
+                    ))}
+                  </Select>
+                </FormGroup>
+
+                <FormGroup>
+                  <Label>Variant *</Label>
+                  <Select
+                    value={createFormData.variantId}
+                    onChange={e => handleCreateFormChange('variantId', e.target.value)}
+                    required
+                    disabled={!createFormData.productId || variants.length === 0}
+                  >
+                    <option value="">
+                      {!createFormData.productId
+                        ? 'Select product first'
+                        : variants.length === 0
+                          ? 'No variants available'
+                          : 'Select Variant'}
+                    </option>
+                    {variants.map(variant => (
+                      <option key={variant._id} value={variant._id}>
+                        {variant.label} - ₹{variant.basePrice}
+                      </option>
+                    ))}
+                  </Select>
+                </FormGroup>
+
+                <FormGroup className="full-width">
+                  <Label>Answers (JSON)</Label>
+                  <TextArea
+                    value={
+                      typeof createFormData.answers === 'string'
+                        ? createFormData.answers
+                        : JSON.stringify(createFormData.answers, null, 2)
+                    }
+                    onChange={e => {
+                      try {
+                        const parsed = JSON.parse(e.target.value);
+                        handleCreateFormChange('answers', parsed);
+                      } catch {
+                        handleCreateFormChange('answers', e.target.value);
+                      }
+                    }}
+                    placeholder='{"condition": "excellent", "accessories": ["charger", "box"]}'
+                    rows="4"
+                  />
+                  <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
+                    Enter answers as JSON object (optional)
+                  </small>
+                </FormGroup>
+
+                <FormGroup className="full-width">
+                  <Label>Defects</Label>
+                  <MultiSelectContainer>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+                      {createFormData.defects.map(defectId => {
+                        const defect = defects.find(d => d._id === defectId);
+                        return (
+                          <MultiSelectItem key={defectId}>
+                            {defect ? defect.title : defectId}
+                            <MultiSelectRemove
+                              type="button"
+                              onClick={() => {
+                                const updatedDefects = createFormData.defects.filter(
+                                  id => id !== defectId
+                                );
+                                handleCreateFormChange('defects', updatedDefects);
+                              }}
+                            >
+                              ×
+                            </MultiSelectRemove>
+                          </MultiSelectItem>
+                        );
+                      })}
+                    </div>
+                    <MultiSelectDropdown
+                      value=""
+                      onChange={e => {
+                        if (e.target.value && !createFormData.defects.includes(e.target.value)) {
+                          const updatedDefects = [...createFormData.defects, e.target.value];
+                          handleCreateFormChange('defects', updatedDefects);
+                        }
+                        e.target.value = '';
+                      }}
+                      disabled={defectsLoading}
+                    >
+                      <option value="">
+                        {defectsLoading ? 'Loading defects...' : 'Select defects to add'}
+                      </option>
+                      {defects
+                        .filter(defect => !createFormData.defects.includes(defect._id))
+                        .map(defect => (
+                          <option key={defect._id} value={defect._id}>
+                            {defect.title}{' '}
+                            {defect.delta &&
+                              `(${defect.delta.sign}${defect.delta.value}${defect.delta.type === 'abs' ? '₹' : '%'})`}
+                          </option>
+                        ))}
+                    </MultiSelectDropdown>
+                  </MultiSelectContainer>
+                  <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
+                    Select defects that apply to this device (optional)
+                  </small>
+                </FormGroup>
+
+                <FormGroup className="full-width">
+                  <Label>Accessories</Label>
+                  <MultiSelectContainer>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+                      {createFormData.accessories.map(accessoryId => {
+                        const accessory = accessories.find(a => a._id === accessoryId);
+                        return (
+                          <MultiSelectItem key={accessoryId}>
+                            {accessory ? accessory.title : accessoryId}
+                            <MultiSelectRemove
+                              type="button"
+                              onClick={() => {
+                                const updatedAccessories = createFormData.accessories.filter(
+                                  id => id !== accessoryId
+                                );
+                                handleCreateFormChange('accessories', updatedAccessories);
+                              }}
+                            >
+                              ×
+                            </MultiSelectRemove>
+                          </MultiSelectItem>
+                        );
+                      })}
+                    </div>
+                    <MultiSelectDropdown
+                      value=""
+                      onChange={e => {
+                        if (
+                          e.target.value &&
+                          !createFormData.accessories.includes(e.target.value)
+                        ) {
+                          const updatedAccessories = [
+                            ...createFormData.accessories,
+                            e.target.value,
+                          ];
+                          handleCreateFormChange('accessories', updatedAccessories);
+                        }
+                        e.target.value = '';
+                      }}
+                      disabled={accessoriesLoading}
+                    >
+                      <option value="">
+                        {accessoriesLoading
+                          ? 'Loading accessories...'
+                          : 'Select accessories to add'}
+                      </option>
+                      {accessories
+                        .filter(accessory => !createFormData.accessories.includes(accessory._id))
+                        .map(accessory => (
+                          <option key={accessory._id} value={accessory._id}>
+                            {accessory.title}{' '}
+                            {accessory.delta &&
+                              `(${accessory.delta.sign}${accessory.delta.value}${accessory.delta.type === 'abs' ? '₹' : '%'})`}
+                          </option>
+                        ))}
+                    </MultiSelectDropdown>
+                  </MultiSelectContainer>
+                  <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
+                    Select accessories included with this device (optional)
+                  </small>
+                </FormGroup>
+              </FormGrid>
+
+              <ModalActions>
+                <Button type="button" className="secondary" onClick={handleCloseCreateModal}>
+                  Cancel
+                </Button>
+                <Button type="submit" className="primary">
+                  Create Session
+                </Button>
+              </ModalActions>
+            </form>
+          </ModalContent>
+        </ModalOverlay>
+      )}
+    </Container>
+  );
+};
 
 export default SellSessionsManagement;

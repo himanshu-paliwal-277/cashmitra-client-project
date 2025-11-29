@@ -25,14 +25,14 @@ const LoginCard = styled.div`
 const Logo = styled.div`
   text-align: center;
   margin-bottom: 30px;
-  
+
   h1 {
     color: #667eea;
     font-size: 32px;
     font-weight: 700;
     margin: 0 0 10px 0;
   }
-  
+
   p {
     color: #6b7280;
     font-size: 16px;
@@ -62,7 +62,7 @@ const InputWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  
+
   svg {
     position: absolute;
     left: 12px;
@@ -77,13 +77,13 @@ const Input = styled.input`
   border-radius: 10px;
   font-size: 15px;
   transition: all 0.3s ease;
-  
+
   &:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   }
-  
+
   &::placeholder {
     color: #9ca3af;
   }
@@ -98,22 +98,24 @@ const Button = styled.button`
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   margin-top: 10px;
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -135,7 +137,7 @@ const ErrorMessage = styled.div`
 const AgentLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -143,15 +145,15 @@ const AgentLogin = () => {
   const { login } = useAgentAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
     setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError('');
 

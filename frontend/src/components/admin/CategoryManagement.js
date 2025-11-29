@@ -20,7 +20,7 @@ import {
   Tablet,
   Monitor,
   Headphones,
-  Camera
+  Camera,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -74,7 +74,7 @@ const SearchInput = styled.input`
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   transition: border-color 0.2s ease;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary.main};
@@ -95,19 +95,23 @@ const Button = styled.button`
   align-items: center;
   gap: ${theme.spacing[2]};
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  background-color: ${props => props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
-  color: ${props => props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
-  border: 1px solid ${props => props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
+  background-color: ${props =>
+    props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
+  color: ${props => (props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary)};
+  border: 1px solid
+    ${props =>
+      props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    background-color: ${props => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background-color: ${props =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -119,7 +123,7 @@ const Content = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: ${theme.spacing[6]};
   padding: ${theme.spacing[6]};
-  
+
   @media (max-width: ${theme.breakpoints.lg}) {
     grid-template-columns: 1fr;
   }
@@ -156,11 +160,11 @@ const CategoryItem = styled.div`
   border-bottom: 1px solid ${theme.colors.border.primary};
   cursor: pointer;
   transition: background-color 0.2s ease;
-  
+
   &:hover {
     background-color: ${theme.colors.grey[50]};
   }
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -173,8 +177,9 @@ const CategoryIcon = styled.div`
   width: 32px;
   height: 32px;
   border-radius: ${theme.borderRadius.md};
-  background-color: ${props => props.isParent ? theme.colors.primary[100] : theme.colors.grey[100]};
-  color: ${props => props.isParent ? theme.colors.primary.main : theme.colors.grey[600]};
+  background-color: ${props =>
+    props.isParent ? theme.colors.primary[100] : theme.colors.grey[100]};
+  color: ${props => (props.isParent ? theme.colors.primary.main : theme.colors.grey[600])};
   margin-right: ${theme.spacing[3]};
 `;
 
@@ -202,7 +207,7 @@ const CategoryActions = styled.div`
   gap: ${theme.spacing[1]};
   opacity: 0;
   transition: opacity 0.2s ease;
-  
+
   ${CategoryItem}:hover & {
     opacity: 1;
   }
@@ -220,7 +225,7 @@ const ActionButton = styled.button`
   cursor: pointer;
   color: ${theme.colors.text.secondary};
   transition: all 0.2s ease;
-  
+
   &:hover {
     background-color: ${theme.colors.grey[100]};
     color: ${theme.colors.text.primary};
@@ -238,7 +243,7 @@ const ExpandButton = styled.button`
   cursor: pointer;
   color: ${theme.colors.text.secondary};
   margin-right: ${theme.spacing[2]};
-  
+
   &:hover {
     color: ${theme.colors.text.primary};
   }
@@ -276,7 +281,7 @@ const Input = styled.input`
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   transition: border-color 0.2s ease;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary.main};
@@ -292,7 +297,7 @@ const Select = styled.select`
   font-size: ${theme.typography.fontSize.sm};
   background-color: ${theme.colors.white};
   cursor: pointer;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary.main};
@@ -316,7 +321,7 @@ const CategoryManagement = () => {
     name: '',
     description: '',
     parentId: '',
-    icon: 'Package'
+    icon: 'Package',
   });
   const [loading, setLoading] = useState(true);
 
@@ -327,7 +332,7 @@ const CategoryManagement = () => {
     Tablet: Tablet,
     Monitor: Monitor,
     Headphones: Headphones,
-    Camera: Camera
+    Camera: Camera,
   };
 
   useEffect(() => {
@@ -346,7 +351,7 @@ const CategoryManagement = () => {
     }
   };
 
-  const handleToggleExpand = (categoryId) => {
+  const handleToggleExpand = categoryId => {
     const newExpanded = new Set(expandedCategories);
     if (newExpanded.has(categoryId)) {
       newExpanded.delete(categoryId);
@@ -356,13 +361,13 @@ const CategoryManagement = () => {
     setExpandedCategories(newExpanded);
   };
 
-  const handleEditCategory = (category) => {
+  const handleEditCategory = category => {
     setEditingCategory(category);
     setFormData({
       name: category.name,
       description: category.description || '',
       parentId: category.parentId || '',
-      icon: category.icon || 'Package'
+      icon: category.icon || 'Package',
     });
   };
 
@@ -380,7 +385,7 @@ const CategoryManagement = () => {
     }
   };
 
-  const handleDeleteCategory = async (categoryId) => {
+  const handleDeleteCategory = async categoryId => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
         await adminService.deleteCategory(categoryId);
@@ -397,19 +402,20 @@ const CategoryManagement = () => {
       name: '',
       description: '',
       parentId: '',
-      icon: 'Package'
+      icon: 'Package',
     });
   };
 
   const getFilteredCategories = () => {
     if (!searchTerm) return categories;
-    return categories.filter(category => 
-      category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      category.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    return categories.filter(
+      category =>
+        category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        category.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 
-  const renderCategoryIcon = (iconName) => {
+  const renderCategoryIcon = iconName => {
     const IconComponent = categoryIcons[iconName] || Package;
     return <IconComponent size={16} />;
   };
@@ -427,18 +433,16 @@ const CategoryManagement = () => {
               {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </ExpandButton>
           )}
-          
-          <CategoryIcon isParent={hasChildren}>
-            {renderCategoryIcon(category.icon)}
-          </CategoryIcon>
-          
+
+          <CategoryIcon isParent={hasChildren}>{renderCategoryIcon(category.icon)}</CategoryIcon>
+
           <CategoryContent>
             <CategoryName>{category.name}</CategoryName>
             <CategoryInfo>
               {category.description} • {children.length} subcategories
             </CategoryInfo>
           </CategoryContent>
-          
+
           <CategoryActions>
             <ActionButton onClick={() => handleEditCategory(category)}>
               <Edit size={14} />
@@ -448,11 +452,9 @@ const CategoryManagement = () => {
             </ActionButton>
           </CategoryActions>
         </CategoryItem>
-        
+
         {hasChildren && isExpanded && (
-          <div>
-            {children.map(child => renderCategory(child, level + 1))}
-          </div>
+          <div>{children.map(child => renderCategory(child, level + 1))}</div>
         )}
       </div>
     );
@@ -469,7 +471,7 @@ const CategoryManagement = () => {
             Category Management
           </Title>
         </HeaderLeft>
-        
+
         <HeaderRight>
           <SearchContainer>
             <SearchIcon>
@@ -479,31 +481,43 @@ const CategoryManagement = () => {
               type="text"
               placeholder="Search categories..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </SearchContainer>
-          
+
           <Button variant="primary" onClick={resetForm}>
             <Plus size={16} />
             Add Category
           </Button>
         </HeaderRight>
       </Header>
-      
+
       <Content>
         <Section>
           <SectionTitle>
             <FolderTree size={20} />
             Category Hierarchy
           </SectionTitle>
-          
+
           <CategoryTree>
             {loading ? (
-              <div style={{ padding: theme.spacing[6], textAlign: 'center', color: theme.colors.text.secondary }}>
+              <div
+                style={{
+                  padding: theme.spacing[6],
+                  textAlign: 'center',
+                  color: theme.colors.text.secondary,
+                }}
+              >
                 Loading categories...
               </div>
             ) : mainCategories.length === 0 ? (
-              <div style={{ padding: theme.spacing[6], textAlign: 'center', color: theme.colors.text.secondary }}>
+              <div
+                style={{
+                  padding: theme.spacing[6],
+                  textAlign: 'center',
+                  color: theme.colors.text.secondary,
+                }}
+              >
                 No categories found
               </div>
             ) : (
@@ -511,53 +525,53 @@ const CategoryManagement = () => {
             )}
           </CategoryTree>
         </Section>
-        
+
         <Section>
-          <SectionTitle>
-            {editingCategory ? 'Edit Category' : 'Add New Category'}
-          </SectionTitle>
-          
+          <SectionTitle>{editingCategory ? 'Edit Category' : 'Add New Category'}</SectionTitle>
+
           <FormContainer>
             <FormGroup>
               <Label>Category Name</Label>
               <Input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter category name"
               />
             </FormGroup>
-            
+
             <FormGroup>
               <Label>Description</Label>
               <Input
                 type="text"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={e => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Enter category description"
               />
             </FormGroup>
-            
+
             <FormGroup>
               <Label>Parent Category</Label>
               <Select
                 value={formData.parentId}
-                onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
+                onChange={e => setFormData({ ...formData, parentId: e.target.value })}
               >
                 <option value="">None (Main Category)</option>
-                {categories.filter(cat => !cat.parentId && cat.id !== editingCategory?.id).map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
+                {categories
+                  .filter(cat => !cat.parentId && cat.id !== editingCategory?.id)
+                  .map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
               </Select>
             </FormGroup>
-            
+
             <FormGroup>
               <Label>Icon</Label>
               <Select
                 value={formData.icon}
-                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                onChange={e => setFormData({ ...formData, icon: e.target.value })}
               >
                 {Object.keys(categoryIcons).map(iconName => (
                   <option key={iconName} value={iconName}>
@@ -566,7 +580,7 @@ const CategoryManagement = () => {
                 ))}
               </Select>
             </FormGroup>
-            
+
             <FormActions>
               {editingCategory && (
                 <Button onClick={resetForm}>

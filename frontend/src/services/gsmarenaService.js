@@ -6,14 +6,15 @@
 import axios from 'axios';
 
 // Note: In production, use process.env.OPENAI_API_KEY instead of hardcoding
-const OPENAI_API_KEY = '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';
+const OPENAI_API_KEY =
+  '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';
 
 class GSMArenaService {
   constructor() {
     this.openaiClient = axios.create({
       baseURL: 'https://api.openai.com/v1',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       timeout: 30000, // 30 second default timeout
@@ -32,18 +33,19 @@ class GSMArenaService {
       }
 
       const prompt = this.buildSearchPrompt(productName);
-      
+
       const response = await this.openaiClient.post('/chat/completions', {
         model: 'gpt-4o', // Updated to more recent model for better accuracy
         messages: [
           {
             role: 'system',
-            content: 'You are a mobile phone specification expert with comprehensive knowledge of smartphone specifications from various manufacturers. Provide accurate technical specifications based on your training data. Always return complete, valid JSON responses with all requested fields filled. Use "N/A" for unknown fields.'
+            content:
+              'You are a mobile phone specification expert with comprehensive knowledge of smartphone specifications from various manufacturers. Provide accurate technical specifications based on your training data. Always return complete, valid JSON responses with all requested fields filled. Use "N/A" for unknown fields.',
           },
           {
             role: 'user',
-            content: prompt
-          }
+            content: prompt,
+          },
         ],
         max_tokens: 2000,
         temperature: 0.1,
@@ -54,20 +56,27 @@ class GSMArenaService {
       }
 
       const content = response.data.choices[0].message.content.trim();
-      
+
       // Handle cases where OpenAI can't provide data
-      if (content.toLowerCase().includes('sorry') && (content.toLowerCase().includes('browse') || content.toLowerCase().includes('internet'))) {
-        throw new Error(`Unable to retrieve specifications for "${productName}". This product may not be in the database. Please try a different product name or enter manually.`);
+      if (
+        content.toLowerCase().includes('sorry') &&
+        (content.toLowerCase().includes('browse') || content.toLowerCase().includes('internet'))
+      ) {
+        throw new Error(
+          `Unable to retrieve specifications for "${productName}". This product may not be in the database. Please try a different product name or enter manually.`
+        );
       }
-      
+
       if (content.toLowerCase().includes('not found') || content === 'null') {
-        throw new Error(`Product "${productName}" specifications not available. Please check the name or enter manually.`);
+        throw new Error(
+          `Product "${productName}" specifications not available. Please check the name or enter manually.`
+        );
       }
-      
+
       // Extract JSON
       const jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/) || content.match(/\{[\s\S]*\}/);
-      const jsonString = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
-      
+      const jsonString = jsonMatch ? jsonMatch[1] || jsonMatch[0] : content;
+
       let productData;
       try {
         productData = JSON.parse(jsonString);
@@ -76,9 +85,8 @@ class GSMArenaService {
         console.error('Raw content:', content);
         throw new Error('Invalid response format from API. Please try again.');
       }
-      
+
       return this.formatProductData(productData);
-      
     } catch (error) {
       console.error('GSMArena search error:', error);
       const status = error.response?.status;
@@ -236,9 +244,9 @@ Important: Return only valid JSON. Fill based on known data for the product. If 
    */
   formatProductData(rawData) {
     // Ensure numbers, booleans, arrays are correctly typed
-    const formatArray = (val) => Array.isArray(val) ? val : [];
-    const formatBool = (val) => !!val;
-    const formatNum = (val) => Number(val) || 0;
+    const formatArray = val => (Array.isArray(val) ? val : []);
+    const formatBool = val => !!val;
+    const formatNum = val => Number(val) || 0;
 
     return {
       name: rawData.name || '',
@@ -281,11 +289,12 @@ Important: Return only valid JSON. Fill based on known data for the product. If 
           modelNumber: rawData.productDetails?.general?.modelNumber || '',
         },
         memoryStorage: {
-          phoneVariants: rawData.productDetails?.memoryStorage?.phoneVariants.map(v => ({
-            ram: v.ram || '',
-            storage: v.storage || '',
-            price: formatNum(v.price),
-          })) || [],
+          phoneVariants:
+            rawData.productDetails?.memoryStorage?.phoneVariants.map(v => ({
+              ram: v.ram || '',
+              storage: v.storage || '',
+              price: formatNum(v.price),
+            })) || [],
           expandableStorage: formatBool(rawData.productDetails?.memoryStorage?.expandableStorage),
           ramType: rawData.productDetails?.memoryStorage?.ramType || '',
           storageType: rawData.productDetails?.memoryStorage?.storageType || '',
@@ -377,12 +386,13 @@ Important: Return only valid JSON. Fill based on known data for the product. If 
         messages: [
           {
             role: 'system',
-            content: 'You are a mobile phone expert. Suggest popular models matching the query. Return only JSON array of strings.'
+            content:
+              'You are a mobile phone expert. Suggest popular models matching the query. Return only JSON array of strings.',
           },
           {
             role: 'user',
-            content: `Suggest 5-10 popular smartphone models matching "${query}". Return only ["Model1", "Model2", ...]. Focus on recent models.`
-          }
+            content: `Suggest 5-10 popular smartphone models matching "${query}". Return only ["Model1", "Model2", ...]. Focus on recent models.`,
+          },
         ],
         max_tokens: 200,
         temperature: 0.3,

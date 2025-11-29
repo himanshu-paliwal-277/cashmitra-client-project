@@ -6,7 +6,7 @@ import api from '../config/api';
  */
 const partnerService = {
   // ==================== DASHBOARD ====================
-  
+
   /**
    * Get partner dashboard statistics for sell/buy products
    * @returns {Promise} Dashboard data with statistics and recent orders
@@ -28,12 +28,12 @@ const partnerService = {
    * @param {Object} data - Profile data to update
    * @returns {Promise} Updated profile
    */
-  updateProfile: (data) => {
+  updateProfile: data => {
     return api.put('/partner/profile', data);
   },
 
   // ==================== SELL PRODUCTS ====================
-  
+
   /**
    * Get partner's sell products
    * @param {Object} params - Query parameters (page, limit, status, search)
@@ -48,7 +48,7 @@ const partnerService = {
    * @param {Object} data - Product data
    * @returns {Promise} Created product
    */
-  createSellProduct: (data) => {
+  createSellProduct: data => {
     return api.post('/sell-products', data);
   },
 
@@ -67,12 +67,12 @@ const partnerService = {
    * @param {string} id - Product ID
    * @returns {Promise} Deletion confirmation
    */
-  deleteSellProduct: (id) => {
+  deleteSellProduct: id => {
     return api.delete(`/sell-products/${id}`);
   },
 
   // ==================== BUY PRODUCTS ====================
-  
+
   /**
    * Get partner's buy products
    * @param {Object} params - Query parameters (page, limit, isActive, search)
@@ -87,7 +87,7 @@ const partnerService = {
    * @param {Object} data - Product data
    * @returns {Promise} Created product
    */
-  createBuyProduct: (data) => {
+  createBuyProduct: data => {
     return api.post('/buy-products', data);
   },
 
@@ -106,12 +106,12 @@ const partnerService = {
    * @param {string} id - Product ID
    * @returns {Promise} Deletion confirmation
    */
-  deleteBuyProduct: (id) => {
+  deleteBuyProduct: id => {
     return api.delete(`/buy-products/${id}`);
   },
 
   // ==================== ORDERS ====================
-  
+
   /**
    * Get partner's sell orders
    * @param {Object} params - Query parameters (page, limit, status)
@@ -126,7 +126,7 @@ const partnerService = {
    * @param {string} id - Order ID
    * @returns {Promise} Order details
    */
-  getSellOrderDetails: (id) => {
+  getSellOrderDetails: id => {
     return api.get(`/partner/sell-orders/${id}`);
   },
 
@@ -141,13 +141,13 @@ const partnerService = {
   },
 
   // ==================== OLD INVENTORY METHODS (Keep for backward compatibility) ====================
-  
+
   /**
    * Register as partner
    * @param {Object} data - Shop registration data
    * @returns {Promise} Registration confirmation
    */
-  register: (data) => {
+  register: data => {
     return api.post('/partner/register', data);
   },
 
@@ -156,7 +156,7 @@ const partnerService = {
    * @param {Object} data - Document URLs
    * @returns {Promise} Upload confirmation
    */
-  uploadDocuments: (data) => {
+  uploadDocuments: data => {
     return api.put('/partner/documents', data);
   },
 
@@ -182,7 +182,7 @@ const partnerService = {
    * @param {Object} data - Inventory data
    * @returns {Promise} Created inventory item
    */
-  addInventory: (data) => {
+  addInventory: data => {
     return api.post('/partner/inventory', data);
   },
 
@@ -201,7 +201,7 @@ const partnerService = {
    * @param {string} id - Inventory ID
    * @returns {Promise} Deletion confirmation
    */
-  deleteInventory: (id) => {
+  deleteInventory: id => {
     return api.delete(`/partner/inventory/${id}`);
   },
 

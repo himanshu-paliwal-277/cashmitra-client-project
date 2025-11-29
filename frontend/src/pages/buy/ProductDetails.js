@@ -1,11 +1,40 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Star, Heart, ShoppingCart, Zap, Shield, Truck, ChevronDown, ChevronUp,
-  ChevronLeft, ChevronRight, Check, X, Users, Award, Phone, Wifi, Camera,
-  Battery, Monitor, Cpu, HardDrive, Smartphone, CreditCard, RefreshCw,
-  MapPin, Info, Headphones, RotateCcw, FileText, HelpCircle, Gift, Percent,
-  Plus, Minus
+  Star,
+  Heart,
+  ShoppingCart,
+  Zap,
+  Shield,
+  Truck,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  X,
+  Users,
+  Award,
+  Phone,
+  Wifi,
+  Camera,
+  Battery,
+  Monitor,
+  Cpu,
+  HardDrive,
+  Smartphone,
+  CreditCard,
+  RefreshCw,
+  MapPin,
+  Info,
+  Headphones,
+  RotateCcw,
+  FileText,
+  HelpCircle,
+  Gift,
+  Percent,
+  Plus,
+  Minus,
 } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
 import adminService from '../../services/adminService';
@@ -84,7 +113,7 @@ const ProductDetails = () => {
         inventoryId: product.inventoryId || product._id,
         variant: selectedVariant,
         storage: selectedStorage,
-        color: selectedColor
+        color: selectedColor,
       },
       quantity
     );
@@ -143,24 +172,24 @@ const ProductDetails = () => {
     );
   }
 
-  const priceNow =
-    product.pricing?.discountedPrice || selectedVariant?.price || product.price || 0;
+  const priceNow = product.pricing?.discountedPrice || selectedVariant?.price || product.price || 0;
   const mrp = product.pricing?.mrp || product.originalPrice || null;
-  const discountPct =
-    mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
+  const discountPct = mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
 
   return (
     <div className="pd__shell">
       {/* Breadcrumb */}
       <nav className="pd__breadcrumb">
-        <button onClick={() => navigate('/')} className="link">Home</button>
+        <button onClick={() => navigate('/')} className="link">
+          Home
+        </button>
         <ChevronRight size={14} />
-        <button onClick={() => navigate('/buy')} className="link">Buy</button>
+        <button onClick={() => navigate('/buy')} className="link">
+          Buy
+        </button>
         <ChevronRight size={14} />
         <button
-          onClick={() =>
-            navigate(`/buy/category/${product?.categoryId?.name || 'Category'}`)
-          }
+          onClick={() => navigate(`/buy/category/${product?.categoryId?.name || 'Category'}`)}
           className="link"
         >
           {product?.categoryId?.name || 'Category'}
@@ -184,13 +213,16 @@ const ProductDetails = () => {
                 if (product.images) {
                   if (product.images.main) imageArray.push(product.images.main.trim());
                   if (product.images.gallery) imageArray.push(product.images.gallery.trim());
-                  if (product.images.thumbnail && product.images.thumbnail !== product.images.gallery) {
+                  if (
+                    product.images.thumbnail &&
+                    product.images.thumbnail !== product.images.gallery
+                  ) {
                     imageArray.push(product.images.thumbnail.trim());
                   }
                 }
                 // Fallback to placeholder if no images
                 const finalImages = imageArray.length > 0 ? imageArray : ['/placeholder-phone.jpg'];
-                
+
                 return finalImages.map((img, i) => (
                   <button
                     key={i}
@@ -215,7 +247,10 @@ const ProductDetails = () => {
                 if (product.images) {
                   if (product.images.main) imageArray.push(product.images.main.trim());
                   if (product.images.gallery) imageArray.push(product.images.gallery.trim());
-                  if (product.images.thumbnail && product.images.thumbnail !== product.images.gallery) {
+                  if (
+                    product.images.thumbnail &&
+                    product.images.thumbnail !== product.images.gallery
+                  ) {
                     imageArray.push(product.images.thumbnail.trim());
                   }
                 }
@@ -282,20 +317,34 @@ const ProductDetails = () => {
 
           {/* Trust strip */}
           <div className="pd__trust">
-            <div className="trust-item irow"><Shield size={ICON_SIZE} />32-Point Quality Check</div>
-            <div className="trust-item irow"><RotateCcw size={ICON_SIZE} />15-Day Refund</div>
-            <div className="trust-item irow"><Award size={ICON_SIZE} />12-Month Warranty</div>
+            <div className="trust-item irow">
+              <Shield size={ICON_SIZE} />
+              32-Point Quality Check
+            </div>
+            <div className="trust-item irow">
+              <RotateCcw size={ICON_SIZE} />
+              15-Day Refund
+            </div>
+            <div className="trust-item irow">
+              <Award size={ICON_SIZE} />
+              12-Month Warranty
+            </div>
           </div>
 
           {/* What is Assured */}
           <div className="pd__accordion card">
-            <button className="acc__head" onClick={() => setShowAssured((v) => !v)}>
-              <div className="irow"><Info size={ICON_SIZE} />What is Cashify Assured?</div>
+            <button className="acc__head" onClick={() => setShowAssured(v => !v)}>
+              <div className="irow">
+                <Info size={ICON_SIZE} />
+                What is Cashify Assured?
+              </div>
               {showAssured ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
             {showAssured && (
               <div className="acc__body">
-                <p>Fully tested, verified devices with secure payment, easy returns and warranty.</p>
+                <p>
+                  Fully tested, verified devices with secure payment, easy returns and warranty.
+                </p>
                 <ul className="list-ticks">
                   <li>Authentic & verified</li>
                   <li>32-point QC</li>
@@ -375,18 +424,18 @@ const ProductDetails = () => {
           {/* Quantity + Actions */}
           <div className="pd__actions card">
             <div className="qty">
-              <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} disabled={quantity <= 1}>
+              <button onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={quantity <= 1}>
                 <Minus size={16} />
               </button>
               <span>{quantity}</span>
-              <button onClick={() => setQuantity((q) => q + 1)}>
+              <button onClick={() => setQuantity(q => q + 1)}>
                 <Plus size={16} />
               </button>
             </div>
             <div className="act">
               <button
                 className={`btn icon ${isWishlisted ? 'wish' : ''}`}
-                onClick={() => setIsWishlisted((v) => !v)}
+                onClick={() => setIsWishlisted(v => !v)}
                 aria-label="Wishlist"
               >
                 <Heart size={18} fill={isWishlisted ? '#10b981' : 'none'} />
@@ -422,15 +471,27 @@ const ProductDetails = () => {
                 <div className="pin">
                   <input
                     value={pincode}
-                    onChange={(e) => setPincode(e.target.value)}
+                    onChange={e => setPincode(e.target.value)}
                     placeholder="Enter pincode"
                   />
                   <button className="btn-sm">Check</button>
                 </div>
               </div>
             </div>
-            <div className="row irow"><RotateCcw size={ICON_SIZE} /><div><div className="bold">15-Day Refund</div><div className="muted">Easy returns & exchanges</div></div></div>
-            <div className="row irow"><Shield size={ICON_SIZE} /><div><div className="bold">Secure Packaging</div><div className="muted">Safe & secure delivery</div></div></div>
+            <div className="row irow">
+              <RotateCcw size={ICON_SIZE} />
+              <div>
+                <div className="bold">15-Day Refund</div>
+                <div className="muted">Easy returns & exchanges</div>
+              </div>
+            </div>
+            <div className="row irow">
+              <Shield size={ICON_SIZE} />
+              <div>
+                <div className="bold">Secure Packaging</div>
+                <div className="muted">Safe & secure delivery</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -438,19 +499,34 @@ const ProductDetails = () => {
       {/* Tabs */}
       <section className="pd__tabs card">
         <div className="pd__tabbar">
-          <button className={activeTab === 'specs' ? 'active' : ''} onClick={() => setActiveTab('specs')}>
+          <button
+            className={activeTab === 'specs' ? 'active' : ''}
+            onClick={() => setActiveTab('specs')}
+          >
             <FileText size={16} /> Specifications
           </button>
-          <button className={activeTab === 'reviews' ? 'active' : ''} onClick={() => setActiveTab('reviews')}>
+          <button
+            className={activeTab === 'reviews' ? 'active' : ''}
+            onClick={() => setActiveTab('reviews')}
+          >
             <Star size={16} /> Reviews ({product.totalReviews || 4})
           </button>
-          <button className={activeTab === 'warranty' ? 'active' : ''} onClick={() => setActiveTab('warranty')}>
+          <button
+            className={activeTab === 'warranty' ? 'active' : ''}
+            onClick={() => setActiveTab('warranty')}
+          >
             <Shield size={16} /> Warranty
           </button>
-          <button className={activeTab === 'offers' ? 'active' : ''} onClick={() => setActiveTab('offers')}>
+          <button
+            className={activeTab === 'offers' ? 'active' : ''}
+            onClick={() => setActiveTab('offers')}
+          >
             <Gift size={16} /> Offers
           </button>
-          <button className={activeTab === 'faq' ? 'active' : ''} onClick={() => setActiveTab('faq')}>
+          <button
+            className={activeTab === 'faq' ? 'active' : ''}
+            onClick={() => setActiveTab('faq')}
+          >
             <HelpCircle size={16} /> FAQ
           </button>
         </div>
@@ -460,11 +536,47 @@ const ProductDetails = () => {
           <div className="pd__specs">
             {/* Top specs */}
             <div className="pd__topspecs">
-              <SpecTile icon={<Monitor size={ICON_SIZE} />} label="Screen Size" value={product.productDetails?.display?.size || product.topSpecs?.screenSize || '6.7 inches'} />
-              <SpecTile icon={<Cpu size={ICON_SIZE} />} label="Chipset" value={product.productDetails?.performance?.chipset || product.topSpecs?.chipset || 'Google Tensor G3'} />
-              <SpecTile icon={<HardDrive size={ICON_SIZE} />} label="Pixel Density" value={product.topSpecs?.pixelDensity || '490 ppi'} />
-              <SpecTile icon={<Smartphone size={ICON_SIZE} />} label="Network" value={product.productDetails?.networkConnectivity?.networkSupport || product.topSpecs?.networkSupport || '5G'} />
-              <SpecTile icon={<Smartphone size={ICON_SIZE} />} label="SIM Slots" value={product.productDetails?.networkConnectivity?.simSlots || product.topSpecs?.simSlots || 'Dual SIM, GSM+GSM'} />
+              <SpecTile
+                icon={<Monitor size={ICON_SIZE} />}
+                label="Screen Size"
+                value={
+                  product.productDetails?.display?.size ||
+                  product.topSpecs?.screenSize ||
+                  '6.7 inches'
+                }
+              />
+              <SpecTile
+                icon={<Cpu size={ICON_SIZE} />}
+                label="Chipset"
+                value={
+                  product.productDetails?.performance?.chipset ||
+                  product.topSpecs?.chipset ||
+                  'Google Tensor G3'
+                }
+              />
+              <SpecTile
+                icon={<HardDrive size={ICON_SIZE} />}
+                label="Pixel Density"
+                value={product.topSpecs?.pixelDensity || '490 ppi'}
+              />
+              <SpecTile
+                icon={<Smartphone size={ICON_SIZE} />}
+                label="Network"
+                value={
+                  product.productDetails?.networkConnectivity?.networkSupport ||
+                  product.topSpecs?.networkSupport ||
+                  '5G'
+                }
+              />
+              <SpecTile
+                icon={<Smartphone size={ICON_SIZE} />}
+                label="SIM Slots"
+                value={
+                  product.productDetails?.networkConnectivity?.simSlots ||
+                  product.topSpecs?.simSlots ||
+                  'Dual SIM, GSM+GSM'
+                }
+              />
             </div>
 
             {/* Accordions (single-open) */}
@@ -478,7 +590,7 @@ const ProductDetails = () => {
                 ['Type', product.productDetails?.display?.technology || 'LTPO OLED'],
                 ['Resolution', product.productDetails?.display?.resolution || '2992 × 1344'],
                 ['Refresh Rate', product.productDetails?.display?.refreshRate || '120Hz'],
-                ['Peak Brightness', product.topSpecs?.pixelDensity || '2400 nits peak']
+                ['Peak Brightness', product.topSpecs?.pixelDensity || '2400 nits peak'],
               ]}
             />
             <Acc
@@ -492,7 +604,7 @@ const ProductDetails = () => {
                 ['OS', product.productDetails?.performance?.os || 'Android 14'],
                 ['Architecture', product.productDetails?.performance?.architecture || 'ARM64'],
                 ['RAM Type', product.productDetails?.memoryStorage?.ramType || 'LPDDR5X'],
-                ['Storage Type', product.productDetails?.memoryStorage?.romType || 'UFS 3.1']
+                ['Storage Type', product.productDetails?.memoryStorage?.romType || 'UFS 3.1'],
               ]}
             />
             <Acc
@@ -501,10 +613,17 @@ const ProductDetails = () => {
               open={openKey === 'camera'}
               onToggle={() => setOpenKey(openKey === 'camera' ? '' : 'camera')}
               rows={[
-                ['Rear Setup', product.productDetails?.rearCamera?.setup || '50MP OIS + 48MP + 48MP'],
+                [
+                  'Rear Setup',
+                  product.productDetails?.rearCamera?.setup || '50MP OIS + 48MP + 48MP',
+                ],
                 ['Front', product.productDetails?.frontCamera?.resolution || '10.5MP'],
-                ['Video', product.productDetails?.rearCamera?.videoRecording?.join(', ') || '4K60, 1080p240'],
-                ['Flash', product.productDetails?.rearCamera?.flash || 'LED']
+                [
+                  'Video',
+                  product.productDetails?.rearCamera?.videoRecording?.join(', ') ||
+                    '4K60, 1080p240',
+                ],
+                ['Flash', product.productDetails?.rearCamera?.flash || 'LED'],
               ]}
             />
             <Acc
@@ -515,7 +634,7 @@ const ProductDetails = () => {
               rows={[
                 ['Capacity', product.productDetails?.battery?.capacity || '5000 mAh'],
                 ['Fast Charging', product.productDetails?.battery?.fastCharging || '30W'],
-                ['Wireless', product.productDetails?.battery?.wirelessCharging || '23W']
+                ['Wireless', product.productDetails?.battery?.wirelessCharging || '23W'],
               ]}
             />
             <Acc
@@ -524,12 +643,18 @@ const ProductDetails = () => {
               open={openKey === 'connectivity'}
               onToggle={() => setOpenKey(openKey === 'connectivity' ? '' : 'connectivity')}
               rows={[
-                ['Network', product.productDetails?.networkConnectivity?.networkSupport || '5G / 4G'],
+                [
+                  'Network',
+                  product.productDetails?.networkConnectivity?.networkSupport || '5G / 4G',
+                ],
                 ['Wi-Fi', product.productDetails?.networkConnectivity?.wifi || 'Wi-Fi 6E'],
                 ['Bluetooth', product.productDetails?.networkConnectivity?.bluetooth || '5.3'],
                 ['NFC', product.productDetails?.networkConnectivity?.nfc ? 'Yes' : 'No'],
-                ['GPS', product.productDetails?.networkConnectivity?.gps || 'GPS, GLONASS, Galileo'],
-                ['SIM Slots', product.productDetails?.networkConnectivity?.simSlots || 'Dual SIM']
+                [
+                  'GPS',
+                  product.productDetails?.networkConnectivity?.gps || 'GPS, GLONASS, Galileo',
+                ],
+                ['SIM Slots', product.productDetails?.networkConnectivity?.simSlots || 'Dual SIM'],
               ]}
             />
             <Acc
@@ -539,9 +664,20 @@ const ProductDetails = () => {
               onToggle={() => setOpenKey(openKey === 'design' ? '' : 'design')}
               rows={[
                 ['Weight', product.productDetails?.design?.weight || '210 g'],
-                ['Build', product.productDetails?.design?.build || 'Aluminum, Gorilla Glass Victus 2'],
-                ['Colors', (product.productDetails?.design?.colors || ['Obsidian', 'Porcelain', 'Bay']).join(', ')],
-                ['Fingerprint', product.productDetails?.sensorsMisc?.fingerprintScanner ? 'Yes' : 'No']
+                [
+                  'Build',
+                  product.productDetails?.design?.build || 'Aluminum, Gorilla Glass Victus 2',
+                ],
+                [
+                  'Colors',
+                  (product.productDetails?.design?.colors || ['Obsidian', 'Porcelain', 'Bay']).join(
+                    ', '
+                  ),
+                ],
+                [
+                  'Fingerprint',
+                  product.productDetails?.sensorsMisc?.fingerprintScanner ? 'Yes' : 'No',
+                ],
               ]}
             />
           </div>
@@ -552,7 +688,9 @@ const ProductDetails = () => {
             <div className="summary">
               <div className="score">
                 <div className="big">{product.averageRating || '5.0'}</div>
-                <div className="stars big">{renderStars(Math.round(product.averageRating || 5))}</div>
+                <div className="stars big">
+                  {renderStars(Math.round(product.averageRating || 5))}
+                </div>
                 <div className="muted">out of 5</div>
               </div>
             </div>
@@ -586,12 +724,32 @@ const ProductDetails = () => {
         {activeTab === 'warranty' && (
           <div className="pd__warranty">
             <div className="grid3">
-              <div className="wcard irow"><Shield size={22} /><div><h4>12-Month Warranty</h4><p>Hardware defects covered</p></div></div>
-              <div className="wcard irow"><Headphones size={22} /><div><h4>24/7 Support</h4><p>We’re here any time</p></div></div>
-              <div className="wcard irow"><RotateCcw size={22} /><div><h4>15-Day Refund</h4><p>No-hassle returns</p></div></div>
+              <div className="wcard irow">
+                <Shield size={22} />
+                <div>
+                  <h4>12-Month Warranty</h4>
+                  <p>Hardware defects covered</p>
+                </div>
+              </div>
+              <div className="wcard irow">
+                <Headphones size={22} />
+                <div>
+                  <h4>24/7 Support</h4>
+                  <p>We’re here any time</p>
+                </div>
+              </div>
+              <div className="wcard irow">
+                <RotateCcw size={22} />
+                <div>
+                  <h4>15-Day Refund</h4>
+                  <p>No-hassle returns</p>
+                </div>
+              </div>
             </div>
             <div className="acc">
-              <div className="acc__head static"><span>Coverage</span></div>
+              <div className="acc__head static">
+                <span>Coverage</span>
+              </div>
               <div className="acc__body list-cols">
                 <ul className="list-ticks">
                   <li>Hardware defects & malfunctions</li>
@@ -610,9 +768,21 @@ const ProductDetails = () => {
 
         {activeTab === 'offers' && (
           <div className="pd__offers">
-            <Offer icon={<Percent size={20} />} title="Bank Offer" desc="10% instant discount up to ₹2,000 on select cards" />
-            <Offer icon={<CreditCard size={20} />} title="No-Cost EMI" desc="Available on major credit/debit cards" />
-            <Offer icon={<Gift size={20} />} title="Exchange Bonus" desc="Get extra value for your old smartphone" />
+            <Offer
+              icon={<Percent size={20} />}
+              title="Bank Offer"
+              desc="10% instant discount up to ₹2,000 on select cards"
+            />
+            <Offer
+              icon={<CreditCard size={20} />}
+              title="No-Cost EMI"
+              desc="Available on major credit/debit cards"
+            />
+            <Offer
+              icon={<Gift size={20} />}
+              title="Exchange Bonus"
+              desc="Get extra value for your old smartphone"
+            />
           </div>
         )}
 
@@ -621,27 +791,31 @@ const ProductDetails = () => {
             <FaqItem
               open={openKey === 'faq1'}
               onToggle={() => setOpenKey(openKey === 'faq1' ? '' : 'faq1')}
-              q='What does “Superb” condition mean?'
-              a='Minor body marks, flawless screen, fully functional & QC-passed.'
+              q="What does “Superb” condition mean?"
+              a="Minor body marks, flawless screen, fully functional & QC-passed."
             />
             <FaqItem
               open={openKey === 'faq2'}
               onToggle={() => setOpenKey(openKey === 'faq2' ? '' : 'faq2')}
-              q='Is the warranty transferable?'
-              a='Yes — remaining warranty follows the device with the original invoice.'
+              q="Is the warranty transferable?"
+              a="Yes — remaining warranty follows the device with the original invoice."
             />
             <FaqItem
               open={openKey === 'faq3'}
               onToggle={() => setOpenKey(openKey === 'faq3' ? '' : 'faq3')}
-              q='What’s in the box?'
-              a='Phone, compatible USB cable and docs. Adapters may vary by availability.'
+              q="What’s in the box?"
+              a="Phone, compatible USB cable and docs. Adapters may vary by availability."
             />
 
             <div className="support-callout">
               <h4>Still have questions?</h4>
               <div className="row">
-                <button className="btn-sm"><Phone size={16} /> Call Support</button>
-                <button className="btn-sm"><HelpCircle size={16} /> Live Chat</button>
+                <button className="btn-sm">
+                  <Phone size={16} /> Call Support
+                </button>
+                <button className="btn-sm">
+                  <HelpCircle size={16} /> Live Chat
+                </button>
               </div>
             </div>
           </div>
@@ -673,7 +847,10 @@ const SpecTile = ({ icon, label, value }) => (
 const Acc = ({ label, icon, open, onToggle, rows }) => (
   <div className="acc">
     <button className="acc__head" onClick={onToggle}>
-      <div className="irow">{icon}<span>{label}</span></div>
+      <div className="irow">
+        {icon}
+        <span>{label}</span>
+      </div>
       {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
     </button>
     {open && (

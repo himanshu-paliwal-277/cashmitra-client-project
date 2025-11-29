@@ -119,7 +119,7 @@
   position: relative;
 }
 
-.checkbox-label input[type="checkbox"] {
+.checkbox-label input[type='checkbox'] {
   opacity: 0;
   position: absolute;
   width: 0;
@@ -135,12 +135,12 @@
   transition: all 0.2s ease;
 }
 
-.checkbox-label input[type="checkbox"]:checked + .checkmark {
+.checkbox-label input[type='checkbox']:checked + .checkmark {
   background-color: #3b82f6;
   border-color: #3b82f6;
 }
 
-.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+.checkbox-label input[type='checkbox']:checked + .checkmark::after {
   content: '';
   position: absolute;
   left: 5px;
@@ -207,21 +207,21 @@
   .create-user {
     padding: 16px;
   }
-  
+
   .create-user-header {
     flex-direction: column;
     gap: 16px;
     align-items: flex-start;
   }
-  
+
   .create-user-form-container {
     padding: 24px 16px;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
-  
+
   .btn-primary,
   .btn-secondary {
     width: 100%;

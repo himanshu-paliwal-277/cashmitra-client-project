@@ -15,7 +15,7 @@ const CreateUser = () => {
     confirmPassword: '',
     role: 'user',
     isVerified: false,
-    roleTemplate: '' // For partner role
+    roleTemplate: '', // For partner role
   });
   const [errors, setErrors] = useState({});
   const [roleTemplates, setRoleTemplates] = useState([]);
@@ -39,11 +39,11 @@ const CreateUser = () => {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
     // Clear error when user starts typing
     if (errors[name]) {
@@ -84,9 +84,9 @@ const CreateUser = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -99,7 +99,7 @@ const CreateUser = () => {
         phone: formData.phone,
         password: formData.password,
         role: formData.role,
-        isVerified: formData.isVerified
+        isVerified: formData.isVerified,
       };
 
       // Add roleTemplate only if role is partner and a template is selected
@@ -122,10 +122,7 @@ const CreateUser = () => {
     <div className="create-user">
       <div className="create-user-header">
         <h2>Create New User</h2>
-        <button 
-          className="btn-secondary"
-          onClick={() => navigate('/admin/users')}
-        >
+        <button className="btn-secondary" onClick={() => navigate('/admin/users')}>
           Back to Users
         </button>
       </div>
@@ -179,12 +176,7 @@ const CreateUser = () => {
 
             <div className="form-group">
               <label htmlFor="role">Role</label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleInputChange}
-              >
+              <select id="role" name="role" value={formData.role} onChange={handleInputChange}>
                 <option value="user">User</option>
                 <option value="partner">Partner</option>
                 <option value="admin">Admin</option>
@@ -206,7 +198,7 @@ const CreateUser = () => {
                   disabled={loadingTemplates}
                 >
                   <option value="">Select a role template (optional)</option>
-                  {roleTemplates.map((template) => (
+                  {roleTemplates.map(template => (
                     <option key={template._id || template.id} value={template._id || template.name}>
                       {template.displayName} - {template.permissions?.length || 0} permissions
                     </option>
@@ -245,7 +237,9 @@ const CreateUser = () => {
                 className={errors.confirmPassword ? 'error' : ''}
                 placeholder="Confirm password"
               />
-              {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+              {errors.confirmPassword && (
+                <span className="error-message">{errors.confirmPassword}</span>
+              )}
             </div>
           </div>
 
@@ -265,18 +259,14 @@ const CreateUser = () => {
           </div>
 
           <div className="form-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="btn-secondary"
               onClick={() => navigate('/admin/users')}
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
-              className="btn-primary"
-              disabled={loading}
-            >
+            <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Creating...' : 'Create User'}
             </button>
           </div>

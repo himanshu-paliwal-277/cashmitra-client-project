@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
-import adminService, { 
-  getPartners, 
+import adminService, {
+  getPartners,
   getPartnerById,
-  updatePartnerStatus 
+  updatePartnerStatus,
 } from '../services/adminService';
 
 export const useAdminPartners = () => {
@@ -21,13 +21,13 @@ export const useAdminPartners = () => {
     try {
       const response = await getPartners(params);
       console.log('Partners API response: ', response);
-      
+
       // Handle the actual API response structure
       setPartners(response.partners || []);
       setTotalPartners(response.total || response.totalPartners || 0);
       setCurrentPage(response.currentPage || 1);
       setTotalPages(response.totalPages || 1);
-      
+
       return response;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch partners');
@@ -37,13 +37,13 @@ export const useAdminPartners = () => {
     }
   }, []);
 
-  const fetchPartnerById = useCallback(async (id) => {
+  const fetchPartnerById = useCallback(async id => {
     setLoading(true);
     setError(null);
     try {
       const response = await getPartnerById(id);
       console.log('Partner by ID response: ', response);
-      
+
       // Handle the actual API response structure
       return response.data || response.partner || response;
     } catch (err) {
@@ -60,10 +60,8 @@ export const useAdminPartners = () => {
     try {
       const response = await updatePartnerStatus(id, { isVerified });
       // Update the partner in the local state
-      setPartners(prevPartners => 
-        prevPartners.map(partner => 
-          partner._id === id ? { ...partner, isVerified } : partner
-        )
+      setPartners(prevPartners =>
+        prevPartners.map(partner => (partner._id === id ? { ...partner, isVerified } : partner))
       );
       return response;
     } catch (err) {
@@ -75,7 +73,7 @@ export const useAdminPartners = () => {
   }, []);
 
   // Add partner function
-  const addPartner = async (partnerData) => {
+  const addPartner = async partnerData => {
     try {
       setLoading(true);
       const response = await adminService.createPartner(partnerData);
@@ -117,7 +115,7 @@ export const useAdminPartners = () => {
   };
 
   // Remove partner function
-  const removePartner = async (partnerId) => {
+  const removePartner = async partnerId => {
     try {
       setLoading(true);
       const response = await adminService.deletePartner(partnerId);
@@ -149,7 +147,7 @@ export const useAdminPartners = () => {
     verifyPartner,
     addPartner,
     editPartner,
-    removePartner
+    removePartner,
   };
 };
 

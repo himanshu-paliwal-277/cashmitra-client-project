@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { theme } from '../../theme';
@@ -28,7 +26,7 @@ import {
   ShoppingCart,
   CheckCircle,
   Home,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
 const WizardContainer = styled.div`
@@ -106,7 +104,7 @@ const ProgressStep = styled.div`
     transform: translateY(-50%);
     width: ${theme.spacing[2]};
     height: 2px;
-    background: ${props => props.completed ? theme.colors.accent.main : theme.colors.grey[300]};
+    background: ${props => (props.completed ? theme.colors.accent.main : theme.colors.grey[300])};
     z-index: 1;
   }
 `;
@@ -121,7 +119,7 @@ const StepIcon = styled.div`
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.semibold};
   transition: all ${theme.transitions.duration.normal};
-  
+
   ${props => {
     if (props.completed) {
       return `
@@ -144,8 +142,9 @@ const StepIcon = styled.div`
 
 const StepLabel = styled.div`
   font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${props => props.active ? theme.typography.fontWeight.semibold : theme.typography.fontWeight.medium};
-  color: ${props => props.active ? theme.colors.text.primary : theme.colors.text.secondary};
+  font-weight: ${props =>
+    props.active ? theme.typography.fontWeight.semibold : theme.typography.fontWeight.medium};
+  color: ${props => (props.active ? theme.colors.text.primary : theme.colors.text.secondary)};
   white-space: nowrap;
 `;
 
@@ -259,7 +258,7 @@ const NavigationContainer = styled.div`
 
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -268,10 +267,11 @@ const NavigationContainer = styled.div`
 
 const NavButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[6]};
-  border: ${props => props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
+  border: ${props =>
+    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.variant === 'primary' ? theme.colors.primary.main : 'white'};
-  color: ${props => props.variant === 'primary' ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.variant === 'primary' ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.variant === 'primary' ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.base};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -285,7 +285,8 @@ const NavButton = styled.button`
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.md};
-    background: ${props => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -298,7 +299,7 @@ const NavButton = styled.button`
     &.back-button {
       order: 2;
     }
-    
+
     &.next-button {
       order: 1;
     }
@@ -358,50 +359,50 @@ const STEPS = [
     title: 'Select Device',
     subtitle: 'Choose the device you want to sell',
     icon: Smartphone,
-    component: DeviceSelection
+    component: DeviceSelection,
   },
   {
     id: 'questionnaire',
     title: 'Answer Questions',
     subtitle: 'Help us understand your device better',
     icon: HelpCircle,
-    component: QuestionnaireStep
+    component: QuestionnaireStep,
   },
   {
     id: 'defects',
     title: 'Select Defects',
     subtitle: 'Identify any issues with your device',
     icon: AlertTriangle,
-    component: DefectSelection
+    component: DefectSelection,
   },
   {
     id: 'accessories',
     title: 'Select Accessories',
     subtitle: 'Include any accessories you have',
     icon: Package,
-    component: AccessorySelection
+    component: AccessorySelection,
   },
   {
     id: 'price',
     title: 'Price Calculation',
     subtitle: 'See your device valuation',
     icon: Calculator,
-    component: PriceCalculation
+    component: PriceCalculation,
   },
   {
     id: 'order',
     title: 'Place Order',
     subtitle: 'Complete your sell order',
     icon: ShoppingCart,
-    component: OrderPlacement
+    component: OrderPlacement,
   },
   {
     id: 'confirmation',
     title: 'Order Confirmation',
     subtitle: 'Order placed successfully',
     icon: CheckCircle,
-    component: OrderConfirmation
-  }
+    component: OrderConfirmation,
+  },
 ];
 
 const SellFlowWizard = () => {
@@ -414,7 +415,7 @@ const SellFlowWizard = () => {
     selectedDefects: [],
     selectedAccessories: [],
     currentPrice: null,
-    orderDetails: null
+    orderDetails: null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -428,117 +429,129 @@ const SellFlowWizard = () => {
   const sellOrders = useSellOrders();
 
   // Initialize session when device is selected
-  const initializeSession = useCallback(async (productId, variantId) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const session = await sellSessions.createSession({
-        productId,
-        variantId
-      });
-      
-      setSessionData(prev => ({
-        ...prev,
-        sessionId: session._id,
-        selectedProduct: productId,
-        selectedVariant: variantId
-      }));
-      
-      return session;
-    } catch (err) {
-      setError('Failed to initialize session. Please try again.');
-      console.error('Session initialization error:', err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [sellSessions]);
+  const initializeSession = useCallback(
+    async (productId, variantId) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const session = await sellSessions.createSession({
+          productId,
+          variantId,
+        });
+
+        setSessionData(prev => ({
+          ...prev,
+          sessionId: session._id,
+          selectedProduct: productId,
+          selectedVariant: variantId,
+        }));
+
+        return session;
+      } catch (err) {
+        setError('Failed to initialize session. Please try again.');
+        console.error('Session initialization error:', err);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [sellSessions]
+  );
 
   // Update session with answers
-  const updateSessionAnswers = useCallback(async (answers) => {
-    if (!sessionData.sessionId) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      
-      await sellSessions.updateSessionAnswers(sessionData.sessionId, answers);
-      
-      setSessionData(prev => ({
-        ...prev,
-        answers: { ...prev.answers, ...answers }
-      }));
-    } catch (err) {
-      setError('Failed to save answers. Please try again.');
-      console.error('Session update error:', err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [sessionData.sessionId, sellSessions]);
+  const updateSessionAnswers = useCallback(
+    async answers => {
+      if (!sessionData.sessionId) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        await sellSessions.updateSessionAnswers(sessionData.sessionId, answers);
+
+        setSessionData(prev => ({
+          ...prev,
+          answers: { ...prev.answers, ...answers },
+        }));
+      } catch (err) {
+        setError('Failed to save answers. Please try again.');
+        console.error('Session update error:', err);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [sessionData.sessionId, sellSessions]
+  );
 
   // Update session with defects
-  const updateSessionDefects = useCallback(async (defects) => {
-    if (!sessionData.sessionId) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      
-      await sellSessions.updateSessionDefects(sessionData.sessionId, defects);
-      
-      setSessionData(prev => ({
-        ...prev,
-        selectedDefects: defects
-      }));
-    } catch (err) {
-      setError('Failed to save defects. Please try again.');
-      console.error('Session defects update error:', err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [sessionData.sessionId, sellSessions]);
+  const updateSessionDefects = useCallback(
+    async defects => {
+      if (!sessionData.sessionId) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        await sellSessions.updateSessionDefects(sessionData.sessionId, defects);
+
+        setSessionData(prev => ({
+          ...prev,
+          selectedDefects: defects,
+        }));
+      } catch (err) {
+        setError('Failed to save defects. Please try again.');
+        console.error('Session defects update error:', err);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [sessionData.sessionId, sellSessions]
+  );
 
   // Update session with accessories
-  const updateSessionAccessories = useCallback(async (accessories) => {
-    if (!sessionData.sessionId) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      
-      await sellSessions.updateSessionAccessories(sessionData.sessionId, accessories);
-      
-      setSessionData(prev => ({
-        ...prev,
-        selectedAccessories: accessories
-      }));
-    } catch (err) {
-      setError('Failed to save accessories. Please try again.');
-      console.error('Session accessories update error:', err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [sessionData.sessionId, sellSessions]);
+  const updateSessionAccessories = useCallback(
+    async accessories => {
+      if (!sessionData.sessionId) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        await sellSessions.updateSessionAccessories(sessionData.sessionId, accessories);
+
+        setSessionData(prev => ({
+          ...prev,
+          selectedAccessories: accessories,
+        }));
+      } catch (err) {
+        setError('Failed to save accessories. Please try again.');
+        console.error('Session accessories update error:', err);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [sessionData.sessionId, sellSessions]
+  );
 
   // Calculate current price
   const calculatePrice = useCallback(async () => {
     if (!sessionData.sessionId) return;
-    
+
     try {
       setLoading(true);
       setError(null);
-      
+
       const price = await sellSessions.calculatePrice(sessionData.sessionId);
-      
+
       setSessionData(prev => ({
         ...prev,
-        currentPrice: price
+        currentPrice: price,
       }));
-      
+
       return price;
     } catch (err) {
       setError('Failed to calculate price. Please try again.');
@@ -550,32 +563,35 @@ const SellFlowWizard = () => {
   }, [sessionData.sessionId, sellSessions]);
 
   // Place order
-  const placeOrder = useCallback(async (orderData) => {
-    if (!sessionData.sessionId) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const order = await sellOrders.createOrder({
-        sessionId: sessionData.sessionId,
-        ...orderData
-      });
-      
-      setSessionData(prev => ({
-        ...prev,
-        orderDetails: order
-      }));
-      
-      return order;
-    } catch (err) {
-      setError('Failed to place order. Please try again.');
-      console.error('Order placement error:', err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [sessionData.sessionId, sellOrders]);
+  const placeOrder = useCallback(
+    async orderData => {
+      if (!sessionData.sessionId) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        const order = await sellOrders.createOrder({
+          sessionId: sessionData.sessionId,
+          ...orderData,
+        });
+
+        setSessionData(prev => ({
+          ...prev,
+          orderDetails: order,
+        }));
+
+        return order;
+      } catch (err) {
+        setError('Failed to place order. Please try again.');
+        console.error('Order placement error:', err);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [sessionData.sessionId, sellOrders]
+  );
 
   // Navigation handlers
   const handleNext = useCallback(() => {
@@ -592,51 +608,62 @@ const SellFlowWizard = () => {
     }
   }, [currentStep]);
 
-  const handleStepComplete = useCallback((stepData) => {
-    // Handle step-specific completion logic
-    switch (STEPS[currentStep].id) {
-      case 'device':
-        initializeSession(stepData.productId, stepData.variantId)
-          .then(() => handleNext())
-          .catch(() => {});
-        break;
-      case 'questionnaire':
-        updateSessionAnswers(stepData.answers)
-          .then(() => handleNext())
-          .catch(() => {});
-        break;
-      case 'defects':
-        updateSessionDefects(stepData.defects)
-          .then(() => handleNext())
-          .catch(() => {});
-        break;
-      case 'accessories':
-        updateSessionAccessories(stepData.accessories)
-          .then(() => handleNext())
-          .catch(() => {});
-        break;
-      case 'price':
-        handleNext();
-        break;
-      case 'order':
-        placeOrder(stepData)
-          .then(() => handleNext())
-          .catch(() => {});
-        break;
-      case 'confirmation':
-        // Handle completion actions
-        if (stepData.action === 'sell_another') {
-          // Reset wizard to start
-          setCurrentStep(0);
-          setSessionData({});
-        } else if (stepData.action === 'go_home') {
-          onComplete?.(stepData);
-        }
-        break;
-      default:
-        handleNext();
-    }
-  }, [currentStep, initializeSession, updateSessionAnswers, updateSessionDefects, updateSessionAccessories, placeOrder, handleNext]);
+  const handleStepComplete = useCallback(
+    stepData => {
+      // Handle step-specific completion logic
+      switch (STEPS[currentStep].id) {
+        case 'device':
+          initializeSession(stepData.productId, stepData.variantId)
+            .then(() => handleNext())
+            .catch(() => {});
+          break;
+        case 'questionnaire':
+          updateSessionAnswers(stepData.answers)
+            .then(() => handleNext())
+            .catch(() => {});
+          break;
+        case 'defects':
+          updateSessionDefects(stepData.defects)
+            .then(() => handleNext())
+            .catch(() => {});
+          break;
+        case 'accessories':
+          updateSessionAccessories(stepData.accessories)
+            .then(() => handleNext())
+            .catch(() => {});
+          break;
+        case 'price':
+          handleNext();
+          break;
+        case 'order':
+          placeOrder(stepData)
+            .then(() => handleNext())
+            .catch(() => {});
+          break;
+        case 'confirmation':
+          // Handle completion actions
+          if (stepData.action === 'sell_another') {
+            // Reset wizard to start
+            setCurrentStep(0);
+            setSessionData({});
+          } else if (stepData.action === 'go_home') {
+            onComplete?.(stepData);
+          }
+          break;
+        default:
+          handleNext();
+      }
+    },
+    [
+      currentStep,
+      initializeSession,
+      updateSessionAnswers,
+      updateSessionDefects,
+      updateSessionAccessories,
+      placeOrder,
+      handleNext,
+    ]
+  );
 
   const handleRestart = useCallback(() => {
     setCurrentStep(0);
@@ -648,7 +675,7 @@ const SellFlowWizard = () => {
       selectedDefects: [],
       selectedAccessories: [],
       currentPrice: null,
-      orderDetails: null
+      orderDetails: null,
     });
     setError(null);
   }, []);
@@ -677,24 +704,15 @@ const SellFlowWizard = () => {
             <Home size={24} />
             Cashify
           </Logo>
-          
+
           <ProgressContainer>
             <ProgressBar>
               {STEPS.map((step, index) => (
                 <ProgressStep key={step.id} completed={index < currentStep}>
-                  <StepIcon 
-                    completed={index < currentStep}
-                    active={index === currentStep}
-                  >
-                    {index < currentStep ? (
-                      <Check size={16} />
-                    ) : (
-                      <step.icon size={16} />
-                    )}
+                  <StepIcon completed={index < currentStep} active={index === currentStep}>
+                    {index < currentStep ? <Check size={16} /> : <step.icon size={16} />}
                   </StepIcon>
-                  <StepLabel active={index === currentStep}>
-                    {step.title}
-                  </StepLabel>
+                  <StepLabel active={index === currentStep}>{step.title}</StepLabel>
                 </ProgressStep>
               ))}
             </ProgressBar>
@@ -728,12 +746,9 @@ const SellFlowWizard = () => {
             )}
 
             {currentStep === STEPS.length - 1 ? (
-               // Confirmation step - pass order data
-               <CurrentStepComponent
-                 orderData={sessionData.order}
-                 onComplete={handleStepComplete}
-               />
-             ) : (
+              // Confirmation step - pass order data
+              <CurrentStepComponent orderData={sessionData.order} onComplete={handleStepComplete} />
+            ) : (
               <CurrentStepComponent
                 sessionData={sessionData}
                 onComplete={handleStepComplete}
@@ -744,7 +759,7 @@ const SellFlowWizard = () => {
                   sellDefects,
                   sellAccessories,
                   sellSessions,
-                  sellOrders
+                  sellOrders,
                 }}
                 calculatePrice={calculatePrice}
               />
@@ -755,11 +770,7 @@ const SellFlowWizard = () => {
         {currentStep < STEPS.length - 1 && (
           <NavigationFooter>
             <NavigationContainer>
-              <NavButton
-                className="back-button"
-                onClick={handleBack}
-                disabled={currentStep === 0}
-              >
+              <NavButton className="back-button" onClick={handleBack} disabled={currentStep === 0}>
                 <ArrowLeft size={16} />
                 Back
               </NavButton>

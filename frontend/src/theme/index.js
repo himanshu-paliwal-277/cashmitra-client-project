@@ -14,7 +14,7 @@ export const colors = {
     600: '#3A56CC',
     700: '#2D4399',
     800: '#233366',
-    900: '#1A2633'
+    900: '#1A2633',
   },
   accent: {
     main: '#00C853',
@@ -29,7 +29,7 @@ export const colors = {
     600: '#00A142',
     700: '#007A32',
     800: '#005423',
-    900: '#002E14'
+    900: '#002E14',
   },
   warning: {
     main: '#FFB300',
@@ -44,7 +44,7 @@ export const colors = {
     600: '#FF8F00',
     700: '#FF6F00',
     800: '#E65100',
-    900: '#BF360C'
+    900: '#BF360C',
   },
   error: {
     main: '#E53935',
@@ -59,7 +59,7 @@ export const colors = {
     600: '#D32F2F',
     700: '#C62828',
     800: '#B71C1C',
-    900: '#8B0000'
+    900: '#8B0000',
   },
   grey: {
     50: '#FAFAFA',
@@ -71,7 +71,7 @@ export const colors = {
     600: '#757575',
     700: '#616161',
     800: '#424242',
-    900: '#212121'
+    900: '#212121',
   },
   white: '#FFFFFF',
   black: '#000000',
@@ -80,11 +80,11 @@ export const colors = {
     paper: '#FAFAFA',
     grey: '#F5F5F5',
     primary: '#FFFFFF',
-    secondary: '#F5F5F5'
+    secondary: '#F5F5F5',
   },
   border: {
     primary: '#E0E0E0',
-    secondary: '#EEEEEE'
+    secondary: '#EEEEEE',
   },
   success: {
     main: '#00C853',
@@ -99,7 +99,7 @@ export const colors = {
     600: '#00A142',
     700: '#007A32',
     800: '#005423',
-    900: '#002E14'
+    900: '#002E14',
   },
   info: {
     main: '#2196F3',
@@ -114,32 +114,32 @@ export const colors = {
     600: '#1E88E5',
     700: '#1976D2',
     800: '#1565C0',
-    900: '#0D47A1'
+    900: '#0D47A1',
   },
   text: {
     primary: '#212121',
     secondary: '#757575',
     disabled: '#BDBDBD',
-    hint: '#9E9E9E'
-  }
+    hint: '#9E9E9E',
+  },
 };
 
 export const typography = {
   fontFamily: {
     primary: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    mono: '"JetBrains Mono", "Fira Code", Consolas, monospace'
+    mono: '"JetBrains Mono", "Fira Code", Consolas, monospace',
   },
   fontSize: {
-    xs: '0.75rem',    // 12px
-    sm: '0.875rem',   // 14px
-    base: '1rem',     // 16px
-    lg: '1.125rem',   // 18px
-    xl: '1.25rem',    // 20px
-    '2xl': '1.5rem',  // 24px
+    xs: '0.75rem', // 12px
+    sm: '0.875rem', // 14px
+    base: '1rem', // 16px
+    lg: '1.125rem', // 18px
+    xl: '1.25rem', // 20px
+    '2xl': '1.5rem', // 24px
     '3xl': '1.875rem', // 30px
-    '4xl': '2.25rem',  // 36px
-    '5xl': '3rem',     // 48px
-    '6xl': '3.75rem'   // 60px
+    '4xl': '2.25rem', // 36px
+    '5xl': '3rem', // 48px
+    '6xl': '3.75rem', // 60px
   },
   fontWeight: {
     light: 300,
@@ -147,51 +147,51 @@ export const typography = {
     medium: 500,
     semibold: 600,
     bold: 700,
-    extrabold: 800
+    extrabold: 800,
   },
   lineHeight: {
     tight: 1.25,
     normal: 1.5,
-    relaxed: 1.75
+    relaxed: 1.75,
   },
   letterSpacing: {
     tight: '-0.025em',
     normal: '0',
-    wide: '0.025em'
-  }
+    wide: '0.025em',
+  },
 };
 
 export const spacing = {
   0: '0',
-  1: '0.25rem',   // 4px
-  2: '0.5rem',    // 8px
-  3: '0.75rem',   // 12px
-  4: '1rem',      // 16px
-  5: '1.25rem',   // 20px
-  6: '1.5rem',    // 24px
-  8: '2rem',      // 32px
-  10: '2.5rem',   // 40px
-  12: '3rem',     // 48px
-  16: '4rem',     // 64px
-  20: '5rem',     // 80px
-  24: '6rem',     // 96px
-  32: '8rem',     // 128px
-  40: '10rem',    // 160px
-  48: '12rem',    // 192px
-  56: '14rem',    // 224px
-  64: '16rem'     // 256px
+  1: '0.25rem', // 4px
+  2: '0.5rem', // 8px
+  3: '0.75rem', // 12px
+  4: '1rem', // 16px
+  5: '1.25rem', // 20px
+  6: '1.5rem', // 24px
+  8: '2rem', // 32px
+  10: '2.5rem', // 40px
+  12: '3rem', // 48px
+  16: '4rem', // 64px
+  20: '5rem', // 80px
+  24: '6rem', // 96px
+  32: '8rem', // 128px
+  40: '10rem', // 160px
+  48: '12rem', // 192px
+  56: '14rem', // 224px
+  64: '16rem', // 256px
 };
 
 export const borderRadius = {
   none: '0',
-  sm: '0.125rem',   // 2px
-  base: '0.25rem',  // 4px
-  md: '0.375rem',   // 6px
-  lg: '0.5rem',     // 8px
-  xl: '0.75rem',    // 12px
-  '2xl': '1rem',    // 16px
-  '3xl': '1.5rem',  // 24px
-  full: '9999px'
+  sm: '0.125rem', // 2px
+  base: '0.25rem', // 4px
+  md: '0.375rem', // 6px
+  lg: '0.5rem', // 8px
+  xl: '0.75rem', // 12px
+  '2xl': '1rem', // 16px
+  '3xl': '1.5rem', // 24px
+  full: '9999px',
 };
 
 export const shadows = {
@@ -202,7 +202,7 @@ export const shadows = {
   lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
   xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
   '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-  inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)'
+  inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
 };
 
 export const breakpoints = {
@@ -211,7 +211,7 @@ export const breakpoints = {
   md: '768px',
   lg: '1024px',
   xl: '1280px',
-  '2xl': '1536px'
+  '2xl': '1536px',
 };
 
 export const zIndex = {
@@ -227,7 +227,7 @@ export const zIndex = {
   popover: 1500,
   skipLink: 1600,
   toast: 1700,
-  tooltip: 1800
+  tooltip: 1800,
 };
 
 export const transitions = {
@@ -238,14 +238,14 @@ export const transitions = {
     normal: '200ms',
     slow: '300ms',
     slower: '500ms',
-    slowest: '1000ms'
+    slowest: '1000ms',
   },
   easing: {
     easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
     easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
     easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
-    sharp: 'cubic-bezier(0.4, 0, 0.6, 1)'
-  }
+    sharp: 'cubic-bezier(0.4, 0, 0.6, 1)',
+  },
 };
 
 // Complete theme object
@@ -257,7 +257,7 @@ export const theme = {
   shadows,
   breakpoints,
   zIndex,
-  transitions
+  transitions,
 };
 
 export default theme;

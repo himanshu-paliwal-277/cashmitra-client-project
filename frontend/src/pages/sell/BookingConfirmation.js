@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { theme } from '../../theme';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import { 
+import {
   CheckCircle,
   Home,
   Calendar,
@@ -22,12 +22,16 @@ import {
   Bell,
   ArrowRight,
   Copy,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 
 const PageContainer = styled.div`
   min-height: calc(100vh - 72px);
-  background: linear-gradient(135deg, ${theme.colors.accent[50]} 0%, ${theme.colors.primary[50]} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.accent[50]} 0%,
+    ${theme.colors.primary[50]} 100%
+  );
   padding: ${theme.spacing[8]} 0;
 `;
 
@@ -35,7 +39,7 @@ const Container = styled.div`
   max-width: 900px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
@@ -57,19 +61,24 @@ const SuccessIcon = styled.div`
   margin: 0 auto ${theme.spacing[4]};
   box-shadow: ${theme.shadows.lg};
   animation: bounce 0.6s ease-out;
-  
+
   @keyframes bounce {
-    0%, 20%, 53%, 80%, 100% {
-      transform: translate3d(0,0,0);
+    0%,
+    20%,
+    53%,
+    80%,
+    100% {
+      transform: translate3d(0, 0, 0);
     }
-    40%, 43% {
-      transform: translate3d(0,-8px,0);
+    40%,
+    43% {
+      transform: translate3d(0, -8px, 0);
     }
     70% {
-      transform: translate3d(0,-4px,0);
+      transform: translate3d(0, -4px, 0);
     }
     90% {
-      transform: translate3d(0,-2px,0);
+      transform: translate3d(0, -2px, 0);
     }
   }
 `;
@@ -79,7 +88,7 @@ const SuccessTitle = styled.h1`
   font-weight: ${theme.typography.fontWeight.bold};
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[3]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     font-size: ${theme.typography.fontSize['2xl']};
   }
@@ -105,7 +114,7 @@ const BookingId = styled.div`
   color: ${theme.colors.accent.main};
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: ${theme.colors.accent[50]};
     transform: translateY(-1px);
@@ -116,7 +125,7 @@ const ContentGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: ${theme.spacing[6]};
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     grid-template-columns: 2fr 1fr;
   }
@@ -154,7 +163,7 @@ const InfoGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -261,7 +270,7 @@ const TimelineStep = styled.div`
   gap: ${theme.spacing[4]};
   padding: ${theme.spacing[4]} 0;
   position: relative;
-  
+
   &:not(:last-child)::after {
     content: '';
     position: absolute;
@@ -269,7 +278,7 @@ const TimelineStep = styled.div`
     top: 60px;
     bottom: -16px;
     width: 2px;
-    background: ${props => props.completed ? theme.colors.accent.main : theme.colors.grey[300]};
+    background: ${props => (props.completed ? theme.colors.accent.main : theme.colors.grey[300])};
   }
 `;
 
@@ -280,7 +289,7 @@ const StepIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${props => props.completed ? theme.colors.accent.main : theme.colors.grey[300]};
+  background: ${props => (props.completed ? theme.colors.accent.main : theme.colors.grey[300])};
   color: white;
   font-weight: ${theme.typography.fontWeight.semibold};
   z-index: 1;
@@ -314,7 +323,7 @@ const ActionButtons = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: ${theme.spacing[3]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -329,7 +338,7 @@ const QuickActions = styled.div`
   justify-content: center;
   gap: ${theme.spacing[4]};
   margin-top: ${theme.spacing[8]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
     align-items: center;
@@ -339,68 +348,76 @@ const QuickActions = styled.div`
 const BookingConfirmation = () => {
   const location = useLocation();
   const [copied, setCopied] = useState(false);
-  
+
   // Extract data from navigation state
   const { bookingData, orderData } = location.state || {};
-  
+
   // Extract additional data from orderData and location state if available
-  const { assessmentData, product, priceData, category, brand: brandData, model: modelData } = location.state || {};
-  
+  const {
+    assessmentData,
+    product,
+    priceData,
+    category,
+    brand: brandData,
+    model: modelData,
+  } = location.state || {};
+
   // Use the brand and model from location state or fallback to bookingData
   const brand = brandData || bookingData?.brand;
   const model = modelData || bookingData?.model;
   const priceQuote = priceData || bookingData?.priceQuote;
-  
+
   // Extract contact information from orderData or bookingData
   const contactInfo = {
     fullName: orderData?.pickup?.address?.fullName || bookingData?.fullName || 'N/A',
     phone: orderData?.pickup?.address?.phone || bookingData?.phone || 'N/A',
     address: orderData?.pickup?.address?.street || bookingData?.address || 'N/A',
     city: orderData?.pickup?.address?.city || bookingData?.city || 'N/A',
-    pincode: orderData?.pickup?.address?.pincode || bookingData?.pincode || 'N/A'
+    pincode: orderData?.pickup?.address?.pincode || bookingData?.pincode || 'N/A',
   };
-  
+
   // Extract pickup details
   const pickupDetails = {
     date: orderData?.pickup?.slot?.date || bookingData?.pickupDate,
-    timeSlot: orderData?.pickup?.slot?.window || bookingData?.timeSlot
+    timeSlot: orderData?.pickup?.slot?.window || bookingData?.timeSlot,
   };
-  
-  const bookingId = bookingData?.bookingId || orderData?.orderNumber || 'CSH' + Date.now().toString().slice(-6);
-  
+
+  const bookingId =
+    bookingData?.bookingId || orderData?.orderNumber || 'CSH' + Date.now().toString().slice(-6);
+
   const copyBookingId = () => {
     navigator.clipboard.writeText(bookingId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-  
-  const formatPrice = (price) => {
+
+  const formatPrice = price => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(price);
   };
-  
-  const formatDate = (dateString) => {
+
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
-  
-  const formatTimeSlot = (slot) => {
+
+  const formatTimeSlot = slot => {
     const slots = {
       '9-12': '9:00 AM - 12:00 PM',
       '12-3': '12:00 PM - 3:00 PM',
       '3-6': '3:00 PM - 6:00 PM',
-      '6-9': '6:00 PM - 9:00 PM'
+      '6-9': '6:00 PM - 9:00 PM',
     };
     return slots[slot] || slot;
   };
-  
+
   const timelineSteps = [
     {
       id: 1,
@@ -408,7 +425,7 @@ const BookingConfirmation = () => {
       description: 'Your pickup has been successfully scheduled',
       time: 'Just now',
       completed: true,
-      icon: <CheckCircle size={20} />
+      icon: <CheckCircle size={20} />,
     },
     {
       id: 2,
@@ -416,7 +433,7 @@ const BookingConfirmation = () => {
       description: 'Our pickup executive will contact you soon',
       time: 'Within 2 hours',
       completed: false,
-      icon: <User size={20} />
+      icon: <User size={20} />,
     },
     {
       id: 3,
@@ -424,7 +441,7 @@ const BookingConfirmation = () => {
       description: 'Executive will collect and verify your device',
       time: formatDate(pickupDetails.date),
       completed: false,
-      icon: <Truck size={20} />
+      icon: <Truck size={20} />,
     },
     {
       id: 4,
@@ -432,10 +449,10 @@ const BookingConfirmation = () => {
       description: 'Instant payment after device verification',
       time: 'Same day',
       completed: false,
-      icon: <CreditCard size={20} />
-    }
+      icon: <CreditCard size={20} />,
+    },
   ];
-  
+
   return (
     <PageContainer>
       <Container>
@@ -444,42 +461,48 @@ const BookingConfirmation = () => {
           <SuccessIcon>
             <CheckCircle size={40} color="white" />
           </SuccessIcon>
-          
+
           <SuccessTitle>🎉 Booking Confirmed!</SuccessTitle>
           <SuccessSubtitle>
-            Your device pickup has been successfully scheduled. We'll take care of everything from here.
+            Your device pickup has been successfully scheduled. We'll take care of everything from
+            here.
           </SuccessSubtitle>
-          
+
           <BookingId onClick={copyBookingId}>
             Booking ID: {bookingId}
             <Copy size={16} />
             {copied && <span style={{ color: theme.colors.accent.main }}>Copied!</span>}
           </BookingId>
         </SuccessHeader>
-        
+
         <ContentGrid>
           <MainContent>
             {/* Booking Details */}
             <InfoCard>
               <Card.Body>
-                <SectionTitle>
-                  📋 Booking Details
-                </SectionTitle>
-                
+                <SectionTitle>📋 Booking Details</SectionTitle>
+
                 <DeviceInfo>
-                  <BrandLogo bgColor={brand?.bgColor || '#007bff'} textColor={brand?.textColor || '#fff'}>
+                  <BrandLogo
+                    bgColor={brand?.bgColor || '#007bff'}
+                    textColor={brand?.textColor || '#fff'}
+                  >
                     {brand?.logo || brand?.name?.charAt(0) || 'B'}
                   </BrandLogo>
                   <DeviceDetails>
                     <DeviceName>{model?.name || product?.name || 'Device'}</DeviceName>
-                    <DeviceSpecs>{brand?.name || 'Brand'} • {model?.year || 'Year'}</DeviceSpecs>
+                    <DeviceSpecs>
+                      {brand?.name || 'Brand'} • {model?.year || 'Year'}
+                    </DeviceSpecs>
                   </DeviceDetails>
                   <PriceDisplay>
-                    <PriceAmount>{formatPrice(priceQuote?.finalPrice || bookingData?.finalPrice || 0)}</PriceAmount>
+                    <PriceAmount>
+                      {formatPrice(priceQuote?.finalPrice || bookingData?.finalPrice || 0)}
+                    </PriceAmount>
                     <PriceLabel>You'll receive</PriceLabel>
                   </PriceDisplay>
                 </DeviceInfo>
-                
+
                 <InfoGrid>
                   <InfoItem>
                     <InfoIcon>
@@ -490,7 +513,7 @@ const BookingConfirmation = () => {
                       <InfoValue>{formatDate(pickupDetails.date)}</InfoValue>
                     </InfoContent>
                   </InfoItem>
-                  
+
                   <InfoItem>
                     <InfoIcon>
                       <Clock size={20} />
@@ -500,7 +523,7 @@ const BookingConfirmation = () => {
                       <InfoValue>{formatTimeSlot(pickupDetails.timeSlot)}</InfoValue>
                     </InfoContent>
                   </InfoItem>
-                  
+
                   <InfoItem>
                     <InfoIcon>
                       <User size={20} />
@@ -510,7 +533,7 @@ const BookingConfirmation = () => {
                       <InfoValue>{contactInfo.fullName}</InfoValue>
                     </InfoContent>
                   </InfoItem>
-                  
+
                   <InfoItem>
                     <InfoIcon>
                       <Phone size={20} />
@@ -523,7 +546,7 @@ const BookingConfirmation = () => {
                 </InfoGrid>
               </Card.Body>
             </InfoCard>
-            
+
             {/* Pickup Address */}
             <InfoCard>
               <Card.Body>
@@ -531,23 +554,26 @@ const BookingConfirmation = () => {
                   <MapPin size={20} />
                   Pickup Address
                 </SectionTitle>
-                
+
                 <InfoItem>
                   <InfoIcon>
                     <MapPin size={20} />
                   </InfoIcon>
                   <InfoContent>
                     <InfoValue>
-                      {contactInfo.address}<br />
+                      {contactInfo.address}
+                      <br />
                       {contactInfo.city} - {contactInfo.pincode}
                     </InfoValue>
                     {orderData?.pickup?.specialInstructions && (
-                      <div style={{ 
-                        marginTop: theme.spacing[2], 
-                        fontSize: theme.typography.fontSize.sm,
-                        color: theme.colors.text.secondary,
-                        fontStyle: 'italic'
-                      }}>
+                      <div
+                        style={{
+                          marginTop: theme.spacing[2],
+                          fontSize: theme.typography.fontSize.sm,
+                          color: theme.colors.text.secondary,
+                          fontStyle: 'italic',
+                        }}
+                      >
                         Note: {orderData.pickup.specialInstructions}
                       </div>
                     )}
@@ -555,14 +581,12 @@ const BookingConfirmation = () => {
                 </InfoItem>
               </Card.Body>
             </InfoCard>
-            
+
             {/* Process Timeline */}
             <TimelineCard>
               <Card.Body>
-                <SectionTitle>
-                  🚀 What Happens Next
-                </SectionTitle>
-                
+                <SectionTitle>🚀 What Happens Next</SectionTitle>
+
                 {timelineSteps.map((step, index) => (
                   <TimelineStep key={step.id} completed={step.completed}>
                     <StepIcon completed={step.completed}>
@@ -578,58 +602,38 @@ const BookingConfirmation = () => {
               </Card.Body>
             </TimelineCard>
           </MainContent>
-          
+
           <SidebarContent>
             {/* Quick Actions */}
             <InfoCard>
               <Card.Body>
-                <SectionTitle>
-                  ⚡ Quick Actions
-                </SectionTitle>
-                
+                <SectionTitle>⚡ Quick Actions</SectionTitle>
+
                 <ActionButtons>
-                  <ActionButton 
-                    variant="primary" 
-                    leftIcon={<Download size={16} />}
-                    size="sm"
-                  >
+                  <ActionButton variant="primary" leftIcon={<Download size={16} />} size="sm">
                     Download Receipt
                   </ActionButton>
-                  
-                  <ActionButton 
-                    variant="secondary" 
-                    leftIcon={<Share2 size={16} />}
-                    size="sm"
-                  >
+
+                  <ActionButton variant="secondary" leftIcon={<Share2 size={16} />} size="sm">
                     Share Details
                   </ActionButton>
-                  
-                  <ActionButton 
-                    variant="ghost" 
-                    leftIcon={<MessageCircle size={16} />}
-                    size="sm"
-                  >
+
+                  <ActionButton variant="ghost" leftIcon={<MessageCircle size={16} />} size="sm">
                     Contact Support
                   </ActionButton>
-                  
-                  <ActionButton 
-                    variant="ghost" 
-                    leftIcon={<Bell size={16} />}
-                    size="sm"
-                  >
+
+                  <ActionButton variant="ghost" leftIcon={<Bell size={16} />} size="sm">
                     Set Reminders
                   </ActionButton>
                 </ActionButtons>
               </Card.Body>
             </InfoCard>
-            
+
             {/* Support Info */}
             <InfoCard>
               <Card.Body>
-                <SectionTitle>
-                  🆘 Need Help?
-                </SectionTitle>
-                
+                <SectionTitle>🆘 Need Help?</SectionTitle>
+
                 <div style={{ marginBottom: theme.spacing[4] }}>
                   <InfoItem>
                     <InfoIcon>
@@ -641,7 +645,7 @@ const BookingConfirmation = () => {
                     </InfoContent>
                   </InfoItem>
                 </div>
-                
+
                 <div style={{ marginBottom: theme.spacing[4] }}>
                   <InfoItem>
                     <InfoIcon>
@@ -653,9 +657,9 @@ const BookingConfirmation = () => {
                     </InfoContent>
                   </InfoItem>
                 </div>
-                
-                <ActionButton 
-                  variant="accent" 
+
+                <ActionButton
+                  variant="accent"
                   leftIcon={<ExternalLink size={16} />}
                   size="sm"
                   fullWidth
@@ -664,54 +668,58 @@ const BookingConfirmation = () => {
                 </ActionButton>
               </Card.Body>
             </InfoCard>
-            
+
             {/* Service Features */}
             <InfoCard>
               <Card.Body>
-                <SectionTitle>
-                  ✨ Our Promise
-                </SectionTitle>
-                
+                <SectionTitle>✨ Our Promise</SectionTitle>
+
                 <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[3] }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
                     <Shield size={16} color={theme.colors.accent.main} />
-                    <span style={{ fontSize: theme.typography.fontSize.sm }}>100% Secure Process</span>
+                    <span style={{ fontSize: theme.typography.fontSize.sm }}>
+                      100% Secure Process
+                    </span>
                   </div>
-                  
+
                   <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
                     <Truck size={16} color={theme.colors.accent.main} />
-                    <span style={{ fontSize: theme.typography.fontSize.sm }}>Free Doorstep Pickup</span>
+                    <span style={{ fontSize: theme.typography.fontSize.sm }}>
+                      Free Doorstep Pickup
+                    </span>
                   </div>
-                  
+
                   <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
                     <CreditCard size={16} color={theme.colors.accent.main} />
                     <span style={{ fontSize: theme.typography.fontSize.sm }}>Instant Payment</span>
                   </div>
-                  
+
                   <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
                     <CheckCircle size={16} color={theme.colors.accent.main} />
-                    <span style={{ fontSize: theme.typography.fontSize.sm }}>Transparent Pricing</span>
+                    <span style={{ fontSize: theme.typography.fontSize.sm }}>
+                      Transparent Pricing
+                    </span>
                   </div>
                 </div>
               </Card.Body>
             </InfoCard>
           </SidebarContent>
         </ContentGrid>
-        
+
         {/* Quick Actions */}
         <QuickActions>
-          <Button 
-            variant="secondary" 
+          <Button
+            variant="secondary"
             leftIcon={<Home size={20} />}
-            onClick={() => window.location.href = '/'}
+            onClick={() => (window.location.href = '/')}
           >
             Back to Home
           </Button>
-          
-          <Button 
-            variant="primary" 
+
+          <Button
+            variant="primary"
             rightIcon={<ArrowRight size={20} />}
-            onClick={() => window.location.href = '/sell'}
+            onClick={() => (window.location.href = '/sell')}
           >
             Sell Another Device
           </Button>

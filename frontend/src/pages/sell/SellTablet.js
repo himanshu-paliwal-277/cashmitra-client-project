@@ -3,16 +3,7 @@ import styled from 'styled-components';
 import { theme } from '../../theme';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import { 
-  ArrowRight,
-  ArrowLeft,
-  Home,
-  Tablet,
-  Star,
-  TrendingUp,
-  Shield,
-  Clock
-} from 'lucide-react';
+import { ArrowRight, ArrowLeft, Home, Tablet, Star, TrendingUp, Shield, Clock } from 'lucide-react';
 import { brands } from '../../data/products';
 
 const PageContainer = styled.div`
@@ -25,11 +16,11 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 0 ${theme.spacing[8]};
   }
@@ -50,7 +41,7 @@ const BreadcrumbLink = styled.a`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -74,7 +65,7 @@ const CategoryIcon = styled.div`
   align-items: center;
   justify-content: center;
   margin: 0 auto ${theme.spacing[4]};
-  
+
   svg {
     color: ${theme.colors.primary.main};
   }
@@ -85,7 +76,7 @@ const PageTitle = styled.h1`
   font-weight: ${theme.typography.fontWeight.semibold};
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[3]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     font-size: ${theme.typography.fontSize['2xl']};
   }
@@ -119,7 +110,7 @@ const FeatureIcon = styled.div`
   align-items: center;
   justify-content: center;
   margin: 0 auto ${theme.spacing[3]};
-  
+
   svg {
     color: ${theme.colors.accent.main};
   }
@@ -143,7 +134,7 @@ const BrandGrid = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: ${theme.spacing[4]};
   margin-bottom: ${theme.spacing[8]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -155,13 +146,13 @@ const BrandCard = styled(Card)`
   border: 2px solid transparent;
   text-align: center;
   padding: ${theme.spacing[4]};
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.lg};
     border-color: ${theme.colors.primary.main};
   }
-  
+
   &.selected {
     border-color: ${theme.colors.primary.main};
     background: ${theme.colors.primary[50]};
@@ -202,10 +193,10 @@ const NavigationButtons = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: ${theme.spacing[4]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -226,37 +217,39 @@ const NextButton = styled(Button)`
 
 const SellTablet = ({ onBrandSelect, onBack }) => {
   const [selectedBrand, setSelectedBrand] = useState(null);
-  
+
   const tabletBrands = brands.tablet || [];
-  
+
   const features = [
     {
       icon: <TrendingUp size={24} />,
       title: 'Premium Valuation',
-      description: 'Get top market value for your tablet with our advanced pricing system for larger devices.'
+      description:
+        'Get top market value for your tablet with our advanced pricing system for larger devices.',
     },
     {
       icon: <Shield size={24} />,
       title: 'Professional Service',
-      description: 'Expert handling of your tablet with complete data security and certified refurbishment.'
+      description:
+        'Expert handling of your tablet with complete data security and certified refurbishment.',
     },
     {
       icon: <Clock size={24} />,
       title: 'Express Pickup',
-      description: 'Free doorstep collection with special packaging for tablets within 24 hours.'
-    }
+      description: 'Free doorstep collection with special packaging for tablets within 24 hours.',
+    },
   ];
-  
-  const handleBrandSelect = (brand) => {
+
+  const handleBrandSelect = brand => {
     setSelectedBrand(brand);
   };
-  
+
   const handleNext = () => {
     if (selectedBrand && onBrandSelect) {
       onBrandSelect(selectedBrand, 'tablet');
     }
   };
-  
+
   return (
     <PageContainer>
       <Container>
@@ -266,67 +259,54 @@ const SellTablet = ({ onBrandSelect, onBack }) => {
             Home
           </BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
-          <BreadcrumbLink href="/sell">
-            Sell
-          </BreadcrumbLink>
+          <BreadcrumbLink href="/sell">Sell</BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
           <span>Tablet</span>
         </Breadcrumb>
-        
+
         <PageHeader>
           <CategoryIcon>
             <Tablet size={40} />
           </CategoryIcon>
           <PageTitle>Sell Your Tablet</PageTitle>
           <PageSubtitle>
-            Convert your tablet into instant cash. Get premium pricing with our 
-            specialized tablet evaluation process and secure pickup service.
+            Convert your tablet into instant cash. Get premium pricing with our specialized tablet
+            evaluation process and secure pickup service.
           </PageSubtitle>
         </PageHeader>
-        
+
         <FeatureGrid>
           {features.map((feature, index) => (
             <FeatureCard key={index}>
-              <FeatureIcon>
-                {feature.icon}
-              </FeatureIcon>
+              <FeatureIcon>{feature.icon}</FeatureIcon>
               <FeatureTitle>{feature.title}</FeatureTitle>
               <FeatureDescription>{feature.description}</FeatureDescription>
             </FeatureCard>
           ))}
         </FeatureGrid>
-        
+
         <SectionTitle>Select Your Tablet Brand</SectionTitle>
-        
+
         <BrandGrid>
-          {tabletBrands.map((brand) => (
+          {tabletBrands.map(brand => (
             <BrandCard
               key={brand}
               className={selectedBrand === brand ? 'selected' : ''}
               onClick={() => handleBrandSelect(brand)}
             >
-              <BrandLogo>
-                {brand.charAt(0).toUpperCase()}
-              </BrandLogo>
+              <BrandLogo>{brand.charAt(0).toUpperCase()}</BrandLogo>
               <BrandName>{brand}</BrandName>
             </BrandCard>
           ))}
         </BrandGrid>
-        
+
         <NavigationButtons>
-          <BackButton
-            variant="outline"
-            onClick={onBack}
-          >
+          <BackButton variant="outline" onClick={onBack}>
             <ArrowLeft size={20} />
             Back to Categories
           </BackButton>
-          
-          <NextButton
-            variant="primary"
-            disabled={!selectedBrand}
-            onClick={handleNext}
-          >
+
+          <NextButton variant="primary" disabled={!selectedBrand} onClick={handleNext}>
             Continue to Models
             <ArrowRight size={20} />
           </NextButton>

@@ -1,6 +1,24 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Wallet as WalletIcon, CreditCard, Plus, ArrowUpRight, ArrowDownLeft, Eye, EyeOff, TrendingUp, TrendingDown, Calendar, Filter, Search, Download, RefreshCw, Shield, Award, Gift } from 'lucide-react';
+import {
+  Wallet as WalletIcon,
+  CreditCard,
+  Plus,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Eye,
+  EyeOff,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  Filter,
+  Search,
+  Download,
+  RefreshCw,
+  Shield,
+  Award,
+  Gift,
+} from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import useUserWallet from '../../hooks/useUserWallet';
@@ -38,7 +56,7 @@ const WalletGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: ${props => props.theme.spacing.lg};
   margin-bottom: ${props => props.theme.spacing.xl};
-  
+
   @media (max-width: ${props => props.theme.breakpoints.md}) {
     grid-template-columns: 1fr;
   }
@@ -46,11 +64,15 @@ const WalletGrid = styled.div`
 
 const BalanceCard = styled(Card)`
   padding: ${props => props.theme.spacing.xl};
-  background: linear-gradient(135deg, ${props => props.theme.colors.primary.main} 0%, ${props => props.theme.colors.primary.dark} 100%);
+  background: linear-gradient(
+    135deg,
+    ${props => props.theme.colors.primary.main} 0%,
+    ${props => props.theme.colors.primary.dark} 100%
+  );
   color: white;
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -100,7 +122,7 @@ const VisibilityToggle = styled.button`
   border-radius: ${props => props.theme.borderRadius.md};
   opacity: 0.8;
   transition: opacity 0.2s ease;
-  
+
   &:hover {
     opacity: 1;
   }
@@ -117,7 +139,7 @@ const ActionButton = styled(Button)`
   background: rgba(255, 255, 255, 0.2);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: translateY(-1px);
@@ -141,8 +163,10 @@ const StatItem = styled.div`
 const StatIcon = styled.div`
   width: 48px;
   height: 48px;
-  background: ${props => props.positive ? props.theme.colors.success.light : props.theme.colors.error.light};
-  color: ${props => props.positive ? props.theme.colors.success.main : props.theme.colors.error.main};
+  background: ${props =>
+    props.positive ? props.theme.colors.success.light : props.theme.colors.error.light};
+  color: ${props =>
+    props.positive ? props.theme.colors.success.main : props.theme.colors.error.main};
   border-radius: ${props => props.theme.borderRadius.full};
   display: flex;
   align-items: center;
@@ -166,7 +190,7 @@ const SectionGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: ${props => props.theme.spacing.xl};
-  
+
   @media (max-width: ${props => props.theme.breakpoints.lg}) {
     grid-template-columns: 1fr;
   }
@@ -202,7 +226,7 @@ const PaymentMethod = styled.div`
   padding: ${props => props.theme.spacing.md};
   background: ${props => props.theme.colors.background.secondary};
   border-radius: ${props => props.theme.borderRadius.md};
-  border: 2px solid ${props => props.default ? props.theme.colors.primary.main : 'transparent'};
+  border: 2px solid ${props => (props.default ? props.theme.colors.primary.main : 'transparent')};
 `;
 
 const PaymentIcon = styled.div`
@@ -256,7 +280,7 @@ const TransactionItem = styled.div`
   padding: ${props => props.theme.spacing.md};
   border-radius: ${props => props.theme.borderRadius.md};
   transition: background-color 0.2s ease;
-  
+
   &:hover {
     background: ${props => props.theme.colors.background.secondary};
   }
@@ -265,8 +289,10 @@ const TransactionItem = styled.div`
 const TransactionIcon = styled.div`
   width: 40px;
   height: 40px;
-  background: ${props => props.type === 'credit' ? props.theme.colors.success.light : props.theme.colors.error.light};
-  color: ${props => props.type === 'credit' ? props.theme.colors.success.main : props.theme.colors.error.main};
+  background: ${props =>
+    props.type === 'credit' ? props.theme.colors.success.light : props.theme.colors.error.light};
+  color: ${props =>
+    props.type === 'credit' ? props.theme.colors.success.main : props.theme.colors.error.main};
   border-radius: ${props => props.theme.borderRadius.full};
   display: flex;
   align-items: center;
@@ -294,7 +320,8 @@ const TransactionDate = styled.div`
 const TransactionAmount = styled.div`
   font-size: ${props => props.theme.typography.fontSize.md};
   font-weight: ${props => props.theme.typography.fontWeight.bold};
-  color: ${props => props.type === 'credit' ? props.theme.colors.success.main : props.theme.colors.error.main};
+  color: ${props =>
+    props.type === 'credit' ? props.theme.colors.success.main : props.theme.colors.error.main};
   text-align: right;
 `;
 
@@ -310,7 +337,7 @@ const AddMethodCard = styled.div`
   cursor: pointer;
   transition: all 0.2s ease;
   color: ${props => props.theme.colors.text.secondary};
-  
+
   &:hover {
     border-color: ${props => props.theme.colors.primary.main};
     color: ${props => props.theme.colors.primary.main};
@@ -322,7 +349,7 @@ const FilterBar = styled.div`
   display: flex;
   gap: ${props => props.theme.spacing.sm};
   margin-bottom: ${props => props.theme.spacing.md};
-  
+
   @media (max-width: ${props => props.theme.breakpoints.sm}) {
     flex-direction: column;
   }
@@ -335,7 +362,7 @@ const FilterSelect = styled.select`
   font-size: ${props => props.theme.typography.fontSize.sm};
   color: ${props => props.theme.colors.text.primary};
   background: ${props => props.theme.colors.background.primary};
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary.main};
@@ -353,9 +380,9 @@ const Wallet = () => {
     addMoney,
     withdrawMoney,
     transferMoney,
-    downloadStatement
+    downloadStatement,
   } = useUserWallet();
-  
+
   const [balanceVisible, setBalanceVisible] = useState(true);
   const [transactionFilter, setTransactionFilter] = useState('all');
 
@@ -370,29 +397,30 @@ const Wallet = () => {
       type: 'card',
       title: 'HDFC Bank Credit Card',
       details: '**** **** **** 4532',
-      default: true
+      default: true,
     },
     {
       id: 2,
       type: 'upi',
       title: 'PhonePe UPI',
       details: 'user@phonepe',
-      default: false
+      default: false,
     },
     {
       id: 3,
       type: 'wallet',
       title: 'Paytm Wallet',
       details: 'Balance: ₹2,450',
-      default: false
-    }
+      default: false,
+    },
   ];
 
   // Filter transactions based on selected filter
-  const filteredTransactions = transactions?.filter(transaction => {
-    if (transactionFilter === 'all') return true;
-    return transaction.type === transactionFilter;
-  }) || [];
+  const filteredTransactions =
+    transactions?.filter(transaction => {
+      if (transactionFilter === 'all') return true;
+      return transaction.type === transactionFilter;
+    }) || [];
 
   return (
     <WalletContainer>
@@ -416,7 +444,7 @@ const Wallet = () => {
                 </BalanceAmount>
               </BalanceInfo>
             </BalanceHeader>
-            
+
             <BalanceActions>
               <ActionButton size="sm">
                 <Plus size={16} />
@@ -443,7 +471,7 @@ const Wallet = () => {
                 <StatValue>₹{monthlyEarned.toLocaleString()}</StatValue>
                 <StatLabel>Earned</StatLabel>
               </StatItem>
-              
+
               <StatItem>
                 <StatIcon>
                   <TrendingDown size={24} />
@@ -465,9 +493,9 @@ const Wallet = () => {
                 Manage
               </Button>
             </SectionHeader>
-            
+
             <PaymentMethodsList>
-              {paymentMethods.map((method) => (
+              {paymentMethods.map(method => (
                 <PaymentMethod key={method.id} default={method.default}>
                   <PaymentIcon>
                     <CreditCard size={20} />
@@ -475,13 +503,15 @@ const Wallet = () => {
                   <PaymentInfo>
                     <PaymentTitle>
                       {method.title}
-                      {method.default && <DefaultBadge style={{ marginLeft: '8px' }}>Default</DefaultBadge>}
+                      {method.default && (
+                        <DefaultBadge style={{ marginLeft: '8px' }}>Default</DefaultBadge>
+                      )}
                     </PaymentTitle>
                     <PaymentDetails>{method.details}</PaymentDetails>
                   </PaymentInfo>
                 </PaymentMethod>
               ))}
-              
+
               <AddMethodCard>
                 <Plus size={20} />
                 Add New Payment Method
@@ -497,26 +527,27 @@ const Wallet = () => {
                 View All
               </Button>
             </SectionHeader>
-            
+
             <FilterBar>
               <FilterSelect
                 value={transactionFilter}
-                onChange={(e) => setTransactionFilter(e.target.value)}
+                onChange={e => setTransactionFilter(e.target.value)}
               >
                 <option value="all">All Transactions</option>
                 <option value="credit">Money In</option>
                 <option value="debit">Money Out</option>
               </FilterSelect>
             </FilterBar>
-            
+
             <TransactionsList>
-              {filteredTransactions.slice(0, 5).map((transaction) => (
+              {filteredTransactions.slice(0, 5).map(transaction => (
                 <TransactionItem key={transaction.id}>
                   <TransactionIcon type={transaction.type}>
-                    {transaction.type === 'credit' ? 
-                      <ArrowDownLeft size={20} /> : 
+                    {transaction.type === 'credit' ? (
+                      <ArrowDownLeft size={20} />
+                    ) : (
                       <ArrowUpRight size={20} />
-                    }
+                    )}
                   </TransactionIcon>
                   <TransactionInfo>
                     <TransactionTitle>{transaction.title}</TransactionTitle>
@@ -525,7 +556,8 @@ const Wallet = () => {
                     </TransactionDate>
                   </TransactionInfo>
                   <TransactionAmount type={transaction.type}>
-                    {transaction.type === 'credit' ? '+' : '-'}₹{transaction.amount.toLocaleString()}
+                    {transaction.type === 'credit' ? '+' : '-'}₹
+                    {transaction.amount.toLocaleString()}
                   </TransactionAmount>
                 </TransactionItem>
               ))}

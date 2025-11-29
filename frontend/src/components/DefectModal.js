@@ -50,7 +50,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   border-radius: 6px;
   color: #6b7280;
-  
+
   &:hover {
     background: #f3f4f6;
     color: #374151;
@@ -80,7 +80,7 @@ const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -95,7 +95,7 @@ const TextArea = styled.textarea`
   font-size: 0.875rem;
   min-height: 100px;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -109,7 +109,7 @@ const Select = styled.select`
   border-radius: 8px;
   font-size: 0.875rem;
   background: white;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -157,26 +157,26 @@ const Button = styled.button`
   align-items: center;
   gap: 8px;
   transition: all 0.2s;
-  
+
   &.secondary {
     background: #f9fafb;
     border: 1px solid #d1d5db;
     color: #374151;
-    
+
     &:hover {
       background: #f3f4f6;
     }
   }
-  
+
   &.primary {
     background: #3b82f6;
     border: 1px solid #3b82f6;
     color: white;
-    
+
     &:hover {
       background: #2563eb;
     }
-    
+
     &:disabled {
       background: #9ca3af;
       border-color: #9ca3af;
@@ -208,12 +208,12 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
     delta: {
       type: 'percent',
       sign: '-',
-      value: 0
+      value: 0,
     },
     order: 0,
-    isActive: true
+    isActive: true,
   });
-  
+
   const [errors, setErrors] = useState({});
 
   const sections = [
@@ -224,7 +224,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
     'camera',
     'sensor',
     'buttons',
-    'others'
+    'others',
   ];
 
   // Fetch categories function
@@ -252,7 +252,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
         icon: defect.icon || '',
         delta: defect.delta || { type: 'percent', sign: '-', value: 0 },
         order: defect.order || 0,
-        isActive: defect.isActive !== undefined ? defect.isActive : true
+        isActive: defect.isActive !== undefined ? defect.isActive : true,
       });
     } else {
       setFormData({
@@ -264,10 +264,10 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
         delta: {
           type: 'percent',
           sign: '-',
-          value: 0
+          value: 0,
         },
         order: 0,
-        isActive: true
+        isActive: true,
       });
     }
     setErrors({});
@@ -320,27 +320,27 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     onSave(formData);
   };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [field]: undefined
+        [field]: undefined,
       }));
     }
   };
@@ -349,11 +349,9 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
 
   return (
     <ModalOverlay onClick={onClose}>
-      <ModalContent onClick={(e) => e.stopPropagation()}>
+      <ModalContent onClick={e => e.stopPropagation()}>
         <ModalHeader>
-          <ModalTitle>
-            {defect ? 'Edit Defect' : 'Add New Defect'}
-          </ModalTitle>
+          <ModalTitle>{defect ? 'Edit Defect' : 'Add New Defect'}</ModalTitle>
           <CloseButton onClick={onClose}>
             <X size={20} />
           </CloseButton>
@@ -364,7 +362,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
             <Label>Category *</Label>
             <Select
               value={formData.categoryId}
-              onChange={(e) => handleInputChange('categoryId', e.target.value)}
+              onChange={e => handleInputChange('categoryId', e.target.value)}
             >
               <option value="">Select a category</option>
               {categories.map(category => (
@@ -385,7 +383,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
             <Label>Section *</Label>
             <Select
               value={formData.section}
-              onChange={(e) => handleInputChange('section', e.target.value)}
+              onChange={e => handleInputChange('section', e.target.value)}
             >
               <option value="">Select section</option>
               {sections.map(section => (
@@ -407,7 +405,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
             <Input
               type="text"
               value={formData.key}
-              onChange={(e) => handleInputChange('key', e.target.value.toLowerCase())}
+              onChange={e => handleInputChange('key', e.target.value.toLowerCase())}
               placeholder="Enter key (lowercase, numbers, underscores only)"
             />
             {errors.key && (
@@ -423,7 +421,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
             <Input
               type="text"
               value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
+              onChange={e => handleInputChange('title', e.target.value)}
               placeholder="Enter defect title"
             />
             {errors.title && (
@@ -439,7 +437,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
             <Input
               type="text"
               value={formData.icon}
-              onChange={(e) => handleInputChange('icon', e.target.value)}
+              onChange={e => handleInputChange('icon', e.target.value)}
               placeholder="Enter icon name or URL"
             />
           </FormGroup>
@@ -451,7 +449,9 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
                 <Label style={{ fontSize: '0.75rem', marginBottom: '4px' }}>Type</Label>
                 <Select
                   value={formData.delta.type}
-                  onChange={(e) => handleInputChange('delta', { ...formData.delta, type: e.target.value })}
+                  onChange={e =>
+                    handleInputChange('delta', { ...formData.delta, type: e.target.value })
+                  }
                 >
                   <option value="percent">Percentage</option>
                   <option value="abs">Absolute</option>
@@ -461,7 +461,9 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
                 <Label style={{ fontSize: '0.75rem', marginBottom: '4px' }}>Sign</Label>
                 <Select
                   value={formData.delta.sign}
-                  onChange={(e) => handleInputChange('delta', { ...formData.delta, sign: e.target.value })}
+                  onChange={e =>
+                    handleInputChange('delta', { ...formData.delta, sign: e.target.value })
+                  }
                 >
                   <option value="-">- (Decrease)</option>
                   <option value="+">+ (Increase)</option>
@@ -474,7 +476,12 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
                   min="0"
                   step="0.01"
                   value={formData.delta.value}
-                  onChange={(e) => handleInputChange('delta', { ...formData.delta, value: parseFloat(e.target.value) || 0 })}
+                  onChange={e =>
+                    handleInputChange('delta', {
+                      ...formData.delta,
+                      value: parseFloat(e.target.value) || 0,
+                    })
+                  }
                   placeholder="Enter value"
                 />
               </div>
@@ -492,7 +499,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
             <Input
               type="number"
               value={formData.order}
-              onChange={(e) => handleInputChange('order', parseInt(e.target.value) || 0)}
+              onChange={e => handleInputChange('order', parseInt(e.target.value) || 0)}
               placeholder="Display order (0 for default)"
             />
           </FormGroup>
@@ -501,7 +508,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
             <Label>Status</Label>
             <Select
               value={formData.isActive}
-              onChange={(e) => handleInputChange('isActive', e.target.value === 'true')}
+              onChange={e => handleInputChange('isActive', e.target.value === 'true')}
             >
               <option value="true">Active</option>
               <option value="false">Inactive</option>

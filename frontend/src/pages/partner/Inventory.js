@@ -14,7 +14,7 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  X
+  X,
 } from 'lucide-react';
 
 const InventoryContainer = styled.div`
@@ -43,8 +43,9 @@ const HeaderActions = styled.div`
 `;
 
 const Button = styled.button`
-  background: ${props => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${props => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
+  background: ${props =>
+    props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
+  color: ${props => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
   border: 1px solid ${props => props.theme.colors.primary};
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -54,9 +55,10 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   &:hover {
-    background: ${props => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
+    background: ${props =>
+      props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
     color: white;
   }
 `;
@@ -73,7 +75,7 @@ const StatCard = styled.div`
   padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 `;
 
 const StatHeader = styled.div`
@@ -137,7 +139,7 @@ const SearchInput = styled.input`
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 8px;
   font-size: 1rem;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
@@ -158,7 +160,7 @@ const FilterSelect = styled.select`
   border-radius: 8px;
   background: white;
   cursor: pointer;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
@@ -180,7 +182,7 @@ const TableHeader = styled.div`
   border-bottom: 1px solid ${props => props.theme.colors.border};
   font-weight: 600;
   color: ${props => props.theme.colors.text};
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr 100px 80px;
   }
@@ -193,15 +195,15 @@ const TableRow = styled.div`
   border-bottom: 1px solid ${props => props.theme.colors.border};
   align-items: center;
   transition: background 0.2s ease;
-  
+
   &:hover {
     background: ${props => props.theme.colors.background};
   }
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr 100px 80px;
   }
@@ -252,20 +254,30 @@ const StatusBadge = styled.span`
   width: fit-content;
   background: ${props => {
     switch (props.status) {
-      case 'active': return '#D1FAE5';
-      case 'inactive': return '#FEE2E2';
-      case 'pending': return '#FEF3C7';
-      case 'out-of-stock': return '#F3F4F6';
-      default: return '#F3F4F6';
+      case 'active':
+        return '#D1FAE5';
+      case 'inactive':
+        return '#FEE2E2';
+      case 'pending':
+        return '#FEF3C7';
+      case 'out-of-stock':
+        return '#F3F4F6';
+      default:
+        return '#F3F4F6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'active': return '#065F46';
-      case 'inactive': return '#991B1B';
-      case 'pending': return '#92400E';
-      case 'out-of-stock': return '#374151';
-      default: return '#374151';
+      case 'active':
+        return '#065F46';
+      case 'inactive':
+        return '#991B1B';
+      case 'pending':
+        return '#92400E';
+      case 'out-of-stock':
+        return '#374151';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -277,7 +289,7 @@ const Price = styled.span`
 
 const Stock = styled.span`
   font-weight: 500;
-  color: ${props => props.low ? '#EF4444' : props.theme.colors.text};
+  color: ${props => (props.low ? '#EF4444' : props.theme.colors.text)};
 `;
 
 const ActionsMenu = styled.div`
@@ -293,7 +305,7 @@ const ActionsButton = styled.button`
   cursor: pointer;
   color: ${props => props.theme.colors.textSecondary};
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: ${props => props.theme.colors.background};
     color: ${props => props.theme.colors.text};
@@ -307,10 +319,10 @@ const ActionsDropdown = styled.div`
   background: white;
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 10;
   min-width: 150px;
-  display: ${props => props.show ? 'block' : 'none'};
+  display: ${props => (props.show ? 'block' : 'none')};
 `;
 
 const ActionItem = styled.button`
@@ -325,15 +337,15 @@ const ActionItem = styled.button`
   gap: 0.5rem;
   color: ${props => props.theme.colors.text};
   transition: background 0.2s ease;
-  
+
   &:hover {
     background: ${props => props.theme.colors.background};
   }
-  
+
   &:first-child {
     border-radius: 8px 8px 0 0;
   }
-  
+
   &:last-child {
     border-radius: 0 0 8px 8px;
   }
@@ -368,26 +380,26 @@ function Inventory() {
       label: 'Total Products',
       value: '156',
       icon: <Package size={20} />,
-      color: '#3B82F6'
+      color: '#3B82F6',
     },
     {
       label: 'Active Listings',
       value: '142',
       icon: <CheckCircle size={20} />,
-      color: '#10B981'
+      color: '#10B981',
     },
     {
       label: 'Low Stock',
       value: '8',
       icon: <AlertCircle size={20} />,
-      color: '#F59E0B'
+      color: '#F59E0B',
     },
     {
       label: 'Pending Review',
       value: '6',
       icon: <Clock size={20} />,
-      color: '#8B5CF6'
-    }
+      color: '#8B5CF6',
+    },
   ];
 
   const products = [
@@ -399,7 +411,7 @@ function Inventory() {
       price: '₹89,999',
       stock: 12,
       status: 'active',
-      views: 234
+      views: 234,
     },
     {
       id: 2,
@@ -409,7 +421,7 @@ function Inventory() {
       price: '₹79,999',
       stock: 8,
       status: 'active',
-      views: 189
+      views: 189,
     },
     {
       id: 3,
@@ -419,7 +431,7 @@ function Inventory() {
       price: '₹54,999',
       stock: 3,
       status: 'active',
-      views: 156
+      views: 156,
     },
     {
       id: 4,
@@ -429,7 +441,7 @@ function Inventory() {
       price: '₹54,900',
       stock: 0,
       status: 'out-of-stock',
-      views: 98
+      views: 98,
     },
     {
       id: 5,
@@ -439,26 +451,32 @@ function Inventory() {
       price: '₹1,94,900',
       stock: 5,
       status: 'pending',
-      views: 67
-    }
+      views: 67,
+    },
   ];
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || product.status === statusFilter;
     const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
-    
+
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
-      case 'active': return <CheckCircle size={12} />;
-      case 'inactive': return <X size={12} />;
-      case 'pending': return <Clock size={12} />;
-      case 'out-of-stock': return <AlertCircle size={12} />;
-      default: return null;
+      case 'active':
+        return <CheckCircle size={12} />;
+      case 'inactive':
+        return <X size={12} />;
+      case 'pending':
+        return <Clock size={12} />;
+      case 'out-of-stock':
+        return <AlertCircle size={12} />;
+      default:
+        return null;
     }
   };
 
@@ -487,9 +505,7 @@ function Inventory() {
         {stats.map((stat, index) => (
           <StatCard key={index}>
             <StatHeader>
-              <StatIcon color={stat.color}>
-                {stat.icon}
-              </StatIcon>
+              <StatIcon color={stat.color}>{stat.icon}</StatIcon>
               <StatInfo>
                 <StatValue>{stat.value}</StatValue>
                 <StatLabel>{stat.label}</StatLabel>
@@ -507,25 +523,19 @@ function Inventory() {
               type="text"
               placeholder="Search products by name or SKU..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </SearchContainer>
-          
-          <FilterSelect
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
+
+          <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
             <option value="pending">Pending</option>
             <option value="out-of-stock">Out of Stock</option>
           </FilterSelect>
-          
-          <FilterSelect
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
+
+          <FilterSelect value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
             <option value="all">All Categories</option>
             <option value="Smartphones">Smartphones</option>
             <option value="Tablets">Tablets</option>
@@ -544,9 +554,9 @@ function Inventory() {
           <div>Status</div>
           <div>Actions</div>
         </TableHeader>
-        
+
         {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
+          filteredProducts.map(product => (
             <TableRow key={product.id}>
               <ProductInfo>
                 <ProductImage>
@@ -557,19 +567,21 @@ function Inventory() {
                   <ProductSKU>{product.sku}</ProductSKU>
                 </ProductDetails>
               </ProductInfo>
-              
+
               <div>{product.category}</div>
               <Price>{product.price}</Price>
               <Stock low={product.stock <= 5}>{product.stock}</Stock>
-              
+
               <StatusBadge status={product.status}>
                 {getStatusIcon(product.status)}
                 {product.status.charAt(0).toUpperCase() + product.status.slice(1).replace('-', ' ')}
               </StatusBadge>
-              
+
               <ActionsMenu>
                 <ActionsButton
-                  onClick={() => setActiveDropdown(activeDropdown === product.id ? null : product.id)}
+                  onClick={() =>
+                    setActiveDropdown(activeDropdown === product.id ? null : product.id)
+                  }
                 >
                   <MoreVertical size={16} />
                 </ActionsButton>

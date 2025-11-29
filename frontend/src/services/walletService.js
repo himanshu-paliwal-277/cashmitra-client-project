@@ -17,7 +17,7 @@ class WalletService {
       const params = new URLSearchParams({ page, limit });
       if (type) params.append('type', type);
       if (status) params.append('status', status);
-      
+
       const response = await api.get(`/wallet/transactions?${params}`);
       return response.data;
     } catch (error) {
@@ -34,8 +34,8 @@ class WalletService {
             createdAt: new Date().toISOString(),
             order: {
               orderType: 'sell',
-              totalAmount: 50000
-            }
+              totalAmount: 50000,
+            },
           },
           {
             _id: 'txn002',
@@ -43,7 +43,7 @@ class WalletService {
             amount: -15000,
             status: 'completed',
             description: 'Payout request via Bank Transfer',
-            createdAt: new Date(Date.now() - 86400000).toISOString()
+            createdAt: new Date(Date.now() - 86400000).toISOString(),
           },
           {
             _id: 'txn003',
@@ -54,13 +54,13 @@ class WalletService {
             createdAt: new Date(Date.now() - 172800000).toISOString(),
             order: {
               orderType: 'buy',
-              totalAmount: 60000
-            }
-          }
+              totalAmount: 60000,
+            },
+          },
         ],
         totalPages: 1,
         currentPage: 1,
-        totalTransactions: 3
+        totalTransactions: 3,
       };
     }
   }
@@ -90,7 +90,7 @@ class WalletService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (status) params.append('status', status);
-      
+
       const response = await api.get(`/wallet/payouts?${params}`);
       return response.data;
     } catch (error) {
@@ -108,9 +108,9 @@ class WalletService {
             paymentDetails: {
               bankDetails: {
                 accountNumber: '****1234',
-                accountHolderName: 'John Doe'
-              }
-            }
+                accountHolderName: 'John Doe',
+              },
+            },
           },
           {
             _id: 'payout002',
@@ -121,14 +121,14 @@ class WalletService {
             createdAt: new Date(Date.now() - 86400000).toISOString(),
             paymentDetails: {
               upiDetails: {
-                upiId: 'partner@paytm'
-              }
-            }
-          }
+                upiId: 'partner@paytm',
+              },
+            },
+          },
         ],
         totalPages: 1,
         currentPage: 1,
-        totalPayouts: 2
+        totalPayouts: 2,
       };
     }
   }
@@ -152,7 +152,7 @@ class WalletService {
           { date: '2024-01-02', earnings: 1800, payouts: 15000 },
           { date: '2024-01-03', earnings: 3200, payouts: 0 },
           { date: '2024-01-04', earnings: 1500, payouts: 0 },
-          { date: '2024-01-05', earnings: 2800, payouts: 4250 }
+          { date: '2024-01-05', earnings: 2800, payouts: 4250 },
         ],
         payoutSettings: {
           minimumPayoutAmount: 1000,
@@ -161,10 +161,10 @@ class WalletService {
           bankDetails: {
             accountNumber: '****1234',
             accountHolderName: 'John Doe',
-            bankName: 'HDFC Bank'
+            bankName: 'HDFC Bank',
           },
-          upiId: 'partner@paytm'
-        }
+          upiId: 'partner@paytm',
+        },
       };
     }
   }
@@ -190,13 +190,13 @@ class WalletService {
             partner: {
               shopName: 'TechMart Electronics',
               user: { name: 'Rajesh Kumar' },
-              shopEmail: 'contact@techmart.com'
+              shopEmail: 'contact@techmart.com',
             },
             paymentDetails: {
               upiDetails: {
-                upiId: 'rajesh@paytm'
-              }
-            }
+                upiId: 'rajesh@paytm',
+              },
+            },
           },
           {
             _id: 'payout002',
@@ -208,20 +208,20 @@ class WalletService {
             partner: {
               shopName: 'Mobile World',
               user: { name: 'Priya Sharma' },
-              shopEmail: 'info@mobileworld.com'
+              shopEmail: 'info@mobileworld.com',
             },
             paymentDetails: {
               bankDetails: {
                 accountNumber: '****5678',
                 accountHolderName: 'Priya Sharma',
-                bankName: 'SBI'
-              }
-            }
-          }
+                bankName: 'SBI',
+              },
+            },
+          },
         ],
         totalPages: 1,
         currentPage: 1,
-        totalPayouts: 2
+        totalPayouts: 2,
       };
     }
   }
@@ -231,7 +231,7 @@ class WalletService {
     try {
       const response = await api.put(`/wallet/admin/payouts/${transactionId}`, {
         status,
-        notes
+        notes,
       });
       return response.data;
     } catch (error) {
@@ -250,19 +250,19 @@ class WalletService {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   }
 
   // Get transaction type display name
   getTransactionTypeDisplay(type) {
     const typeMap = {
-      'commission': 'Commission Earned',
-      'payout': 'Payout',
-      'order_payment': 'Order Payment',
-      'refund': 'Refund',
-      'wallet_credit': 'Wallet Credit',
-      'wallet_debit': 'Wallet Debit'
+      commission: 'Commission Earned',
+      payout: 'Payout',
+      order_payment: 'Order Payment',
+      refund: 'Refund',
+      wallet_credit: 'Wallet Credit',
+      wallet_debit: 'Wallet Debit',
     };
     return typeMap[type] || type;
   }
@@ -270,10 +270,10 @@ class WalletService {
   // Get status color
   getStatusColor(status) {
     const colorMap = {
-      'completed': '#10B981',
-      'pending': '#F59E0B',
-      'failed': '#EF4444',
-      'cancelled': '#6B7280'
+      completed: '#10B981',
+      pending: '#F59E0B',
+      failed: '#EF4444',
+      cancelled: '#6B7280',
     };
     return colorMap[status] || '#6B7280';
   }
@@ -284,10 +284,13 @@ export default walletService;
 
 // Legacy exports for backward compatibility
 export const getWallet = () => walletService.getWallet();
-export const getTransactions = (page, limit, type, status) => walletService.getTransactions(page, limit, type, status);
-export const requestPayout = (payoutData) => walletService.requestPayout(payoutData);
-export const updatePayoutSettings = (settings) => walletService.updatePayoutSettings(settings);
-export const getPayoutHistory = (page, limit, status) => walletService.getPayoutHistory(page, limit, status);
-export const getWalletAnalytics = (period) => walletService.getWalletAnalytics(period);
+export const getTransactions = (page, limit, type, status) =>
+  walletService.getTransactions(page, limit, type, status);
+export const requestPayout = payoutData => walletService.requestPayout(payoutData);
+export const updatePayoutSettings = settings => walletService.updatePayoutSettings(settings);
+export const getPayoutHistory = (page, limit, status) =>
+  walletService.getPayoutHistory(page, limit, status);
+export const getWalletAnalytics = period => walletService.getWalletAnalytics(period);
 export const getPendingPayouts = (page, limit) => walletService.getPendingPayouts(page, limit);
-export const processPayout = (transactionId, status, notes) => walletService.processPayout(transactionId, status, notes);
+export const processPayout = (transactionId, status, notes) =>
+  walletService.processPayout(transactionId, status, notes);

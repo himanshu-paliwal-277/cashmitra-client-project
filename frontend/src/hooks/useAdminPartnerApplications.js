@@ -8,19 +8,19 @@ const useAdminPartnerApplications = () => {
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
-    totalApplications: 0
+    totalApplications: 0,
   });
   const [filters, setFilters] = useState({
     status: '',
     page: 1,
-    limit: 10
+    limit: 10,
   });
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
     approved: 0,
     rejected: 0,
-    underReview: 0
+    underReview: 0,
   });
 
   // Fetch partner applications with pagination and filters
@@ -34,21 +34,21 @@ const useAdminPartnerApplications = () => {
         setPagination({
           currentPage: response.currentPage || page,
           totalPages: response.totalPages || 1,
-          totalApplications: response.totalApplications || response.applications.length
+          totalApplications: response.totalApplications || response.applications.length,
         });
-        
+
         // Calculate stats from all applications
         const statusCounts = response.applications.reduce((acc, app) => {
           acc[app.status] = (acc[app.status] || 0) + 1;
           return acc;
         }, {});
-        
+
         setStats({
           total: response.applications.length,
           pending: statusCounts.pending || 0,
           approved: statusCounts.approved || 0,
           rejected: statusCounts.rejected || 0,
-          underReview: statusCounts.underReview || 0
+          underReview: statusCounts.underReview || 0,
         });
       }
     } catch (err) {
@@ -60,91 +60,125 @@ const useAdminPartnerApplications = () => {
   }, []);
 
   // Update application status
-  const updateApplicationStatus = useCallback(async (applicationId, status, notes = '') => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await adminService.updatePartnerApplicationStatus(applicationId, status, notes);
-      if (response.success) {
-        setApplications(prev => prev.map(app => 
-          app.id === applicationId 
-            ? { ...app, status, notes, updatedAt: new Date().toISOString() }
-            : app
-        ));
-        
-        // Update stats
-        setStats(prev => {
-          const oldApp = applications.find(app => app.id === applicationId);
-          if (oldApp && oldApp.status !== status) {
-            return {
-              ...prev,
-              [oldApp.status]: Math.max(0, prev[oldApp.status] - 1),
-              [status]: prev[status] + 1
-            };
-          }
-          return prev;
-        });
-        
-        return { success: true, message: response.message };
+  const updateApplicationStatus = useCallback(
+    async (applicationId, status, notes = '') => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await adminService.updatePartnerApplicationStatus(
+          applicationId,
+          status,
+          notes
+        );
+        if (response.success) {
+          setApplications(prev =>
+            prev.map(app =>
+              app.id === applicationId
+                ? { ...app, status, notes, updatedAt: new Date().toISOString() }
+                : app
+            )
+          );
+
+          // Update stats
+          setStats(prev => {
+            const oldApp = applications.find(app => app.id === applicationId);
+            if (oldApp && oldApp.status !== status) {
+              return {
+                ...prev,
+                [oldApp.status]: Math.max(0, prev[oldApp.status] - 1),
+                [status]: prev[status] + 1,
+              };
+            }
+            return prev;
+          });
+
+          return { success: true, message: response.message };
+        }
+        throw new Error('Failed to update application status');
+      } catch (err) {
+        setError(err.message || 'Failed to update application status');
+        console.error('Error updating application status:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
       }
-      throw new Error('Failed to update application status');
-    } catch (err) {
-      setError(err.message || 'Failed to update application status');
-      console.error('Error updating application status:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [applications]);
+    },
+    [applications]
+  );
 
   // Approve application
-  const approveApplication = useCallback(async (applicationId, notes = '') => {
-    return await updateApplicationStatus(applicationId, 'approved', notes);
-  }, [updateApplicationStatus]);
+  const approveApplication = useCallback(
+    async (applicationId, notes = '') => {
+      return await updateApplicationStatus(applicationId, 'approved', notes);
+    },
+    [updateApplicationStatus]
+  );
 
   // Reject application
-  const rejectApplication = useCallback(async (applicationId, notes = '') => {
-    return await updateApplicationStatus(applicationId, 'rejected', notes);
-  }, [updateApplicationStatus]);
+  const rejectApplication = useCallback(
+    async (applicationId, notes = '') => {
+      return await updateApplicationStatus(applicationId, 'rejected', notes);
+    },
+    [updateApplicationStatus]
+  );
 
   // Mark application as under review
-  const reviewApplication = useCallback(async (applicationId, notes = '') => {
-    return await updateApplicationStatus(applicationId, 'underReview', notes);
-  }, [updateApplicationStatus]);
+  const reviewApplication = useCallback(
+    async (applicationId, notes = '') => {
+      return await updateApplicationStatus(applicationId, 'underReview', notes);
+    },
+    [updateApplicationStatus]
+  );
 
   // Filter applications by status
-  const filterByStatus = useCallback((status) => {
-    setFilters(prev => ({ ...prev, status, page: 1 }));
-    fetchApplications(1, filters.limit, status);
-  }, [fetchApplications, filters.limit]);
+  const filterByStatus = useCallback(
+    status => {
+      setFilters(prev => ({ ...prev, status, page: 1 }));
+      fetchApplications(1, filters.limit, status);
+    },
+    [fetchApplications, filters.limit]
+  );
 
   // Change page
-  const changePage = useCallback((page) => {
-    setFilters(prev => ({ ...prev, page }));
-    fetchApplications(page, filters.limit, filters.status);
-  }, [fetchApplications, filters.limit, filters.status]);
+  const changePage = useCallback(
+    page => {
+      setFilters(prev => ({ ...prev, page }));
+      fetchApplications(page, filters.limit, filters.status);
+    },
+    [fetchApplications, filters.limit, filters.status]
+  );
 
   // Change page size
-  const changePageSize = useCallback((limit) => {
-    setFilters(prev => ({ ...prev, limit, page: 1 }));
-    fetchApplications(1, limit, filters.status);
-  }, [fetchApplications, filters.status]);
+  const changePageSize = useCallback(
+    limit => {
+      setFilters(prev => ({ ...prev, limit, page: 1 }));
+      fetchApplications(1, limit, filters.status);
+    },
+    [fetchApplications, filters.status]
+  );
 
   // Get application by ID
-  const getApplicationById = useCallback((applicationId) => {
-    return applications.find(app => app.id === applicationId);
-  }, [applications]);
+  const getApplicationById = useCallback(
+    applicationId => {
+      return applications.find(app => app.id === applicationId);
+    },
+    [applications]
+  );
 
   // Search applications by shop name or owner name
-  const searchApplications = useCallback((searchTerm) => {
-    if (!searchTerm) return applications;
-    
-    return applications.filter(app => 
-      app.shopName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [applications]);
+  const searchApplications = useCallback(
+    searchTerm => {
+      if (!searchTerm) return applications;
+
+      return applications.filter(
+        app =>
+          app.shopName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    },
+    [applications]
+  );
 
   // Auto-fetch on mount
   useEffect(() => {
@@ -167,7 +201,7 @@ const useAdminPartnerApplications = () => {
     changePage,
     changePageSize,
     getApplicationById,
-    searchApplications
+    searchApplications,
   };
 };
 

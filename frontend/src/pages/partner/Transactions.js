@@ -70,7 +70,7 @@ const Transactions = () => {
         <Title>Transactions</Title>
         <Subtitle>View and manage all your financial transactions</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,7 +78,7 @@ const Transactions = () => {
           </Icon>
           <ComingSoonTitle>Transactions Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to view all your 
+            This feature is currently under development. Soon you'll be able to view all your
             transactions with detailed filtering, search capabilities, and export options.
           </ComingSoonText>
         </ComingSoon>

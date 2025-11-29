@@ -70,7 +70,7 @@ const Support = () => {
         <Title>Support</Title>
         <Subtitle>Get help and support for your partner account</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,7 +78,7 @@ const Support = () => {
           </Icon>
           <ComingSoonTitle>Support Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll have access to comprehensive 
+            This feature is currently under development. Soon you'll have access to comprehensive
             support including FAQs, live chat, ticket system, and direct contact options.
           </ComingSoonText>
         </ComingSoon>

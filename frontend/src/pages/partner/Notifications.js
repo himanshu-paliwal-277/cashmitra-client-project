@@ -70,7 +70,7 @@ const Notifications = () => {
         <Title>Notifications</Title>
         <Subtitle>Manage your notifications and alerts</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,7 +78,7 @@ const Notifications = () => {
           </Icon>
           <ComingSoonTitle>Notifications Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to manage all your 
+            This feature is currently under development. Soon you'll be able to manage all your
             notifications, set preferences, and stay updated with important alerts.
           </ComingSoonText>
         </ComingSoon>

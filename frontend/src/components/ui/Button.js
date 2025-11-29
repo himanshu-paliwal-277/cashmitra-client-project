@@ -9,38 +9,50 @@ const StyledButton = styled.button`
   gap: ${theme.spacing[2]};
   padding: ${props => {
     switch (props.size) {
-      case 'sm': return `${theme.spacing[2]} ${theme.spacing[3]}`;
-      case 'lg': return `${theme.spacing[4]} ${theme.spacing[6]}`;
-      case 'xl': return `${theme.spacing[5]} ${theme.spacing[8]}`;
-      default: return `${theme.spacing[3]} ${theme.spacing[5]}`;
+      case 'sm':
+        return `${theme.spacing[2]} ${theme.spacing[3]}`;
+      case 'lg':
+        return `${theme.spacing[4]} ${theme.spacing[6]}`;
+      case 'xl':
+        return `${theme.spacing[5]} ${theme.spacing[8]}`;
+      default:
+        return `${theme.spacing[3]} ${theme.spacing[5]}`;
     }
   }};
   font-size: ${props => {
     switch (props.size) {
-      case 'sm': return theme.typography.fontSize.sm;
-      case 'lg': return theme.typography.fontSize.lg;
-      case 'xl': return theme.typography.fontSize.xl;
-      default: return theme.typography.fontSize.base;
+      case 'sm':
+        return theme.typography.fontSize.sm;
+      case 'lg':
+        return theme.typography.fontSize.lg;
+      case 'xl':
+        return theme.typography.fontSize.xl;
+      default:
+        return theme.typography.fontSize.base;
     }
   }};
   font-weight: ${theme.typography.fontWeight.medium};
-  border-radius: ${props => props.$rounded ? theme.borderRadius.full : theme.borderRadius.lg};
+  border-radius: ${props => (props.$rounded ? theme.borderRadius.full : theme.borderRadius.lg)};
   border: 2px solid transparent;
   cursor: pointer;
   transition: all ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
   text-decoration: none;
   min-height: ${props => {
     switch (props.size) {
-      case 'sm': return '32px';
-      case 'lg': return '48px';
-      case 'xl': return '56px';
-      default: return '40px';
+      case 'sm':
+        return '32px';
+      case 'lg':
+        return '48px';
+      case 'xl':
+        return '56px';
+      default:
+        return '40px';
     }
   }};
   position: relative;
   overflow: hidden;
-  width: ${props => props.$fullWidth ? '100%' : 'auto'};
-  
+  width: ${props => (props.$fullWidth ? '100%' : 'auto')};
+
   /* Variant Styles */
   ${props => {
     switch (props.variant) {
@@ -137,21 +149,23 @@ const StyledButton = styled.button`
         `;
     }
   }}
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
   }
-  
+
   &:focus-visible {
     outline: 2px solid ${theme.colors.primary.main};
     outline-offset: 2px;
   }
-  
+
   /* Loading State */
-  ${props => props.$loading && `
+  ${props =>
+    props.$loading &&
+    `
     pointer-events: none;
     
     &::after {
@@ -165,47 +179,52 @@ const StyledButton = styled.button`
       animation: spin 1s linear infinite;
     }
   `}
-  
+
   @keyframes spin {
     to {
       transform: rotate(360deg);
     }
   }
-  
+
   /* This is now handled by the width property above */
 `;
 
-const Button = React.forwardRef(({ 
-  children, 
-  variant = 'default', 
-  size = 'md', 
-  loading = false,
-  disabled = false,
-  fullWidth = false,
-  rounded = false,
-  leftIcon,
-  rightIcon,
-  as = 'button',
-  ...props 
-}, ref) => {
-  return (
-    <StyledButton
-      ref={ref}
-      variant={variant}
-      size={size}
-      $loading={loading}
-      disabled={disabled || loading}
-      $fullWidth={fullWidth}
-      $rounded={rounded}
-      as={as}
-      {...props}
-    >
-      {leftIcon && !loading && leftIcon}
-      {!loading && children}
-      {rightIcon && !loading && rightIcon}
-    </StyledButton>
-  );
-});
+const Button = React.forwardRef(
+  (
+    {
+      children,
+      variant = 'default',
+      size = 'md',
+      loading = false,
+      disabled = false,
+      fullWidth = false,
+      rounded = false,
+      leftIcon,
+      rightIcon,
+      as = 'button',
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <StyledButton
+        ref={ref}
+        variant={variant}
+        size={size}
+        $loading={loading}
+        disabled={disabled || loading}
+        $fullWidth={fullWidth}
+        $rounded={rounded}
+        as={as}
+        {...props}
+      >
+        {leftIcon && !loading && leftIcon}
+        {!loading && children}
+        {rightIcon && !loading && rightIcon}
+      </StyledButton>
+    );
+  }
+);
 
 Button.displayName = 'Button';
 

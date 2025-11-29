@@ -26,7 +26,7 @@ import {
   Zap,
   Cable,
   Box,
-  Gift
+  Gift,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -141,8 +141,8 @@ const FilterButton = styled.button`
   padding: ${theme.spacing[2]} ${theme.spacing[4]};
   border: 1px solid ${theme.colors.grey[300]};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.active ? theme.colors.primary.main : 'white'};
-  color: ${props => props.active ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.active ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.active ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -153,7 +153,7 @@ const FilterButton = styled.button`
 
   &:hover {
     border-color: ${theme.colors.primary.main};
-    background: ${props => props.active ? theme.colors.primary[600] : theme.colors.primary[50]};
+    background: ${props => (props.active ? theme.colors.primary[600] : theme.colors.primary[50])};
   }
 `;
 
@@ -181,16 +181,16 @@ const CategoryTabs = styled.div`
   gap: ${theme.spacing[2]};
   overflow-x: auto;
   padding-bottom: ${theme.spacing[2]};
-  
+
   &::-webkit-scrollbar {
     height: 4px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: ${theme.colors.grey[100]};
     border-radius: ${theme.borderRadius.full};
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: ${theme.colors.grey[300]};
     border-radius: ${theme.borderRadius.full};
@@ -199,10 +199,10 @@ const CategoryTabs = styled.div`
 
 const CategoryTab = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: 1px solid ${props => props.active ? theme.colors.primary.main : theme.colors.grey[300]};
+  border: 1px solid ${props => (props.active ? theme.colors.primary.main : theme.colors.grey[300])};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.active ? theme.colors.primary[50] : 'white'};
-  color: ${props => props.active ? theme.colors.primary.main : theme.colors.text.primary};
+  background: ${props => (props.active ? theme.colors.primary[50] : 'white')};
+  color: ${props => (props.active ? theme.colors.primary.main : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -226,19 +226,22 @@ const AccessoriesGrid = styled.div`
 
 const AccessoryCard = styled.div`
   background: white;
-  border: 1px solid ${props => props.selected ? theme.colors.accent.main : theme.colors.grey[200]};
+  border: 1px solid ${props => (props.selected ? theme.colors.accent.main : theme.colors.grey[200])};
   border-radius: ${theme.borderRadius.lg};
   overflow: hidden;
   transition: all ${theme.transitions.duration.normal};
   cursor: pointer;
 
-  ${props => props.selected && `
+  ${props =>
+    props.selected &&
+    `
     background: ${theme.colors.accent[50]};
     box-shadow: 0 0 0 1px ${theme.colors.accent.main}20;
   `}
 
   &:hover {
-    border-color: ${props => props.selected ? theme.colors.accent[600] : theme.colors.accent.main};
+    border-color: ${props =>
+      props.selected ? theme.colors.accent[600] : theme.colors.accent.main};
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.md};
   }
@@ -259,8 +262,8 @@ const AccessoryIcon = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: ${props => props.selected ? theme.colors.accent.main : theme.colors.grey[100]};
-  color: ${props => props.selected ? 'white' : theme.colors.text.secondary};
+  background: ${props => (props.selected ? theme.colors.accent.main : theme.colors.grey[100])};
+  color: ${props => (props.selected ? 'white' : theme.colors.text.secondary)};
   transition: all ${theme.transitions.duration.normal};
 `;
 
@@ -294,14 +297,14 @@ const AccessoryBonus = styled.div`
 const AccessoryCheckbox = styled.div`
   width: 20px;
   height: 20px;
-  border: 2px solid ${props => props.selected ? theme.colors.accent.main : theme.colors.grey[300]};
+  border: 2px solid ${props => (props.selected ? theme.colors.accent.main : theme.colors.grey[300])};
   border-radius: ${theme.borderRadius.sm};
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: all ${theme.transitions.duration.normal};
-  background: ${props => props.selected ? theme.colors.accent.main : 'white'};
+  background: ${props => (props.selected ? theme.colors.accent.main : 'white')};
   color: white;
 `;
 
@@ -310,8 +313,8 @@ const RequiredBadge = styled.div`
   border-radius: ${theme.borderRadius.sm};
   font-size: ${theme.typography.fontSize.xs};
   font-weight: ${theme.typography.fontWeight.medium};
-  background: ${props => props.required ? theme.colors.warning[50] : theme.colors.grey[50]};
-  color: ${props => props.required ? theme.colors.warning.main : theme.colors.text.secondary};
+  background: ${props => (props.required ? theme.colors.warning[50] : theme.colors.grey[50])};
+  color: ${props => (props.required ? theme.colors.warning.main : theme.colors.text.secondary)};
 `;
 
 const NavigationButtons = styled.div`
@@ -323,7 +326,7 @@ const NavigationButtons = styled.div`
 
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -332,10 +335,11 @@ const NavigationButtons = styled.div`
 
 const NavButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[6]};
-  border: ${props => props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
+  border: ${props =>
+    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.variant === 'primary' ? theme.colors.primary.main : 'white'};
-  color: ${props => props.variant === 'primary' ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.variant === 'primary' ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.variant === 'primary' ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.base};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -349,7 +353,8 @@ const NavButton = styled.button`
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.md};
-    background: ${props => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -429,13 +434,15 @@ const CATEGORY_ICONS = {
   case: Smartphone,
   box: Box,
   documentation: Package,
-  other: Gift
+  other: Gift,
 };
 
 const AccessorySelection = ({ sessionData, onComplete, onError, hooks }) => {
   const { sellAccessories } = hooks;
-  
-  const [selectedAccessories, setSelectedAccessories] = useState(sessionData.selectedAccessories || []);
+
+  const [selectedAccessories, setSelectedAccessories] = useState(
+    sessionData.selectedAccessories || []
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showOnlySelected, setShowOnlySelected] = useState(false);
@@ -445,7 +452,7 @@ const AccessorySelection = ({ sessionData, onComplete, onError, hooks }) => {
   useEffect(() => {
     if (sessionData.selectedProduct) {
       sellAccessories.fetchPublicAccessories({
-        productId: sessionData.selectedProduct
+        productId: sessionData.selectedProduct,
       });
     }
   }, [sessionData.selectedProduct]);
@@ -456,25 +463,24 @@ const AccessorySelection = ({ sessionData, onComplete, onError, hooks }) => {
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(accessory =>
-        accessory.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        accessory.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        accessory.category?.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        accessory =>
+          accessory.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          accessory.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          accessory.category?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(accessory => 
-        accessory.category?.toLowerCase() === selectedCategory.toLowerCase()
+      filtered = filtered.filter(
+        accessory => accessory.category?.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
 
     // Filter by selection status
     if (showOnlySelected) {
-      filtered = filtered.filter(accessory => 
-        selectedAccessories.includes(accessory._id)
-      );
+      filtered = filtered.filter(accessory => selectedAccessories.includes(accessory._id));
     }
 
     // Sort accessories
@@ -492,7 +498,14 @@ const AccessorySelection = ({ sessionData, onComplete, onError, hooks }) => {
     });
 
     return filtered;
-  }, [sellAccessories.publicAccessories, searchTerm, selectedCategory, showOnlySelected, sortBy, selectedAccessories]);
+  }, [
+    sellAccessories.publicAccessories,
+    searchTerm,
+    selectedCategory,
+    showOnlySelected,
+    sortBy,
+    selectedAccessories,
+  ]);
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -513,7 +526,7 @@ const AccessorySelection = ({ sessionData, onComplete, onError, hooks }) => {
     }, 0);
   }, [selectedAccessories, sellAccessories.publicAccessories]);
 
-  const handleAccessoryToggle = (accessoryId) => {
+  const handleAccessoryToggle = accessoryId => {
     setSelectedAccessories(prev => {
       if (prev.includes(accessoryId)) {
         return prev.filter(id => id !== accessoryId);
@@ -559,7 +572,8 @@ const AccessorySelection = ({ sessionData, onComplete, onError, hooks }) => {
       <Header>
         <HeaderTitle>Include Accessories</HeaderTitle>
         <HeaderSubtitle>
-          Select any original accessories you have with your device. Including accessories can increase your device's value.
+          Select any original accessories you have with your device. Including accessories can
+          increase your device's value.
         </HeaderSubtitle>
         <SelectionSummary>
           <SummaryItem>
@@ -588,29 +602,20 @@ const AccessorySelection = ({ sessionData, onComplete, onError, hooks }) => {
             type="text"
             placeholder="Search accessories..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
         </SearchContainer>
 
         <FiltersContainer>
-          <FilterButton
-            active={sortBy === 'bonus'}
-            onClick={() => setSortBy('bonus')}
-          >
+          <FilterButton active={sortBy === 'bonus'} onClick={() => setSortBy('bonus')}>
             <Plus size={14} />
             Bonus
           </FilterButton>
-          <FilterButton
-            active={sortBy === 'required'}
-            onClick={() => setSortBy('required')}
-          >
+          <FilterButton active={sortBy === 'required'} onClick={() => setSortBy('required')}>
             <Info size={14} />
             Required
           </FilterButton>
-          <FilterButton
-            active={sortBy === 'name'}
-            onClick={() => setSortBy('name')}
-          >
+          <FilterButton active={sortBy === 'name'} onClick={() => setSortBy('name')}>
             Name
           </FilterButton>
 
@@ -622,10 +627,7 @@ const AccessorySelection = ({ sessionData, onComplete, onError, hooks }) => {
       </SearchAndFilters>
 
       <CategoryTabs>
-        <CategoryTab
-          active={selectedCategory === 'all'}
-          onClick={() => setSelectedCategory('all')}
-        >
+        <CategoryTab active={selectedCategory === 'all'} onClick={() => setSelectedCategory('all')}>
           All Categories
         </CategoryTab>
         {categories.map(category => {
@@ -690,13 +692,16 @@ const AccessorySelection = ({ sessionData, onComplete, onError, hooks }) => {
 
                       <AccessoryContent>
                         <AccessoryTitle>{accessory.name}</AccessoryTitle>
-                        <AccessoryDescription>
-                          {accessory.description}
-                        </AccessoryDescription>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <AccessoryDescription>{accessory.description}</AccessoryDescription>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
                           <AccessoryBonus>
-                            <Plus size={12} />
-                            ₹{(accessory.priceBonus || 0).toLocaleString()}
+                            <Plus size={12} />₹{(accessory.priceBonus || 0).toLocaleString()}
                           </AccessoryBonus>
                           <RequiredBadge required={accessory.required}>
                             {accessory.required ? 'Required' : 'Optional'}
@@ -722,14 +727,19 @@ const AccessorySelection = ({ sessionData, onComplete, onError, hooks }) => {
           Back
         </NavButton>
 
-        <div style={{ textAlign: 'center', color: theme.colors.text.secondary, fontSize: theme.typography.fontSize.sm }}>
-          {selectedAccessories.length === 0 ? 'No accessories selected' : `${selectedAccessories.length} accessories selected`}
+        <div
+          style={{
+            textAlign: 'center',
+            color: theme.colors.text.secondary,
+            fontSize: theme.typography.fontSize.sm,
+          }}
+        >
+          {selectedAccessories.length === 0
+            ? 'No accessories selected'
+            : `${selectedAccessories.length} accessories selected`}
         </div>
 
-        <NavButton
-          variant="primary"
-          onClick={handleComplete}
-        >
+        <NavButton variant="primary" onClick={handleComplete}>
           Continue
           <ArrowRight size={16} />
         </NavButton>

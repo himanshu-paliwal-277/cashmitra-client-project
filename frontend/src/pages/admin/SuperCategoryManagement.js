@@ -18,7 +18,7 @@ const SuperCategoryManagement = () => {
       setLoading(true);
       setError(''); // Clear previous errors
       const token = localStorage.getItem('adminToken');
-      
+
       let url = `${API_BASE_URL}/buy-super-categories?`;
       if (filterActive !== 'all') {
         url += `isActive=${filterActive === 'active'}&`;
@@ -26,15 +26,15 @@ const SuperCategoryManagement = () => {
       if (searchTerm) {
         url += `search=${searchTerm}&`;
       }
-      
+
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setSuperCategories(data.data || []);
         setError(''); // Clear errors on success
@@ -62,8 +62,12 @@ const SuperCategoryManagement = () => {
     fetchSuperCategories();
   }, [fetchSuperCategories]);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this super category? This will fail if there are linked categories.')) {
+  const handleDelete = async id => {
+    if (
+      !window.confirm(
+        'Are you sure you want to delete this super category? This will fail if there are linked categories.'
+      )
+    ) {
       return;
     }
 
@@ -72,12 +76,12 @@ const SuperCategoryManagement = () => {
       const response = await fetch(`${API_BASE_URL}/buy-super-categories/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         fetchSuperCategories();
         alert('Super category deleted successfully');
@@ -89,7 +93,7 @@ const SuperCategoryManagement = () => {
     }
   };
 
-  const handleEdit = (category) => {
+  const handleEdit = category => {
     setEditingCategory(category);
     setShowForm(true);
   };
@@ -112,8 +116,8 @@ const SuperCategoryManagement = () => {
           <Title>{editingCategory ? 'Edit Super Category' : 'Create Super Category'}</Title>
           <BackButton onClick={handleFormClose}>← Back to List</BackButton>
         </Header>
-        <SuperCategoryForm 
-          category={editingCategory} 
+        <SuperCategoryForm
+          category={editingCategory}
           onClose={handleFormClose}
           onSave={handleFormClose}
         />
@@ -138,15 +142,12 @@ const SuperCategoryManagement = () => {
             type="text"
             placeholder="Search super categories..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
         </SearchBox>
-        
+
         <FilterButtons>
-          <FilterButton
-            active={filterActive === 'all'}
-            onClick={() => setFilterActive('all')}
-          >
+          <FilterButton active={filterActive === 'all'} onClick={() => setFilterActive('all')}>
             All
           </FilterButton>
           <FilterButton
@@ -164,7 +165,9 @@ const SuperCategoryManagement = () => {
         </FilterButtons>
       </FilterBar>
 
-      {error && <ErrorMessage>{typeof error === 'string' ? error : JSON.stringify(error)}</ErrorMessage>}
+      {error && (
+        <ErrorMessage>{typeof error === 'string' ? error : JSON.stringify(error)}</ErrorMessage>
+      )}
 
       {loading ? (
         <LoadingMessage>Loading super categories...</LoadingMessage>
@@ -179,7 +182,7 @@ const SuperCategoryManagement = () => {
         </EmptyMessage>
       ) : (
         <Grid>
-          {superCategories.map((category) => (
+          {superCategories.map(category => (
             <Card key={category._id}>
               <CardImage>
                 {category.image ? (
@@ -193,13 +196,13 @@ const SuperCategoryManagement = () => {
                   {category.isActive ? 'Active' : 'Inactive'}
                 </StatusBadge>
               </CardImage>
-              
+
               <CardContent>
                 <CategoryName>{category.name}</CategoryName>
                 <CategoryDescription>
                   {category.description || 'No description'}
                 </CategoryDescription>
-                
+
                 <CategoryStats>
                   <Stat>
                     <StatLabel>Categories:</StatLabel>
@@ -211,7 +214,7 @@ const SuperCategoryManagement = () => {
                   </Stat>
                 </CategoryStats>
               </CardContent>
-              
+
               <CardActions>
                 <ActionButton onClick={() => handleEdit(category)} variant="edit">
                   <Edit2 size={18} />
@@ -242,7 +245,7 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 1rem;
@@ -253,7 +256,7 @@ const Header = styled.div`
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -264,7 +267,7 @@ const CreateButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -272,12 +275,12 @@ const CreateButton = styled.button`
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 200, 83, 0.4);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -292,7 +295,7 @@ const BackButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: #e0e0e0;
   }
@@ -303,7 +306,7 @@ const FilterBar = styled.div`
   gap: 1rem;
   margin-bottom: 2rem;
   flex-wrap: wrap;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
   }
@@ -319,23 +322,23 @@ const SearchBox = styled.div`
   border-radius: 12px;
   flex: 1;
   transition: all 0.3s ease;
-  
+
   &:focus-within {
-    border-color: #00C853;
+    border-color: #00c853;
     box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
   }
-  
+
   svg {
     color: #666;
   }
-  
+
   input {
     border: none;
     outline: none;
     font-size: 1rem;
     flex: 1;
     background: transparent;
-    
+
     &::placeholder {
       color: #999;
     }
@@ -358,11 +361,13 @@ const FilterButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: ${props => props.active ? 'linear-gradient(135deg, #00C853 0%, #00E676 100%)' : 'transparent'};
-  color: ${props => props.active ? 'white' : '#666'};
-  
+  background: ${props =>
+    props.active ? 'linear-gradient(135deg, #00C853 0%, #00E676 100%)' : 'transparent'};
+  color: ${props => (props.active ? 'white' : '#666')};
+
   &:hover {
-    background: ${props => props.active ? 'linear-gradient(135deg, #00C853 0%, #00E676 100%)' : '#f5f5f5'};
+    background: ${props =>
+      props.active ? 'linear-gradient(135deg, #00C853 0%, #00E676 100%)' : '#f5f5f5'};
   }
 `;
 
@@ -385,12 +390,12 @@ const LoadingMessage = styled.div`
 const EmptyMessage = styled.div`
   text-align: center;
   padding: 4rem 2rem;
-  
+
   svg {
     color: #ccc;
     margin-bottom: 1rem;
   }
-  
+
   p {
     font-size: 1.2rem;
     color: #666;
@@ -402,7 +407,7 @@ const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -415,11 +420,11 @@ const Card = styled.div`
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   border: 2px solid transparent;
-  
+
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    border-color: #00C853;
+    border-color: #00c853;
   }
 `;
 
@@ -428,7 +433,7 @@ const CardImage = styled.div`
   height: 200px;
   overflow: hidden;
   background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -442,7 +447,7 @@ const PlaceholderImage = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   svg {
     color: #999;
   }
@@ -456,7 +461,7 @@ const StatusBadge = styled.div`
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
-  background: ${props => props.active ? '#00C853' : '#ff4444'};
+  background: ${props => (props.active ? '#00C853' : '#ff4444')};
   color: white;
   backdrop-filter: blur(10px);
 `;
@@ -499,7 +504,7 @@ const StatLabel = styled.span`
 const StatValue = styled.span`
   font-size: 1rem;
   font-weight: 700;
-  color: #00C853;
+  color: #00c853;
 `;
 
 const CardActions = styled.div`
@@ -515,17 +520,17 @@ const ActionButton = styled.button`
   gap: 0.5rem;
   padding: 1rem;
   border: none;
-  background: ${props => props.variant === 'edit' ? '#f5f5f5' : '#fff'};
-  color: ${props => props.variant === 'edit' ? '#00C853' : '#ff4444'};
+  background: ${props => (props.variant === 'edit' ? '#f5f5f5' : '#fff')};
+  color: ${props => (props.variant === 'edit' ? '#00C853' : '#ff4444')};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover {
-    background: ${props => props.variant === 'edit' ? '#00C853' : '#ff4444'};
+    background: ${props => (props.variant === 'edit' ? '#00C853' : '#ff4444')};
     color: white;
   }
-  
+
   &:not(:last-child) {
     border-right: 2px solid #f5f5f5;
   }

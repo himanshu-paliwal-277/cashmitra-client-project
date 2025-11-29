@@ -32,11 +32,11 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
     }
   }, [category]);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
     // Clear error for this field
     if (errors[name]) {
@@ -44,14 +44,14 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
     }
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = e => {
     const file = e.target.files[0];
     if (file) {
       validateAndSetImage(file);
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = e => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
@@ -59,11 +59,11 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
     }
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = e => {
     e.preventDefault();
   };
 
-  const validateAndSetImage = (file) => {
+  const validateAndSetImage = file => {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       setErrors(prev => ({ ...prev, image: 'Please select an image file' }));
@@ -93,7 +93,7 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
     setFormData(prev => ({ ...prev, image: '' }));
   };
 
-  const uploadImageToCloudinary = async (file) => {
+  const uploadImageToCloudinary = async file => {
     const formData = new FormData();
     formData.append('image', file);
 
@@ -103,7 +103,7 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
       const response = await fetch(`${API_BASE_URL}/upload/image`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
@@ -145,7 +145,7 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -181,7 +181,7 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -245,7 +245,7 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
               disabled={loading}
             >
               <option value="">Select Super Category</option>
-              {superCategories.map((sc) => (
+              {superCategories.map(sc => (
                 <option key={sc._id} value={sc._id}>
                   {sc.name}
                 </option>
@@ -261,7 +261,7 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
           <Label>
             Category Image <Required>*</Required>
           </Label>
-          
+
           {!imagePreview ? (
             <UploadZone
               onDrop={handleDrop}
@@ -302,7 +302,7 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
               )}
             </ImagePreview>
           )}
-          
+
           {errors.image && <ErrorText>{errors.image}</ErrorText>}
           <HelpText>Upload a high-quality image representing this category</HelpText>
         </FormGroup>
@@ -348,8 +348,10 @@ const BuyCategoryForm = ({ category, superCategories, onClose, onSave }) => {
                 <Loader className="spin" size={20} />
                 {category ? 'Updating...' : 'Creating...'}
               </>
+            ) : category ? (
+              'Update Category'
             ) : (
-              category ? 'Update Category' : 'Create Category'
+              'Create Category'
             )}
           </SubmitButton>
         </FormActions>
@@ -399,13 +401,13 @@ const Input = styled.input`
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  
+
   &:focus {
     outline: none;
-    border-color: #00C853;
+    border-color: #00c853;
     box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
   }
-  
+
   &:disabled {
     background: #f5f5f5;
     cursor: not-allowed;
@@ -416,11 +418,11 @@ const SelectWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  
+
   svg {
     position: absolute;
     left: 1rem;
-    color: #00C853;
+    color: #00c853;
     z-index: 1;
     pointer-events: none;
   }
@@ -435,13 +437,13 @@ const Select = styled.select`
   transition: all 0.3s ease;
   cursor: pointer;
   background: white;
-  
+
   &:focus {
     outline: none;
-    border-color: #00C853;
+    border-color: #00c853;
     box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
   }
-  
+
   &:disabled {
     background: #f5f5f5;
     cursor: not-allowed;
@@ -456,24 +458,28 @@ const UploadZone = styled.div`
   cursor: pointer;
   transition: all 0.3s ease;
   background: #fafafa;
-  
+
   &:hover {
-    border-color: #00C853;
+    border-color: #00c853;
     background: #f0fff4;
   }
 `;
 
 const UploadIcon = styled.div`
-  color: #00C853;
+  color: #00c853;
   margin-bottom: 1rem;
-  
+
   .spin {
     animation: spin 1s linear infinite;
   }
-  
+
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -518,12 +524,12 @@ const RemoveButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: #ff4444;
     transform: scale(1.1);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -538,9 +544,9 @@ const ImageInfo = styled.div`
   background: #f5f5f5;
   font-size: 0.9rem;
   color: #666;
-  
+
   svg {
-    color: #00C853;
+    color: #00c853;
   }
 `;
 
@@ -554,7 +560,7 @@ const Checkbox = styled.input`
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #00C853;
+  accent-color: #00c853;
 `;
 
 const HelpText = styled.p`
@@ -579,7 +585,7 @@ const FormActions = styled.div`
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
   }
@@ -596,12 +602,12 @@ const CancelButton = styled.button`
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: #f5f5f5;
     border-color: #ccc;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -612,7 +618,7 @@ const SubmitButton = styled.button`
   flex: 1;
   padding: 1rem 2rem;
   border: none;
-  background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
   color: white;
   border-radius: 12px;
   font-weight: 600;
@@ -624,28 +630,32 @@ const SubmitButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 200, 83, 0.4);
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
-  
+
   &:disabled {
     opacity: 0.7;
     cursor: not-allowed;
   }
-  
+
   .spin {
     animation: spin 1s linear infinite;
   }
-  
+
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 

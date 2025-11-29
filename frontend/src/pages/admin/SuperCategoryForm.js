@@ -10,7 +10,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
     isActive: true,
     sortOrder: 0,
   });
-  
+
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
     }
   }, [category]);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -42,7 +42,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
     }
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = e => {
     const file = e.target.files[0];
     if (file) {
       // Validate file type
@@ -50,16 +50,16 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
         setErrors(prev => ({ ...prev, image: 'Please select an image file' }));
         return;
       }
-      
+
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setErrors(prev => ({ ...prev, image: 'Image size should be less than 5MB' }));
         return;
       }
-      
+
       setImageFile(file);
       setErrors(prev => ({ ...prev, image: '' }));
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -69,7 +69,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = e => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
@@ -77,7 +77,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
     }
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = e => {
     e.preventDefault();
   };
 
@@ -88,27 +88,27 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
 
   const validate = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     } else if (formData.name.length > 50) {
       newErrors.name = 'Name must be 50 characters or less';
     }
-    
+
     if (formData.description && formData.description.length > 200) {
       newErrors.description = 'Description must be 200 characters or less';
     }
-    
+
     // Image is required only when creating new category
     if (!category && !imageFile && !imagePreview) {
       newErrors.image = 'Image is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const uploadImageToCloudinary = async (file) => {
+  const uploadImageToCloudinary = async file => {
     const token = localStorage.getItem('adminToken');
     const uploadFormData = new FormData();
     uploadFormData.append('image', file);
@@ -116,13 +116,13 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
     const uploadResponse = await fetch(`${API_BASE_URL}/upload/image`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: uploadFormData,
     });
 
     const uploadData = await uploadResponse.json();
-    
+
     if (!uploadData.success) {
       throw new Error(uploadData.message || 'Failed to upload image');
     }
@@ -130,20 +130,20 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
     return uploadData.data.url;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validate()) {
       return;
     }
-    
+
     try {
       setLoading(true);
       setErrors({}); // Clear previous errors
       const token = localStorage.getItem('adminToken');
-      
+
       let imageUrl = imagePreview;
-      
+
       // Upload new image if file is selected
       if (imageFile) {
         try {
@@ -154,14 +154,14 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
           return;
         }
       }
-      
+
       // Validate we have an image URL
       if (!imageUrl) {
         setErrors({ submit: 'Image is required' });
         setLoading(false);
         return;
       }
-      
+
       const payload = {
         name: formData.name,
         description: formData.description,
@@ -169,25 +169,25 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
         isActive: formData.isActive,
         sortOrder: formData.sortOrder,
       };
-      
+
       const apiEndpoint = apiType === 'sell' ? 'sell-super-categories' : 'buy-super-categories';
-      const url = category 
+      const url = category
         ? `${API_BASE_URL}/${apiEndpoint}/${category._id}`
         : `${API_BASE_URL}/${apiEndpoint}`;
-      
+
       const method = category ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         alert(data.message || 'Super category saved successfully');
         if (onSuccess) onSuccess(data.data);
@@ -209,7 +209,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
       <Form onSubmit={handleSubmit}>
         <FormSection>
           <SectionTitle>Basic Information</SectionTitle>
-          
+
           <FormGroup>
             <Label>
               Name <Required>*</Required>
@@ -226,7 +226,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
             {errors.name && <ErrorText>{errors.name}</ErrorText>}
             <CharCount>{formData.name.length}/50</CharCount>
           </FormGroup>
-          
+
           <FormGroup>
             <Label>Description</Label>
             <Textarea
@@ -241,7 +241,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
             {errors.description && <ErrorText>{errors.description}</ErrorText>}
             <CharCount>{formData.description.length}/200</CharCount>
           </FormGroup>
-          
+
           <FormRow>
             <FormGroup>
               <Label>Sort Order</Label>
@@ -254,7 +254,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
               />
               <HelpText>Lower numbers appear first</HelpText>
             </FormGroup>
-            
+
             <FormGroup>
               <CheckboxWrapper>
                 <Checkbox
@@ -270,12 +270,12 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
             </FormGroup>
           </FormRow>
         </FormSection>
-        
+
         <FormSection>
           <SectionTitle>
             Image <Required>*</Required>
           </SectionTitle>
-          
+
           {imagePreview ? (
             <ImagePreview>
               <img src={imagePreview} alt="Preview" />
@@ -284,11 +284,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
               </RemoveImageButton>
             </ImagePreview>
           ) : (
-            <DropZone
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              hasError={errors.image}
-            >
+            <DropZone onDrop={handleDrop} onDragOver={handleDragOver} hasError={errors.image}>
               <ImageIcon size={48} />
               <DropText>Drag and drop an image here</DropText>
               <DropSubText>or</DropSubText>
@@ -305,14 +301,12 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
               <DropHint>PNG, JPG, GIF up to 5MB</DropHint>
             </DropZone>
           )}
-          
+
           {errors.image && <ErrorText>{errors.image}</ErrorText>}
         </FormSection>
-        
-        {errors.submit && (
-          <SubmitError>{errors.submit}</SubmitError>
-        )}
-        
+
+        {errors.submit && <SubmitError>{errors.submit}</SubmitError>}
+
         <FormActions>
           <CancelButton type="button" onClick={onClose} disabled={loading}>
             Cancel
@@ -370,7 +364,7 @@ const FormRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -391,17 +385,18 @@ const Required = styled.span`
 
 const Input = styled.input`
   padding: 0.75rem 1rem;
-  border: 2px solid ${props => props.hasError ? '#ff4444' : '#e0e0e0'};
+  border: 2px solid ${props => (props.hasError ? '#ff4444' : '#e0e0e0')};
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  
+
   &:focus {
     outline: none;
-    border-color: ${props => props.hasError ? '#ff4444' : '#00C853'};
-    box-shadow: 0 0 0 3px ${props => props.hasError ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 83, 0.1)'};
+    border-color: ${props => (props.hasError ? '#ff4444' : '#00C853')};
+    box-shadow: 0 0 0 3px
+      ${props => (props.hasError ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 83, 0.1)')};
   }
-  
+
   &::placeholder {
     color: #999;
   }
@@ -409,19 +404,20 @@ const Input = styled.input`
 
 const Textarea = styled.textarea`
   padding: 0.75rem 1rem;
-  border: 2px solid ${props => props.hasError ? '#ff4444' : '#e0e0e0'};
+  border: 2px solid ${props => (props.hasError ? '#ff4444' : '#e0e0e0')};
   border-radius: 12px;
   font-size: 1rem;
   font-family: inherit;
   resize: vertical;
   transition: all 0.3s ease;
-  
+
   &:focus {
     outline: none;
-    border-color: ${props => props.hasError ? '#ff4444' : '#00C853'};
-    box-shadow: 0 0 0 3px ${props => props.hasError ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 83, 0.1)'};
+    border-color: ${props => (props.hasError ? '#ff4444' : '#00C853')};
+    box-shadow: 0 0 0 3px
+      ${props => (props.hasError ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 83, 0.1)')};
   }
-  
+
   &::placeholder {
     color: #999;
   }
@@ -437,7 +433,7 @@ const Checkbox = styled.input`
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #00C853;
+  accent-color: #00c853;
 `;
 
 const CharCount = styled.span`
@@ -457,18 +453,18 @@ const ErrorText = styled.span`
 `;
 
 const DropZone = styled.div`
-  border: 3px dashed ${props => props.hasError ? '#ff4444' : '#e0e0e0'};
+  border: 3px dashed ${props => (props.hasError ? '#ff4444' : '#e0e0e0')};
   border-radius: 16px;
   padding: 3rem 2rem;
   text-align: center;
   transition: all 0.3s ease;
   background: #fafafa;
-  
+
   &:hover {
-    border-color: ${props => props.hasError ? '#ff4444' : '#00C853'};
+    border-color: ${props => (props.hasError ? '#ff4444' : '#00C853')};
     background: #f5f5f5;
   }
-  
+
   svg:first-child {
     color: #999;
     margin-bottom: 1rem;
@@ -497,13 +493,13 @@ const FileInputLabel = styled.label`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
   color: white;
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
@@ -522,7 +518,7 @@ const ImagePreview = styled.div`
   overflow: hidden;
   max-width: 400px;
   margin: 0 auto;
-  
+
   img {
     width: 100%;
     height: auto;
@@ -545,7 +541,7 @@ const RemoveImageButton = styled.button`
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: #ff4444;
     transform: scale(1.1);
@@ -567,7 +563,7 @@ const FormActions = styled.div`
   justify-content: flex-end;
   padding-top: 1rem;
   border-top: 2px solid #f5f5f5;
-  
+
   @media (max-width: 768px) {
     flex-direction: column-reverse;
   }
@@ -583,11 +579,11 @@ const CancelButton = styled.button`
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover:not(:disabled) {
     background: #e0e0e0;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -600,7 +596,7 @@ const SubmitButton = styled.button`
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 2rem;
-  background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -609,12 +605,12 @@ const SubmitButton = styled.button`
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 200, 83, 0.4);
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;

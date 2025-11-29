@@ -12,22 +12,22 @@ const api = axios.create({
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  (config) => {
+  config => {
     const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
   }
 );
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  response => response,
+  error => {
     if (error.response?.status === 401) {
       // Token expired or invalid
       localStorage.removeItem('authToken');
@@ -58,7 +58,7 @@ export const productCategoriesAPI = {
   },
 
   // Get category by ID
-  getCategoryById: async (categoryId) => {
+  getCategoryById: async categoryId => {
     try {
       const response = await api.get(`/categories/${categoryId}`);
       return {
@@ -121,7 +121,7 @@ export const productCategoriesAPI = {
   },
 
   // Search categories
-  searchCategories: async (query) => {
+  searchCategories: async query => {
     try {
       const response = await api.get('/categories/search', {
         params: { q: query },
@@ -140,7 +140,7 @@ export const productCategoriesAPI = {
   },
 
   // Get category statistics
-  getCategoryStats: async (categoryId) => {
+  getCategoryStats: async categoryId => {
     try {
       const response = await api.get(`/categories/${categoryId}/stats`);
       return {
@@ -160,12 +160,12 @@ export const productCategoriesAPI = {
   subscribeToCategoryUpdates: (categoryId, onUpdate, onError) => {
     const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
     const ws = new WebSocket(`${wsUrl}/categories/${categoryId}/updates`);
-    
+
     ws.onopen = () => {
       console.log(`Connected to category ${categoryId} updates`);
     };
-    
-    ws.onmessage = (event) => {
+
+    ws.onmessage = event => {
       try {
         const data = JSON.parse(event.data);
         onUpdate(data);
@@ -174,16 +174,16 @@ export const productCategoriesAPI = {
         onError?.(error);
       }
     };
-    
-    ws.onerror = (error) => {
+
+    ws.onerror = error => {
       console.error('WebSocket error:', error);
       onError?.(error);
     };
-    
+
     ws.onclose = () => {
       console.log(`Disconnected from category ${categoryId} updates`);
     };
-    
+
     return ws;
   },
 
@@ -239,7 +239,7 @@ export const productsAPI = {
   },
 
   // Get product by ID
-  getProductById: async (productId) => {
+  getProductById: async productId => {
     try {
       const response = await api.get(`/products/${productId}`);
       return {
@@ -354,7 +354,7 @@ export const cartAPI = {
   },
 
   // Remove item from cart
-  removeFromCart: async (itemId) => {
+  removeFromCart: async itemId => {
     try {
       const response = await api.delete(`/buy/cart/${itemId}`);
       return {
@@ -388,7 +388,7 @@ export const cartAPI = {
   },
 
   // Sync cart with server - Note: Backend doesn't have this endpoint, will need to be implemented
-  syncCart: async (cartItems) => {
+  syncCart: async cartItems => {
     try {
       const response = await api.post('/buy/cart/sync', {
         items: cartItems,

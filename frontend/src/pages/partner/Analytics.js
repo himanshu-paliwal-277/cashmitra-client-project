@@ -70,7 +70,7 @@ const Analytics = () => {
         <Title>Analytics</Title>
         <Subtitle>Detailed insights and performance analytics</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,7 +78,7 @@ const Analytics = () => {
           </Icon>
           <ComingSoonTitle>Analytics Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll have access to comprehensive 
+            This feature is currently under development. Soon you'll have access to comprehensive
             analytics including sales trends, performance metrics, and detailed business insights.
           </ComingSoonText>
         </ComingSoon>

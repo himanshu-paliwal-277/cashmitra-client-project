@@ -24,25 +24,25 @@ const CategoryProducts = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = {
         page: currentPage,
         limit: 12,
         ...(searchTerm && { search: searchTerm }),
-        ...(selectedBrand && { brand: selectedBrand })
+        ...(selectedBrand && { brand: selectedBrand }),
       };
 
       const response = await adminService.getBuyProductsByCategory(category, params);
-      
+
       if (response.success) {
         // Handle the new API response structure where products are directly in response.data
         const products = Array.isArray(response.data) ? response.data : [];
         setProducts(products);
-        
+
         // Calculate total pages based on products length (assuming all products are returned)
         const totalPages = Math.ceil(products.length / 12) || 1;
         setTotalPages(totalPages);
-        
+
         // Extract unique brands from products
         const uniqueBrands = [...new Set(products.map(product => product.brand).filter(Boolean))];
         setBrands(uniqueBrands);
@@ -57,36 +57,41 @@ const CategoryProducts = () => {
     }
   };
 
-  const handleProductClick = (product) => {
+  const handleProductClick = product => {
     // Store the selected product information for the ModelSelection page
-    localStorage.setItem('selectedProduct', JSON.stringify({
-      id: product._id,
-      name: product.name,
-      brand: product.brand,
-      category: category,
-      image: product.images && product.images['0'] ? product.images['0'] : product.image
-    }));
-    
+    localStorage.setItem(
+      'selectedProduct',
+      JSON.stringify({
+        id: product._id,
+        name: product.name,
+        brand: product.brand,
+        category: category,
+        image: product.images && product.images['0'] ? product.images['0'] : product.image,
+      })
+    );
+
     // Navigate to the sell model page with category, brand, and product ID parameters
-    navigate(`/sell/model?category=${encodeURIComponent(category)}&brand=${encodeURIComponent(product.brand || '')}&productId=${encodeURIComponent(product._id)}`);
+    navigate(
+      `/sell/model?category=${encodeURIComponent(category)}&brand=${encodeURIComponent(product.brand || '')}&productId=${encodeURIComponent(product._id)}`
+    );
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = e => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
 
-  const handleBrandChange = (e) => {
+  const handleBrandChange = e => {
     setSelectedBrand(e.target.value);
     setCurrentPage(1);
   };
 
-  const handlePageChange = (page) => {
+  const handlePageChange = page => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const formatCategoryName = (category) => {
+  const formatCategoryName = category => {
     return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
   };
 
@@ -135,7 +140,8 @@ const CategoryProducts = () => {
         <div className="page-header">
           <h1 className="page-title">Sell Your {formatCategoryName(category)}</h1>
           <p className="page-subtitle">
-            Get the best price for your {category.toLowerCase()}. Choose your device below to get started.
+            Get the best price for your {category.toLowerCase()}. Choose your device below to get
+            started.
           </p>
         </div>
 
@@ -150,17 +156,15 @@ const CategoryProducts = () => {
               className="search-input"
             />
           </div>
-          
+
           {brands.length > 0 && (
             <div className="brand-filter">
-              <select
-                value={selectedBrand}
-                onChange={handleBrandChange}
-                className="brand-select"
-              >
+              <select value={selectedBrand} onChange={handleBrandChange} className="brand-select">
                 <option value="">All Brands</option>
                 {brands.map(brand => (
-                  <option key={brand} value={brand}>{brand}</option>
+                  <option key={brand} value={brand}>
+                    {brand}
+                  </option>
                 ))}
               </select>
             </div>
@@ -180,27 +184,29 @@ const CategoryProducts = () => {
                   <div className="product-image-container">
                     <img
                       src={
-                        product.images && product.images['0'] 
-                          ? product.images['0'] 
+                        product.images && product.images['0']
+                          ? product.images['0']
                           : product.image || '/placeholder-product.jpg'
                       }
                       alt={product.name}
                       className="product-image"
-                      onError={(e) => {
+                      onError={e => {
                         e.target.src = '/placeholder-product.jpg';
                       }}
                     />
                   </div>
                   <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>
-                    {product.brand && (
-                      <p className="product-brand">{product.brand}</p>
-                    )}
+                    {product.brand && <p className="product-brand">{product.brand}</p>}
                     {product.pricing?.discountedPrice && (
-                      <p className="product-price">Starting from ₹{product.pricing.discountedPrice.toLocaleString()}</p>
+                      <p className="product-price">
+                        Starting from ₹{product.pricing.discountedPrice.toLocaleString()}
+                      </p>
                     )}
                     {!product.pricing?.discountedPrice && product.basePrice && (
-                      <p className="product-price">Starting from ₹{product.basePrice.toLocaleString()}</p>
+                      <p className="product-price">
+                        Starting from ₹{product.basePrice.toLocaleString()}
+                      </p>
                     )}
                   </div>
                   <div className="product-overlay">
@@ -220,7 +226,7 @@ const CategoryProducts = () => {
                 >
                   Previous
                 </button>
-                
+
                 <div className="pagination-numbers">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                     <button
@@ -232,7 +238,7 @@ const CategoryProducts = () => {
                     </button>
                   ))}
                 </div>
-                
+
                 <button
                   className="pagination-button"
                   onClick={() => handlePageChange(currentPage + 1)}
@@ -249,8 +255,7 @@ const CategoryProducts = () => {
             <p>
               {searchTerm || selectedBrand
                 ? 'Try adjusting your search or filter criteria.'
-                : `No ${category.toLowerCase()} products are currently available.`
-              }
+                : `No ${category.toLowerCase()} products are currently available.`}
             </p>
           </div>
         )}

@@ -70,7 +70,7 @@ const Catalog = () => {
         <Title>Product Catalog</Title>
         <Subtitle>Browse and manage your product catalog</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,8 +78,8 @@ const Catalog = () => {
           </Icon>
           <ComingSoonTitle>Product Catalog Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to browse, search, 
-            and manage your entire product catalog with advanced filtering and sorting options.
+            This feature is currently under development. Soon you'll be able to browse, search, and
+            manage your entire product catalog with advanced filtering and sorting options.
           </ComingSoonText>
         </ComingSoon>
       </Card>

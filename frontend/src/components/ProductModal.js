@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { adminService } from '../services/adminService';
-import {
-  X,
-  Upload,
-  Star,
-  Plus,
-  Trash2,
-  Save,
-  AlertCircle,
-  Image as ImageIcon
-} from 'lucide-react';
+import { X, Upload, Star, Plus, Trash2, Save, AlertCircle, Image as ImageIcon } from 'lucide-react';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -221,7 +212,7 @@ const RatingSection = styled.div`
 const StarButton = styled.button`
   background: none;
   border: none;
-  color: ${props => props.filled ? '#fbbf24' : '#d1d5db'};
+  color: ${props => (props.filled ? '#fbbf24' : '#d1d5db')};
   cursor: pointer;
   padding: 0.25rem;
   transition: all 0.2s;
@@ -301,16 +292,16 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
     pricing: {
       mrp: '',
       discountedPrice: '',
-      discountPercent: ''
+      discountPercent: '',
     },
     rating: {
       average: 0,
-      totalReviews: 0
+      totalReviews: 0,
     },
     availability: {
-      inStock: true
+      inStock: true,
     },
-    isRefurbished: false
+    isRefurbished: false,
   });
 
   const [categories, setCategories] = useState([]);
@@ -326,7 +317,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
           ...product,
           pricing: product.pricing || { mrp: '', discountedPrice: '', discountPercent: '' },
           rating: product.rating || { average: 0, totalReviews: 0 },
-          availability: product.availability || { inStock: true }
+          availability: product.availability || { inStock: true },
         });
       } else {
         setFormData({
@@ -338,16 +329,16 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
           pricing: {
             mrp: '',
             discountedPrice: '',
-            discountPercent: ''
+            discountPercent: '',
           },
           rating: {
             average: 0,
-            totalReviews: 0
+            totalReviews: 0,
           },
           availability: {
-            inStock: true
+            inStock: true,
           },
-          isRefurbished: false
+          isRefurbished: false,
         });
       }
       setErrors({});
@@ -370,28 +361,28 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
         ...prev,
         [parent]: {
           ...prev[parent],
-          [child]: value
-        }
+          [child]: value,
+        },
       }));
     } else {
       setFormData(prev => ({
         ...prev,
-        [field]: value
+        [field]: value,
       }));
     }
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [field]: null
+        [field]: null,
       }));
     }
   };
 
-  const handleImageUpload = async (files) => {
+  const handleImageUpload = async files => {
     const uploadedImages = [];
-    
+
     for (const file of files) {
       if (file.type.startsWith('image/')) {
         try {
@@ -403,39 +394,39 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
         }
       }
     }
-    
+
     setFormData(prev => ({
       ...prev,
-      images: [...prev.images, ...uploadedImages]
+      images: [...prev.images, ...uploadedImages],
     }));
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = e => {
     e.preventDefault();
     setDragOver(false);
     const files = Array.from(e.dataTransfer.files);
     handleImageUpload(files);
   };
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = e => {
     const files = Array.from(e.target.files);
     handleImageUpload(files);
   };
 
-  const removeImage = (index) => {
+  const removeImage = index => {
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
-  const setRating = (rating) => {
+  const setRating = rating => {
     setFormData(prev => ({
       ...prev,
       rating: {
         ...prev.rating,
-        average: rating
-      }
+        average: rating,
+      },
     }));
   };
 
@@ -464,9 +455,9 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -486,7 +477,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
       } else {
         await adminService.createBuyProduct(processedData);
       }
-      
+
       onSave();
       onClose();
     } catch (error) {
@@ -500,12 +491,10 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
   if (!isOpen) return null;
 
   return (
-    <ModalOverlay onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <ModalOverlay onClick={e => e.target === e.currentTarget && onClose()}>
       <ModalContainer>
         <ModalHeader>
-          <ModalTitle>
-            {product ? 'Edit Product' : 'Add New Product'}
-          </ModalTitle>
+          <ModalTitle>{product ? 'Edit Product' : 'Add New Product'}</ModalTitle>
           <CloseButton onClick={onClose}>
             <X size={20} />
           </CloseButton>
@@ -519,7 +508,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                 <Input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={e => handleInputChange('name', e.target.value)}
                   placeholder="Enter product name"
                 />
                 {errors.name && (
@@ -535,7 +524,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                 <Input
                   type="text"
                   value={formData.brand}
-                  onChange={(e) => handleInputChange('brand', e.target.value)}
+                  onChange={e => handleInputChange('brand', e.target.value)}
                   placeholder="Enter brand name"
                 />
                 {errors.brand && (
@@ -550,7 +539,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                 <Label>Category *</Label>
                 <Select
                   value={formData.categoryId}
-                  onChange={(e) => handleInputChange('categoryId', e.target.value)}
+                  onChange={e => handleInputChange('categoryId', e.target.value)}
                 >
                   <option value="">Select a category</option>
                   {categories.map(category => (
@@ -572,7 +561,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                   <input
                     type="checkbox"
                     checked={formData.isRefurbished}
-                    onChange={(e) => handleInputChange('isRefurbished', e.target.checked)}
+                    onChange={e => handleInputChange('isRefurbished', e.target.checked)}
                     style={{ marginRight: '0.5rem' }}
                   />
                   Refurbished Product
@@ -584,7 +573,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                 <Input
                   type="number"
                   value={formData.pricing.mrp}
-                  onChange={(e) => handleInputChange('pricing.mrp', e.target.value)}
+                  onChange={e => handleInputChange('pricing.mrp', e.target.value)}
                   placeholder="Enter MRP"
                   min="0"
                   step="0.01"
@@ -596,7 +585,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                 <Input
                   type="number"
                   value={formData.pricing.discountedPrice}
-                  onChange={(e) => handleInputChange('pricing.discountedPrice', e.target.value)}
+                  onChange={e => handleInputChange('pricing.discountedPrice', e.target.value)}
                   placeholder="Enter discounted price"
                   min="0"
                   step="0.01"
@@ -613,7 +602,9 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                 <Label>Stock Status</Label>
                 <Select
                   value={formData.availability.inStock}
-                  onChange={(e) => handleInputChange('availability.inStock', e.target.value === 'true')}
+                  onChange={e =>
+                    handleInputChange('availability.inStock', e.target.value === 'true')
+                  }
                 >
                   <option value="true">In Stock</option>
                   <option value="false">Out of Stock</option>
@@ -630,7 +621,10 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                       filled={star <= formData.rating.average}
                       onClick={() => setRating(star)}
                     >
-                      <Star size={20} fill={star <= formData.rating.average ? 'currentColor' : 'none'} />
+                      <Star
+                        size={20}
+                        fill={star <= formData.rating.average ? 'currentColor' : 'none'}
+                      />
                     </StarButton>
                   ))}
                   <span style={{ marginLeft: '0.5rem', color: '#6b7280' }}>
@@ -643,7 +637,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                 <Label>Description</Label>
                 <TextArea
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={e => handleInputChange('description', e.target.value)}
                   placeholder="Enter product description"
                 />
               </FormGroup>
@@ -653,7 +647,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                 <ImageUploadSection
                   className={dragOver ? 'dragover' : ''}
                   onDrop={handleDrop}
-                  onDragOver={(e) => {
+                  onDragOver={e => {
                     e.preventDefault();
                     setDragOver(true);
                   }}
@@ -682,10 +676,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }) => {
                     {formData.images.map((image, index) => (
                       <ImagePreview key={index}>
                         <PreviewImage src={image} alt={`Product ${index + 1}`} />
-                        <RemoveImageButton
-                          type="button"
-                          onClick={() => removeImage(index)}
-                        >
+                        <RemoveImageButton type="button" onClick={() => removeImage(index)}>
                           <X size={12} />
                         </RemoveImageButton>
                       </ImagePreview>

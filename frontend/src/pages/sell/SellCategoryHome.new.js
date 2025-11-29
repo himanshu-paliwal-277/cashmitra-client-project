@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { theme } from '../../theme';
 import { getSellSuperCategories } from '../../services/productService';
 import { useAdminCategories } from '../../hooks/useAdminCategories';
-import { 
-  Smartphone, 
-  Tablet, 
-  Laptop, 
+import {
+  Smartphone,
+  Tablet,
+  Laptop,
   Watch,
   Headphones,
   ChevronRight,
@@ -16,7 +16,7 @@ import {
   Shield,
   Truck,
   IndianRupee,
-  TrendingUp
+  TrendingUp,
 } from 'lucide-react';
 
 const PageContainer = styled.div`
@@ -25,11 +25,15 @@ const PageContainer = styled.div`
 `;
 
 const HeroSection = styled.section`
-  background: linear-gradient(135deg, ${theme.colors.primary.main} 0%, ${theme.colors.primary.dark} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary.main} 0%,
+    ${theme.colors.primary.dark} 100%
+  );
   padding: 3rem 1rem;
   text-align: center;
   color: white;
-  
+
   @media (min-width: ${theme.breakpoints.md}) {
     padding: 4rem 2rem;
   }
@@ -39,7 +43,7 @@ const HeroTitle = styled.h1`
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  
+
   @media (min-width: ${theme.breakpoints.md}) {
     font-size: 2.5rem;
   }
@@ -56,7 +60,7 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
-  
+
   @media (min-width: ${theme.breakpoints.md}) {
     padding: 0 2rem;
   }
@@ -73,7 +77,7 @@ const FeaturesBar = styled.div`
   margin-top: -2rem;
   position: relative;
   z-index: 10;
-  
+
   @media (min-width: ${theme.breakpoints.md}) {
     grid-template-columns: repeat(4, 1fr);
     padding: 2rem;
@@ -85,7 +89,7 @@ const FeatureItem = styled.div`
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem;
-  
+
   svg {
     color: ${theme.colors.primary.main};
     flex-shrink: 0;
@@ -96,7 +100,7 @@ const FeatureText = styled.div`
   font-size: 0.85rem;
   font-weight: 500;
   color: ${theme.colors.text.primary};
-  
+
   @media (min-width: ${theme.breakpoints.md}) {
     font-size: 0.95rem;
   }
@@ -108,7 +112,7 @@ const SectionTitle = styled.h2`
   color: ${theme.colors.text.primary};
   text-align: center;
   margin: 3rem 0 0.5rem 0;
-  
+
   @media (min-width: ${theme.breakpoints.md}) {
     font-size: 2rem;
     margin: 4rem 0 0.5rem 0;
@@ -141,7 +145,7 @@ const SuperCategoryTitle = styled.h3`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  
+
   svg {
     color: ${theme.colors.primary.main};
   }
@@ -157,7 +161,7 @@ const ViewAllLink = styled.button`
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -167,15 +171,15 @@ const CategoriesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   @media (min-width: ${theme.breakpoints.md}) {
     grid-template-columns: repeat(4, 1fr);
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     grid-template-columns: repeat(5, 1fr);
   }
@@ -190,7 +194,7 @@ const CategoryCard = styled.div`
   transition: all 0.3s ease;
   border: 2px solid transparent;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -208,13 +212,13 @@ const CategoryImage = styled.div`
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   svg {
     color: ${theme.colors.text.hint};
   }
@@ -228,13 +232,17 @@ const CategoryName = styled.h4`
 `;
 
 const SuperCategoryCard = styled.div`
-  background: linear-gradient(135deg, ${props => props.$bgColor || '#667eea'}15 0%, ${props => props.$bgColor || '#667eea'}05 100%);
+  background: linear-gradient(
+    135deg,
+    ${props => props.$bgColor || '#667eea'}15 0%,
+    ${props => props.$bgColor || '#667eea'}05 100%
+  );
   border: 2px solid ${props => props.$bgColor || '#667eea'}20;
   border-radius: 20px;
   padding: 2rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 32px ${props => props.$bgColor || '#667eea'}25;
@@ -253,13 +261,13 @@ const SuperCategoryIcon = styled.div`
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   svg {
     color: ${props => props.$iconColor || theme.colors.primary.main};
   }
@@ -284,16 +292,16 @@ const MainGrid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   margin-bottom: 3rem;
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
   }
-  
+
   @media (min-width: ${theme.breakpoints.md}) {
     grid-template-columns: repeat(4, 1fr);
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     grid-template-columns: repeat(5, 1fr);
   }
@@ -304,14 +312,18 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 400px;
-  
+
   svg {
     animation: spin 1s linear infinite;
   }
-  
+
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -336,7 +348,7 @@ const RetryButton = styled.button`
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
-  
+
   &:hover {
     background: ${theme.colors.primary.dark};
   }
@@ -365,7 +377,7 @@ const PopularTitle = styled.h3`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  
+
   svg {
     color: ${theme.colors.primary.main};
   }
@@ -376,15 +388,15 @@ const PopularGrid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   padding: 0 1.5rem;
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   @media (min-width: ${theme.breakpoints.md}) {
     grid-template-columns: repeat(4, 1fr);
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     grid-template-columns: repeat(5, 1fr);
   }
@@ -399,7 +411,7 @@ const PopularCard = styled.div`
   transition: all 0.3s ease;
   border: 2px solid transparent;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
@@ -417,13 +429,13 @@ const PopularImage = styled.div`
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   svg {
     color: ${theme.colors.primary.main};
   }
@@ -441,7 +453,11 @@ const PopularName = styled.h4`
 
 const PopularBadge = styled.span`
   display: inline-block;
-  background: linear-gradient(135deg, ${theme.colors.primary.main} 0%, ${theme.colors.primary.dark} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary.main} 0%,
+    ${theme.colors.primary.dark} 100%
+  );
   color: white;
   font-size: 0.7rem;
   font-weight: 600;
@@ -450,7 +466,7 @@ const PopularBadge = styled.span`
 `;
 
 // Icon mapping for super categories
-const getIconForSuperCategory = (name) => {
+const getIconForSuperCategory = name => {
   const nameLower = name?.toLowerCase() || '';
   if (nameLower.includes('mobile') || nameLower.includes('phone')) {
     return { icon: <Smartphone size={32} />, color: '#3b82f6' };
@@ -464,7 +480,11 @@ const getIconForSuperCategory = (name) => {
   if (nameLower.includes('watch') || nameLower.includes('smart')) {
     return { icon: <Watch size={32} />, color: '#f59e0b' };
   }
-  if (nameLower.includes('accessor') || nameLower.includes('headphone') || nameLower.includes('earphone')) {
+  if (
+    nameLower.includes('accessor') ||
+    nameLower.includes('headphone') ||
+    nameLower.includes('earphone')
+  ) {
     return { icon: <Headphones size={32} />, color: '#ef4444' };
   }
   return { icon: <Smartphone size={32} />, color: '#6366f1' };
@@ -475,7 +495,7 @@ const SellCategoryHome = () => {
   const [superCategories, setSuperCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Get sell categories from hook
   const { categories: sellCategories, loading: categoriesLoading } = useAdminCategories();
 
@@ -497,11 +517,11 @@ const SellCategoryHome = () => {
     fetchSuperCategories();
   }, []);
 
-  const handleSuperCategoryClick = (superCategory) => {
+  const handleSuperCategoryClick = superCategory => {
     navigate(`/sell?category=${encodeURIComponent(superCategory.name)}`);
   };
 
-  const handleCategoryClick = (category) => {
+  const handleCategoryClick = category => {
     navigate(`/sell/brand?category=${encodeURIComponent(category.name)}`);
   };
 
@@ -524,7 +544,8 @@ const SellCategoryHome = () => {
         <Container>
           <HeroTitle>Sell Your Old Device</HeroTitle>
           <HeroSubtitle>
-            Get the best price for your old gadgets. Quick evaluation, instant payment, and free pickup!
+            Get the best price for your old gadgets. Quick evaluation, instant payment, and free
+            pickup!
           </HeroSubtitle>
         </Container>
       </HeroSection>
@@ -561,20 +582,16 @@ const SellCategoryHome = () => {
 
             {/* Main Super Categories Grid */}
             <MainGrid>
-              {superCategories.map((superCat) => {
+              {superCategories.map(superCat => {
                 const { icon, color } = getIconForSuperCategory(superCat.name);
                 return (
-                  <SuperCategoryCard 
-                    key={superCat._id} 
+                  <SuperCategoryCard
+                    key={superCat._id}
                     $bgColor={color}
                     onClick={() => handleSuperCategoryClick(superCat)}
                   >
                     <SuperCategoryIcon $iconColor={color}>
-                      {superCat.image ? (
-                        <img src={superCat.image} alt={superCat.name} />
-                      ) : (
-                        icon
-                      )}
+                      {superCat.image ? <img src={superCat.image} alt={superCat.name} /> : icon}
                     </SuperCategoryIcon>
                     <SuperCategoryName>{superCat.name}</SuperCategoryName>
                     {superCat.description && (
@@ -601,16 +618,12 @@ const SellCategoryHome = () => {
                   {popularCategories.map((category, index) => {
                     const { icon } = getIconForSuperCategory(category.name);
                     return (
-                      <PopularCard 
+                      <PopularCard
                         key={category._id || index}
                         onClick={() => handleCategoryClick(category)}
                       >
                         <PopularImage>
-                          {category.image ? (
-                            <img src={category.image} alt={category.name} />
-                          ) : (
-                            icon
-                          )}
+                          {category.image ? <img src={category.image} alt={category.name} /> : icon}
                         </PopularImage>
                         <PopularName>{category.name}</PopularName>
                         {index < 2 && <PopularBadge>Trending</PopularBadge>}
@@ -622,11 +635,11 @@ const SellCategoryHome = () => {
             )}
 
             {/* Categories under each Super Category */}
-            {superCategories.map((superCat) => {
+            {superCategories.map(superCat => {
               if (!superCat.categories || superCat.categories.length === 0) return null;
-              
+
               const { icon } = getIconForSuperCategory(superCat.name);
-              
+
               return (
                 <SuperCategorySection key={superCat._id}>
                   <SuperCategoryHeader>
@@ -638,10 +651,10 @@ const SellCategoryHome = () => {
                       View All <ChevronRight size={16} />
                     </ViewAllLink>
                   </SuperCategoryHeader>
-                  
+
                   <CategoriesGrid>
-                    {superCat.categories.slice(0, 5).map((category) => (
-                      <CategoryCard 
+                    {superCat.categories.slice(0, 5).map(category => (
+                      <CategoryCard
                         key={category._id}
                         onClick={() => handleCategoryClick(category)}
                       >

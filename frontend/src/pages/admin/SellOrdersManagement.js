@@ -51,7 +51,7 @@ import {
   UserCheck,
   Clock3,
   CheckSquare,
-  X
+  X,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -103,20 +103,27 @@ const HeaderRight = styled.div`
 
 const ActionButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: ${props => props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
+  border: ${props =>
+    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
   border-radius: ${theme.borderRadius.md};
   background: ${props => {
     switch (props.variant) {
-      case 'primary': return theme.colors.primary.main;
-      case 'danger': return theme.colors.error.main;
-      default: return 'white';
+      case 'primary':
+        return theme.colors.primary.main;
+      case 'danger':
+        return theme.colors.error.main;
+      default:
+        return 'white';
     }
   }};
   color: ${props => {
     switch (props.variant) {
-      case 'primary': return 'white';
-      case 'danger': return 'white';
-      default: return theme.colors.text.primary;
+      case 'primary':
+        return 'white';
+      case 'danger':
+        return 'white';
+      default:
+        return theme.colors.text.primary;
     }
   }};
   font-size: ${theme.typography.fontSize.sm};
@@ -132,9 +139,12 @@ const ActionButton = styled.button`
     box-shadow: ${theme.shadows.md};
     background: ${props => {
       switch (props.variant) {
-        case 'primary': return theme.colors.primary[600];
-        case 'danger': return theme.colors.error[600];
-        default: return theme.colors.grey[50];
+        case 'primary':
+          return theme.colors.primary[600];
+        case 'danger':
+          return theme.colors.error[600];
+        default:
+          return theme.colors.grey[50];
       }
     }};
   }
@@ -175,11 +185,16 @@ const StatIcon = styled.div`
   height: 60px;
   background: ${props => {
     switch (props.type) {
-      case 'total': return theme.colors.primary[50];
-      case 'pending': return theme.colors.warning[50];
-      case 'completed': return theme.colors.success[50];
-      case 'revenue': return theme.colors.accent[50];
-      default: return theme.colors.grey[50];
+      case 'total':
+        return theme.colors.primary[50];
+      case 'pending':
+        return theme.colors.warning[50];
+      case 'completed':
+        return theme.colors.success[50];
+      case 'revenue':
+        return theme.colors.accent[50];
+      default:
+        return theme.colors.grey[50];
     }
   }};
   border-radius: ${theme.borderRadius.lg};
@@ -188,11 +203,16 @@ const StatIcon = styled.div`
   justify-content: center;
   color: ${props => {
     switch (props.type) {
-      case 'total': return theme.colors.primary.main;
-      case 'pending': return theme.colors.warning.main;
-      case 'completed': return theme.colors.success.main;
-      case 'revenue': return theme.colors.accent.main;
-      default: return theme.colors.text.secondary;
+      case 'total':
+        return theme.colors.primary.main;
+      case 'pending':
+        return theme.colors.warning.main;
+      case 'completed':
+        return theme.colors.success.main;
+      case 'revenue':
+        return theme.colors.accent.main;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
 `;
@@ -217,7 +237,7 @@ const StatLabel = styled.div`
 const StatChange = styled.div`
   font-size: ${theme.typography.fontSize.xs};
   font-weight: ${theme.typography.fontWeight.medium};
-  color: ${props => props.positive ? theme.colors.success.main : theme.colors.error.main};
+  color: ${props => (props.positive ? theme.colors.success.main : theme.colors.error.main)};
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
@@ -312,8 +332,8 @@ const ViewButton = styled.button`
   padding: ${theme.spacing[2]};
   border: 1px solid ${theme.colors.grey[300]};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.active ? theme.colors.primary.main : 'white'};
-  color: ${props => props.active ? 'white' : theme.colors.text.secondary};
+  background: ${props => (props.active ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.active ? 'white' : theme.colors.text.secondary)};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -321,7 +341,7 @@ const ViewButton = styled.button`
   transition: all ${theme.transitions.duration.normal};
 
   &:hover:not(:disabled) {
-    background: ${props => props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props => (props.active ? theme.colors.primary[600] : theme.colors.grey[50])};
   }
 `;
 
@@ -393,24 +413,38 @@ const OrderStatus = styled.div`
   letter-spacing: 0.5px;
   background: ${props => {
     switch (props.status) {
-      case 'pending': return theme.colors.warning[100];
-      case 'confirmed': return theme.colors.primary[100];
-      case 'picked_up': return theme.colors.info[100];
-      case 'inspected': return theme.colors.secondary[100];
-      case 'completed': return theme.colors.success[100];
-      case 'cancelled': return theme.colors.error[100];
-      default: return theme.colors.grey[100];
+      case 'pending':
+        return theme.colors.warning[100];
+      case 'confirmed':
+        return theme.colors.primary[100];
+      case 'picked_up':
+        return theme.colors.info[100];
+      case 'inspected':
+        return theme.colors.secondary[100];
+      case 'completed':
+        return theme.colors.success[100];
+      case 'cancelled':
+        return theme.colors.error[100];
+      default:
+        return theme.colors.grey[100];
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'pending': return theme.colors.warning[700];
-      case 'confirmed': return theme.colors.primary[700];
-      case 'picked_up': return theme.colors.info[700];
-      case 'inspected': return theme.colors.secondary[700];
-      case 'completed': return theme.colors.success[700];
-      case 'cancelled': return theme.colors.error[700];
-      default: return theme.colors.grey[700];
+      case 'pending':
+        return theme.colors.warning[700];
+      case 'confirmed':
+        return theme.colors.primary[700];
+      case 'picked_up':
+        return theme.colors.info[700];
+      case 'inspected':
+        return theme.colors.secondary[700];
+      case 'completed':
+        return theme.colors.success[700];
+      case 'cancelled':
+        return theme.colors.error[700];
+      default:
+        return theme.colors.grey[700];
     }
   }};
 `;
@@ -586,14 +620,14 @@ const PaginationButton = styled.button`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
   border: 1px solid ${theme.colors.grey[300]};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.active ? theme.colors.primary.main : 'white'};
-  color: ${props => props.active ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.active ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.active ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.sm};
   cursor: pointer;
   transition: all ${theme.transitions.duration.normal};
 
   &:hover:not(:disabled) {
-    background: ${props => props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props => (props.active ? theme.colors.primary[600] : theme.colors.grey[50])};
   }
 
   &:disabled {
@@ -658,7 +692,7 @@ const SellOrdersManagement = () => {
     assignStaff,
     updatePickupDetails,
     deleteOrder,
-    fetchStatistics
+    fetchStatistics,
   } = useSellOrders();
 
   // Local state
@@ -680,12 +714,21 @@ const SellOrdersManagement = () => {
       sortBy,
       sortOrder,
       page: currentPage,
-      limit: 12
+      limit: 12,
     };
 
     fetchOrders(filters);
     fetchStatistics();
-  }, [searchTerm, statusFilter, dateFilter, sortBy, sortOrder, currentPage, fetchOrders, fetchStatistics]);
+  }, [
+    searchTerm,
+    statusFilter,
+    dateFilter,
+    sortBy,
+    sortOrder,
+    currentPage,
+    fetchOrders,
+    fetchStatistics,
+  ]);
 
   // Filter and sort orders
   const filteredOrders = useMemo(() => {
@@ -696,12 +739,13 @@ const SellOrdersManagement = () => {
     // Apply search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(order =>
-        order._id.toLowerCase().includes(searchLower) ||
-        order.customerInfo?.fullName?.toLowerCase().includes(searchLower) ||
-        order.customerInfo?.email?.toLowerCase().includes(searchLower) ||
-        order.customerInfo?.phone?.includes(searchTerm) ||
-        order.deviceInfo?.name?.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        order =>
+          order._id.toLowerCase().includes(searchLower) ||
+          order.customerInfo?.fullName?.toLowerCase().includes(searchLower) ||
+          order.customerInfo?.email?.toLowerCase().includes(searchLower) ||
+          order.customerInfo?.phone?.includes(searchTerm) ||
+          order.deviceInfo?.name?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -717,7 +761,7 @@ const SellOrdersManagement = () => {
       sortBy,
       sortOrder,
       page: currentPage,
-      limit: 12
+      limit: 12,
     };
     fetchOrders(filters);
     fetchStatistics();
@@ -741,7 +785,7 @@ const SellOrdersManagement = () => {
     }
   };
 
-  const handleDeleteOrder = async (orderId) => {
+  const handleDeleteOrder = async orderId => {
     if (window.confirm('Are you sure you want to delete this order?')) {
       try {
         await deleteOrder(orderId);
@@ -752,7 +796,7 @@ const SellOrdersManagement = () => {
     }
   };
 
-  const handleBulkAction = async (action) => {
+  const handleBulkAction = async action => {
     if (selectedOrders.length === 0) return;
 
     switch (action) {
@@ -776,64 +820,76 @@ const SellOrdersManagement = () => {
     }
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
-  const formatPrice = (price) => {
+  const formatPrice = price => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(price);
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
-      case 'pending': return theme.colors.warning.main;
-      case 'confirmed': return theme.colors.primary.main;
-      case 'picked_up': return theme.colors.info.main;
-      case 'inspected': return theme.colors.secondary.main;
-      case 'completed': return theme.colors.success.main;
-      case 'cancelled': return theme.colors.error.main;
-      default: return theme.colors.grey.main;
+      case 'pending':
+        return theme.colors.warning.main;
+      case 'confirmed':
+        return theme.colors.primary.main;
+      case 'picked_up':
+        return theme.colors.info.main;
+      case 'inspected':
+        return theme.colors.secondary.main;
+      case 'completed':
+        return theme.colors.success.main;
+      case 'cancelled':
+        return theme.colors.error.main;
+      default:
+        return theme.colors.grey.main;
     }
   };
 
-  const renderOrderCard = (order) => (
+  const renderOrderCard = order => (
     <OrderCard key={order._id}>
       <OrderHeader>
         <OrderId>
-          <FileText size={16} />
-          #{order._id.slice(-8)}
+          <FileText size={16} />#{order._id.slice(-8)}
         </OrderId>
-        <OrderStatus status={order.status}>
-          {order.status.replace('_', ' ')}
-        </OrderStatus>
+        <OrderStatus status={order.status}>{order.status.replace('_', ' ')}</OrderStatus>
       </OrderHeader>
 
       <OrderContent>
         <OrderInfo>
           <InfoItem>
-            <InfoIcon><User size={16} /></InfoIcon>
+            <InfoIcon>
+              <User size={16} />
+            </InfoIcon>
             {order.customerInfo?.fullName || 'N/A'}
           </InfoItem>
           <InfoItem>
-            <InfoIcon><Phone size={16} /></InfoIcon>
+            <InfoIcon>
+              <Phone size={16} />
+            </InfoIcon>
             {order.customerInfo?.phone || 'N/A'}
           </InfoItem>
           <InfoItem>
-            <InfoIcon><Calendar size={16} /></InfoIcon>
+            <InfoIcon>
+              <Calendar size={16} />
+            </InfoIcon>
             {formatDate(order.createdAt)}
           </InfoItem>
           <InfoItem>
-            <InfoIcon><Truck size={16} /></InfoIcon>
+            <InfoIcon>
+              <Truck size={16} />
+            </InfoIcon>
             {order.pickup?.method === 'home_pickup' ? 'Home Pickup' : 'Store Drop'}
           </InfoItem>
         </OrderInfo>
@@ -844,9 +900,8 @@ const SellOrdersManagement = () => {
             {order.deviceInfo?.name || 'Device'}
           </DeviceName>
           <DeviceDetails>
-            {order.deviceInfo?.variant && (
-              `${order.deviceInfo.variant.storage} • ${order.deviceInfo.variant.color}`
-            )}
+            {order.deviceInfo?.variant &&
+              `${order.deviceInfo.variant.storage} • ${order.deviceInfo.variant.color}`}
           </DeviceDetails>
         </DeviceInfo>
 
@@ -877,13 +932,13 @@ const SellOrdersManagement = () => {
     </OrderCard>
   );
 
-  const renderOrderRow = (order) => (
+  const renderOrderRow = order => (
     <TableRow key={order._id}>
       <TableCell>
         <input
           type="checkbox"
           checked={selectedOrders.includes(order._id)}
-          onChange={(e) => {
+          onChange={e => {
             if (e.target.checked) {
               setSelectedOrders([...selectedOrders, order._id]);
             } else {
@@ -894,16 +949,13 @@ const SellOrdersManagement = () => {
       </TableCell>
       <TableCell>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <FileText size={16} />
-          #{order._id.slice(-8)}
+          <FileText size={16} />#{order._id.slice(-8)}
         </div>
       </TableCell>
       <TableCell>{order.customerInfo?.fullName || 'N/A'}</TableCell>
       <TableCell>{order.deviceInfo?.name || 'Device'}</TableCell>
       <TableCell>
-        <OrderStatus status={order.status}>
-          {order.status.replace('_', ' ')}
-        </OrderStatus>
+        <OrderStatus status={order.status}>{order.status.replace('_', ' ')}</OrderStatus>
       </TableCell>
       <TableCell>{formatPrice(order.finalPrice || 0)}</TableCell>
       <TableCell>{formatDate(order.createdAt)}</TableCell>
@@ -968,7 +1020,11 @@ const SellOrdersManagement = () => {
               <StatValue>{statistics.totalOrders || 0}</StatValue>
               <StatLabel>Total Orders</StatLabel>
               <StatChange positive={statistics.ordersGrowth >= 0}>
-                {statistics.ordersGrowth >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                {statistics.ordersGrowth >= 0 ? (
+                  <TrendingUp size={12} />
+                ) : (
+                  <TrendingDown size={12} />
+                )}
                 {Math.abs(statistics.ordersGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
@@ -982,7 +1038,11 @@ const SellOrdersManagement = () => {
               <StatValue>{statistics.pendingOrders || 0}</StatValue>
               <StatLabel>Pending Orders</StatLabel>
               <StatChange positive={statistics.pendingGrowth <= 0}>
-                {statistics.pendingGrowth <= 0 ? <TrendingDown size={12} /> : <TrendingUp size={12} />}
+                {statistics.pendingGrowth <= 0 ? (
+                  <TrendingDown size={12} />
+                ) : (
+                  <TrendingUp size={12} />
+                )}
                 {Math.abs(statistics.pendingGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
@@ -996,7 +1056,11 @@ const SellOrdersManagement = () => {
               <StatValue>{statistics.completedOrders || 0}</StatValue>
               <StatLabel>Completed Orders</StatLabel>
               <StatChange positive={statistics.completedGrowth >= 0}>
-                {statistics.completedGrowth >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                {statistics.completedGrowth >= 0 ? (
+                  <TrendingUp size={12} />
+                ) : (
+                  <TrendingDown size={12} />
+                )}
                 {Math.abs(statistics.completedGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
@@ -1010,7 +1074,11 @@ const SellOrdersManagement = () => {
               <StatValue>{formatPrice(statistics.totalRevenue || 0)}</StatValue>
               <StatLabel>Total Revenue</StatLabel>
               <StatChange positive={statistics.revenueGrowth >= 0}>
-                {statistics.revenueGrowth >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                {statistics.revenueGrowth >= 0 ? (
+                  <TrendingUp size={12} />
+                ) : (
+                  <TrendingDown size={12} />
+                )}
                 {Math.abs(statistics.revenueGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
@@ -1026,16 +1094,13 @@ const SellOrdersManagement = () => {
               type="text"
               placeholder="Search by order ID, customer name, email, phone, or device..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </FilterGroup>
 
           <FilterGroup>
             <FilterLabel>Status</FilterLabel>
-            <FilterSelect
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
+            <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
               <option value="confirmed">Confirmed</option>
@@ -1048,10 +1113,7 @@ const SellOrdersManagement = () => {
 
           <FilterGroup>
             <FilterLabel>Date Range</FilterLabel>
-            <FilterSelect
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-            >
+            <FilterSelect value={dateFilter} onChange={e => setDateFilter(e.target.value)}>
               <option value="all">All Time</option>
               <option value="today">Today</option>
               <option value="week">This Week</option>
@@ -1064,7 +1126,7 @@ const SellOrdersManagement = () => {
             <FilterLabel>Sort By</FilterLabel>
             <FilterSelect
               value={`${sortBy}-${sortOrder}`}
-              onChange={(e) => {
+              onChange={e => {
                 const [field, order] = e.target.value.split('-');
                 setSortBy(field);
                 setSortOrder(order);
@@ -1087,36 +1149,34 @@ const SellOrdersManagement = () => {
 
       <ViewControls>
         <ViewToggle>
-          <ViewButton
-            active={viewMode === 'grid'}
-            onClick={() => setViewMode('grid')}
-          >
+          <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
             <Grid size={16} />
           </ViewButton>
-          <ViewButton
-            active={viewMode === 'list'}
-            onClick={() => setViewMode('list')}
-          >
+          <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
             <List size={16} />
           </ViewButton>
         </ViewToggle>
 
         <SortControls>
-          <span style={{ fontSize: theme.typography.fontSize.sm, color: theme.colors.text.secondary }}>
+          <span
+            style={{ fontSize: theme.typography.fontSize.sm, color: theme.colors.text.secondary }}
+          >
             {filteredOrders.length} orders found
           </span>
         </SortControls>
       </ViewControls>
 
       {error && (
-        <div style={{
-          padding: theme.spacing[4],
-          background: theme.colors.error[50],
-          border: `1px solid ${theme.colors.error[200]}`,
-          borderRadius: theme.borderRadius.md,
-          color: theme.colors.error[700],
-          marginBottom: theme.spacing[6]
-        }}>
+        <div
+          style={{
+            padding: theme.spacing[4],
+            background: theme.colors.error[50],
+            border: `1px solid ${theme.colors.error[200]}`,
+            borderRadius: theme.borderRadius.md,
+            color: theme.colors.error[700],
+            marginBottom: theme.spacing[6],
+          }}
+        >
           {error}
         </div>
       )}
@@ -1130,16 +1190,13 @@ const SellOrdersManagement = () => {
           <EmptyDescription>
             {searchTerm || statusFilter !== 'all' || dateFilter !== 'all'
               ? 'No orders match your current filters. Try adjusting your search criteria.'
-              : 'No sell orders have been placed yet. Orders will appear here once customers start selling their devices.'
-            }
+              : 'No sell orders have been placed yet. Orders will appear here once customers start selling their devices.'}
           </EmptyDescription>
         </EmptyState>
       ) : (
         <>
           {viewMode === 'grid' ? (
-            <OrdersGrid>
-              {filteredOrders.map(renderOrderCard)}
-            </OrdersGrid>
+            <OrdersGrid>{filteredOrders.map(renderOrderCard)}</OrdersGrid>
           ) : (
             <OrdersList>
               <OrdersTable>
@@ -1149,7 +1206,7 @@ const SellOrdersManagement = () => {
                       <input
                         type="checkbox"
                         checked={selectedOrders.length === filteredOrders.length}
-                        onChange={(e) => {
+                        onChange={e => {
                           if (e.target.checked) {
                             setSelectedOrders(filteredOrders.map(order => order._id));
                           } else {
@@ -1167,9 +1224,7 @@ const SellOrdersManagement = () => {
                     <TableHeaderCell>Actions</TableHeaderCell>
                   </TableRow>
                 </TableHeader>
-                <tbody>
-                  {filteredOrders.map(renderOrderRow)}
-                </tbody>
+                <tbody>{filteredOrders.map(renderOrderRow)}</tbody>
               </OrdersTable>
             </OrdersList>
           )}
@@ -1177,7 +1232,9 @@ const SellOrdersManagement = () => {
           {pagination && pagination.totalPages > 1 && (
             <Pagination>
               <PaginationInfo>
-                Showing {((currentPage - 1) * 12) + 1} to {Math.min(currentPage * 12, pagination.totalItems)} of {pagination.totalItems} orders
+                Showing {(currentPage - 1) * 12 + 1} to{' '}
+                {Math.min(currentPage * 12, pagination.totalItems)} of {pagination.totalItems}{' '}
+                orders
               </PaginationInfo>
               <PaginationControls>
                 <PaginationButton

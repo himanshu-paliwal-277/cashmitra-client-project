@@ -27,11 +27,11 @@ const HeaderContent = styled.div`
 const Logo = styled.div`
   font-size: 24px;
   font-weight: bold;
-  color: #00C853;
+  color: #00c853;
 `;
 
 const LoginButton = styled.button`
-  background: #00C853;
+  background: #00c853;
   color: white;
   border: none;
   padding: 8px 20px;
@@ -50,16 +50,16 @@ const Breadcrumb = styled.div`
   font-size: 14px;
   color: #666;
   margin-bottom: 20px;
-  
+
   a {
     color: #666;
     text-decoration: none;
-    
+
     &:hover {
-      color: #00C853;
+      color: #00c853;
     }
   }
-  
+
   span {
     margin: 0 8px;
   }
@@ -81,7 +81,7 @@ const ContentWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: 40px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -92,7 +92,7 @@ const EvaluationSection = styled.div`
   background: white;
   border-radius: 12px;
   padding: 40px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const QuestionSection = styled.div`
@@ -114,36 +114,36 @@ const OptionGrid = styled.div`
 
 const OptionButton = styled.button`
   padding: 16px 20px;
-  border: 2px solid ${props => props.selected ? '#00C853' : '#e9ecef'};
-  background: ${props => props.selected ? '#f0fff4' : 'white'};
+  border: 2px solid ${props => (props.selected ? '#00C853' : '#e9ecef')};
+  background: ${props => (props.selected ? '#f0fff4' : 'white')};
   border-radius: 8px;
   font-size: 16px;
   font-weight: 500;
-  color: ${props => props.selected ? '#00C853' : '#333'};
+  color: ${props => (props.selected ? '#00C853' : '#333')};
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
-  
+
   &:hover {
-    border-color: #00C853;
+    border-color: #00c853;
     background: #f0fff4;
   }
 `;
 
 const ContinueButton = styled.button`
   width: 100%;
-  background: ${props => props.disabled ? '#e9ecef' : '#00C853'};
-  color: ${props => props.disabled ? '#666' : 'white'};
+  background: ${props => (props.disabled ? '#e9ecef' : '#00C853')};
+  color: ${props => (props.disabled ? '#666' : 'white')};
   border: none;
   padding: 16px 24px;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
   margin-top: 20px;
-  
+
   &:hover {
-    background: ${props => props.disabled ? '#e9ecef' : '#00a844'};
+    background: ${props => (props.disabled ? '#e9ecef' : '#00a844')};
   }
 `;
 
@@ -151,7 +151,7 @@ const Sidebar = styled.div`
   background: white;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: fit-content;
 `;
 
@@ -164,7 +164,7 @@ const SidebarImage = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   img {
     max-width: 100%;
     max-height: 100%;
@@ -200,19 +200,19 @@ const ProgressIndicator = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
-  
+
   .step {
     width: 8px;
     height: 8px;
     border-radius: 50%;
     background: #e9ecef;
     margin-right: 8px;
-    
+
     &.active {
-      background: #00C853;
+      background: #00c853;
     }
   }
-  
+
   .label {
     font-size: 14px;
     color: #666;
@@ -223,11 +223,11 @@ const SellDeviceEvaluation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { selectedVariant, product } = location.state || {};
-  
+
   const [answers, setAnswers] = useState({
     calls: '',
     touchScreen: '',
-    originalScreen: ''
+    originalScreen: '',
   });
 
   const questions = [
@@ -236,31 +236,31 @@ const SellDeviceEvaluation = () => {
       title: 'Are you able to make and receive calls?',
       options: [
         { value: 'yes', label: 'Yes' },
-        { value: 'no', label: 'No' }
-      ]
+        { value: 'no', label: 'No' },
+      ],
     },
     {
       id: 'touchScreen',
       title: 'Is your touch screen working properly?',
       options: [
         { value: 'yes', label: 'Yes' },
-        { value: 'no', label: 'No' }
-      ]
+        { value: 'no', label: 'No' },
+      ],
     },
     {
       id: 'originalScreen',
       title: 'Does your phone have original screen?',
       options: [
         { value: 'yes', label: 'Yes' },
-        { value: 'no', label: 'No' }
-      ]
-    }
+        { value: 'no', label: 'No' },
+      ],
+    },
   ];
 
   const handleAnswerSelect = (questionId, value) => {
     setAnswers(prev => ({
       ...prev,
-      [questionId]: value
+      [questionId]: value,
     }));
   };
 
@@ -269,7 +269,7 @@ const SellDeviceEvaluation = () => {
   const handleContinue = () => {
     if (isAllAnswered) {
       navigate(`/sell/screen-defects/${product._id}`, {
-        state: { selectedVariant, product, deviceEvaluation: answers }
+        state: { selectedVariant, product, deviceEvaluation: answers },
       });
     }
   };
@@ -277,7 +277,14 @@ const SellDeviceEvaluation = () => {
   if (!product) {
     return (
       <Container>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '50vh',
+          }}
+        >
           Product information not found
         </div>
       </Container>
@@ -319,11 +326,11 @@ const SellDeviceEvaluation = () => {
               <span className="label">Device Evaluation</span>
             </ProgressIndicator>
 
-            {questions.map((question) => (
+            {questions.map(question => (
               <QuestionSection key={question.id}>
                 <QuestionTitle>{question.title}</QuestionTitle>
                 <OptionGrid>
-                  {question.options.map((option) => (
+                  {question.options.map(option => (
                     <OptionButton
                       key={option.value}
                       selected={answers[question.id] === option.value}
@@ -336,10 +343,7 @@ const SellDeviceEvaluation = () => {
               </QuestionSection>
             ))}
 
-            <ContinueButton
-              disabled={!isAllAnswered}
-              onClick={handleContinue}
-            >
+            <ContinueButton disabled={!isAllAnswered} onClick={handleContinue}>
               Continue
             </ContinueButton>
           </EvaluationSection>
@@ -352,9 +356,9 @@ const SellDeviceEvaluation = () => {
                 <div style={{ color: '#999' }}>No Image</div>
               )}
             </SidebarImage>
-            
+
             <SidebarTitle>Apple iPhone 6S ({selectedVariant})</SidebarTitle>
-            
+
             <SidebarSection>
               <SidebarSectionTitle>Get Upto</SidebarSectionTitle>
               <SidebarText style={{ color: '#00C853', fontSize: '18px', fontWeight: '600' }}>

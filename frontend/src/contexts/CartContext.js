@@ -50,17 +50,17 @@ export const CartProvider = ({ children }) => {
       // Get server cart
       const response = await fetch(`${API_BASE_URL}/buy/cart`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
         const serverCartResponse = await response.json();
         console.log('serverCart: ', serverCartResponse);
-        
+
         // Extract cart items from the new backend response format
         const serverCartItems = serverCartResponse.cart || [];
-        
+
         // Transform server cart items to match frontend format
         const transformedServerItems = serverCartItems.map(item => ({
           productId: item.inventoryId,
@@ -72,23 +72,25 @@ export const CartProvider = ({ children }) => {
           partner: item.partner,
           isAvailable: item.isAvailable,
           // Map product fields for compatibility
-          name: item.product?.brand && item.product?.model ? 
-                `${item.product.brand} ${item.product.model}` : 'Unknown Product',
+          name:
+            item.product?.brand && item.product?.model
+              ? `${item.product.brand} ${item.product.model}`
+              : 'Unknown Product',
           brand: item.product?.brand,
           model: item.product?.model,
           variant: item.product?.variant,
           images: item.product?.images || [],
-          shopName: item.partner?.shopName
+          shopName: item.partner?.shopName,
         }));
-        
+
         // If there are local cart items, sync them to server first
         if (cartItems.length > 0) {
           await syncLocalItemsToServer(cartItems);
         }
-        
+
         // Set server cart items as the source of truth
         setCartItems(transformedServerItems);
-        
+
         // Set the total from server response
         if (serverCartResponse.total !== undefined) {
           console.log('Cart total:', serverCartResponse.total);
@@ -99,7 +101,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const syncLocalItemsToServer = async (localItems) => {
+  const syncLocalItemsToServer = async localItems => {
     try {
       const token = getAuthToken();
       if (!token) return;
@@ -111,11 +113,11 @@ export const CartProvider = ({ children }) => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ 
-              inventoryId: item.inventoryId || item.productId, 
-              quantity: item.quantity 
+            body: JSON.stringify({
+              inventoryId: item.inventoryId || item.productId,
+              quantity: item.quantity,
             }),
           });
         } catch (itemError) {
@@ -129,28 +131,30 @@ export const CartProvider = ({ children }) => {
 
   const mergeCartItems = (localItems, serverItems) => {
     const merged = [...serverItems];
-    
+
     localItems.forEach(localItem => {
-      const existingIndex = merged.findIndex(item => 
-        (item.productId === localItem.productId) || 
-        (item.inventoryId === localItem.inventoryId) ||
-        (item.inventoryId === localItem.productId)
+      const existingIndex = merged.findIndex(
+        item =>
+          item.productId === localItem.productId ||
+          item.inventoryId === localItem.inventoryId ||
+          item.inventoryId === localItem.productId
       );
       if (existingIndex >= 0) {
         // Combine quantities and update subtotal
         merged[existingIndex].quantity += localItem.quantity;
         if (merged[existingIndex].price) {
-          merged[existingIndex].subtotal = merged[existingIndex].price * merged[existingIndex].quantity;
+          merged[existingIndex].subtotal =
+            merged[existingIndex].price * merged[existingIndex].quantity;
         }
       } else {
         merged.push(localItem);
       }
     });
-    
+
     return merged;
   };
 
-  const updateServerCart = async (items) => {
+  const updateServerCart = async items => {
     try {
       const token = getAuthToken();
       if (!token) return;
@@ -161,11 +165,11 @@ export const CartProvider = ({ children }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ 
-            inventoryId: item.inventoryId || item.productId, 
-            quantity: item.quantity 
+          body: JSON.stringify({
+            inventoryId: item.inventoryId || item.productId,
+            quantity: item.quantity,
           }),
         });
       }
@@ -180,18 +184,17 @@ export const CartProvider = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      const existingItemIndex = cartItems.findIndex(
-        item => item.productId === product._id
-      );
+      const existingItemIndex = cartItems.findIndex(item => item.productId === product._id);
 
       let updatedCart;
       if (existingItemIndex >= 0) {
         // Update existing item and move to front
-        const updatedItem = { 
-          ...cartItems[existingItemIndex], 
+        const updatedItem = {
+          ...cartItems[existingItemIndex],
           quantity: cartItems[existingItemIndex].quantity + quantity,
-          inventoryId: cartItems[existingItemIndex].inventoryId || cartItems[existingItemIndex].productId, // Ensure inventoryId exists
-          addedAt: new Date().toISOString() // Update timestamp
+          inventoryId:
+            cartItems[existingItemIndex].inventoryId || cartItems[existingItemIndex].productId, // Ensure inventoryId exists
+          addedAt: new Date().toISOString(), // Update timestamp
         };
         const otherItems = cartItems.filter((_, index) => index !== existingItemIndex);
         updatedCart = [updatedItem, ...otherItems]; // Move updated item to front
@@ -213,7 +216,7 @@ export const CartProvider = ({ children }) => {
       }
 
       setCartItems(updatedCart);
-      
+
       // Update server if user is logged in
       if (user) {
         await updateServerCart(updatedCart);
@@ -228,21 +231,21 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const removeFromCart = async (productId) => {
+  const removeFromCart = async productId => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Find the item to get its inventoryId
       const itemToRemove = cartItems.find(item => item.productId === productId);
       if (!itemToRemove) {
         throw new Error('Item not found in cart');
       }
-      
+
       // Update local state first
       const updatedCart = cartItems.filter(item => item.productId !== productId);
       setCartItems(updatedCart);
-      
+
       // Update server if user is logged in
       if (user) {
         const token = getAuthToken();
@@ -251,10 +254,10 @@ export const CartProvider = ({ children }) => {
           const response = await fetch(`${API_BASE_URL}/buy/cart/${inventoryId}`, {
             method: 'DELETE',
             headers: {
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
           });
-          
+
           if (!response.ok) {
             // Revert local state if server update fails
             setCartItems(cartItems);
@@ -274,7 +277,7 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       if (quantity <= 0) {
         await removeFromCart(productId);
         return;
@@ -287,14 +290,14 @@ export const CartProvider = ({ children }) => {
       }
 
       // Update local state first
-      const updatedCart = cartItems.map(item => 
-        item.productId === productId 
+      const updatedCart = cartItems.map(item =>
+        item.productId === productId
           ? { ...item, quantity, inventoryId: item.inventoryId || item.productId }
           : item
       );
-      
+
       setCartItems(updatedCart);
-      
+
       // Update server if user is logged in
       if (user) {
         const token = getAuthToken();
@@ -304,11 +307,11 @@ export const CartProvider = ({ children }) => {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({ quantity }),
           });
-          
+
           if (!response.ok) {
             // Revert local state if server update fails
             setCartItems(cartItems);
@@ -328,27 +331,27 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Update local state first
       setCartItems([]);
-      
+
       // Clear server cart if user is logged in
       if (user) {
         const token = getAuthToken();
         if (token) {
           // Since there's no dedicated clear endpoint, we'll remove each item individually
           const itemsToRemove = [...cartItems]; // Create a copy to avoid state mutation issues
-          
+
           for (const item of itemsToRemove) {
             const inventoryId = item.inventoryId || item.productId;
             try {
               const response = await fetch(`${API_BASE_URL}/buy/cart/${inventoryId}`, {
                 method: 'DELETE',
                 headers: {
-                  'Authorization': `Bearer ${token}`,
+                  Authorization: `Bearer ${token}`,
                 },
               });
-              
+
               if (!response.ok) {
                 console.warn(`Failed to remove item ${inventoryId} from server cart`);
               }
@@ -367,7 +370,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   const getCartItemsCount = () => {
@@ -377,7 +380,7 @@ export const CartProvider = ({ children }) => {
   const clearError = () => {
     setError(null);
   };
-    console.log('context cartes: ', cartItems);
+  console.log('context cartes: ', cartItems);
 
   const value = {
     cartItems,
@@ -390,14 +393,10 @@ export const CartProvider = ({ children }) => {
     getCartTotal,
     getCartItemsCount,
     clearError,
-    syncCartWithServer
+    syncCartWithServer,
   };
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
 
 export default CartContext;

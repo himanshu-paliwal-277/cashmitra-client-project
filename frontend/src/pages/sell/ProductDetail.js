@@ -20,9 +20,9 @@ const ProductDetail = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await adminService.getBuyProductById(id);
-      
+
       if (response.success) {
         setProduct(response.data);
       } else {
@@ -38,24 +38,24 @@ const ProductDetail = () => {
 
   const handleSellNow = () => {
     // Navigate to sell form with product details
-    navigate(`/sell/form/${id}`, { 
-      state: { 
+    navigate(`/sell/form/${id}`, {
+      state: {
         product: product,
-        category: product.category?.name 
-      } 
+        category: product.category?.name,
+      },
     });
   };
 
   const handleGetQuote = () => {
     // Navigate to price quote with product details
-    navigate(`/sell/quote/${id}`, { 
-      state: { 
-        product: product 
-      } 
+    navigate(`/sell/quote/${id}`, {
+      state: {
+        product: product,
+      },
     });
   };
 
-  const formatCategoryName = (category) => {
+  const formatCategoryName = category => {
     if (!category) return '';
     return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
   };
@@ -111,8 +111,8 @@ const ProductDetail = () => {
             Sell
           </button>
           <span className="breadcrumb-separator">›</span>
-          <button 
-            onClick={() => navigate(`/sell/category/${product.category?.name?.toLowerCase()}`)} 
+          <button
+            onClick={() => navigate(`/sell/category/${product.category?.name?.toLowerCase()}`)}
             className="breadcrumb-link"
           >
             {formatCategoryName(product.category?.name)}
@@ -130,12 +130,12 @@ const ProductDetail = () => {
                 src={images[selectedImage]}
                 alt={product.name}
                 className="main-image"
-                onError={(e) => {
+                onError={e => {
                   e.target.src = '/placeholder-product.jpg';
                 }}
               />
             </div>
-            
+
             {images.length > 1 && (
               <div className="image-thumbnails">
                 {images.map((image, index) => (
@@ -147,7 +147,7 @@ const ProductDetail = () => {
                     <img
                       src={image}
                       alt={`${product.name} ${index + 1}`}
-                      onError={(e) => {
+                      onError={e => {
                         e.target.src = '/placeholder-product.jpg';
                       }}
                     />
@@ -161,9 +161,7 @@ const ProductDetail = () => {
           <div className="product-info">
             <div className="product-header">
               <h1 className="product-title">{product.name}</h1>
-              {product.brand && (
-                <p className="product-brand">by {product.brand}</p>
-              )}
+              {product.brand && <p className="product-brand">by {product.brand}</p>}
               {product.category && (
                 <span className="category-badge">{formatCategoryName(product.category.name)}</span>
               )}
@@ -173,14 +171,12 @@ const ProductDetail = () => {
             {product.variant && (
               <div className="variants-section">
                 <h3 className="section-title">Product Specifications</h3>
-                
+
                 {product.variant.ram && (
                   <div className="variant-group">
                     <label className="variant-label">RAM</label>
                     <div className="variant-options">
-                      <div className="variant-chip selected">
-                        {product.variant.ram}
-                      </div>
+                      <div className="variant-chip selected">{product.variant.ram}</div>
                     </div>
                   </div>
                 )}
@@ -189,9 +185,7 @@ const ProductDetail = () => {
                   <div className="variant-group">
                     <label className="variant-label">Storage</label>
                     <div className="variant-options">
-                      <div className="variant-chip selected">
-                        {product.variant.storage}
-                      </div>
+                      <div className="variant-chip selected">{product.variant.storage}</div>
                     </div>
                   </div>
                 )}
@@ -211,9 +205,7 @@ const ProductDetail = () => {
                   <div className="variant-group">
                     <label className="variant-label">Processor</label>
                     <div className="variant-options">
-                      <div className="variant-chip selected">
-                        {product.variant.processor}
-                      </div>
+                      <div className="variant-chip selected">{product.variant.processor}</div>
                     </div>
                   </div>
                 )}
@@ -222,9 +214,7 @@ const ProductDetail = () => {
                   <div className="variant-group">
                     <label className="variant-label">Screen Size</label>
                     <div className="variant-options">
-                      <div className="variant-chip selected">
-                        {product.variant.screenSize}
-                      </div>
+                      <div className="variant-chip selected">{product.variant.screenSize}</div>
                     </div>
                   </div>
                 )}
@@ -234,9 +224,7 @@ const ProductDetail = () => {
             {/* Price Section */}
             <div className="price-section">
               <div className="price-container">
-                <span className="current-price">
-                  ₹{product.basePrice?.toLocaleString() || '0'}
-                </span>
+                <span className="current-price">₹{product.basePrice?.toLocaleString() || '0'}</span>
                 <span className="price-label">Starting Price</span>
               </div>
               <p className="price-note">
@@ -294,19 +282,19 @@ const ProductDetail = () => {
         {/* Detailed Information Tabs */}
         <div className="product-tabs">
           <div className="tab-navigation">
-            <button 
+            <button
               className={`tab-button ${activeTab === 'specifications' ? 'active' : ''}`}
               onClick={() => setActiveTab('specifications')}
             >
               Specifications
             </button>
-            <button 
+            <button
               className={`tab-button ${activeTab === 'condition' ? 'active' : ''}`}
               onClick={() => setActiveTab('condition')}
             >
               Condition Factors
             </button>
-            <button 
+            <button
               className={`tab-button ${activeTab === 'process' ? 'active' : ''}`}
               onClick={() => setActiveTab('process')}
             >
@@ -361,7 +349,7 @@ const ProductDetail = () => {
                         </div>
                       </div>
                     )}
-                    
+
                     {product.conditionFactors.bodyCondition && (
                       <div className="condition-category">
                         <h4>Body Condition</h4>
@@ -400,21 +388,29 @@ const ProductDetail = () => {
                     <div className="step-number">1</div>
                     <div className="step-content">
                       <h4>Get Instant Quote</h4>
-                      <p>Answer a few questions about your device condition to get an instant price quote.</p>
+                      <p>
+                        Answer a few questions about your device condition to get an instant price
+                        quote.
+                      </p>
                     </div>
                   </div>
                   <div className="process-step">
                     <div className="step-number">2</div>
                     <div className="step-content">
                       <h4>Schedule Pickup</h4>
-                      <p>Book a free pickup at your convenience. Our executive will visit your location.</p>
+                      <p>
+                        Book a free pickup at your convenience. Our executive will visit your
+                        location.
+                      </p>
                     </div>
                   </div>
                   <div className="process-step">
                     <div className="step-number">3</div>
                     <div className="step-content">
                       <h4>Device Verification</h4>
-                      <p>Our expert will verify your device condition and confirm the final price.</p>
+                      <p>
+                        Our expert will verify your device condition and confirm the final price.
+                      </p>
                     </div>
                   </div>
                   <div className="process-step">

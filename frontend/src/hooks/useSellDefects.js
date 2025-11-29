@@ -16,7 +16,7 @@ const useSellDefects = () => {
     page: 1,
     limit: 10,
     total: 0,
-    totalPages: 0
+    totalPages: 0,
   });
 
   // Fetch all defects with pagination
@@ -28,13 +28,13 @@ const useSellDefects = () => {
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
-        ...filters
+        ...filters,
       });
 
       const response = await api.get(`/sell-defects?${queryParams}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       setDefects(response.data.data || []);
@@ -42,7 +42,7 @@ const useSellDefects = () => {
         page: response.data.page || 1,
         limit: response.data.limit || 10,
         total: response.data.total || 0,
-        totalPages: response.data.totalPages || 0
+        totalPages: response.data.totalPages || 0,
       });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch defects');
@@ -52,15 +52,15 @@ const useSellDefects = () => {
   }, []);
 
   // Fetch single defect by ID
-  const fetchDefect = useCallback(async (defectId) => {
+  const fetchDefect = useCallback(async defectId => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-defects/${defectId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       return response.data;
     } catch (err) {
@@ -72,148 +72,170 @@ const useSellDefects = () => {
   }, []);
 
   // Create new defect
-  const createDefect = useCallback(async (defectData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.post('/sell-defects', defectData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh defects list
-      await fetchDefects();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create defect');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchDefects]);
+  const createDefect = useCallback(
+    async defectData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.post('/sell-defects', defectData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh defects list
+        await fetchDefects();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create defect');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchDefects]
+  );
 
   // Update defect
-  const updateDefect = useCallback(async (defectId, defectData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put(`/sell-defects/${defectId}`, defectData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh defects list
-      await fetchDefects();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update defect');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchDefects]);
+  const updateDefect = useCallback(
+    async (defectId, defectData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put(`/sell-defects/${defectId}`, defectData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh defects list
+        await fetchDefects();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update defect');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchDefects]
+  );
 
   // Delete defect
-  const deleteDefect = useCallback(async (defectId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      await api.delete(`/sell-defects/${defectId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      // Refresh defects list
-      await fetchDefects();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete defect');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchDefects]);
+  const deleteDefect = useCallback(
+    async defectId => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        await api.delete(`/sell-defects/${defectId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Refresh defects list
+        await fetchDefects();
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete defect');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchDefects]
+  );
 
   // Bulk create defects
-  const bulkCreateDefects = useCallback(async (defectsData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.post('/sell-defects/bulk', defectsData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh defects list
-      await fetchDefects();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create defects');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchDefects]);
+  const bulkCreateDefects = useCallback(
+    async defectsData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.post('/sell-defects/bulk', defectsData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh defects list
+        await fetchDefects();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create defects');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchDefects]
+  );
 
   // Reorder defects
-  const reorderDefects = useCallback(async (reorderData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put('/sell-defects/reorder', reorderData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh defects list
-      await fetchDefects();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to reorder defects');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchDefects]);
+  const reorderDefects = useCallback(
+    async reorderData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put('/sell-defects/reorder', reorderData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh defects list
+        await fetchDefects();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to reorder defects');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchDefects]
+  );
 
   // Toggle defect active status
-  const toggleDefectStatus = useCallback(async (defectId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.patch(`/sell-defects/${defectId}/toggle`, {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      // Refresh defects list
-      await fetchDefects();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to toggle defect status');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchDefects]);
+  const toggleDefectStatus = useCallback(
+    async defectId => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.patch(
+          `/sell-defects/${defectId}/toggle`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Refresh defects list
+        await fetchDefects();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to toggle defect status');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchDefects]
+  );
 
   // Public methods for customer access
-  const getPublicDefects = useCallback(async (categoryId) => {
+  const getPublicDefects = useCallback(async categoryId => {
     setLoading(true);
     setError(null);
     try {
@@ -227,7 +249,7 @@ const useSellDefects = () => {
     }
   }, []);
 
-  const getPublicDefect = useCallback(async (defectId) => {
+  const getPublicDefect = useCallback(async defectId => {
     setLoading(true);
     setError(null);
     try {
@@ -273,7 +295,7 @@ const useSellDefects = () => {
     getPublicDefect,
 
     // Utilities
-    clearError
+    clearError,
   };
 };
 

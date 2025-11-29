@@ -38,7 +38,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -64,7 +64,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -82,7 +82,7 @@ const FilterButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #e5e7eb;
   }
@@ -128,7 +128,7 @@ const LeadCard = styled.div`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -191,8 +191,8 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${props => props.primary ? '#3b82f6' : '#f3f4f6'};
-  color: ${props => props.primary ? 'white' : '#6b7280'};
+  background: ${props => (props.primary ? '#3b82f6' : '#f3f4f6')};
+  color: ${props => (props.primary ? 'white' : '#6b7280')};
   border: none;
   padding: 0.5rem;
   border-radius: 0.375rem;
@@ -202,10 +202,10 @@ const IconButton = styled.button`
   gap: 0.25rem;
   font-size: 0.75rem;
   transition: all 0.2s;
-  
+
   &:hover {
-    background: ${props => props.primary ? '#2563eb' : '#e5e7eb'};
-    color: ${props => props.primary ? 'white' : '#374151'};
+    background: ${props => (props.primary ? '#2563eb' : '#e5e7eb')};
+    color: ${props => (props.primary ? 'white' : '#374151')};
   }
 `;
 
@@ -216,22 +216,34 @@ const StatusBadge = styled.span`
   font-weight: 600;
   background: ${props => {
     switch (props.status) {
-      case 'new': return '#dbeafe';
-      case 'contacted': return '#fef3c7';
-      case 'qualified': return '#d1fae5';
-      case 'converted': return '#dcfce7';
-      case 'lost': return '#fee2e2';
-      default: return '#f3f4f6';
+      case 'new':
+        return '#dbeafe';
+      case 'contacted':
+        return '#fef3c7';
+      case 'qualified':
+        return '#d1fae5';
+      case 'converted':
+        return '#dcfce7';
+      case 'lost':
+        return '#fee2e2';
+      default:
+        return '#f3f4f6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'new': return '#1e40af';
-      case 'contacted': return '#92400e';
-      case 'qualified': return '#065f46';
-      case 'converted': return '#166534';
-      case 'lost': return '#991b1b';
-      default: return '#374151';
+      case 'new':
+        return '#1e40af';
+      case 'contacted':
+        return '#92400e';
+      case 'qualified':
+        return '#065f46';
+      case 'converted':
+        return '#166534';
+      case 'lost':
+        return '#991b1b';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -289,7 +301,7 @@ const Leads = () => {
         createdAt: '2024-01-12',
       },
     ];
-    
+
     setTimeout(() => {
       setLeads(mockData);
       setLoading(false);
@@ -303,10 +315,11 @@ const Leads = () => {
     { label: 'Conversion Rate', value: '24.5%', color: '#8b5cf6' },
   ];
 
-  const filteredLeads = leads.filter(lead =>
-    lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.interest.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredLeads = leads.filter(
+    lead =>
+      lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.interest.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -336,7 +349,7 @@ const Leads = () => {
           type="text"
           placeholder="Search by name, email, or interest..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
         <FilterButton>
           <Filter size={16} />
@@ -348,7 +361,7 @@ const Leads = () => {
         <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
       ) : (
         <LeadsGrid>
-          {filteredLeads.map((lead) => (
+          {filteredLeads.map(lead => (
             <LeadCard key={lead.id}>
               <LeadHeader>
                 <div>
@@ -359,7 +372,7 @@ const Leads = () => {
                 </div>
                 <LeadScore score={lead.score}>{lead.score}</LeadScore>
               </LeadHeader>
-              
+
               <LeadInfo>
                 <InfoRow>
                   <Mail size={14} />
@@ -374,11 +387,11 @@ const Leads = () => {
                   {lead.source}
                 </InfoRow>
               </LeadInfo>
-              
+
               <LeadInterest>
                 <strong>Interest:</strong> {lead.interest}
               </LeadInterest>
-              
+
               <ActionButtons>
                 <IconButton primary>
                   <Eye size={14} />

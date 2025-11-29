@@ -18,7 +18,11 @@ export const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, ${theme.colors.primary[50]} 0%, ${theme.colors.accent[50]} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary[50]} 0%,
+    ${theme.colors.accent[50]} 100%
+  );
   padding: ${theme.spacing[4]};
 `;
 
@@ -45,12 +49,16 @@ export const LogoContainer = styled.div`
     font-weight: ${theme.typography.fontWeight.bold};
     color: ${theme.colors.primary.main};
     margin: 0 0 ${theme.spacing[1]};
-    background: linear-gradient(135deg, ${theme.colors.primary.main} 0%, ${theme.colors.accent.main} 100%);
+    background: linear-gradient(
+      135deg,
+      ${theme.colors.primary.main} 0%,
+      ${theme.colors.accent.main} 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   span {
     font-size: ${theme.typography.fontSize.base};
     color: ${theme.colors.text.secondary};
@@ -62,14 +70,14 @@ export const LogoContainer = styled.div`
 export const LoginHeader = styled.div`
   text-align: center;
   margin-bottom: ${theme.spacing[6]};
-  
+
   h2 {
     font-size: ${theme.typography.fontSize['2xl']};
     font-weight: ${theme.typography.fontWeight.bold};
     color: ${theme.colors.text.primary};
     margin: 0 0 ${theme.spacing[2]};
   }
-  
+
   p {
     font-size: ${theme.typography.fontSize.base};
     color: ${theme.colors.text.secondary};
@@ -98,22 +106,24 @@ export const Label = styled.label`
 
 export const Input = styled.input`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: 2px solid ${props => props.hasError ? theme.colors.error.main : theme.colors.grey[300]};
+  border: 2px solid ${props => (props.hasError ? theme.colors.error.main : theme.colors.grey[300])};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.base};
   transition: all 0.2s ease;
   background: ${theme.colors.white};
-  
+
   &:focus {
     outline: none;
-    border-color: ${props => props.hasError ? theme.colors.error.main : theme.colors.primary.main};
-    box-shadow: 0 0 0 3px ${props => props.hasError ? theme.colors.error[100] : theme.colors.primary[100]};
+    border-color: ${props =>
+      props.hasError ? theme.colors.error.main : theme.colors.primary.main};
+    box-shadow: 0 0 0 3px
+      ${props => (props.hasError ? theme.colors.error[100] : theme.colors.primary[100])};
   }
-  
+
   &::placeholder {
     color: ${theme.colors.text.secondary};
   }
-  
+
   &:disabled {
     background: ${theme.colors.grey[100]};
     cursor: not-allowed;
@@ -122,25 +132,28 @@ export const Input = styled.input`
 
 export const Button = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  background: ${props => props.disabled ? theme.colors.grey[300] : `linear-gradient(135deg, ${theme.colors.primary.main} 0%, ${theme.colors.accent.main} 100%)`};
+  background: ${props =>
+    props.disabled
+      ? theme.colors.grey[300]
+      : `linear-gradient(135deg, ${theme.colors.primary.main} 0%, ${theme.colors.accent.main} 100%)`};
   color: ${theme.colors.white};
   border: none;
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.base};
   font-weight: ${theme.typography.fontWeight.medium};
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: ${theme.spacing[2]};
   min-height: 48px;
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.lg};
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
@@ -161,10 +174,12 @@ export const ErrorMessage = styled.div`
 
 // Loading spinner
 export const LoadingSpinner = styled.div`
-  width: ${props => props.size === 'small' ? '16px' : '24px'};
-  height: ${props => props.size === 'small' ? '16px' : '24px'};
-  border: 2px solid ${props => props.size === 'small' ? 'rgba(255,255,255,0.3)' : theme.colors.grey[300]};
-  border-top: 2px solid ${props => props.size === 'small' ? theme.colors.white : theme.colors.primary.main};
+  width: ${props => (props.size === 'small' ? '16px' : '24px')};
+  height: ${props => (props.size === 'small' ? '16px' : '24px')};
+  border: 2px solid
+    ${props => (props.size === 'small' ? 'rgba(255,255,255,0.3)' : theme.colors.grey[300])};
+  border-top: 2px solid
+    ${props => (props.size === 'small' ? theme.colors.white : theme.colors.primary.main)};
   border-radius: 50%;
   animation: ${spin} 1s linear infinite;
 `;
@@ -174,7 +189,7 @@ export const Divider = styled.div`
   display: flex;
   align-items: center;
   margin: ${theme.spacing[6]} 0;
-  
+
   &::before,
   &::after {
     content: '';
@@ -182,7 +197,7 @@ export const Divider = styled.div`
     height: 1px;
     background: ${theme.colors.grey[300]};
   }
-  
+
   span {
     padding: 0 ${theme.spacing[4]};
     color: ${theme.colors.text.secondary};
@@ -195,12 +210,12 @@ export const LinkText = styled.div`
   text-align: center;
   font-size: ${theme.typography.fontSize.sm};
   color: ${theme.colors.text.secondary};
-  
+
   a {
     color: ${theme.colors.primary.main};
     text-decoration: none;
     font-weight: ${theme.typography.fontWeight.medium};
-    
+
     &:hover {
       text-decoration: underline;
     }
@@ -212,7 +227,7 @@ export const FeatureList = styled.div`
   margin-top: ${theme.spacing[6]};
   padding-top: ${theme.spacing[6]};
   border-top: 1px solid ${theme.colors.grey[200]};
-  
+
   h3 {
     font-size: ${theme.typography.fontSize.base};
     font-weight: ${theme.typography.fontWeight.semibold};
@@ -229,7 +244,7 @@ export const FeatureItem = styled.div`
   font-size: ${theme.typography.fontSize.sm};
   color: ${theme.colors.text.secondary};
   margin-bottom: ${theme.spacing[2]};
-  
+
   &:last-child {
     margin-bottom: 0;
   }

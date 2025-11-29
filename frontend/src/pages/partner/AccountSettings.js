@@ -70,7 +70,7 @@ const AccountSettings = () => {
         <Title>Account Settings</Title>
         <Subtitle>Manage your account preferences and security settings</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,8 +78,8 @@ const AccountSettings = () => {
           </Icon>
           <ComingSoonTitle>Account Settings Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to manage your 
-            account settings, security preferences, notification settings, and privacy options.
+            This feature is currently under development. Soon you'll be able to manage your account
+            settings, security preferences, notification settings, and privacy options.
           </ComingSoonText>
         </ComingSoon>
       </Card>

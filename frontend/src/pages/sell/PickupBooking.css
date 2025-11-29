@@ -93,11 +93,11 @@
 }
 
 .booking-step-item.active:not(:last-child)::after {
-  background: linear-gradient(90deg, #00C853 0%, rgba(255, 255, 255, 0.3) 100%);
+  background: linear-gradient(90deg, #00c853 0%, rgba(255, 255, 255, 0.3) 100%);
 }
 
 .booking-step-item.active .booking-step-number {
-  background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(0, 200, 83, 0.4);
   transform: scale(1.1);
@@ -244,7 +244,7 @@
   background: rgba(102, 126, 234, 0.1);
 }
 
-.booking-radio-option input[type="radio"] {
+.booking-radio-option input[type='radio'] {
   margin: 0;
   width: 18px;
   height: 18px;
@@ -406,7 +406,7 @@
   box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
 }
 
-.booking-payment-option input[type="radio"] {
+.booking-payment-option input[type='radio'] {
   margin: 0;
   width: 20px;
   height: 20px;
@@ -588,14 +588,14 @@
 .booking-total-row .booking-value {
   font-weight: 700;
   font-size: 24px;
-  background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .booking-continue-btn {
-  background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
   color: white;
   padding: 16px 24px;
   font-size: 16px;
@@ -671,37 +671,37 @@
   .booking-pickup-booking-page {
     padding: 20px 0;
   }
-  
+
   .booking-page-title {
     font-size: 24px;
   }
-  
+
   .booking-step-indicator {
     padding: 16px;
   }
-  
+
   .booking-step-content {
     padding: 20px;
   }
-  
+
   .booking-step-number {
     width: 36px;
     height: 36px;
     font-size: 14px;
   }
-  
+
   .booking-step-label {
     font-size: 11px;
   }
-  
+
   .booking-save-as-group {
     flex-wrap: wrap;
   }
-  
+
   .booking-device-preview {
     padding: 20px;
   }
-  
+
   .booking-price-summary {
     padding: 20px;
   }

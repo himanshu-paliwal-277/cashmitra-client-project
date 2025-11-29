@@ -28,11 +28,11 @@ const HeaderContent = styled.div`
 const Logo = styled.div`
   font-size: 24px;
   font-weight: bold;
-  color: #00C853;
+  color: #00c853;
 `;
 
 const LoginButton = styled.button`
-  background: #00C853;
+  background: #00c853;
   color: white;
   border: none;
   padding: 8px 20px;
@@ -51,16 +51,16 @@ const Breadcrumb = styled.div`
   font-size: 14px;
   color: #666;
   margin-bottom: 20px;
-  
+
   a {
     color: #666;
     text-decoration: none;
-    
+
     &:hover {
-      color: #00C853;
+      color: #00c853;
     }
   }
-  
+
   span {
     margin: 0 8px;
   }
@@ -82,7 +82,7 @@ const ContentWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: 40px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -93,7 +93,7 @@ const AccessoriesSection = styled.div`
   background: white;
   border-radius: 12px;
   padding: 40px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const SectionTitle = styled.h3`
@@ -109,7 +109,7 @@ const AccessoryGrid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-bottom: 40px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -120,14 +120,14 @@ const AccessoryOption = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 30px 20px;
-  border: 2px solid ${props => props.selected ? '#00C853' : '#e9ecef'};
-  background: ${props => props.selected ? '#f0fff4' : 'white'};
+  border: 2px solid ${props => (props.selected ? '#00C853' : '#e9ecef')};
+  background: ${props => (props.selected ? '#f0fff4' : 'white')};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    border-color: #00C853;
+    border-color: #00c853;
     background: #f0fff4;
   }
 `;
@@ -148,7 +148,7 @@ const AccessoryIcon = styled.div`
 const AccessoryLabel = styled.span`
   font-size: 16px;
   font-weight: 500;
-  color: ${props => props.selected ? '#00C853' : '#333'};
+  color: ${props => (props.selected ? '#00C853' : '#333')};
   text-align: center;
 `;
 
@@ -162,7 +162,7 @@ const AccessoryDescription = styled.p`
 
 const ContinueButton = styled.button`
   width: 100%;
-  background: #00C853;
+  background: #00c853;
   color: white;
   border: none;
   padding: 16px 24px;
@@ -171,7 +171,7 @@ const ContinueButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   margin-top: 20px;
-  
+
   &:hover {
     background: #00a844;
   }
@@ -181,7 +181,7 @@ const Sidebar = styled.div`
   background: white;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: fit-content;
 `;
 
@@ -194,7 +194,7 @@ const SidebarImage = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   img {
     max-width: 100%;
     max-height: 100%;
@@ -230,19 +230,19 @@ const ProgressIndicator = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
-  
+
   .step {
     width: 8px;
     height: 8px;
     border-radius: 50%;
     background: #e9ecef;
     margin-right: 8px;
-    
+
     &.active {
-      background: #00C853;
+      background: #00c853;
     }
   }
-  
+
   .label {
     font-size: 14px;
     color: #666;
@@ -251,7 +251,7 @@ const ProgressIndicator = styled.div`
 
 const PriceSection = styled.div`
   background: #f0fff4;
-  border: 1px solid #00C853;
+  border: 1px solid #00c853;
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 16px;
@@ -260,29 +260,38 @@ const PriceSection = styled.div`
 const PriceTitle = styled.h5`
   font-size: 16px;
   font-weight: 600;
-  color: #00C853;
+  color: #00c853;
   margin-bottom: 8px;
 `;
 
 const PriceAmount = styled.div`
   font-size: 24px;
   font-weight: 700;
-  color: #00C853;
+  color: #00c853;
 `;
 
 const SellAccessories = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
-  
+
   // Get data from previous pages (location.state) or use URL parameter
-  const { product, answers, productId, variantId, selectedDefects, selectedVariant, deviceEvaluation, screenDefects } = location.state || {};
+  const {
+    product,
+    answers,
+    productId,
+    variantId,
+    selectedDefects,
+    selectedVariant,
+    deviceEvaluation,
+    screenDefects,
+  } = location.state || {};
   const currentProductId = productId || id;
-  
+
   // Handle different data structures from different previous pages
   const finalSelectedDefects = selectedDefects || screenDefects || [];
   const finalAnswers = answers || deviceEvaluation || {};
-  
+
   const [accessories, setAccessories] = useState([]);
   const [selectedAccessories, setSelectedAccessories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -294,7 +303,7 @@ const SellAccessories = () => {
       setLoading(false);
       return;
     }
-      console.log('Fetching accessories for category ID:', product);
+    console.log('Fetching accessories for category ID:', product);
 
     fetchAccessories();
   }, [product, navigate]);
@@ -314,7 +323,7 @@ const SellAccessories = () => {
     }
   };
 
-  const handleAccessoryToggle = (accessory) => {
+  const handleAccessoryToggle = accessory => {
     setSelectedAccessories(prev => {
       const isSelected = prev.some(a => a._id === accessory._id);
       if (isSelected) {
@@ -336,17 +345,24 @@ const SellAccessories = () => {
           answers: finalAnswers,
           selectedDefects: finalSelectedDefects,
           selectedAccessories,
-          productDetails: product
+          productDetails: product,
         },
-        product
-      }
+        product,
+      },
     });
   };
 
   if (!product) {
     return (
       <Container>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '50vh',
+          }}
+        >
           Product information not found
         </div>
       </Container>
@@ -373,7 +389,10 @@ const SellAccessories = () => {
           <span>Sell Old Apple iPhone 6S</span>
         </Breadcrumb>
 
-        <Title>Sell Old {product?.brand} {product?.model} ({selectedVariant?.label || selectedVariant || 'Unknown Variant'})</Title>
+        <Title>
+          Sell Old {product?.brand} {product?.model} (
+          {selectedVariant?.label || selectedVariant || 'Unknown Variant'})
+        </Title>
         <Subtitle>
           <span style={{ color: '#00C853' }}>₹2,160+</span> already sold on Cashify
         </Subtitle>
@@ -389,26 +408,26 @@ const SellAccessories = () => {
             </ProgressIndicator>
 
             <SectionTitle>Do you have the following?</SectionTitle>
-            
+
             {loading ? (
               <div style={{ textAlign: 'center', padding: '2rem' }}>Loading accessories...</div>
             ) : error ? (
               <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>{error}</div>
             ) : (
               <AccessoryGrid>
-                {accessories.map((accessory) => (
+                {accessories.map(accessory => (
                   <AccessoryOption
                     key={accessory._id}
                     selected={selectedAccessories.some(a => a._id === accessory._id)}
                     onClick={() => handleAccessoryToggle(accessory)}
                   >
                     <AccessoryIcon>📱</AccessoryIcon>
-                    <AccessoryLabel selected={selectedAccessories.some(a => a._id === accessory._id)}>
+                    <AccessoryLabel
+                      selected={selectedAccessories.some(a => a._id === accessory._id)}
+                    >
                       {accessory.title}
                     </AccessoryLabel>
-                    <AccessoryDescription>
-                      +₹{accessory.delta.value}
-                    </AccessoryDescription>
+                    <AccessoryDescription>+₹{accessory.delta.value}</AccessoryDescription>
                   </AccessoryOption>
                 ))}
               </AccessoryGrid>
@@ -427,9 +446,11 @@ const SellAccessories = () => {
                 <div style={{ color: '#999' }}>No Image</div>
               )}
             </SidebarImage>
-            
-            <SidebarTitle>{product?.brand} {product?.model}</SidebarTitle>
-            
+
+            <SidebarTitle>
+              {product?.brand} {product?.model}
+            </SidebarTitle>
+
             <PriceSection>
               <PriceTitle>Estimated Value</PriceTitle>
               <PriceAmount>₹{product?.pricing?.discountedPrice || 'TBD'}</PriceAmount>

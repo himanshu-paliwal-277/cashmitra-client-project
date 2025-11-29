@@ -26,7 +26,7 @@ import {
   Layers,
   Image,
   DollarSign,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
 const CatalogContainer = styled.div`
@@ -59,7 +59,7 @@ const HeaderActions = styled.div`
 `;
 
 const PrimaryButton = styled.button`
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border: none;
   padding: 0.875rem 1.75rem;
@@ -73,17 +73,17 @@ const PrimaryButton = styled.button`
   font-size: 0.875rem;
   min-height: 44px;
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-  
+
   &:hover {
-    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -115,7 +115,7 @@ const Button = styled.button`
   gap: 0.5rem;
   font-size: 0.875rem;
   min-height: 40px;
-  
+
   &:hover {
     background: ${props => {
       if (props.variant === 'outline') {
@@ -125,7 +125,7 @@ const Button = styled.button`
     }};
     color: white;
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -144,7 +144,7 @@ const StatCard = styled.div`
   padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 `;
 
 const StatHeader = styled.div`
@@ -186,7 +186,7 @@ const FiltersCard = styled.div`
   background: white;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   padding: 1.5rem;
   margin-bottom: 2rem;
 `;
@@ -215,7 +215,7 @@ const SearchInput = styled.input`
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 6px;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
@@ -229,7 +229,7 @@ const Select = styled.select`
   font-size: 0.875rem;
   background: white;
   cursor: pointer;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
@@ -244,15 +244,16 @@ const ViewToggle = styled.div`
 `;
 
 const ViewButton = styled.button`
-  background: ${props => props.active ? props.theme.colors.primary : 'white'};
-  color: ${props => props.active ? 'white' : props.theme.colors.textSecondary};
+  background: ${props => (props.active ? props.theme.colors.primary : 'white')};
+  color: ${props => (props.active ? 'white' : props.theme.colors.textSecondary)};
   border: none;
   padding: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    background: ${props => props.active ? props.theme.colors.primaryDark : props.theme.colors.background};
+    background: ${props =>
+      props.active ? props.theme.colors.primaryDark : props.theme.colors.background};
   }
 `;
 
@@ -260,7 +261,7 @@ const ProductsContainer = styled.div`
   background: white;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 `;
 
 const ProductsHeader = styled.div`
@@ -278,7 +279,7 @@ const ProductsTitle = styled.h3`
 `;
 
 const ProductsGrid = styled.div`
-  display: ${props => props.view === 'grid' ? 'grid' : 'block'};
+  display: ${props => (props.view === 'grid' ? 'grid' : 'block')};
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
   padding: 1.5rem;
@@ -289,9 +290,9 @@ const ProductCard = styled.div`
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
 `;
@@ -316,18 +317,26 @@ const ProductBadge = styled.span`
   font-weight: 500;
   background: ${props => {
     switch (props.status) {
-      case 'active': return '#D1FAE5';
-      case 'inactive': return '#FEE2E2';
-      case 'pending': return '#FEF3C7';
-      default: return '#F3F4F6';
+      case 'active':
+        return '#D1FAE5';
+      case 'inactive':
+        return '#FEE2E2';
+      case 'pending':
+        return '#FEF3C7';
+      default:
+        return '#F3F4F6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'active': return '#065F46';
-      case 'inactive': return '#991B1B';
-      case 'pending': return '#92400E';
-      default: return '#374151';
+      case 'active':
+        return '#065F46';
+      case 'inactive':
+        return '#991B1B';
+      case 'pending':
+        return '#92400E';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -392,7 +401,7 @@ const ActionButton = styled.button`
   justify-content: center;
   gap: 0.25rem;
   font-size: 0.75rem;
-  
+
   &:hover {
     border-color: ${props => props.theme.colors.primary};
     color: ${props => props.theme.colors.primary};
@@ -405,11 +414,11 @@ const ProductListItem = styled.div`
   gap: 1rem;
   padding: 1rem;
   border-bottom: 1px solid ${props => props.theme.colors.border};
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   &:hover {
     background: ${props => props.theme.colors.background};
   }
@@ -456,18 +465,26 @@ const StatusBadge = styled.span`
   justify-content: center;
   background: ${props => {
     switch (props.status) {
-      case 'active': return '#D1FAE5';
-      case 'inactive': return '#FEE2E2';
-      case 'pending': return '#FEF3C7';
-      default: return '#F3F4F6';
+      case 'active':
+        return '#D1FAE5';
+      case 'inactive':
+        return '#FEE2E2';
+      case 'pending':
+        return '#FEF3C7';
+      default:
+        return '#F3F4F6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'active': return '#065F46';
-      case 'inactive': return '#991B1B';
-      case 'pending': return '#92400E';
-      default: return '#374151';
+      case 'active':
+        return '#065F46';
+      case 'inactive':
+        return '#991B1B';
+      case 'pending':
+        return '#92400E';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -498,89 +515,94 @@ function CatalogManagement() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const { adminUser } = useAdminAuth();
-  const { 
-    products: catalogProducts, 
+  const {
+    products: catalogProducts,
     categories,
-    loading, 
-    error, 
+    loading,
+    error,
     fetchProducts,
     addProduct,
     updateProduct,
     removeProduct,
-    productStats
+    productStats,
   } = useAdminCatalog();
 
   // Use product stats from hook - calculated based on actual API data
-  const stats = productStats ? [
-    {
-      label: 'Total Products',
-      value: productStats.totalProducts?.toLocaleString() || '0',
-      icon: <Package size={20} />,
-      color: '#3B82F6'
-    },
-    {
-      label: 'Active Products',
-      value: productStats.activeProducts?.toLocaleString() || '0',
-      icon: <CheckCircle size={20} />,
-      color: '#10B981'
-    },
-    {
-      label: 'Inactive Products',
-      value: productStats.pendingProducts?.toLocaleString() || '0',
-      icon: <Clock size={20} />,
-      color: '#F59E0B'
-    },
-    {
-      label: 'Categories',
-      value: productStats.categoriesCount?.toLocaleString() || '0',
-      icon: <Layers size={20} />,
-      color: '#8B5CF6'
-    }
-  ] : [
-    {
-      label: 'Total Products',
-      value: '0',
-      icon: <Package size={20} />,
-      color: '#3B82F6'
-    },
-    {
-      label: 'Active Products',
-      value: '0',
-      icon: <CheckCircle size={20} />,
-      color: '#10B981'
-    },
-    {
-      label: 'Inactive Products',
-      value: '0',
-      icon: <Clock size={20} />,
-      color: '#F59E0B'
-    },
-    {
-      label: 'Categories',
-      value: '0',
-      icon: <Layers size={20} />,
-      color: '#8B5CF6'
-    }
-  ];
+  const stats = productStats
+    ? [
+        {
+          label: 'Total Products',
+          value: productStats.totalProducts?.toLocaleString() || '0',
+          icon: <Package size={20} />,
+          color: '#3B82F6',
+        },
+        {
+          label: 'Active Products',
+          value: productStats.activeProducts?.toLocaleString() || '0',
+          icon: <CheckCircle size={20} />,
+          color: '#10B981',
+        },
+        {
+          label: 'Inactive Products',
+          value: productStats.pendingProducts?.toLocaleString() || '0',
+          icon: <Clock size={20} />,
+          color: '#F59E0B',
+        },
+        {
+          label: 'Categories',
+          value: productStats.categoriesCount?.toLocaleString() || '0',
+          icon: <Layers size={20} />,
+          color: '#8B5CF6',
+        },
+      ]
+    : [
+        {
+          label: 'Total Products',
+          value: '0',
+          icon: <Package size={20} />,
+          color: '#3B82F6',
+        },
+        {
+          label: 'Active Products',
+          value: '0',
+          icon: <CheckCircle size={20} />,
+          color: '#10B981',
+        },
+        {
+          label: 'Inactive Products',
+          value: '0',
+          icon: <Clock size={20} />,
+          color: '#F59E0B',
+        },
+        {
+          label: 'Categories',
+          value: '0',
+          icon: <Layers size={20} />,
+          color: '#8B5CF6',
+        },
+      ];
 
   // Use products from hook - format to match API structure
-  const products = catalogProducts?.length > 0 ? catalogProducts.map(product => ({
-    id: product._id,
-    name: `${product.brand} ${product.model}`,
-    category: product.category,
-    brand: product.brand,
-    model: product.model,
-    series: product.series,
-    price: product.basePrice ? `₹${product.basePrice.toLocaleString()}` : '₹0',
-    basePrice: product.basePrice,
-    variant: product.variant,
-    status: product.isActive ? 'active' : 'inactive',
-    images: product.images || [],
-    specifications: product.specifications,
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
-    createdBy: product.createdBy
-  })) : [];
+  const products =
+    catalogProducts?.length > 0
+      ? catalogProducts.map(product => ({
+          id: product._id,
+          name: `${product.brand} ${product.model}`,
+          category: product.category,
+          brand: product.brand,
+          model: product.model,
+          series: product.series,
+          price: product.basePrice ? `₹${product.basePrice.toLocaleString()}` : '₹0',
+          basePrice: product.basePrice,
+          variant: product.variant,
+          status: product.isActive ? 'active' : 'inactive',
+          images: product.images || [],
+          specifications: product.specifications,
+          createdAt: product.createdAt,
+          updatedAt: product.updatedAt,
+          createdBy: product.createdBy,
+        }))
+      : [];
 
   const filteredProducts = products.filter(product => {
     // Handle potential null/undefined values in product properties
@@ -589,25 +611,26 @@ function CatalogManagement() {
     const productModel = product.model || '';
     const productCategory = product.category || '';
     const productStatus = product.status || 'inactive';
-    
-    const matchesSearch = productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         productBrand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         productModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         productCategory.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesSearch =
+      productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      productBrand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      productModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      productCategory.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || productCategory === categoryFilter;
     const matchesStatus = statusFilter === 'all' || productStatus === statusFilter;
-    
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
   // Add loading state and refresh function
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   // Load products when component mounts
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
-  
+
   // Function to handle manual refresh
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -619,13 +642,17 @@ function CatalogManagement() {
       setIsRefreshing(false);
     }
   }, [fetchProducts]);
-  
-  const getStatusIcon = (status) => {
+
+  const getStatusIcon = status => {
     switch (status) {
-      case 'active': return <CheckCircle size={12} />;
-      case 'pending': return <Clock size={12} />;
-      case 'inactive': return <AlertCircle size={12} />;
-      default: return null;
+      case 'active':
+        return <CheckCircle size={12} />;
+      case 'pending':
+        return <Clock size={12} />;
+      case 'inactive':
+        return <AlertCircle size={12} />;
+      default:
+        return null;
     }
   };
 
@@ -635,7 +662,11 @@ function CatalogManagement() {
         <Title>Catalog Management</Title>
         <HeaderActions>
           <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing || loading}>
-            {isRefreshing ? <RefreshCw size={20} className="animate-spin" /> : <RefreshCw size={20} />}
+            {isRefreshing ? (
+              <RefreshCw size={20} className="animate-spin" />
+            ) : (
+              <RefreshCw size={20} />
+            )}
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
           <Button variant="outline">
@@ -646,10 +677,12 @@ function CatalogManagement() {
             <Upload size={20} />
             Import
           </Button>
-          <PrimaryButton onClick={() => {
-            console.log('Navigating to create product page...');
-            navigate('/admin/products/create');
-          }}>
+          <PrimaryButton
+            onClick={() => {
+              console.log('Navigating to create product page...');
+              navigate('/admin/products/create');
+            }}
+          >
             <Plus size={20} />
             Add Product
           </PrimaryButton>
@@ -660,9 +693,7 @@ function CatalogManagement() {
         {stats.map((stat, index) => (
           <StatCard key={index}>
             <StatHeader>
-              <StatIcon color={stat.color}>
-                {stat.icon}
-              </StatIcon>
+              <StatIcon color={stat.color}>{stat.icon}</StatIcon>
               <StatInfo>
                 <StatValue>{stat.value}</StatValue>
                 <StatLabel>{stat.label}</StatLabel>
@@ -680,10 +711,10 @@ function CatalogManagement() {
               type="text"
               placeholder="Search by name, category, or partner..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </FilterGroup>
-          
+
           <FilterGroup>
             <Label>Category</Label>
             <Select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
@@ -691,7 +722,8 @@ function CatalogManagement() {
               {categories && categories.length > 0 ? (
                 categories.map(category => (
                   <option key={category.name || category} value={category.name || category}>
-                    {(category.name || category).charAt(0).toUpperCase() + (category.name || category).slice(1)}
+                    {(category.name || category).charAt(0).toUpperCase() +
+                      (category.name || category).slice(1)}
                   </option>
                 ))
               ) : (
@@ -707,46 +739,34 @@ function CatalogManagement() {
               )}
             </Select>
           </FilterGroup>
-          
+
           <FilterGroup>
             <Label>Status</Label>
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
+            <Select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
               <option value="all">All Status</option>
               <option value="active">Active</option>
               <option value="pending">Pending</option>
               <option value="inactive">Inactive</option>
             </Select>
           </FilterGroup>
-          
+
           <FilterGroup>
             <Label>Sort By</Label>
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-            >
+            <Select value={sortBy} onChange={e => setSortBy(e.target.value)}>
               <option value="name">Name</option>
               <option value="price">Price</option>
               <option value="rating">Rating</option>
               <option value="date">Date Added</option>
             </Select>
           </FilterGroup>
-          
+
           <FilterGroup>
             <Label>View</Label>
             <ViewToggle>
-              <ViewButton
-                active={viewMode === 'grid'}
-                onClick={() => setViewMode('grid')}
-              >
+              <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
                 <Grid size={16} />
               </ViewButton>
-              <ViewButton
-                active={viewMode === 'list'}
-                onClick={() => setViewMode('list')}
-              >
+              <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
                 <List size={16} />
               </ViewButton>
             </ViewToggle>
@@ -756,18 +776,18 @@ function CatalogManagement() {
 
       <ProductsContainer>
         <ProductsHeader>
-          <ProductsTitle>
-            Products ({filteredProducts.length})
-          </ProductsTitle>
-          <PrimaryButton onClick={() => {
-            console.log('Navigating to create product page from products section...');
-            navigate('/admin/products/create');
-          }}>
+          <ProductsTitle>Products ({filteredProducts.length})</ProductsTitle>
+          <PrimaryButton
+            onClick={() => {
+              console.log('Navigating to create product page from products section...');
+              navigate('/admin/products/create');
+            }}
+          >
             <Plus size={16} />
             Add New Product
           </PrimaryButton>
         </ProductsHeader>
-        
+
         {loading && !isRefreshing ? (
           <EmptyState>
             <EmptyIcon>
@@ -789,96 +809,105 @@ function CatalogManagement() {
           </EmptyState>
         ) : filteredProducts.length > 0 ? (
           <ProductsGrid view={viewMode}>
-            {viewMode === 'grid' ? (
-              filteredProducts.map((product) => (
-                <ProductCard key={product.id}>
-                  <ProductImage>
-                    {product.images && product.images.length > 0 ? (
-                      <img 
-                        src={product.images[0]} 
-                        alt={product.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <Image size={40} />
-                    )}
-                    <ProductBadge status={product.status}>
-                      {product.status?.charAt(0).toUpperCase() + product.status?.slice(1)}
-                    </ProductBadge>
-                  </ProductImage>
-                  <ProductInfo>
-                    <ProductTitle>{product.name}</ProductTitle>
-                    <ProductDetails>
-                      <ProductPrice>{product.price}</ProductPrice>
+            {viewMode === 'grid'
+              ? filteredProducts.map(product => (
+                  <ProductCard key={product.id}>
+                    <ProductImage>
+                      {product.images && product.images.length > 0 ? (
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <Image size={40} />
+                      )}
+                      <ProductBadge status={product.status}>
+                        {product.status?.charAt(0).toUpperCase() + product.status?.slice(1)}
+                      </ProductBadge>
+                    </ProductImage>
+                    <ProductInfo>
+                      <ProductTitle>{product.name}</ProductTitle>
+                      <ProductDetails>
+                        <ProductPrice>{product.price}</ProductPrice>
+                        <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>
+                          {product.variant?.ram} / {product.variant?.storage}
+                        </div>
+                      </ProductDetails>
+                      <ProductMeta>
+                        <span>{product.category}</span>
+                        <span>{product.brand}</span>
+                      </ProductMeta>
+                      <ProductActions>
+                        <ActionButton onClick={() => navigate(`/admin/products/${product.id}`)}>
+                          <Eye size={14} />
+                          View
+                        </ActionButton>
+                        <ActionButton
+                          onClick={() => navigate(`/admin/products/${product.id}/edit`)}
+                        >
+                          <Edit size={14} />
+                          Edit
+                        </ActionButton>
+                        <ActionButton>
+                          <MoreVertical size={14} />
+                        </ActionButton>
+                      </ProductActions>
+                    </ProductInfo>
+                  </ProductCard>
+                ))
+              : filteredProducts.map(product => (
+                  <ProductListItem key={product.id}>
+                    <ListProductImage>
+                      {product.images && product.images.length > 0 ? (
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            borderRadius: '8px',
+                          }}
+                        />
+                      ) : (
+                        <Image size={24} />
+                      )}
+                    </ListProductImage>
+                    <ListProductInfo>
+                      <div>
+                        <ListProductTitle>{product.name}</ListProductTitle>
+                        <ListProductCategory>
+                          {product.category} • {product.brand}
+                        </ListProductCategory>
+                      </div>
+                      <div>{product.price}</div>
                       <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>
                         {product.variant?.ram} / {product.variant?.storage}
                       </div>
-                    </ProductDetails>
-                    <ProductMeta>
-                      <span>{product.category}</span>
-                      <span>{product.brand}</span>
-                    </ProductMeta>
-                    <ProductActions>
-                      <ActionButton onClick={() => navigate(`/admin/products/${product.id}`)}>
-                        <Eye size={14} />
-                        View
-                      </ActionButton>
-                      <ActionButton onClick={() => navigate(`/admin/products/${product.id}/edit`)}>
-                        <Edit size={14} />
-                        Edit
-                      </ActionButton>
-                      <ActionButton>
-                        <MoreVertical size={14} />
-                      </ActionButton>
-                    </ProductActions>
-                  </ProductInfo>
-                </ProductCard>
-              ))
-            ) : (
-              filteredProducts.map((product) => (
-                <ProductListItem key={product.id}>
-                  <ListProductImage>
-                    {product.images && product.images.length > 0 ? (
-                      <img 
-                        src={product.images[0]} 
-                        alt={product.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
-                      />
-                    ) : (
-                      <Image size={24} />
-                    )}
-                  </ListProductImage>
-                  <ListProductInfo>
-                    <div>
-                      <ListProductTitle>{product.name}</ListProductTitle>
-                      <ListProductCategory>{product.category} • {product.brand}</ListProductCategory>
-                    </div>
-                    <div>{product.price}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>
-                      {product.variant?.ram} / {product.variant?.storage}
-                    </div>
-                    <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>
-                      Created: {new Date(product.createdAt).toLocaleDateString()}
-                    </div>
-                    <StatusBadge status={product.status}>
-                      {getStatusIcon(product.status)}
-                      {product.status?.charAt(0).toUpperCase() + product.status?.slice(1)}
-                    </StatusBadge>
-                    <ProductActions>
-                      <ActionButton onClick={() => navigate(`/admin/products/${product.id}`)}>
-                        <Eye size={14} />
-                      </ActionButton>
-                      <ActionButton onClick={() => navigate(`/admin/products/${product.id}/edit`)}>
-                        <Edit size={14} />
-                      </ActionButton>
-                      <ActionButton onClick={() => removeProduct && removeProduct(product.id)}>
-                        <Trash2 size={14} />
-                      </ActionButton>
-                    </ProductActions>
-                  </ListProductInfo>
-                </ProductListItem>
-              ))
-            )}
+                      <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>
+                        Created: {new Date(product.createdAt).toLocaleDateString()}
+                      </div>
+                      <StatusBadge status={product.status}>
+                        {getStatusIcon(product.status)}
+                        {product.status?.charAt(0).toUpperCase() + product.status?.slice(1)}
+                      </StatusBadge>
+                      <ProductActions>
+                        <ActionButton onClick={() => navigate(`/admin/products/${product.id}`)}>
+                          <Eye size={14} />
+                        </ActionButton>
+                        <ActionButton
+                          onClick={() => navigate(`/admin/products/${product.id}/edit`)}
+                        >
+                          <Edit size={14} />
+                        </ActionButton>
+                        <ActionButton onClick={() => removeProduct && removeProduct(product.id)}>
+                          <Trash2 size={14} />
+                        </ActionButton>
+                      </ProductActions>
+                    </ListProductInfo>
+                  </ProductListItem>
+                ))}
           </ProductsGrid>
         ) : (
           <EmptyState>

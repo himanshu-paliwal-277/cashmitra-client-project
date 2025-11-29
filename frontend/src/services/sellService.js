@@ -17,10 +17,10 @@ class SellService {
   async createSellOrder(orderData) {
     try {
       console.log('Creating sell order with data:', orderData);
-      
+
       // Get sessionId from localStorage or orderData
       const sessionId = orderData.sessionId || localStorage.getItem('sessionId');
-      
+
       if (!sessionId) {
         throw new Error('Session ID is required to create a sell order');
       }
@@ -31,7 +31,7 @@ class SellService {
       // Transform the data structure to match backend expectations for /api/sell-orders
       const transformedData = {
         sessionId: sessionId,
-        
+
         // Customer info as expected by backend validation
         customerInfo: {
           name: userData.name || orderData.customerDetails?.fullName || 'User',
@@ -40,14 +40,14 @@ class SellService {
           address: orderData.pickupDetails?.address || '',
           city: orderData.pickupDetails?.city || '',
           state: orderData.pickupDetails?.state || 'Unknown',
-          pincode: orderData.pickupDetails?.pincode || ''
+          pincode: orderData.pickupDetails?.pincode || '',
         },
-        
+
         // Pickup details
         pickupPreference: 'scheduled', // or 'immediate' based on your logic
         preferredDate: orderData.pickupDetails?.pickupDate,
         preferredTimeSlot: orderData.pickupDetails?.timeSlot,
-        notes: orderData.pickupDetails?.specialInstructions || ''
+        notes: orderData.pickupDetails?.specialInstructions || '',
       };
 
       console.log('Transformed data for API:', transformedData);
@@ -65,7 +65,7 @@ class SellService {
   async createSellOrderCorrect(orderData) {
     try {
       console.log('Creating sell order with correct payload:', orderData);
-      
+
       // Use the correct API endpoint that matches the backend route
       const response = await api.post('/sell-orders', orderData);
       return response.data;
@@ -166,7 +166,9 @@ class SellService {
   // Search products by model name
   async searchProductsByModel(modelName) {
     try {
-      const response = await api.get(`/sell/products/search?model=${encodeURIComponent(modelName)}`);
+      const response = await api.get(
+        `/sell/products/search?model=${encodeURIComponent(modelName)}`
+      );
       return response.data;
     } catch (error) {
       console.error('Error searching products by model:', error);
@@ -182,8 +184,8 @@ class SellService {
         { status },
         {
           headers: {
-            Authorization: `Bearer ${adminToken}`
-          }
+            Authorization: `Bearer ${adminToken}`,
+          },
         }
       );
       return response.data;
@@ -233,16 +235,12 @@ class SellService {
       images.forEach((image, index) => {
         formData.append(`image${index}`, image);
       });
-      
-      const response = await api.post(
-        `/sell/upload-images/${orderId}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
+
+      const response = await api.post(`/sell/upload-images/${orderId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       return response.data;
     } catch (error) {
       console.error('Error uploading device images:', error);
@@ -264,10 +262,7 @@ class SellService {
   // Schedule pickup for sell order
   async schedulePickup(orderId, pickupDetails) {
     try {
-      const response = await api.post(
-        `/sell/schedule-pickup/${orderId}`,
-        pickupDetails
-      );
+      const response = await api.post(`/sell/schedule-pickup/${orderId}`, pickupDetails);
       return response.data;
     } catch (error) {
       console.error('Error scheduling pickup:', error);
@@ -289,10 +284,7 @@ class SellService {
   // Validate device condition (for quality check)
   async validateDeviceCondition(orderId, conditionData) {
     try {
-      const response = await api.post(
-        `/sell/validate-condition/${orderId}`,
-        conditionData
-      );
+      const response = await api.post(`/sell/validate-condition/${orderId}`, conditionData);
       return response.data;
     } catch (error) {
       console.error('Error validating device condition:', error);
@@ -325,10 +317,7 @@ class SellService {
   // Process payment for sell order
   async processPayment(orderId, paymentDetails) {
     try {
-      const response = await api.post(
-        `/sell/process-payment/${orderId}`,
-        paymentDetails
-      );
+      const response = await api.post(`/sell/process-payment/${orderId}`, paymentDetails);
       return response.data;
     } catch (error) {
       console.error('Error processing payment:', error);
@@ -374,24 +363,26 @@ class SellService {
   async getCustomerDefects(categoryId) {
     try {
       const response = await api.get(`/sell-defects/category/${categoryId}`);
-      
+
       // Handle the API response structure
       if (response.data && response.data.success && response.data.data) {
         const defects = response.data.data;
-        
+
         // Return grouped structure by section
         return {
-          defects: defects.flatMap(section => section.defects.map(defect => ({
-            ...defect,
-            name: defect.title || defect.name // Map title to name for UI compatibility
-          }))),
+          defects: defects.flatMap(section =>
+            section.defects.map(defect => ({
+              ...defect,
+              name: defect.title || defect.name, // Map title to name for UI compatibility
+            }))
+          ),
           grouped: defects.reduce((acc, section) => {
             acc[section._id] = section.defects;
             return acc;
-          }, {})
+          }, {}),
         };
       }
-      
+
       return { defects: [], grouped: {} };
     } catch (error) {
       console.error('Error fetching customer defects:', error);
@@ -403,12 +394,12 @@ class SellService {
   async getCustomerAccessories(categoryId) {
     try {
       const response = await api.get(`/sell-accessories/customer?categoryId=${categoryId}`);
-      
+
       // Return accessories array from response
       if (response.data && response.data.data) {
         return response.data.data;
       }
-      
+
       return response.data || [];
     } catch (error) {
       console.error('Error fetching customer accessories:', error);
@@ -440,7 +431,7 @@ class SellService {
           answers: data.answers,
           selectedDefects: data.selectedDefects || [],
           selectedAccessories: data.selectedAccessories || [],
-          productDetails: data.productDetails
+          productDetails: data.productDetails,
         };
       } else if (typeof data === 'object' && data.category !== undefined) {
         // Legacy support for category-based calls
@@ -449,7 +440,7 @@ class SellService {
           brand: data.brand,
           model: data.model,
           answers: data.answers,
-          productDetails: data.productDetails
+          productDetails: data.productDetails,
         };
       } else {
         // Called with individual parameters (legacy support)
@@ -459,7 +450,7 @@ class SellService {
           brand,
           model,
           answers,
-          productDetails
+          productDetails,
         };
       }
 
@@ -480,4 +471,4 @@ export default sellService;
 export { SellService };
 
 // Export individual methods for direct import
-export const createSellOfferSession = (offerData) => sellService.createSellOfferSession(offerData);
+export const createSellOfferSession = offerData => sellService.createSellOfferSession(offerData);

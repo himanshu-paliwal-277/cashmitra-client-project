@@ -5,7 +5,7 @@ import { theme } from '../../theme';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import sellService from '../../services/sellService';
-import { 
+import {
   ArrowRight,
   ArrowLeft,
   Home,
@@ -15,7 +15,7 @@ import {
   AlertTriangle,
   HelpCircle,
   Loader2,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 
 const PageContainer = styled.div`
@@ -28,7 +28,7 @@ const Container = styled.div`
   max-width: 800px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
@@ -49,7 +49,7 @@ const BreadcrumbLink = styled.a`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -126,13 +126,15 @@ const OptionItem = styled.label`
   border-radius: ${theme.borderRadius.md};
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     border-color: ${theme.colors.primary.main};
     background: ${theme.colors.primary.light}10;
   }
-  
-  ${props => props.selected && `
+
+  ${props =>
+    props.selected &&
+    `
     border-color: ${theme.colors.primary.main};
     background: ${theme.colors.primary.light}20;
   `}
@@ -173,13 +175,15 @@ const DefectItem = styled.label`
   border-radius: ${theme.borderRadius.md};
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     border-color: ${theme.colors.primary.main};
     background: ${theme.colors.primary.light}10;
   }
-  
-  ${props => props.selected && `
+
+  ${props =>
+    props.selected &&
+    `
     border-color: ${theme.colors.primary.main};
     background: ${theme.colors.primary.light}20;
   `}
@@ -238,11 +242,11 @@ const ProductCondition = () => {
       // Fetch product data
       const productData = await sellService.getProductVariants(productId);
       setProduct(productData);
-console.log('productData',productData)
+      console.log('productData', productData);
       // Fetch questions using productId
       if (productId) {
         const questionsData = await sellService.getCustomerQuestions(productId);
-        
+
         // Process the new API response structure
         // Questions are now grouped by sections, we need to flatten them
         const allQuestions = [];
@@ -253,18 +257,17 @@ console.log('productData',productData)
               // Add section information to each question
               const questionsWithSection = sectionQuestions.map(question => ({
                 ...question,
-                section: sectionName
+                section: sectionName,
               }));
               allQuestions.push(...questionsWithSection);
             }
           });
         }
-        
+
         setQuestions(allQuestions);
       } else {
         console.warn('Product ID is not available');
       }
-
     } catch (error) {
       console.error('Error fetching data:', error);
       setError('Failed to load product information. Please try again.');
@@ -277,7 +280,7 @@ console.log('productData',productData)
     // Find the question details
     const question = questions.find(q => q._id === questionId);
     const selectedOption = question?.options?.find(opt => opt.value === value);
-    
+
     setAnswers(prev => ({
       ...prev,
       [questionId]: {
@@ -287,8 +290,8 @@ console.log('productData',productData)
         answerValue: value,
         answerText: selectedOption?.label || value,
         delta: selectedOption?.delta || { type: 'percentage', value: 0 },
-        section: question?.section || ''
-      }
+        section: question?.section || '',
+      },
     }));
   };
 
@@ -298,12 +301,12 @@ console.log('productData',productData)
     console.log('variantId', variantId);
     // console.log('deviceEvaluation',deviceEvaluation)
     console.log('selectedVariant', selectedVariant);
-    
+
     // Log the new answer structure for debugging
     // Object.entries(answers).forEach(([questionId, answerData]) => {
     //   console.log(`Question: ${answerData.questionText} | Answer: ${answerData.answerText} | Delta: ${JSON.stringify(answerData.delta)}`);
     // });
-    
+
     // Navigate to defects page with product and answers data
     navigate('/sell/defects', {
       state: {
@@ -311,20 +314,20 @@ console.log('productData',productData)
         answers,
         productId,
         variantId,
-        selectedVariant
-      }
+        selectedVariant,
+      },
     });
   };
 
   const isFormComplete = () => {
     // Only validate required questions
     const requiredQuestions = questions.filter(question => question.required);
-    
+
     // If no required questions, check if at least one question is answered
     if (requiredQuestions.length === 0) {
       return questions.length > 0 && Object.keys(answers).length > 0;
     }
-    
+
     // Check if all required questions are answered (using answerValue property)
     return requiredQuestions.every(question => answers[question._id]?.answerValue);
   };
@@ -350,15 +353,13 @@ console.log('productData',productData)
               <AlertCircle size={20} />
               {error}
             </ErrorMessage>
-            <Button onClick={() => window.location.reload()}>
-              Try Again
-            </Button>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
           </ErrorContainer>
         </Container>
       </PageContainer>
     );
   }
-// console.log('product',product)
+  // console.log('product',product)
   const selectedVariant = product?.data.variants?.find(v => v._id === variantId);
 
   return (
@@ -371,11 +372,9 @@ console.log('productData',productData)
             Home
           </BreadcrumbLink>
           <BreadcrumbSeparator>
-             <ChevronRight size={14} />
-           </BreadcrumbSeparator>
-          <BreadcrumbLink href="/sell">
-            Sell
-          </BreadcrumbLink>
+            <ChevronRight size={14} />
+          </BreadcrumbSeparator>
+          <BreadcrumbLink href="/sell">Sell</BreadcrumbLink>
           <BreadcrumbSeparator>
             <ArrowRight size={14} />
           </BreadcrumbSeparator>
@@ -391,12 +390,12 @@ console.log('productData',productData)
         </PageHeader>
 
         {/* Questions Section */}
-        {questions.map((question) => (
+        {questions.map(question => (
           <QuestionCard key={question._id}>
             <QuestionTitle>{question.title}</QuestionTitle>
             <OptionsList>
-              {question.activeOptions?.map((option) => (
-                <OptionItem 
+              {question.activeOptions?.map(option => (
+                <OptionItem
                   key={option.value}
                   selected={answers[question._id]?.answerValue === option.value}
                 >
@@ -416,19 +415,12 @@ console.log('productData',productData)
 
         {/* Navigation Buttons */}
         <NavigationButtons>
-          <BackButton 
-            variant="outline" 
-            onClick={() => navigate(-1)}
-          >
+          <BackButton variant="outline" onClick={() => navigate(-1)}>
             <ArrowLeft size={16} />
             Back
           </BackButton>
-          
-          <NextButton 
-            variant="primary"
-            onClick={handleContinue}
-            disabled={!isFormComplete()}
-          >
+
+          <NextButton variant="primary" onClick={handleContinue} disabled={!isFormComplete()}>
             Continue to Quote
             <ArrowRight size={16} />
           </NextButton>

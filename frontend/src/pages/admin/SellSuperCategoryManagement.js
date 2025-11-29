@@ -18,7 +18,7 @@ const SellSuperCategoryManagement = () => {
       setLoading(true);
       setError('');
       const token = localStorage.getItem('adminToken');
-      
+
       let url = `${API_BASE_URL}/sell-super-categories?`;
       if (filterActive !== 'all') {
         url += `isActive=${filterActive === 'active'}&`;
@@ -26,15 +26,15 @@ const SellSuperCategoryManagement = () => {
       if (searchTerm) {
         url += `search=${searchTerm}&`;
       }
-      
+
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setSuperCategories(data.data || []);
         setError('');
@@ -61,8 +61,12 @@ const SellSuperCategoryManagement = () => {
     fetchSuperCategories();
   }, [fetchSuperCategories]);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this super category? This will fail if there are linked categories.')) {
+  const handleDelete = async id => {
+    if (
+      !window.confirm(
+        'Are you sure you want to delete this super category? This will fail if there are linked categories.'
+      )
+    ) {
       return;
     }
 
@@ -71,12 +75,12 @@ const SellSuperCategoryManagement = () => {
       const response = await fetch(`${API_BASE_URL}/sell-super-categories/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         fetchSuperCategories();
         alert('Super category deleted successfully');
@@ -88,7 +92,7 @@ const SellSuperCategoryManagement = () => {
     }
   };
 
-  const handleEdit = (category) => {
+  const handleEdit = category => {
     setEditingCategory(category);
     setShowForm(true);
   };
@@ -109,8 +113,9 @@ const SellSuperCategoryManagement = () => {
   };
 
   const filteredCategories = superCategories.filter(category => {
-    const matchesSearch = category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         category.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category.description?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
@@ -125,24 +130,21 @@ const SellSuperCategoryManagement = () => {
               type="text"
               placeholder="Search super categories..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </SearchBox>
           <FilterGroup>
-            <FilterButton 
-              active={filterActive === 'all'} 
-              onClick={() => setFilterActive('all')}
-            >
+            <FilterButton active={filterActive === 'all'} onClick={() => setFilterActive('all')}>
               All
             </FilterButton>
-            <FilterButton 
-              active={filterActive === 'active'} 
+            <FilterButton
+              active={filterActive === 'active'}
               onClick={() => setFilterActive('active')}
             >
               Active
             </FilterButton>
-            <FilterButton 
-              active={filterActive === 'inactive'} 
+            <FilterButton
+              active={filterActive === 'inactive'}
               onClick={() => setFilterActive('inactive')}
             >
               Inactive
@@ -155,23 +157,19 @@ const SellSuperCategoryManagement = () => {
         </HeaderActions>
       </Header>
 
-      {error && (
-        <ErrorMessage>
-          {error}
-        </ErrorMessage>
-      )}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
 
       {loading ? (
         <LoadingMessage>Loading super categories...</LoadingMessage>
       ) : filteredCategories.length === 0 ? (
         <EmptyMessage>
-          {searchTerm || filterActive !== 'all' 
-            ? 'No super categories found matching your criteria' 
+          {searchTerm || filterActive !== 'all'
+            ? 'No super categories found matching your criteria'
             : 'No super categories yet. Create your first one!'}
         </EmptyMessage>
       ) : (
         <Grid>
-          {filteredCategories.map((category) => (
+          {filteredCategories.map(category => (
             <Card key={category._id}>
               <CardImage>
                 {category.image ? (
@@ -191,9 +189,7 @@ const SellSuperCategoryManagement = () => {
                 <CardFooter>
                   <CardMeta>
                     <MetaItem>Sort: {category.sortOrder || 0}</MetaItem>
-                    <MetaItem>
-                      {new Date(category.createdAt).toLocaleDateString()}
-                    </MetaItem>
+                    <MetaItem>{new Date(category.createdAt).toLocaleDateString()}</MetaItem>
                   </CardMeta>
                   <CardActions>
                     <ActionButton onClick={() => handleEdit(category)}>
@@ -273,9 +269,9 @@ const FilterGroup = styled.div`
 
 const FilterButton = styled.button`
   padding: 0.5rem 1rem;
-  border: 1px solid ${props => props.active ? '#f59e0b' : '#e2e8f0'};
-  background: ${props => props.active ? '#f59e0b' : 'white'};
-  color: ${props => props.active ? 'white' : '#4a5568'};
+  border: 1px solid ${props => (props.active ? '#f59e0b' : '#e2e8f0')};
+  background: ${props => (props.active ? '#f59e0b' : 'white')};
+  color: ${props => (props.active ? 'white' : '#4a5568')};
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
@@ -284,7 +280,7 @@ const FilterButton = styled.button`
 
   &:hover {
     border-color: #f59e0b;
-    background: ${props => props.active ? '#d97706' : '#fffbeb'};
+    background: ${props => (props.active ? '#d97706' : '#fffbeb')};
   }
 `;
 
@@ -299,7 +295,9 @@ const CreateButton = styled.button`
   border-radius: 0.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-2px);
@@ -339,7 +337,9 @@ const Card = styled.div`
   border-radius: 0.75rem;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-4px);
@@ -385,8 +385,8 @@ const StatusBadge = styled.span`
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: ${props => props.isActive ? '#d1fae5' : '#fee2e2'};
-  color: ${props => props.isActive ? '#065f46' : '#991b1b'};
+  background: ${props => (props.isActive ? '#d1fae5' : '#fee2e2')};
+  color: ${props => (props.isActive ? '#065f46' : '#991b1b')};
 `;
 
 const CardDescription = styled.p`
@@ -422,15 +422,15 @@ const CardActions = styled.div`
 
 const ActionButton = styled.button`
   padding: 0.5rem;
-  background: ${props => props.danger ? '#fee2e2' : '#f3f4f6'};
-  color: ${props => props.danger ? '#dc2626' : '#4a5568'};
+  background: ${props => (props.danger ? '#fee2e2' : '#f3f4f6')};
+  color: ${props => (props.danger ? '#dc2626' : '#4a5568')};
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: ${props => props.danger ? '#fecaca' : '#e2e8f0'};
+    background: ${props => (props.danger ? '#fecaca' : '#e2e8f0')};
     transform: scale(1.1);
   }
 `;

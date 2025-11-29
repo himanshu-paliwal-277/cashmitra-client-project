@@ -70,7 +70,7 @@ const Messages = () => {
         <Title>Messages</Title>
         <Subtitle>Communicate with customers and support team</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,8 +78,8 @@ const Messages = () => {
           </Icon>
           <ComingSoonTitle>Messages Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to communicate 
-            directly with customers, support team, and manage all your conversations in one place.
+            This feature is currently under development. Soon you'll be able to communicate directly
+            with customers, support team, and manage all your conversations in one place.
           </ComingSoonText>
         </ComingSoon>
       </Card>

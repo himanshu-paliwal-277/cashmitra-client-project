@@ -23,7 +23,7 @@ const useUserAddresses = () => {
   };
 
   // Add new address
-  const addAddress = async (addressData) => {
+  const addAddress = async addressData => {
     setLoading(true);
     setError(null);
     try {
@@ -44,8 +44,8 @@ const useUserAddresses = () => {
     setError(null);
     try {
       const response = await api.put(`/user/addresses/${addressId}`, addressData);
-      setAddresses(prev => 
-        prev.map(addr => (addr._id || addr.id) === addressId ? response.data : addr)
+      setAddresses(prev =>
+        prev.map(addr => ((addr._id || addr.id) === addressId ? response.data : addr))
       );
       return response.data;
     } catch (err) {
@@ -57,11 +57,11 @@ const useUserAddresses = () => {
   };
 
   // Delete address
-  const deleteAddress = async (addressId) => {
+  const deleteAddress = async addressId => {
     setLoading(true);
     setError(null);
     try {
-   const response = await api.delete(`/user/addresses/${addressId}`);
+      const response = await api.delete(`/user/addresses/${addressId}`);
       setAddresses(prev => prev.filter(addr => (addr._id || addr.id) !== addressId));
       return true;
     } catch (err) {
@@ -73,15 +73,15 @@ const useUserAddresses = () => {
   };
 
   // Set default address
-  const setDefaultAddress = async (addressId) => {
+  const setDefaultAddress = async addressId => {
     setLoading(true);
     setError(null);
     try {
       const response = await api.put(`/user/addresses/${addressId}/default`);
-      setAddresses(prev => 
+      setAddresses(prev =>
         prev.map(addr => ({
           ...addr,
-          isDefault: addr.id === addressId
+          isDefault: addr.id === addressId,
         }))
       );
       return response.data;
@@ -106,7 +106,7 @@ const useUserAddresses = () => {
     addAddress,
     updateAddress,
     deleteAddress,
-    setDefaultAddress
+    setDefaultAddress,
   };
 };
 

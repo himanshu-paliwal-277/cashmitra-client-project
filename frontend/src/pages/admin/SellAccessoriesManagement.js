@@ -90,7 +90,7 @@ import {
   Car,
   Home,
   Gift,
-  Box
+  Box,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -142,20 +142,27 @@ const HeaderRight = styled.div`
 
 const ActionButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: ${props => props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
+  border: ${props =>
+    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
   border-radius: ${theme.borderRadius.md};
   background: ${props => {
     switch (props.variant) {
-      case 'primary': return theme.colors.primary.main;
-      case 'danger': return theme.colors.error.main;
-      default: return 'white';
+      case 'primary':
+        return theme.colors.primary.main;
+      case 'danger':
+        return theme.colors.error.main;
+      default:
+        return 'white';
     }
   }};
   color: ${props => {
     switch (props.variant) {
-      case 'primary': return 'white';
-      case 'danger': return 'white';
-      default: return theme.colors.text.primary;
+      case 'primary':
+        return 'white';
+      case 'danger':
+        return 'white';
+      default:
+        return theme.colors.text.primary;
     }
   }};
   font-size: ${theme.typography.fontSize.sm};
@@ -171,9 +178,12 @@ const ActionButton = styled.button`
     box-shadow: ${theme.shadows.md};
     background: ${props => {
       switch (props.variant) {
-        case 'primary': return theme.colors.primary[600];
-        case 'danger': return theme.colors.error[600];
-        default: return theme.colors.grey[50];
+        case 'primary':
+          return theme.colors.primary[600];
+        case 'danger':
+          return theme.colors.error[600];
+        default:
+          return theme.colors.grey[50];
       }
     }};
   }
@@ -214,11 +224,16 @@ const StatIcon = styled.div`
   height: 60px;
   background: ${props => {
     switch (props.type) {
-      case 'total': return theme.colors.primary[50];
-      case 'active': return theme.colors.success[50];
-      case 'categories': return theme.colors.info[50];
-      case 'value': return theme.colors.warning[50];
-      default: return theme.colors.grey[50];
+      case 'total':
+        return theme.colors.primary[50];
+      case 'active':
+        return theme.colors.success[50];
+      case 'categories':
+        return theme.colors.info[50];
+      case 'value':
+        return theme.colors.warning[50];
+      default:
+        return theme.colors.grey[50];
     }
   }};
   border-radius: ${theme.borderRadius.lg};
@@ -227,11 +242,16 @@ const StatIcon = styled.div`
   justify-content: center;
   color: ${props => {
     switch (props.type) {
-      case 'total': return theme.colors.primary.main;
-      case 'active': return theme.colors.success.main;
-      case 'categories': return theme.colors.info.main;
-      case 'value': return theme.colors.warning.main;
-      default: return theme.colors.text.secondary;
+      case 'total':
+        return theme.colors.primary.main;
+      case 'active':
+        return theme.colors.success.main;
+      case 'categories':
+        return theme.colors.info.main;
+      case 'value':
+        return theme.colors.warning.main;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
 `;
@@ -256,7 +276,7 @@ const StatLabel = styled.div`
 const StatChange = styled.div`
   font-size: ${theme.typography.fontSize.xs};
   font-weight: ${theme.typography.fontWeight.medium};
-  color: ${props => props.positive ? theme.colors.success.main : theme.colors.error.main};
+  color: ${props => (props.positive ? theme.colors.success.main : theme.colors.error.main)};
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
@@ -351,8 +371,8 @@ const ViewButton = styled.button`
   padding: ${theme.spacing[2]};
   border: 1px solid ${theme.colors.grey[300]};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.active ? theme.colors.primary.main : 'white'};
-  color: ${props => props.active ? 'white' : theme.colors.text.secondary};
+  background: ${props => (props.active ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.active ? 'white' : theme.colors.text.secondary)};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -360,7 +380,7 @@ const ViewButton = styled.button`
   transition: all ${theme.transitions.duration.normal};
 
   &:hover:not(:disabled) {
-    background: ${props => props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props => (props.active ? theme.colors.primary[600] : theme.colors.grey[50])};
   }
 `;
 
@@ -415,8 +435,8 @@ const AccessoryStatus = styled.div`
   font-weight: ${theme.typography.fontWeight.medium};
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: ${props => props.active ? theme.colors.success[100] : theme.colors.grey[100]};
-  color: ${props => props.active ? theme.colors.success[700] : theme.colors.grey[700]};
+  background: ${props => (props.active ? theme.colors.success[100] : theme.colors.grey[100])};
+  color: ${props => (props.active ? theme.colors.success[700] : theme.colors.grey[700])};
 `;
 
 const AccessoryContent = styled.div`
@@ -579,14 +599,14 @@ const PaginationButton = styled.button`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
   border: 1px solid ${theme.colors.grey[300]};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.active ? theme.colors.primary.main : 'white'};
-  color: ${props => props.active ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.active ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.active ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.sm};
   cursor: pointer;
   transition: all ${theme.transitions.duration.normal};
 
   &:hover:not(:disabled) {
-    background: ${props => props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props => (props.active ? theme.colors.primary[600] : theme.colors.grey[50])};
   }
 
   &:disabled {
@@ -782,16 +802,16 @@ const SellAccessoriesManagement = () => {
     createAccessory,
     updateAccessory,
     deleteAccessory,
-    reorderAccessories
+    reorderAccessories,
   } = useSellAccessories();
 
   // Categories hook for category selection
-  const { 
-    categories, 
-    loading: categoriesLoading, 
-    error: categoriesError, 
-    fetchCategories: getAllCategories, 
-    clearError: clearCategoriesError 
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+    fetchCategories: getAllCategories,
+    clearError: clearCategoriesError,
   } = useAdminCategories();
 
   // Local state
@@ -816,10 +836,10 @@ const SellAccessoriesManagement = () => {
     delta: {
       type: 'abs',
       sign: '+',
-      value: 0
+      value: 0,
     },
     isActive: true,
-    order: 0
+    order: 0,
   });
 
   // Fetch data on component mount and when filters change
@@ -831,7 +851,7 @@ const SellAccessoriesManagement = () => {
       sortBy,
       sortOrder,
       page: currentPage,
-      limit: 12
+      limit: 12,
     };
 
     fetchAccessories(filters);
@@ -848,11 +868,13 @@ const SellAccessoriesManagement = () => {
     // Apply search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(accessory =>
-        (accessory.title && accessory.title.toLowerCase().includes(searchLower)) ||
-        (accessory.key && accessory.key.toLowerCase().includes(searchLower)) ||
-        (accessory.categoryId?.name && accessory.categoryId.name.toLowerCase().includes(searchLower)) ||
-        (accessory.category && accessory.category.toLowerCase().includes(searchLower))
+      filtered = filtered.filter(
+        accessory =>
+          (accessory.title && accessory.title.toLowerCase().includes(searchLower)) ||
+          (accessory.key && accessory.key.toLowerCase().includes(searchLower)) ||
+          (accessory.categoryId?.name &&
+            accessory.categoryId.name.toLowerCase().includes(searchLower)) ||
+          (accessory.category && accessory.category.toLowerCase().includes(searchLower))
       );
     }
 
@@ -868,7 +890,7 @@ const SellAccessoriesManagement = () => {
       sortBy,
       sortOrder,
       page: currentPage,
-      limit: 12
+      limit: 12,
     };
     fetchAccessories(filters);
   };
@@ -884,15 +906,15 @@ const SellAccessoriesManagement = () => {
       delta: {
         type: 'abs',
         sign: '+',
-        value: 0
+        value: 0,
       },
       isActive: true,
-      order: accessories ? accessories.length : 0
+      order: accessories ? accessories.length : 0,
     });
     setShowModal(true);
   };
 
-  const handleEditAccessory = (accessory) => {
+  const handleEditAccessory = accessory => {
     setEditingAccessory(accessory);
     setFormData({
       categoryId: accessory.categoryId?._id || accessory.categoryId || '',
@@ -903,15 +925,15 @@ const SellAccessoriesManagement = () => {
       delta: {
         type: accessory.delta?.type || 'abs',
         sign: accessory.delta?.sign || '+',
-        value: accessory.delta?.value || 0
+        value: accessory.delta?.value || 0,
       },
       isActive: accessory.isActive !== undefined ? accessory.isActive : true,
-      order: accessory.order || 0
+      order: accessory.order || 0,
     });
     setShowModal(true);
   };
 
-  const handleDeleteAccessory = async (accessoryId) => {
+  const handleDeleteAccessory = async accessoryId => {
     if (window.confirm('Are you sure you want to delete this accessory?')) {
       try {
         await deleteAccessory(accessoryId);
@@ -922,7 +944,7 @@ const SellAccessoriesManagement = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     try {
       if (editingAccessory) {
@@ -937,12 +959,16 @@ const SellAccessoriesManagement = () => {
     }
   };
 
-  const handleBulkAction = async (action) => {
+  const handleBulkAction = async action => {
     if (selectedAccessories.length === 0) return;
 
     switch (action) {
       case 'delete':
-        if (window.confirm(`Are you sure you want to delete ${selectedAccessories.length} accessories?`)) {
+        if (
+          window.confirm(
+            `Are you sure you want to delete ${selectedAccessories.length} accessories?`
+          )
+        ) {
           try {
             await Promise.all(selectedAccessories.map(id => deleteAccessory(id)));
             setSelectedAccessories([]);
@@ -963,7 +989,9 @@ const SellAccessoriesManagement = () => {
         break;
       case 'deactivate':
         try {
-          await Promise.all(selectedAccessories.map(id => updateAccessory(id, { isActive: false })));
+          await Promise.all(
+            selectedAccessories.map(id => updateAccessory(id, { isActive: false }))
+          );
           setSelectedAccessories([]);
           handleRefresh();
         } catch (error) {
@@ -975,43 +1003,64 @@ const SellAccessoriesManagement = () => {
     }
   };
 
-  const getAccessoryIcon = (category) => {
+  const getAccessoryIcon = category => {
     switch (category?.toLowerCase()) {
-      case 'charger': return Cable;
-      case 'case': return Shield;
-      case 'headphones': return Headphones;
-      case 'speaker': return Speaker;
-      case 'gaming': return Gamepad2;
-      case 'watch': return Watch;
-      case 'mouse': return MousePointer;
-      case 'keyboard': return Keyboard;
-      case 'storage': return HardDrive;
-      case 'cable': return Usb;
-      case 'media': return Disc;
-      case 'tablet': return Tablet;
-      case 'laptop': return Laptop;
-      case 'printer': return Printer;
-      case 'network': return Router;
-      case 'camera': return Webcam;
-      case 'lighting': return Lightbulb;
-      case 'automotive': return Car;
-      case 'smart_home': return Home;
-      case 'gift': return Gift;
-      default: return Box;
+      case 'charger':
+        return Cable;
+      case 'case':
+        return Shield;
+      case 'headphones':
+        return Headphones;
+      case 'speaker':
+        return Speaker;
+      case 'gaming':
+        return Gamepad2;
+      case 'watch':
+        return Watch;
+      case 'mouse':
+        return MousePointer;
+      case 'keyboard':
+        return Keyboard;
+      case 'storage':
+        return HardDrive;
+      case 'cable':
+        return Usb;
+      case 'media':
+        return Disc;
+      case 'tablet':
+        return Tablet;
+      case 'laptop':
+        return Laptop;
+      case 'printer':
+        return Printer;
+      case 'network':
+        return Router;
+      case 'camera':
+        return Webcam;
+      case 'lighting':
+        return Lightbulb;
+      case 'automotive':
+        return Car;
+      case 'smart_home':
+        return Home;
+      case 'gift':
+        return Gift;
+      default:
+        return Box;
     }
   };
 
-  const formatPrice = (price) => {
+  const formatPrice = price => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(price);
   };
 
-  const renderAccessoryCard = (accessory) => {
+  const renderAccessoryCard = accessory => {
     const IconComponent = getAccessoryIcon(accessory.category || 'default');
-    
+
     return (
       <AccessoryCard key={accessory._id}>
         <AccessoryHeader>
@@ -1025,17 +1074,19 @@ const SellAccessoriesManagement = () => {
         </AccessoryHeader>
 
         <AccessoryContent>
-          <AccessoryDescription>
-            Key: {accessory.key || 'No Key'}
-          </AccessoryDescription>
+          <AccessoryDescription>Key: {accessory.key || 'No Key'}</AccessoryDescription>
 
           <AccessoryInfo>
             <InfoItem>
-              <InfoIcon><Package size={16} /></InfoIcon>
+              <InfoIcon>
+                <Package size={16} />
+              </InfoIcon>
               {accessory.productId?.name || 'No Product'}
             </InfoItem>
             <InfoItem>
-              <InfoIcon><Activity size={16} /></InfoIcon>
+              <InfoIcon>
+                <Activity size={16} />
+              </InfoIcon>
               Order: {accessory.order || 0}
             </InfoItem>
           </AccessoryInfo>
@@ -1043,7 +1094,8 @@ const SellAccessoriesManagement = () => {
           <AccessoryValue>
             <ValueLabel>Price Delta</ValueLabel>
             <ValueAmount>
-              {accessory.delta?.sign || '+'}{accessory.delta?.value || 0} {accessory.delta?.type === 'percent' ? '%' : '₹'}
+              {accessory.delta?.sign || '+'}
+              {accessory.delta?.value || 0} {accessory.delta?.type === 'percent' ? '%' : '₹'}
             </ValueAmount>
           </AccessoryValue>
         </AccessoryContent>
@@ -1073,16 +1125,16 @@ const SellAccessoriesManagement = () => {
     );
   };
 
-  const renderAccessoryRow = (accessory) => {
+  const renderAccessoryRow = accessory => {
     const IconComponent = getAccessoryIcon(accessory.category || 'default');
-    
+
     return (
       <TableRow key={accessory._id}>
         <TableCell>
           <input
             type="checkbox"
             checked={selectedAccessories.includes(accessory._id)}
-            onChange={(e) => {
+            onChange={e => {
               if (e.target.checked) {
                 setSelectedAccessories([...selectedAccessories, accessory._id]);
               } else {
@@ -1106,7 +1158,8 @@ const SellAccessoriesManagement = () => {
         </TableCell>
         <TableCell>
           <span style={{ color: theme.colors.success.main }}>
-            {accessory.delta?.sign || '+'}{accessory.delta?.value || 0} {accessory.delta?.type === 'percent' ? '%' : '₹'}
+            {accessory.delta?.sign || '+'}
+            {accessory.delta?.value || 0} {accessory.delta?.type === 'percent' ? '%' : '₹'}
           </span>
         </TableCell>
         <TableCell>{accessory.order || 0}</TableCell>
@@ -1180,16 +1233,13 @@ const SellAccessoriesManagement = () => {
               type="text"
               placeholder="Search by name, description, or category..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </FilterGroup>
 
           <FilterGroup>
             <FilterLabel>Category</FilterLabel>
-            <FilterSelect
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-            >
+            <FilterSelect value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
               <option value="all">All Categories</option>
               <option value="charger">Charger</option>
               <option value="case">Case</option>
@@ -1216,10 +1266,7 @@ const SellAccessoriesManagement = () => {
 
           <FilterGroup>
             <FilterLabel>Status</FilterLabel>
-            <FilterSelect
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
+            <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
               <option value="all">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
@@ -1228,10 +1275,7 @@ const SellAccessoriesManagement = () => {
 
           <FilterGroup>
             <FilterLabel>Sort By</FilterLabel>
-            <FilterSelect
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-            >
+            <FilterSelect value={sortBy} onChange={e => setSortBy(e.target.value)}>
               <option value="order">Order</option>
               <option value="name">Name</option>
               <option value="category">Category</option>
@@ -1248,16 +1292,10 @@ const SellAccessoriesManagement = () => {
 
       <ViewControls>
         <ViewToggle>
-          <ViewButton
-            active={viewMode === 'grid'}
-            onClick={() => setViewMode('grid')}
-          >
+          <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
             <Grid size={16} />
           </ViewButton>
-          <ViewButton
-            active={viewMode === 'list'}
-            onClick={() => setViewMode('list')}
-          >
+          <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
             <List size={16} />
           </ViewButton>
         </ViewToggle>
@@ -1268,14 +1306,16 @@ const SellAccessoriesManagement = () => {
       </ViewControls>
 
       {error && (
-        <div style={{
-          padding: theme.spacing[4],
-          background: theme.colors.error[50],
-          border: `1px solid ${theme.colors.error[200]}`,
-          borderRadius: theme.borderRadius.md,
-          color: theme.colors.error[700],
-          marginBottom: theme.spacing[6]
-        }}>
+        <div
+          style={{
+            padding: theme.spacing[4],
+            background: theme.colors.error[50],
+            border: `1px solid ${theme.colors.error[200]}`,
+            borderRadius: theme.borderRadius.md,
+            color: theme.colors.error[700],
+            marginBottom: theme.spacing[6],
+          }}
+        >
           {error}
         </div>
       )}
@@ -1289,16 +1329,13 @@ const SellAccessoriesManagement = () => {
           <EmptyDescription>
             {searchTerm || categoryFilter !== 'all' || statusFilter !== 'all'
               ? 'No accessories match your current filters. Try adjusting your search criteria.'
-              : 'No accessories have been created yet. Add accessories to help customers identify valuable add-ons during the sell process.'
-            }
+              : 'No accessories have been created yet. Add accessories to help customers identify valuable add-ons during the sell process.'}
           </EmptyDescription>
         </EmptyState>
       ) : (
         <>
           {viewMode === 'grid' ? (
-            <AccessoriesGrid>
-              {filteredAccessories.map(renderAccessoryCard)}
-            </AccessoriesGrid>
+            <AccessoriesGrid>{filteredAccessories.map(renderAccessoryCard)}</AccessoriesGrid>
           ) : (
             <AccessoriesList>
               <AccessoriesTable>
@@ -1308,9 +1345,11 @@ const SellAccessoriesManagement = () => {
                       <input
                         type="checkbox"
                         checked={selectedAccessories.length === filteredAccessories.length}
-                        onChange={(e) => {
+                        onChange={e => {
                           if (e.target.checked) {
-                            setSelectedAccessories(filteredAccessories.map(accessory => accessory._id));
+                            setSelectedAccessories(
+                              filteredAccessories.map(accessory => accessory._id)
+                            );
                           } else {
                             setSelectedAccessories([]);
                           }
@@ -1326,9 +1365,7 @@ const SellAccessoriesManagement = () => {
                     <TableHeaderCell>Actions</TableHeaderCell>
                   </TableRow>
                 </TableHeader>
-                <tbody>
-                  {filteredAccessories.map(renderAccessoryRow)}
-                </tbody>
+                <tbody>{filteredAccessories.map(renderAccessoryRow)}</tbody>
               </AccessoriesTable>
             </AccessoriesList>
           )}
@@ -1336,7 +1373,9 @@ const SellAccessoriesManagement = () => {
           {pagination && pagination.totalPages > 1 && (
             <Pagination>
               <PaginationInfo>
-                Showing {((currentPage - 1) * 12) + 1} to {Math.min(currentPage * 12, pagination.totalItems)} of {pagination.totalItems} accessories
+                Showing {(currentPage - 1) * 12 + 1} to{' '}
+                {Math.min(currentPage * 12, pagination.totalItems)} of {pagination.totalItems}{' '}
+                accessories
               </PaginationInfo>
               <PaginationControls>
                 <PaginationButton
@@ -1370,12 +1409,10 @@ const SellAccessoriesManagement = () => {
       )}
 
       {showModal && (
-        <Modal onClick={(e) => e.target === e.currentTarget && setShowModal(false)}>
+        <Modal onClick={e => e.target === e.currentTarget && setShowModal(false)}>
           <ModalContent>
             <ModalHeader>
-              <ModalTitle>
-                {editingAccessory ? 'Edit Accessory' : 'Add New Accessory'}
-              </ModalTitle>
+              <ModalTitle>{editingAccessory ? 'Edit Accessory' : 'Add New Accessory'}</ModalTitle>
               <CloseButton onClick={() => setShowModal(false)}>
                 <X size={20} />
               </CloseButton>
@@ -1386,17 +1423,22 @@ const SellAccessoriesManagement = () => {
                 <FormLabel>Category *</FormLabel>
                 <FormSelect
                   value={formData.categoryId}
-                  onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                  onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
                   required
                 >
                   <option value="">Select a category</option>
-                  {categories && categories.map(category => (
-                    <option key={category._id} value={category._id}>
-                      {category.name}
-                    </option>
-                  ))}
+                  {categories &&
+                    categories.map(category => (
+                      <option key={category._id} value={category._id}>
+                        {category.name}
+                      </option>
+                    ))}
                 </FormSelect>
-                {categoriesLoading && <small style={{ color: theme.colors.text.secondary }}>Loading categories...</small>}
+                {categoriesLoading && (
+                  <small style={{ color: theme.colors.text.secondary }}>
+                    Loading categories...
+                  </small>
+                )}
               </FormGroup>
 
               <FormGroup>
@@ -1405,7 +1447,7 @@ const SellAccessoriesManagement = () => {
                   type="text"
                   placeholder="Enter accessory key (lowercase, numbers, underscores only)"
                   value={formData.key}
-                  onChange={(e) => setFormData({ ...formData, key: e.target.value })}
+                  onChange={e => setFormData({ ...formData, key: e.target.value })}
                   pattern="^[a-z0-9_]+$"
                   title="Key must contain only lowercase letters, numbers, and underscores"
                   required
@@ -1421,7 +1463,7 @@ const SellAccessoriesManagement = () => {
                   type="text"
                   placeholder="Enter accessory title"
                   value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={e => setFormData({ ...formData, title: e.target.value })}
                   maxLength="200"
                   required
                 />
@@ -1432,7 +1474,7 @@ const SellAccessoriesManagement = () => {
                 <FormTextarea
                   placeholder="Enter accessory description"
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={e => setFormData({ ...formData, description: e.target.value })}
                 />
               </FormGroup>
 
@@ -1440,7 +1482,7 @@ const SellAccessoriesManagement = () => {
                 <FormLabel>Category *</FormLabel>
                 <FormSelect
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  onChange={e => setFormData({ ...formData, category: e.target.value })}
                   required
                 >
                   <option value="">Select category</option>
@@ -1472,43 +1514,50 @@ const SellAccessoriesManagement = () => {
                 <div style={{ display: 'flex', gap: theme.spacing[2], alignItems: 'center' }}>
                   <FormSelect
                     value={formData.delta.type}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      delta: { ...formData.delta, type: e.target.value }
-                    })}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        delta: { ...formData.delta, type: e.target.value },
+                      })
+                    }
                     style={{ flex: '0 0 100px' }}
                   >
                     <option value="abs">Absolute (₹)</option>
                     <option value="percent">Percentage (%)</option>
                   </FormSelect>
-                  
+
                   <FormSelect
                     value={formData.delta.sign}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      delta: { ...formData.delta, sign: e.target.value }
-                    })}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        delta: { ...formData.delta, sign: e.target.value },
+                      })
+                    }
                     style={{ flex: '0 0 60px' }}
                   >
                     <option value="+">+</option>
                     <option value="-">-</option>
                   </FormSelect>
-                  
+
                   <FormInput
                     type="number"
                     placeholder="Enter value"
                     value={formData.delta.value}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      delta: { ...formData.delta, value: parseFloat(e.target.value) || 0 }
-                    })}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        delta: { ...formData.delta, value: parseFloat(e.target.value) || 0 },
+                      })
+                    }
                     min="0"
                     step="0.01"
                     style={{ flex: 1 }}
                   />
                 </div>
                 <small style={{ color: theme.colors.text.secondary }}>
-                  Price adjustment: {formData.delta.sign}{formData.delta.value} {formData.delta.type === 'percent' ? '%' : '₹'}
+                  Price adjustment: {formData.delta.sign}
+                  {formData.delta.value} {formData.delta.type === 'percent' ? '%' : '₹'}
                 </small>
               </FormGroup>
 
@@ -1518,7 +1567,7 @@ const SellAccessoriesManagement = () => {
                   type="number"
                   placeholder="Enter display order"
                   value={formData.order}
-                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+                  onChange={e => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                 />
               </FormGroup>
 
@@ -1527,9 +1576,14 @@ const SellAccessoriesManagement = () => {
                   <input
                     type="checkbox"
                     checked={formData.isActive}
-                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
                   />
-                  <span style={{ fontSize: theme.typography.fontSize.sm, color: theme.colors.text.primary }}>
+                  <span
+                    style={{
+                      fontSize: theme.typography.fontSize.sm,
+                      color: theme.colors.text.primary,
+                    }}
+                  >
                     Active
                   </span>
                 </label>

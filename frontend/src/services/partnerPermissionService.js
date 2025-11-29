@@ -5,7 +5,7 @@ class PartnerPermissionService {
   async getAllPartners(filters = {}) {
     try {
       const params = new URLSearchParams();
-      
+
       if (filters.search) params.append('search', filters.search);
       if (filters.roleTemplate) params.append('roleTemplate', filters.roleTemplate);
       if (filters.isActive !== undefined) params.append('isActive', filters.isActive);
@@ -46,7 +46,7 @@ class PartnerPermissionService {
   async applyRoleTemplate(partnerId, templateKey) {
     try {
       const response = await api.post(`/partner-permissions/admin/${partnerId}/apply-role`, {
-        roleTemplate: templateKey
+        roleTemplate: templateKey,
       });
       return response.data;
     } catch (error) {
@@ -60,7 +60,7 @@ class PartnerPermissionService {
     try {
       const response = await api.post('/partner-permissions/admin/bulk-permissions', {
         partnerIds,
-        permissions: permissionsData
+        permissions: permissionsData,
       });
       return response.data;
     } catch (error) {
@@ -94,7 +94,10 @@ class PartnerPermissionService {
   // Update role template
   async updateRoleTemplate(templateId, templateData) {
     try {
-      const response = await api.put(`/partner-permissions/admin/role-templates/${templateId}`, templateData);
+      const response = await api.put(
+        `/partner-permissions/admin/role-templates/${templateId}`,
+        templateData
+      );
       return response.data;
     } catch (error) {
       console.error('Error updating role template:', error);
@@ -138,7 +141,10 @@ class PartnerPermissionService {
   // Create new permission
   async createPermission(permissionData) {
     try {
-      const response = await api.post('/partner-permissions/admin/create-permission', permissionData);
+      const response = await api.post(
+        '/partner-permissions/admin/create-permission',
+        permissionData
+      );
       return response.data;
     } catch (error) {
       console.error('Error creating permission:', error);
@@ -172,7 +178,7 @@ class PartnerPermissionService {
   async getPermissionAuditLog(partnerId, filters = {}) {
     try {
       const params = new URLSearchParams();
-      
+
       if (filters.startDate) params.append('startDate', filters.startDate);
       if (filters.endDate) params.append('endDate', filters.endDate);
       if (filters.action) params.append('action', filters.action);
@@ -191,16 +197,16 @@ class PartnerPermissionService {
   async exportPartnerPermissions(format = 'csv', filters = {}) {
     try {
       const params = new URLSearchParams();
-      
+
       if (filters.search) params.append('search', filters.search);
       if (filters.role) params.append('role', filters.role);
       if (filters.status) params.append('status', filters.status);
       params.append('format', format);
 
       const response = await api.get(`/partner-permissions/admin/export?${params}`, {
-        responseType: 'blob'
+        responseType: 'blob',
       });
-      
+
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -210,7 +216,7 @@ class PartnerPermissionService {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      
+
       return { success: true };
     } catch (error) {
       console.error('Error exporting partner permissions:', error);
@@ -226,8 +232,8 @@ class PartnerPermissionService {
 
       const response = await api.post('/partner-permissions/admin/import', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
       return response.data;
     } catch (error) {
@@ -240,7 +246,7 @@ class PartnerPermissionService {
   async comparePartnerPermissions(partnerIds) {
     try {
       const response = await api.post('/partner-permissions/admin/compare-permissions', {
-        partnerIds
+        partnerIds,
       });
       return response.data;
     } catch (error) {
@@ -253,7 +259,7 @@ class PartnerPermissionService {
   async resetPartnerPermissions(partnerId, roleTemplate = 'basic') {
     try {
       const response = await api.post(`/partner-permissions/admin/${partnerId}/reset-permissions`, {
-        template: roleTemplate
+        template: roleTemplate,
       });
       return response.data;
     } catch (error) {
@@ -287,7 +293,9 @@ class PartnerPermissionService {
   // Get partner feature usage
   async getPartnerFeatureUsage(partnerId, timeRange = '30d') {
     try {
-      const response = await api.get(`/partner-permissions/admin/${partnerId}/feature-usage?range=${timeRange}`);
+      const response = await api.get(
+        `/partner-permissions/admin/${partnerId}/feature-usage?range=${timeRange}`
+      );
       return response.data;
     } catch (error) {
       console.error('Error fetching partner feature usage:', error);
@@ -322,7 +330,7 @@ class PartnerPermissionService {
     try {
       const response = await api.post(`/admin/partners/${partnerId}/schedule-review`, {
         reviewDate,
-        notes
+        notes,
       });
       return response.data;
     } catch (error) {
@@ -335,7 +343,7 @@ class PartnerPermissionService {
   async getPendingReviews(filters = {}) {
     try {
       const params = new URLSearchParams();
-      
+
       if (filters.priority) params.append('priority', filters.priority);
       if (filters.dueDate) params.append('dueDate', filters.dueDate);
       if (filters.page) params.append('page', filters.page);
@@ -393,5 +401,5 @@ export const {
   getPermissionRecommendations,
   schedulePermissionReview,
   getPendingReviews,
-  completePermissionReview
+  completePermissionReview,
 } = partnerPermissionService;

@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAgentAuth } from '../../contexts/AgentAuthContext';
 import axios from 'axios';
-import { 
-  Package, 
-  Clock, 
-  CheckCircle, 
-  DollarSign, 
-  LogOut, 
+import {
+  Package,
+  Clock,
+  CheckCircle,
+  DollarSign,
+  LogOut,
   Navigation,
   User,
   Loader,
   Calendar,
-  MapPin
+  MapPin,
 } from 'lucide-react';
 import styled from 'styled-components';
 import { toast } from 'react-hot-toast';
@@ -44,7 +44,7 @@ const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: 15px;
-  
+
   h1 {
     font-size: 24px;
     margin: 0;
@@ -58,7 +58,7 @@ const AgentInfo = styled.div`
   background: rgba(255, 255, 255, 0.15);
   padding: 8px 16px;
   border-radius: 50px;
-  
+
   span {
     font-size: 14px;
   }
@@ -77,7 +77,7 @@ const LogoutButton = styled.button`
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.3);
   }
@@ -104,8 +104,10 @@ const StatCard = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -120,7 +122,7 @@ const IconWrapper = styled.div`
   align-items: center;
   justify-content: center;
   background: ${props => props.background || '#667eea'};
-  
+
   svg {
     color: white;
   }
@@ -128,14 +130,14 @@ const IconWrapper = styled.div`
 
 const StatInfo = styled.div`
   flex: 1;
-  
+
   h3 {
     font-size: 14px;
     color: #6b7280;
     margin: 0 0 8px 0;
     font-weight: 500;
   }
-  
+
   p {
     font-size: 28px;
     font-weight: 700;
@@ -156,7 +158,7 @@ const SectionHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  
+
   h2 {
     font-size: 20px;
     font-weight: 700;
@@ -177,7 +179,7 @@ const PickupCard = styled.div`
   padding: 20px;
   transition: all 0.3s ease;
   cursor: pointer;
-  
+
   &:hover {
     border-color: #667eea;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
@@ -193,14 +195,14 @@ const PickupHeader = styled.div`
 
 const PickupInfo = styled.div`
   flex: 1;
-  
+
   h3 {
     font-size: 18px;
     font-weight: 600;
     color: #111827;
     margin: 0 0 8px 0;
   }
-  
+
   p {
     font-size: 14px;
     color: #6b7280;
@@ -208,7 +210,7 @@ const PickupInfo = styled.div`
     display: flex;
     align-items: center;
     gap: 6px;
-    
+
     svg {
       width: 16px;
       height: 16px;
@@ -268,11 +270,11 @@ const ActionButton = styled.button`
   font-size: 14px;
   font-weight: 600;
   transition: transform 0.2s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
   }
-  
+
   svg {
     width: 18px;
     height: 18px;
@@ -283,20 +285,20 @@ const EmptyState = styled.div`
   text-align: center;
   padding: 60px 20px;
   color: #6b7280;
-  
+
   svg {
     width: 64px;
     height: 64px;
     margin-bottom: 16px;
     opacity: 0.5;
   }
-  
+
   h3 {
     font-size: 18px;
     font-weight: 600;
     margin: 0 0 8px 0;
   }
-  
+
   p {
     font-size: 14px;
     margin: 0;
@@ -308,14 +310,18 @@ const LoadingSpinner = styled.div`
   justify-content: center;
   align-items: center;
   padding: 40px;
-  
+
   svg {
     animation: spin 1s linear infinite;
   }
-  
+
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -334,7 +340,7 @@ const AgentDashboard = () => {
   const loadDashboard = async () => {
     try {
       const response = await axios.get(`${API_URL}/agent/dashboard`, {
-        headers: getAuthHeader()
+        headers: getAuthHeader(),
       });
       // API returns data in response.data.data
       setDashboard(response.data.data || {});
@@ -348,7 +354,7 @@ const AgentDashboard = () => {
   const loadPickups = async () => {
     try {
       const response = await axios.get(`${API_URL}/agent/pickups`, {
-        headers: getAuthHeader()
+        headers: getAuthHeader(),
       });
       // API returns data in response.data.data.pickups
       setPickups(response.data.data?.pickups || []);
@@ -366,19 +372,19 @@ const AgentDashboard = () => {
     navigate('/agent/login');
   };
 
-  const handlePickupClick = (pickup) => {
+  const handlePickupClick = pickup => {
     navigate(`/agent/pickup/${pickup._id}`);
   };
 
-  const formatStatus = (status) => {
+  const formatStatus = status => {
     return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     return new Date(date).toLocaleDateString('en-IN', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
@@ -466,7 +472,7 @@ const AgentDashboard = () => {
                 </EmptyState>
               ) : (
                 <PickupsList>
-                  {pickups.map((pickup) => (
+                  {pickups.map(pickup => (
                     <PickupCard key={pickup._id} onClick={() => handlePickupClick(pickup)}>
                       <PickupHeader>
                         <PickupInfo>
@@ -484,7 +490,7 @@ const AgentDashboard = () => {
                           {formatStatus(pickup.status)}
                         </StatusBadge>
                       </PickupHeader>
-                      
+
                       {pickup.status === 'agent_assigned' && (
                         <ActionButton>
                           <Navigation />

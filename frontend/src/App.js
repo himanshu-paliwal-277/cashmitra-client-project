@@ -135,14 +135,12 @@ function AppContent() {
     model: null,
     conditionAnswers: {},
     priceQuote: null,
-    bookingData: null
+    bookingData: null,
   });
 
   const handleLogin = () => {
     navigate('/login');
   };
-
-
 
   const updateSellFlowData = (key, value) => {
     setSellFlowData(prev => ({ ...prev, [key]: value }));
@@ -172,7 +170,7 @@ function AppContent() {
             path="/sell"
             element={
               <CategorySelection
-                onContinue={(category) => {
+                onContinue={category => {
                   updateSellFlowData('category', category);
                   window.location.href = '/sell/brand';
                 }}
@@ -184,11 +182,11 @@ function AppContent() {
             element={
               <BrandSelection
                 category={sellFlowData.category}
-                onContinue={(brand) => {
+                onContinue={brand => {
                   updateSellFlowData('brand', brand);
                   window.location.href = '/sell/model';
                 }}
-                onBack={() => window.location.href = '/sell'}
+                onBack={() => (window.location.href = '/sell')}
               />
             }
           />
@@ -203,7 +201,7 @@ function AppContent() {
                   updateSellFlowData('variant', variant);
                   window.location.href = '/sell/evaluation';
                 }}
-                onBack={() => window.location.href = '/sell/brand'}
+                onBack={() => (window.location.href = '/sell/brand')}
               />
             }
           />
@@ -213,11 +211,11 @@ function AppContent() {
               <SellDeviceEvaluation
                 brand={sellFlowData.brand}
                 model={sellFlowData.model}
-                onContinue={(evaluationAnswers) => {
+                onContinue={evaluationAnswers => {
                   updateSellFlowData('evaluationAnswers', evaluationAnswers);
                   window.location.href = '/sell/defects';
                 }}
-                onBack={() => window.location.href = '/sell/model'}
+                onBack={() => (window.location.href = '/sell/model')}
               />
             }
           />
@@ -227,11 +225,11 @@ function AppContent() {
               <SellScreenDefects
                 brand={sellFlowData.brand}
                 model={sellFlowData.model}
-                onContinue={(defects) => {
+                onContinue={defects => {
                   updateSellFlowData('defects', defects);
                   window.location.href = '/sell/accessories';
                 }}
-                onBack={() => window.location.href = '/sell/evaluation'}
+                onBack={() => (window.location.href = '/sell/evaluation')}
               />
             }
           />
@@ -241,11 +239,11 @@ function AppContent() {
               <SellAccessories
                 brand={sellFlowData.brand}
                 model={sellFlowData.model}
-                onContinue={(accessories) => {
+                onContinue={accessories => {
                   updateSellFlowData('accessories', accessories);
                   window.location.href = '/sell/quote';
                 }}
-                onBack={() => window.location.href = '/sell/defects'}
+                onBack={() => (window.location.href = '/sell/defects')}
               />
             }
           />
@@ -255,14 +253,14 @@ function AppContent() {
               <ConditionQuestionnaire
                 brand={sellFlowData.brand}
                 model={sellFlowData.model}
-                onContinue={(answers) => {
+                onContinue={answers => {
                   updateSellFlowData('conditionAnswers', answers);
                   window.location.href = '/sell/quote';
                 }}
-                onBack={() => window.location.href = '/sell/model'}
+                onBack={() => (window.location.href = '/sell/model')}
               />
             }
-  />
+          />
           <Route
             path="/sell/quote"
             element={
@@ -270,8 +268,8 @@ function AppContent() {
                 brand={sellFlowData.brand}
                 model={sellFlowData.model}
                 conditionAnswers={sellFlowData.conditionAnswers}
-                onContinue={() => window.location.href = '/sell/booking'}
-                onBack={() => window.location.href = '/sell/condition'}
+                onContinue={() => (window.location.href = '/sell/booking')}
+                onBack={() => (window.location.href = '/sell/condition')}
               />
             }
           />
@@ -282,11 +280,11 @@ function AppContent() {
                 brand={sellFlowData.brand}
                 model={sellFlowData.model}
                 priceQuote={sellFlowData.priceQuote}
-                onContinue={(bookingData) => {
+                onContinue={bookingData => {
                   updateSellFlowData('bookingData', bookingData);
                   window.location.href = '/sell/confirmation';
                 }}
-                onBack={() => window.location.href = '/sell/quote'}
+                onBack={() => (window.location.href = '/sell/quote')}
               />
             }
           />
@@ -297,11 +295,11 @@ function AppContent() {
                 brand={sellFlowData.brand}
                 model={sellFlowData.model}
                 priceQuote={sellFlowData.priceQuote}
-                onContinue={(bookingData) => {
+                onContinue={bookingData => {
                   updateSellFlowData('bookingData', bookingData);
                   window.location.href = '/sell/confirmation';
                 }}
-                onBack={() => window.location.href = '/sell/quote'}
+                onBack={() => (window.location.href = '/sell/quote')}
               />
             }
           />
@@ -322,12 +320,12 @@ function AppContent() {
             path="/sell/mobile"
             element={
               <SellMobileForm
-                onContinue={(brand) => {
+                onContinue={brand => {
                   updateSellFlowData('category', 'mobile');
                   updateSellFlowData('brand', brand);
                   window.location.href = '/sell/model';
                 }}
-                onBack={() => window.location.href = '/sell'}
+                onBack={() => (window.location.href = '/sell')}
               />
             }
           />
@@ -335,54 +333,55 @@ function AppContent() {
             path="/sell/tablet"
             element={
               <SellTablet
-                onContinue={(brand) => {
+                onContinue={brand => {
                   updateSellFlowData('category', 'tablet');
                   updateSellFlowData('brand', brand);
                   window.location.href = '/sell/model';
                 }}
-                onBack={() => window.location.href = '/sell'}
+                onBack={() => (window.location.href = '/sell')}
               />
             }
           />
-          <Route path="/sell/laptop"
+          <Route
+            path="/sell/laptop"
             element={
               <SellLaptop
-                onContinue={(brand) => {
+                onContinue={brand => {
                   updateSellFlowData('category', 'laptop');
                   updateSellFlowData('brand', brand);
                   window.location.href = '/sell/model';
                 }}
-                onBack={() => window.location.href = '/sell'}
+                onBack={() => (window.location.href = '/sell')}
               />
             }
           />
           <Route path="/sell/mobile-form" element={<SellMobileForm />} />
-          
+
           {/* Category and Product Detail Routes */}
           <Route path="/sell/category/:category" element={<CategoryProducts />} />
           <Route path="/sell/product/:id" element={<ProductDetail />} />
-          <Route 
-            path="/sell/product/:productId/variants" 
+          <Route
+            path="/sell/product/:productId/variants"
             element={
-              <ProductVariantSelection 
+              <ProductVariantSelection
                 onContinue={(product, variant) => {
                   updateSellFlowData('product', product);
                   updateSellFlowData('variant', variant);
                   window.location.href = '/sell/condition';
                 }}
-                onBack={() => window.location.href = '/sell/category/' + (sellFlowData.category || 'mobile')}
+                onBack={() =>
+                  (window.location.href = '/sell/category/' + (sellFlowData.category || 'mobile'))
+                }
               />
-            } 
-          />
-          
-          {/* Nested condition route for product/variant flow */}
-          <Route 
-            path="/sell/product/:productId/variant/:variantId/condition" 
-            element={<ProductCondition />} 
+            }
           />
 
-          
-          
+          {/* Nested condition route for product/variant flow */}
+          <Route
+            path="/sell/product/:productId/variant/:variantId/condition"
+            element={<ProductCondition />}
+          />
+
           <Route path="/buy" element={<Marketplace />} />
           <Route path="/buy-device" element={<BuyCategoryHome />} />
           <Route path="/buy/marketplace" element={<Marketplace />} />
@@ -410,19 +409,31 @@ function AppContent() {
           <Route element={<PartnerProtectedRoute />}>
             <Route element={<PartnerLayout />}>
               <Route path="/partner/dashboard" element={<AdminDashboard />} />
-              
+
               {/* Sell Management */}
               <Route path="/partner/sell" element={<Sell />} />
               <Route path="/partner/sell/categories" element={<SellCategories />} />
               <Route path="/partner/sell/products" element={<SellProducts />} />
-              <Route path="/partner/sell/questions/management" element={<SellQuestionsManagement />} />
+              <Route
+                path="/partner/sell/questions/management"
+                element={<SellQuestionsManagement />}
+              />
               <Route path="/partner/sell/defects/management" element={<SellDefectsManagement />} />
-              <Route path="/partner/sell/accessories/management" element={<SellAccessoriesManagement />} />
-              <Route path="/partner/sell/sessions/management" element={<SellSessionsManagement />} />
-              <Route path="/partner/sell/configuration/management" element={<SellConfigurationManagement />} />
+              <Route
+                path="/partner/sell/accessories/management"
+                element={<SellAccessoriesManagement />}
+              />
+              <Route
+                path="/partner/sell/sessions/management"
+                element={<SellSessionsManagement />}
+              />
+              <Route
+                path="/partner/sell/configuration/management"
+                element={<SellConfigurationManagement />}
+              />
               <Route path="/partner/leads" element={<Leads />} />
               <Route path="/partner/sell/orders" element={<SellOrders />} />
-              
+
               {/* Buy Management */}
               <Route path="/partner/buy" element={<Buy />} />
               <Route path="/partner/buy/order/:orderId" element={<OrderView />} />
@@ -433,18 +444,21 @@ function AppContent() {
               <Route path="/partner/buy/orders" element={<BuyOrders />} />
               <Route path="/partner/pickup/management" element={<PickupManagement />} />
               <Route path="/partner/returns" element={<Returns />} />
-              
+
               {/* Catalog Management */}
               <Route path="/partner/catalog" element={<CatalogManagement />} />
               <Route path="/partner/products" element={<Products />} />
               <Route path="/partner/categories" element={<Categories />} />
               <Route path="/partner/brands" element={<Brands />} />
               <Route path="/partner/models" element={<Models />} />
-              <Route path="/partner/condition/questionnaire" element={<AdminConditionQuestionnaire />} />
+              <Route
+                path="/partner/condition/questionnaire"
+                element={<AdminConditionQuestionnaire />}
+              />
               <Route path="/partner/products/create" element={<CreateProduct />} />
               <Route path="/partner/products/:id" element={<ProductDetail />} />
               <Route path="/partner/products/:productId/edit" element={<EditProduct />} />
-              
+
               {/* Partner Management */}
               <Route path="/partner/partners" element={<Partners />} />
               <Route path="/partner/partner/applications" element={<PartnerApplications />} />
@@ -454,7 +468,7 @@ function AppContent() {
               <Route path="/partner/users" element={<UserManagement />} />
               <Route path="/partner/users/create" element={<CreateUser />} />
               <Route path="/partner/users/edit/:userId" element={<EditUser />} />
-              
+
               {/* Pricing & Finance */}
               <Route path="/partner/pricing" element={<Pricing />} />
               <Route path="/partner/price/table" element={<Pricing />} />
@@ -463,10 +477,10 @@ function AppContent() {
               <Route path="/partner/finance" element={<Finance />} />
               <Route path="/partner/commission/rules" element={<Finance />} />
               <Route path="/partner/wallet/payouts" element={<Finance />} />
-              
+
               {/* Reports & Analytics */}
               <Route path="/partner/reports" element={<Reports />} />
-              
+
               {/* Legacy Routes for Compatibility */}
               <Route path="/partner/inventory" element={<Products />} />
               <Route path="/partner/orders" element={<BuyOrders />} />
@@ -483,14 +497,26 @@ function AppContent() {
 
               {/* Sales & Orders */}
               <Route path="/admin/sell" element={<Sell />} />
-              <Route path="/admin/sell-super-categories" element={<SellSuperCategoryManagement />} />
+              <Route
+                path="/admin/sell-super-categories"
+                element={<SellSuperCategoryManagement />}
+              />
               <Route path="/admin/sell-categories" element={<SellCategories />} />
               <Route path="/admin/sell-products" element={<SellProducts />} />
-              <Route path="/admin/sell-questions-management" element={<SellQuestionsManagement />} />
+              <Route
+                path="/admin/sell-questions-management"
+                element={<SellQuestionsManagement />}
+              />
               <Route path="/admin/sell-defects-management" element={<SellDefectsManagement />} />
-              <Route path="/admin/sell-accessories-management" element={<SellAccessoriesManagement />} />
+              <Route
+                path="/admin/sell-accessories-management"
+                element={<SellAccessoriesManagement />}
+              />
               <Route path="/admin/sell-sessions-management" element={<SellSessionsManagement />} />
-              <Route path="/admin/sell-configuration-management" element={<SellConfigurationManagement />} />
+              <Route
+                path="/admin/sell-configuration-management"
+                element={<SellConfigurationManagement />}
+              />
               <Route path="/admin/leads" element={<Leads />} />
               <Route path="/admin/sell-orders" element={<SellOrders />} />
               <Route path="/admin/buy" element={<Buy />} />
@@ -510,12 +536,14 @@ function AppContent() {
               <Route path="/admin/categories" element={<Categories />} />
               <Route path="/admin/brands" element={<Brands />} />
               <Route path="/admin/models" element={<Models />} />
-              <Route path="/admin/condition-questionnaire" element={<AdminConditionQuestionnaire />} />
+              <Route
+                path="/admin/condition-questionnaire"
+                element={<AdminConditionQuestionnaire />}
+              />
               <Route path="/admin/products/create" element={<CreateProduct />} />
               <Route path="/admin/products/:id" element={<ProductDetail />} />
               <Route path="/admin/products/:productId/edit" element={<EditProduct />} />
 
-             
               <Route path="/admin/partners" element={<Partners />} />
               <Route path="/admin/partner-applications" element={<PartnerApplications />} />
               <Route path="/admin/partner-list" element={<PartnerList />} />

@@ -70,7 +70,7 @@ const AddProduct = () => {
         <Title>Add Product</Title>
         <Subtitle>Add new products to your inventory</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,8 +78,8 @@ const AddProduct = () => {
           </Icon>
           <ComingSoonTitle>Add Product Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to add new products 
-            to your inventory with detailed information, images, and pricing.
+            This feature is currently under development. Soon you'll be able to add new products to
+            your inventory with detailed information, images, and pricing.
           </ComingSoonText>
         </ComingSoon>
       </Card>

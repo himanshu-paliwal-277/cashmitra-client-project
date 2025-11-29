@@ -29,13 +29,13 @@ export const VendorAuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('vendorToken');
         const storedUser = localStorage.getItem('vendorUser');
-        
+
         if (token && storedUser) {
           // Verify token validity by fetching profile
           const profileData = await getVendorProfile();
           setVendorUser(profileData.vendor);
           setIsAuthenticated(true);
-          
+
           // Fetch vendor permissions
           const permissionsData = await getVendorPermissions();
           setPermissions(permissionsData.permissions || {});
@@ -55,7 +55,7 @@ export const VendorAuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Call login API using the service
       const data = await loginVendor({ email, password });
@@ -63,17 +63,17 @@ export const VendorAuthProvider = ({ children }) => {
       // Store auth data
       localStorage.setItem('vendorToken', data.token);
       localStorage.setItem('vendorUser', JSON.stringify(data.vendor));
-      
+
       // Update state
       setVendorUser(data.vendor);
       setIsAuthenticated(true);
-      
+
       // Fetch vendor permissions
       const permissionsData = await getVendorPermissions();
       setPermissions(permissionsData.permissions || {});
-      
+
       navigate('/vendor/dashboard');
-      
+
       return data;
     } catch (error) {
       setError(error.response?.data?.message || 'Login failed');
@@ -88,12 +88,12 @@ export const VendorAuthProvider = ({ children }) => {
     // Clear auth data from localStorage
     localStorage.removeItem('vendorToken');
     localStorage.removeItem('vendorUser');
-    
+
     // Reset state
     setVendorUser(null);
     setPermissions({});
     setIsAuthenticated(false);
-    
+
     // Redirect to login
     navigate('/vendor/login');
   };
@@ -103,16 +103,16 @@ export const VendorAuthProvider = ({ children }) => {
     const token = localStorage.getItem('vendorToken');
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
-  
+
   // Refresh vendor profile and permissions
   const refreshProfile = async () => {
     try {
       const profileData = await getVendorProfile();
       setVendorUser(profileData.vendor);
-      
+
       const permissionsData = await getVendorPermissions();
       setPermissions(permissionsData.permissions || {});
-      
+
       return profileData.vendor;
     } catch (error) {
       console.error('Error refreshing vendor profile:', error);
@@ -124,22 +124,22 @@ export const VendorAuthProvider = ({ children }) => {
   };
 
   // Check if vendor has permission for a specific menu item
-  const hasPermission = (menuItemName) => {
+  const hasPermission = menuItemName => {
     if (!permissions || !permissions[menuItemName]) {
       return false;
     }
-    
+
     const permission = permissions[menuItemName];
     return permission.granted && permission.isActive !== false;
   };
 
   // Get permission details for a menu item
-  const getPermissionDetails = (menuItemName) => {
+  const getPermissionDetails = menuItemName => {
     return permissions[menuItemName] || null;
   };
 
   // Check if vendor has read-only access to a menu item
-  const isReadOnly = (menuItemName) => {
+  const isReadOnly = menuItemName => {
     const permission = permissions[menuItemName];
     return permission?.restrictions?.readOnly || false;
   };
@@ -157,14 +157,10 @@ export const VendorAuthProvider = ({ children }) => {
     refreshProfile,
     hasPermission,
     getPermissionDetails,
-    isReadOnly
+    isReadOnly,
   };
 
-  return (
-    <VendorAuthContext.Provider value={contextValue}>
-      {children}
-    </VendorAuthContext.Provider>
-  );
+  return <VendorAuthContext.Provider value={contextValue}>{children}</VendorAuthContext.Provider>;
 };
 
 export default VendorAuthContext;

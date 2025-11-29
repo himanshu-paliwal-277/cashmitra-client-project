@@ -17,7 +17,7 @@ const useSellQuestions = () => {
     page: 1,
     limit: 10,
     total: 0,
-    totalPages: 0
+    totalPages: 0,
   });
 
   // Fetch all questions with pagination
@@ -29,13 +29,13 @@ const useSellQuestions = () => {
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
-        ...filters
+        ...filters,
       });
 
       const response = await api.get(`/sell-questions?${queryParams}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const list = Array.isArray(response.data)
@@ -45,9 +45,9 @@ const useSellQuestions = () => {
 
       setPagination({
         page: response.data?.page ?? 1,
-        limit: response.data?.limit ?? (list?.length ?? 0),
-        total: response.data?.total ?? (list?.length ?? 0),
-        totalPages: response.data?.totalPages ?? 1
+        limit: response.data?.limit ?? list?.length ?? 0,
+        total: response.data?.total ?? list?.length ?? 0,
+        totalPages: response.data?.totalPages ?? 1,
       });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch questions');
@@ -57,15 +57,15 @@ const useSellQuestions = () => {
   }, []);
 
   // Fetch single question by ID
-  const fetchQuestion = useCallback(async (questionId) => {
+  const fetchQuestion = useCallback(async questionId => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-questions/${questionId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       return response.data;
     } catch (err) {
@@ -77,109 +77,121 @@ const useSellQuestions = () => {
   }, []);
 
   // Create new question
-  const createQuestion = useCallback(async (questionData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.post('/sell-questions', questionData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh questions list
-      await fetchQuestions();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create question');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchQuestions]);
+  const createQuestion = useCallback(
+    async questionData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.post('/sell-questions', questionData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh questions list
+        await fetchQuestions();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create question');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchQuestions]
+  );
 
   // Update question
-  const updateQuestion = useCallback(async (questionId, questionData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put(`/sell-questions/${questionId}`, questionData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh questions list
-      await fetchQuestions();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update question');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchQuestions]);
+  const updateQuestion = useCallback(
+    async (questionId, questionData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put(`/sell-questions/${questionId}`, questionData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh questions list
+        await fetchQuestions();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update question');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchQuestions]
+  );
 
   // Delete question
-  const deleteQuestion = useCallback(async (questionId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      await api.delete(`/sell-questions/${questionId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      // Refresh questions list
-      await fetchQuestions();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete question');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchQuestions]);
+  const deleteQuestion = useCallback(
+    async questionId => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        await api.delete(`/sell-questions/${questionId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Refresh questions list
+        await fetchQuestions();
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete question');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchQuestions]
+  );
 
   // Reorder questions
-  const reorderQuestions = useCallback(async (reorderData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put('/sell-questions/reorder', reorderData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh questions list
-      await fetchQuestions();
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to reorder questions');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchQuestions]);
+  const reorderQuestions = useCallback(
+    async reorderData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put('/sell-questions/reorder', reorderData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh questions list
+        await fetchQuestions();
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to reorder questions');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchQuestions]
+  );
 
   // Fetch options for a question
-  const fetchOptions = useCallback(async (questionId) => {
+  const fetchOptions = useCallback(async questionId => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('adminToken');
       const response = await api.get(`/sell-questions/${questionId}/options`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setOptions(response.data.options || []);
       return response.data.options || [];
@@ -192,101 +204,121 @@ const useSellQuestions = () => {
   }, []);
 
   // Create option
-  const createOption = useCallback(async (questionId, optionData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.post(`/sell-questions/${questionId}/options`, optionData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh options list
-      await fetchOptions(questionId);
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create option');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchOptions]);
+  const createOption = useCallback(
+    async (questionId, optionData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.post(`/sell-questions/${questionId}/options`, optionData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Refresh options list
+        await fetchOptions(questionId);
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create option');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchOptions]
+  );
 
   // Update option
-  const updateOption = useCallback(async (questionId, optionId, optionData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put(`/sell-questions/${questionId}/options/${optionId}`, optionData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh options list
-      await fetchOptions(questionId);
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update option');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchOptions]);
+  const updateOption = useCallback(
+    async (questionId, optionId, optionData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put(
+          `/sell-questions/${questionId}/options/${optionId}`,
+          optionData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        // Refresh options list
+        await fetchOptions(questionId);
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update option');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchOptions]
+  );
 
   // Delete option
-  const deleteOption = useCallback(async (questionId, optionId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      await api.delete(`/sell-questions/${questionId}/options/${optionId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      // Refresh options list
-      await fetchOptions(questionId);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete option');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchOptions]);
+  const deleteOption = useCallback(
+    async (questionId, optionId) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        await api.delete(`/sell-questions/${questionId}/options/${optionId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Refresh options list
+        await fetchOptions(questionId);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete option');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchOptions]
+  );
 
   // Reorder options
-  const reorderOptions = useCallback(async (questionId, reorderData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.put(`/sell-questions/${questionId}/options/reorder`, reorderData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      // Refresh options list
-      await fetchOptions(questionId);
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to reorder options');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchOptions]);
+  const reorderOptions = useCallback(
+    async (questionId, reorderData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await api.put(
+          `/sell-questions/${questionId}/options/reorder`,
+          reorderData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        // Refresh options list
+        await fetchOptions(questionId);
+        return response.data;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to reorder options');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchOptions]
+  );
 
   // Public methods for customer access
-  const getPublicQuestions = useCallback(async (productId) => {
+  const getPublicQuestions = useCallback(async productId => {
     setLoading(true);
     setError(null);
     try {
@@ -300,7 +332,7 @@ const useSellQuestions = () => {
     }
   }, []);
 
-  const getPublicQuestion = useCallback(async (questionId) => {
+  const getPublicQuestion = useCallback(async questionId => {
     setLoading(true);
     setError(null);
     try {
@@ -350,7 +382,7 @@ const useSellQuestions = () => {
     getPublicQuestion,
 
     // Utilities
-    clearError
+    clearError,
   };
 };
 

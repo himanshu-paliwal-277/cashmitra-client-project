@@ -31,16 +31,16 @@ class CloudinaryService {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      
+
       // Get auth token from localStorage
       const token = localStorage.getItem('adminToken');
-      
+
       const response = await fetch(`${this.baseUrl}/image`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: formData
+        body: formData,
       });
 
       if (!response.ok) {
@@ -52,7 +52,7 @@ class CloudinaryService {
       if (!result.success) {
         throw new Error(result.message || 'Upload failed');
       }
-      
+
       return {
         success: true,
         data: {
@@ -65,14 +65,14 @@ class CloudinaryService {
           createdAt: result.data.created_at,
           resourceType: result.data.resource_type,
           tags: result.data.tags || [],
-          folder: result.data.folder
-        }
+          folder: result.data.folder,
+        },
       };
     } catch (error) {
       console.error('Cloudinary upload error:', error);
       return {
         success: false,
-        error: error.message || 'Failed to upload image'
+        error: error.message || 'Failed to upload image',
       };
     }
   }
@@ -89,16 +89,16 @@ class CloudinaryService {
       Array.from(files).forEach(file => {
         formData.append('images', file);
       });
-      
+
       // Get auth token from localStorage
       const token = localStorage.getItem('adminToken');
-      
+
       const response = await fetch(`${this.baseUrl}/images`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: formData
+        body: formData,
       });
 
       if (!response.ok) {
@@ -113,14 +113,14 @@ class CloudinaryService {
 
       // Handle the actual API response structure where result.data is an array of image objects
       const imageData = result.data || [];
-      
+
       return {
         success: true,
         results: imageData,
         successful: imageData, // All images in data array are successful uploads
         failed: [], // No failed uploads if we reach this point
         totalUploaded: imageData.length,
-        totalFailed: 0
+        totalFailed: 0,
       };
     } catch (error) {
       console.error('Multiple upload error:', error);
@@ -131,7 +131,7 @@ class CloudinaryService {
         successful: [],
         failed: [error.message],
         totalUploaded: 0,
-        totalFailed: Array.from(files).length
+        totalFailed: Array.from(files).length,
       };
     }
   }
@@ -146,7 +146,7 @@ class CloudinaryService {
       const timestamp = Math.round(new Date().getTime() / 1000);
       const signature = await this.generateSignature({
         public_id: publicId,
-        timestamp
+        timestamp,
       });
 
       const formData = new FormData();
@@ -157,20 +157,20 @@ class CloudinaryService {
 
       const response = await fetch(`${this.baseUrl}/image/destroy`, {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       const result = await response.json();
-      
+
       return {
         success: result.result === 'ok',
-        result: result.result
+        result: result.result,
       };
     } catch (error) {
       console.error('Cloudinary delete error:', error);
       return {
         success: false,
-        error: error.message || 'Failed to delete image'
+        error: error.message || 'Failed to delete image',
       };
     }
   }
@@ -183,9 +183,9 @@ class CloudinaryService {
    */
   getTransformedUrl(publicId, transformations = {}) {
     const baseUrl = `https://res.cloudinary.com/${this.cloudName}/image/upload`;
-    
+
     const transformParams = [];
-    
+
     if (transformations.width) transformParams.push(`w_${transformations.width}`);
     if (transformations.height) transformParams.push(`h_${transformations.height}`);
     if (transformations.crop) transformParams.push(`c_${transformations.crop}`);
@@ -194,9 +194,9 @@ class CloudinaryService {
     if (transformations.gravity) transformParams.push(`g_${transformations.gravity}`);
     if (transformations.radius) transformParams.push(`r_${transformations.radius}`);
     if (transformations.effect) transformParams.push(`e_${transformations.effect}`);
-    
+
     const transformString = transformParams.length > 0 ? `${transformParams.join(',')}/` : '';
-    
+
     return `${baseUrl}/${transformString}${publicId}`;
   }
 
@@ -210,9 +210,9 @@ class CloudinaryService {
     const defaultTransformations = {
       quality: 'auto',
       format: 'auto',
-      ...options
+      ...options,
     };
-    
+
     return this.getTransformedUrl(publicId, defaultTransformations);
   }
 
@@ -229,7 +229,7 @@ class CloudinaryService {
       crop: 'fill',
       gravity: 'center',
       quality: 'auto',
-      format: 'auto'
+      format: 'auto',
     });
   }
 
@@ -246,24 +246,28 @@ class CloudinaryService {
       minWidth = 100,
       minHeight = 100,
       maxWidth = 5000,
-      maxHeight = 5000
+      maxHeight = 5000,
     } = options;
 
     const errors = [];
 
     // Check file type
     if (!allowedTypes.includes(file.type)) {
-      errors.push(`File type ${file.type} is not allowed. Allowed types: ${allowedTypes.join(', ')}`);
+      errors.push(
+        `File type ${file.type} is not allowed. Allowed types: ${allowedTypes.join(', ')}`
+      );
     }
 
     // Check file size
     if (file.size > maxSize) {
-      errors.push(`File size ${(file.size / 1024 / 1024).toFixed(2)}MB exceeds maximum allowed size ${(maxSize / 1024 / 1024).toFixed(2)}MB`);
+      errors.push(
+        `File size ${(file.size / 1024 / 1024).toFixed(2)}MB exceeds maximum allowed size ${(maxSize / 1024 / 1024).toFixed(2)}MB`
+      );
     }
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -318,9 +322,9 @@ class CloudinaryService {
           error: '#F44235',
           inProgress: '#0078FF',
           complete: '#20B832',
-          sourceBg: '#E4EBF1'
-        }
-      }
+          sourceBg: '#E4EBF1',
+        },
+      },
     };
   }
 }

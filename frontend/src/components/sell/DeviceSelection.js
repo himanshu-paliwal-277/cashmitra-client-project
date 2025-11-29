@@ -24,7 +24,7 @@ import {
   ChevronRight,
   Check,
   X,
-  Loader
+  Loader,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -90,8 +90,8 @@ const FilterButton = styled.button`
   padding: ${theme.spacing[2]} ${theme.spacing[4]};
   border: 1px solid ${theme.colors.grey[300]};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.active ? theme.colors.primary.main : 'white'};
-  color: ${props => props.active ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.active ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.active ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -102,7 +102,7 @@ const FilterButton = styled.button`
 
   &:hover {
     border-color: ${theme.colors.primary.main};
-    background: ${props => props.active ? theme.colors.primary[600] : theme.colors.primary[50]};
+    background: ${props => (props.active ? theme.colors.primary[600] : theme.colors.primary[50])};
   }
 `;
 
@@ -116,8 +116,8 @@ const ViewToggle = styled.div`
 const ViewButton = styled.button`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
   border: none;
-  background: ${props => props.active ? theme.colors.primary.main : 'white'};
-  color: ${props => props.active ? 'white' : theme.colors.text.secondary};
+  background: ${props => (props.active ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.active ? 'white' : theme.colors.text.secondary)};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -125,7 +125,7 @@ const ViewButton = styled.button`
   transition: all ${theme.transitions.duration.normal};
 
   &:hover {
-    background: ${props => props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props => (props.active ? theme.colors.primary[600] : theme.colors.grey[50])};
   }
 `;
 
@@ -134,16 +134,16 @@ const CategoryTabs = styled.div`
   gap: ${theme.spacing[2]};
   overflow-x: auto;
   padding-bottom: ${theme.spacing[2]};
-  
+
   &::-webkit-scrollbar {
     height: 4px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: ${theme.colors.grey[100]};
     border-radius: ${theme.borderRadius.full};
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: ${theme.colors.grey[300]};
     border-radius: ${theme.borderRadius.full};
@@ -152,10 +152,10 @@ const CategoryTabs = styled.div`
 
 const CategoryTab = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: 1px solid ${props => props.active ? theme.colors.primary.main : theme.colors.grey[300]};
+  border: 1px solid ${props => (props.active ? theme.colors.primary.main : theme.colors.grey[300])};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.active ? theme.colors.primary[50] : 'white'};
-  color: ${props => props.active ? theme.colors.primary.main : theme.colors.text.primary};
+  background: ${props => (props.active ? theme.colors.primary[50] : 'white')};
+  color: ${props => (props.active ? theme.colors.primary.main : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -174,14 +174,17 @@ const CategoryTab = styled.button`
 const ProductsGrid = styled.div`
   display: grid;
   gap: ${theme.spacing[4]};
-  
-  ${props => props.viewMode === 'grid' ? `
+
+  ${props =>
+    props.viewMode === 'grid'
+      ? `
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     
     @media (min-width: ${theme.breakpoints.sm}) {
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     }
-  ` : `
+  `
+      : `
     grid-template-columns: 1fr;
   `}
 `;
@@ -200,25 +203,31 @@ const ProductCard = styled.div`
     transform: translateY(-2px);
   }
 
-  ${props => props.viewMode === 'list' ? `
+  ${props =>
+    props.viewMode === 'list'
+      ? `
     display: flex;
     align-items: center;
     
     &:hover {
       transform: none;
     }
-  ` : ''}
+  `
+      : ''}
 `;
 
 const ProductImage = styled.div`
-  ${props => props.viewMode === 'grid' ? `
+  ${props =>
+    props.viewMode === 'grid'
+      ? `
     height: 200px;
     background: ${theme.colors.grey[50]};
     display: flex;
     align-items: center;
     justify-content: center;
     color: ${theme.colors.text.secondary};
-  ` : `
+  `
+      : `
     width: 120px;
     height: 120px;
     background: ${theme.colors.grey[50]};
@@ -254,16 +263,22 @@ const ProductBadge = styled.div`
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
   background: ${props => {
     switch (props.type) {
-      case 'popular': return theme.colors.accent[50];
-      case 'trending': return theme.colors.primary[50];
-      default: return theme.colors.grey[50];
+      case 'popular':
+        return theme.colors.accent[50];
+      case 'trending':
+        return theme.colors.primary[50];
+      default:
+        return theme.colors.grey[50];
     }
   }};
   color: ${props => {
     switch (props.type) {
-      case 'popular': return theme.colors.accent.main;
-      case 'trending': return theme.colors.primary.main;
-      default: return theme.colors.text.secondary;
+      case 'popular':
+        return theme.colors.accent.main;
+      case 'trending':
+        return theme.colors.primary.main;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
   border-radius: ${theme.borderRadius.sm};
@@ -443,12 +458,12 @@ const CATEGORY_ICONS = {
   laptop: Laptop,
   watch: Watch,
   headphones: Headphones,
-  camera: Camera
+  camera: Camera,
 };
 
 const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
   const { sellProducts } = hooks;
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
@@ -467,17 +482,18 @@ const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category?.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        product =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.category?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(product => 
-        product.category?.toLowerCase() === selectedCategory.toLowerCase()
+      filtered = filtered.filter(
+        product => product.category?.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
 
@@ -511,7 +527,7 @@ const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
     return Array.from(cats);
   }, [sellProducts.publicProducts]);
 
-  const handleProductSelect = (product) => {
+  const handleProductSelect = product => {
     if (product.variants && product.variants.length > 1) {
       setSelectedProduct(product);
       setShowVariantModal(true);
@@ -522,33 +538,36 @@ const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
         productId: product._id,
         variantId: variant?._id || null,
         product,
-        variant
+        variant,
       });
     }
   };
 
-  const handleVariantSelect = (variant) => {
+  const handleVariantSelect = variant => {
     onComplete({
       productId: selectedProduct._id,
       variantId: variant._id,
       product: selectedProduct,
-      variant
+      variant,
     });
     setShowVariantModal(false);
     setSelectedProduct(null);
   };
 
-  const getBadgeType = (product) => {
+  const getBadgeType = product => {
     if (product.popularity > 80) return 'popular';
     if (product.trending) return 'trending';
     return null;
   };
 
-  const getBadgeIcon = (type) => {
+  const getBadgeIcon = type => {
     switch (type) {
-      case 'popular': return Star;
-      case 'trending': return TrendingUp;
-      default: return null;
+      case 'popular':
+        return Star;
+      case 'trending':
+        return TrendingUp;
+      default:
+        return null;
     }
   };
 
@@ -584,42 +603,27 @@ const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
             type="text"
             placeholder="Search devices..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
         </SearchContainer>
 
         <FiltersContainer>
-          <FilterButton
-            active={sortBy === 'popular'}
-            onClick={() => setSortBy('popular')}
-          >
+          <FilterButton active={sortBy === 'popular'} onClick={() => setSortBy('popular')}>
             <Star size={14} />
             Popular
           </FilterButton>
-          <FilterButton
-            active={sortBy === 'price-high'}
-            onClick={() => setSortBy('price-high')}
-          >
+          <FilterButton active={sortBy === 'price-high'} onClick={() => setSortBy('price-high')}>
             Price: High
           </FilterButton>
-          <FilterButton
-            active={sortBy === 'price-low'}
-            onClick={() => setSortBy('price-low')}
-          >
+          <FilterButton active={sortBy === 'price-low'} onClick={() => setSortBy('price-low')}>
             Price: Low
           </FilterButton>
 
           <ViewToggle>
-            <ViewButton
-              active={viewMode === 'grid'}
-              onClick={() => setViewMode('grid')}
-            >
+            <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
               <Grid size={16} />
             </ViewButton>
-            <ViewButton
-              active={viewMode === 'list'}
-              onClick={() => setViewMode('list')}
-            >
+            <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
               <List size={16} />
             </ViewButton>
           </ViewToggle>
@@ -627,10 +631,7 @@ const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
       </SearchAndFilters>
 
       <CategoryTabs>
-        <CategoryTab
-          active={selectedCategory === 'all'}
-          onClick={() => setSelectedCategory('all')}
-        >
+        <CategoryTab active={selectedCategory === 'all'} onClick={() => setSelectedCategory('all')}>
           All Devices
         </CategoryTab>
         {categories.map(category => {
@@ -661,7 +662,7 @@ const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
           {filteredProducts.map(product => {
             const badgeType = getBadgeType(product);
             const BadgeIcon = getBadgeIcon(badgeType);
-            
+
             return (
               <ProductCard
                 key={product._id}
@@ -671,7 +672,7 @@ const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
                 <ProductImage viewMode={viewMode}>
                   <Smartphone size={viewMode === 'grid' ? 48 : 32} />
                 </ProductImage>
-                
+
                 <ProductInfo>
                   <ProductHeader>
                     <ProductName>{product.name}</ProductName>
@@ -688,12 +689,8 @@ const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
                   </ProductDescription>
 
                   <ProductMeta>
-                    <ProductPrice>
-                      ₹{product.basePrice?.toLocaleString() || 'N/A'}
-                    </ProductPrice>
-                    <ProductVariants>
-                      {product.variants?.length || 0} variants
-                    </ProductVariants>
+                    <ProductPrice>₹{product.basePrice?.toLocaleString() || 'N/A'}</ProductPrice>
+                    <ProductVariants>{product.variants?.length || 0} variants</ProductVariants>
                   </ProductMeta>
 
                   <SelectButton>
@@ -709,11 +706,9 @@ const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
 
       {showVariantModal && selectedProduct && (
         <VariantModal onClick={() => setShowVariantModal(false)}>
-          <VariantModalContent onClick={(e) => e.stopPropagation()}>
+          <VariantModalContent onClick={e => e.stopPropagation()}>
             <VariantModalHeader>
-              <VariantModalTitle>
-                Select {selectedProduct.name} Variant
-              </VariantModalTitle>
+              <VariantModalTitle>Select {selectedProduct.name} Variant</VariantModalTitle>
               <CloseButton onClick={() => setShowVariantModal(false)}>
                 <X size={20} />
               </CloseButton>
@@ -722,21 +717,16 @@ const DeviceSelection = ({ sessionData, onComplete, onError, hooks }) => {
             <VariantModalBody>
               <VariantGrid>
                 {selectedProduct.variants?.map(variant => (
-                  <VariantCard
-                    key={variant._id}
-                    onClick={() => handleVariantSelect(variant)}
-                  >
+                  <VariantCard key={variant._id} onClick={() => handleVariantSelect(variant)}>
                     <VariantName>{variant.name}</VariantName>
                     <VariantSpecs>
-                      {variant.specifications && Object.entries(variant.specifications)
-                        .slice(0, 3)
-                        .map(([key, value]) => `${key}: ${value}`)
-                        .join(' • ')
-                      }
+                      {variant.specifications &&
+                        Object.entries(variant.specifications)
+                          .slice(0, 3)
+                          .map(([key, value]) => `${key}: ${value}`)
+                          .join(' • ')}
                     </VariantSpecs>
-                    <VariantPrice>
-                      ₹{variant.basePrice?.toLocaleString() || 'N/A'}
-                    </VariantPrice>
+                    <VariantPrice>₹{variant.basePrice?.toLocaleString() || 'N/A'}</VariantPrice>
                   </VariantCard>
                 ))}
               </VariantGrid>

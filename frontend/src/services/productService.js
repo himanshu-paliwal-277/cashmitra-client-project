@@ -12,14 +12,14 @@ const api = axios.create({
 
 // Add a request interceptor to include auth token for protected routes
 api.interceptors.request.use(
-  (config) => {
+  config => {
     const token = localStorage.getItem('token'); // User token, not admin token
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 );
 
 class ProductService {
@@ -27,19 +27,21 @@ class ProductService {
   async getProducts(params = {}) {
     try {
       const queryParams = new URLSearchParams();
-      
+
       // Add pagination
       if (params.page) queryParams.append('page', params.page);
       if (params.limit) queryParams.append('limit', params.limit);
-      
+
       // Add filters
-      if (params.category && params.category !== 'all') queryParams.append('category', params.category);
+      if (params.category && params.category !== 'all')
+        queryParams.append('category', params.category);
       if (params.brand && params.brand !== 'all') queryParams.append('brand', params.brand);
-      if (params.condition && params.condition !== 'all') queryParams.append('condition', params.condition);
+      if (params.condition && params.condition !== 'all')
+        queryParams.append('condition', params.condition);
       if (params.search) queryParams.append('search', params.search);
       if (params.minPrice) queryParams.append('minPrice', params.minPrice);
       if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice);
-      
+
       // Map frontend sortBy values to backend values
       let backendSortBy = params.sortBy;
       if (params.sortBy === 'popularity') backendSortBy = 'popularity';
@@ -51,13 +53,14 @@ class ProductService {
         queryParams.append('sortOrder', 'desc');
       } else if (params.sortBy === 'rating') backendSortBy = 'rating';
       else if (params.sortBy === 'newest') backendSortBy = 'createdAt';
-      
+
       if (backendSortBy) queryParams.append('sortBy', backendSortBy);
-      if (params.sortOrder && !params.sortBy?.includes('price')) queryParams.append('sortOrder', params.sortOrder);
+      if (params.sortOrder && !params.sortBy?.includes('price'))
+        queryParams.append('sortOrder', params.sortOrder);
       if (params.availability) queryParams.append('availability', params.availability);
       if (params.pincode) queryParams.append('pincode', params.pincode);
       if (params.featured) queryParams.append('featured', params.featured);
-      
+
       const response = await api.get(`/products?${queryParams.toString()}`);
       return {
         products: response.data.data || [],
@@ -65,8 +68,8 @@ class ProductService {
           page: response.data.page || 1,
           pages: response.data.pages || 1,
           total: response.data.total || 0,
-          count: response.data.count || 0
-        }
+          count: response.data.count || 0,
+        },
       };
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -132,22 +135,23 @@ class ProductService {
   async getBuyProducts(params = {}) {
     try {
       const queryParams = new URLSearchParams();
-      
+
       // Add pagination
       if (params.page) queryParams.append('page', params.page);
       if (params.limit) queryParams.append('limit', params.limit);
-      
+
       // Add filters - support both categoryId and category name
       if (params.categoryId) queryParams.append('categoryId', params.categoryId);
-      if (params.category && params.category !== 'all') queryParams.append('category', params.category);
+      if (params.category && params.category !== 'all')
+        queryParams.append('category', params.category);
       if (params.brand && params.brand !== 'all') queryParams.append('brand', params.brand);
       if (params.search) queryParams.append('search', params.search);
       if (params.isActive !== undefined) queryParams.append('isActive', params.isActive);
-      
+
       // Add sorting
       if (params.sortBy) queryParams.append('sortBy', params.sortBy);
       if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
-      
+
       const response = await api.get(`/buy-products?${queryParams.toString()}`);
       return {
         products: response.data.data || [],
@@ -155,8 +159,8 @@ class ProductService {
           page: response.data.pagination?.current || 1,
           pages: response.data.pagination?.pages || 1,
           total: response.data.pagination?.total || 0,
-          limit: response.data.pagination?.limit || 10
-        }
+          limit: response.data.pagination?.limit || 10,
+        },
       };
     } catch (error) {
       console.error('Error fetching buy products:', error);
@@ -233,8 +237,8 @@ class ProductService {
     try {
       const response = await api.post('/products/upload-images', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
       return response.data;
     } catch (error) {
@@ -261,5 +265,5 @@ export const {
   createProduct,
   updateProduct,
   deleteProduct,
-  uploadProductImages
+  uploadProductImages,
 } = productService;

@@ -16,18 +16,18 @@ const useSellSessions = () => {
   const [error, setError] = useState(null);
 
   // Create new session
-  const createSession = useCallback(async (sessionData) => {
+  const createSession = useCallback(async sessionData => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await api.post('/sell-sessions', sessionData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       setCurrentSession(response.data.session);
       return response.data;
     } catch (err) {
@@ -46,10 +46,10 @@ const useSellSessions = () => {
       const token = localStorage.getItem('token');
       const response = await api.get('/sell-sessions/my-sessions', {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       setSessions(response.data.data || []);
       return response.data.data || [];
     } catch (err) {
@@ -61,17 +61,17 @@ const useSellSessions = () => {
   }, []);
 
   // Get session by ID
-  const getSession = useCallback(async (sessionId) => {
+  const getSession = useCallback(async sessionId => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await api.get(`/sell-sessions/${sessionId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       setCurrentSession(response.data.session);
       return response.data.session;
     } catch (err) {
@@ -90,11 +90,11 @@ const useSellSessions = () => {
       const token = localStorage.getItem('token');
       const response = await api.put(`/sell-sessions/${sessionId}/answers`, answersData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       setCurrentSession(response.data.session);
       return response.data;
     } catch (err) {
@@ -113,11 +113,11 @@ const useSellSessions = () => {
       const token = localStorage.getItem('token');
       const response = await api.put(`/sell-sessions/${sessionId}/defects`, defectsData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       setCurrentSession(response.data.session);
       return response.data;
     } catch (err) {
@@ -136,11 +136,11 @@ const useSellSessions = () => {
       const token = localStorage.getItem('token');
       const response = await api.put(`/sell-sessions/${sessionId}/accessories`, accessoriesData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       setCurrentSession(response.data.session);
       return response.data;
     } catch (err) {
@@ -152,17 +152,17 @@ const useSellSessions = () => {
   }, []);
 
   // Get current price for session
-  const getCurrentPrice = useCallback(async (sessionId) => {
+  const getCurrentPrice = useCallback(async sessionId => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await api.get(`/sell-sessions/${sessionId}/price`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       setCurrentPrice(response.data.price);
       return response.data.price;
     } catch (err) {
@@ -174,17 +174,21 @@ const useSellSessions = () => {
   }, []);
 
   // Extend session expiry
-  const extendSession = useCallback(async (sessionId) => {
+  const extendSession = useCallback(async sessionId => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
-      const response = await api.patch(`/sell-sessions/${sessionId}/extend`, {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const response = await api.patch(
+        `/sell-sessions/${sessionId}/extend`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
-      
+      );
+
       setCurrentSession(response.data.session);
       return response.data;
     } catch (err) {
@@ -196,32 +200,35 @@ const useSellSessions = () => {
   }, []);
 
   // Delete session
-  const deleteSession = useCallback(async (sessionId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('token');
-      await api.delete(`/sell-sessions/${sessionId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+  const deleteSession = useCallback(
+    async sessionId => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('token');
+        await api.delete(`/sell-sessions/${sessionId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Remove from sessions list
+        setSessions(prev => prev.filter(session => session._id !== sessionId));
+
+        // Clear current session if it was deleted
+        if (currentSession?._id === sessionId) {
+          setCurrentSession(null);
+          setCurrentPrice(null);
         }
-      });
-      
-      // Remove from sessions list
-      setSessions(prev => prev.filter(session => session._id !== sessionId));
-      
-      // Clear current session if it was deleted
-      if (currentSession?._id === sessionId) {
-        setCurrentSession(null);
-        setCurrentPrice(null);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete session');
+        throw err;
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete session');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [currentSession]);
+    },
+    [currentSession]
+  );
 
   // Admin method: Clean expired sessions
   const cleanExpiredSessions = useCallback(async () => {
@@ -231,10 +238,10 @@ const useSellSessions = () => {
       const token = localStorage.getItem('adminToken');
       const response = await api.delete('/sell-sessions/admin/cleanup', {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to clean expired sessions');
@@ -245,16 +252,16 @@ const useSellSessions = () => {
   }, []);
 
   // Calculate price based on session data
-  const calculatePrice = useCallback(async (sessionData) => {
+  const calculatePrice = useCallback(async sessionData => {
     setLoading(true);
     setError(null);
     try {
       const response = await api.post('/sell-sessions/calculate-price', sessionData, {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       return response.data.price;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to calculate price');
@@ -310,7 +317,7 @@ const useSellSessions = () => {
     cleanExpiredSessions,
 
     // Utilities
-    clearError
+    clearError,
   };
 };
 

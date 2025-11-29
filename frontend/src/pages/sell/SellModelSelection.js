@@ -28,11 +28,11 @@ const HeaderContent = styled.div`
 const Logo = styled.div`
   font-size: 24px;
   font-weight: bold;
-  color: #00C853;
+  color: #00c853;
 `;
 
 const LoginButton = styled.button`
-  background: #00C853;
+  background: #00c853;
   color: white;
   border: none;
   padding: 8px 20px;
@@ -51,16 +51,16 @@ const Breadcrumb = styled.div`
   font-size: 14px;
   color: #666;
   margin-bottom: 20px;
-  
+
   a {
     color: #666;
     text-decoration: none;
-    
+
     &:hover {
-      color: #00C853;
+      color: #00c853;
     }
   }
-  
+
   span {
     margin: 0 8px;
   }
@@ -82,7 +82,7 @@ const ContentWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: 40px;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -93,7 +93,7 @@ const ProductSection = styled.div`
   background: white;
   border-radius: 12px;
   padding: 40px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const ProductImage = styled.div`
@@ -105,7 +105,7 @@ const ProductImage = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   img {
     max-width: 100%;
     max-height: 100%;
@@ -132,17 +132,17 @@ const VariantGrid = styled.div`
 
 const VariantOption = styled.button`
   padding: 16px 20px;
-  border: 2px solid ${props => props.selected ? '#00C853' : '#e9ecef'};
-  background: ${props => props.selected ? '#f0fff4' : 'white'};
+  border: 2px solid ${props => (props.selected ? '#00C853' : '#e9ecef')};
+  background: ${props => (props.selected ? '#f0fff4' : 'white')};
   border-radius: 8px;
   font-size: 16px;
   font-weight: 500;
-  color: ${props => props.selected ? '#00C853' : '#333'};
+  color: ${props => (props.selected ? '#00C853' : '#333')};
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
-    border-color: #00C853;
+    border-color: #00c853;
     background: #f0fff4;
   }
 `;
@@ -158,12 +158,12 @@ const GetValueButton = styled.button`
   font-weight: 600;
   cursor: not-allowed;
   margin-top: 20px;
-  
+
   &.active {
-    background: #00C853;
+    background: #00c853;
     color: white;
     cursor: pointer;
-    
+
     &:hover {
       background: #00a844;
     }
@@ -174,7 +174,7 @@ const Sidebar = styled.div`
   background: white;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: fit-content;
 `;
 
@@ -187,7 +187,7 @@ const SidebarImage = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   img {
     max-width: 100%;
     max-height: 100%;
@@ -249,14 +249,14 @@ const SellModelSelection = () => {
     }
   }, [productId]);
 
-  const handleVariantSelect = (variant) => {
+  const handleVariantSelect = variant => {
     setSelectedVariant(variant);
   };
 
   const handleGetValue = () => {
     if (selectedVariant) {
       navigate(`/sell/device-evaluation/${productId}`, {
-        state: { selectedVariant, product }
+        state: { selectedVariant, product },
       });
     }
   };
@@ -264,7 +264,14 @@ const SellModelSelection = () => {
   if (loading) {
     return (
       <Container>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '50vh',
+          }}
+        >
           Loading...
         </div>
       </Container>
@@ -274,7 +281,14 @@ const SellModelSelection = () => {
   if (!product) {
     return (
       <Container>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '50vh',
+          }}
+        >
           Product not found
         </div>
       </Container>
@@ -282,14 +296,14 @@ const SellModelSelection = () => {
   }
 
   // Get variants from API data or fallback to default
-  const variants = product.productDetails?.memoryStorage?.phoneVariants?.length > 0 
-    ? product.productDetails.memoryStorage.phoneVariants 
-    : ['16 GB', '32 GB', '64 GB', '128 GB'];
+  const variants =
+    product.productDetails?.memoryStorage?.phoneVariants?.length > 0
+      ? product.productDetails.memoryStorage.phoneVariants
+      : ['16 GB', '32 GB', '64 GB', '128 GB'];
 
   // Get product image
-  const productImage = product.images && product.images['0'] 
-    ? product.images['0'].replace(/["`]/g, '') 
-    : null;
+  const productImage =
+    product.images && product.images['0'] ? product.images['0'].replace(/["`]/g, '') : null;
 
   // Dynamic breadcrumb and title
   const brandName = product.brand || 'Brand';
@@ -313,12 +327,17 @@ const SellModelSelection = () => {
           <span>&gt;</span>
           <a href={`/sell/${brandName.toLowerCase()}`}>Sell Old {brandName}</a>
           <span>&gt;</span>
-          <span>Sell Old {brandName} {productName}</span>
+          <span>
+            Sell Old {brandName} {productName}
+          </span>
         </Breadcrumb>
 
-        <Title>Sell Old {brandName} {productName}</Title>
+        <Title>
+          Sell Old {brandName} {productName}
+        </Title>
         <Subtitle>
-          <span style={{ color: '#00C853' }}>₹{product.pricing?.discountedPrice || '2,160'}+</span> already sold on Cashify
+          <span style={{ color: '#00C853' }}>₹{product.pricing?.discountedPrice || '2,160'}+</span>{' '}
+          already sold on Cashify
         </Subtitle>
 
         <ContentWrapper>
@@ -340,7 +359,9 @@ const SellModelSelection = () => {
                     selected={selectedVariant === variant}
                     onClick={() => handleVariantSelect(variant)}
                   >
-                    {typeof variant === 'string' ? variant : `${variant.storage || variant.memory || 'Unknown'}`}
+                    {typeof variant === 'string'
+                      ? variant
+                      : `${variant.storage || variant.memory || 'Unknown'}`}
                   </VariantOption>
                 ))}
               </VariantGrid>
@@ -363,9 +384,11 @@ const SellModelSelection = () => {
                 <div style={{ color: '#999' }}>No Image</div>
               )}
             </SidebarImage>
-            
-            <SidebarTitle>{brandName} {productName}</SidebarTitle>
-            
+
+            <SidebarTitle>
+              {brandName} {productName}
+            </SidebarTitle>
+
             <SidebarSection>
               <SidebarSectionTitle>Get Upto</SidebarSectionTitle>
               <SidebarText style={{ color: '#00C853', fontSize: '18px', fontWeight: '600' }}>

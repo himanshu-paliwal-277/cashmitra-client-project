@@ -27,7 +27,7 @@ import {
   CheckCircle,
   Clock,
   Briefcase,
-  XCircle
+  XCircle,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -67,7 +67,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
@@ -93,7 +93,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -108,7 +108,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: #3b82f6;
@@ -179,7 +179,7 @@ const PartnerCard = styled.div`
   padding: 1.5rem;
   transition: all 0.2s;
   position: relative;
-  
+
   &:hover {
     border-color: #3b82f6;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
@@ -227,7 +227,7 @@ const StatusBadge = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  
+
   ${props => {
     switch (props.status) {
       case 'active':
@@ -317,7 +317,16 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${props => props.primary ? '#3b82f6' : props.danger ? '#ef4444' : props.success ? '#10b981' : props.warning ? '#f59e0b' : '#6b7280'};
+  background: ${props =>
+    props.primary
+      ? '#3b82f6'
+      : props.danger
+        ? '#ef4444'
+        : props.success
+          ? '#10b981'
+          : props.warning
+            ? '#f59e0b'
+            : '#6b7280'};
   color: white;
   border: none;
   padding: 0.5rem;
@@ -326,12 +335,12 @@ const IconButton = styled.button`
   display: flex;
   align-items: center;
   transition: all 0.2s;
-  
+
   &:hover {
     opacity: 0.9;
     transform: scale(1.05);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -349,8 +358,8 @@ const ToggleButton = styled.button`
   padding: 0.5rem;
   border-radius: 0.375rem;
   transition: all 0.2s;
-  color: ${props => props.active ? '#10b981' : '#ef4444'};
-  
+  color: ${props => (props.active ? '#10b981' : '#ef4444')};
+
   &:hover {
     background: #f3f4f6;
   }
@@ -401,7 +410,7 @@ const CloseButton = styled.button`
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  
+
   &:hover {
     background: #f3f4f6;
   }
@@ -457,7 +466,7 @@ const PartnerList = () => {
     active: 0,
     inactive: 0,
     totalOrders: 0,
-    totalRevenue: 0
+    totalRevenue: 0,
   });
 
   const {
@@ -466,7 +475,7 @@ const PartnerList = () => {
     loading: hookLoading,
     error: hookError,
     updatePartnerStatus,
-    fetchPartners
+    fetchPartners,
   } = useAdminPartnerList();
 
   useEffect(() => {
@@ -484,33 +493,35 @@ const PartnerList = () => {
     }
   };
 
-  const handleViewDetails = (partner) => {
+  const handleViewDetails = partner => {
     setSelectedPartner(partner);
     setShowDetailModal(true);
   };
 
-  const renderStars = (rating) => {
+  const renderStars = rating => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
-    
+
     for (let i = 0; i < fullStars; i++) {
       stars.push(<Star key={i} size={14} fill="#fbbf24" color="#fbbf24" />);
     }
-    
+
     if (hasHalfStar) {
-      stars.push(<Star key="half" size={14} fill="#fbbf24" color="#fbbf24" style={{ opacity: 0.5 }} />);
+      stars.push(
+        <Star key="half" size={14} fill="#fbbf24" color="#fbbf24" style={{ opacity: 0.5 }} />
+      );
     }
-    
+
     const emptyStars = 5 - Math.ceil(rating);
     for (let i = 0; i < emptyStars; i++) {
       stars.push(<Star key={`empty-${i}`} size={14} color="#d1d5db" />);
     }
-    
+
     return stars;
   };
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'active':
         return <CheckCircle size={12} />;
@@ -526,13 +537,14 @@ const PartnerList = () => {
   };
 
   const filteredPartners = partners.filter(partner => {
-    const matchesSearch = partner.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         partner.contactPerson?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         partner.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch =
+      partner.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partner.contactPerson?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partner.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesStatus = !statusFilter || partner.status === statusFilter;
     const matchesType = !typeFilter || partner.businessType === typeFilter;
-    
+
     return matchesSearch && matchesStatus && matchesType;
   });
 
@@ -576,7 +588,7 @@ const PartnerList = () => {
             <StatLabel>Total Partners</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#10b981">
             <CheckCircle size={24} />
@@ -586,7 +598,7 @@ const PartnerList = () => {
             <StatLabel>Active Partners</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#f59e0b">
             <Package size={24} />
@@ -596,7 +608,7 @@ const PartnerList = () => {
             <StatLabel>Total Orders</StatLabel>
           </StatContent>
         </StatCard>
-        
+
         <StatCard>
           <StatIcon color="#059669">
             <DollarSign size={24} />
@@ -613,24 +625,18 @@ const PartnerList = () => {
           type="text"
           placeholder="Search by business name, contact person, or email..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
-        
-        <FilterSelect
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
+
+        <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
           <option value="suspended">Suspended</option>
           <option value="pending">Pending</option>
         </FilterSelect>
-        
-        <FilterSelect
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-        >
+
+        <FilterSelect value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
           <option value="">All Types</option>
           <option value="retailer">Retailer</option>
           <option value="distributor">Distributor</option>
@@ -644,19 +650,22 @@ const PartnerList = () => {
           <EmptyState>
             <Users size={48} style={{ marginBottom: '1rem' }} />
             <p style={{ fontSize: '1.125rem' }}>
-              {searchTerm || statusFilter || typeFilter ? 'No partners match your filters' : 'No partners found'}
+              {searchTerm || statusFilter || typeFilter
+                ? 'No partners match your filters'
+                : 'No partners found'}
             </p>
           </EmptyState>
         ) : (
           <PartnersGrid>
-            {filteredPartners.map((partner) => (
+            {filteredPartners.map(partner => (
               <PartnerCard key={partner._id}>
                 <PartnerHeader>
                   <PartnerInfo>
                     <PartnerName>{partner.businessName || 'N/A'}</PartnerName>
                     <PartnerType>
                       <Briefcase size={14} style={{ display: 'inline', marginRight: '0.25rem' }} />
-                      {partner.businessType?.charAt(0)?.toUpperCase() + partner.businessType?.slice(1) || 'N/A'}
+                      {partner.businessType?.charAt(0)?.toUpperCase() +
+                        partner.businessType?.slice(1) || 'N/A'}
                     </PartnerType>
                     <PartnerLocation>
                       <MapPin size={14} />
@@ -665,18 +674,17 @@ const PartnerList = () => {
                   </PartnerInfo>
                   <StatusBadge status={partner.status}>
                     {getStatusIcon(partner.status)}
-                    {partner.status?.charAt(0)?.toUpperCase() + partner.status?.slice(1) || 'Active'}
+                    {partner.status?.charAt(0)?.toUpperCase() + partner.status?.slice(1) ||
+                      'Active'}
                   </StatusBadge>
                 </PartnerHeader>
-                
+
                 <RatingSection>
-                  <RatingStars>
-                    {renderStars(partner.rating || 0)}
-                  </RatingStars>
+                  <RatingStars>{renderStars(partner.rating || 0)}</RatingStars>
                   <RatingValue>{(partner.rating || 0).toFixed(1)}</RatingValue>
                   <RatingCount>({partner.reviewCount || 0} reviews)</RatingCount>
                 </RatingSection>
-                
+
                 <StatsRow>
                   <StatItem>
                     <StatItemValue>{partner.totalOrders || 0}</StatItemValue>
@@ -687,7 +695,7 @@ const PartnerList = () => {
                     <StatItemLabel>Revenue</StatItemLabel>
                   </StatItem>
                 </StatsRow>
-                
+
                 <ContactInfo>
                   <ContactItem>
                     <Phone size={14} />
@@ -702,17 +710,17 @@ const PartnerList = () => {
                     Joined {new Date(partner.createdAt).toLocaleDateString()}
                   </ContactItem>
                 </ContactInfo>
-                
+
                 <ActionButtons>
                   <IconButton primary onClick={() => handleViewDetails(partner)}>
                     <Eye size={14} />
                   </IconButton>
-                  
+
                   <IconButton primary>
                     <Edit size={14} />
                   </IconButton>
-                  
-                  <ToggleButton 
+
+                  <ToggleButton
                     active={partner.status === 'active'}
                     onClick={() => handleStatusToggle(partner._id, partner.status)}
                   >
@@ -739,7 +747,7 @@ const PartnerList = () => {
                 <XCircle size={20} />
               </CloseButton>
             </ModalHeader>
-            
+
             <DetailSection>
               <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Business Information</h3>
               <DetailGrid>
@@ -767,7 +775,7 @@ const PartnerList = () => {
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
-            
+
             <DetailSection>
               <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Contact Information</h3>
               <DetailGrid>
@@ -793,7 +801,7 @@ const PartnerList = () => {
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
-            
+
             <DetailSection>
               <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Performance Metrics</h3>
               <DetailGrid>
@@ -819,31 +827,41 @@ const PartnerList = () => {
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
-            
+
             {selectedPartner.specializations && selectedPartner.specializations.length > 0 && (
               <DetailSection>
                 <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Specializations</h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   {selectedPartner.specializations.map((spec, index) => (
-                    <span key={index} style={{
-                      padding: '0.25rem 0.75rem',
-                      background: '#dbeafe',
-                      color: '#1e40af',
-                      borderRadius: '9999px',
-                      fontSize: '0.875rem',
-                      fontWeight: '500'
-                    }}>
+                    <span
+                      key={index}
+                      style={{
+                        padding: '0.25rem 0.75rem',
+                        background: '#dbeafe',
+                        color: '#1e40af',
+                        borderRadius: '9999px',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                      }}
+                    >
                       {spec}
                     </span>
                   ))}
                 </div>
               </DetailSection>
             )}
-            
+
             {selectedPartner.notes && (
               <DetailSection>
                 <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Notes</h3>
-                <div style={{ padding: '1rem', background: '#f9fafb', borderRadius: '0.5rem', color: '#374151' }}>
+                <div
+                  style={{
+                    padding: '1rem',
+                    background: '#f9fafb',
+                    borderRadius: '0.5rem',
+                    color: '#374151',
+                  }}
+                >
                   {selectedPartner.notes}
                 </div>
               </DetailSection>

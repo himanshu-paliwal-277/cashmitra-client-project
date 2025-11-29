@@ -1,7 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import {
-  User, Mail, Phone, MapPin, Calendar, Camera, Edit3, Save, X, Shield,
-  Bell, CreditCard, Settings, ChevronRight
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Camera,
+  Edit3,
+  Save,
+  X,
+  Shield,
+  Bell,
+  CreditCard,
+  Settings,
+  ChevronRight,
 } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -11,12 +23,7 @@ import './Profile.css';
 
 const Profile = () => {
   const { user } = useAuth();
-  const {
-    profile: profileData,
-    loading,
-    error,
-    updateProfile
-  } = useUserProfile();
+  const { profile: profileData, loading, error, updateProfile } = useUserProfile();
 
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -25,7 +32,7 @@ const Profile = () => {
     email: '',
     phone: '',
     dateOfBirth: '',
-    address: ''
+    address: '',
   });
 
   // hydrate edit data when we receive profile
@@ -41,14 +48,14 @@ const Profile = () => {
             ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                 .replace(/^,\s*|,\s*,/g, ',')
                 .replace(/^,\s*|,\s*$/g, '')
-            : (profileData.address || '')
+            : profileData.address || '',
       });
     }
   }, [profileData]);
 
   const handleEdit = () => {
     if (profileData) {
-      setEditData((prev) => ({
+      setEditData(prev => ({
         ...prev,
         name: profileData.name || '',
         email: profileData.email || '',
@@ -59,7 +66,7 @@ const Profile = () => {
             ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                 .replace(/^,\s*|,\s*,/g, ',')
                 .replace(/^,\s*|,\s*$/g, '')
-            : (profileData.address || '')
+            : profileData.address || '',
       }));
     }
     setIsEditing(true);
@@ -90,36 +97,59 @@ const Profile = () => {
             ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                 .replace(/^,\s*|,\s*,/g, ',')
                 .replace(/^,\s*|,\s*$/g, '')
-            : (profileData.address || '')
+            : profileData.address || '',
       });
     }
     setIsEditing(false);
   };
 
   const handleInputChange = (field, value) => {
-    setEditData((prev) => ({ ...prev, [field]: value }));
+    setEditData(prev => ({ ...prev, [field]: value }));
   };
 
   const quickActions = [
-    { icon: CreditCard, label: 'Payment Methods', description: 'Manage cards & wallets', onClick: () => console.log('Payment Methods') },
-    { icon: Bell,        label: 'Notifications',   description: 'Manage preferences',    onClick: () => console.log('Notifications') },
-    { icon: Shield,      label: 'Security',        description: 'Password & 2FA',        onClick: () => console.log('Security') },
-    { icon: Settings,    label: 'Account Settings',description: 'Privacy & preferences', onClick: () => console.log('Account Settings') },
+    {
+      icon: CreditCard,
+      label: 'Payment Methods',
+      description: 'Manage cards & wallets',
+      onClick: () => console.log('Payment Methods'),
+    },
+    {
+      icon: Bell,
+      label: 'Notifications',
+      description: 'Manage preferences',
+      onClick: () => console.log('Notifications'),
+    },
+    {
+      icon: Shield,
+      label: 'Security',
+      description: 'Password & 2FA',
+      onClick: () => console.log('Security'),
+    },
+    {
+      icon: Settings,
+      label: 'Account Settings',
+      description: 'Privacy & preferences',
+      onClick: () => console.log('Account Settings'),
+    },
   ];
 
   const stats = [
     { label: 'Orders Placed', value: '12' },
     { label: 'Devices Sold', value: '8' },
     { label: 'Total Savings', value: '₹45,000' },
-    { label: 'Member Since', value: '2023' }
+    { label: 'Member Since', value: '2023' },
   ];
 
-  const initials =
-    loading
-      ? 'L'
-      : (profileData?.name
-          ? profileData.name.split(' ').map(n => n[0]).join('').slice(0,2)
-          : 'U');
+  const initials = loading
+    ? 'L'
+    : profileData?.name
+      ? profileData.name
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .slice(0, 2)
+      : 'U';
 
   return (
     <div className="prof-page">
@@ -144,10 +174,10 @@ const Profile = () => {
               </div>
 
               <h2 className="prof-username">
-                {loading ? 'Loading...' : (profileData?.name || 'User Name')}
+                {loading ? 'Loading...' : profileData?.name || 'User Name'}
               </h2>
               <div className="prof-email">
-                {loading ? 'Loading...' : (profileData?.email || 'user@example.com')}
+                {loading ? 'Loading...' : profileData?.email || 'user@example.com'}
               </div>
 
               <div className="prof-status" role="status" aria-live="polite">
@@ -212,12 +242,12 @@ const Profile = () => {
                       className="prof-input"
                       type="text"
                       value={editData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      onChange={e => handleInputChange('name', e.target.value)}
                       disabled={saving}
                     />
                   ) : (
                     <div className="prof-value">
-                      {loading ? 'Loading...' : (profileData?.name || 'Not provided')}
+                      {loading ? 'Loading...' : profileData?.name || 'Not provided'}
                     </div>
                   )}
                 </div>
@@ -232,14 +262,14 @@ const Profile = () => {
                       className="prof-input"
                       type="email"
                       value={editData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onChange={e => handleInputChange('email', e.target.value)}
                       disabled
                       aria-disabled="true"
                       title="Email is verified and cannot be changed here"
                     />
                   ) : (
                     <div className="prof-value">
-                      {loading ? 'Loading...' : (profileData?.email || 'Not provided')}
+                      {loading ? 'Loading...' : profileData?.email || 'Not provided'}
                       <Shield size={14} className="prof-value-ok" />
                     </div>
                   )}
@@ -255,12 +285,12 @@ const Profile = () => {
                       className="prof-input"
                       type="tel"
                       value={editData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      onChange={e => handleInputChange('phone', e.target.value)}
                       disabled={saving}
                     />
                   ) : (
                     <div className="prof-value">
-                      {loading ? 'Loading...' : (profileData?.phone || 'Not provided')}
+                      {loading ? 'Loading...' : profileData?.phone || 'Not provided'}
                     </div>
                   )}
                 </div>
@@ -275,16 +305,20 @@ const Profile = () => {
                       className="prof-input"
                       type="date"
                       value={editData.dateOfBirth}
-                      onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                      onChange={e => handleInputChange('dateOfBirth', e.target.value)}
                       disabled={saving}
                     />
                   ) : (
                     <div className="prof-value">
                       {loading
                         ? 'Loading...'
-                        : (profileData?.dateOfBirth
-                            ? new Date(profileData.dateOfBirth).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })
-                            : 'Not provided')}
+                        : profileData?.dateOfBirth
+                          ? new Date(profileData.dateOfBirth).toLocaleDateString('en-IN', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })
+                          : 'Not provided'}
                     </div>
                   )}
                 </div>
@@ -299,18 +333,18 @@ const Profile = () => {
                       className="prof-input"
                       type="text"
                       value={editData.address}
-                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      onChange={e => handleInputChange('address', e.target.value)}
                       disabled={saving}
                     />
                   ) : (
                     <div className="prof-value">
                       {loading
                         ? 'Loading...'
-                        : (profileData?.address && typeof profileData.address === 'object'
-                            ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
-                                .replace(/^,\s*|,\s*,/g, ',')
-                                .replace(/^,\s*|,\s*$/g, '') || 'Not provided'
-                            : (profileData?.address || 'Not provided'))}
+                        : profileData?.address && typeof profileData.address === 'object'
+                          ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
+                              .replace(/^,\s*|,\s*,/g, ',')
+                              .replace(/^,\s*|,\s*$/g, '') || 'Not provided'
+                          : profileData?.address || 'Not provided'}
                     </div>
                   )}
                 </div>

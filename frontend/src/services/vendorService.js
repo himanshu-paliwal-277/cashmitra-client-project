@@ -47,14 +47,14 @@ class VendorService {
           totalOrders: 245,
           pendingOrders: 12,
           completedOrders: 233,
-          totalRevenue: 125000
+          totalRevenue: 125000,
         },
         recentOrders: [],
         monthlyStats: {
           orders: 45,
           revenue: 25000,
-          growth: 15.2
-        }
+          growth: 15.2,
+        },
       };
     }
   }
@@ -64,7 +64,7 @@ class VendorService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (status) params.append('status', status);
-      
+
       const response = await api.get(`/vendor/orders?${params}`);
       return response.data;
     } catch (error) {
@@ -96,7 +96,7 @@ class VendorService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (category && category !== 'all') params.append('category', category);
-      
+
       const response = await api.get(`/vendor/inventory?${params}`);
       return response.data;
     } catch (error) {
@@ -137,7 +137,7 @@ class VendorService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (category && category !== 'all') params.append('category', category);
-      
+
       const response = await api.get(`/vendor/products?${params}`);
       return response.data;
     } catch (error) {
@@ -151,7 +151,7 @@ class VendorService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (dateRange) params.append('dateRange', dateRange);
-      
+
       const response = await api.get(`/vendor/sales?${params}`);
       return response.data;
     } catch (error) {
@@ -164,7 +164,7 @@ class VendorService {
   async getFinanceData(page = 1, limit = 10) {
     try {
       const params = new URLSearchParams({ page, limit });
-      
+
       const response = await api.get(`/vendor/finance?${params}`);
       return response.data;
     } catch (error) {
@@ -178,7 +178,7 @@ class VendorService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (search) params.append('search', search);
-      
+
       const response = await api.get(`/vendor/users?${params}`);
       return response.data;
     } catch (error) {
@@ -192,7 +192,7 @@ class VendorService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (status) params.append('status', status);
-      
+
       const response = await api.get(`/vendor/partners?${params}`);
       return response.data;
     } catch (error) {
@@ -217,7 +217,7 @@ class VendorService {
     try {
       const params = new URLSearchParams();
       if (dateRange) params.append('dateRange', dateRange);
-      
+
       const response = await api.get(`/vendor/analytics/detailed?${params}`);
       return response.data;
     } catch (error) {
@@ -242,16 +242,22 @@ export const vendorService = new VendorService();
 export default vendorService;
 
 // Named exports for convenience
-export const loginVendor = (credentials) => vendorService.login(credentials);
+export const loginVendor = credentials => vendorService.login(credentials);
 export const getVendorProfile = () => vendorService.getProfile();
 export const getVendorPermissions = () => vendorService.getPermissions();
 export const getVendorAnalytics = () => vendorService.getAnalytics();
-export const getVendorOrders = (params) => vendorService.getOrders(params?.page, params?.limit, params?.status);
-export const getVendorInventory = (params) => vendorService.getInventory(params?.page, params?.limit, params?.category);
-export const getVendorProducts = (params) => vendorService.getProducts(params?.page, params?.limit, params?.category);
-export const getVendorSales = (params) => vendorService.getSales(params?.page, params?.limit, params?.dateRange);
-export const getVendorFinance = (params) => vendorService.getFinanceData(params?.page, params?.limit);
-export const getVendorUsers = (params) => vendorService.getUsers(params?.page, params?.limit, params?.search);
-export const getVendorPartners = (params) => vendorService.getPartners(params?.page, params?.limit, params?.status);
+export const getVendorOrders = params =>
+  vendorService.getOrders(params?.page, params?.limit, params?.status);
+export const getVendorInventory = params =>
+  vendorService.getInventory(params?.page, params?.limit, params?.category);
+export const getVendorProducts = params =>
+  vendorService.getProducts(params?.page, params?.limit, params?.category);
+export const getVendorSales = params =>
+  vendorService.getSales(params?.page, params?.limit, params?.dateRange);
+export const getVendorFinance = params => vendorService.getFinanceData(params?.page, params?.limit);
+export const getVendorUsers = params =>
+  vendorService.getUsers(params?.page, params?.limit, params?.search);
+export const getVendorPartners = params =>
+  vendorService.getPartners(params?.page, params?.limit, params?.status);
 export const getVendorPricing = () => vendorService.getPricing();
 export const getVendorMenuItems = () => vendorService.getMenuItems();

@@ -29,7 +29,9 @@ const useUserWallet = () => {
     setError(null);
     try {
       const queryParams = new URLSearchParams(filters).toString();
-      const url = queryParams ? `/user/wallet/transactions?${queryParams}` : '/user/wallet/transactions';
+      const url = queryParams
+        ? `/user/wallet/transactions?${queryParams}`
+        : '/user/wallet/transactions';
       const response = await api.get(url);
       setTransactions(response.data);
       return response.data;
@@ -48,18 +50,18 @@ const useUserWallet = () => {
     try {
       const response = await api.post('/user/wallet/add', {
         amount,
-        paymentMethod
+        paymentMethod,
       });
-      
+
       // Update wallet balance
       setWallet(prev => ({
         ...prev,
-        balance: prev.balance + amount
+        balance: prev.balance + amount,
       }));
-      
+
       // Add transaction to list
       setTransactions(prev => [response.data.transaction, ...prev]);
-      
+
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to add money to wallet');
@@ -76,18 +78,18 @@ const useUserWallet = () => {
     try {
       const response = await api.post('/user/wallet/withdraw', {
         amount,
-        bankDetails
+        bankDetails,
       });
-      
+
       // Update wallet balance
       setWallet(prev => ({
         ...prev,
-        balance: prev.balance - amount
+        balance: prev.balance - amount,
       }));
-      
+
       // Add transaction to list
       setTransactions(prev => [response.data.transaction, ...prev]);
-      
+
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to withdraw money');
@@ -105,18 +107,18 @@ const useUserWallet = () => {
       const response = await api.post('/user/wallet/transfer', {
         recipientId,
         amount,
-        note
+        note,
       });
-      
+
       // Update wallet balance
       setWallet(prev => ({
         ...prev,
-        balance: prev.balance - amount
+        balance: prev.balance - amount,
       }));
-      
+
       // Add transaction to list
       setTransactions(prev => [response.data.transaction, ...prev]);
-      
+
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to transfer money');
@@ -127,7 +129,7 @@ const useUserWallet = () => {
   };
 
   // Get transaction by ID
-  const getTransactionById = async (transactionId) => {
+  const getTransactionById = async transactionId => {
     setLoading(true);
     setError(null);
     try {
@@ -148,9 +150,9 @@ const useUserWallet = () => {
     try {
       const response = await api.get('/user/wallet/statement', {
         params: { startDate, endDate },
-        responseType: 'blob'
+        responseType: 'blob',
       });
-      
+
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -160,7 +162,7 @@ const useUserWallet = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      
+
       return true;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to download statement');
@@ -187,7 +189,7 @@ const useUserWallet = () => {
     withdrawMoney,
     transferMoney,
     getTransactionById,
-    downloadStatement
+    downloadStatement,
   };
 };
 

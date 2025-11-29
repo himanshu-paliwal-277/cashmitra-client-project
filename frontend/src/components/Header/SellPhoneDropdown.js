@@ -9,23 +9,21 @@ const SellPhoneDropdown = ({ isVisible = true, onClose }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-const {
+  const {
     categories: hookCategories,
     loading: hookLoading,
     error: hookError,
     addCategory,
     editCategory,
     removeCategory,
-    fetchCategories
-    
+    fetchCategories,
   } = useAdminCategories();
   useEffect(() => {
     setCategories(hookCategories);
     setLoading(hookLoading);
   }, [hookCategories, hookLoading]);
 
-
-  const handleCategoryClick = (category) => {
+  const handleCategoryClick = category => {
     // Navigate to sell page with category
     navigate(`/sell?category=${category.name}`);
     if (onClose) onClose();
@@ -69,18 +67,15 @@ const {
       <div className="sell-dropdown-content">
         <div className="sell-dropdown-header">
           <h3>Sell Your Device</h3>
-          <button 
-            onClick={handleViewAllClick}
-            className="view-all-btn"
-          >
+          <button onClick={handleViewAllClick} className="view-all-btn">
             View All Categories
           </button>
         </div>
-        
+
         <div className="sell-categories-grid">
-          {categories.map((category) => {
+          {categories.map(category => {
             const imageUrl = category.image || getCategoryImage(category.name);
-            
+
             return (
               <div
                 key={category.id}
@@ -88,10 +83,10 @@ const {
                 onClick={() => handleCategoryClick(category)}
               >
                 <div className="category-image">
-                  <img 
+                  <img
                     src={imageUrl}
                     alt={category.name}
-                    onError={(e) => {
+                    onError={e => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'flex';
                     }}
@@ -112,9 +107,7 @@ const {
         </div>
 
         <div className="sell-dropdown-footer">
-          <p className="sell-info">
-            Get instant quotes and sell your devices quickly with Cashify
-          </p>
+          <p className="sell-info">Get instant quotes and sell your devices quickly with Cashify</p>
         </div>
       </div>
     </div>
@@ -122,28 +115,29 @@ const {
 };
 
 // Helper function to get category images from URLs
-const getCategoryImage = (categoryName) => {
+const getCategoryImage = categoryName => {
   const imageMap = {
-    'Smartphone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
-    'Mobile': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
-    'Phone': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
-    'Laptop': 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200&h=200&fit=crop',
-    'Tablet': 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=200&h=200&fit=crop',
-    'iPad': 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=200&h=200&fit=crop',
-    'Smartwatch': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop',
-    'Watch': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop',
-    'Headphones': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop',
-    'Earbuds': 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=200&h=200&fit=crop',
-    'Camera': 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200&h=200&fit=crop',
-    'Gaming Console': 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=200&h=200&fit=crop',
-    'default': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop'
+    Smartphone: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
+    Mobile: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
+    Phone: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
+    Laptop: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200&h=200&fit=crop',
+    Tablet: 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=200&h=200&fit=crop',
+    iPad: 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=200&h=200&fit=crop',
+    Smartwatch: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop',
+    Watch: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop',
+    Headphones: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop',
+    Earbuds: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=200&h=200&fit=crop',
+    Camera: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=200&h=200&fit=crop',
+    'Gaming Console':
+      'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=200&h=200&fit=crop',
+    default: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
   };
-  
+
   return imageMap[categoryName] || imageMap['default'];
 };
 
 // Helper function to get category icons (fallback)
-const getCategoryIcon = (iconName) => {
+const getCategoryIcon = iconName => {
   const iconMap = {
     Smartphone: '📱',
     Mobile: '📱',
@@ -158,9 +152,9 @@ const getCategoryIcon = (iconName) => {
     Camera: '📷',
     'Gaming Console': '🎮',
     Package: '📦',
-    Monitor: '🖥️'
+    Monitor: '🖥️',
   };
-  
+
   return iconMap[iconName] || '📦';
 };
 

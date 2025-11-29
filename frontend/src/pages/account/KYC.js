@@ -1,6 +1,25 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Shield, CheckCircle, AlertCircle, Clock, Upload, Camera, FileText, User, CreditCard, MapPin, Phone, Mail, Calendar, ArrowRight, RefreshCw, Eye, Download, X } from 'lucide-react';
+import {
+  Shield,
+  CheckCircle,
+  AlertCircle,
+  Clock,
+  Upload,
+  Camera,
+  FileText,
+  User,
+  CreditCard,
+  MapPin,
+  Phone,
+  Mail,
+  Calendar,
+  ArrowRight,
+  RefreshCw,
+  Eye,
+  Download,
+  X,
+} from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 
@@ -39,7 +58,7 @@ const StatusCard = styled(Card)`
   padding: ${props => props.theme.spacing.xl};
   margin-bottom: ${props => props.theme.spacing.xl};
   text-align: center;
-  
+
   ${props => {
     switch (props.status) {
       case 'verified':
@@ -115,7 +134,7 @@ const StepsContainer = styled.div`
 const StepCard = styled(Card)`
   padding: ${props => props.theme.spacing.xl};
   transition: all 0.2s ease;
-  
+
   ${props => {
     if (props.completed) {
       return `
@@ -149,7 +168,7 @@ const StepNumber = styled.div`
   justify-content: center;
   font-weight: ${props => props.theme.typography.fontWeight.bold};
   flex-shrink: 0;
-  
+
   ${props => {
     if (props.completed) {
       return `
@@ -188,7 +207,7 @@ const StepDescription = styled.p`
 
 const StepContent = styled.div`
   margin-left: 56px;
-  
+
   @media (max-width: ${props => props.theme.breakpoints.sm}) {
     margin-left: 0;
   }
@@ -199,7 +218,7 @@ const FormGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: ${props => props.theme.spacing.md};
   margin-bottom: ${props => props.theme.spacing.lg};
-  
+
   @media (max-width: ${props => props.theme.breakpoints.sm}) {
     grid-template-columns: 1fr;
   }
@@ -207,7 +226,7 @@ const FormGrid = styled.div`
 
 const FormGroup = styled.div`
   margin-bottom: ${props => props.theme.spacing.md};
-  
+
   &.full-width {
     grid-column: 1 / -1;
   }
@@ -229,13 +248,13 @@ const Input = styled.input`
   font-size: ${props => props.theme.typography.fontSize.md};
   color: ${props => props.theme.colors.text.primary};
   background: ${props => props.theme.colors.background.primary};
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary.main};
     box-shadow: 0 0 0 3px ${props => props.theme.colors.primary.light};
   }
-  
+
   &:disabled {
     background: ${props => props.theme.colors.background.secondary};
     color: ${props => props.theme.colors.text.secondary};
@@ -250,7 +269,7 @@ const Select = styled.select`
   font-size: ${props => props.theme.typography.fontSize.md};
   color: ${props => props.theme.colors.text.primary};
   background: ${props => props.theme.colors.background.primary};
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary.main};
@@ -264,12 +283,12 @@ const UploadArea = styled.div`
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     border-color: ${props => props.theme.colors.primary.main};
     background: ${props => props.theme.colors.primary.light};
   }
-  
+
   &.has-file {
     border-color: ${props => props.theme.colors.success.main};
     background: ${props => props.theme.colors.success.light};
@@ -360,7 +379,7 @@ const ActionButton = styled.button`
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: ${props => props.theme.colors.primary.light};
     color: ${props => props.theme.colors.primary.main};
@@ -383,7 +402,7 @@ const KYC = () => {
       dateOfBirth: '',
       gender: '',
       fatherName: '',
-      motherName: ''
+      motherName: '',
     },
     contactInfo: {
       email: '',
@@ -391,14 +410,14 @@ const KYC = () => {
       address: '',
       city: '',
       state: '',
-      pincode: ''
+      pincode: '',
     },
     documents: {
       aadhar: null,
       pan: null,
       bankStatement: null,
-      photo: null
-    }
+      photo: null,
+    },
   });
 
   const steps = [
@@ -407,29 +426,29 @@ const KYC = () => {
       title: 'Personal Information',
       description: 'Provide your basic personal details',
       icon: <User size={20} />,
-      completed: currentStep > 1
+      completed: currentStep > 1,
     },
     {
       id: 2,
       title: 'Contact Information',
       description: 'Add your contact and address details',
       icon: <MapPin size={20} />,
-      completed: currentStep > 2
+      completed: currentStep > 2,
     },
     {
       id: 3,
       title: 'Document Upload',
       description: 'Upload required identity documents',
       icon: <FileText size={20} />,
-      completed: currentStep > 3
+      completed: currentStep > 3,
     },
     {
       id: 4,
       title: 'Verification',
       description: 'Review and submit for verification',
       icon: <Shield size={20} />,
-      completed: kycStatus === 'verified'
-    }
+      completed: kycStatus === 'verified',
+    },
   ];
 
   const getStatusInfo = () => {
@@ -438,29 +457,33 @@ const KYC = () => {
         return {
           icon: <CheckCircle size={40} />,
           title: 'KYC Verified',
-          description: 'Your identity has been successfully verified. You can now access all features.',
-          progress: 100
+          description:
+            'Your identity has been successfully verified. You can now access all features.',
+          progress: 100,
         };
       case 'pending':
         return {
           icon: <Clock size={40} />,
           title: 'Verification Pending',
-          description: 'Your documents are under review. We\'ll notify you once verification is complete.',
-          progress: 75
+          description:
+            "Your documents are under review. We'll notify you once verification is complete.",
+          progress: 75,
         };
       case 'rejected':
         return {
           icon: <AlertCircle size={40} />,
           title: 'Verification Failed',
-          description: 'Some documents need to be resubmitted. Please check the requirements and try again.',
-          progress: 50
+          description:
+            'Some documents need to be resubmitted. Please check the requirements and try again.',
+          progress: 50,
         };
       default:
         return {
           icon: <Shield size={40} />,
           title: 'Complete Your KYC',
-          description: 'Verify your identity to unlock all features and increase transaction limits.',
-          progress: (currentStep - 1) * 25
+          description:
+            'Verify your identity to unlock all features and increase transaction limits.',
+          progress: (currentStep - 1) * 25,
         };
     }
   };
@@ -472,8 +495,8 @@ const KYC = () => {
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
@@ -507,25 +530,25 @@ const KYC = () => {
               <Input
                 type="text"
                 value={formData.personalInfo.fullName}
-                onChange={(e) => handleInputChange('personalInfo', 'fullName', e.target.value)}
+                onChange={e => handleInputChange('personalInfo', 'fullName', e.target.value)}
                 placeholder="Enter your full name"
               />
             </FormGroup>
-            
+
             <FormGroup>
               <Label>Date of Birth *</Label>
               <Input
                 type="date"
                 value={formData.personalInfo.dateOfBirth}
-                onChange={(e) => handleInputChange('personalInfo', 'dateOfBirth', e.target.value)}
+                onChange={e => handleInputChange('personalInfo', 'dateOfBirth', e.target.value)}
               />
             </FormGroup>
-            
+
             <FormGroup>
               <Label>Gender *</Label>
               <Select
                 value={formData.personalInfo.gender}
-                onChange={(e) => handleInputChange('personalInfo', 'gender', e.target.value)}
+                onChange={e => handleInputChange('personalInfo', 'gender', e.target.value)}
               >
                 <option value="">Select Gender</option>
                 <option value="male">Male</option>
@@ -533,29 +556,29 @@ const KYC = () => {
                 <option value="other">Other</option>
               </Select>
             </FormGroup>
-            
+
             <FormGroup>
               <Label>Father's Name</Label>
               <Input
                 type="text"
                 value={formData.personalInfo.fatherName}
-                onChange={(e) => handleInputChange('personalInfo', 'fatherName', e.target.value)}
+                onChange={e => handleInputChange('personalInfo', 'fatherName', e.target.value)}
                 placeholder="Enter father's name"
               />
             </FormGroup>
-            
+
             <FormGroup className="full-width">
               <Label>Mother's Name</Label>
               <Input
                 type="text"
                 value={formData.personalInfo.motherName}
-                onChange={(e) => handleInputChange('personalInfo', 'motherName', e.target.value)}
+                onChange={e => handleInputChange('personalInfo', 'motherName', e.target.value)}
                 placeholder="Enter mother's name"
               />
             </FormGroup>
           </FormGrid>
         );
-        
+
       case 2:
         return (
           <FormGrid>
@@ -564,46 +587,46 @@ const KYC = () => {
               <Input
                 type="email"
                 value={formData.contactInfo.email}
-                onChange={(e) => handleInputChange('contactInfo', 'email', e.target.value)}
+                onChange={e => handleInputChange('contactInfo', 'email', e.target.value)}
                 placeholder="Enter email address"
               />
             </FormGroup>
-            
+
             <FormGroup>
               <Label>Phone Number *</Label>
               <Input
                 type="tel"
                 value={formData.contactInfo.phone}
-                onChange={(e) => handleInputChange('contactInfo', 'phone', e.target.value)}
+                onChange={e => handleInputChange('contactInfo', 'phone', e.target.value)}
                 placeholder="Enter phone number"
               />
             </FormGroup>
-            
+
             <FormGroup className="full-width">
               <Label>Address *</Label>
               <Input
                 type="text"
                 value={formData.contactInfo.address}
-                onChange={(e) => handleInputChange('contactInfo', 'address', e.target.value)}
+                onChange={e => handleInputChange('contactInfo', 'address', e.target.value)}
                 placeholder="Enter complete address"
               />
             </FormGroup>
-            
+
             <FormGroup>
               <Label>City *</Label>
               <Input
                 type="text"
                 value={formData.contactInfo.city}
-                onChange={(e) => handleInputChange('contactInfo', 'city', e.target.value)}
+                onChange={e => handleInputChange('contactInfo', 'city', e.target.value)}
                 placeholder="Enter city"
               />
             </FormGroup>
-            
+
             <FormGroup>
               <Label>State *</Label>
               <Select
                 value={formData.contactInfo.state}
-                onChange={(e) => handleInputChange('contactInfo', 'state', e.target.value)}
+                onChange={e => handleInputChange('contactInfo', 'state', e.target.value)}
               >
                 <option value="">Select State</option>
                 <option value="maharashtra">Maharashtra</option>
@@ -613,19 +636,19 @@ const KYC = () => {
                 <option value="gujarat">Gujarat</option>
               </Select>
             </FormGroup>
-            
+
             <FormGroup>
               <Label>PIN Code *</Label>
               <Input
                 type="text"
                 value={formData.contactInfo.pincode}
-                onChange={(e) => handleInputChange('contactInfo', 'pincode', e.target.value)}
+                onChange={e => handleInputChange('contactInfo', 'pincode', e.target.value)}
                 placeholder="Enter PIN code"
               />
             </FormGroup>
           </FormGrid>
         );
-        
+
       case 3:
         return (
           <div>
@@ -640,7 +663,7 @@ const KYC = () => {
                   <UploadSubtext>PDF, JPG, PNG (Max 5MB)</UploadSubtext>
                 </UploadArea>
               </FormGroup>
-              
+
               <FormGroup>
                 <Label>PAN Card *</Label>
                 <UploadArea>
@@ -651,7 +674,7 @@ const KYC = () => {
                   <UploadSubtext>PDF, JPG, PNG (Max 5MB)</UploadSubtext>
                 </UploadArea>
               </FormGroup>
-              
+
               <FormGroup>
                 <Label>Bank Statement</Label>
                 <UploadArea>
@@ -662,7 +685,7 @@ const KYC = () => {
                   <UploadSubtext>PDF (Last 3 months)</UploadSubtext>
                 </UploadArea>
               </FormGroup>
-              
+
               <FormGroup>
                 <Label>Profile Photo *</Label>
                 <UploadArea>
@@ -674,7 +697,7 @@ const KYC = () => {
                 </UploadArea>
               </FormGroup>
             </FormGrid>
-            
+
             <DocumentsList>
               <DocumentItem>
                 <DocumentIcon>
@@ -699,14 +722,25 @@ const KYC = () => {
             </DocumentsList>
           </div>
         );
-        
+
       case 4:
         return (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <Shield size={80} style={{ color: '#10B981', marginBottom: '24px' }} />
-            <h3 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>Ready for Verification</h3>
-            <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '32px', maxWidth: '500px', margin: '0 auto 32px' }}>
-              Please review all the information you've provided. Once submitted, our team will verify your documents within 24-48 hours.
+            <h3 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>
+              Ready for Verification
+            </h3>
+            <p
+              style={{
+                fontSize: '16px',
+                color: '#6B7280',
+                marginBottom: '32px',
+                maxWidth: '500px',
+                margin: '0 auto 32px',
+              }}
+            >
+              Please review all the information you've provided. Once submitted, our team will
+              verify your documents within 24-48 hours.
             </p>
             <Button variant="primary" size="lg" onClick={handleSubmit}>
               Submit for Verification
@@ -714,7 +748,7 @@ const KYC = () => {
             </Button>
           </div>
         );
-        
+
       default:
         return null;
     }
@@ -725,16 +759,17 @@ const KYC = () => {
       <KYCContainer>
         <Container>
           <StatusCard status={kycStatus}>
-            <StatusIcon>
-              {statusInfo.icon}
-            </StatusIcon>
+            <StatusIcon>{statusInfo.icon}</StatusIcon>
             <StatusTitle>{statusInfo.title}</StatusTitle>
             <StatusDescription>{statusInfo.description}</StatusDescription>
             <ProgressBar>
               <ProgressFill progress={statusInfo.progress} />
             </ProgressBar>
             {kycStatus === 'pending' && (
-              <Button variant="ghost" style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}>
+              <Button
+                variant="ghost"
+                style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}
+              >
                 <RefreshCw size={16} />
                 Check Status
               </Button>
@@ -751,14 +786,13 @@ const KYC = () => {
         <KYCHeader>
           <PageTitle>KYC Verification</PageTitle>
           <PageSubtitle>
-            Complete your Know Your Customer (KYC) verification to unlock all features and increase your transaction limits.
+            Complete your Know Your Customer (KYC) verification to unlock all features and increase
+            your transaction limits.
           </PageSubtitle>
         </KYCHeader>
 
         <StatusCard>
-          <StatusIcon>
-            {statusInfo.icon}
-          </StatusIcon>
+          <StatusIcon>{statusInfo.icon}</StatusIcon>
           <StatusTitle>{statusInfo.title}</StatusTitle>
           <StatusDescription>{statusInfo.description}</StatusDescription>
           <ProgressBar>
@@ -767,17 +801,10 @@ const KYC = () => {
         </StatusCard>
 
         <StepsContainer>
-          {steps.map((step) => (
-            <StepCard
-              key={step.id}
-              active={step.id === currentStep}
-              completed={step.completed}
-            >
+          {steps.map(step => (
+            <StepCard key={step.id} active={step.id === currentStep} completed={step.completed}>
               <StepHeader>
-                <StepNumber
-                  active={step.id === currentStep}
-                  completed={step.completed}
-                >
+                <StepNumber active={step.id === currentStep} completed={step.completed}>
                   {step.completed ? <CheckCircle size={20} /> : step.id}
                 </StepNumber>
                 <StepInfo>
@@ -785,11 +812,11 @@ const KYC = () => {
                   <StepDescription>{step.description}</StepDescription>
                 </StepInfo>
               </StepHeader>
-              
+
               {step.id === currentStep && (
                 <StepContent>
                   {renderStepContent()}
-                  
+
                   <StepActions>
                     {currentStep > 1 && (
                       <Button variant="ghost" onClick={handlePrevStep}>

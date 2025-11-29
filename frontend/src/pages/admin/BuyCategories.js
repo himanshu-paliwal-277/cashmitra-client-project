@@ -14,7 +14,7 @@ import {
   CheckCircle,
   Loader,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
 } from 'lucide-react';
 import { API_BASE_URL } from '../../config/api';
 
@@ -55,7 +55,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
@@ -72,7 +72,7 @@ const Content = styled.div`
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: 2rem;
-  
+
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
@@ -115,7 +115,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #10b981;
@@ -146,13 +146,15 @@ const CategoryItem = styled.div`
   transition: all 0.2s;
   border: 1px solid transparent;
   margin-bottom: 0.5rem;
-  
+
   &:hover {
     background: #f9fafb;
     border-color: #e5e7eb;
   }
 
-  ${props => props.isEditing && `
+  ${props =>
+    props.isEditing &&
+    `
     background: #fef3c7;
     border-color: #f59e0b;
   `}
@@ -170,7 +172,7 @@ const CategoryIcon = styled.div`
   margin-right: 1rem;
   flex-shrink: 0;
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -199,7 +201,7 @@ const CategoryActions = styled.div`
   gap: 0.5rem;
   opacity: 0;
   transition: opacity 0.2s;
-  
+
   ${CategoryItem}:hover & {
     opacity: 1;
   }
@@ -213,7 +215,7 @@ const ActionButtonSmall = styled.button`
   cursor: pointer;
   color: #6b7280;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f3f4f6;
     color: #374151;
@@ -249,7 +251,7 @@ const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #10b981;
@@ -270,7 +272,7 @@ const Select = styled.select`
   font-size: 0.875rem;
   background: white;
   cursor: pointer;
-  
+
   &:focus {
     outline: none;
     border-color: #10b981;
@@ -299,8 +301,10 @@ const Button = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
-  ${props => props.variant === 'primary' ? `
+
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
     border: none;
@@ -309,7 +313,8 @@ const Button = styled.button`
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
-  ` : `
+  `
+      : `
     background: white;
     color: #6b7280;
     border: 1px solid #d1d5db;
@@ -355,7 +360,7 @@ const Toast = styled.div`
   position: fixed;
   top: 1rem;
   right: 1rem;
-  background: ${props => props.type === 'success' ? '#10b981' : '#dc2626'};
+  background: ${props => (props.type === 'success' ? '#10b981' : '#dc2626')};
   color: white;
   padding: 1rem 1.5rem;
   border-radius: 0.5rem;
@@ -399,7 +404,7 @@ const BuyCategories = () => {
     try {
       const token = localStorage.getItem('adminToken');
       const res = await fetch(`${API_BASE_URL}/buy-super-categories`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       console.log('Super categories fetched:', data);
@@ -457,7 +462,7 @@ const BuyCategories = () => {
         const res = await fetch(`${API_BASE_URL}/upload/image`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
-          body: fd
+          body: fd,
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.message || 'Image upload failed');
@@ -467,7 +472,7 @@ const BuyCategories = () => {
       await adminService.createBuyCategory({
         name: formData.name.trim(),
         superCategory: formData.superCategory,
-        image: imageUrl
+        image: imageUrl,
       });
 
       setFormData({ name: '', superCategory: '' });
@@ -482,9 +487,12 @@ const BuyCategories = () => {
     }
   };
 
-  const handleEdit = (category) => {
+  const handleEdit = category => {
     setEditingCategory(category._id);
-    setFormData({ name: category.name, superCategory: category.superCategory?._id || category.superCategory || '' });
+    setFormData({
+      name: category.name,
+      superCategory: category.superCategory?._id || category.superCategory || '',
+    });
     setImagePreview(category.image || '');
     setImageFile(null);
   };
@@ -511,7 +519,7 @@ const BuyCategories = () => {
         const res = await fetch(`${API_BASE_URL}/upload/image`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
-          body: fd
+          body: fd,
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.message || 'Image upload failed');
@@ -521,7 +529,7 @@ const BuyCategories = () => {
       await adminService.updateBuyCategory(editingCategory, {
         name: formData.name.trim(),
         superCategory: formData.superCategory,
-        image: imageUrl
+        image: imageUrl,
       });
 
       setEditingCategory(null);
@@ -537,7 +545,7 @@ const BuyCategories = () => {
     }
   };
 
-  const handleDelete = async (categoryId) => {
+  const handleDelete = async categoryId => {
     if (!window.confirm('Are you sure you want to delete this category?')) {
       return;
     }
@@ -569,12 +577,14 @@ const BuyCategories = () => {
           <FolderTree size={32} />
           Buy Categories
         </Title>
-        <ActionButton onClick={() => {
-          setEditingCategory(null);
-          setFormData({ name: '', superCategory: '' });
-          setImageFile(null);
-          setImagePreview('');
-        }}>
+        <ActionButton
+          onClick={() => {
+            setEditingCategory(null);
+            setFormData({ name: '', superCategory: '' });
+            setImageFile(null);
+            setImagePreview('');
+          }}
+        >
           <Plus size={20} />
           Add Category
         </ActionButton>
@@ -592,7 +602,7 @@ const BuyCategories = () => {
                 type="text"
                 placeholder="Search categories..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
               />
             </SearchContainer>
           </SectionHeader>
@@ -613,20 +623,23 @@ const BuyCategories = () => {
                 <Package size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
                 <div>No categories found</div>
                 <div style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
-                  {searchTerm ? 'Try adjusting your search' : 'Create your first category to get started'}
+                  {searchTerm
+                    ? 'Try adjusting your search'
+                    : 'Create your first category to get started'}
                 </div>
               </EmptyState>
             ) : (
-              filteredCategories.map((category) => (
+              filteredCategories.map(category => (
                 <CategoryItem key={category._id} isEditing={editingCategory === category._id}>
                   <CategoryIcon>
                     {category.image ? (
-                      <img 
-                        src={category.image} 
+                      <img
+                        src={category.image}
                         alt={category.name}
-                        onError={(e) => {
+                        onError={e => {
                           e.target.style.display = 'none';
-                          e.target.parentElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="3" x2="21" y2="21"></line><path d="M9 9v6h6"></path><path d="M21 15V6a2 2 0 0 0-2-2H6"></path></svg>';
+                          e.target.parentElement.innerHTML =
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="3" x2="21" y2="21"></line><path d="M9 9v6h6"></path><path d="M21 15V6a2 2 0 0 0-2-2H6"></path></svg>';
                         }}
                       />
                     ) : (
@@ -637,16 +650,18 @@ const BuyCategories = () => {
                     <CategoryName>{category.name}</CategoryName>
                     <CategoryInfo>
                       {category.superCategory?.name && (
-                        <span style={{ 
-                          display: 'inline-block', 
-                          padding: '0.125rem 0.5rem', 
-                          background: '#e0f2fe', 
-                          color: '#0369a1',
-                          borderRadius: '0.25rem',
-                          fontSize: '0.75rem',
-                          fontWeight: '500',
-                          marginRight: '0.5rem'
-                        }}>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            padding: '0.125rem 0.5rem',
+                            background: '#e0f2fe',
+                            color: '#0369a1',
+                            borderRadius: '0.25rem',
+                            fontSize: '0.75rem',
+                            fontWeight: '500',
+                            marginRight: '0.5rem',
+                          }}
+                        >
                           {category.superCategory.name}
                         </span>
                       )}
@@ -654,10 +669,7 @@ const BuyCategories = () => {
                     </CategoryInfo>
                   </CategoryContent>
                   <CategoryActions>
-                    <ActionButtonSmall
-                      onClick={() => handleEdit(category)}
-                      disabled={isSubmitting}
-                    >
+                    <ActionButtonSmall onClick={() => handleEdit(category)} disabled={isSubmitting}>
                       <Edit size={16} />
                     </ActionButtonSmall>
                     <ActionButtonSmall
@@ -675,9 +687,7 @@ const BuyCategories = () => {
 
         <Section>
           <SectionHeader>
-            <SectionTitle>
-              {editingCategory ? 'Edit Category' : 'Add New Category'}
-            </SectionTitle>
+            <SectionTitle>{editingCategory ? 'Edit Category' : 'Add New Category'}</SectionTitle>
           </SectionHeader>
 
           <FormContainer>
@@ -688,7 +698,7 @@ const BuyCategories = () => {
                 type="text"
                 placeholder="Enter category name"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 disabled={isSubmitting}
               />
             </FormGroup>
@@ -698,12 +708,14 @@ const BuyCategories = () => {
               <Select
                 id="superCategory"
                 value={formData.superCategory}
-                onChange={(e) => setFormData(prev => ({ ...prev, superCategory: e.target.value }))}
+                onChange={e => setFormData(prev => ({ ...prev, superCategory: e.target.value }))}
                 disabled={isSubmitting}
               >
                 <option value="">Select Super Category</option>
                 {superCategories.map(sc => (
-                  <option key={sc._id} value={sc._id}>{sc.name}</option>
+                  <option key={sc._id} value={sc._id}>
+                    {sc.name}
+                  </option>
                 ))}
               </Select>
             </FormGroup>
@@ -711,22 +723,22 @@ const BuyCategories = () => {
             <FormGroup>
               <Label>Category Image {editingCategory ? '(optional to change)' : '*'}</Label>
               {!imagePreview ? (
-                <div 
-                  style={{ 
-                    padding: '2rem', 
-                    border: '2px dashed #d1d5db', 
-                    borderRadius: '0.5rem', 
-                    textAlign: 'center', 
+                <div
+                  style={{
+                    padding: '2rem',
+                    border: '2px dashed #d1d5db',
+                    borderRadius: '0.5rem',
+                    textAlign: 'center',
                     cursor: 'pointer',
                     background: '#f9fafb',
-                    transition: 'all 0.2s'
-                  }} 
+                    transition: 'all 0.2s',
+                  }}
                   onClick={() => document.getElementById('catImageInput').click()}
-                  onMouseEnter={(e) => {
+                  onMouseEnter={e => {
                     e.currentTarget.style.borderColor = '#10b981';
                     e.currentTarget.style.background = '#f0fdf4';
                   }}
-                  onMouseLeave={(e) => {
+                  onMouseLeave={e => {
                     e.currentTarget.style.borderColor = '#d1d5db';
                     e.currentTarget.style.background = '#f9fafb';
                   }}
@@ -738,12 +750,12 @@ const BuyCategories = () => {
                   <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
                     PNG, JPG, GIF up to 10MB
                   </div>
-                  <input 
-                    id="catImageInput" 
-                    type="file" 
-                    accept="image/*" 
-                    style={{ display: 'none' }} 
-                    onChange={(e) => {
+                  <input
+                    id="catImageInput"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={e => {
                       const file = e.target.files[0];
                       if (file) {
                         setImageFile(file);
@@ -751,46 +763,53 @@ const BuyCategories = () => {
                         reader.onloadend = () => setImagePreview(reader.result);
                         reader.readAsDataURL(file);
                       }
-                    }} 
+                    }}
                   />
                 </div>
               ) : (
-                <div style={{ position: 'relative', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e5e7eb' }}>
-                  <img 
-                    src={imagePreview} 
-                    alt="preview" 
-                    style={{ 
-                      width: '100%', 
-                      height: '200px', 
-                      objectFit: 'cover' 
-                    }} 
+                <div
+                  style={{
+                    position: 'relative',
+                    borderRadius: '0.5rem',
+                    overflow: 'hidden',
+                    border: '1px solid #e5e7eb',
+                  }}
+                >
+                  <img
+                    src={imagePreview}
+                    alt="preview"
+                    style={{
+                      width: '100%',
+                      height: '200px',
+                      objectFit: 'cover',
+                    }}
                   />
-                  <button 
-                    type="button" 
-                    onClick={() => { 
-                      setImageFile(null); 
-                      setImagePreview(''); 
-                    }} 
-                    style={{ 
-                      position: 'absolute', 
-                      top: '0.5rem', 
-                      right: '0.5rem', 
-                      background: '#fff', 
-                      border: '1px solid #e5e7eb', 
-                      borderRadius: '0.375rem', 
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview('');
+                    }}
+                    style={{
+                      position: 'absolute',
+                      top: '0.5rem',
+                      right: '0.5rem',
+                      background: '#fff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '0.375rem',
                       padding: '0.5rem',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.25rem',
                       boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
                     }}
-                    onMouseEnter={(e) => {
+                    onMouseEnter={e => {
                       e.currentTarget.style.background = '#fee2e2';
                       e.currentTarget.style.borderColor = '#dc2626';
                     }}
-                    onMouseLeave={(e) => {
+                    onMouseLeave={e => {
                       e.currentTarget.style.background = '#fff';
                       e.currentTarget.style.borderColor = '#e5e7eb';
                     }}
@@ -798,19 +817,19 @@ const BuyCategories = () => {
                     <X size={16} />
                     <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>Remove</span>
                   </button>
-                  <div 
-                    style={{ 
-                      position: 'absolute', 
-                      bottom: '0.5rem', 
-                      left: '0.5rem', 
-                      background: 'rgba(0, 0, 0, 0.6)', 
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '0.5rem',
+                      left: '0.5rem',
+                      background: 'rgba(0, 0, 0, 0.6)',
                       color: 'white',
                       padding: '0.25rem 0.5rem',
                       borderRadius: '0.25rem',
                       fontSize: '0.75rem',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.25rem'
+                      gap: '0.25rem',
                     }}
                   >
                     <ImageIcon size={14} />
@@ -822,11 +841,7 @@ const BuyCategories = () => {
 
             <FormActions>
               {editingCategory && (
-                <Button
-                  type="button"
-                  onClick={handleCancel}
-                  disabled={isSubmitting}
-                >
+                <Button type="button" onClick={handleCancel} disabled={isSubmitting}>
                   <X size={16} />
                   Cancel
                 </Button>
@@ -836,11 +851,7 @@ const BuyCategories = () => {
                 onClick={editingCategory ? handleUpdate : handleCreate}
                 disabled={isSubmitting || !formData.name.trim()}
               >
-                {isSubmitting ? (
-                  <Loader className="animate-spin" size={16} />
-                ) : (
-                  <Save size={16} />
-                )}
+                {isSubmitting ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
                 {editingCategory ? 'Update' : 'Create'} Category
               </Button>
             </FormActions>

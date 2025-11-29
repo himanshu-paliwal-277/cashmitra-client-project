@@ -37,18 +37,18 @@ class AdminService {
           totalUsers: 12458,
           totalPartners: 1247,
           totalOrders: 8924,
-          totalProducts: 25680
+          totalProducts: 25680,
         },
         revenue: {
           totalRevenue: 4520000,
           monthlyRevenue: 450000,
-          growth: 23.1
+          growth: 23.1,
         },
         orders: {
           pending: 156,
           processing: 89,
-          completed: 8679
-        }
+          completed: 8679,
+        },
       };
     }
   }
@@ -106,7 +106,7 @@ class AdminService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (status) params.append('status', status);
-      
+
       const response = await api.get(`/admin/partners?${params}`);
       return response.data;
     } catch (error) {
@@ -120,7 +120,7 @@ class AdminService {
             user: { name: 'Rajesh Kumar' },
             shopEmail: 'contact@techmart.com',
             verificationStatus: 'pending',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             _id: '2',
@@ -128,7 +128,7 @@ class AdminService {
             user: { name: 'Priya Sharma' },
             shopEmail: 'info@mobileworld.com',
             verificationStatus: 'approved',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             _id: '3',
@@ -136,12 +136,12 @@ class AdminService {
             user: { name: 'Amit Singh' },
             shopEmail: 'admin@gadgethub.com',
             verificationStatus: 'rejected',
-            createdAt: new Date().toISOString()
-          }
+            createdAt: new Date().toISOString(),
+          },
         ],
         totalPages: 1,
         currentPage: 1,
-        totalPartners: 3
+        totalPartners: 3,
       };
     }
   }
@@ -197,7 +197,7 @@ class AdminService {
       const params = new URLSearchParams({ page, limit });
       if (status) params.append('status', status);
       if (type) params.append('type', type);
-      
+
       const response = await api.get(`/admin/orders?${params}`);
       return response.data;
     } catch (error) {
@@ -212,7 +212,7 @@ class AdminService {
             orderType: 'sell',
             totalAmount: 25000,
             status: 'completed',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             _id: 'ord002',
@@ -221,7 +221,7 @@ class AdminService {
             orderType: 'buy',
             totalAmount: 18000,
             status: 'pending',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             _id: 'ord003',
@@ -230,12 +230,12 @@ class AdminService {
             orderType: 'sell',
             totalAmount: 32000,
             status: 'processing',
-            createdAt: new Date().toISOString()
-          }
+            createdAt: new Date().toISOString(),
+          },
         ],
         totalPages: 1,
         currentPage: 1,
-        totalOrders: 3
+        totalOrders: 3,
       };
     }
   }
@@ -252,9 +252,9 @@ class AdminService {
 
   async updateOrderStatus(orderId, status, notes = '') {
     try {
-      const response = await api.put(`/admin/orders/${orderId}/status`, { 
-        status, 
-        notes 
+      const response = await api.put(`/admin/orders/${orderId}/status`, {
+        status,
+        notes,
       });
       return response.data;
     } catch (error) {
@@ -277,8 +277,8 @@ class AdminService {
     try {
       const response = await api.get('/admin/buy-orders', {
         params: {
-          status: 'confirmed,processing'
-        }
+          status: 'confirmed,processing',
+        },
       });
       return response.data;
     } catch (error) {
@@ -314,7 +314,7 @@ class AdminService {
       if (category && category !== 'all') params.append('category', category);
       if (brand && brand !== 'all') params.append('brand', brand);
       if (model && model !== 'all') params.append('model', model);
-      
+
       const response = await api.get(`/admin/catalog?${params}`);
       console.log('response: ', response);
       return response.data;
@@ -325,52 +325,52 @@ class AdminService {
         success: true,
         products: [
           {
-            _id: "68cb125366349168cd4ba527",
-            category: "mobile",
-            brand: "Apple",
-            model: "iPhone 14 Pro",
+            _id: '68cb125366349168cd4ba527',
+            category: 'mobile',
+            brand: 'Apple',
+            model: 'iPhone 14 Pro',
             variant: {
-              ram: "6GB",
-              storage: "128GB"
+              ram: '6GB',
+              storage: '128GB',
             },
             basePrice: 85000,
             isActive: true,
             images: [],
-            createdAt: "2025-09-17T19:56:03.085Z",
-            updatedAt: "2025-09-17T19:56:03.085Z"
+            createdAt: '2025-09-17T19:56:03.085Z',
+            updatedAt: '2025-09-17T19:56:03.085Z',
           },
           {
-            _id: "68c551ab1681ba261fa14869",
-            category: "mobile",
-            brand: "Apple",
-            series: "Apple iPhone 11",
-            model: "Apple iPhone 11",
+            _id: '68c551ab1681ba261fa14869',
+            category: 'mobile',
+            brand: 'Apple',
+            series: 'Apple iPhone 11',
+            model: 'Apple iPhone 11',
             variant: {
-              ram: "4GB",
-              storage: "64GB"
+              ram: '4GB',
+              storage: '64GB',
             },
             basePrice: 15000,
             isActive: true,
             images: [],
-            createdAt: "2025-09-13T11:12:43.040Z",
-            updatedAt: "2025-09-13T11:20:07.161Z"
+            createdAt: '2025-09-13T11:12:43.040Z',
+            updatedAt: '2025-09-13T11:20:07.161Z',
           },
           {
-            _id: "68c456ee598834a00f1415fc",
-            category: "laptop",
-            brand: "Dell",
-            series: "XPS",
-            model: "XPS 13",
+            _id: '68c456ee598834a00f1415fc',
+            category: 'laptop',
+            brand: 'Dell',
+            series: 'XPS',
+            model: 'XPS 13',
             variant: {
-              ram: "16GB",
-              storage: "512GB SSD"
+              ram: '16GB',
+              storage: '512GB SSD',
             },
             basePrice: 120000,
             isActive: true,
             images: [],
-            createdAt: "2025-09-12T17:22:54.515Z",
-            updatedAt: "2025-09-12T21:06:19.653Z"
-          }
+            createdAt: '2025-09-12T17:22:54.515Z',
+            updatedAt: '2025-09-12T21:06:19.653Z',
+          },
         ],
         pagination: {
           currentPage: 1,
@@ -378,12 +378,12 @@ class AdminService {
           totalItems: 3,
           itemsPerPage: 10,
           hasNextPage: false,
-          hasPrevPage: false
+          hasPrevPage: false,
         },
         filters: {
-          brands: ["Apple", "Dell", "Samsung"],
-          categories: ["mobile", "laptop", "tablet"]
-        }
+          brands: ['Apple', 'Dell', 'Samsung'],
+          categories: ['mobile', 'laptop', 'tablet'],
+        },
       };
     }
   }
@@ -427,7 +427,7 @@ class AdminService {
         sellCommission: 5,
         buyCommission: 3,
         deliveryCharges: 50,
-        processingFee: 25
+        processingFee: 25,
       };
     }
   }
@@ -450,7 +450,7 @@ class AdminService {
       if (params.search) queryParams.append('search', params.search);
       if (params.role) queryParams.append('role', params.role);
       if (params.isVerified !== undefined) queryParams.append('isVerified', params.isVerified);
-      
+
       const response = await api.get(`/admin/users?${queryParams}`);
       return response.data;
     } catch (error) {
@@ -509,8 +509,8 @@ class AdminService {
     try {
       const response = await api.post('/admin/catalog/upload-images', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
       return response.data;
     } catch (error) {
@@ -539,7 +539,8 @@ class AdminService {
           id: productId,
           name: 'iPhone 14 Pro Max',
           brand: 'Apple',
-          description: 'The most advanced iPhone yet with Pro camera system, A16 Bionic chip, and Dynamic Island.',
+          description:
+            'The most advanced iPhone yet with Pro camera system, A16 Bionic chip, and Dynamic Island.',
           price: 129900,
           originalPrice: 139900,
           status: 'active',
@@ -550,14 +551,14 @@ class AdminService {
           dimensions: {
             length: 16.07,
             width: 7.85,
-            height: 0.78
+            height: 0.78,
           },
           rating: 4.8,
           reviewCount: 1247,
           images: [
             'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800',
             'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800',
-            'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=800'
+            'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=800',
           ],
           specifications: {
             display: '6.7-inch Super Retina XDR',
@@ -570,17 +571,18 @@ class AdminService {
             colors: 'Deep Purple, Gold, Silver, Space Black',
             waterResistance: 'IP68',
             faceId: 'Yes',
-            wirelessCharging: 'MagSafe and Qi wireless charging'
+            wirelessCharging: 'MagSafe and Qi wireless charging',
           },
           seo: {
             title: 'iPhone 14 Pro Max - 256GB - Apple',
-            description: 'Buy iPhone 14 Pro Max with 256GB storage. Features Pro camera system, A16 Bionic chip, and Dynamic Island.',
-            keywords: 'iPhone, Apple, smartphone, Pro Max, 256GB'
+            description:
+              'Buy iPhone 14 Pro Max with 256GB storage. Features Pro camera system, A16 Bionic chip, and Dynamic Island.',
+            keywords: 'iPhone, Apple, smartphone, Pro Max, 256GB',
           },
           createdAt: '2024-01-15T10:30:00Z',
           updatedAt: '2024-01-20T14:45:00Z',
-          publishedAt: '2024-01-16T09:00:00Z'
-        }
+          publishedAt: '2024-01-16T09:00:00Z',
+        },
       };
     }
   }
@@ -612,7 +614,7 @@ class AdminService {
             description: 'Smartphones and mobile devices',
             icon: 'Smartphone',
             parentId: null,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             id: '2',
@@ -620,7 +622,7 @@ class AdminService {
             description: 'Apple iPhone series',
             icon: 'Smartphone',
             parentId: '1',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             id: '3',
@@ -628,7 +630,7 @@ class AdminService {
             description: 'Samsung Galaxy series',
             icon: 'Smartphone',
             parentId: '1',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             id: '4',
@@ -636,7 +638,7 @@ class AdminService {
             description: 'Laptop computers and notebooks',
             icon: 'Laptop',
             parentId: null,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             id: '5',
@@ -644,7 +646,7 @@ class AdminService {
             description: 'Apple MacBook series',
             icon: 'Laptop',
             parentId: '4',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             id: '6',
@@ -652,7 +654,7 @@ class AdminService {
             description: 'High-performance gaming laptops',
             icon: 'Laptop',
             parentId: '4',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             id: '7',
@@ -660,7 +662,7 @@ class AdminService {
             description: 'Tablet devices and accessories',
             icon: 'Tablet',
             parentId: null,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             id: '8',
@@ -668,9 +670,9 @@ class AdminService {
             description: 'Apple iPad series',
             icon: 'Tablet',
             parentId: '7',
-            createdAt: new Date().toISOString()
-          }
-        ]
+            createdAt: new Date().toISOString(),
+          },
+        ],
       };
     }
   }
@@ -687,8 +689,8 @@ class AdminService {
         data: {
           id: Date.now().toString(),
           ...categoryData,
-          createdAt: new Date().toISOString()
-        }
+          createdAt: new Date().toISOString(),
+        },
       };
     }
   }
@@ -705,8 +707,8 @@ class AdminService {
         data: {
           id: categoryId,
           ...categoryData,
-          updatedAt: new Date().toISOString()
-        }
+          updatedAt: new Date().toISOString(),
+        },
       };
     }
   }
@@ -773,7 +775,7 @@ class AdminService {
     }
   }
 
-  // Buy Super Category Management  
+  // Buy Super Category Management
   async getBuySuperCategories() {
     try {
       const response = await api.get('/buy-super-categories');
@@ -834,12 +836,42 @@ class AdminService {
       // Return mock data if API fails
       return {
         data: [
-          { id: '1', name: 'Apple', description: 'Apple Inc. products', logo: '', createdAt: new Date().toISOString() },
-          { id: '2', name: 'Samsung', description: 'Samsung Electronics', logo: '', createdAt: new Date().toISOString() },
-          { id: '3', name: 'Dell', description: 'Dell Technologies', logo: '', createdAt: new Date().toISOString() },
-          { id: '4', name: 'HP', description: 'HP Inc.', logo: '', createdAt: new Date().toISOString() },
-          { id: '5', name: 'Lenovo', description: 'Lenovo Group', logo: '', createdAt: new Date().toISOString() }
-        ]
+          {
+            id: '1',
+            name: 'Apple',
+            description: 'Apple Inc. products',
+            logo: '',
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: '2',
+            name: 'Samsung',
+            description: 'Samsung Electronics',
+            logo: '',
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: '3',
+            name: 'Dell',
+            description: 'Dell Technologies',
+            logo: '',
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: '4',
+            name: 'HP',
+            description: 'HP Inc.',
+            logo: '',
+            createdAt: new Date().toISOString(),
+          },
+          {
+            id: '5',
+            name: 'Lenovo',
+            description: 'Lenovo Group',
+            logo: '',
+            createdAt: new Date().toISOString(),
+          },
+        ],
       };
     }
   }
@@ -850,7 +882,10 @@ class AdminService {
       return response.data;
     } catch (error) {
       console.error('Error creating brand:', error);
-      return { success: true, data: { id: Date.now().toString(), ...brandData, createdAt: new Date().toISOString() } };
+      return {
+        success: true,
+        data: { id: Date.now().toString(), ...brandData, createdAt: new Date().toISOString() },
+      };
     }
   }
 
@@ -858,13 +893,13 @@ class AdminService {
     try {
       // Transform the request to match backend expectations
       const requestData = {
-        newBrandName: brandData.brand || brandData.newBrandName || brandData.name
+        newBrandName: brandData.brand || brandData.newBrandName || brandData.name,
       };
-      
+
       // Use brandName (brand name string) as URL parameter, not brand ID
       const brandName = encodeURIComponent(brandData.currentBrandName || brandId);
       console.log('Updating brand:', brandName, 'with payload:', requestData);
-      
+
       const response = await api.put(`/admin/brands/${brandName}`, requestData);
       return response.data;
     } catch (error) {
@@ -880,8 +915,8 @@ class AdminService {
       const brandName = encodeURIComponent(brandId);
       const response = await api.delete(`/admin/brands/${brandName}`, {
         data: {
-          confirmDeletion: true  // Required by backend
-        }
+          confirmDeletion: true, // Required by backend
+        },
       });
       return response.data;
     } catch (error) {
@@ -900,11 +935,47 @@ class AdminService {
       // Return mock data if API fails
       return {
         data: [
-          { model: 'iPhone 14 Pro', brand: 'Apple', category: 'Mobile Phones', description: 'Latest iPhone model', releaseYear: 2023, isActive: true, variants: [], createdAt: new Date().toISOString() },
-          { model: 'Galaxy S23', brand: 'Samsung', category: 'Mobile Phones', description: 'Samsung flagship phone', releaseYear: 2023, isActive: true, variants: [], createdAt: new Date().toISOString() },
-          { model: 'XPS 13', brand: 'Dell', category: 'Laptops', description: 'Dell ultrabook', releaseYear: 2023, isActive: true, variants: [], createdAt: new Date().toISOString() },
-          { model: 'MacBook Pro', brand: 'Apple', category: 'Laptops', description: 'Apple professional laptop', releaseYear: 2023, isActive: true, variants: [], createdAt: new Date().toISOString() }
-        ]
+          {
+            model: 'iPhone 14 Pro',
+            brand: 'Apple',
+            category: 'Mobile Phones',
+            description: 'Latest iPhone model',
+            releaseYear: 2023,
+            isActive: true,
+            variants: [],
+            createdAt: new Date().toISOString(),
+          },
+          {
+            model: 'Galaxy S23',
+            brand: 'Samsung',
+            category: 'Mobile Phones',
+            description: 'Samsung flagship phone',
+            releaseYear: 2023,
+            isActive: true,
+            variants: [],
+            createdAt: new Date().toISOString(),
+          },
+          {
+            model: 'XPS 13',
+            brand: 'Dell',
+            category: 'Laptops',
+            description: 'Dell ultrabook',
+            releaseYear: 2023,
+            isActive: true,
+            variants: [],
+            createdAt: new Date().toISOString(),
+          },
+          {
+            model: 'MacBook Pro',
+            brand: 'Apple',
+            category: 'Laptops',
+            description: 'Apple professional laptop',
+            releaseYear: 2023,
+            isActive: true,
+            variants: [],
+            createdAt: new Date().toISOString(),
+          },
+        ],
       };
     }
   }
@@ -914,9 +985,9 @@ class AdminService {
       // Ensure variants is always an array
       const requestData = {
         ...modelData,
-        variants: Array.isArray(modelData.variants) ? modelData.variants : []
+        variants: Array.isArray(modelData.variants) ? modelData.variants : [],
       };
-      
+
       const response = await api.post('/admin/models', requestData);
       return response.data;
     } catch (error) {
@@ -929,7 +1000,7 @@ class AdminService {
     try {
       // Use model name as URL parameter (URL encoded)
       const modelName = encodeURIComponent(modelId);
-      
+
       // Transform frontend data to backend format
       const requestData = {
         model: modelData.name || modelData.model,
@@ -937,9 +1008,9 @@ class AdminService {
         description: modelData.description,
         releaseYear: modelData.releaseYear,
         isActive: modelData.isActive,
-        variants: Array.isArray(modelData.variants) ? modelData.variants : []
+        variants: Array.isArray(modelData.variants) ? modelData.variants : [],
       };
-      
+
       console.log('Updating model:', modelName, 'with data:', requestData);
       const response = await api.put(`/admin/models/${modelName}`, requestData);
       return response.data;
@@ -966,7 +1037,7 @@ class AdminService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (status) params.append('status', status);
-      
+
       const response = await api.get(`/admin/returns?${params}`);
       return response.data;
     } catch (error) {
@@ -983,7 +1054,7 @@ class AdminService {
             reason: 'Defective product',
             status: 'pending',
             requestDate: new Date().toISOString(),
-            amount: 79900
+            amount: 79900,
           },
           {
             id: '2',
@@ -994,12 +1065,12 @@ class AdminService {
             reason: 'Wrong item received',
             status: 'approved',
             requestDate: new Date().toISOString(),
-            amount: 69900
-          }
+            amount: 69900,
+          },
         ],
         totalPages: 1,
         currentPage: 1,
-        totalReturns: 2
+        totalReturns: 2,
       };
     }
   }
@@ -1019,7 +1090,7 @@ class AdminService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (status) params.append('status', status);
-      
+
       const response = await api.get(`/admin/partner-applications?${params}`);
       return response.data;
     } catch (error) {
@@ -1036,7 +1107,7 @@ class AdminService {
             address: 'Mumbai, Maharashtra',
             status: 'pending',
             appliedDate: new Date().toISOString(),
-            documents: ['gst.pdf', 'shop_license.pdf']
+            documents: ['gst.pdf', 'shop_license.pdf'],
           },
           {
             id: '2',
@@ -1047,19 +1118,22 @@ class AdminService {
             address: 'Delhi, India',
             status: 'approved',
             appliedDate: new Date().toISOString(),
-            documents: ['gst.pdf', 'shop_license.pdf']
-          }
+            documents: ['gst.pdf', 'shop_license.pdf'],
+          },
         ],
         totalPages: 1,
         currentPage: 1,
-        totalApplications: 2
+        totalApplications: 2,
       };
     }
   }
 
   async updatePartnerApplicationStatus(applicationId, status, notes = '') {
     try {
-      const response = await api.put(`/admin/partner-applications/${applicationId}`, { status, notes });
+      const response = await api.put(`/admin/partner-applications/${applicationId}`, {
+        status,
+        notes,
+      });
       return response.data;
     } catch (error) {
       console.error('Error updating partner application status:', error);
@@ -1072,7 +1146,7 @@ class AdminService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (status) params.append('status', status);
-      
+
       const response = await api.get(`/admin/inventory-approvals?${params}`);
       return response.data;
     } catch (error) {
@@ -1089,7 +1163,7 @@ class AdminService {
             proposedPrice: 75000,
             status: 'pending',
             submittedDate: new Date().toISOString(),
-            images: ['product1.jpg', 'product2.jpg']
+            images: ['product1.jpg', 'product2.jpg'],
           },
           {
             id: '2',
@@ -1100,12 +1174,12 @@ class AdminService {
             proposedPrice: 65000,
             status: 'approved',
             submittedDate: new Date().toISOString(),
-            images: ['product3.jpg', 'product4.jpg']
-          }
+            images: ['product3.jpg', 'product4.jpg'],
+          },
         ],
         totalPages: 1,
         currentPage: 1,
-        totalApprovals: 2
+        totalApprovals: 2,
       };
     }
   }
@@ -1146,7 +1220,7 @@ class AdminService {
     try {
       const params = new URLSearchParams({ page, limit });
       if (search) params.append('search', search);
-      
+
       const response = await api.get(`/buy-categories?${params}`);
       return response.data;
     } catch (error) {
@@ -1217,7 +1291,9 @@ class AdminService {
 
   async deleteConditionQuestionnaire(questionnaireId, forceDelete = false) {
     try {
-      const url = forceDelete ? `/admin/questionnaires/${questionnaireId}?force=true` : `/admin/questionnaires/${questionnaireId}`;
+      const url = forceDelete
+        ? `/admin/questionnaires/${questionnaireId}?force=true`
+        : `/admin/questionnaires/${questionnaireId}`;
       const response = await api.delete(url);
       return response.data;
     } catch (error) {
@@ -1237,23 +1313,26 @@ export const adminService = new AdminService();
 export default adminService;
 
 // Legacy exports for backward compatibility
-export const loginAdmin = (credentials) => adminService.login(credentials);
+export const loginAdmin = credentials => adminService.login(credentials);
 export const getAdminProfile = () => adminService.getProfile();
-export const getProducts = (params) => adminService.getCatalog(params?.page, params?.limit, params?.category);
-export const getProductById = (id) => adminService.getCatalog().then(data => data.products.find(p => p._id === id));
+export const getProducts = params =>
+  adminService.getCatalog(params?.page, params?.limit, params?.category);
+export const getProductById = id =>
+  adminService.getCatalog().then(data => data.products.find(p => p._id === id));
 export const updateProduct = (id, productData) => adminService.updateProduct(id, productData);
-export const createProduct = (productData) => adminService.addProduct(productData);
-export const deleteProduct = (id) => adminService.deleteProduct(id);
-export const getPartners = (params) => adminService.getPartners(params?.page, params?.limit, params?.status);
-export const getPartnerById = (id) => adminService.getPartnerById(id);
-export const createPartner = (partnerData) => adminService.createPartner(partnerData);
+export const createProduct = productData => adminService.addProduct(productData);
+export const deleteProduct = id => adminService.deleteProduct(id);
+export const getPartners = params =>
+  adminService.getPartners(params?.page, params?.limit, params?.status);
+export const getPartnerById = id => adminService.getPartnerById(id);
+export const createPartner = partnerData => adminService.createPartner(partnerData);
 export const updatePartner = (id, partnerData) => adminService.updatePartner(id, partnerData);
-export const deletePartner = (id) => adminService.deletePartner(id);
+export const deletePartner = id => adminService.deletePartner(id);
 export const updatePartnerStatus = (id, status) => adminService.verifyPartner(id, { status });
 export const getDashboardStats = () => adminService.getAnalytics();
 export const getRecentOrders = () => adminService.getOrders(1, 5);
 // export const getRecentPartners = () => adminService.getPartners(1, 5);
 // export const getSalesReport = (params) => adminService.getOrders(params?.page, params?.limit);
 // export const getInventoryReport = (params) => adminService.getCatalog(params?.page, params?.limit);export const getRecentPartners = () => adminService.getPartners(1, 5);
-export const getSalesReport = (params) => adminService.getOrders(params?.page, params?.limit);
-export const getInventoryReport = (params) => adminService.getCatalog(params?.page, params?.limit);
+export const getSalesReport = params => adminService.getOrders(params?.page, params?.limit);
+export const getInventoryReport = params => adminService.getCatalog(params?.page, params?.limit);

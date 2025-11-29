@@ -70,7 +70,7 @@ const BulkUpload = () => {
         <Title>Bulk Upload</Title>
         <Subtitle>Upload multiple products at once using CSV or Excel files</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,8 +78,9 @@ const BulkUpload = () => {
           </Icon>
           <ComingSoonTitle>Bulk Upload Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to upload multiple products 
-            at once using CSV or Excel files, making inventory management much more efficient.
+            This feature is currently under development. Soon you'll be able to upload multiple
+            products at once using CSV or Excel files, making inventory management much more
+            efficient.
           </ComingSoonText>
         </ComingSoon>
       </Card>

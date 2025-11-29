@@ -33,7 +33,7 @@ import {
   Save,
   X,
   Check,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -68,9 +68,9 @@ const HeaderActions = styled.div`
 `;
 
 const ActionButton = styled.button`
-  background: ${props => props.variant === 'primary' ? '#f59e0b' : 'white'};
-  color: ${props => props.variant === 'primary' ? 'white' : '#374151'};
-  border: 1px solid ${props => props.variant === 'primary' ? '#f59e0b' : '#d1d5db'};
+  background: ${props => (props.variant === 'primary' ? '#f59e0b' : 'white')};
+  color: ${props => (props.variant === 'primary' ? 'white' : '#374151')};
+  border: 1px solid ${props => (props.variant === 'primary' ? '#f59e0b' : '#d1d5db')};
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 600;
@@ -83,7 +83,7 @@ const ActionButton = styled.button`
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background: ${props => props.variant === 'primary' ? '#d97706' : '#f9fafb'};
+    background: ${props => (props.variant === 'primary' ? '#d97706' : '#f9fafb')};
   }
 
   &:disabled {
@@ -205,13 +205,13 @@ const ViewToggle = styled.div`
 const ViewButton = styled.button`
   padding: 0.75rem;
   border: none;
-  background: ${props => props.active ? '#f59e0b' : 'white'};
-  color: ${props => props.active ? 'white' : '#6b7280'};
+  background: ${props => (props.active ? '#f59e0b' : 'white')};
+  color: ${props => (props.active ? 'white' : '#6b7280')};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: ${props => props.active ? '#d97706' : '#f9fafb'};
+    background: ${props => (props.active ? '#d97706' : '#f9fafb')};
   }
 `;
 
@@ -264,7 +264,7 @@ const ProductImage = styled.div`
   justify-content: center;
   color: #6b7280;
   position: relative;
-  background-image: ${props => props.image ? `url(${props.image})` : 'none'};
+  background-image: ${props => (props.image ? `url(${props.image})` : 'none')};
   background-size: cover;
   background-position: center;
 `;
@@ -275,10 +275,14 @@ const ProductBadge = styled.div`
   right: 0.75rem;
   background: ${props => {
     switch (props.status) {
-      case 'active': return '#10b981';
-      case 'inactive': return '#ef4444';
-      case 'draft': return '#6b7280';
-      default: return '#f59e0b';
+      case 'active':
+        return '#10b981';
+      case 'inactive':
+        return '#ef4444';
+      case 'draft':
+        return '#6b7280';
+      default:
+        return '#f59e0b';
     }
   }};
   color: white;
@@ -404,18 +408,26 @@ const StatusBadge = styled.span`
   text-transform: capitalize;
   background: ${props => {
     switch (props.status) {
-      case 'active': return '#dcfce7';
-      case 'inactive': return '#fee2e2';
-      case 'draft': return '#f3f4f6';
-      default: return '#fef3c7';
+      case 'active':
+        return '#dcfce7';
+      case 'inactive':
+        return '#fee2e2';
+      case 'draft':
+        return '#f3f4f6';
+      default:
+        return '#fef3c7';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'active': return '#166534';
-      case 'inactive': return '#dc2626';
-      case 'draft': return '#374151';
-      default: return '#92400e';
+      case 'active':
+        return '#166534';
+      case 'inactive':
+        return '#dc2626';
+      case 'draft':
+        return '#374151';
+      default:
+        return '#92400e';
     }
   }};
 `;
@@ -500,7 +512,7 @@ const SellProductsManagement = () => {
     getAllProducts,
     deleteProduct,
     updateProduct,
-    clearError
+    clearError,
   } = useSellProducts();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -517,41 +529,41 @@ const SellProductsManagement = () => {
     { id: 'mobile', name: 'Mobile Phones' },
     { id: 'laptop', name: 'Laptops' },
     { id: 'tablet', name: 'Tablets' },
-    { id: 'smartwatch', name: 'Smart Watches' }
+    { id: 'smartwatch', name: 'Smart Watches' },
   ];
 
   const brands = [
     { id: 'apple', name: 'Apple' },
     { id: 'samsung', name: 'Samsung' },
     { id: 'oneplus', name: 'OnePlus' },
-    { id: 'xiaomi', name: 'Xiaomi' }
+    { id: 'xiaomi', name: 'Xiaomi' },
   ];
 
   const stats = [
-    { 
-      label: 'Total Products', 
-      value: pagination.total || 0, 
-      icon: Package, 
-      color: '#f59e0b' 
+    {
+      label: 'Total Products',
+      value: pagination.total || 0,
+      icon: Package,
+      color: '#f59e0b',
     },
-    { 
-      label: 'Active Products', 
-      value: products.filter(p => p.status === 'active').length, 
-      icon: TrendingUp, 
-      color: '#10b981' 
+    {
+      label: 'Active Products',
+      value: products.filter(p => p.status === 'active').length,
+      icon: TrendingUp,
+      color: '#10b981',
     },
-    { 
-      label: 'Total Variants', 
-      value: products.reduce((sum, p) => sum + (p.variants?.length || 0), 0), 
-      icon: Tag, 
-      color: '#3b82f6' 
+    {
+      label: 'Total Variants',
+      value: products.reduce((sum, p) => sum + (p.variants?.length || 0), 0),
+      icon: Tag,
+      color: '#3b82f6',
     },
-    { 
-      label: 'Categories', 
-      value: new Set(products.map(p => p.categoryId)).size, 
-      icon: Grid, 
-      color: '#8b5cf6' 
-    }
+    {
+      label: 'Categories',
+      value: new Set(products.map(p => p.categoryId)).size,
+      icon: Grid,
+      color: '#8b5cf6',
+    },
   ];
 
   useEffect(() => {
@@ -566,7 +578,7 @@ const SellProductsManagement = () => {
         status: selectedStatus,
         brand: selectedBrand,
         sortBy,
-        sortOrder
+        sortOrder,
       };
       await getAllProducts(currentPage, 12, filters);
     } catch (error) {
@@ -579,8 +591,10 @@ const SellProductsManagement = () => {
     fetchProducts();
   };
 
-  const handleDeleteProduct = async (productId) => {
-    if (window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+  const handleDeleteProduct = async productId => {
+    if (
+      window.confirm('Are you sure you want to delete this product? This action cannot be undone.')
+    ) {
       try {
         await deleteProduct(productId);
         fetchProducts();
@@ -590,7 +604,7 @@ const SellProductsManagement = () => {
     }
   };
 
-  const handleSort = (field) => {
+  const handleSort = field => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -599,13 +613,11 @@ const SellProductsManagement = () => {
     }
   };
 
-  const renderProductCard = (product) => (
+  const renderProductCard = product => (
     <ProductCard key={product._id}>
       <ProductImage image={product.images?.[0]}>
         {!product.images?.[0] && <Package size={48} />}
-        <ProductBadge status={product.status}>
-          {product.status}
-        </ProductBadge>
+        <ProductBadge status={product.status}>{product.status}</ProductBadge>
       </ProductImage>
       <ProductContent>
         <ProductName>{product.name}</ProductName>
@@ -613,9 +625,7 @@ const SellProductsManagement = () => {
         <ProductCategory>
           {categories.find(cat => cat.id === product.categoryId)?.name || 'Uncategorized'}
         </ProductCategory>
-        <ProductPrice>
-          ${product.basePrice ? product.basePrice.toFixed(2) : 'N/A'}
-        </ProductPrice>
+        <ProductPrice>${product.basePrice ? product.basePrice.toFixed(2) : 'N/A'}</ProductPrice>
         <VariantsCount>
           <Tag size={14} />
           {product.variants?.length || 0} variants
@@ -633,9 +643,7 @@ const SellProductsManagement = () => {
             <Edit size={14} />
             Edit
           </ActionButtonSmall>
-          <ActionButtonSmall
-            onClick={() => handleDeleteProduct(product._id)}
-          >
+          <ActionButtonSmall onClick={() => handleDeleteProduct(product._id)}>
             <Trash2 size={14} />
             Delete
           </ActionButtonSmall>
@@ -649,18 +657,26 @@ const SellProductsManagement = () => {
       <thead>
         <tr>
           <TableHeader onClick={() => handleSort('name')}>
-            Name {sortBy === 'name' && (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+            Name{' '}
+            {sortBy === 'name' &&
+              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
           </TableHeader>
           <TableHeader onClick={() => handleSort('brand')}>
-            Brand {sortBy === 'brand' && (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+            Brand{' '}
+            {sortBy === 'brand' &&
+              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
           </TableHeader>
           <TableHeader>Category</TableHeader>
           <TableHeader onClick={() => handleSort('basePrice')}>
-            Base Price {sortBy === 'basePrice' && (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+            Base Price{' '}
+            {sortBy === 'basePrice' &&
+              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
           </TableHeader>
           <TableHeader>Variants</TableHeader>
           <TableHeader onClick={() => handleSort('status')}>
-            Status {sortBy === 'status' && (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+            Status{' '}
+            {sortBy === 'status' &&
+              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
           </TableHeader>
           <TableHeader>Actions</TableHeader>
         </tr>
@@ -678,14 +694,10 @@ const SellProductsManagement = () => {
             <TableCell>
               {categories.find(cat => cat.id === product.categoryId)?.name || 'Uncategorized'}
             </TableCell>
-            <TableCell>
-              ${product.basePrice ? product.basePrice.toFixed(2) : 'N/A'}
-            </TableCell>
+            <TableCell>${product.basePrice ? product.basePrice.toFixed(2) : 'N/A'}</TableCell>
             <TableCell>{product.variants?.length || 0}</TableCell>
             <TableCell>
-              <StatusBadge status={product.status}>
-                {product.status}
-              </StatusBadge>
+              <StatusBadge status={product.status}>{product.status}</StatusBadge>
             </TableCell>
             <TableCell>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -699,9 +711,7 @@ const SellProductsManagement = () => {
                 >
                   <Edit size={14} />
                 </ActionButtonSmall>
-                <ActionButtonSmall
-                  onClick={() => handleDeleteProduct(product._id)}
-                >
+                <ActionButtonSmall onClick={() => handleDeleteProduct(product._id)}>
                   <Trash2 size={14} />
                 </ActionButtonSmall>
               </div>
@@ -715,7 +725,7 @@ const SellProductsManagement = () => {
   const renderPagination = () => {
     const totalPages = pagination.totalPages || 1;
     const pages = [];
-    
+
     for (let i = 1; i <= Math.min(totalPages, 5); i++) {
       pages.push(
         <PaginationButton
@@ -731,9 +741,9 @@ const SellProductsManagement = () => {
     return (
       <Pagination>
         <PaginationInfo>
-          Showing {((currentPage - 1) * pagination.limit) + 1} to{' '}
-          {Math.min(currentPage * pagination.limit, pagination.total)} of{' '}
-          {pagination.total} products
+          Showing {(currentPage - 1) * pagination.limit + 1} to{' '}
+          {Math.min(currentPage * pagination.limit, pagination.total)} of {pagination.total}{' '}
+          products
         </PaginationInfo>
         <PaginationControls>
           <PaginationButton
@@ -792,7 +802,10 @@ const SellProductsManagement = () => {
         <ErrorMessage>
           <AlertCircle size={16} />
           {error}
-          <button onClick={clearError} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit' }}>
+          <button
+            onClick={clearError}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit' }}
+          >
             <X size={16} />
           </button>
         </ErrorMessage>
@@ -822,14 +835,14 @@ const SellProductsManagement = () => {
               type="text"
               placeholder="Search products by name, brand, or description..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              onChange={e => setSearchTerm(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && handleSearch()}
             />
           </SearchContainer>
-          
+
           <FilterSelect
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={e => setSelectedCategory(e.target.value)}
           >
             <option value="">All Categories</option>
             {categories.map(category => (
@@ -839,10 +852,7 @@ const SellProductsManagement = () => {
             ))}
           </FilterSelect>
 
-          <FilterSelect
-            value={selectedBrand}
-            onChange={(e) => setSelectedBrand(e.target.value)}
-          >
+          <FilterSelect value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)}>
             <option value="">All Brands</option>
             {brands.map(brand => (
               <option key={brand.id} value={brand.id}>
@@ -851,10 +861,7 @@ const SellProductsManagement = () => {
             ))}
           </FilterSelect>
 
-          <FilterSelect
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-          >
+          <FilterSelect value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)}>
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -867,16 +874,10 @@ const SellProductsManagement = () => {
           </ActionButton>
 
           <ViewToggle>
-            <ViewButton
-              active={viewMode === 'grid'}
-              onClick={() => setViewMode('grid')}
-            >
+            <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
               <Grid size={16} />
             </ViewButton>
-            <ViewButton
-              active={viewMode === 'list'}
-              onClick={() => setViewMode('list')}
-            >
+            <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
               <List size={16} />
             </ViewButton>
           </ViewToggle>
@@ -885,9 +886,7 @@ const SellProductsManagement = () => {
 
       <ProductsSection>
         <SectionHeader>
-          <SectionTitle>
-            Products ({pagination.total || 0})
-          </SectionTitle>
+          <SectionTitle>Products ({pagination.total || 0})</SectionTitle>
         </SectionHeader>
 
         {products.length === 0 ? (
@@ -901,9 +900,7 @@ const SellProductsManagement = () => {
         ) : (
           <>
             {viewMode === 'grid' ? (
-              <ProductsGrid>
-                {products.map(renderProductCard)}
-              </ProductsGrid>
+              <ProductsGrid>{products.map(renderProductCard)}</ProductsGrid>
             ) : (
               renderProductTable()
             )}

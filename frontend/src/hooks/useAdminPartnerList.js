@@ -10,7 +10,7 @@ const useAdminPartnerList = () => {
     active: 0,
     inactive: 0,
     totalOrders: 0,
-    totalRevenue: 0
+    totalRevenue: 0,
   });
 
   // Fetch partners
@@ -21,32 +21,35 @@ const useAdminPartnerList = () => {
       const token = localStorage.getItem('adminToken');
       const response = await fetch('/api/admin/partners', {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch partners');
       }
-      
+
       const data = await response.json();
       setPartners(data.partners || []);
-      
+
       // Calculate stats
       const partnerList = data.partners || [];
       const totalPartners = partnerList.length;
       const activePartners = partnerList.filter(partner => partner.status === 'active').length;
       const inactivePartners = partnerList.filter(partner => partner.status === 'inactive').length;
       const totalOrders = partnerList.reduce((sum, partner) => sum + (partner.totalOrders || 0), 0);
-      const totalRevenue = partnerList.reduce((sum, partner) => sum + (partner.totalRevenue || 0), 0);
-      
+      const totalRevenue = partnerList.reduce(
+        (sum, partner) => sum + (partner.totalRevenue || 0),
+        0
+      );
+
       setStats({
         total: totalPartners,
         active: activePartners,
         inactive: inactivePartners,
         totalOrders,
-        totalRevenue
+        totalRevenue,
       });
     } catch (err) {
       setError(err.message || 'Failed to fetch partners');
@@ -57,132 +60,147 @@ const useAdminPartnerList = () => {
   }, []);
 
   // Update partner status
-  const updatePartnerStatus = useCallback(async (partnerId, status) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`/api/admin/partners/${partnerId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update partner status');
+  const updatePartnerStatus = useCallback(
+    async (partnerId, status) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(`/api/admin/partners/${partnerId}/status`, {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update partner status');
+        }
+
+        // Refresh the data
+        await fetchPartners();
+        return { success: true };
+      } catch (err) {
+        setError(err.message || 'Failed to update partner status');
+        console.error('Error updating partner status:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
       }
-      
-      // Refresh the data
-      await fetchPartners();
-      return { success: true };
-    } catch (err) {
-      setError(err.message || 'Failed to update partner status');
-      console.error('Error updating partner status:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchPartners]);
+    },
+    [fetchPartners]
+  );
 
   // Create new partner
-  const createPartner = useCallback(async (partnerData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch('/api/admin/partners', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(partnerData)
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to create partner');
+  const createPartner = useCallback(
+    async partnerData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch('/api/admin/partners', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(partnerData),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create partner');
+        }
+
+        // Refresh the data
+        await fetchPartners();
+        return { success: true };
+      } catch (err) {
+        setError(err.message || 'Failed to create partner');
+        console.error('Error creating partner:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
       }
-      
-      // Refresh the data
-      await fetchPartners();
-      return { success: true };
-    } catch (err) {
-      setError(err.message || 'Failed to create partner');
-      console.error('Error creating partner:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchPartners]);
+    },
+    [fetchPartners]
+  );
 
   // Update partner
-  const updatePartner = useCallback(async (partnerId, partnerData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`/api/admin/partners/${partnerId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(partnerData)
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update partner');
+  const updatePartner = useCallback(
+    async (partnerId, partnerData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(`/api/admin/partners/${partnerId}`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(partnerData),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update partner');
+        }
+
+        // Refresh the data
+        await fetchPartners();
+        return { success: true };
+      } catch (err) {
+        setError(err.message || 'Failed to update partner');
+        console.error('Error updating partner:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
       }
-      
-      // Refresh the data
-      await fetchPartners();
-      return { success: true };
-    } catch (err) {
-      setError(err.message || 'Failed to update partner');
-      console.error('Error updating partner:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchPartners]);
+    },
+    [fetchPartners]
+  );
 
   // Delete partner
-  const deletePartner = useCallback(async (partnerId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`/api/admin/partners/${partnerId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+  const deletePartner = useCallback(
+    async partnerId => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(`/api/admin/partners/${partnerId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete partner');
         }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete partner');
+
+        // Refresh the data
+        await fetchPartners();
+        return { success: true };
+      } catch (err) {
+        setError(err.message || 'Failed to delete partner');
+        console.error('Error deleting partner:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
       }
-      
-      // Refresh the data
-      await fetchPartners();
-      return { success: true };
-    } catch (err) {
-      setError(err.message || 'Failed to delete partner');
-      console.error('Error deleting partner:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchPartners]);
+    },
+    [fetchPartners]
+  );
 
   // Get partner by ID
-  const getPartnerById = useCallback((partnerId) => {
-    return partners.find(partner => partner._id === partnerId);
-  }, [partners]);
+  const getPartnerById = useCallback(
+    partnerId => {
+      return partners.find(partner => partner._id === partnerId);
+    },
+    [partners]
+  );
 
   // Auto-fetch on mount
   useEffect(() => {
@@ -199,7 +217,7 @@ const useAdminPartnerList = () => {
     createPartner,
     updatePartner,
     deletePartner,
-    getPartnerById
+    getPartnerById,
   };
 };
 

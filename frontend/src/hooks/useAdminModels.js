@@ -8,7 +8,7 @@ const useAdminModels = () => {
   const [stats, setStats] = useState({
     total: 0,
     byCategory: {},
-    byBrand: {}
+    byBrand: {},
   });
 
   // Fetch all models
@@ -19,7 +19,7 @@ const useAdminModels = () => {
       const response = await adminService.getModels();
       if (response.data) {
         setModels(response.data);
-        
+
         // Calculate stats
         const byCategory = {};
         const byBrand = {};
@@ -27,11 +27,11 @@ const useAdminModels = () => {
           byCategory[model.categoryName] = (byCategory[model.categoryName] || 0) + 1;
           byBrand[model.brandName] = (byBrand[model.brandName] || 0) + 1;
         });
-        
+
         setStats({
           total: response.data.length,
           byCategory,
-          byBrand
+          byBrand,
         });
       }
     } catch (err) {
@@ -43,7 +43,7 @@ const useAdminModels = () => {
   }, []);
 
   // Add new model
-  const addModel = useCallback(async (modelData) => {
+  const addModel = useCallback(async modelData => {
     setLoading(true);
     setError(null);
     try {
@@ -55,12 +55,12 @@ const useAdminModels = () => {
           total: prev.total + 1,
           byCategory: {
             ...prev.byCategory,
-            [modelData.categoryName]: (prev.byCategory[modelData.categoryName] || 0) + 1
+            [modelData.categoryName]: (prev.byCategory[modelData.categoryName] || 0) + 1,
           },
           byBrand: {
             ...prev.byBrand,
-            [modelData.brandName]: (prev.byBrand[modelData.brandName] || 0) + 1
-          }
+            [modelData.brandName]: (prev.byBrand[modelData.brandName] || 0) + 1,
+          },
         }));
         return { success: true, data: response.data };
       }
@@ -81,18 +81,22 @@ const useAdminModels = () => {
     try {
       const response = await adminService.updateModel(modelId, modelData);
       if (response.success) {
-        setModels(prev => prev.map(model => 
-          model.model === modelId ? { 
-            ...model, 
-            ...modelData,
-            model: modelData.name || modelData.model || model.model,
-            brand: modelData.brand || model.brand,
-            description: modelData.description || model.description,
-            releaseYear: modelData.releaseYear || model.releaseYear,
-            isActive: modelData.isActive !== undefined ? modelData.isActive : model.isActive,
-            variants: modelData.variants || model.variants
-          } : model
-        ));
+        setModels(prev =>
+          prev.map(model =>
+            model.model === modelId
+              ? {
+                  ...model,
+                  ...modelData,
+                  model: modelData.name || modelData.model || model.model,
+                  brand: modelData.brand || model.brand,
+                  description: modelData.description || model.description,
+                  releaseYear: modelData.releaseYear || model.releaseYear,
+                  isActive: modelData.isActive !== undefined ? modelData.isActive : model.isActive,
+                  variants: modelData.variants || model.variants,
+                }
+              : model
+          )
+        );
         return { success: true, data: response.data };
       }
       throw new Error('Failed to update model');
@@ -107,7 +111,7 @@ const useAdminModels = () => {
   }, []);
 
   // Remove model
-  const removeModel = useCallback(async (modelId) => {
+  const removeModel = useCallback(async modelId => {
     setLoading(true);
     setError(null);
     try {
@@ -115,7 +119,7 @@ const useAdminModels = () => {
       if (response.success) {
         setModels(prev => {
           const updated = prev.filter(model => model.model !== modelId);
-          
+
           // Recalculate stats
           const byCategory = {};
           const byBrand = {};
@@ -123,13 +127,13 @@ const useAdminModels = () => {
             byCategory[model.categoryName] = (byCategory[model.categoryName] || 0) + 1;
             byBrand[model.brandName] = (byBrand[model.brandName] || 0) + 1;
           });
-          
+
           setStats({
             total: updated.length,
             byCategory,
-            byBrand
+            byBrand,
           });
-          
+
           return updated;
         });
         return { success: true };
@@ -145,14 +149,20 @@ const useAdminModels = () => {
   }, []);
 
   // Filter models by category
-  const getModelsByCategory = useCallback((categoryId) => {
-    return models.filter(model => model.categoryId === categoryId);
-  }, [models]);
+  const getModelsByCategory = useCallback(
+    categoryId => {
+      return models.filter(model => model.categoryId === categoryId);
+    },
+    [models]
+  );
 
   // Filter models by brand
-  const getModelsByBrand = useCallback((brandId) => {
-    return models.filter(model => model.brandId === brandId);
-  }, [models]);
+  const getModelsByBrand = useCallback(
+    brandId => {
+      return models.filter(model => model.brandId === brandId);
+    },
+    [models]
+  );
 
   // Auto-fetch on mount
   useEffect(() => {
@@ -170,7 +180,7 @@ const useAdminModels = () => {
     removeModel,
     updateModel: editModel, // Alias for consistency
     getModelsByCategory,
-    getModelsByBrand
+    getModelsByBrand,
   };
 };
 

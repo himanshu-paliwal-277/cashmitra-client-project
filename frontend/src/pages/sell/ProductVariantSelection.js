@@ -5,7 +5,7 @@ import { theme } from '../../theme';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import sellService from '../../services/sellService';
-import { 
+import {
   ArrowLeft,
   Home,
   ArrowRight,
@@ -13,7 +13,7 @@ import {
   Package,
   Star,
   DollarSign,
-  Check
+  Check,
 } from 'lucide-react';
 
 const PageContainer = styled.div`
@@ -26,11 +26,11 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 0 ${theme.spacing[8]};
   }
@@ -52,7 +52,7 @@ const BreadcrumbLink = styled.a`
   align-items: center;
   gap: ${theme.spacing[1]};
   cursor: pointer;
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -79,7 +79,7 @@ const ProductTitle = styled.h1`
   font-weight: ${theme.typography.fontWeight.semibold};
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[4]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     font-size: ${theme.typography.fontSize['3xl']};
   }
@@ -102,7 +102,7 @@ const ProductContent = styled.div`
   grid-template-columns: 1fr 2fr;
   gap: ${theme.spacing[12]};
   align-items: start;
-  
+
   @media (max-width: ${theme.breakpoints.lg}) {
     grid-template-columns: 1fr;
     gap: ${theme.spacing[8]};
@@ -124,14 +124,14 @@ const ProductImage = styled.div`
   align-items: center;
   justify-content: center;
   box-shadow: ${theme.shadows.lg};
-  
+
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     border-radius: ${theme.borderRadius['2xl']};
   }
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     width: 250px;
     height: 320px;
@@ -162,12 +162,13 @@ const VariantGrid = styled.div`
 const VariantCard = styled(Card)`
   cursor: pointer;
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
-  border: 2px solid ${props => props.selected ? theme.colors.primary.main : theme.colors.border.light};
-  background: ${props => props.selected ? theme.colors.primary[50] : theme.colors.white};
+  border: 2px solid
+    ${props => (props.selected ? theme.colors.primary.main : theme.colors.border.light)};
+  background: ${props => (props.selected ? theme.colors.primary[50] : theme.colors.white)};
   text-align: center;
   padding: ${theme.spacing[4]};
   position: relative;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.lg};
@@ -247,7 +248,7 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
   const { productId } = useParams();
   console.log('productId: ', productId);
   const navigate = useNavigate();
-  
+
   const [product, setProduct] = useState(null);
   const [variants, setVariants] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -264,17 +265,18 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await sellService.getProductVariants(productId);
-      
+
       if (response && response.success && response.data) {
         const productData = response.data;
-        
+
         // Set product details from the API response
         const product = {
           id: productData._id || productData.id,
           name: productData.name,
-          category: productData.categoryId?.name || productData.categoryId?.displayName || 'Product',
+          category:
+            productData.categoryId?.name || productData.categoryId?.displayName || 'Product',
           categoryId: productData.categoryId?._id || productData.categoryId?.id,
           images: productData.images || [],
           status: productData.status,
@@ -283,22 +285,23 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
           createdBy: productData.createdBy,
           createdAt: productData.createdAt,
           updatedAt: productData.updatedAt,
-          soldCount: 1250 // Default value, can be updated if available in API
+          soldCount: 1250, // Default value, can be updated if available in API
         };
-        
+
         // Set variants from the API response
-        const variants = productData.variants?.map(variant => ({
-          id: variant._id || variant.id,
-          _id: variant._id,
-          label: variant.label,
-          basePrice: variant.basePrice,
-          isActive: variant.isActive,
-          name: variant.label // For backward compatibility
-        })) || [];
-        
+        const variants =
+          productData.variants?.map(variant => ({
+            id: variant._id || variant.id,
+            _id: variant._id,
+            label: variant.label,
+            basePrice: variant.basePrice,
+            isActive: variant.isActive,
+            name: variant.label, // For backward compatibility
+          })) || [];
+
         setProduct(product);
         setVariants(variants);
-        
+
         console.log('Product loaded:', product);
         console.log('Variants loaded:', variants);
       } else {
@@ -309,16 +312,16 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
           brand: 'Apple',
           category: 'Mobile',
           images: ['/images/iphone-14-pro.jpg'],
-          soldCount: 1250
+          soldCount: 1250,
         };
-        
+
         const mockVariants = [
           { id: 1, label: '6GB RAM, 128GB Storage', basePrice: 45000, isActive: true },
           { id: 2, label: '6GB RAM, 256GB Storage', basePrice: 52000, isActive: true },
           { id: 3, label: '6GB RAM, 512GB Storage', basePrice: 65000, isActive: true },
-          { id: 4, label: '6GB RAM, 1TB Storage', basePrice: 78000, isActive: true }
+          { id: 4, label: '6GB RAM, 1TB Storage', basePrice: 78000, isActive: true },
         ];
-        
+
         setVariants(mockVariants);
         setProduct(mockProduct);
       }
@@ -330,7 +333,7 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
     }
   };
 
-  const handleVariantSelect = (variant) => {
+  const handleVariantSelect = variant => {
     setSelectedVariant(variant);
   };
 
@@ -339,13 +342,16 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
       // onContinue(product, selectedVariant);
       const variantId = selectedVariant._id || selectedVariant.id;
       const categoryId = product.categoryId;
-      navigate(`/sell/product/${product.id}/variant/${variantId}/condition?categoryId=${categoryId}`);
-
+      navigate(
+        `/sell/product/${product.id}/variant/${variantId}/condition?categoryId=${categoryId}`
+      );
     } else if (selectedVariant && product) {
       // Navigate to condition page with product, variant, and category IDs
       const variantId = selectedVariant._id || selectedVariant.id;
       const categoryId = product.categoryId;
-      navigate(`/sell/product/${product.id}/variant/${variantId}/condition?categoryId=${categoryId}`);
+      navigate(
+        `/sell/product/${product.id}/variant/${variantId}/condition?categoryId=${categoryId}`
+      );
     }
   };
 
@@ -357,7 +363,7 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
     }
   };
 
-  const handleBreadcrumbClick = (path) => {
+  const handleBreadcrumbClick = path => {
     navigate(path);
   };
 
@@ -381,9 +387,7 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
           <ErrorContainer>
             <ErrorTitle>Oops! Something went wrong</ErrorTitle>
             <ErrorText>{error}</ErrorText>
-            <Button onClick={() => fetchProductDetails()}>
-              Try Again
-            </Button>
+            <Button onClick={() => fetchProductDetails()}>Try Again</Button>
           </ErrorContainer>
         </Container>
       </PageContainer>
@@ -421,9 +425,7 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
 
         <ProductHeader>
           <ProductTitle>{product?.name}</ProductTitle>
-          <SoldCount>
-            {product?.soldCount}+ already sold on Cashify
-          </SoldCount>
+          <SoldCount>{product?.soldCount}+ already sold on Cashify</SoldCount>
         </ProductHeader>
 
         <ProductContent>
@@ -439,11 +441,11 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
 
           <VariantSection>
             <VariantTitle>Choose a variant</VariantTitle>
-            
+
             {variants.length > 0 ? (
               <>
                 <VariantGrid>
-                  {variants.map((variant) => (
+                  {variants.map(variant => (
                     <VariantCard
                       key={variant.id}
                       selected={selectedVariant?.id === variant.id}
@@ -479,9 +481,7 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
                 <ErrorText>
                   This product doesn't have any variants available at the moment.
                 </ErrorText>
-                <Button onClick={handleBackClick}>
-                  Back to Products
-                </Button>
+                <Button onClick={handleBackClick}>Back to Products</Button>
               </ErrorContainer>
             )}
           </VariantSection>

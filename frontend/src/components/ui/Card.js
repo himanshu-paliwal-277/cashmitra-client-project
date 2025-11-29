@@ -3,32 +3,45 @@ import styled from 'styled-components';
 import { theme } from '../../theme';
 
 const StyledCard = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['shadow', 'rounded', 'bordered', 'hoverable', 'clickable', 'fullHeight'].includes(prop)
+  shouldForwardProp: prop =>
+    !['shadow', 'rounded', 'bordered', 'hoverable', 'clickable', 'fullHeight'].includes(prop),
 })`
   background: ${theme.colors.white};
   border-radius: ${props => {
     switch (props.rounded) {
-      case 'sm': return theme.borderRadius.md;
-      case 'lg': return theme.borderRadius['2xl'];
-      case 'xl': return theme.borderRadius['3xl'];
-      default: return theme.borderRadius.xl;
+      case 'sm':
+        return theme.borderRadius.md;
+      case 'lg':
+        return theme.borderRadius['2xl'];
+      case 'xl':
+        return theme.borderRadius['3xl'];
+      default:
+        return theme.borderRadius.xl;
     }
   }};
   box-shadow: ${props => {
     switch (props.shadow) {
-      case 'none': return theme.shadows.none;
-      case 'sm': return theme.shadows.sm;
-      case 'md': return theme.shadows.md;
-      case 'lg': return theme.shadows.lg;
-      case 'xl': return theme.shadows.xl;
-      default: return theme.shadows.base;
+      case 'none':
+        return theme.shadows.none;
+      case 'sm':
+        return theme.shadows.sm;
+      case 'md':
+        return theme.shadows.md;
+      case 'lg':
+        return theme.shadows.lg;
+      case 'xl':
+        return theme.shadows.xl;
+      default:
+        return theme.shadows.base;
     }
   }};
-  border: ${props => props.bordered ? `1px solid ${theme.colors.grey[200]}` : 'none'};
+  border: ${props => (props.bordered ? `1px solid ${theme.colors.grey[200]}` : 'none')};
   overflow: hidden;
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
-  
-  ${props => props.hoverable && `
+
+  ${props =>
+    props.hoverable &&
+    `
     cursor: pointer;
     
     &:hover {
@@ -36,8 +49,10 @@ const StyledCard = styled.div.withConfig({
       transform: translateY(-2px);
     }
   `}
-  
-  ${props => props.clickable && `
+
+  ${props =>
+    props.clickable &&
+    `
     cursor: pointer;
     
     &:hover {
@@ -49,7 +64,9 @@ const StyledCard = styled.div.withConfig({
     }
   `}
   
-  ${props => props.fullHeight && `
+  ${props =>
+    props.fullHeight &&
+    `
     height: 100%;
   `}
 `;
@@ -57,14 +74,19 @@ const StyledCard = styled.div.withConfig({
 const CardHeader = styled.div`
   padding: ${props => {
     switch (props.size) {
-      case 'sm': return `${theme.spacing[3]} ${theme.spacing[4]}`;
-      case 'lg': return `${theme.spacing[6]} ${theme.spacing[8]}`;
-      default: return `${theme.spacing[4]} ${theme.spacing[6]}`;
+      case 'sm':
+        return `${theme.spacing[3]} ${theme.spacing[4]}`;
+      case 'lg':
+        return `${theme.spacing[6]} ${theme.spacing[8]}`;
+      default:
+        return `${theme.spacing[4]} ${theme.spacing[6]}`;
     }
   }};
-  border-bottom: ${props => props.divider ? `1px solid ${theme.colors.grey[200]}` : 'none'};
-  
-  ${props => props.centered && `
+  border-bottom: ${props => (props.divider ? `1px solid ${theme.colors.grey[200]}` : 'none')};
+
+  ${props =>
+    props.centered &&
+    `
     text-align: center;
   `}
 `;
@@ -72,17 +94,24 @@ const CardHeader = styled.div`
 const CardBody = styled.div`
   padding: ${props => {
     switch (props.size) {
-      case 'sm': return `${theme.spacing[3]} ${theme.spacing[4]}`;
-      case 'lg': return `${theme.spacing[6]} ${theme.spacing[8]}`;
-      default: return `${theme.spacing[4]} ${theme.spacing[6]}`;
+      case 'sm':
+        return `${theme.spacing[3]} ${theme.spacing[4]}`;
+      case 'lg':
+        return `${theme.spacing[6]} ${theme.spacing[8]}`;
+      default:
+        return `${theme.spacing[4]} ${theme.spacing[6]}`;
     }
   }};
-  
-  ${props => props.noPadding && `
+
+  ${props =>
+    props.noPadding &&
+    `
     padding: 0;
   `}
-  
-  ${props => props.centered && `
+
+  ${props =>
+    props.centered &&
+    `
     text-align: center;
   `}
 `;
@@ -90,15 +119,20 @@ const CardBody = styled.div`
 const CardFooter = styled.div`
   padding: ${props => {
     switch (props.size) {
-      case 'sm': return `${theme.spacing[3]} ${theme.spacing[4]}`;
-      case 'lg': return `${theme.spacing[6]} ${theme.spacing[8]}`;
-      default: return `${theme.spacing[4]} ${theme.spacing[6]}`;
+      case 'sm':
+        return `${theme.spacing[3]} ${theme.spacing[4]}`;
+      case 'lg':
+        return `${theme.spacing[6]} ${theme.spacing[8]}`;
+      default:
+        return `${theme.spacing[4]} ${theme.spacing[6]}`;
     }
   }};
-  border-top: ${props => props.divider ? `1px solid ${theme.colors.grey[200]}` : 'none'};
-  background: ${props => props.muted ? theme.colors.grey[50] : 'transparent'};
-  
-  ${props => props.centered && `
+  border-top: ${props => (props.divider ? `1px solid ${theme.colors.grey[200]}` : 'none')};
+  background: ${props => (props.muted ? theme.colors.grey[50] : 'transparent')};
+
+  ${props =>
+    props.centered &&
+    `
     text-align: center;
   `}
 `;
@@ -110,8 +144,10 @@ const CardImage = styled.div`
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  
-  ${props => props.overlay && `
+
+  ${props =>
+    props.overlay &&
+    `
     position: relative;
     
     &::after {
@@ -129,9 +165,12 @@ const CardImage = styled.div`
 const CardTitle = styled.h3`
   font-size: ${props => {
     switch (props.size) {
-      case 'sm': return theme.typography.fontSize.lg;
-      case 'lg': return theme.typography.fontSize['2xl'];
-      default: return theme.typography.fontSize.xl;
+      case 'sm':
+        return theme.typography.fontSize.lg;
+      case 'lg':
+        return theme.typography.fontSize['2xl'];
+      default:
+        return theme.typography.fontSize.xl;
     }
   }};
   font-weight: ${theme.typography.fontWeight.semibold};
@@ -152,7 +191,7 @@ const CardText = styled.p`
   color: ${theme.colors.text.primary};
   line-height: ${theme.typography.lineHeight.normal};
   margin: 0 0 ${theme.spacing[3]} 0;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -167,7 +206,7 @@ const CardBadge = styled.span`
   border-radius: ${theme.borderRadius.full};
   text-transform: uppercase;
   letter-spacing: ${theme.typography.letterSpacing.wide};
-  
+
   ${props => {
     switch (props.variant) {
       case 'primary':
@@ -200,8 +239,8 @@ const CardBadge = styled.span`
 `;
 
 // Main Card Component
-const Card = ({ 
-  children, 
+const Card = ({
+  children,
   shadow = 'base',
   rounded = 'md',
   bordered = false,
@@ -210,7 +249,7 @@ const Card = ({
   fullHeight = false,
   className,
   onClick,
-  ...props 
+  ...props
 }) => {
   return (
     <StyledCard
@@ -248,5 +287,5 @@ export {
   CardTitle,
   CardSubtitle,
   CardText,
-  CardBadge
+  CardBadge,
 };

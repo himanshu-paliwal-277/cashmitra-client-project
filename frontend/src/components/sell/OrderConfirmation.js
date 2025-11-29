@@ -34,7 +34,7 @@ import {
   DollarSign,
   FileText,
   Smartphone,
-  Plus
+  Plus,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -61,13 +61,18 @@ const SuccessHeader = styled.div`
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     animation: shimmer 3s ease-in-out infinite;
   }
 
   @keyframes shimmer {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(180deg); }
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
   }
 `;
 
@@ -158,11 +163,16 @@ const InfoIcon = styled.div`
   height: 40px;
   background: ${props => {
     switch (props.type) {
-      case 'pickup': return theme.colors.primary[50];
-      case 'payment': return theme.colors.accent[50];
-      case 'contact': return theme.colors.secondary[50];
-      case 'device': return theme.colors.primary[50];
-      default: return theme.colors.grey[50];
+      case 'pickup':
+        return theme.colors.primary[50];
+      case 'payment':
+        return theme.colors.accent[50];
+      case 'contact':
+        return theme.colors.secondary[50];
+      case 'device':
+        return theme.colors.primary[50];
+      default:
+        return theme.colors.grey[50];
     }
   }};
   border-radius: ${theme.borderRadius.md};
@@ -171,11 +181,16 @@ const InfoIcon = styled.div`
   justify-content: center;
   color: ${props => {
     switch (props.type) {
-      case 'pickup': return theme.colors.primary.main;
-      case 'payment': return theme.colors.accent.main;
-      case 'contact': return theme.colors.secondary.main;
-      case 'device': return theme.colors.primary.main;
-      default: return theme.colors.text.secondary;
+      case 'pickup':
+        return theme.colors.primary.main;
+      case 'payment':
+        return theme.colors.accent.main;
+      case 'contact':
+        return theme.colors.secondary.main;
+      case 'device':
+        return theme.colors.primary.main;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
   flex-shrink: 0;
@@ -236,19 +251,19 @@ const TimelineItem = styled.div`
     top: 40px;
     bottom: -24px;
     width: 2px;
-    background: ${props => props.completed ? theme.colors.accent.main : theme.colors.grey[200]};
+    background: ${props => (props.completed ? theme.colors.accent.main : theme.colors.grey[200])};
   }
 `;
 
 const TimelineIcon = styled.div`
   width: 40px;
   height: 40px;
-  background: ${props => props.completed ? theme.colors.accent.main : theme.colors.grey[200]};
+  background: ${props => (props.completed ? theme.colors.accent.main : theme.colors.grey[200])};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${props => props.completed ? 'white' : theme.colors.text.secondary};
+  color: ${props => (props.completed ? 'white' : theme.colors.text.secondary)};
   flex-shrink: 0;
   position: relative;
   z-index: 1;
@@ -262,7 +277,7 @@ const TimelineDetails = styled.div`
 const TimelineTitle = styled.div`
   font-size: ${theme.typography.fontSize.base};
   font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${props => props.completed ? theme.colors.text.primary : theme.colors.text.secondary};
+  color: ${props => (props.completed ? theme.colors.text.primary : theme.colors.text.secondary)};
   margin-bottom: ${theme.spacing[1]};
 `;
 
@@ -399,10 +414,11 @@ const NavigationButtons = styled.div`
 
 const NavButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[6]};
-  border: ${props => props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
+  border: ${props =>
+    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.variant === 'primary' ? theme.colors.primary.main : 'white'};
-  color: ${props => props.variant === 'primary' ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.variant === 'primary' ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.variant === 'primary' ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.base};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -416,7 +432,8 @@ const NavButton = styled.button`
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.md};
-    background: ${props => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -437,27 +454,29 @@ const OrderConfirmation = ({ orderData, onComplete }) => {
       description: 'Your sell order has been successfully placed and confirmed.',
       icon: CheckCircle,
       completed: true,
-      time: 'Just now'
+      time: 'Just now',
     },
     {
       id: 'pickup_scheduled',
       title: 'Pickup Scheduled',
-      description: orderData.pickup?.method === 'home_pickup' 
-        ? `Pickup scheduled for ${orderData.pickup?.date} between ${orderData.pickup?.timeSlot}`
-        : 'Ready for store drop-off at your convenience',
+      description:
+        orderData.pickup?.method === 'home_pickup'
+          ? `Pickup scheduled for ${orderData.pickup?.date} between ${orderData.pickup?.timeSlot}`
+          : 'Ready for store drop-off at your convenience',
       icon: Calendar,
       completed: true,
-      time: orderData.pickup?.method === 'home_pickup' ? orderData.pickup?.date : 'Anytime'
+      time: orderData.pickup?.method === 'home_pickup' ? orderData.pickup?.date : 'Anytime',
     },
     {
       id: 'device_collection',
       title: 'Device Collection',
-      description: orderData.pickup?.method === 'home_pickup'
-        ? 'Our executive will collect your device from your address'
-        : 'Drop your device at our nearest store location',
+      description:
+        orderData.pickup?.method === 'home_pickup'
+          ? 'Our executive will collect your device from your address'
+          : 'Drop your device at our nearest store location',
       icon: Truck,
       completed: false,
-      time: 'Pending'
+      time: 'Pending',
     },
     {
       id: 'device_inspection',
@@ -465,7 +484,7 @@ const OrderConfirmation = ({ orderData, onComplete }) => {
       description: 'Our experts will inspect your device and verify its condition.',
       icon: Package,
       completed: false,
-      time: 'After collection'
+      time: 'After collection',
     },
     {
       id: 'payment_processing',
@@ -473,8 +492,8 @@ const OrderConfirmation = ({ orderData, onComplete }) => {
       description: `Payment will be processed via ${orderData.payment?.method === 'bank_transfer' ? 'bank transfer' : orderData.payment?.method === 'upi' ? 'UPI' : 'cash'}.`,
       icon: CreditCard,
       completed: false,
-      time: 'After inspection'
-    }
+      time: 'After inspection',
+    },
   ];
 
   const handleCopyOrderId = async () => {
@@ -491,7 +510,7 @@ const OrderConfirmation = ({ orderData, onComplete }) => {
     const shareData = {
       title: 'Cashify Sell Order',
       text: `My device sell order #${orderData._id} has been placed successfully!`,
-      url: window.location.href
+      url: window.location.href,
     };
 
     try {
@@ -545,7 +564,7 @@ const OrderConfirmation = ({ orderData, onComplete }) => {
               border: 'none',
               color: 'inherit',
               cursor: 'pointer',
-              padding: '2px'
+              padding: '2px',
             }}
           >
             {copiedOrderId ? <CheckCircle size={16} /> : <Copy size={16} />}
@@ -567,8 +586,10 @@ const OrderConfirmation = ({ orderData, onComplete }) => {
               <InfoDetails>
                 <InfoLabel>Device</InfoLabel>
                 <InfoValue>
-                  {orderData.deviceInfo?.name || 'Device'}<br />
-                  {orderData.deviceInfo?.variant && `${orderData.deviceInfo.variant.storage} • ${orderData.deviceInfo.variant.color}`}
+                  {orderData.deviceInfo?.name || 'Device'}
+                  <br />
+                  {orderData.deviceInfo?.variant &&
+                    `${orderData.deviceInfo.variant.storage} • ${orderData.deviceInfo.variant.color}`}
                 </InfoValue>
               </InfoDetails>
             </InfoItem>
@@ -611,12 +632,13 @@ const OrderConfirmation = ({ orderData, onComplete }) => {
                   {orderData.payment?.method === 'bank_transfer' && 'Bank Transfer'}
                   {orderData.payment?.method === 'upi' && 'UPI Payment'}
                   {orderData.payment?.method === 'cash' && 'Cash Payment'}
-                  {orderData.payment?.method === 'bank_transfer' && orderData.payment?.bankAccount && (
-                    <>
-                      <br />
-                      Account: ****{orderData.payment.bankAccount.accountNumber?.slice(-4)}
-                    </>
-                  )}
+                  {orderData.payment?.method === 'bank_transfer' &&
+                    orderData.payment?.bankAccount && (
+                      <>
+                        <br />
+                        Account: ****{orderData.payment.bankAccount.accountNumber?.slice(-4)}
+                      </>
+                    )}
                   {orderData.payment?.method === 'upi' && orderData.payment?.upiId && (
                     <>
                       <br />
@@ -634,9 +656,11 @@ const OrderConfirmation = ({ orderData, onComplete }) => {
               <InfoDetails>
                 <InfoLabel>Address</InfoLabel>
                 <InfoValue>
-                  {orderData.address?.line1}<br />
+                  {orderData.address?.line1}
+                  <br />
                   {orderData.address?.line2 && `${orderData.address.line2}, `}
-                  {orderData.address?.city}, {orderData.address?.state} - {orderData.address?.pincode}
+                  {orderData.address?.city}, {orderData.address?.state} -{' '}
+                  {orderData.address?.pincode}
                 </InfoValue>
               </InfoDetails>
             </InfoItem>
@@ -648,8 +672,10 @@ const OrderConfirmation = ({ orderData, onComplete }) => {
               <InfoDetails>
                 <InfoLabel>Contact</InfoLabel>
                 <InfoValue>
-                  {orderData.customerInfo?.fullName}<br />
-                  {orderData.customerInfo?.phone}<br />
+                  {orderData.customerInfo?.fullName}
+                  <br />
+                  {orderData.customerInfo?.phone}
+                  <br />
                   {orderData.customerInfo?.email}
                 </InfoValue>
               </InfoDetails>
@@ -670,12 +696,8 @@ const OrderConfirmation = ({ orderData, onComplete }) => {
                 <step.icon size={20} />
               </TimelineIcon>
               <TimelineDetails>
-                <TimelineTitle completed={step.completed}>
-                  {step.title}
-                </TimelineTitle>
-                <TimelineDescription>
-                  {step.description}
-                </TimelineDescription>
+                <TimelineTitle completed={step.completed}>{step.title}</TimelineTitle>
+                <TimelineDescription>{step.description}</TimelineDescription>
                 <TimelineTime>
                   <Clock size={12} />
                   {step.time}

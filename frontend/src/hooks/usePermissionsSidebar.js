@@ -9,7 +9,7 @@ const usePermissionsSidebar = () => {
   const [selectedPartner, setSelectedPartner] = useState(null);
 
   // Open sidebar with selected partner
-  const openSidebar = useCallback((partner) => {
+  const openSidebar = useCallback(partner => {
     setSelectedPartner(partner);
     setIsOpen(true);
   }, []);
@@ -33,7 +33,7 @@ const usePermissionsSidebar = () => {
   }, [isOpen, selectedPartner, closeSidebar]);
 
   // Update selected partner without opening/closing
-  const updateSelectedPartner = useCallback((partner) => {
+  const updateSelectedPartner = useCallback(partner => {
     setSelectedPartner(partner);
   }, []);
 
@@ -48,17 +48,17 @@ const usePermissionsSidebar = () => {
     // State
     isOpen,
     selectedPartner,
-    
+
     // Actions
     openSidebar,
     closeSidebar,
     toggleSidebar,
     updateSelectedPartner,
     handlePermissionsUpdate,
-    
+
     // Utilities
     hasSelectedPartner: !!selectedPartner,
-    canOpen: !!selectedPartner
+    canOpen: !!selectedPartner,
   };
 };
 

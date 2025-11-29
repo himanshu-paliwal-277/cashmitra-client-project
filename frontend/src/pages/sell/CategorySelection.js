@@ -6,16 +6,16 @@ import Card from '../../components/ui/Card';
 import { useAdminCategories } from '../../hooks/useAdminCategories';
 import adminService from '../../services/adminService';
 import sellService from '../../services/sellService';
-import { 
-  Smartphone, 
-  Tablet, 
-  Laptop, 
+import {
+  Smartphone,
+  Tablet,
+  Laptop,
   ArrowRight,
   Home,
   Loader,
   Package,
   Star,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 
 const PageContainer = styled.div`
@@ -28,11 +28,11 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 0 ${theme.spacing[8]};
   }
@@ -53,7 +53,7 @@ const BreadcrumbLink = styled.a`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -73,7 +73,7 @@ const PageTitle = styled.h1`
   font-weight: ${theme.typography.fontWeight.semibold};
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[4]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     font-size: ${theme.typography.fontSize['3xl']};
   }
@@ -92,7 +92,7 @@ const CategoryGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: ${theme.spacing[6]};
   margin-bottom: ${theme.spacing[12]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     grid-template-columns: 1fr;
   }
@@ -102,13 +102,13 @@ const CategoryCard = styled(Card)`
   cursor: pointer;
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
   border: 2px solid transparent;
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: ${theme.shadows.xl};
     border-color: ${theme.colors.primary.main};
   }
-  
+
   &:active {
     transform: translateY(-2px);
   }
@@ -126,9 +126,13 @@ const CategoryIcon = styled.div`
   justify-content: center;
   color: ${props => props.color};
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
-  
+
   ${CategoryCard}:hover & {
-    background: linear-gradient(135deg, ${props => props.color}25 0%, ${props => props.color}15 100%);
+    background: linear-gradient(
+      135deg,
+      ${props => props.color}25 0%,
+      ${props => props.color}15 100%
+    );
     border-color: ${props => props.color}40;
     transform: scale(1.05);
   }
@@ -166,7 +170,7 @@ const CategoryFeature = styled.li`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[2]};
-  
+
   &::before {
     content: '✓';
     color: ${theme.colors.accent.main};
@@ -239,7 +243,7 @@ const ProductsGrid = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: ${theme.spacing[6]};
   margin-bottom: ${theme.spacing[8]};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     grid-template-columns: 1fr;
   }
@@ -249,7 +253,7 @@ const ProductCard = styled(Card)`
   cursor: pointer;
   transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
   border: 1px solid ${theme.colors.border.light};
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.lg};
@@ -267,7 +271,7 @@ const ProductImage = styled.div`
   justify-content: center;
   margin-bottom: ${theme.spacing[4]};
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -355,7 +359,7 @@ const CategorySelection = ({ onCategorySelect }) => {
   const [productsError, setProductsError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreProducts, setHasMoreProducts] = useState(false);
-  
+
   // Parse URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const categoryFromUrl = urlParams.get('category');
@@ -367,35 +371,38 @@ const CategorySelection = ({ onCategorySelect }) => {
       page,
       append,
       categoriesLength: categories.length,
-      categoriesAvailable: categories.map(cat => cat.categoryData?.name)
+      categoriesAvailable: categories.map(cat => cat.categoryData?.name),
     });
 
     try {
       setProductsLoading(true);
       setProductsError(null);
-      
+
       let categoryId;
       let categoryName;
-      
+
       // Handle both category name string and category object
       if (typeof categoryNameOrObject === 'string') {
         categoryName = categoryNameOrObject;
         console.log('🔍 Looking for category name:', categoryName);
-        
+
         // Find the category ID from the category name
         console.log('categories: ', apiCategories);
-        const matchingCategory = apiCategories.find(cat => 
-          cat.name.toLowerCase() === categoryName.toLowerCase()
+        const matchingCategory = apiCategories.find(
+          cat => cat.name.toLowerCase() === categoryName.toLowerCase()
         );
-        
+
         console.log('🔍 Matching category found:', matchingCategory);
-        
+
         if (!matchingCategory) {
           console.error('❌ Category not found:', categoryName);
-          console.log('Available categories:', apiCategories.map(cat => cat.name));
+          console.log(
+            'Available categories:',
+            apiCategories.map(cat => cat.name)
+          );
           throw new Error(`Category "${categoryName}" not found`);
         }
-        
+
         categoryId = matchingCategory._id;
         console.log('🔍 Using category ID:', categoryId);
       } else if (categoryNameOrObject && categoryNameOrObject._id) {
@@ -407,15 +414,15 @@ const CategorySelection = ({ onCategorySelect }) => {
         console.error('❌ Invalid category parameter:', categoryNameOrObject);
         throw new Error('Invalid category parameter');
       }
-      
+
       console.log('🔍 Making API call with categoryName:', categoryName);
       const response = await sellService.getSellProductsByCategory(categoryName, {
         page,
-        limit: 12
+        limit: 12,
       });
-      
+
       console.log('🔍 API response:', response);
-      
+
       if (response && response.data && response.data.products) {
         console.log('✅ Products received:', response.data.products.length);
         if (append) {
@@ -423,7 +430,7 @@ const CategorySelection = ({ onCategorySelect }) => {
         } else {
           setProducts(response.data.products);
         }
-        
+
         // Update pagination logic to use the new structure
         const pagination = response.data.pagination;
         if (pagination) {
@@ -449,7 +456,7 @@ const CategorySelection = ({ onCategorySelect }) => {
   };
 
   // Function to handle category selection and fetch products
-  const handleCategorySelection = async (category) => {
+  const handleCategorySelection = async category => {
     setSelectedCategory(category);
     setCurrentPage(1);
     await fetchProductsByCategory(category.categoryData.id, 1, false);
@@ -464,13 +471,13 @@ const CategorySelection = ({ onCategorySelect }) => {
   };
 
   // Function to handle product click
-  const handleProductClick = (product) => {
+  const handleProductClick = product => {
     // Navigate to product variant selection page
     window.location.href = `/sell/product/${product.id}/variants`;
   };
 
   // Icon mapping for categories
-  const getIconForCategory = (categoryName) => {
+  const getIconForCategory = categoryName => {
     const name = categoryName.toLowerCase();
     if (name.includes('mobile') || name.includes('phone')) {
       return <Smartphone size={48} />;
@@ -483,7 +490,7 @@ const CategorySelection = ({ onCategorySelect }) => {
   };
 
   // Color mapping for categories
-  const getColorForCategory = (categoryName) => {
+  const getColorForCategory = categoryName => {
     const name = categoryName.toLowerCase();
     if (name.includes('mobile') || name.includes('phone')) {
       return theme.colors.primary.main;
@@ -496,39 +503,37 @@ const CategorySelection = ({ onCategorySelect }) => {
   };
 
   // Features mapping for categories
-  const getFeaturesForCategory = (categoryName) => {
+  const getFeaturesForCategory = categoryName => {
     const name = categoryName.toLowerCase();
     if (name.includes('mobile') || name.includes('phone')) {
       return [
         'iPhone, Samsung, OnePlus, Xiaomi & more',
         'All conditions accepted',
         'Instant price quotes',
-        'Free pickup & inspection'
+        'Free pickup & inspection',
       ];
     } else if (name.includes('tablet')) {
       return [
         'iPad, Samsung Tab, Lenovo & more',
         'Working & non-working accepted',
         'Quick evaluation process',
-        'Same-day payment'
+        'Same-day payment',
       ];
     } else if (name.includes('laptop')) {
       return [
         'MacBook, Dell, HP, Lenovo & more',
         'All brands & models',
         'Professional assessment',
-        'Secure data wiping'
+        'Secure data wiping',
       ];
     }
     return [
       'All major brands supported',
       'Quick evaluation process',
       'Instant price quotes',
-      'Free pickup & inspection'
+      'Free pickup & inspection',
     ];
   };
-  
-
 
   useEffect(() => {
     if (apiCategories && apiCategories.length > 0) {
@@ -540,25 +545,30 @@ const CategorySelection = ({ onCategorySelect }) => {
         color: getColorForCategory(category.name),
         features: getFeaturesForCategory(category.name),
         href: `/sell/brand?category=${category.name}`,
-        categoryData: category
+        categoryData: category,
       }));
       setCategories(formattedCategories);
     }
   }, []);
 
   useEffect(() => {
-   console.log('decodedCategory', categoryFromUrl);
-      fetchProductsByCategory(categoryFromUrl);
-    }
-  , [categoryFromUrl,apiCategories]);
+    console.log('decodedCategory', categoryFromUrl);
+    fetchProductsByCategory(categoryFromUrl);
+  }, [categoryFromUrl, apiCategories]);
   // Handle automatic category selection from URL
- 
 
   if (loading) {
     return (
       <PageContainer>
         <Container>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '400px',
+            }}
+          >
             <Loader size={48} className="animate-spin" />
           </div>
         </Container>
@@ -578,41 +588,48 @@ const CategorySelection = ({ onCategorySelect }) => {
       </PageContainer>
     );
   }
-  
+
   return (
     <PageContainer>
       <Container>
         {/* Only show category selection UI when no category is selected */}
-      
-        
+
         {/* Products Section - Show when category is selected */}
         {true && (
           <ProductsSection>
             {productsLoading && products.length === 0 ? (
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: '200px',
+                }}
+              >
                 <Loader size={32} className="animate-spin" />
               </div>
             ) : productsError ? (
               <NoProductsMessage>
                 <NoProductsTitle>Error Loading Products</NoProductsTitle>
                 <NoProductsText>{productsError}</NoProductsText>
-                <Button onClick={() => fetchProductsByCategory(selectedCategory.categoryData.id, 1, false)}>
+                <Button
+                  onClick={() =>
+                    fetchProductsByCategory(selectedCategory.categoryData.id, 1, false)
+                  }
+                >
                   Try Again
                 </Button>
               </NoProductsMessage>
             ) : products.length === 0 ? (
               <NoProductsMessage>
                 <NoProductsTitle>No Products Available</NoProductsTitle>
-                <NoProductsText>
-                </NoProductsText>
-                <Button onClick={() => setSelectedCategory(null)}>
-                  Browse Other Categories
-                </Button>
+                <NoProductsText></NoProductsText>
+                <Button onClick={() => setSelectedCategory(null)}>Browse Other Categories</Button>
               </NoProductsMessage>
             ) : (
               <>
                 <ProductsGrid>
-                  {products.map((product) => (
+                  {products.map(product => (
                     <ProductCard key={product.id} onClick={() => handleProductClick(product)}>
                       <ProductImage>
                         {product.images ? (
@@ -624,7 +641,7 @@ const CategorySelection = ({ onCategorySelect }) => {
                       <ProductInfo>
                         <ProductName>{product.name}</ProductName>
                         <ProductCategory>{product.categoryId?.name}</ProductCategory>
-                        
+
                         <ProductStats>
                           <ProductStat>
                             <Star size={16} />
@@ -635,12 +652,12 @@ const CategorySelection = ({ onCategorySelect }) => {
                             {product.variants?.length || 0} variants
                           </ProductStat>
                         </ProductStats>
-                        
+
                         <ProductPrice>
                           <DollarSign size={20} style={{ display: 'inline' }} />
                           {product.basePrice ? `${product.basePrice}+` : 'Get Quote'}
                         </ProductPrice>
-                        
+
                         <ProductButton variant="primary" size="sm">
                           Sell This Device
                         </ProductButton>
@@ -648,10 +665,10 @@ const CategorySelection = ({ onCategorySelect }) => {
                     </ProductCard>
                   ))}
                 </ProductsGrid>
-                
+
                 {hasMoreProducts && (
-                  <LoadMoreButton 
-                    variant="secondary" 
+                  <LoadMoreButton
+                    variant="secondary"
                     onClick={handleLoadMore}
                     disabled={productsLoading}
                   >

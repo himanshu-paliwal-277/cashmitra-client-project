@@ -60,7 +60,7 @@ import {
   Mail,
   Calendar as CalendarIcon,
   PlusCircle,
-  Home
+  Home,
 } from 'lucide-react';
 
 const DashboardContainer = styled.div`
@@ -68,7 +68,7 @@ const DashboardContainer = styled.div`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
   overflow-x: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -76,7 +76,7 @@ const DashboardContainer = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
+    background:
       radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 40% 80%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
@@ -109,7 +109,7 @@ const Logo = styled.div`
   -webkit-text-fill-color: transparent;
   background-clip: text;
   position: relative;
-  
+
   &::after {
     content: 'ADMIN';
     position: absolute;
@@ -155,7 +155,7 @@ const QuickStat = styled.div`
   background: rgba(102, 126, 234, 0.05);
   border: 1px solid rgba(102, 126, 234, 0.1);
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba(102, 126, 234, 0.1);
     transform: translateY(-2px);
@@ -202,8 +202,9 @@ const NavigationTabs = styled.div`
 `;
 
 const TabButton = styled.button`
-  background: ${props => props.active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent'};
-  color: ${props => props.active ? 'white' : '#64748b'};
+  background: ${props =>
+    props.active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent'};
+  color: ${props => (props.active ? 'white' : '#64748b')};
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
@@ -214,10 +215,13 @@ const TabButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:hover {
-    background: ${props => props.active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'rgba(102, 126, 234, 0.1)'};
-    color: ${props => props.active ? 'white' : '#667eea'};
+    background: ${props =>
+      props.active
+        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        : 'rgba(102, 126, 234, 0.1)'};
+    color: ${props => (props.active ? 'white' : '#667eea')};
     transform: translateY(-1px);
   }
 `;
@@ -230,7 +234,7 @@ const IconButton = styled.button`
   cursor: pointer;
   color: ${props => props.theme.colors.textSecondary};
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: ${props => props.theme.colors.background};
   }
@@ -244,7 +248,7 @@ const UserProfile = styled.div`
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: ${props => props.theme.colors.background};
   }
@@ -319,7 +323,7 @@ const WelcomeSection = styled.div`
   position: relative;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -369,7 +373,7 @@ const WelcomeStatCard = styled.div`
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
@@ -402,9 +406,11 @@ const WelcomeStatLabel = styled.div`
 `;
 
 const Button = styled.button`
-  background: ${props => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${props => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
-  border: ${props => props.variant === 'outline' ? `1px solid ${props.theme.colors.primary}` : 'none'};
+  background: ${props =>
+    props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
+  color: ${props => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
+  border: ${props =>
+    props.variant === 'outline' ? `1px solid ${props.theme.colors.primary}` : 'none'};
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-weight: 500;
@@ -413,9 +419,10 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   &:hover {
-    background: ${props => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
+    background: ${props =>
+      props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
     color: white;
   }
 `;
@@ -437,12 +444,12 @@ const StatCard = styled.div`
   transition: all 0.4s ease;
   position: relative;
   overflow: hidden;
-  
+
   &:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
   }
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -453,7 +460,7 @@ const StatCard = styled.div`
     background: ${props => props.accentColor || '#667eea'};
     border-radius: 24px 24px 0 0;
   }
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -477,7 +484,11 @@ const StatIcon = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  background: linear-gradient(135deg, ${props => props.color || props.theme.colors.primary} 0%, ${props => props.colorSecondary || props.theme.colors.primaryDark} 100%);
+  background: linear-gradient(
+    135deg,
+    ${props => props.color || props.theme.colors.primary} 0%,
+    ${props => props.colorSecondary || props.theme.colors.primaryDark} 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -514,7 +525,7 @@ const StatTrend = styled.div`
   margin-top: 0.75rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: ${props => props.positive ? '#059669' : '#DC2626'};
+  color: ${props => (props.positive ? '#059669' : '#DC2626')};
 `;
 
 const StatSubtext = styled.p`
@@ -533,7 +544,7 @@ const Card = styled.div`
   margin-bottom: 3rem;
   overflow: hidden;
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
@@ -666,7 +677,7 @@ const Input = styled.input`
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 8px;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
@@ -679,7 +690,7 @@ const Select = styled.select`
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 8px;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
@@ -694,7 +705,7 @@ const TextArea = styled.textarea`
   font-size: 0.875rem;
   min-height: 100px;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
@@ -756,7 +767,7 @@ function AdminDashboard() {
     }
   };
 
-  const handleAddProduct = async (productData) => {
+  const handleAddProduct = async productData => {
     try {
       await adminService.addProduct(productData);
       loadDashboardData();
@@ -810,7 +821,9 @@ function AdminDashboard() {
             <WelcomeStatIcon color="#8B5CF6" colorAlt="#7C3AED">
               <DollarSign size={28} />
             </WelcomeStatIcon>
-            <WelcomeStatValue>₹{analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}</WelcomeStatValue>
+            <WelcomeStatValue>
+              ₹{analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}
+            </WelcomeStatValue>
             <WelcomeStatLabel>Revenue</WelcomeStatLabel>
           </WelcomeStatCard>
         </WelcomeStats>
@@ -833,7 +846,7 @@ function AdminDashboard() {
           </StatHeader>
           <StatSubtext>Active user base growing steadily</StatSubtext>
         </StatCard>
-        
+
         <StatCard accentColor="#10B981">
           <StatHeader>
             <StatIcon color="#10B981" colorSecondary="#047857">
@@ -850,7 +863,7 @@ function AdminDashboard() {
           </StatHeader>
           <StatSubtext>Partnership network expansion</StatSubtext>
         </StatCard>
-        
+
         <StatCard accentColor="#F59E0B">
           <StatHeader>
             <StatIcon color="#F59E0B" colorSecondary="#D97706">
@@ -867,14 +880,16 @@ function AdminDashboard() {
           </StatHeader>
           <StatSubtext>Order volume increasing</StatSubtext>
         </StatCard>
-        
+
         <StatCard accentColor="#8B5CF6">
           <StatHeader>
             <StatIcon color="#8B5CF6" colorSecondary="#7C3AED">
               <DollarSign size={32} />
             </StatIcon>
             <StatContent>
-              <StatValue>₹{analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}</StatValue>
+              <StatValue>
+                ₹{analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}
+              </StatValue>
               <StatLabel>Total Revenue</StatLabel>
               <StatTrend positive>
                 <ArrowUpRight size={16} />
@@ -884,7 +899,7 @@ function AdminDashboard() {
           </StatHeader>
           <StatSubtext>Revenue growth trending upward</StatSubtext>
         </StatCard>
-        
+
         <StatCard accentColor="#EF4444">
           <StatHeader>
             <StatIcon color="#EF4444" colorSecondary="#DC2626">
@@ -901,7 +916,7 @@ function AdminDashboard() {
           </StatHeader>
           <StatSubtext>User engagement metrics</StatSubtext>
         </StatCard>
-        
+
         <StatCard accentColor="#06B6D4">
           <StatHeader>
             <StatIcon color="#06B6D4" colorSecondary="#0891B2">
@@ -915,7 +930,7 @@ function AdminDashboard() {
           </StatHeader>
           <StatSubtext>Device category performance</StatSubtext>
         </StatCard>
-        
+
         <StatCard accentColor="#84CC16">
           <StatHeader>
             <StatIcon color="#84CC16" colorSecondary="#65A30D">
@@ -932,7 +947,7 @@ function AdminDashboard() {
           </StatHeader>
           <StatSubtext>Daily activity monitoring</StatSubtext>
         </StatCard>
-        
+
         <StatCard accentColor="#F97316">
           <StatHeader>
             <StatIcon color="#F97316" colorSecondary="#EA580C">
@@ -977,15 +992,21 @@ function AdminDashboard() {
             <tbody>
               {orders.slice(0, 5).map((order, index) => (
                 <TableRow key={order._id || index}>
-                  <TableCell>#{order._id?.slice(-6) || `ORD${String(index + 1).padStart(3, '0')}`}</TableCell>
+                  <TableCell>
+                    #{order._id?.slice(-6) || `ORD${String(index + 1).padStart(3, '0')}`}
+                  </TableCell>
                   <TableCell>{order.user?.name || `Customer ${index + 1}`}</TableCell>
                   <TableCell>{order.orderType || 'Sell'}</TableCell>
-                  <TableCell>₹{order.totalAmount || Math.floor(Math.random() * 50000 + 10000)}</TableCell>
+                  <TableCell>
+                    ₹{order.totalAmount || Math.floor(Math.random() * 50000 + 10000)}
+                  </TableCell>
                   <TableCell>
                     <Badge status={order.status || 'pending'}>{order.status || 'pending'}</Badge>
                   </TableCell>
                   <TableCell>
-                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
+                    {order.createdAt
+                      ? new Date(order.createdAt).toLocaleDateString()
+                      : new Date().toLocaleDateString()}
                   </TableCell>
                 </TableRow>
               ))}
@@ -1021,49 +1042,52 @@ function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {partners.length > 0 ? partners.map(partner => (
-              <TableRow key={partner._id}>
-                <TableCell>{partner.shopName}</TableCell>
-                <TableCell>{partner.user?.name}</TableCell>
-                <TableCell>{partner.shopEmail}</TableCell>
-                <TableCell>{partner.phone || 'N/A'}</TableCell>
-                <TableCell>
-                  <Badge status={partner.verificationStatus}>
-                    {partner.verificationStatus}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => openModal('verifyPartner', partner)}
-                  >
-                    <Eye size={14} />
-                    Review
-                  </Button>
-                </TableCell>
-              </TableRow>
-            )) : (
-              // Demo data if no partners
-              ['TechHub Store', 'Mobile Palace', 'Gadget Zone', 'Smart Devices'].map((name, index) => (
-                <TableRow key={index}>
-                  <TableCell>{name}</TableCell>
-                  <TableCell>Owner {index + 1}</TableCell>
-                  <TableCell>{name.toLowerCase().replace(' ', '')}@email.com</TableCell>
-                  <TableCell>+91 9876543{index + 1}0</TableCell>
-                  <TableCell>
-                    <Badge status={index % 3 === 0 ? 'approved' : index % 3 === 1 ? 'pending' : 'rejected'}>
-                      {index % 3 === 0 ? 'approved' : index % 3 === 1 ? 'pending' : 'rejected'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="outline">
-                      <Eye size={14} />
-                      Review
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
+            {partners.length > 0
+              ? partners.map(partner => (
+                  <TableRow key={partner._id}>
+                    <TableCell>{partner.shopName}</TableCell>
+                    <TableCell>{partner.user?.name}</TableCell>
+                    <TableCell>{partner.shopEmail}</TableCell>
+                    <TableCell>{partner.phone || 'N/A'}</TableCell>
+                    <TableCell>
+                      <Badge status={partner.verificationStatus}>
+                        {partner.verificationStatus}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="outline" onClick={() => openModal('verifyPartner', partner)}>
+                        <Eye size={14} />
+                        Review
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              : // Demo data if no partners
+                ['TechHub Store', 'Mobile Palace', 'Gadget Zone', 'Smart Devices'].map(
+                  (name, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{name}</TableCell>
+                      <TableCell>Owner {index + 1}</TableCell>
+                      <TableCell>{name.toLowerCase().replace(' ', '')}@email.com</TableCell>
+                      <TableCell>+91 9876543{index + 1}0</TableCell>
+                      <TableCell>
+                        <Badge
+                          status={
+                            index % 3 === 0 ? 'approved' : index % 3 === 1 ? 'pending' : 'rejected'
+                          }
+                        >
+                          {index % 3 === 0 ? 'approved' : index % 3 === 1 ? 'pending' : 'rejected'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="outline">
+                          <Eye size={14} />
+                          Review
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+                )}
           </tbody>
         </Table>
       </CardContent>
@@ -1103,52 +1127,70 @@ function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {orders.length > 0 ? orders.map(order => (
-              <TableRow key={order._id}>
-                <TableCell>#{order._id.slice(-6)}</TableCell>
-                <TableCell>{order.user?.name}</TableCell>
-                <TableCell>{order.partner?.shopName}</TableCell>
-                <TableCell>{order.orderType}</TableCell>
-                <TableCell>₹{order.totalAmount}</TableCell>
-                <TableCell>
-                  <Badge status={order.status}>{order.status}</Badge>
-                </TableCell>
-                <TableCell>
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <Button variant="outline">
-                    <Eye size={14} />
-                    View
-                  </Button>
-                </TableCell>
-              </TableRow>
-            )) : (
-              // Demo data if no orders
-              Array.from({ length: 8 }, (_, index) => (
-                <TableRow key={index}>
-                  <TableCell>#ORD{String(index + 1).padStart(3, '0')}</TableCell>
-                  <TableCell>Customer {index + 1}</TableCell>
-                  <TableCell>Partner Store {index % 3 + 1}</TableCell>
-                  <TableCell>{index % 2 === 0 ? 'Sell' : 'Buy'}</TableCell>
-                  <TableCell>₹{Math.floor(Math.random() * 50000 + 10000).toLocaleString()}</TableCell>
-                  <TableCell>
-                    <Badge status={index % 4 === 0 ? 'completed' : index % 4 === 1 ? 'pending' : index % 4 === 2 ? 'approved' : 'cancelled'}>
-                      {index % 4 === 0 ? 'completed' : index % 4 === 1 ? 'pending' : index % 4 === 2 ? 'approved' : 'cancelled'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="outline">
-                      <Eye size={14} />
-                      View
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
+            {orders.length > 0
+              ? orders.map(order => (
+                  <TableRow key={order._id}>
+                    <TableCell>#{order._id.slice(-6)}</TableCell>
+                    <TableCell>{order.user?.name}</TableCell>
+                    <TableCell>{order.partner?.shopName}</TableCell>
+                    <TableCell>{order.orderType}</TableCell>
+                    <TableCell>₹{order.totalAmount}</TableCell>
+                    <TableCell>
+                      <Badge status={order.status}>{order.status}</Badge>
+                    </TableCell>
+                    <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Button variant="outline">
+                        <Eye size={14} />
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              : // Demo data if no orders
+                Array.from({ length: 8 }, (_, index) => (
+                  <TableRow key={index}>
+                    <TableCell>#ORD{String(index + 1).padStart(3, '0')}</TableCell>
+                    <TableCell>Customer {index + 1}</TableCell>
+                    <TableCell>Partner Store {(index % 3) + 1}</TableCell>
+                    <TableCell>{index % 2 === 0 ? 'Sell' : 'Buy'}</TableCell>
+                    <TableCell>
+                      ₹{Math.floor(Math.random() * 50000 + 10000).toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        status={
+                          index % 4 === 0
+                            ? 'completed'
+                            : index % 4 === 1
+                              ? 'pending'
+                              : index % 4 === 2
+                                ? 'approved'
+                                : 'cancelled'
+                        }
+                      >
+                        {index % 4 === 0
+                          ? 'completed'
+                          : index % 4 === 1
+                            ? 'pending'
+                            : index % 4 === 2
+                              ? 'approved'
+                              : 'cancelled'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(
+                        Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
+                      ).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="outline">
+                        <Eye size={14} />
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
           </tbody>
         </Table>
       </CardContent>
@@ -1187,55 +1229,91 @@ function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {products.length > 0 ? products.map(product => (
-              <TableRow key={product._id}>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.brand}</TableCell>
-                <TableCell>{product.model}</TableCell>
-                <TableCell>₹{product.basePrice}</TableCell>
-                <TableCell>{product.stock || 'In Stock'}</TableCell>
-                <TableCell>
-                  <Badge status="approved">Active</Badge>
-                </TableCell>
-                <TableCell>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Button variant="outline" onClick={() => openModal('editProduct', product)}>
-                      <Edit size={14} />
-                      Edit
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )) : (
-              // Demo data if no products
-              [
-                { category: 'Mobile', brand: 'iPhone', model: '15 Pro', price: '1,29,900', stock: '25' },
-                { category: 'Mobile', brand: 'Samsung', model: 'Galaxy S24', price: '89,999', stock: '40' },
-                { category: 'Laptop', brand: 'MacBook', model: 'Air M2', price: '1,19,900', stock: '15' },
-                { category: 'Tablet', brand: 'iPad', model: 'Pro 12.9', price: '1,09,900', stock: '20' },
-                { category: 'Mobile', brand: 'OnePlus', model: '12 Pro', price: '64,999', stock: '35' },
-                { category: 'Laptop', brand: 'Dell', model: 'XPS 13', price: '89,990', stock: '12' }
-              ].map((product, index) => (
-                <TableRow key={index}>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell>{product.brand}</TableCell>
-                  <TableCell>{product.model}</TableCell>
-                  <TableCell>₹{product.price}</TableCell>
-                  <TableCell>{product.stock}</TableCell>
-                  <TableCell>
-                    <Badge status="approved">Active</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <Button variant="outline">
-                        <Edit size={14} />
-                        Edit
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
+            {products.length > 0
+              ? products.map(product => (
+                  <TableRow key={product._id}>
+                    <TableCell>{product.category}</TableCell>
+                    <TableCell>{product.brand}</TableCell>
+                    <TableCell>{product.model}</TableCell>
+                    <TableCell>₹{product.basePrice}</TableCell>
+                    <TableCell>{product.stock || 'In Stock'}</TableCell>
+                    <TableCell>
+                      <Badge status="approved">Active</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <Button variant="outline" onClick={() => openModal('editProduct', product)}>
+                          <Edit size={14} />
+                          Edit
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              : // Demo data if no products
+                [
+                  {
+                    category: 'Mobile',
+                    brand: 'iPhone',
+                    model: '15 Pro',
+                    price: '1,29,900',
+                    stock: '25',
+                  },
+                  {
+                    category: 'Mobile',
+                    brand: 'Samsung',
+                    model: 'Galaxy S24',
+                    price: '89,999',
+                    stock: '40',
+                  },
+                  {
+                    category: 'Laptop',
+                    brand: 'MacBook',
+                    model: 'Air M2',
+                    price: '1,19,900',
+                    stock: '15',
+                  },
+                  {
+                    category: 'Tablet',
+                    brand: 'iPad',
+                    model: 'Pro 12.9',
+                    price: '1,09,900',
+                    stock: '20',
+                  },
+                  {
+                    category: 'Mobile',
+                    brand: 'OnePlus',
+                    model: '12 Pro',
+                    price: '64,999',
+                    stock: '35',
+                  },
+                  {
+                    category: 'Laptop',
+                    brand: 'Dell',
+                    model: 'XPS 13',
+                    price: '89,990',
+                    stock: '12',
+                  },
+                ].map((product, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{product.category}</TableCell>
+                    <TableCell>{product.brand}</TableCell>
+                    <TableCell>{product.model}</TableCell>
+                    <TableCell>₹{product.price}</TableCell>
+                    <TableCell>{product.stock}</TableCell>
+                    <TableCell>
+                      <Badge status="approved">Active</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <Button variant="outline">
+                          <Edit size={14} />
+                          Edit
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
           </tbody>
         </Table>
       </CardContent>
@@ -1271,9 +1349,9 @@ function AdminDashboard() {
               </FormGroup>
               <FormGroup>
                 <Label>Status</Label>
-                <Select 
+                <Select
                   value={formData.status || selectedItem?.verificationStatus || ''}
-                  onChange={(e) => setFormData({...formData, status: e.target.value})}
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
                 >
                   <option value="pending">Pending</option>
                   <option value="approved">Approved</option>
@@ -1282,14 +1360,16 @@ function AdminDashboard() {
               </FormGroup>
               <FormGroup>
                 <Label>Notes</Label>
-                <TextArea 
+                <TextArea
                   value={formData.notes || ''}
-                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                  onChange={e => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Add verification notes..."
                 />
               </FormGroup>
-              <Button 
-                onClick={() => handleVerifyPartner(selectedItem._id, formData.status, formData.notes)}
+              <Button
+                onClick={() =>
+                  handleVerifyPartner(selectedItem._id, formData.status, formData.notes)
+                }
               >
                 Update Status
               </Button>
@@ -1300,9 +1380,9 @@ function AdminDashboard() {
             <>
               <FormGroup>
                 <Label>Category</Label>
-                <Select 
+                <Select
                   value={formData.category || ''}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  onChange={e => setFormData({ ...formData, category: e.target.value })}
                 >
                   <option value="">Select Category</option>
                   <option value="mobile">Mobile</option>
@@ -1312,43 +1392,43 @@ function AdminDashboard() {
               </FormGroup>
               <FormGroup>
                 <Label>Brand</Label>
-                <Input 
+                <Input
                   value={formData.brand || ''}
-                  onChange={(e) => setFormData({...formData, brand: e.target.value})}
+                  onChange={e => setFormData({ ...formData, brand: e.target.value })}
                   placeholder="Enter brand name"
                 />
               </FormGroup>
               <FormGroup>
                 <Label>Series</Label>
-                <Input 
+                <Input
                   value={formData.series || ''}
-                  onChange={(e) => setFormData({...formData, series: e.target.value})}
+                  onChange={e => setFormData({ ...formData, series: e.target.value })}
                   placeholder="Enter series name"
                 />
               </FormGroup>
               <FormGroup>
                 <Label>Model</Label>
-                <Input 
+                <Input
                   value={formData.model || ''}
-                  onChange={(e) => setFormData({...formData, model: e.target.value})}
+                  onChange={e => setFormData({ ...formData, model: e.target.value })}
                   placeholder="Enter model name"
                 />
               </FormGroup>
               <FormGroup>
                 <Label>Base Price</Label>
-                <Input 
+                <Input
                   type="number"
                   value={formData.basePrice || ''}
-                  onChange={(e) => setFormData({...formData, basePrice: e.target.value})}
+                  onChange={e => setFormData({ ...formData, basePrice: e.target.value })}
                   placeholder="Enter base price"
                 />
               </FormGroup>
               <FormGroup>
                 <Label>Depreciation Rate (%)</Label>
-                <Input 
+                <Input
                   type="number"
                   value={formData.depreciationRate || ''}
-                  onChange={(e) => setFormData({...formData, depreciationRate: e.target.value})}
+                  onChange={e => setFormData({ ...formData, depreciationRate: e.target.value })}
                   placeholder="Enter depreciation rate"
                 />
               </FormGroup>
@@ -1444,7 +1524,9 @@ function AdminDashboard() {
 
       <MainContent>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem', color: 'white', fontSize: '1.25rem' }}>
+          <div
+            style={{ textAlign: 'center', padding: '4rem', color: 'white', fontSize: '1.25rem' }}
+          >
             <RefreshCw size={32} style={{ animation: 'spin 1s linear infinite' }} />
             <p>Loading dashboard data...</p>
           </div>

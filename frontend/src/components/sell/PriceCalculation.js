@@ -27,7 +27,7 @@ import {
   Star,
   Clock,
   Shield,
-  Zap
+  Zap,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -74,13 +74,18 @@ const PriceCard = styled.div`
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     animation: shimmer 3s ease-in-out infinite;
   }
 
   @keyframes shimmer {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(180deg); }
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
   }
 `;
 
@@ -212,20 +217,30 @@ const ItemIcon = styled.div`
   justify-content: center;
   background: ${props => {
     switch (props.type) {
-      case 'base': return theme.colors.primary[50];
-      case 'condition': return theme.colors.accent[50];
-      case 'defect': return theme.colors.error[50];
-      case 'accessory': return theme.colors.accent[50];
-      default: return theme.colors.grey[50];
+      case 'base':
+        return theme.colors.primary[50];
+      case 'condition':
+        return theme.colors.accent[50];
+      case 'defect':
+        return theme.colors.error[50];
+      case 'accessory':
+        return theme.colors.accent[50];
+      default:
+        return theme.colors.grey[50];
     }
   }};
   color: ${props => {
     switch (props.type) {
-      case 'base': return theme.colors.primary.main;
-      case 'condition': return theme.colors.accent.main;
-      case 'defect': return theme.colors.error.main;
-      case 'accessory': return theme.colors.accent.main;
-      default: return theme.colors.text.secondary;
+      case 'base':
+        return theme.colors.primary.main;
+      case 'condition':
+        return theme.colors.accent.main;
+      case 'defect':
+        return theme.colors.error.main;
+      case 'accessory':
+        return theme.colors.accent.main;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
 `;
@@ -352,7 +367,7 @@ const NavigationButtons = styled.div`
 
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
-    
+
     > * {
       width: 100%;
     }
@@ -361,10 +376,11 @@ const NavigationButtons = styled.div`
 
 const NavButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[6]};
-  border: ${props => props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
+  border: ${props =>
+    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.variant === 'primary' ? theme.colors.primary.main : 'white'};
-  color: ${props => props.variant === 'primary' ? 'white' : theme.colors.text.primary};
+  background: ${props => (props.variant === 'primary' ? theme.colors.primary.main : 'white')};
+  color: ${props => (props.variant === 'primary' ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.base};
   font-weight: ${theme.typography.fontWeight.medium};
   cursor: pointer;
@@ -378,7 +394,8 @@ const NavButton = styled.button`
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.md};
-    background: ${props => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${props =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -411,7 +428,7 @@ const ErrorState = styled.div`
 
 const PriceCalculation = ({ sessionData, onComplete, onError, hooks }) => {
   const { sellSessions, sellProducts, sellQuestions, sellDefects, sellAccessories } = hooks;
-  
+
   const [priceData, setPriceData] = useState(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [calculationError, setCalculationError] = useState(null);
@@ -444,22 +461,22 @@ const PriceCalculation = ({ sessionData, onComplete, onError, hooks }) => {
   // Get device details
   const deviceDetails = useMemo(() => {
     if (!sessionData.selectedProduct || !sellProducts.publicProducts) return null;
-    
+
     const product = sellProducts.publicProducts.find(p => p._id === sessionData.selectedProduct);
     const variant = product?.variants?.find(v => v._id === sessionData.selectedVariant);
-    
+
     return { product, variant };
   }, [sessionData.selectedProduct, sessionData.selectedVariant, sellProducts.publicProducts]);
 
   // Get selected items details
   const selectedItems = useMemo(() => {
-    const defects = (sessionData.selectedDefects || []).map(id => 
-      sellDefects.publicDefects?.find(d => d._id === id)
-    ).filter(Boolean);
+    const defects = (sessionData.selectedDefects || [])
+      .map(id => sellDefects.publicDefects?.find(d => d._id === id))
+      .filter(Boolean);
 
-    const accessories = (sessionData.selectedAccessories || []).map(id => 
-      sellAccessories.publicAccessories?.find(a => a._id === id)
-    ).filter(Boolean);
+    const accessories = (sessionData.selectedAccessories || [])
+      .map(id => sellAccessories.publicAccessories?.find(a => a._id === id))
+      .filter(Boolean);
 
     return { defects, accessories };
   }, [sessionData, sellDefects.publicDefects, sellAccessories.publicAccessories]);
@@ -470,10 +487,10 @@ const PriceCalculation = ({ sessionData, onComplete, onError, hooks }) => {
       return;
     }
 
-    onComplete({ 
+    onComplete({
       priceData,
       finalPrice: priceData.finalPrice,
-      breakdown: priceData.breakdown
+      breakdown: priceData.breakdown,
     });
   };
 
@@ -550,7 +567,7 @@ const PriceCalculation = ({ sessionData, onComplete, onError, hooks }) => {
               </DeviceVariant>
             </DeviceDetails>
           </DeviceHeader>
-          
+
           <DeviceSpecs>
             <SpecItem>
               <SpecLabel>Brand:</SpecLabel>
@@ -624,7 +641,11 @@ const PriceCalculation = ({ sessionData, onComplete, onError, hooks }) => {
                   </ItemText>
                 </ItemLabel>
                 <ItemValue value={priceData.breakdown.conditionAdjustment}>
-                  {priceData.breakdown.conditionAdjustment > 0 ? <Plus size={12} /> : <Minus size={12} />}
+                  {priceData.breakdown.conditionAdjustment > 0 ? (
+                    <Plus size={12} />
+                  ) : (
+                    <Minus size={12} />
+                  )}
                   ₹{Math.abs(priceData.breakdown.conditionAdjustment).toLocaleString()}
                 </ItemValue>
               </BreakdownItem>
@@ -649,8 +670,7 @@ const PriceCalculation = ({ sessionData, onComplete, onError, hooks }) => {
                     </ItemText>
                   </ItemLabel>
                   <ItemValue value={defect.priceImpact || 0}>
-                    <Minus size={12} />
-                    ₹{Math.abs(defect.priceImpact || 0).toLocaleString()}
+                    <Minus size={12} />₹{Math.abs(defect.priceImpact || 0).toLocaleString()}
                   </ItemValue>
                 </BreakdownItem>
               ))}
@@ -675,8 +695,7 @@ const PriceCalculation = ({ sessionData, onComplete, onError, hooks }) => {
                     </ItemText>
                   </ItemLabel>
                   <ItemValue value={accessory.priceBonus || 0}>
-                    <Plus size={12} />
-                    ₹{(accessory.priceBonus || 0).toLocaleString()}
+                    <Plus size={12} />₹{(accessory.priceBonus || 0).toLocaleString()}
                   </ItemValue>
                 </BreakdownItem>
               ))}
@@ -696,15 +715,18 @@ const PriceCalculation = ({ sessionData, onComplete, onError, hooks }) => {
           Back
         </NavButton>
 
-        <div style={{ textAlign: 'center', color: theme.colors.text.secondary, fontSize: theme.typography.fontSize.sm }}>
+        <div
+          style={{
+            textAlign: 'center',
+            color: theme.colors.text.secondary,
+            fontSize: theme.typography.fontSize.sm,
+          }}
+        >
           <Shield size={16} style={{ marginRight: theme.spacing[2] }} />
           Price guaranteed for {priceData.validityHours || 24} hours
         </div>
 
-        <NavButton
-          variant="primary"
-          onClick={handleComplete}
-        >
+        <NavButton variant="primary" onClick={handleComplete}>
           Accept Offer
           <ArrowRight size={16} />
         </NavButton>

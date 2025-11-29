@@ -70,7 +70,7 @@ const Profile = () => {
         <Title>Profile</Title>
         <Subtitle>Manage your profile information and settings</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,8 +78,8 @@ const Profile = () => {
           </Icon>
           <ComingSoonTitle>Profile Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to manage your 
-            profile information, update personal details, and customize your account settings.
+            This feature is currently under development. Soon you'll be able to manage your profile
+            information, update personal details, and customize your account settings.
           </ComingSoonText>
         </ComingSoon>
       </Card>

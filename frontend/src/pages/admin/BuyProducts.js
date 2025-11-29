@@ -23,7 +23,7 @@ import {
   SortDesc,
   Download,
   Upload,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -58,11 +58,10 @@ const HeaderActions = styled.div`
 `;
 
 const ActionButton = styled.button`
-  background: ${props => props.variant === 'primary' ? 
-    'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 
-    '#f3f4f6'};
-  color: ${props => props.variant === 'primary' ? 'white' : '#374151'};
-  border: ${props => props.variant === 'primary' ? 'none' : '1px solid #d1d5db'};
+  background: ${props =>
+    props.variant === 'primary' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : '#f3f4f6'};
+  color: ${props => (props.variant === 'primary' ? 'white' : '#374151')};
+  border: ${props => (props.variant === 'primary' ? 'none' : '1px solid #d1d5db')};
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 600;
@@ -71,12 +70,13 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
-    box-shadow: ${props => props.variant === 'primary' ? 
-      '0 4px 12px rgba(16, 185, 129, 0.4)' : 
-      '0 2px 8px rgba(0, 0, 0, 0.1)'};
+    box-shadow: ${props =>
+      props.variant === 'primary'
+        ? '0 4px 12px rgba(16, 185, 129, 0.4)'
+        : '0 2px 8px rgba(0, 0, 0, 0.1)'};
   }
 `;
 
@@ -151,7 +151,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #10b981;
@@ -174,7 +174,7 @@ const FilterSelect = styled.select`
   font-size: 0.875rem;
   background: white;
   min-width: 150px;
-  
+
   &:focus {
     outline: none;
     border-color: #10b981;
@@ -192,13 +192,13 @@ const ViewToggle = styled.div`
 const ViewButton = styled.button`
   padding: 0.75rem;
   border: none;
-  background: ${props => props.active ? '#10b981' : 'white'};
-  color: ${props => props.active ? 'white' : '#6b7280'};
+  background: ${props => (props.active ? '#10b981' : 'white')};
+  color: ${props => (props.active ? 'white' : '#6b7280')};
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
-    background: ${props => props.active ? '#059669' : '#f9fafb'};
+    background: ${props => (props.active ? '#059669' : '#f9fafb')};
   }
 `;
 
@@ -225,7 +225,7 @@ const SectionTitle = styled.h2`
 `;
 
 const ProductsGrid = styled.div`
-  display: ${props => props.view === 'grid' ? 'grid' : 'block'};
+  display: ${props => (props.view === 'grid' ? 'grid' : 'block')};
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
   padding: 1.5rem;
@@ -236,7 +236,7 @@ const ProductCard = styled.div`
   border-radius: 0.5rem;
   overflow: hidden;
   transition: all 0.2s;
-  
+
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
@@ -259,10 +259,14 @@ const ProductBadge = styled.div`
   right: 0.75rem;
   background: ${props => {
     switch (props.status) {
-      case 'active': return '#10b981';
-      case 'inactive': return '#ef4444';
-      case 'draft': return '#f59e0b';
-      default: return '#6b7280';
+      case 'active':
+        return '#10b981';
+      case 'inactive':
+        return '#ef4444';
+      case 'draft':
+        return '#f59e0b';
+      default:
+        return '#6b7280';
     }
   }};
   color: white;
@@ -315,7 +319,7 @@ const ActionButtonSmall = styled.button`
   gap: 0.25rem;
   font-size: 0.875rem;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f9fafb;
     border-color: #10b981;
@@ -367,7 +371,7 @@ const BuyProducts = () => {
     { label: 'Total Products', value: '1,234', icon: Package, color: '#10b981' },
     { label: 'Active Products', value: '987', icon: TrendingUp, color: '#3b82f6' },
     { label: 'Total Value', value: '₹45,678', icon: DollarSign, color: '#f59e0b' },
-    { label: 'Categories', value: '23', icon: Grid, color: '#8b5cf6' }
+    { label: 'Categories', value: '23', icon: Grid, color: '#8b5cf6' },
   ];
 
   useEffect(() => {
@@ -396,7 +400,7 @@ const BuyProducts = () => {
     }
   };
 
-  const handleDeleteProduct = async (productId) => {
+  const handleDeleteProduct = async productId => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await adminService.deleteBuyProduct(productId);
@@ -411,7 +415,7 @@ const BuyProducts = () => {
     navigate('/admin/buy-products/add');
   };
 
-  const handleEditProduct = (product) => {
+  const handleEditProduct = product => {
     navigate(`/admin/buy-products/edit/${product._id}`);
   };
 
@@ -425,23 +429,24 @@ const BuyProducts = () => {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || product.categoryId === selectedCategory;
     const matchesStatus = !selectedStatus || product.status === selectedStatus;
-    
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     let aValue = a[sortBy];
     let bValue = b[sortBy];
-    
+
     if (sortBy === 'price') {
       aValue = parseFloat(aValue) || 0;
       bValue = parseFloat(bValue) || 0;
     }
-    
+
     if (sortOrder === 'asc') {
       return aValue > bValue ? 1 : -1;
     } else {
@@ -449,36 +454,38 @@ const BuyProducts = () => {
     }
   });
 
-  const renderProductCard = (product) => {
+  const renderProductCard = product => {
     // Get the first image from the images object
     const firstImageKey = Object.keys(product.images || {})[0];
     const productImage = product.images?.[firstImageKey];
-    
+
     return (
       <ProductCard key={product._id}>
         <ProductImage>
           {productImage ? (
-            <img 
-              src={productImage.replace(/`/g, '').trim()} 
+            <img
+              src={productImage.replace(/`/g, '').trim()}
               alt={product.name}
               style={{
                 width: '100%',
                 height: '100%',
-                objectFit: 'cover'
+                objectFit: 'cover',
               }}
-              onError={(e) => {
+              onError={e => {
                 e.target.style.display = 'none';
                 e.target.nextSibling.style.display = 'flex';
               }}
             />
           ) : null}
-          <div style={{ 
-            display: productImage ? 'none' : 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            height: '100%'
-          }}>
+          <div
+            style={{
+              display: productImage ? 'none' : 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              height: '100%',
+            }}
+          >
             <Package size={48} />
           </div>
           <ProductBadge status={product.isActive ? 'active' : 'inactive'}>
@@ -487,12 +494,8 @@ const BuyProducts = () => {
         </ProductImage>
         <ProductContent>
           <ProductName>{product.name}</ProductName>
-          <ProductCategory>
-            {product.categoryId?.name || 'Uncategorized'}
-          </ProductCategory>
-          <ProductPrice>
-            ₹{product.pricing?.discountedPrice || 'N/A'}
-          </ProductPrice>
+          <ProductCategory>{product.categoryId?.name || 'Uncategorized'}</ProductCategory>
+          <ProductPrice>₹{product.pricing?.discountedPrice || 'N/A'}</ProductPrice>
           <ProductActions>
             <ActionButtonSmall>
               <Eye size={14} />
@@ -528,43 +531,47 @@ const BuyProducts = () => {
           // Get the first image from the images object
           const firstImageKey = Object.keys(product.images || {})[0];
           const productImage = product.images?.[firstImageKey];
-          
+
           return (
             <TableRow key={product._id}>
               <TableCell>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    background: '#f3f4f6', 
-                    borderRadius: '0.375rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden'
-                  }}>
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      background: '#f3f4f6',
+                      borderRadius: '0.375rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                    }}
+                  >
                     {productImage ? (
-                      <img 
-                        src={productImage.replace(/`/g, '').trim()} 
+                      <img
+                        src={productImage.replace(/`/g, '').trim()}
                         alt={product.name}
                         style={{
                           width: '100%',
                           height: '100%',
-                          objectFit: 'cover'
+                          objectFit: 'cover',
                         }}
-                        onError={(e) => {
+                        onError={e => {
                           e.target.style.display = 'none';
                           e.target.nextSibling.style.display = 'flex';
                         }}
                       />
                     ) : null}
-                    <div style={{ 
-                      display: productImage ? 'none' : 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '100%',
-                      height: '100%'
-                    }}>
+                    <div
+                      style={{
+                        display: productImage ? 'none' : 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    >
                       <Package size={20} />
                     </div>
                   </div>
@@ -576,9 +583,7 @@ const BuyProducts = () => {
                   </div>
                 </div>
               </TableCell>
-              <TableCell>
-                {product.categoryId?.name || 'Uncategorized'}
-              </TableCell>
+              <TableCell>{product.categoryId?.name || 'Uncategorized'}</TableCell>
               <TableCell style={{ fontWeight: '600', color: '#10b981' }}>
                 ₹{product.pricing?.discountedPrice || 'N/A'}
               </TableCell>
@@ -592,13 +597,13 @@ const BuyProducts = () => {
                   <ActionButtonSmall style={{ flex: 'none', padding: '0.375rem' }}>
                     <Eye size={14} />
                   </ActionButtonSmall>
-                  <ActionButtonSmall 
+                  <ActionButtonSmall
                     style={{ flex: 'none', padding: '0.375rem' }}
                     onClick={() => handleEditProduct(product)}
                   >
                     <Edit size={14} />
                   </ActionButtonSmall>
-                  <ActionButtonSmall 
+                  <ActionButtonSmall
                     style={{ flex: 'none', padding: '0.375rem' }}
                     onClick={() => handleDeleteProduct(product._id)}
                   >
@@ -660,13 +665,13 @@ const BuyProducts = () => {
               type="text"
               placeholder="Search products..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </SearchContainer>
-          
+
           <FilterSelect
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={e => setSelectedCategory(e.target.value)}
           >
             <option value="">All Categories</option>
             {categories.map(category => (
@@ -675,20 +680,17 @@ const BuyProducts = () => {
               </option>
             ))}
           </FilterSelect>
-          
-          <FilterSelect
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-          >
+
+          <FilterSelect value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)}>
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
             <option value="draft">Draft</option>
           </FilterSelect>
-          
+
           <FilterSelect
             value={`${sortBy}-${sortOrder}`}
-            onChange={(e) => {
+            onChange={e => {
               const [field, order] = e.target.value.split('-');
               setSortBy(field);
               setSortOrder(order);
@@ -699,18 +701,12 @@ const BuyProducts = () => {
             <option value="price-asc">Price Low-High</option>
             <option value="price-desc">Price High-Low</option>
           </FilterSelect>
-          
+
           <ViewToggle>
-            <ViewButton 
-              active={viewMode === 'grid'} 
-              onClick={() => setViewMode('grid')}
-            >
+            <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
               <Grid size={16} />
             </ViewButton>
-            <ViewButton 
-              active={viewMode === 'list'} 
-              onClick={() => setViewMode('list')}
-            >
+            <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
               <List size={16} />
             </ViewButton>
           </ViewToggle>
@@ -719,15 +715,13 @@ const BuyProducts = () => {
 
       <ProductsSection>
         <SectionHeader>
-          <SectionTitle>
-            Products ({sortedProducts.length})
-          </SectionTitle>
+          <SectionTitle>Products ({sortedProducts.length})</SectionTitle>
           <ActionButton onClick={fetchProducts}>
             <RefreshCw size={16} />
             Refresh
           </ActionButton>
         </SectionHeader>
-        
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: '3rem' }}>Loading...</div>
         ) : sortedProducts.length === 0 ? (
@@ -735,13 +729,9 @@ const BuyProducts = () => {
             No products found
           </div>
         ) : viewMode === 'grid' ? (
-          <ProductsGrid view="grid">
-            {sortedProducts.map(renderProductCard)}
-          </ProductsGrid>
+          <ProductsGrid view="grid">{sortedProducts.map(renderProductCard)}</ProductsGrid>
         ) : (
-          <div style={{ padding: '0' }}>
-            {renderProductTable()}
-          </div>
+          <div style={{ padding: '0' }}>{renderProductTable()}</div>
         )}
       </ProductsSection>
 

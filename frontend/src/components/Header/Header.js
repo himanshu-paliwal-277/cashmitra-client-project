@@ -20,10 +20,17 @@ const Header = () => {
   ];
 
   const locations = [
-    'Gurgaon', 'Delhi', 'Mumbai', 'Bangalore', 'Chennai', 'Kolkata', 'Pune', 'Hyderabad'
+    'Gurgaon',
+    'Delhi',
+    'Mumbai',
+    'Bangalore',
+    'Chennai',
+    'Kolkata',
+    'Pune',
+    'Hyderabad',
   ];
 
-  const handleNavigation = (href) => {
+  const handleNavigation = href => {
     if (href !== '#') {
       navigate(href);
     }
@@ -36,7 +43,6 @@ const Header = () => {
       <div className="header-top">
         <div className="header-container">
           {/* Logo */}
-       
 
           {/* Desktop Navigation */}
           <nav className="header-nav desktop-nav">
@@ -67,10 +73,7 @@ const Header = () => {
                   }
                 }}
               >
-                <button
-                  className="nav-link"
-                  onClick={() => handleNavigation(item.href)}
-                >
+                <button className="nav-link" onClick={() => handleNavigation(item.href)}>
                   {item.label}
                   {item.hasDropdown && <ChevronDown size={14} className="dropdown-icon" />}
                 </button>
@@ -103,7 +106,7 @@ const Header = () => {
           </nav>
 
           {/* Search Bar */}
-      
+
           {/* Right Section */}
           <div className="header-right">
             {/* Cart Icon */}
@@ -116,7 +119,6 @@ const Header = () => {
             </button> */}
 
             {/* Location Selector */}
-      
 
             {/* Mobile Menu Toggle */}
             {/* <button
@@ -147,7 +149,6 @@ const Header = () => {
       )}
 
       {/* Promotional Banner */}
-   
     </header>
   );
 };

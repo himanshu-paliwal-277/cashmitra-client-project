@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { 
-  CreditCard, 
-  DollarSign, 
-  TrendingUp, 
-  TrendingDown, 
-  Download, 
-  Filter, 
+import {
+  CreditCard,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  Download,
+  Filter,
   Search,
   Calendar,
   Wallet,
   ArrowUpRight,
   ArrowDownLeft,
   Eye,
-  FileText
+  FileText,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -52,7 +52,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
@@ -72,7 +72,7 @@ const StatCard = styled.div`
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -121,7 +121,7 @@ const StatChange = styled.div`
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: ${props => props.positive ? '#10b981' : '#ef4444'};
+  color: ${props => (props.positive ? '#10b981' : '#ef4444')};
   margin-top: 0.5rem;
 `;
 
@@ -141,14 +141,14 @@ const TabsList = styled.div`
 const Tab = styled.button`
   flex: 1;
   padding: 1rem 1.5rem;
-  background: ${props => props.active ? '#f9fafb' : 'white'};
+  background: ${props => (props.active ? '#f9fafb' : 'white')};
   border: none;
-  border-bottom: 2px solid ${props => props.active ? '#10b981' : 'transparent'};
-  font-weight: ${props => props.active ? '600' : '500'};
-  color: ${props => props.active ? '#10b981' : '#6b7280'};
+  border-bottom: 2px solid ${props => (props.active ? '#10b981' : 'transparent')};
+  font-weight: ${props => (props.active ? '600' : '500')};
+  color: ${props => (props.active ? '#10b981' : '#6b7280')};
   cursor: pointer;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #f9fafb;
   }
@@ -173,7 +173,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #10b981;
@@ -191,7 +191,7 @@ const FilterButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #e5e7eb;
   }
@@ -215,7 +215,7 @@ const TableHeader = styled.thead`
 
 const TableRow = styled.tr`
   border-bottom: 1px solid #e5e7eb;
-  
+
   &:hover {
     background: #f9fafb;
   }
@@ -245,18 +245,26 @@ const StatusBadge = styled.span`
   font-weight: 600;
   background: ${props => {
     switch (props.status) {
-      case 'completed': return '#d1fae5';
-      case 'pending': return '#fef3c7';
-      case 'failed': return '#fee2e2';
-      default: return '#f3f4f6';
+      case 'completed':
+        return '#d1fae5';
+      case 'pending':
+        return '#fef3c7';
+      case 'failed':
+        return '#fee2e2';
+      default:
+        return '#f3f4f6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'completed': return '#065f46';
-      case 'pending': return '#92400e';
-      case 'failed': return '#991b1b';
-      default: return '#374151';
+      case 'completed':
+        return '#065f46';
+      case 'pending':
+        return '#92400e';
+      case 'failed':
+        return '#991b1b';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -271,7 +279,7 @@ const IconButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #e5e7eb;
   }
@@ -348,7 +356,7 @@ const Finance = () => {
         status: 'suspended',
       },
     ];
-    
+
     setTimeout(() => {
       setCommissionData(mockCommissionData);
       setWalletData(mockWalletData);
@@ -356,9 +364,10 @@ const Finance = () => {
     }, 1000);
   }, []);
 
-  const filteredCommissionData = commissionData.filter(item =>
-    item.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.partner.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCommissionData = commissionData.filter(
+    item =>
+      item.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.partner.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredWalletData = walletData.filter(item =>
@@ -450,16 +459,10 @@ const Finance = () => {
 
       <TabsContainer>
         <TabsList>
-          <Tab 
-            active={activeTab === 'commission'} 
-            onClick={() => setActiveTab('commission')}
-          >
+          <Tab active={activeTab === 'commission'} onClick={() => setActiveTab('commission')}>
             Commission Rules
           </Tab>
-          <Tab 
-            active={activeTab === 'wallet'} 
-            onClick={() => setActiveTab('wallet')}
-          >
+          <Tab active={activeTab === 'wallet'} onClick={() => setActiveTab('wallet')}>
             Wallet & Payouts
           </Tab>
         </TabsList>
@@ -468,9 +471,13 @@ const Finance = () => {
           <FilterSection>
             <SearchInput
               type="text"
-              placeholder={activeTab === 'commission' ? "Search by order ID or partner..." : "Search by partner..."}
+              placeholder={
+                activeTab === 'commission'
+                  ? 'Search by order ID or partner...'
+                  : 'Search by partner...'
+              }
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
             <FilterButton>
               <Filter size={16} />
@@ -522,7 +529,7 @@ const Finance = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredCommissionData.map((item) => (
+                      filteredCommissionData.map(item => (
                         <TableRow key={item.id}>
                           <TableCell>{item.orderId}</TableCell>
                           <TableCell>{item.partner}</TableCell>
@@ -548,39 +555,37 @@ const Finance = () => {
                         </TableRow>
                       ))
                     )
+                  ) : filteredWalletData.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
+                        No wallet data found
+                      </TableCell>
+                    </TableRow>
                   ) : (
-                    filteredWalletData.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
-                          No wallet data found
+                    filteredWalletData.map(item => (
+                      <TableRow key={item.id}>
+                        <TableCell>{item.partner}</TableCell>
+                        <TableCell>₹{item.balance.toLocaleString()}</TableCell>
+                        <TableCell>₹{item.pendingAmount.toLocaleString()}</TableCell>
+                        <TableCell>{item.lastPayout}</TableCell>
+                        <TableCell>₹{item.payoutAmount.toLocaleString()}</TableCell>
+                        <TableCell>
+                          <StatusBadge status={item.status}>
+                            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                          </StatusBadge>
+                        </TableCell>
+                        <TableCell>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <IconButton>
+                              <Eye size={14} />
+                            </IconButton>
+                            <IconButton>
+                              <ArrowUpRight size={14} />
+                            </IconButton>
+                          </div>
                         </TableCell>
                       </TableRow>
-                    ) : (
-                      filteredWalletData.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell>{item.partner}</TableCell>
-                          <TableCell>₹{item.balance.toLocaleString()}</TableCell>
-                          <TableCell>₹{item.pendingAmount.toLocaleString()}</TableCell>
-                          <TableCell>{item.lastPayout}</TableCell>
-                          <TableCell>₹{item.payoutAmount.toLocaleString()}</TableCell>
-                          <TableCell>
-                            <StatusBadge status={item.status}>
-                              {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                            </StatusBadge>
-                          </TableCell>
-                          <TableCell>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                              <IconButton>
-                                <Eye size={14} />
-                              </IconButton>
-                              <IconButton>
-                                <ArrowUpRight size={14} />
-                              </IconButton>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )
+                    ))
                   )}
                 </tbody>
               </Table>

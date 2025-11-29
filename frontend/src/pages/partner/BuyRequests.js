@@ -70,7 +70,7 @@ const BuyRequests = () => {
         <Title>Buy Requests</Title>
         <Subtitle>Manage incoming buy requests from customers</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,8 +78,8 @@ const BuyRequests = () => {
           </Icon>
           <ComingSoonTitle>Buy Requests Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to view and manage 
-            all incoming buy requests from customers, with options to accept, decline, or negotiate.
+            This feature is currently under development. Soon you'll be able to view and manage all
+            incoming buy requests from customers, with options to accept, decline, or negotiate.
           </ComingSoonText>
         </ComingSoon>
       </Card>

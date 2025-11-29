@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Package, Search, Filter, Eye, Edit, Truck, CheckCircle, XCircle, Clock } from 'lucide-react';
+import {
+  Package,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Truck,
+  CheckCircle,
+  XCircle,
+  Clock,
+} from 'lucide-react';
 
 const Container = styled.div`
   padding: 2rem;
@@ -45,7 +55,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #10b981;
@@ -63,7 +73,7 @@ const FilterButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #e5e7eb;
   }
@@ -108,7 +118,7 @@ const OrderCard = styled.div`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -159,22 +169,34 @@ const StatusBadge = styled.span`
   font-weight: 600;
   background: ${props => {
     switch (props.status) {
-      case 'pending': return '#fef3c7';
-      case 'confirmed': return '#dbeafe';
-      case 'shipped': return '#e0e7ff';
-      case 'delivered': return '#d1fae5';
-      case 'cancelled': return '#fee2e2';
-      default: return '#f3f4f6';
+      case 'pending':
+        return '#fef3c7';
+      case 'confirmed':
+        return '#dbeafe';
+      case 'shipped':
+        return '#e0e7ff';
+      case 'delivered':
+        return '#d1fae5';
+      case 'cancelled':
+        return '#fee2e2';
+      default:
+        return '#f3f4f6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'pending': return '#92400e';
-      case 'confirmed': return '#1e40af';
-      case 'shipped': return '#3730a3';
-      case 'delivered': return '#065f46';
-      case 'cancelled': return '#991b1b';
-      default: return '#374151';
+      case 'pending':
+        return '#92400e';
+      case 'confirmed':
+        return '#1e40af';
+      case 'shipped':
+        return '#3730a3';
+      case 'delivered':
+        return '#065f46';
+      case 'cancelled':
+        return '#991b1b';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -214,8 +236,8 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${props => props.primary ? '#10b981' : '#f3f4f6'};
-  color: ${props => props.primary ? 'white' : '#6b7280'};
+  background: ${props => (props.primary ? '#10b981' : '#f3f4f6')};
+  color: ${props => (props.primary ? 'white' : '#6b7280')};
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
@@ -226,10 +248,10 @@ const IconButton = styled.button`
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s;
-  
+
   &:hover {
-    background: ${props => props.primary ? '#059669' : '#e5e7eb'};
-    color: ${props => props.primary ? 'white' : '#374151'};
+    background: ${props => (props.primary ? '#059669' : '#e5e7eb')};
+    color: ${props => (props.primary ? 'white' : '#374151')};
   }
 `;
 
@@ -294,7 +316,7 @@ const BuyOrders = () => {
         estimatedDelivery: '2024-01-19',
       },
     ];
-    
+
     setTimeout(() => {
       setOrders(mockData);
       setLoading(false);
@@ -308,20 +330,27 @@ const BuyOrders = () => {
     { label: 'Total Revenue', value: '₹32.4L', color: '#8b5cf6' },
   ];
 
-  const filteredOrders = orders.filter(order =>
-    order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.product.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOrders = orders.filter(
+    order =>
+      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.product.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
-      case 'pending': return <Clock size={16} />;
-      case 'confirmed': return <CheckCircle size={16} />;
-      case 'shipped': return <Truck size={16} />;
-      case 'delivered': return <Package size={16} />;
-      case 'cancelled': return <XCircle size={16} />;
-      default: return <Clock size={16} />;
+      case 'pending':
+        return <Clock size={16} />;
+      case 'confirmed':
+        return <CheckCircle size={16} />;
+      case 'shipped':
+        return <Truck size={16} />;
+      case 'delivered':
+        return <Package size={16} />;
+      case 'cancelled':
+        return <XCircle size={16} />;
+      default:
+        return <Clock size={16} />;
     }
   };
 
@@ -348,7 +377,7 @@ const BuyOrders = () => {
           type="text"
           placeholder="Search by order ID, customer name, or product..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
         <FilterButton>
           <Filter size={16} />
@@ -360,7 +389,7 @@ const BuyOrders = () => {
         <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
       ) : (
         <OrdersGrid>
-          {filteredOrders.map((order) => (
+          {filteredOrders.map(order => (
             <OrderCard key={order.id}>
               <OrderHeader>
                 <OrderInfo>
@@ -375,7 +404,7 @@ const BuyOrders = () => {
                   </StatusBadge>
                 </OrderStatus>
               </OrderHeader>
-              
+
               <OrderDetails>
                 <DetailItem>
                   <DetailLabel>Product</DetailLabel>
@@ -402,7 +431,7 @@ const BuyOrders = () => {
                   <DetailValue>{order.estimatedDelivery}</DetailValue>
                 </DetailItem>
               </OrderDetails>
-              
+
               <ActionButtons>
                 <IconButton primary>
                   <Eye size={16} />

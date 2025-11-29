@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { API_BASE_URL } from '../config/api';
-import { 
-  hasMenuPermission, 
-  isMenuItemAccessible, 
+import {
+  hasMenuPermission,
+  isMenuItemAccessible,
   getMenuPermissionDetails,
   getAvailableMenuItems,
   getBusinessLimits,
   getAvailableFeatures,
-  canPerformAction
+  canPerformAction,
 } from '../utils/partnerMenuPermissions';
 
 const PartnerAuthContext = createContext();
@@ -35,11 +35,11 @@ export const PartnerAuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('partnerToken');
         const storedPartner = localStorage.getItem('partnerData');
-        
+
         if (token && storedPartner) {
           const partnerData = JSON.parse(storedPartner);
           setPartner(partnerData);
-          
+
           // Fetch fresh permissions and role data
           await fetchPartnerPermissions(partnerData._id);
         }
@@ -57,25 +57,25 @@ export const PartnerAuthProvider = ({ children }) => {
   }, []);
 
   // Fetch partner permissions
-  const fetchPartnerPermissions = async (partnerId) => {
+  const fetchPartnerPermissions = async partnerId => {
     try {
       const token = localStorage.getItem('partnerToken');
       const response = await fetch(`${API_BASE_URL}/partner-permissions`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (response.ok) {
         const data = await response.json();
         setPermissions(data.permissions);
         setRoleTemplate(data.roleTemplate);
-        
+
         // Set business limits and features based on role
         const limits = getBusinessLimits(data.permissions, data.roleTemplate);
         const features = getAvailableFeatures(data.permissions, data.roleTemplate);
-        
+
         setBusinessLimits(limits);
         setAvailableFeatures(features);
       } else {
@@ -88,15 +88,15 @@ export const PartnerAuthProvider = ({ children }) => {
   };
 
   // Partner login
-  const login = async (credentials) => {
+  const login = async credentials => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/auth/partner/login`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials)
+        body: JSON.stringify(credentials),
       });
 
       const data = await response.json();
@@ -105,12 +105,12 @@ export const PartnerAuthProvider = ({ children }) => {
         // Store auth data
         localStorage.setItem('partnerToken', data.token);
         localStorage.setItem('partnerData', JSON.stringify(data));
-        
+
         setPartner(data);
-        
+
         // Fetch permissions after successful login
         await fetchPartnerPermissions(data._id);
-        
+
         toast.success('Login successful!');
         return { success: true, partner: data.partner };
       } else {
@@ -139,17 +139,17 @@ export const PartnerAuthProvider = ({ children }) => {
   };
 
   // Check if partner has specific permission
-  const hasPermission = (permissionName) => {
+  const hasPermission = permissionName => {
     return hasMenuPermission(permissions, permissionName);
   };
 
   // Check if menu item is accessible (considering restrictions)
-  const canAccessMenuItem = (permissionName) => {
+  const canAccessMenuItem = permissionName => {
     return isMenuItemAccessible(permissions, permissionName);
   };
 
   // Get permission details
-  const getPermissionDetails = (permissionName) => {
+  const getPermissionDetails = permissionName => {
     return getMenuPermissionDetails(permissions, permissionName);
   };
 
@@ -164,7 +164,7 @@ export const PartnerAuthProvider = ({ children }) => {
   };
 
   // Check if partner has specific feature enabled
-  const hasFeature = (featureName) => {
+  const hasFeature = featureName => {
     return availableFeatures[featureName] || false;
   };
 
@@ -174,21 +174,21 @@ export const PartnerAuthProvider = ({ children }) => {
       template: roleTemplate,
       permissions: permissions,
       limits: businessLimits,
-      features: availableFeatures
+      features: availableFeatures,
     };
   };
 
   // Update partner profile
-  const updateProfile = async (profileData) => {
+  const updateProfile = async profileData => {
     try {
       const token = localStorage.getItem('partnerToken');
       const response = await fetch(`${API_BASE_URL}/partners/profile`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(profileData)
+        body: JSON.stringify(profileData),
       });
 
       const data = await response.json();
@@ -228,7 +228,7 @@ export const PartnerAuthProvider = ({ children }) => {
       isVerified: partner?.isVerified || false,
       kycStatus: partner?.kycStatus || 'pending',
       documentsStatus: partner?.documentsStatus || 'pending',
-      profileComplete: partner?.profileComplete || false
+      profileComplete: partner?.profileComplete || false,
     };
   };
 
@@ -259,12 +259,12 @@ export const PartnerAuthProvider = ({ children }) => {
     getPermissionDetails,
     getMenuItems,
     refreshPermissions,
-    
+
     // Menu and feature methods (from utils)
     getAvailableMenuItems: () => getAvailableMenuItems(permissions, roleTemplate),
     getBusinessLimits: () => getBusinessLimits(permissions, roleTemplate),
     getAvailableFeatures: () => getAvailableFeatures(permissions, roleTemplate),
-    hasMenuPermission: (menuId) => hasMenuPermission(permissions, roleTemplate, menuId),
+    hasMenuPermission: menuId => hasMenuPermission(permissions, roleTemplate, menuId),
 
     // Business logic methods
     canPerformBusinessAction,
@@ -273,14 +273,10 @@ export const PartnerAuthProvider = ({ children }) => {
 
     // Verification methods
     getVerificationStatus,
-    needsVerification
+    needsVerification,
   };
 
-  return (
-    <PartnerAuthContext.Provider value={value}>
-      {children}
-    </PartnerAuthContext.Provider>
-  );
+  return <PartnerAuthContext.Provider value={value}>{children}</PartnerAuthContext.Provider>;
 };
 
 export default PartnerAuthContext;

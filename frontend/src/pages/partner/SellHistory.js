@@ -70,7 +70,7 @@ const SellHistory = () => {
         <Title>Sell History</Title>
         <Subtitle>View your complete sales history and performance</Subtitle>
       </Header>
-      
+
       <Card>
         <ComingSoon>
           <Icon>
@@ -78,7 +78,7 @@ const SellHistory = () => {
           </Icon>
           <ComingSoonTitle>Sell History Feature</ComingSoonTitle>
           <ComingSoonText>
-            This feature is currently under development. Soon you'll be able to view your complete 
+            This feature is currently under development. Soon you'll be able to view your complete
             sales history with detailed analytics, performance metrics, and export capabilities.
           </ComingSoonText>
         </ComingSoon>

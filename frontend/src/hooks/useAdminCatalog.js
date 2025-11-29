@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
-import { 
-  getProducts, 
-  getProductById, 
-  updateProduct, 
-  createProduct, 
-  deleteProduct 
+import {
+  getProducts,
+  getProductById,
+  updateProduct,
+  createProduct,
+  deleteProduct,
 } from '../services/adminService';
 
 export const useAdminCatalog = () => {
@@ -28,20 +28,20 @@ export const useAdminCatalog = () => {
       setTotalProducts(response.pagination?.totalItems || response.totalProducts || 0);
       setCurrentPage(response.pagination?.currentPage || response.page || 1);
       setTotalPages(response.pagination?.totalPages || response.pages || 1);
-      
+
       // Set categories if available in the response (from filters)
       if (response.filters?.categories) {
         setCategories(response.filters.categories.map(cat => ({ name: cat })));
       }
-      
+
       // Set product stats based on API response structure
       setProductStats({
         totalProducts: response.pagination?.totalItems || response.totalProducts || 0,
         activeProducts: response.products?.filter(p => p.isActive === true)?.length || 0,
         pendingProducts: response.products?.filter(p => p.isActive === false)?.length || 0,
-        categoriesCount: response.filters?.categories?.length || 0
+        categoriesCount: response.filters?.categories?.length || 0,
       });
-      
+
       return response;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch products');
@@ -51,7 +51,7 @@ export const useAdminCatalog = () => {
     }
   }, []);
 
-  const fetchProductById = useCallback(async (id) => {
+  const fetchProductById = useCallback(async id => {
     setLoading(true);
     setError(null);
     try {
@@ -65,21 +65,24 @@ export const useAdminCatalog = () => {
     }
   }, []);
 
-  const addProduct = useCallback(async (productData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await createProduct(productData);
-      // Refresh products list after adding
-      fetchProducts();
-      return response;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to add product');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchProducts]);
+  const addProduct = useCallback(
+    async productData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await createProduct(productData);
+        // Refresh products list after adding
+        fetchProducts();
+        return response;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to add product');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchProducts]
+  );
 
   const editProduct = useCallback(async (id, productData) => {
     setLoading(true);
@@ -87,10 +90,8 @@ export const useAdminCatalog = () => {
     try {
       const response = await updateProduct(id, productData);
       // Update the product in the local state
-      setProducts(prevProducts => 
-        prevProducts.map(product => 
-          product._id === id ? { ...product, ...productData } : product
-        )
+      setProducts(prevProducts =>
+        prevProducts.map(product => (product._id === id ? { ...product, ...productData } : product))
       );
       return response;
     } catch (err) {
@@ -101,7 +102,7 @@ export const useAdminCatalog = () => {
     }
   }, []);
 
-  const removeProduct = useCallback(async (id) => {
+  const removeProduct = useCallback(async id => {
     setLoading(true);
     setError(null);
     try {
@@ -131,7 +132,7 @@ export const useAdminCatalog = () => {
     addProduct,
     editProduct,
     updateProduct: editProduct,
-    removeProduct
+    removeProduct,
   };
 };
 

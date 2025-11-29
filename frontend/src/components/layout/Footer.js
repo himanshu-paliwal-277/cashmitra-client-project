@@ -13,7 +13,7 @@ import {
   Shield,
   Award,
   Truck,
-  RotateCcw
+  RotateCcw,
 } from 'lucide-react';
 
 const FooterContainer = styled.footer`
@@ -27,11 +27,11 @@ const FooterContent = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 0 ${theme.spacing[6]};
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 0 ${theme.spacing[8]};
   }
@@ -42,11 +42,11 @@ const FooterGrid = styled.div`
   grid-template-columns: 1fr;
   gap: ${theme.spacing[8]};
   margin-bottom: ${theme.spacing[12]};
-  
+
   @media (min-width: ${theme.breakpoints.sm}) {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   @media (min-width: ${theme.breakpoints.lg}) {
     grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
   }
@@ -77,7 +77,7 @@ const FooterLink = styled(Link)`
   color: ${theme.colors.grey[300]};
   text-decoration: none;
   transition: color ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
-  
+
   &:hover {
     color: ${theme.colors.primary.light};
   }
@@ -111,7 +111,7 @@ const SocialLink = styled.a`
   color: ${theme.colors.grey[300]};
   text-decoration: none;
   transition: all ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
-  
+
   &:hover {
     background: ${theme.colors.primary.main};
     color: ${theme.colors.white};
@@ -152,7 +152,7 @@ const FooterBottom = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing[4]};
-  
+
   @media (min-width: ${theme.breakpoints.md}) {
     flex-direction: row;
     justify-content: space-between;
@@ -176,7 +176,7 @@ const BottomLink = styled(Link)`
   font-size: ${theme.typography.fontSize.sm};
   color: ${theme.colors.grey[400]};
   text-decoration: none;
-  
+
   &:hover {
     color: ${theme.colors.primary.light};
   }
@@ -195,7 +195,11 @@ const Logo = styled.div`
 const LogoIcon = styled.div`
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, ${theme.colors.primary.main} 0%, ${theme.colors.accent.main} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary.main} 0%,
+    ${theme.colors.accent.main} 100%
+  );
   border-radius: ${theme.borderRadius.lg};
   display: flex;
   align-items: center;
@@ -217,8 +221,8 @@ const Footer = () => {
               <span>Cashmitra</span>
             </Logo>
             <FooterText>
-              India's most trusted platform for buying and selling refurbished electronics. 
-              Get the best prices for your devices through our network of verified partners.
+              India's most trusted platform for buying and selling refurbished electronics. Get the
+              best prices for your devices through our network of verified partners.
             </FooterText>
             <ContactInfo>
               <Phone size={16} />
@@ -359,9 +363,7 @@ const Footer = () => {
 
         {/* Footer Bottom */}
         <FooterBottom>
-          <Copyright>
-            © 2024 Cashmitra. All rights reserved.
-          </Copyright>
+          <Copyright>© 2024 Cashmitra. All rights reserved.</Copyright>
           <BottomLinks>
             <BottomLink to="/privacy">Privacy Policy</BottomLink>
             <BottomLink to="/terms">Terms of Service</BottomLink>

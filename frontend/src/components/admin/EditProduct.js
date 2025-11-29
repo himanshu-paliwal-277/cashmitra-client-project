@@ -17,7 +17,7 @@ import {
   Info,
   Settings,
   DollarSign,
-  Star
+  Star,
 } from 'lucide-react';
 
 const Container = styled.div`
@@ -44,7 +44,7 @@ const BackButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &:hover {
     border-color: ${props => props.theme?.colors?.primary || '#3b82f6'};
     color: ${props => props.theme?.colors?.primary || '#3b82f6'};
@@ -72,7 +72,7 @@ const FormContainer = styled.div`
   background: white;
   border-radius: 12px;
   border: 1px solid ${props => props.theme?.colors?.border || '#e2e8f0'};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 `;
 
@@ -104,11 +104,11 @@ const DeleteButton = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   &:hover {
     background: #dc2626;
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -123,7 +123,7 @@ const FormGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -133,7 +133,7 @@ const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  
+
   &.full-width {
     grid-column: 1 / -1;
   }
@@ -143,7 +143,7 @@ const Label = styled.label`
   font-weight: 500;
   color: ${props => props.theme?.colors?.text || '#1a202c'};
   font-size: 0.875rem;
-  
+
   &.required::after {
     content: ' *';
     color: #ef4444;
@@ -156,12 +156,12 @@ const Input = styled.input`
   border-radius: 6px;
   font-size: 0.875rem;
   transition: border-color 0.2s ease;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme?.colors?.primary || '#3b82f6'};
   }
-  
+
   &.error {
     border-color: #ef4444;
   }
@@ -175,12 +175,12 @@ const Select = styled.select`
   background: white;
   cursor: pointer;
   transition: border-color 0.2s ease;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme?.colors?.primary || '#3b82f6'};
   }
-  
+
   &.error {
     border-color: #ef4444;
   }
@@ -195,12 +195,12 @@ const TextArea = styled.textarea`
   min-height: 100px;
   font-family: inherit;
   transition: border-color 0.2s ease;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme?.colors?.primary || '#3b82f6'};
   }
-  
+
   &.error {
     border-color: #ef4444;
   }
@@ -224,12 +224,12 @@ const ImageUploadArea = styled.div`
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     border-color: ${props => props.theme?.colors?.primary || '#3b82f6'};
     background: ${props => props.theme?.colors?.background || '#f8fafc'};
   }
-  
+
   &.dragover {
     border-color: ${props => props.theme?.colors?.primary || '#3b82f6'};
     background: ${props => props.theme?.colors?.background || '#f8fafc'};
@@ -261,7 +261,7 @@ const ImagePreview = styled.div`
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid ${props => props.theme?.colors?.border || '#e2e8f0'};
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -284,7 +284,7 @@ const RemoveImageButton = styled.button`
   justify-content: center;
   cursor: pointer;
   transition: background 0.2s ease;
-  
+
   &:hover {
     background: rgba(0, 0, 0, 0.9);
   }
@@ -300,8 +300,10 @@ const FormActions = styled.div`
 `;
 
 const Button = styled.button`
-  background: ${props => props.variant === 'outline' ? 'transparent' : (props.theme?.colors?.primary || '#3b82f6')};
-  color: ${props => props.variant === 'outline' ? (props.theme?.colors?.primary || '#3b82f6') : 'white'};
+  background: ${props =>
+    props.variant === 'outline' ? 'transparent' : props.theme?.colors?.primary || '#3b82f6'};
+  color: ${props =>
+    props.variant === 'outline' ? props.theme?.colors?.primary || '#3b82f6' : 'white'};
   border: 1px solid ${props => props.theme?.colors?.primary || '#3b82f6'};
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -311,12 +313,15 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   &:hover {
-    background: ${props => props.variant === 'outline' ? (props.theme?.colors?.primary || '#3b82f6') : (props.theme?.colors?.primaryDark || '#2563eb')};
+    background: ${props =>
+      props.variant === 'outline'
+        ? props.theme?.colors?.primary || '#3b82f6'
+        : props.theme?.colors?.primaryDark || '#2563eb'};
     color: white;
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -325,10 +330,14 @@ const Button = styled.button`
 
 const LoadingSpinner = styled.div`
   animation: spin 1s linear infinite;
-  
+
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -340,12 +349,12 @@ const FormTabs = styled.div`
   display: flex;
   border-bottom: 1px solid ${theme.colors.border.primary};
   background: ${theme.colors.grey[50]};
-  
+
   @media (max-width: 768px) {
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    
+
     &::-webkit-scrollbar {
       display: none;
     }
@@ -358,8 +367,8 @@ const Tab = styled.button`
   background: none;
   border: none;
   font-weight: ${theme.typography.fontWeight.medium};
-  color: ${props => props.active ? theme.colors.primary.main : theme.colors.text.secondary};
-  border-bottom: 2px solid ${props => props.active ? theme.colors.primary.main : 'transparent'};
+  color: ${props => (props.active ? theme.colors.primary.main : theme.colors.text.secondary)};
+  border-bottom: 2px solid ${props => (props.active ? theme.colors.primary.main : 'transparent')};
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -367,12 +376,12 @@ const Tab = styled.button`
   justify-content: center;
   gap: ${theme.spacing[2]};
   white-space: nowrap;
-  
+
   &:hover {
     color: ${theme.colors.primary.main};
     background: ${theme.colors.primary[50]};
   }
-  
+
   @media (max-width: 768px) {
     padding: ${theme.spacing[3]} ${theme.spacing[4]};
     font-size: ${theme.typography.fontSize.sm};
@@ -385,7 +394,7 @@ const FormSection = styled.div`
   border-radius: ${theme.borderRadius.lg};
   padding: ${theme.spacing[6]};
   border: 1px solid ${theme.colors.border.primary};
-  
+
   @media (max-width: 768px) {
     padding: ${theme.spacing[4]};
   }
@@ -404,7 +413,7 @@ const SectionTitle = styled.h3`
 function EditProduct() {
   const navigate = useNavigate();
   const { productId } = useParams();
-  
+
   const renderBasicTab = () => (
     <FormSection>
       <SectionTitle>
@@ -424,7 +433,7 @@ function EditProduct() {
           />
           {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
         </FormGroup>
-        
+
         <FormGroup>
           <Label className="required">Category</Label>
           <Select
@@ -442,7 +451,7 @@ function EditProduct() {
           </Select>
           {errors.category && <ErrorMessage>{errors.category}</ErrorMessage>}
         </FormGroup>
-        
+
         <FormGroup>
           <Label className="required">Brand</Label>
           <Input
@@ -455,7 +464,7 @@ function EditProduct() {
           />
           {errors.brand && <ErrorMessage>{errors.brand}</ErrorMessage>}
         </FormGroup>
-        
+
         <FormGroup>
           <Label>Series</Label>
           <Input
@@ -466,7 +475,7 @@ function EditProduct() {
             placeholder="Enter product series"
           />
         </FormGroup>
-        
+
         <FormGroup>
           <Label>Model</Label>
           <Input
@@ -480,7 +489,7 @@ function EditProduct() {
       </FormGrid>
     </FormSection>
   );
-  
+
   const renderDetailsTab = () => (
     <FormSection>
       <SectionTitle>
@@ -499,7 +508,7 @@ function EditProduct() {
           />
           {errors.description && <ErrorMessage>{errors.description}</ErrorMessage>}
         </FormGroup>
-        
+
         <FormGroup className="full-width">
           <Label>Specifications</Label>
           <TextArea
@@ -509,7 +518,7 @@ function EditProduct() {
             placeholder="Enter technical specifications (one per line)..."
           />
         </FormGroup>
-        
+
         <FormGroup>
           <Label>Warranty</Label>
           <Input
@@ -520,14 +529,10 @@ function EditProduct() {
             placeholder="e.g., 1 year manufacturer warranty"
           />
         </FormGroup>
-        
+
         <FormGroup>
           <Label>Status</Label>
-          <Select
-            name="status"
-            value={formData.status}
-            onChange={handleInputChange}
-          >
+          <Select name="status" value={formData.status} onChange={handleInputChange}>
             {statuses.map(status => (
               <option key={status} value={status}>
                 {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -538,7 +543,7 @@ function EditProduct() {
       </FormGrid>
     </FormSection>
   );
-  
+
   const renderPricingTab = () => (
     <FormSection>
       <SectionTitle>
@@ -558,7 +563,7 @@ function EditProduct() {
             step="0.01"
           />
         </FormGroup>
-        
+
         <FormGroup>
           <Label className="required">Price (₹)</Label>
           <Input
@@ -573,7 +578,7 @@ function EditProduct() {
           />
           {errors.price && <ErrorMessage>{errors.price}</ErrorMessage>}
         </FormGroup>
-        
+
         <FormGroup>
           <Label>Original Price (₹)</Label>
           <Input
@@ -589,7 +594,7 @@ function EditProduct() {
       </FormGrid>
     </FormSection>
   );
-  
+
   const renderConditionTab = () => (
     <FormSection>
       <SectionTitle>
@@ -617,7 +622,7 @@ function EditProduct() {
       </FormGrid>
     </FormSection>
   );
-  
+
   const renderImagesTab = () => (
     <FormSection>
       <SectionTitle>
@@ -628,7 +633,9 @@ function EditProduct() {
         {/* Existing Images */}
         {existingImages.length > 0 && (
           <>
-            <h4 style={{ margin: '1rem 0 0.5rem', fontSize: '0.875rem', color: '#64748b' }}>Current Images</h4>
+            <h4 style={{ margin: '1rem 0 0.5rem', fontSize: '0.875rem', color: '#64748b' }}>
+              Current Images
+            </h4>
             <ImagePreviewGrid>
               {existingImages.map(image => (
                 <ImagePreview key={image.id}>
@@ -641,7 +648,7 @@ function EditProduct() {
             </ImagePreviewGrid>
           </>
         )}
-        
+
         {/* New Images Upload */}
         <ImageUploadArea
           className={dragOver ? 'dragover' : ''}
@@ -660,7 +667,7 @@ function EditProduct() {
             Supports: JPG, PNG, GIF (Max 5MB each)
           </p>
         </ImageUploadArea>
-        
+
         <HiddenFileInput
           id="image-upload"
           type="file"
@@ -668,11 +675,13 @@ function EditProduct() {
           accept="image/*"
           onChange={handleImageSelect}
         />
-        
+
         {/* New Images Preview */}
         {selectedImages.length > 0 && (
           <>
-            <h4 style={{ margin: '1rem 0 0.5rem', fontSize: '0.875rem', color: '#64748b' }}>New Images</h4>
+            <h4 style={{ margin: '1rem 0 0.5rem', fontSize: '0.875rem', color: '#64748b' }}>
+              New Images
+            </h4>
             <ImagePreviewGrid>
               {selectedImages.map(image => (
                 <ImagePreview key={image.id}>
@@ -696,7 +705,7 @@ function EditProduct() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [dragOver, setDragOver] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -714,7 +723,7 @@ function EditProduct() {
     variant: {},
     depreciation: {},
     conditionFactors: {},
-    isActive: true
+    isActive: true,
   });
 
   const categories = [
@@ -725,23 +734,12 @@ function EditProduct() {
     'Accessories',
     'Gaming',
     'Cameras',
-    'Wearables'
+    'Wearables',
   ];
 
-  const conditions = [
-    'New',
-    'Like New',
-    'Good',
-    'Fair',
-    'Poor'
-  ];
+  const conditions = ['New', 'Like New', 'Good', 'Fair', 'Poor'];
 
-  const statuses = [
-    'pending',
-    'approved',
-    'rejected',
-    'sold'
-  ];
+  const statuses = ['pending', 'approved', 'rejected', 'sold'];
 
   useEffect(() => {
     fetchProduct();
@@ -751,7 +749,7 @@ function EditProduct() {
     try {
       setLoading(true);
       const response = await adminService.getProductById(productId);
-      
+
       if (response.product) {
         const product = response.product;
         setFormData({
@@ -771,15 +769,17 @@ function EditProduct() {
           variant: product.variant || {},
           depreciation: product.depreciation || {},
           conditionFactors: product.conditionFactors || {},
-          isActive: product.isActive !== undefined ? product.isActive : true
+          isActive: product.isActive !== undefined ? product.isActive : true,
         });
-        
+
         if (product.images && product.images.length > 0) {
-          setExistingImages(product.images.map((url, index) => ({
-            id: `existing-${index}`,
-            url: url.trim(),
-            isExisting: true
-          })));
+          setExistingImages(
+            product.images.map((url, index) => ({
+              id: `existing-${index}`,
+              url: url.trim(),
+              isExisting: true,
+            }))
+          );
         }
       } else {
         throw new Error('Product not found');
@@ -792,28 +792,28 @@ function EditProduct() {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
-        [name]: ''
+        [name]: '',
       }));
     }
   };
 
-  const handleImageSelect = (e) => {
+  const handleImageSelect = e => {
     const files = Array.from(e.target.files);
     handleFiles(files);
   };
 
-  const handleFiles = (files) => {
+  const handleFiles = files => {
     const validFiles = files.filter(file => {
       const isImage = file.type.startsWith('image/');
       const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB limit
@@ -822,65 +822,69 @@ function EditProduct() {
 
     validFiles.forEach(file => {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setSelectedImages(prev => [...prev, {
-          file,
-          preview: e.target.result,
-          id: Date.now() + Math.random()
-        }]);
+      reader.onload = e => {
+        setSelectedImages(prev => [
+          ...prev,
+          {
+            file,
+            preview: e.target.result,
+            id: Date.now() + Math.random(),
+          },
+        ]);
       };
       reader.readAsDataURL(file);
     });
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = e => {
     e.preventDefault();
     setDragOver(true);
   };
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = e => {
     e.preventDefault();
     setDragOver(false);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = e => {
     e.preventDefault();
     setDragOver(false);
     const files = Array.from(e.dataTransfer.files);
     handleFiles(files);
   };
 
-  const removeImage = (imageId) => {
+  const removeImage = imageId => {
     setSelectedImages(prev => prev.filter(img => img.id !== imageId));
   };
 
-  const removeExistingImage = (imageId) => {
+  const removeExistingImage = imageId => {
     setExistingImages(prev => prev.filter(img => img.id !== imageId));
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) newErrors.name = 'Product name is required';
     if (!formData.description.trim()) newErrors.description = 'Description is required';
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.brand.trim()) newErrors.brand = 'Brand is required';
-    if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Valid price is required';
+    if (!formData.price || parseFloat(formData.price) <= 0)
+      newErrors.price = 'Valid price is required';
     if (!formData.condition) newErrors.condition = 'Condition is required';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setSaving(true);
-    
+
     try {
       // First, upload new images if any
       let newImageUrls = [];
@@ -889,19 +893,16 @@ function EditProduct() {
         selectedImages.forEach(img => {
           imageFormData.append('images', img.file);
         });
-        
+
         const imageResponse = await adminService.uploadProductImages(imageFormData);
         if (imageResponse.success) {
           newImageUrls = imageResponse.data.imageUrls || [];
         }
       }
-      
+
       // Combine existing and new image URLs
-      const allImageUrls = [
-        ...existingImages.map(img => img.url),
-        ...newImageUrls
-      ];
-      
+      const allImageUrls = [...existingImages.map(img => img.url), ...newImageUrls];
+
       // Then update the product
       const productData = {
         ...formData,
@@ -909,17 +910,17 @@ function EditProduct() {
         price: parseFloat(formData.price),
         originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
         specifications: formData.specifications ? JSON.parse(formData.specifications) : {},
-        images: allImageUrls
+        images: allImageUrls,
       };
-      
+
       const response = await adminService.updateProduct(productId, productData);
-      
+
       if (response.success) {
-        navigate('/admin/products', { 
-          state: { 
+        navigate('/admin/products', {
+          state: {
             message: 'Product updated successfully!',
-            type: 'success'
-          }
+            type: 'success',
+          },
         });
       } else {
         throw new Error(response.message || 'Failed to update product');
@@ -933,21 +934,23 @@ function EditProduct() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+    if (
+      !window.confirm('Are you sure you want to delete this product? This action cannot be undone.')
+    ) {
       return;
     }
-    
+
     setDeleting(true);
-    
+
     try {
       const response = await adminService.deleteProduct(productId);
-      
+
       if (response.success) {
-        navigate('/admin/products', { 
-          state: { 
+        navigate('/admin/products', {
+          state: {
             message: 'Product deleted successfully!',
-            type: 'success'
-          }
+            type: 'success',
+          },
         });
       } else {
         throw new Error(response.message || 'Failed to delete product');
@@ -1013,50 +1016,42 @@ function EditProduct() {
             )}
           </DeleteButton>
         </FormHeader>
-        
+
         <FormTabs>
-          <Tab 
-            active={activeTab === 'basic'} 
-            onClick={() => setActiveTab('basic')}
-            type="button"
-          >
+          <Tab active={activeTab === 'basic'} onClick={() => setActiveTab('basic')} type="button">
             <Package size={18} />
             Basic Info
           </Tab>
-          <Tab 
-            active={activeTab === 'details'} 
+          <Tab
+            active={activeTab === 'details'}
             onClick={() => setActiveTab('details')}
             type="button"
           >
             <Info size={18} />
             Details
           </Tab>
-          <Tab 
-            active={activeTab === 'pricing'} 
+          <Tab
+            active={activeTab === 'pricing'}
             onClick={() => setActiveTab('pricing')}
             type="button"
           >
             <DollarSign size={18} />
             Pricing
           </Tab>
-          <Tab 
-            active={activeTab === 'condition'} 
+          <Tab
+            active={activeTab === 'condition'}
             onClick={() => setActiveTab('condition')}
             type="button"
           >
             <Star size={18} />
             Condition
           </Tab>
-          <Tab 
-            active={activeTab === 'images'} 
-            onClick={() => setActiveTab('images')}
-            type="button"
-          >
+          <Tab active={activeTab === 'images'} onClick={() => setActiveTab('images')} type="button">
             <Settings size={18} />
             Images
           </Tab>
         </FormTabs>
-        
+
         <form onSubmit={handleSubmit}>
           <FormBody>
             {activeTab === 'basic' && renderBasicTab()}
@@ -1065,7 +1060,7 @@ function EditProduct() {
             {activeTab === 'condition' && renderConditionTab()}
             {activeTab === 'images' && renderImagesTab()}
           </FormBody>
-          
+
           <FormActions>
             {(errors.submit || errors.delete) && (
               <ErrorMessage style={{ marginRight: 'auto' }}>
@@ -1073,7 +1068,7 @@ function EditProduct() {
                 {errors.submit || errors.delete}
               </ErrorMessage>
             )}
-            
+
             <Button
               type="button"
               variant="outline"
@@ -1082,7 +1077,7 @@ function EditProduct() {
             >
               Cancel
             </Button>
-            
+
             <Button type="submit" disabled={saving || deleting}>
               {saving ? (
                 <>

@@ -10,7 +10,7 @@ const useAdminInventoryApproval = () => {
     pending: 0,
     approved: 0,
     rejected: 0,
-    underReview: 0
+    underReview: 0,
   });
 
   // Fetch inventory items
@@ -21,18 +21,18 @@ const useAdminInventoryApproval = () => {
       const token = localStorage.getItem('adminToken');
       const response = await fetch('/api/admin/inventory', {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch inventory');
       }
-      
+
       const data = await response.json();
       setInventory(data.inventory || []);
-      
+
       // Calculate stats
       const items = data.inventory || [];
       const totalItems = items.length;
@@ -40,13 +40,13 @@ const useAdminInventoryApproval = () => {
       const approvedItems = items.filter(item => item.status === 'approved').length;
       const rejectedItems = items.filter(item => item.status === 'rejected').length;
       const underReviewItems = items.filter(item => item.status === 'under_review').length;
-      
+
       setStats({
         total: totalItems,
         pending: pendingItems,
         approved: approvedItems,
         rejected: rejectedItems,
-        underReview: underReviewItems
+        underReview: underReviewItems,
       });
     } catch (err) {
       setError(err.message || 'Failed to fetch inventory');
@@ -57,85 +57,103 @@ const useAdminInventoryApproval = () => {
   }, []);
 
   // Update inventory status
-  const updateInventoryStatus = useCallback(async (itemId, status, notes = '') => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`/api/admin/inventory/${itemId}/status`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status, notes })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update inventory status');
+  const updateInventoryStatus = useCallback(
+    async (itemId, status, notes = '') => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(`/api/admin/inventory/${itemId}/status`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status, notes }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update inventory status');
+        }
+
+        // Refresh the data
+        await fetchInventory();
+        return { success: true };
+      } catch (err) {
+        setError(err.message || 'Failed to update inventory status');
+        console.error('Error updating inventory status:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
       }
-      
-      // Refresh the data
-      await fetchInventory();
-      return { success: true };
-    } catch (err) {
-      setError(err.message || 'Failed to update inventory status');
-      console.error('Error updating inventory status:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchInventory]);
+    },
+    [fetchInventory]
+  );
 
   // Approve inventory item
-  const approveInventoryItem = useCallback(async (itemId, notes = '') => {
-    return await updateInventoryStatus(itemId, 'approved', notes);
-  }, [updateInventoryStatus]);
+  const approveInventoryItem = useCallback(
+    async (itemId, notes = '') => {
+      return await updateInventoryStatus(itemId, 'approved', notes);
+    },
+    [updateInventoryStatus]
+  );
 
   // Reject inventory item
-  const rejectInventoryItem = useCallback(async (itemId, notes = '') => {
-    return await updateInventoryStatus(itemId, 'rejected', notes);
-  }, [updateInventoryStatus]);
+  const rejectInventoryItem = useCallback(
+    async (itemId, notes = '') => {
+      return await updateInventoryStatus(itemId, 'rejected', notes);
+    },
+    [updateInventoryStatus]
+  );
 
   // Mark inventory item as under review
-  const markUnderReview = useCallback(async (itemId, notes = '') => {
-    return await updateInventoryStatus(itemId, 'under_review', notes);
-  }, [updateInventoryStatus]);
+  const markUnderReview = useCallback(
+    async (itemId, notes = '') => {
+      return await updateInventoryStatus(itemId, 'under_review', notes);
+    },
+    [updateInventoryStatus]
+  );
 
   // Delete inventory item
-  const deleteInventoryItem = useCallback(async (itemId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`/api/admin/inventory/${itemId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+  const deleteInventoryItem = useCallback(
+    async itemId => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(`/api/admin/inventory/${itemId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete inventory item');
         }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete inventory item');
+
+        // Refresh the data
+        await fetchInventory();
+        return { success: true };
+      } catch (err) {
+        setError(err.message || 'Failed to delete inventory item');
+        console.error('Error deleting inventory item:', err);
+        return { success: false, error: err.message };
+      } finally {
+        setLoading(false);
       }
-      
-      // Refresh the data
-      await fetchInventory();
-      return { success: true };
-    } catch (err) {
-      setError(err.message || 'Failed to delete inventory item');
-      console.error('Error deleting inventory item:', err);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchInventory]);
+    },
+    [fetchInventory]
+  );
 
   // Get inventory item by ID
-  const getInventoryItemById = useCallback((itemId) => {
-    return inventory.find(item => item._id === itemId);
-  }, [inventory]);
+  const getInventoryItemById = useCallback(
+    itemId => {
+      return inventory.find(item => item._id === itemId);
+    },
+    [inventory]
+  );
 
   // Auto-fetch on mount
   useEffect(() => {
@@ -153,7 +171,7 @@ const useAdminInventoryApproval = () => {
     rejectInventoryItem,
     markUnderReview,
     deleteInventoryItem,
-    getInventoryItemById
+    getInventoryItemById,
   };
 };
 

@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Plus, Settings, Tag, X, Save, CheckCircle, Shield, AlertCircle, Upload } from 'lucide-react';
+import {
+  ArrowLeft,
+  Plus,
+  Settings,
+  Tag,
+  X,
+  Save,
+  CheckCircle,
+  Shield,
+  AlertCircle,
+  Upload,
+} from 'lucide-react';
 import adminService from '../../services/adminService';
 import cloudinaryService from '../../services/cloudinaryService';
 
@@ -12,10 +23,14 @@ const LoadingSpinner = styled.div`
   border-top: 2px solid #10b981;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  
+
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -141,7 +156,9 @@ const ContentWrapper = styled.div`
 const Header = styled.div`
   background: white;
   border-radius: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 2rem;
   margin-bottom: 2rem;
   display: flex;
@@ -206,7 +223,9 @@ const PageSubtitle = styled.p`
 const FormContainer = styled.div`
   background: white;
   border-radius: 1rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   border: 1px solid #e2e8f0;
 `;
@@ -214,7 +233,7 @@ const FormContainer = styled.div`
 const FormSection = styled.div`
   padding: 2rem;
   border-bottom: 1px solid #e2e8f0;
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -245,7 +264,7 @@ const Label = styled.label`
   margin-bottom: 0.5rem;
 
   &::after {
-    content: ${props => props.required ? '"*"' : '""'};
+    content: ${props => (props.required ? '"*"' : '""')};
     color: #e53e3e;
     margin-left: 0.25rem;
   }
@@ -539,37 +558,37 @@ const EditBuyProduct = () => {
     brand: '',
     images: [],
     badges: [],
-    
+
     // Pricing
     pricing: {
       originalPrice: '',
       discountedPrice: '',
       discount: {
         type: 'percentage',
-        value: ''
+        value: '',
       },
       emi: {
         available: false,
         startingFrom: '',
-        tenure: ''
-      }
+        tenure: '',
+      },
     },
-    
+
     // Condition Options
     conditionOptions: [],
-    
+
     // Variants
     variants: [],
-    
+
     // Add-ons
     addOns: [],
-    
+
     // Offers
     offers: [],
-    
+
     // Reviews
     reviews: [],
-    
+
     // Payment Options
     paymentOptions: {
       cod: true,
@@ -577,35 +596,35 @@ const EditBuyProduct = () => {
       emi: false,
       exchange: false,
       emiPlans: [],
-      methods: []
+      methods: [],
     },
-    
+
     // Availability
     availability: {
       inStock: true,
       quantity: '',
       estimatedDelivery: '',
-      location: ''
+      location: '',
     },
-    
+
     // Top Specs
     topSpecs: [],
-    
+
     // Product Details
     productDetails: {
       camera: {
         rear: {
           primary: '',
           secondary: '',
-          features: []
+          features: [],
         },
         front: {
           primary: '',
-          features: []
-        }
+          features: [],
+        },
       },
       rearCamera: {
-        features: []
+        features: [],
       },
       network: {
         sim: '',
@@ -613,39 +632,39 @@ const EditBuyProduct = () => {
         wifi: '',
         bluetooth: '',
         gps: false,
-        nfc: false
+        nfc: false,
       },
       networkConnectivity: {
-        wifiFeatures: []
+        wifiFeatures: [],
       },
       display: {
         size: '',
         resolution: '',
         type: '',
         protection: '',
-        features: []
+        features: [],
       },
       general: {
         os: '',
         processor: '',
         chipset: '',
-        gpu: ''
+        gpu: '',
       },
       memory: {
         ram: '',
         storage: '',
         expandable: false,
-        cardSlot: ''
+        cardSlot: '',
       },
       memoryStorage: {
-        phoneVariants: []
+        phoneVariants: [],
       },
       performance: {
         antutu: '',
         geekbench: {
           single: '',
-          multi: ''
-        }
+          multi: '',
+        },
       },
       battery: {
         capacity: '',
@@ -653,39 +672,39 @@ const EditBuyProduct = () => {
         charging: {
           wired: '',
           wireless: false,
-          reverse: false
-        }
+          reverse: false,
+        },
       },
       design: {
         dimensions: {
           height: '',
           width: '',
-          thickness: ''
+          thickness: '',
         },
         weight: '',
         colors: [],
         material: '',
-        waterResistance: ''
+        waterResistance: '',
       },
       sensors: [],
       sensorsMisc: {
-        sensors: []
-      }
+        sensors: [],
+      },
     },
-    
+
     // Trust & Legal
     trustMetrics: {
       warranty: '',
       returnPolicy: '',
-      authenticity: false
+      authenticity: false,
     },
-    
+
     // Active status
     isActive: true,
-    
+
     // Sort order
     sortOrder: 0,
-    
+
     // Description
     description: '',
 
@@ -695,8 +714,8 @@ const EditBuyProduct = () => {
     // Legal
     legal: {
       termsAccepted: false,
-      privacyAccepted: false
-    }
+      privacyAccepted: false,
+    },
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -721,7 +740,7 @@ const EditBuyProduct = () => {
   // Deep merge function to properly merge nested objects
   const deepMerge = (target, source) => {
     const result = { ...target };
-    
+
     for (const key in source) {
       if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
         result[key] = deepMerge(result[key] || {}, source[key]);
@@ -729,12 +748,9 @@ const EditBuyProduct = () => {
         result[key] = source[key];
       }
     }
-    
+
     return result;
   };
-
-
-
 
   const fetchProductData = async () => {
     try {
@@ -743,52 +759,90 @@ const EditBuyProduct = () => {
       if (response.data) {
         // Deep merge the fetched data with the initial structure to ensure all fields exist
         const productData = deepMerge(initialFormData, response.data);
-        
+
         // Ensure arrays are properly initialized
         productData.images = Array.isArray(productData.images) ? productData.images : [];
         productData.badges = Array.isArray(productData.badges) ? productData.badges : [];
-        productData.conditionOptions = Array.isArray(productData.conditionOptions) ? productData.conditionOptions : [];
+        productData.conditionOptions = Array.isArray(productData.conditionOptions)
+          ? productData.conditionOptions
+          : [];
         productData.variants = Array.isArray(productData.variants) ? productData.variants : [];
         productData.addOns = Array.isArray(productData.addOns) ? productData.addOns : [];
         productData.offers = Array.isArray(productData.offers) ? productData.offers : [];
         productData.topSpecs = Array.isArray(productData.topSpecs) ? productData.topSpecs : [];
-        productData.relatedProducts = Array.isArray(productData.relatedProducts) ? productData.relatedProducts : [];
+        productData.relatedProducts = Array.isArray(productData.relatedProducts)
+          ? productData.relatedProducts
+          : [];
         productData.reviews = Array.isArray(productData.reviews) ? productData.reviews : [];
-        
+
         // Ensure payment options arrays are properly initialized
         if (productData.paymentOptions) {
-          productData.paymentOptions.emiPlans = Array.isArray(productData.paymentOptions.emiPlans) ? productData.paymentOptions.emiPlans : [];
-          productData.paymentOptions.methods = Array.isArray(productData.paymentOptions.methods) ? productData.paymentOptions.methods : [];
+          productData.paymentOptions.emiPlans = Array.isArray(productData.paymentOptions.emiPlans)
+            ? productData.paymentOptions.emiPlans
+            : [];
+          productData.paymentOptions.methods = Array.isArray(productData.paymentOptions.methods)
+            ? productData.paymentOptions.methods
+            : [];
         }
-        
+
         // Ensure nested arrays in productDetails are properly initialized
         if (productData.productDetails) {
-          productData.productDetails.cameraFeatures = Array.isArray(productData.productDetails.cameraFeatures) ? productData.productDetails.cameraFeatures : [];
-          productData.productDetails.displayFeatures = Array.isArray(productData.productDetails.displayFeatures) ? productData.productDetails.displayFeatures : [];
-          productData.productDetails.designColors = Array.isArray(productData.productDetails.designColors) ? productData.productDetails.designColors : [];
-          productData.productDetails.sensors = Array.isArray(productData.productDetails.sensors) ? productData.productDetails.sensors : [];
-          
+          productData.productDetails.cameraFeatures = Array.isArray(
+            productData.productDetails.cameraFeatures
+          )
+            ? productData.productDetails.cameraFeatures
+            : [];
+          productData.productDetails.displayFeatures = Array.isArray(
+            productData.productDetails.displayFeatures
+          )
+            ? productData.productDetails.displayFeatures
+            : [];
+          productData.productDetails.designColors = Array.isArray(
+            productData.productDetails.designColors
+          )
+            ? productData.productDetails.designColors
+            : [];
+          productData.productDetails.sensors = Array.isArray(productData.productDetails.sensors)
+            ? productData.productDetails.sensors
+            : [];
+
           // Ensure rearCamera features array
           if (productData.productDetails.rearCamera) {
-            productData.productDetails.rearCamera.features = Array.isArray(productData.productDetails.rearCamera.features) ? productData.productDetails.rearCamera.features : [];
+            productData.productDetails.rearCamera.features = Array.isArray(
+              productData.productDetails.rearCamera.features
+            )
+              ? productData.productDetails.rearCamera.features
+              : [];
           }
-          
+
           // Ensure networkConnectivity wifiFeatures array
           if (productData.productDetails.networkConnectivity) {
-            productData.productDetails.networkConnectivity.wifiFeatures = Array.isArray(productData.productDetails.networkConnectivity.wifiFeatures) ? productData.productDetails.networkConnectivity.wifiFeatures : [];
+            productData.productDetails.networkConnectivity.wifiFeatures = Array.isArray(
+              productData.productDetails.networkConnectivity.wifiFeatures
+            )
+              ? productData.productDetails.networkConnectivity.wifiFeatures
+              : [];
           }
-          
+
           // Ensure memoryStorage phoneVariants array
           if (productData.productDetails.memoryStorage) {
-            productData.productDetails.memoryStorage.phoneVariants = Array.isArray(productData.productDetails.memoryStorage.phoneVariants) ? productData.productDetails.memoryStorage.phoneVariants : [];
+            productData.productDetails.memoryStorage.phoneVariants = Array.isArray(
+              productData.productDetails.memoryStorage.phoneVariants
+            )
+              ? productData.productDetails.memoryStorage.phoneVariants
+              : [];
           }
-          
+
           // Ensure sensorsMisc sensors array
           if (productData.productDetails.sensorsMisc) {
-            productData.productDetails.sensorsMisc.sensors = Array.isArray(productData.productDetails.sensorsMisc.sensors) ? productData.productDetails.sensorsMisc.sensors : [];
+            productData.productDetails.sensorsMisc.sensors = Array.isArray(
+              productData.productDetails.sensorsMisc.sensors
+            )
+              ? productData.productDetails.sensorsMisc.sensors
+              : [];
           }
         }
-        
+
         setFormData(productData);
       }
     } catch (error) {
@@ -799,30 +853,30 @@ const EditBuyProduct = () => {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value, type, checked } = e.target;
-    
+
     if (name.includes('.')) {
       const keys = name.split('.');
       setFormData(prev => {
         const newData = { ...prev };
         let current = newData;
-        
+
         for (let i = 0; i < keys.length - 1; i++) {
           if (!current[keys[i]]) current[keys[i]] = {};
           current = current[keys[i]];
         }
-        
+
         current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
         return newData;
       });
     } else {
       setFormData(prev => ({
         ...prev,
-        [name]: type === 'checkbox' ? checked : value
+        [name]: type === 'checkbox' ? checked : value,
       }));
     }
-    
+
     // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -834,15 +888,15 @@ const EditBuyProduct = () => {
     setFormData(prev => {
       const newData = { ...prev };
       let current = newData;
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
         current = current[keys[i]];
       }
-      
+
       if (!Array.isArray(current[keys[keys.length - 1]])) {
         current[keys[keys.length - 1]] = [];
       }
-      
+
       current[keys[keys.length - 1]].push(newItem);
       return newData;
     });
@@ -853,11 +907,11 @@ const EditBuyProduct = () => {
     setFormData(prev => {
       const newData = { ...prev };
       let current = newData;
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
         current = current[keys[i]];
       }
-      
+
       current[keys[keys.length - 1]].splice(index, 1);
       return newData;
     });
@@ -868,38 +922,40 @@ const EditBuyProduct = () => {
     setFormData(prev => {
       const newData = { ...prev };
       let current = newData;
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
         current = current[keys[i]];
       }
-      
+
       current[keys[keys.length - 1]][index] = value;
       return newData;
     });
   };
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = async e => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
     setLoading(true);
     try {
-      const uploadPromises = files.map(file => cloudinaryService.uploadImage(file, {
-        folder: 'buy-products',
-        transformation: [
-          { width: 800, height: 600, crop: 'fill' },
-          { quality: 'auto' },
-          { fetch_format: 'auto' }
-        ]
-      }));
+      const uploadPromises = files.map(file =>
+        cloudinaryService.uploadImage(file, {
+          folder: 'buy-products',
+          transformation: [
+            { width: 800, height: 600, crop: 'fill' },
+            { quality: 'auto' },
+            { fetch_format: 'auto' },
+          ],
+        })
+      );
       const uploadResults = await Promise.all(uploadPromises);
-      
+
       const newImages = uploadResults.map(result => result.secure_url);
       setFormData(prev => ({
         ...prev,
-        images: [...prev.images, ...newImages]
+        images: [...prev.images, ...newImages],
       }));
-      
+
       setSuccess('Images uploaded successfully!');
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
@@ -910,62 +966,72 @@ const EditBuyProduct = () => {
     }
   };
 
-  const handleImageRemove = (index) => {
+  const handleImageRemove = index => {
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     // Required fields validation
     if (!formData.categoryId) newErrors.categoryId = 'Category is required';
     if (!formData.name.trim()) newErrors.name = 'Product name is required';
     if (!formData.brand.trim()) newErrors.brand = 'Brand is required';
     if (!formData.description.trim()) newErrors.description = 'Description is required';
-    
+
     // Pricing validation
     if (!formData.pricing.originalPrice || parseFloat(formData.pricing.originalPrice) <= 0) {
       newErrors['pricing.originalPrice'] = 'Valid original price is required';
     }
-    
-    if (formData.pricing.discountedPrice && parseFloat(formData.pricing.discountedPrice) >= parseFloat(formData.pricing.originalPrice)) {
+
+    if (
+      formData.pricing.discountedPrice &&
+      parseFloat(formData.pricing.discountedPrice) >= parseFloat(formData.pricing.originalPrice)
+    ) {
       newErrors['pricing.discountedPrice'] = 'Discounted price must be less than original price';
     }
-    
-    if (formData.pricing?.discount?.value && (parseFloat(formData.pricing.discount.value) < 0 || parseFloat(formData.pricing.discount.value) > 100)) {
+
+    if (
+      formData.pricing?.discount?.value &&
+      (parseFloat(formData.pricing.discount.value) < 0 ||
+        parseFloat(formData.pricing.discount.value) > 100)
+    ) {
       newErrors['pricing.discount.value'] = 'Discount value must be between 0 and 100';
     }
-    
+
     // Availability validation
-    if (formData.availability.inStock && (!formData.availability.quantity || parseInt(formData.availability.quantity) <= 0)) {
+    if (
+      formData.availability.inStock &&
+      (!formData.availability.quantity || parseInt(formData.availability.quantity) <= 0)
+    ) {
       newErrors['availability.quantity'] = 'Quantity is required when product is in stock';
     }
-    
+
     // Images validation
     if (formData.images.length === 0) {
       newErrors.images = 'At least one product image is required';
     }
-    
+
     // Top specs validation - at least one spec required
     if (formData.topSpecs.length === 0) {
       newErrors.topSpecs = 'At least one top specification is required';
     }
-    
+
     // Condition options validation - at least one condition required
     if (formData.conditionOptions.length === 0) {
       newErrors.conditionOptions = 'At least one condition option is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -976,37 +1042,63 @@ const EditBuyProduct = () => {
       const productData = {
         ...formData,
         // Convert object-like arrays to proper arrays and handle images properly
-        images: Array.isArray(formData.images) ? 
-          formData.images.filter(img => img && (typeof img === 'string' ? img : img.url)).map(img => typeof img === 'string' ? img : img.url) :
-          Object.values(formData.images || {}).filter(img => img && (typeof img === 'string' ? img : img.url)).map(img => typeof img === 'string' ? img : img.url),
-        conditionOptions: Array.isArray(formData.conditionOptions) ? 
-          formData.conditionOptions.filter(item => item && Object.keys(item).length > 0) : 
-          Object.values(formData.conditionOptions || {}).filter(item => item && Object.keys(item).length > 0),
-        variants: Array.isArray(formData.variants) ? 
-          formData.variants.filter(item => item && Object.keys(item).length > 0) : 
-          Object.values(formData.variants || {}).filter(item => item && Object.keys(item).length > 0),
-        addOns: Array.isArray(formData.addOns) ? 
-          formData.addOns.filter(item => item && Object.keys(item).length > 0) : 
-          Object.values(formData.addOns || {}).filter(item => item && Object.keys(item).length > 0),
-        offers: Array.isArray(formData.offers) ? 
-          formData.offers.filter(item => item && Object.keys(item).length > 0) : 
-          Object.values(formData.offers || {}).filter(item => item && Object.keys(item).length > 0),
-        relatedProducts: Array.isArray(formData.relatedProducts) ? 
-          formData.relatedProducts.filter(item => item && Object.keys(item).length > 0) : 
-          Object.values(formData.relatedProducts || {}).filter(item => item && Object.keys(item).length > 0),
-        topSpecs: Array.isArray(formData.topSpecs) ? formData.topSpecs : Object.values(formData.topSpecs || {}),
-        badges: Array.isArray(formData.badges) ? formData.badges : Object.values(formData.badges || {}),
-        reviews: Array.isArray(formData.reviews) ? 
-          formData.reviews.filter(item => item && Object.keys(item).length > 0) : 
-          Object.values(formData.reviews || {}).filter(item => item && Object.keys(item).length > 0),
+        images: Array.isArray(formData.images)
+          ? formData.images
+              .filter(img => img && (typeof img === 'string' ? img : img.url))
+              .map(img => (typeof img === 'string' ? img : img.url))
+          : Object.values(formData.images || {})
+              .filter(img => img && (typeof img === 'string' ? img : img.url))
+              .map(img => (typeof img === 'string' ? img : img.url)),
+        conditionOptions: Array.isArray(formData.conditionOptions)
+          ? formData.conditionOptions.filter(item => item && Object.keys(item).length > 0)
+          : Object.values(formData.conditionOptions || {}).filter(
+              item => item && Object.keys(item).length > 0
+            ),
+        variants: Array.isArray(formData.variants)
+          ? formData.variants.filter(item => item && Object.keys(item).length > 0)
+          : Object.values(formData.variants || {}).filter(
+              item => item && Object.keys(item).length > 0
+            ),
+        addOns: Array.isArray(formData.addOns)
+          ? formData.addOns.filter(item => item && Object.keys(item).length > 0)
+          : Object.values(formData.addOns || {}).filter(
+              item => item && Object.keys(item).length > 0
+            ),
+        offers: Array.isArray(formData.offers)
+          ? formData.offers.filter(item => item && Object.keys(item).length > 0)
+          : Object.values(formData.offers || {}).filter(
+              item => item && Object.keys(item).length > 0
+            ),
+        relatedProducts: Array.isArray(formData.relatedProducts)
+          ? formData.relatedProducts.filter(item => item && Object.keys(item).length > 0)
+          : Object.values(formData.relatedProducts || {}).filter(
+              item => item && Object.keys(item).length > 0
+            ),
+        topSpecs: Array.isArray(formData.topSpecs)
+          ? formData.topSpecs
+          : Object.values(formData.topSpecs || {}),
+        badges: Array.isArray(formData.badges)
+          ? formData.badges
+          : Object.values(formData.badges || {}),
+        reviews: Array.isArray(formData.reviews)
+          ? formData.reviews.filter(item => item && Object.keys(item).length > 0)
+          : Object.values(formData.reviews || {}).filter(
+              item => item && Object.keys(item).length > 0
+            ),
         paymentOptions: {
           ...formData.paymentOptions,
-          emiPlans: Array.isArray(formData.paymentOptions?.emiPlans) ? 
-            formData.paymentOptions.emiPlans.filter(item => item && Object.keys(item).length > 0) : 
-            Object.values(formData.paymentOptions?.emiPlans || {}).filter(item => item && Object.keys(item).length > 0),
-          methods: Array.isArray(formData.paymentOptions?.methods) ? 
-            formData.paymentOptions.methods.filter(item => item && typeof item === 'string' && item.trim() !== '') : 
-            Object.values(formData.paymentOptions?.methods || {}).filter(item => item && typeof item === 'string' && item.trim() !== '')
+          emiPlans: Array.isArray(formData.paymentOptions?.emiPlans)
+            ? formData.paymentOptions.emiPlans.filter(item => item && Object.keys(item).length > 0)
+            : Object.values(formData.paymentOptions?.emiPlans || {}).filter(
+                item => item && Object.keys(item).length > 0
+              ),
+          methods: Array.isArray(formData.paymentOptions?.methods)
+            ? formData.paymentOptions.methods.filter(
+                item => item && typeof item === 'string' && item.trim() !== ''
+              )
+            : Object.values(formData.paymentOptions?.methods || {}).filter(
+                item => item && typeof item === 'string' && item.trim() !== ''
+              ),
         },
         // Ensure pricing values are numbers
         pricing: {
@@ -1015,95 +1107,127 @@ const EditBuyProduct = () => {
           discountedPrice: parseFloat(formData.pricing.discountedPrice) || 0,
           discount: {
             ...formData.pricing?.discount,
-            value: parseFloat(formData.pricing?.discount?.value) || 0
+            value: parseFloat(formData.pricing?.discount?.value) || 0,
           },
           emi: {
             ...formData.pricing?.emi,
             available: formData.pricing?.emi?.available || false,
             startingFrom: parseFloat(formData.pricing?.emi?.startingFrom) || 0,
-            tenure: parseInt(formData.pricing?.emi?.tenure) || 0
-          }
+            tenure: parseInt(formData.pricing?.emi?.tenure) || 0,
+          },
         },
         // Ensure availability quantity is a number
         availability: {
           ...formData.availability,
-          quantity: parseInt(formData.availability.quantity) || 0
+          quantity: parseInt(formData.availability.quantity) || 0,
         },
         // Ensure rating values are numbers
         rating: {
           ...formData.rating,
           average: parseFloat(formData.rating.average) || 0,
-          count: parseInt(formData.rating.count) || 0
+          count: parseInt(formData.rating.count) || 0,
         },
         // Fix nested arrays in productDetails - matching AddBuyProduct exactly
         productDetails: {
           ...formData.productDetails,
           // Handle both camera and rearCamera/frontCamera structures
-          camera: formData.productDetails.camera ? {
-            ...formData.productDetails.camera,
-            rear: {
-              ...formData.productDetails.camera.rear,
-              features: Array.isArray(formData.productDetails.camera.rear?.features) ? 
-                formData.productDetails.camera.rear.features : 
-                Object.values(formData.productDetails.camera.rear?.features || {})
-            },
-            front: {
-              ...formData.productDetails.camera.front,
-              features: Array.isArray(formData.productDetails.camera.front?.features) ? 
-                formData.productDetails.camera.front.features : 
-                Object.values(formData.productDetails.camera.front?.features || {})
-            }
-          } : undefined,
-          rearCamera: formData.productDetails.rearCamera ? {
-            ...formData.productDetails.rearCamera,
-            features: Array.isArray(formData.productDetails.rearCamera.features) ? 
-              formData.productDetails.rearCamera.features : 
-              Object.values(formData.productDetails.rearCamera.features || {})
-          } : undefined,
-          frontCamera: formData.productDetails.frontCamera ? {
-            ...formData.productDetails.frontCamera,
-            features: Array.isArray(formData.productDetails.frontCamera?.features) ? 
-              formData.productDetails.frontCamera.features : 
-              Object.values(formData.productDetails.frontCamera?.features || {})
-          } : undefined,
-          display: formData.productDetails.display ? {
-            ...formData.productDetails.display,
-            features: Array.isArray(formData.productDetails.display.features) ? 
-              formData.productDetails.display.features.filter(item => item && Object.keys(item).length > 0) : 
-              Object.values(formData.productDetails.display.features || {}).filter(item => item && Object.keys(item).length > 0)
-          } : undefined,
-          design: formData.productDetails.design ? {
-            ...formData.productDetails.design,
-            colors: Array.isArray(formData.productDetails.design.colors) ? 
-              formData.productDetails.design.colors.filter(item => item && Object.keys(item).length > 0) : 
-              Object.values(formData.productDetails.design.colors || {}).filter(item => item && Object.keys(item).length > 0)
-          } : undefined,
-          networkConnectivity: formData.productDetails.networkConnectivity ? {
-            ...formData.productDetails.networkConnectivity,
-            wifiFeatures: Array.isArray(formData.productDetails.networkConnectivity.wifiFeatures) ? 
-              formData.productDetails.networkConnectivity.wifiFeatures : 
-              Object.values(formData.productDetails.networkConnectivity.wifiFeatures || {})
-          } : undefined,
-          memoryStorage: formData.productDetails.memoryStorage ? {
-            ...formData.productDetails.memoryStorage,
-            phoneVariants: Array.isArray(formData.productDetails.memoryStorage.phoneVariants) ? 
-              formData.productDetails.memoryStorage.phoneVariants.filter(item => item && Object.keys(item).length > 0) : 
-              Object.values(formData.productDetails.memoryStorage.phoneVariants || {}).filter(item => item && Object.keys(item).length > 0)
-          } : undefined,
-          sensorsMisc: formData.productDetails.sensorsMisc ? {
-            ...formData.productDetails.sensorsMisc,
-            sensors: Array.isArray(formData.productDetails.sensorsMisc.sensors) ? 
-              formData.productDetails.sensorsMisc.sensors : 
-              Object.values(formData.productDetails.sensorsMisc.sensors || {})
-          } : undefined,
-          sensors: formData.productDetails.sensors ? (
-            Array.isArray(formData.productDetails.sensors) ? 
-              formData.productDetails.sensors.filter(item => item && Object.keys(item).length > 0) : 
-              Object.values(formData.productDetails.sensors || {}).filter(item => item && Object.keys(item).length > 0)
-          ) : undefined
+          camera: formData.productDetails.camera
+            ? {
+                ...formData.productDetails.camera,
+                rear: {
+                  ...formData.productDetails.camera.rear,
+                  features: Array.isArray(formData.productDetails.camera.rear?.features)
+                    ? formData.productDetails.camera.rear.features
+                    : Object.values(formData.productDetails.camera.rear?.features || {}),
+                },
+                front: {
+                  ...formData.productDetails.camera.front,
+                  features: Array.isArray(formData.productDetails.camera.front?.features)
+                    ? formData.productDetails.camera.front.features
+                    : Object.values(formData.productDetails.camera.front?.features || {}),
+                },
+              }
+            : undefined,
+          rearCamera: formData.productDetails.rearCamera
+            ? {
+                ...formData.productDetails.rearCamera,
+                features: Array.isArray(formData.productDetails.rearCamera.features)
+                  ? formData.productDetails.rearCamera.features
+                  : Object.values(formData.productDetails.rearCamera.features || {}),
+              }
+            : undefined,
+          frontCamera: formData.productDetails.frontCamera
+            ? {
+                ...formData.productDetails.frontCamera,
+                features: Array.isArray(formData.productDetails.frontCamera?.features)
+                  ? formData.productDetails.frontCamera.features
+                  : Object.values(formData.productDetails.frontCamera?.features || {}),
+              }
+            : undefined,
+          display: formData.productDetails.display
+            ? {
+                ...formData.productDetails.display,
+                features: Array.isArray(formData.productDetails.display.features)
+                  ? formData.productDetails.display.features.filter(
+                      item => item && Object.keys(item).length > 0
+                    )
+                  : Object.values(formData.productDetails.display.features || {}).filter(
+                      item => item && Object.keys(item).length > 0
+                    ),
+              }
+            : undefined,
+          design: formData.productDetails.design
+            ? {
+                ...formData.productDetails.design,
+                colors: Array.isArray(formData.productDetails.design.colors)
+                  ? formData.productDetails.design.colors.filter(
+                      item => item && Object.keys(item).length > 0
+                    )
+                  : Object.values(formData.productDetails.design.colors || {}).filter(
+                      item => item && Object.keys(item).length > 0
+                    ),
+              }
+            : undefined,
+          networkConnectivity: formData.productDetails.networkConnectivity
+            ? {
+                ...formData.productDetails.networkConnectivity,
+                wifiFeatures: Array.isArray(
+                  formData.productDetails.networkConnectivity.wifiFeatures
+                )
+                  ? formData.productDetails.networkConnectivity.wifiFeatures
+                  : Object.values(formData.productDetails.networkConnectivity.wifiFeatures || {}),
+              }
+            : undefined,
+          memoryStorage: formData.productDetails.memoryStorage
+            ? {
+                ...formData.productDetails.memoryStorage,
+                phoneVariants: Array.isArray(formData.productDetails.memoryStorage.phoneVariants)
+                  ? formData.productDetails.memoryStorage.phoneVariants.filter(
+                      item => item && Object.keys(item).length > 0
+                    )
+                  : Object.values(formData.productDetails.memoryStorage.phoneVariants || {}).filter(
+                      item => item && Object.keys(item).length > 0
+                    ),
+              }
+            : undefined,
+          sensorsMisc: formData.productDetails.sensorsMisc
+            ? {
+                ...formData.productDetails.sensorsMisc,
+                sensors: Array.isArray(formData.productDetails.sensorsMisc.sensors)
+                  ? formData.productDetails.sensorsMisc.sensors
+                  : Object.values(formData.productDetails.sensorsMisc.sensors || {}),
+              }
+            : undefined,
+          sensors: formData.productDetails.sensors
+            ? Array.isArray(formData.productDetails.sensors)
+              ? formData.productDetails.sensors.filter(item => item && Object.keys(item).length > 0)
+              : Object.values(formData.productDetails.sensors || {}).filter(
+                  item => item && Object.keys(item).length > 0
+                )
+            : undefined,
         },
         // Ensure sortOrder is a number
-        sortOrder: parseInt(formData.sortOrder) || 0
+        sortOrder: parseInt(formData.sortOrder) || 0,
       };
 
       await adminService.updateBuyProduct(id, productData);
@@ -1207,11 +1331,7 @@ const EditBuyProduct = () => {
 
               <FormGroup>
                 <Label>Status</Label>
-                <Select
-                  name="isActive"
-                  value={formData.isActive}
-                  onChange={handleInputChange}
-                >
+                <Select name="isActive" value={formData.isActive} onChange={handleInputChange}>
                   <option value={true}>Active</option>
                   <option value={false}>Inactive</option>
                 </Select>
@@ -1234,7 +1354,7 @@ const EditBuyProduct = () => {
                 onChange={handleImageUpload}
                 style={{ display: 'none' }}
               />
-              
+
               {formData.images.length > 0 && (
                 <ImagePreview>
                   {formData.images.map((image, index) => (
@@ -1270,7 +1390,7 @@ const EditBuyProduct = () => {
                   placeholder="Enter original price"
                   required
                   style={{
-                    borderColor: errors['pricing.originalPrice'] ? '#dc2626' : '#d1d5db'
+                    borderColor: errors['pricing.originalPrice'] ? '#dc2626' : '#d1d5db',
                   }}
                 />
                 {errors['pricing.originalPrice'] && (
@@ -1290,7 +1410,7 @@ const EditBuyProduct = () => {
                   onChange={handleInputChange}
                   placeholder="Enter discounted price"
                   style={{
-                    borderColor: errors['pricing.discountedPrice'] ? '#dc2626' : '#d1d5db'
+                    borderColor: errors['pricing.discountedPrice'] ? '#dc2626' : '#d1d5db',
                   }}
                 />
                 {errors['pricing.discountedPrice'] && (
@@ -1322,7 +1442,7 @@ const EditBuyProduct = () => {
                   onChange={handleInputChange}
                   placeholder="Enter discount value"
                   style={{
-                    borderColor: errors['pricing.discount.value'] ? '#dc2626' : '#d1d5db'
+                    borderColor: errors['pricing.discount.value'] ? '#dc2626' : '#d1d5db',
                   }}
                 />
                 {errors['pricing.discount.value'] && (
@@ -1346,7 +1466,10 @@ const EditBuyProduct = () => {
                   onClick={() => {
                     setFormData(prev => ({
                       ...prev,
-                      conditionOptions: [...prev.conditionOptions, { condition: '', price: '', description: '' }]
+                      conditionOptions: [
+                        ...prev.conditionOptions,
+                        { condition: '', price: '', description: '' },
+                      ],
                     }));
                   }}
                 >
@@ -1354,15 +1477,23 @@ const EditBuyProduct = () => {
                   Add Condition
                 </AddButton>
               </DynamicFieldHeader>
-              
+
               {formData.conditionOptions.map((option, index) => (
-                <div key={index} style={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
+                <div
+                  key={index}
+                  style={{
+                    marginBottom: '1rem',
+                    padding: '1rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                  }}
+                >
                   <FormGrid>
                     <FormGroup>
                       <Label>Condition</Label>
                       <Select
                         value={option.condition}
-                        onChange={(e) => {
+                        onChange={e => {
                           const newOptions = [...formData.conditionOptions];
                           newOptions[index] = { ...option, condition: e.target.value };
                           setFormData(prev => ({ ...prev, conditionOptions: newOptions }));
@@ -1377,13 +1508,13 @@ const EditBuyProduct = () => {
                         <option value="Refurbished">Refurbished</option>
                       </Select>
                     </FormGroup>
-                    
+
                     <FormGroup>
                       <Label>Price</Label>
                       <Input
                         type="number"
                         value={option.price}
-                        onChange={(e) => {
+                        onChange={e => {
                           const newOptions = [...formData.conditionOptions];
                           newOptions[index] = { ...option, price: e.target.value };
                           setFormData(prev => ({ ...prev, conditionOptions: newOptions }));
@@ -1393,12 +1524,12 @@ const EditBuyProduct = () => {
                       />
                     </FormGroup>
                   </FormGrid>
-                  
+
                   <FormGroup>
                     <Label>Description</Label>
                     <TextArea
                       value={option.description}
-                      onChange={(e) => {
+                      onChange={e => {
                         const newOptions = [...formData.conditionOptions];
                         newOptions[index] = { ...option, description: e.target.value };
                         setFormData(prev => ({ ...prev, conditionOptions: newOptions }));
@@ -1407,13 +1538,13 @@ const EditBuyProduct = () => {
                       rows={2}
                     />
                   </FormGroup>
-                  
+
                   <RemoveButton
                     type="button"
                     onClick={() => {
                       setFormData(prev => ({
                         ...prev,
-                        conditionOptions: prev.conditionOptions.filter((_, i) => i !== index)
+                        conditionOptions: prev.conditionOptions.filter((_, i) => i !== index),
                       }));
                     }}
                     style={{ marginTop: '0.5rem' }}
@@ -1423,9 +1554,7 @@ const EditBuyProduct = () => {
                 </div>
               ))}
             </DynamicFieldContainer>
-            {errors.conditionOptions && (
-              <ErrorMessage>{errors.conditionOptions}</ErrorMessage>
-            )}
+            {errors.conditionOptions && <ErrorMessage>{errors.conditionOptions}</ErrorMessage>}
           </FormSection>
 
           {/* Availability */}
@@ -1454,7 +1583,7 @@ const EditBuyProduct = () => {
                   onChange={handleInputChange}
                   placeholder="0"
                   style={{
-                    borderColor: errors['availability.quantity'] ? '#dc2626' : '#d1d5db'
+                    borderColor: errors['availability.quantity'] ? '#dc2626' : '#d1d5db',
                   }}
                 />
                 {errors['availability.quantity'] && (
@@ -1549,28 +1678,23 @@ const EditBuyProduct = () => {
 
           {/* Top Specs */}
           <FormSection>
-            <SectionTitle>
-              Top Specifications
-            </SectionTitle>
+            <SectionTitle>Top Specifications</SectionTitle>
             <DynamicFieldContainer>
               <DynamicFieldHeader>
                 <Label>Key Features</Label>
-                <AddButton
-                  type="button"
-                  onClick={() => handleArrayAdd('topSpecs', '')}
-                >
+                <AddButton type="button" onClick={() => handleArrayAdd('topSpecs', '')}>
                   <Plus size={16} />
                   Add Spec
                 </AddButton>
               </DynamicFieldHeader>
-              
+
               {formData.topSpecs.map((spec, index) => (
                 <FormGroup key={index} style={{ marginBottom: '1rem' }}>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                     <Input
                       type="text"
                       value={spec}
-                      onChange={(e) => handleArrayUpdate('topSpecs', index, e.target.value)}
+                      onChange={e => handleArrayUpdate('topSpecs', index, e.target.value)}
                       placeholder="Enter specification"
                       style={{ flex: 1 }}
                     />
@@ -1598,7 +1722,16 @@ const EditBuyProduct = () => {
 
             {/* Display */}
             <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
                 Display
               </h3>
               <FormGrid>
@@ -1647,7 +1780,16 @@ const EditBuyProduct = () => {
 
             {/* Performance */}
             <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
                 Performance
               </h3>
               <FormGrid>
@@ -1696,7 +1838,16 @@ const EditBuyProduct = () => {
 
             {/* Memory */}
             <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
                 Memory & Storage
               </h3>
               <FormGrid>
@@ -1747,7 +1898,16 @@ const EditBuyProduct = () => {
 
             {/* Camera */}
             <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
                 Camera
               </h3>
               <FormGrid>
@@ -1786,7 +1946,16 @@ const EditBuyProduct = () => {
 
             {/* Battery */}
             <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
                 Battery & Charging
               </h3>
               <FormGrid>
@@ -1837,7 +2006,16 @@ const EditBuyProduct = () => {
 
             {/* Design */}
             <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
                 Design & Build
               </h3>
               <FormGrid>
@@ -1906,7 +2084,16 @@ const EditBuyProduct = () => {
 
             {/* Network */}
             <div>
-              <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
                 Connectivity
               </h3>
               <FormGrid>
@@ -2043,21 +2230,31 @@ const EditBuyProduct = () => {
                 <h3>Variants</h3>
                 <AddButton
                   type="button"
-                  onClick={() => handleArrayAdd('variants', { name: '', price: '', stock: '', sku: '' })}
+                  onClick={() =>
+                    handleArrayAdd('variants', { name: '', price: '', stock: '', sku: '' })
+                  }
                 >
                   <Plus size={16} />
                   Add Variant
                 </AddButton>
               </DynamicFieldHeader>
               {formData.variants?.map((variant, index) => (
-                <div key={index} style={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}>
+                <div
+                  key={index}
+                  style={{
+                    marginBottom: '1rem',
+                    padding: '1rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                  }}
+                >
                   <FormGrid>
                     <FormGroup>
                       <Label>Variant Name</Label>
                       <Input
                         type="text"
                         value={variant.name || ''}
-                        onChange={(e) => handleArrayUpdate('variants', index, 'name', e.target.value)}
+                        onChange={e => handleArrayUpdate('variants', index, 'name', e.target.value)}
                         placeholder="e.g., 128GB, Red Color"
                       />
                     </FormGroup>
@@ -2066,7 +2263,9 @@ const EditBuyProduct = () => {
                       <Input
                         type="number"
                         value={variant.price || ''}
-                        onChange={(e) => handleArrayUpdate('variants', index, 'price', e.target.value)}
+                        onChange={e =>
+                          handleArrayUpdate('variants', index, 'price', e.target.value)
+                        }
                         placeholder="0.00"
                         step="0.01"
                       />
@@ -2076,7 +2275,9 @@ const EditBuyProduct = () => {
                       <Input
                         type="number"
                         value={variant.stock || ''}
-                        onChange={(e) => handleArrayUpdate('variants', index, 'stock', e.target.value)}
+                        onChange={e =>
+                          handleArrayUpdate('variants', index, 'stock', e.target.value)
+                        }
                         placeholder="0"
                       />
                     </FormGroup>
@@ -2085,7 +2286,7 @@ const EditBuyProduct = () => {
                       <Input
                         type="text"
                         value={variant.sku || ''}
-                        onChange={(e) => handleArrayUpdate('variants', index, 'sku', e.target.value)}
+                        onChange={e => handleArrayUpdate('variants', index, 'sku', e.target.value)}
                         placeholder="Unique SKU"
                       />
                     </FormGroup>
@@ -2120,14 +2321,22 @@ const EditBuyProduct = () => {
                 </AddButton>
               </DynamicFieldHeader>
               {formData.addOns?.map((addon, index) => (
-                <div key={index} style={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}>
+                <div
+                  key={index}
+                  style={{
+                    marginBottom: '1rem',
+                    padding: '1rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                  }}
+                >
                   <FormGrid>
                     <FormGroup>
                       <Label>Add-on Name</Label>
                       <Input
                         type="text"
                         value={addon.name || ''}
-                        onChange={(e) => handleArrayUpdate('addOns', index, 'name', e.target.value)}
+                        onChange={e => handleArrayUpdate('addOns', index, 'name', e.target.value)}
                         placeholder="e.g., Screen Protector, Case"
                       />
                     </FormGroup>
@@ -2136,7 +2345,7 @@ const EditBuyProduct = () => {
                       <Input
                         type="number"
                         value={addon.price || ''}
-                        onChange={(e) => handleArrayUpdate('addOns', index, 'price', e.target.value)}
+                        onChange={e => handleArrayUpdate('addOns', index, 'price', e.target.value)}
                         placeholder="0.00"
                         step="0.01"
                       />
@@ -2146,7 +2355,9 @@ const EditBuyProduct = () => {
                     <Label>Description</Label>
                     <TextArea
                       value={addon.description || ''}
-                      onChange={(e) => handleArrayUpdate('addOns', index, 'description', e.target.value)}
+                      onChange={e =>
+                        handleArrayUpdate('addOns', index, 'description', e.target.value)
+                      }
                       placeholder="Describe the add-on"
                       rows={2}
                     />
@@ -2174,21 +2385,36 @@ const EditBuyProduct = () => {
                 <h3>Offers</h3>
                 <AddButton
                   type="button"
-                  onClick={() => handleArrayAdd('offers', { title: '', description: '', discount: '', validUntil: '' })}
+                  onClick={() =>
+                    handleArrayAdd('offers', {
+                      title: '',
+                      description: '',
+                      discount: '',
+                      validUntil: '',
+                    })
+                  }
                 >
                   <Plus size={16} />
                   Add Offer
                 </AddButton>
               </DynamicFieldHeader>
               {formData.offers?.map((offer, index) => (
-                <div key={index} style={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}>
+                <div
+                  key={index}
+                  style={{
+                    marginBottom: '1rem',
+                    padding: '1rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                  }}
+                >
                   <FormGrid>
                     <FormGroup>
                       <Label>Offer Title</Label>
                       <Input
                         type="text"
                         value={offer.title || ''}
-                        onChange={(e) => handleArrayUpdate('offers', index, 'title', e.target.value)}
+                        onChange={e => handleArrayUpdate('offers', index, 'title', e.target.value)}
                         placeholder="e.g., Early Bird Discount"
                       />
                     </FormGroup>
@@ -2197,7 +2423,9 @@ const EditBuyProduct = () => {
                       <Input
                         type="number"
                         value={offer.discount || ''}
-                        onChange={(e) => handleArrayUpdate('offers', index, 'discount', e.target.value)}
+                        onChange={e =>
+                          handleArrayUpdate('offers', index, 'discount', e.target.value)
+                        }
                         placeholder="10"
                         min="0"
                         max="100"
@@ -2208,7 +2436,9 @@ const EditBuyProduct = () => {
                       <Input
                         type="date"
                         value={offer.validUntil || ''}
-                        onChange={(e) => handleArrayUpdate('offers', index, 'validUntil', e.target.value)}
+                        onChange={e =>
+                          handleArrayUpdate('offers', index, 'validUntil', e.target.value)
+                        }
                       />
                     </FormGroup>
                   </FormGrid>
@@ -2216,7 +2446,9 @@ const EditBuyProduct = () => {
                     <Label>Description</Label>
                     <TextArea
                       value={offer.description || ''}
-                      onChange={(e) => handleArrayUpdate('offers', index, 'description', e.target.value)}
+                      onChange={e =>
+                        handleArrayUpdate('offers', index, 'description', e.target.value)
+                      }
                       placeholder="Describe the offer details"
                       rows={2}
                     />
@@ -2232,8 +2464,6 @@ const EditBuyProduct = () => {
               ))}
             </DynamicFieldContainer>
           </FormSection>
-
-
 
           {/* Description Section */}
           <FormSection>

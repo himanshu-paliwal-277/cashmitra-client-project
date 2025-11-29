@@ -28,7 +28,7 @@ export const AdminAuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('adminToken');
         const storedUser = localStorage.getItem('adminUser');
-        
+
         if (token && storedUser) {
           // Verify token validity by fetching profile
           const profileData = await getAdminProfile();
@@ -50,7 +50,7 @@ export const AdminAuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Call login API using the service
       const data = await loginAdmin({ email, password });
@@ -58,12 +58,12 @@ export const AdminAuthProvider = ({ children }) => {
       // Store auth data
       localStorage.setItem('adminToken', data.token);
       localStorage.setItem('adminUser', JSON.stringify(data.admin));
-      
+
       // Update state
       setAdminUser(data.admin);
       setIsAuthenticated(true);
       navigate('/admin/dashboard');
-      
+
       return data;
     } catch (error) {
       setError(error.response?.data?.message || 'Login failed');
@@ -78,11 +78,11 @@ export const AdminAuthProvider = ({ children }) => {
     // Clear auth data from localStorage
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminUser');
-    
+
     // Reset state
     setAdminUser(null);
     setIsAuthenticated(false);
-    
+
     // Redirect to login
     navigate('/admin/login');
   };
@@ -92,7 +92,7 @@ export const AdminAuthProvider = ({ children }) => {
     const token = localStorage.getItem('adminToken');
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
-  
+
   // Refresh admin profile
   const refreshProfile = async () => {
     try {
@@ -117,14 +117,10 @@ export const AdminAuthProvider = ({ children }) => {
     login,
     logout,
     getAuthHeader,
-    refreshProfile
+    refreshProfile,
   };
 
-  return (
-    <AdminAuthContext.Provider value={contextValue}>
-      {children}
-    </AdminAuthContext.Provider>
-  );
+  return <AdminAuthContext.Provider value={contextValue}>{children}</AdminAuthContext.Provider>;
 };
 
 export default AdminAuthContext;

@@ -17,7 +17,7 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
 } from 'lucide-react';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
 
@@ -28,7 +28,7 @@ const DashboardContainer = styled.div`
 `;
 
 const Sidebar = styled.aside`
-  width: ${props => props.isOpen ? '280px' : '0'};
+  width: ${props => (props.isOpen ? '280px' : '0')};
   background: white;
   border-right: 1px solid #e2e8f0;
   transition: width 0.3s ease;
@@ -36,7 +36,7 @@ const Sidebar = styled.aside`
   position: fixed;
   height: 100vh;
   z-index: 1000;
-  
+
   @media (min-width: 1024px) {
     position: relative;
     width: 280px;
@@ -63,7 +63,7 @@ const CloseButton = styled.button`
   padding: 0.5rem;
   cursor: pointer;
   color: #64748b;
-  
+
   @media (min-width: 1024px) {
     display: none;
   }
@@ -92,17 +92,17 @@ const NavItem = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: ${props => props.active ? '#3b82f6' : '#64748b'};
-  background: ${props => props.active ? '#eff6ff' : 'transparent'};
-  border-right: ${props => props.active ? '3px solid #3b82f6' : '3px solid transparent'};
+  color: ${props => (props.active ? '#3b82f6' : '#64748b')};
+  background: ${props => (props.active ? '#eff6ff' : 'transparent')};
+  border-right: ${props => (props.active ? '3px solid #3b82f6' : '3px solid transparent')};
   cursor: pointer;
   transition: all 0.2s ease;
-  opacity: ${props => props.disabled ? 0.5 : 1};
-  pointer-events: ${props => props.disabled ? 'none' : 'auto'};
-  
+  opacity: ${props => (props.disabled ? 0.5 : 1)};
+  pointer-events: ${props => (props.disabled ? 'none' : 'auto')};
+
   &:hover {
-    background: ${props => props.active ? '#eff6ff' : '#f1f5f9'};
-    color: ${props => props.active ? '#3b82f6' : '#1e293b'};
+    background: ${props => (props.active ? '#eff6ff' : '#f1f5f9')};
+    color: ${props => (props.active ? '#3b82f6' : '#1e293b')};
   }
 `;
 
@@ -122,9 +122,9 @@ const MainArea = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-left: ${props => props.sidebarOpen ? '280px' : '0'};
+  margin-left: ${props => (props.sidebarOpen ? '280px' : '0')};
   transition: margin-left 0.3s ease;
-  
+
   @media (min-width: 1024px) {
     margin-left: 280px;
   }
@@ -138,8 +138,8 @@ const Overlay = styled.div`
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 999;
-  display: ${props => props.show ? 'block' : 'none'};
-  
+  display: ${props => (props.show ? 'block' : 'none')};
+
   @media (min-width: 1024px) {
     display: none;
   }
@@ -152,7 +152,7 @@ const Header = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const HeaderLeft = styled.div`
@@ -167,7 +167,7 @@ const MenuButton = styled.button`
   padding: 0.5rem;
   cursor: pointer;
   color: #64748b;
-  
+
   @media (min-width: 1024px) {
     display: none;
   }
@@ -193,7 +193,7 @@ const IconButton = styled.button`
   cursor: pointer;
   color: ${props => props.theme.colors.textSecondary};
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: ${props => props.theme.colors.background};
     color: ${props => props.theme.colors.primary};
@@ -208,7 +208,7 @@ const UserProfile = styled.div`
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s ease;
-  
+
   &:hover {
     background: ${props => props.theme.colors.background};
   }
@@ -275,12 +275,14 @@ const StatCard = styled.div`
   padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -325,14 +327,14 @@ const StatChange = styled.div`
   align-items: center;
   gap: 0.25rem;
   font-size: 0.875rem;
-  color: ${props => props.positive ? '#10B981' : '#EF4444'};
+  color: ${props => (props.positive ? '#10B981' : '#EF4444')};
 `;
 
 const ContentGrid = styled.div`
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 2rem;
-  
+
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
@@ -342,7 +344,7 @@ const Card = styled.div`
   background: white;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 `;
 
 const CardHeader = styled.div`
@@ -364,8 +366,9 @@ const CardContent = styled.div`
 `;
 
 const Button = styled.button`
-  background: ${props => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${props => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
+  background: ${props =>
+    props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
+  color: ${props => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
   border: 1px solid ${props => props.theme.colors.primary};
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -375,9 +378,10 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   &:hover {
-    background: ${props => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
+    background: ${props =>
+      props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
     color: white;
   }
 `;
@@ -388,7 +392,7 @@ const OrderItem = styled.div`
   align-items: center;
   padding: 1rem 0;
   border-bottom: 1px solid ${props => props.theme.colors.border};
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -417,20 +421,30 @@ const OrderStatus = styled.span`
   font-weight: 500;
   background: ${props => {
     switch (props.status) {
-      case 'pending': return '#FEF3C7';
-      case 'processing': return '#DBEAFE';
-      case 'completed': return '#D1FAE5';
-      case 'cancelled': return '#FEE2E2';
-      default: return '#F3F4F6';
+      case 'pending':
+        return '#FEF3C7';
+      case 'processing':
+        return '#DBEAFE';
+      case 'completed':
+        return '#D1FAE5';
+      case 'cancelled':
+        return '#FEE2E2';
+      default:
+        return '#F3F4F6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'pending': return '#92400E';
-      case 'processing': return '#1E40AF';
-      case 'completed': return '#065F46';
-      case 'cancelled': return '#991B1B';
-      default: return '#374151';
+      case 'pending':
+        return '#92400E';
+      case 'processing':
+        return '#1E40AF';
+      case 'completed':
+        return '#065F46';
+      case 'cancelled':
+        return '#991B1B';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -444,7 +458,7 @@ const QuickAction = styled.div`
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     border-color: ${props => props.theme.colors.primary};
     background: ${props => props.theme.colors.background};
@@ -479,15 +493,15 @@ const ActionDescription = styled.p`
 
 function Dashboard() {
   const navigate = useNavigate();
-  const { 
-    partner, 
-    logout, 
-    getAvailableMenuItems, 
-    hasMenuPermission, 
-    getBusinessLimits, 
-    getAvailableFeatures 
+  const {
+    partner,
+    logout,
+    getAvailableMenuItems,
+    hasMenuPermission,
+    getBusinessLimits,
+    getAvailableFeatures,
   } = usePartnerAuth();
-  
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState('/partner/dashboard');
 
@@ -500,7 +514,7 @@ function Dashboard() {
   const [user] = useState({
     name: partner?.businessName || partner?.firstName + ' ' + partner?.lastName || 'Partner',
     role: partner?.role || 'Basic Partner',
-    avatar: partner?.businessName?.charAt(0) || partner?.firstName?.charAt(0) || 'P'
+    avatar: partner?.businessName?.charAt(0) || partner?.firstName?.charAt(0) || 'P',
   });
 
   const stats = [
@@ -511,7 +525,7 @@ function Dashboard() {
       positive: true,
       color: '#10b981',
       icon: <DollarSign size={24} />,
-      visible: hasMenuPermission('finance.revenue')
+      visible: hasMenuPermission('finance.revenue'),
     },
     {
       label: 'Active Products',
@@ -520,7 +534,7 @@ function Dashboard() {
       positive: true,
       color: '#3b82f6',
       icon: <Package size={24} />,
-      visible: hasMenuPermission('inventory.products')
+      visible: hasMenuPermission('inventory.products'),
     },
     {
       label: 'Orders This Month',
@@ -529,7 +543,7 @@ function Dashboard() {
       positive: true,
       color: '#f59e0b',
       icon: <ShoppingCart size={24} />,
-      visible: hasMenuPermission('sales.orders')
+      visible: hasMenuPermission('sales.orders'),
     },
     {
       label: 'Customer Views',
@@ -538,15 +552,39 @@ function Dashboard() {
       positive: false,
       color: '#8b5cf6',
       icon: <Eye size={24} />,
-      visible: hasMenuPermission('analytics.views')
-    }
+      visible: hasMenuPermission('analytics.views'),
+    },
   ].filter(stat => stat.visible);
 
   const recentOrders = [
-    { id: '#ORD-001', customer: 'Rahul Sharma', product: 'iPhone 13', amount: '₹65,000', status: 'completed' },
-    { id: '#ORD-002', customer: 'Priya Patel', product: 'Samsung Galaxy', amount: '₹45,000', status: 'pending' },
-    { id: '#ORD-003', customer: 'Amit Kumar', product: 'OnePlus 11', amount: '₹55,000', status: 'processing' },
-    { id: '#ORD-004', customer: 'Sneha Gupta', product: 'Xiaomi 13', amount: '₹35,000', status: 'shipped' }
+    {
+      id: '#ORD-001',
+      customer: 'Rahul Sharma',
+      product: 'iPhone 13',
+      amount: '₹65,000',
+      status: 'completed',
+    },
+    {
+      id: '#ORD-002',
+      customer: 'Priya Patel',
+      product: 'Samsung Galaxy',
+      amount: '₹45,000',
+      status: 'pending',
+    },
+    {
+      id: '#ORD-003',
+      customer: 'Amit Kumar',
+      product: 'OnePlus 11',
+      amount: '₹55,000',
+      status: 'processing',
+    },
+    {
+      id: '#ORD-004',
+      customer: 'Sneha Gupta',
+      product: 'Xiaomi 13',
+      amount: '₹35,000',
+      status: 'shipped',
+    },
   ];
 
   const quickActions = [
@@ -556,7 +594,7 @@ function Dashboard() {
       icon: <Plus size={20} />,
       color: '#10b981',
       action: () => navigate('/partner/inventory/add'),
-      visible: hasMenuPermission('inventory.create')
+      visible: hasMenuPermission('inventory.create'),
     },
     {
       title: 'View Orders',
@@ -564,7 +602,7 @@ function Dashboard() {
       icon: <ShoppingCart size={20} />,
       color: '#3b82f6',
       action: () => navigate('/partner/orders'),
-      visible: hasMenuPermission('sales.orders')
+      visible: hasMenuPermission('sales.orders'),
     },
     {
       title: 'Analytics Dashboard',
@@ -572,7 +610,7 @@ function Dashboard() {
       icon: <TrendingUp size={20} />,
       color: '#f59e0b',
       action: () => navigate('/partner/analytics'),
-      visible: hasMenuPermission('analytics.dashboard')
+      visible: hasMenuPermission('analytics.dashboard'),
     },
     {
       title: 'Manage Profile',
@@ -580,8 +618,8 @@ function Dashboard() {
       icon: <Settings size={20} />,
       color: '#8b5cf6',
       action: () => navigate('/partner/profile'),
-      visible: hasMenuPermission('settings.profile')
-    }
+      visible: hasMenuPermission('settings.profile'),
+    },
   ].filter(action => action.visible);
 
   const handleLogout = async () => {
@@ -593,7 +631,7 @@ function Dashboard() {
     }
   };
 
-  const handleNavigation = (path) => {
+  const handleNavigation = path => {
     setCurrentPath(path);
     navigate(path);
     setSidebarOpen(false); // Close sidebar on mobile after navigation
@@ -606,7 +644,7 @@ function Dashboard() {
   return (
     <DashboardContainer>
       <Overlay show={sidebarOpen} onClick={() => setSidebarOpen(false)} />
-      
+
       <Sidebar isOpen={sidebarOpen}>
         <SidebarHeader>
           <SidebarLogo>Cashify Partner</SidebarLogo>
@@ -614,7 +652,7 @@ function Dashboard() {
             <X size={20} />
           </CloseButton>
         </SidebarHeader>
-        
+
         <SidebarNav>
           {availableMenuItems.map((section, sectionIndex) => (
             <NavSection key={sectionIndex}>
@@ -671,9 +709,7 @@ function Dashboard() {
               {stats.map((stat, index) => (
                 <StatCard key={index}>
                   <StatHeader>
-                    <StatIcon color={stat.color}>
-                      {stat.icon}
-                    </StatIcon>
+                    <StatIcon color={stat.color}>{stat.icon}</StatIcon>
                     <StatInfo>
                       <StatLabel>{stat.label}</StatLabel>
                       <StatValue>{stat.value}</StatValue>
@@ -702,7 +738,9 @@ function Dashboard() {
                     <OrderItem key={index}>
                       <OrderInfo>
                         <OrderId>{order.id}</OrderId>
-                        <OrderDetails>{order.customer} • {order.product}</OrderDetails>
+                        <OrderDetails>
+                          {order.customer} • {order.product}
+                        </OrderDetails>
                       </OrderInfo>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <span style={{ fontWeight: '600' }}>{order.amount}</span>
@@ -725,9 +763,7 @@ function Dashboard() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {quickActions.map((action, index) => (
                       <QuickAction key={index} onClick={action.action}>
-                        <ActionIcon color={action.color}>
-                          {action.icon}
-                        </ActionIcon>
+                        <ActionIcon color={action.color}>{action.icon}</ActionIcon>
                         <ActionInfo>
                           <ActionTitle>{action.title}</ActionTitle>
                           <ActionDescription>{action.description}</ActionDescription>

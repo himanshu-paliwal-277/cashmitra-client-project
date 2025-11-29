@@ -20,17 +20,17 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
 
       // First, get all categories to find the mobile/phone category
       const categoriesResponse = await productCategoriesAPI.getCategories();
-      
+
       if (categoriesResponse.success && categoriesResponse.data?.data) {
         const categoryList = categoriesResponse.data.data;
-        
+
         // Find mobile/phone category
-        const mobileCategory = categoryList.find(cat => 
-          cat.name && (
-            cat.name.toLowerCase().includes('mobile') ||
-            cat.name.toLowerCase().includes('phone') ||
-            cat.name.toLowerCase().includes('smartphone')
-          )
+        const mobileCategory = categoryList.find(
+          cat =>
+            cat.name &&
+            (cat.name.toLowerCase().includes('mobile') ||
+              cat.name.toLowerCase().includes('phone') ||
+              cat.name.toLowerCase().includes('smartphone'))
         );
 
         if (mobileCategory) {
@@ -41,7 +41,7 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
               page: 1,
               limit: 8, // Show only 8 phones in dropdown
               sort: 'createdAt',
-              order: 'desc'
+              order: 'desc',
             }
           );
 
@@ -72,7 +72,7 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
     try {
       // Try to search for mobile products
       const searchResponse = await productCategoriesAPI.searchProducts('mobile phone', {
-        limit: 8
+        limit: 8,
       });
 
       if (searchResponse.success && searchResponse.data?.data) {
@@ -94,7 +94,7 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
       brand: 'Apple',
       price: 134900,
       image: '/phones/iphone-15-pro.jpg',
-      condition: 'New'
+      condition: 'New',
     },
     {
       _id: '2',
@@ -102,7 +102,7 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
       brand: 'Samsung',
       price: 79999,
       image: '/phones/samsung-s24.jpg',
-      condition: 'New'
+      condition: 'New',
     },
     {
       _id: '3',
@@ -110,7 +110,7 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
       brand: 'OnePlus',
       price: 64999,
       image: '/phones/oneplus-12.jpg',
-      condition: 'New'
+      condition: 'New',
     },
     {
       _id: '4',
@@ -118,11 +118,11 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
       brand: 'Google',
       price: 75999,
       image: '/phones/pixel-8.jpg',
-      condition: 'New'
-    }
+      condition: 'New',
+    },
   ];
 
-  const formatPrice = (price) => {
+  const formatPrice = price => {
     if (!price) return 'Price not available';
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -131,7 +131,7 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
     }).format(price);
   };
 
-  const handlePhoneClick = (phone) => {
+  const handlePhoneClick = phone => {
     navigate(`/buy/product/${phone._id}`);
     onClose();
   };
@@ -168,17 +168,17 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
 
         {!loading && !error && phones.length > 0 && (
           <div className="phone-dropdown-grid">
-            {phones.slice(0, 8).map((phone) => (
-              <div 
-                key={phone._id} 
+            {phones.slice(0, 8).map(phone => (
+              <div
+                key={phone._id}
                 className="phone-dropdown-item"
                 onClick={() => handlePhoneClick(phone)}
               >
                 <div className="phone-item-image">
-                  <img 
-                    src={phone.image || phone.images?.[0] || '/placeholder-phone.jpg'} 
+                  <img
+                    src={phone.image || phone.images?.[0] || '/placeholder-phone.jpg'}
                     alt={phone.name}
-                    onError={(e) => {
+                    onError={e => {
                       e.target.src = '/placeholder-phone.jpg';
                     }}
                   />

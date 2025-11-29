@@ -10,17 +10,17 @@ export const usePartnerAuth = () => {
   const [error, setError] = useState(null);
 
   // Partner login hook
-  const login = useCallback(async (credentials) => {
+  const login = useCallback(async credentials => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`${API_BASE_URL}/auth/partner/login`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials)
+        body: JSON.stringify(credentials),
       });
 
       const data = await response.json();
@@ -45,17 +45,17 @@ export const usePartnerAuth = () => {
   }, []);
 
   // Partner registration hook
-  const register = useCallback(async (registrationData) => {
+  const register = useCallback(async registrationData => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`${API_BASE_URL}/auth/partner-register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(registrationData)
+        body: JSON.stringify(registrationData),
       });
 
       const data = await response.json();
@@ -80,17 +80,17 @@ export const usePartnerAuth = () => {
   }, []);
 
   // Forgot password hook
-  const forgotPassword = useCallback(async (email) => {
+  const forgotPassword = useCallback(async email => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`${API_BASE_URL}/auth/partner-forgot-password`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
@@ -119,13 +119,13 @@ export const usePartnerAuth = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`${API_BASE_URL}/auth/partner-reset-password`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token, password: newPassword })
+        body: JSON.stringify({ token, password: newPassword }),
       });
 
       const data = await response.json();
@@ -156,7 +156,7 @@ export const usePartnerAuth = () => {
     resetPassword,
     loading,
     error,
-    clearError: () => setError(null)
+    clearError: () => setError(null),
   };
 };
 

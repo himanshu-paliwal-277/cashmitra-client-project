@@ -7,16 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import {
-  X,
-  Save,
-  Plus,
-  Trash2,
-  AlertCircle,
-  HelpCircle,
-  CheckCircle,
-  Circle
-} from 'lucide-react';
+import { X, Save, Plus, Trash2, AlertCircle, HelpCircle, CheckCircle, Circle } from 'lucide-react';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -218,8 +209,8 @@ const RemoveOptionButton = styled.button`
 `;
 
 const CorrectToggle = styled.button`
-  background: ${props => props.isCorrect ? '#10b981' : '#e5e7eb'};
-  color: ${props => props.isCorrect ? 'white' : '#6b7280'};
+  background: ${props => (props.isCorrect ? '#10b981' : '#e5e7eb')};
+  color: ${props => (props.isCorrect ? 'white' : '#6b7280')};
   border: none;
   padding: 0.5rem;
   border-radius: 0.375rem;
@@ -231,7 +222,7 @@ const CorrectToggle = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: ${props => props.isCorrect ? '#059669' : '#d1d5db'};
+    background: ${props => (props.isCorrect ? '#059669' : '#d1d5db')};
   }
 `;
 
@@ -265,8 +256,10 @@ const Button = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
-  ${props => props.variant === 'primary' ? `
+
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: #f59e0b;
     color: white;
     border: none;
@@ -279,7 +272,8 @@ const Button = styled.button`
       background: #9ca3af;
       cursor: not-allowed;
     }
-  ` : `
+  `
+      : `
     background: white;
     color: #374151;
     border: 1px solid #d1d5db;
@@ -308,14 +302,14 @@ const Button = styled.button`
 
 // QuestionModal.jsx
 
-const QuestionModal = ({ 
-  isOpen, 
-  onClose, 
-  question = null, 
-  onSave, 
+const QuestionModal = ({
+  isOpen,
+  onClose,
+  question = null,
+  onSave,
   loading = false,
   categories = [],
-  selectedCategoryId = null
+  selectedCategoryId = null,
 }) => {
   const [formData, setFormData] = useState({
     categoryId: '',
@@ -329,10 +323,10 @@ const QuestionModal = ({
     required: true,
     showIf: {
       questionKey: '',
-      value: ''
+      value: '',
     },
     options: [],
-    isActive: true
+    isActive: true,
   });
   const [error, setError] = useState('');
 
@@ -349,12 +343,13 @@ const QuestionModal = ({
         multiSelect: question.multiSelect || false,
         required: question.required !== false,
         showIf: question.showIf || { questionKey: '', value: '' },
-        options: question.options?.map(opt => ({
-          ...opt,
-          tempId: opt._id || Date.now(), // Use tempId instead of id
-          showIf: opt.showIf || { questionKey: '', value: '' }
-        })) || [],
-        isActive: question.isActive !== false
+        options:
+          question.options?.map(opt => ({
+            ...opt,
+            tempId: opt._id || Date.now(), // Use tempId instead of id
+            showIf: opt.showIf || { questionKey: '', value: '' },
+          })) || [],
+        isActive: question.isActive !== false,
       });
     } else {
       setFormData({
@@ -369,7 +364,7 @@ const QuestionModal = ({
         required: true,
         showIf: { questionKey: '', value: '' },
         options: [],
-        isActive: true
+        isActive: true,
       });
     }
     setError('');
@@ -378,7 +373,7 @@ const QuestionModal = ({
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     setError('');
   };
@@ -396,43 +391,43 @@ const QuestionModal = ({
           delta: {
             type: 'percent',
             sign: '+',
-            value: 0
+            value: 0,
           },
-          showIf: { questionKey: '', value: '' }
-        }
-      ]
+          showIf: { questionKey: '', value: '' },
+        },
+      ],
     }));
   };
 
-  const removeOption = (tempId) => {
+  const removeOption = tempId => {
     setFormData(prev => ({
       ...prev,
-      options: prev.options.filter(o => o.tempId !== tempId)
+      options: prev.options.filter(o => o.tempId !== tempId),
     }));
   };
 
   const updateOption = (tempId, field, value) => {
     setFormData(prev => ({
       ...prev,
-      options: prev.options.map(o => 
-        o.tempId === tempId ? { ...o, [field]: value } : o
-      )
+      options: prev.options.map(o => (o.tempId === tempId ? { ...o, [field]: value } : o)),
     }));
   };
 
   const updateOptionDelta = (tempId, deltaField, value) => {
     setFormData(prev => ({
       ...prev,
-      options: prev.options.map(o => 
-        o.tempId === tempId ? { 
-          ...o, 
-          delta: { ...o.delta, [deltaField]: value }
-        } : o
-      )
+      options: prev.options.map(o =>
+        o.tempId === tempId
+          ? {
+              ...o,
+              delta: { ...o.delta, [deltaField]: value },
+            }
+          : o
+      ),
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError('');
 
@@ -453,7 +448,11 @@ const QuestionModal = ({
       setError('Category selection is required');
       return;
     }
-    if (formData.uiType === 'radio' || formData.uiType === 'checkbox' || formData.uiType === 'select') {
+    if (
+      formData.uiType === 'radio' ||
+      formData.uiType === 'checkbox' ||
+      formData.uiType === 'select'
+    ) {
       if (formData.options.length < 2) {
         setError('At least 2 options are required for choice questions');
         return;
@@ -466,7 +465,11 @@ const QuestionModal = ({
         setError('All options must have a key');
         return;
       }
-      if (formData.options.some(o => o.showIf && (o.showIf.questionKey === undefined || o.showIf.value === undefined))) {
+      if (
+        formData.options.some(
+          o => o.showIf && (o.showIf.questionKey === undefined || o.showIf.value === undefined)
+        )
+      ) {
         setError('Option showIf must have both questionKey and value or be empty');
         return;
       }
@@ -475,7 +478,7 @@ const QuestionModal = ({
     // Prepare data for backend, excluding tempId
     const submitData = {
       ...formData,
-      options: formData.options.map(({ tempId, ...opt }) => opt) // Exclude tempId from options
+      options: formData.options.map(({ tempId, ...opt }) => opt), // Exclude tempId from options
     };
 
     try {
@@ -489,7 +492,7 @@ const QuestionModal = ({
   if (!isOpen) return null;
 
   return (
-    <ModalOverlay onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <ModalOverlay onClick={e => e.target === e.currentTarget && onClose()}>
       <ModalContent>
         <ModalHeader>
           <ModalTitle>
@@ -514,7 +517,7 @@ const QuestionModal = ({
               <Label>Category *</Label>
               <Select
                 value={formData.categoryId}
-                onChange={(e) => handleInputChange('categoryId', e.target.value)}
+                onChange={e => handleInputChange('categoryId', e.target.value)}
                 required
               >
                 <option value="">Select category</option>
@@ -531,7 +534,7 @@ const QuestionModal = ({
               <Input
                 type="text"
                 value={formData.key}
-                onChange={(e) => handleInputChange('key', e.target.value)}
+                onChange={e => handleInputChange('key', e.target.value)}
                 placeholder="e.g., screen_condition"
                 required
               />
@@ -542,7 +545,7 @@ const QuestionModal = ({
               <Input
                 type="text"
                 value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
+                onChange={e => handleInputChange('title', e.target.value)}
                 placeholder="What is the condition of your screen?"
                 required
               />
@@ -552,7 +555,7 @@ const QuestionModal = ({
               <Label>Description</Label>
               <TextArea
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={e => handleInputChange('description', e.target.value)}
                 placeholder="Please select the current condition of your device screen"
               />
             </FormGroup>
@@ -561,7 +564,7 @@ const QuestionModal = ({
               <Label>UI Type *</Label>
               <Select
                 value={formData.uiType}
-                onChange={(e) => handleInputChange('uiType', e.target.value)}
+                onChange={e => handleInputChange('uiType', e.target.value)}
                 required
               >
                 <option value="radio">Radio Button</option>
@@ -578,7 +581,7 @@ const QuestionModal = ({
               <Label>Section *</Label>
               <Select
                 value={formData.section}
-                onChange={(e) => handleInputChange('section', e.target.value)}
+                onChange={e => handleInputChange('section', e.target.value)}
                 required
               >
                 <option value="">Select section</option>
@@ -596,7 +599,7 @@ const QuestionModal = ({
                 <Input
                   type="number"
                   value={formData.order}
-                  onChange={(e) => handleInputChange('order', parseInt(e.target.value) || 1)}
+                  onChange={e => handleInputChange('order', parseInt(e.target.value) || 1)}
                   min="1"
                 />
               </FormGroup>
@@ -605,7 +608,7 @@ const QuestionModal = ({
                 <Label>Required Question</Label>
                 <Select
                   value={formData.required}
-                  onChange={(e) => handleInputChange('required', e.target.value === 'true')}
+                  onChange={e => handleInputChange('required', e.target.value === 'true')}
                 >
                   <option value={true}>Yes</option>
                   <option value={false}>No</option>
@@ -616,7 +619,7 @@ const QuestionModal = ({
                 <Label>Multi Select</Label>
                 <Select
                   value={formData.multiSelect}
-                  onChange={(e) => handleInputChange('multiSelect', e.target.value === 'true')}
+                  onChange={e => handleInputChange('multiSelect', e.target.value === 'true')}
                 >
                   <option value={false}>No</option>
                   <option value={true}>Yes</option>
@@ -630,21 +633,34 @@ const QuestionModal = ({
                 <Input
                   type="text"
                   value={formData.showIf.questionKey}
-                  onChange={(e) => handleInputChange('showIf', { ...formData.showIf, questionKey: e.target.value })}
+                  onChange={e =>
+                    handleInputChange('showIf', { ...formData.showIf, questionKey: e.target.value })
+                  }
                   placeholder="Question key"
                 />
                 <Input
                   type="text"
                   value={formData.showIf.value}
-                  onChange={(e) => handleInputChange('showIf', { ...formData.showIf, value: e.target.value })}
+                  onChange={e =>
+                    handleInputChange('showIf', { ...formData.showIf, value: e.target.value })
+                  }
                   placeholder="Expected value"
                 />
               </div>
             </FormGroup>
 
-            {(formData.uiType === 'radio' || formData.uiType === 'checkbox' || formData.uiType === 'select') && (
+            {(formData.uiType === 'radio' ||
+              formData.uiType === 'checkbox' ||
+              formData.uiType === 'select') && (
               <OptionsSection>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '1rem',
+                  }}
+                >
                   <SectionTitle>
                     <CheckCircle size={18} />
                     Answer Options
@@ -661,32 +677,36 @@ const QuestionModal = ({
                       <span style={{ fontWeight: '600', color: '#374151' }}>
                         Option {index + 1}
                       </span>
-                      <RemoveOptionButton 
-                        type="button" 
-                        onClick={() => removeOption(option.tempId)}
-                      >
+                      <RemoveOptionButton type="button" onClick={() => removeOption(option.tempId)}>
                         <Trash2 size={12} />
                         Remove
                       </RemoveOptionButton>
                     </OptionHeader>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '1rem',
+                        marginBottom: '1rem',
+                      }}
+                    >
                       <FormGroup>
                         <Label>Option Key</Label>
                         <Input
                           type="text"
                           value={option.key}
-                          onChange={(e) => updateOption(option.tempId, 'key', e.target.value)}
+                          onChange={e => updateOption(option.tempId, 'key', e.target.value)}
                           placeholder="excellent"
                         />
                       </FormGroup>
-                      
+
                       <FormGroup>
                         <Label>Option Value</Label>
                         <Input
                           type="text"
                           value={option.value}
-                          onChange={(e) => updateOption(option.tempId, 'value', e.target.value)}
+                          onChange={e => updateOption(option.tempId, 'value', e.target.value)}
                           placeholder="excellent"
                         />
                       </FormGroup>
@@ -697,34 +717,55 @@ const QuestionModal = ({
                       <Input
                         type="text"
                         value={option.label}
-                        onChange={(e) => updateOption(option.tempId, 'label', e.target.value)}
+                        onChange={e => updateOption(option.tempId, 'label', e.target.value)}
                         placeholder="Excellent - No scratches or damage"
                       />
                     </FormGroup>
 
-                    <div style={{ marginTop: '1rem', padding: '1rem', background: '#f3f4f6', borderRadius: '0.5rem' }}>
-                      <Label style={{ marginBottom: '0.5rem', display: 'block' }}>Price Delta</Label>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+                    <div
+                      style={{
+                        marginTop: '1rem',
+                        padding: '1rem',
+                        background: '#f3f4f6',
+                        borderRadius: '0.5rem',
+                      }}
+                    >
+                      <Label style={{ marginBottom: '0.5rem', display: 'block' }}>
+                        Price Delta
+                      </Label>
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr 1fr',
+                          gap: '0.5rem',
+                        }}
+                      >
                         <Select
                           value={option.delta?.type || 'percent'}
-                          onChange={(e) => updateOptionDelta(option.tempId, 'type', e.target.value)}
+                          onChange={e => updateOptionDelta(option.tempId, 'type', e.target.value)}
                         >
                           <option value="percent">Percentage</option>
                           <option value="abs">Absolute</option>
                         </Select>
-                        
+
                         <Select
                           value={option.delta?.sign || '+'}
-                          onChange={(e) => updateOptionDelta(option.tempId, 'sign', e.target.value)}
+                          onChange={e => updateOptionDelta(option.tempId, 'sign', e.target.value)}
                         >
                           <option value="+">+ (Add)</option>
                           <option value="-">- (Subtract)</option>
                         </Select>
-                        
+
                         <Input
                           type="number"
                           value={option.delta?.value || 0}
-                          onChange={(e) => updateOptionDelta(option.tempId, 'value', parseFloat(e.target.value) || 0)}
+                          onChange={e =>
+                            updateOptionDelta(
+                              option.tempId,
+                              'value',
+                              parseFloat(e.target.value) || 0
+                            )
+                          }
                           placeholder="0"
                           min="0"
                         />
@@ -734,13 +775,15 @@ const QuestionModal = ({
                 ))}
 
                 {formData.options.length === 0 && (
-                  <div style={{ 
-                    textAlign: 'center', 
-                    padding: '2rem', 
-                    color: '#6b7280',
-                    border: '2px dashed #d1d5db',
-                    borderRadius: '0.5rem'
-                  }}>
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      padding: '2rem',
+                      color: '#6b7280',
+                      border: '2px dashed #d1d5db',
+                      borderRadius: '0.5rem',
+                    }}
+                  >
                     No options added yet. Click "Add Option" to create answer choices.
                   </div>
                 )}
@@ -754,7 +797,7 @@ const QuestionModal = ({
             </Button>
             <Button type="submit" variant="primary" disabled={loading}>
               <Save size={16} />
-              {loading ? 'Saving...' : (question ? 'Update Question' : 'Create Question')}
+              {loading ? 'Saving...' : question ? 'Update Question' : 'Create Question'}
             </Button>
           </ModalFooter>
         </form>

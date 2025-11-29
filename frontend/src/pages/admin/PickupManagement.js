@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  User, 
-  Phone, 
-  Package, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  User,
+  Phone,
+  Package,
+  CheckCircle,
+  XCircle,
   AlertCircle,
   Edit,
   Eye,
@@ -16,7 +16,7 @@ import {
   Search,
   Plus,
   Trash2,
-  Truck
+  Truck,
 } from 'lucide-react';
 import pickupService from '../../services/pickupService';
 import productService from '../../services/productService';
@@ -60,7 +60,7 @@ const SearchInput = styled.input`
   border-radius: 8px;
   font-size: 14px;
   width: 250px;
-  
+
   &:focus {
     outline: none;
     border-color: #007bff;
@@ -85,7 +85,7 @@ const FilterButton = styled.button`
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  
+
   &:hover {
     background: #f8f9fa;
   }
@@ -102,7 +102,7 @@ const CreateButton = styled.button`
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  
+
   &:hover {
     background: #0056b3;
   }
@@ -120,7 +120,7 @@ const StatCard = styled.div`
   padding: 20px;
   border-radius: 12px;
   border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 `;
 
 const StatValue = styled.div`
@@ -140,7 +140,7 @@ const TableContainer = styled.div`
   border-radius: 12px;
   border: 1px solid #e0e0e0;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 `;
 
 const TableHeader = styled.div`
@@ -162,11 +162,11 @@ const TableRow = styled.div`
   padding: 16px 20px;
   border-bottom: 1px solid #f0f0f0;
   align-items: center;
-  
+
   &:hover {
     background: #f8f9fa;
   }
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -177,9 +177,9 @@ const StatusBadge = styled.span`
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
-  
+
   ${props => {
-    switch(props.status) {
+    switch (props.status) {
       case 'scheduled':
         return 'background: #fff3cd; color: #856404;';
       case 'confirmed':
@@ -207,7 +207,7 @@ const ActionButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &:hover {
     background: #f0f0f0;
   }
@@ -224,7 +224,7 @@ const Modal = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -279,7 +279,7 @@ const Input = styled.input`
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
-  
+
   &:focus {
     outline: none;
     border-color: #007bff;
@@ -292,7 +292,7 @@ const Select = styled.select`
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
-  
+
   &:focus {
     outline: none;
     border-color: #007bff;
@@ -307,7 +307,7 @@ const TextArea = styled.textarea`
   font-size: 14px;
   min-height: 80px;
   resize: vertical;
-  
+
   &:focus {
     outline: none;
     border-color: #007bff;
@@ -327,12 +327,15 @@ const Button = styled.button`
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  
-  ${props => props.variant === 'primary' ? `
+
+  ${props =>
+    props.variant === 'primary'
+      ? `
     background: #007bff;
     color: white;
     &:hover { background: #0056b3; }
-  ` : `
+  `
+      : `
     background: #f8f9fa;
     color: #333;
     border: 1px solid #ddd;
@@ -355,7 +358,7 @@ const CancelButton = styled.button`
   color: #333;
   cursor: pointer;
   font-size: 14px;
-  
+
   &:hover {
     background: #e9ecef;
   }
@@ -369,27 +372,38 @@ const SubmitButton = styled.button`
   color: white;
   cursor: pointer;
   font-size: 14px;
-  
+
   &:hover {
     background: #0056b3;
   }
 `;
 
 // Form component for create/edit pickup
-const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, orders, loadingOrders, onSubmit, onCancel, onOrderTypeChange }) => {
+const PickupForm = ({
+  pickup,
+  agents,
+  loadingAgents,
+  products,
+  loadingProducts,
+  orders,
+  loadingOrders,
+  onSubmit,
+  onCancel,
+  onOrderTypeChange,
+}) => {
   const [formData, setFormData] = useState({
     orderType: pickup?.orderType || 'sell', // New field for order type
     orderNumber: pickup?.orderNumber || '',
     selectedOrderId: pickup?.selectedOrderId || '',
     customer: {
       name: pickup?.customer?.name || '',
-      phone: pickup?.customer?.phone || ''
+      phone: pickup?.customer?.phone || '',
     },
     address: {
       street: pickup?.address?.street || '',
       city: pickup?.address?.city || '',
       state: pickup?.address?.state || '',
-      pincode: pickup?.address?.pincode || ''
+      pincode: pickup?.address?.pincode || '',
     },
     scheduledDate: pickup?.scheduledDate || '',
     timeSlot: pickup?.timeSlot || 'morning',
@@ -398,7 +412,7 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
     items: pickup?.items?.join(', ') || '',
     instructions: pickup?.instructions || '',
     selectedProduct: pickup?.selectedProduct || '',
-    productNumber: pickup?.productNumber || ''
+    productNumber: pickup?.productNumber || '',
   });
 
   const handleInputChange = (field, value) => {
@@ -408,18 +422,18 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
         ...prev,
         [parent]: {
           ...prev[parent],
-          [child]: value
-        }
+          [child]: value,
+        },
       }));
     } else {
       setFormData(prev => ({
         ...prev,
-        [field]: value
+        [field]: value,
       }));
     }
   };
 
-  const handleOrderTypeChange = (orderType) => {
+  const handleOrderTypeChange = orderType => {
     handleInputChange('orderType', orderType);
     // Clear selected order when order type changes
     handleInputChange('selectedOrderId', '');
@@ -432,46 +446,51 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
     }
   };
 
-  const handleProductChange = (productId) => {
+  const handleProductChange = productId => {
     const selectedProduct = products.find(p => p._id === productId);
     if (selectedProduct) {
       setFormData(prev => ({
         ...prev,
         selectedProduct: productId,
-        productNumber: selectedProduct.model || selectedProduct.sku || `${selectedProduct.brand}-${selectedProduct.name}`,
-        items: selectedProduct.name // Auto-populate items with product name
+        productNumber:
+          selectedProduct.model ||
+          selectedProduct.sku ||
+          `${selectedProduct.brand}-${selectedProduct.name}`,
+        items: selectedProduct.name, // Auto-populate items with product name
       }));
     }
   };
 
-  const handleOrderChange = (orderId) => {
+  const handleOrderChange = orderId => {
     const selectedOrder = orders.find(order => order._id === orderId);
     if (selectedOrder) {
       if (formData.orderType === 'buy') {
         // For buy orders, use the order data directly since it contains all needed information
-        const items = selectedOrder.items?.map(item => 
-          `${item.product?.name || 'Unknown Product'} (Qty: ${item.quantity || 1})`
-        ).join(', ') || '';
-        
+        const items =
+          selectedOrder.items
+            ?.map(item => `${item.product?.name || 'Unknown Product'} (Qty: ${item.quantity || 1})`)
+            .join(', ') || '';
+
         setFormData(prev => ({
           ...prev,
           selectedOrderId: orderId,
           orderNumber: selectedOrder._id, // Use order ID as order number for buy orders
           customer: {
             name: selectedOrder.user?.name || '',
-            phone: selectedOrder.user?.phone || ''
+            phone: selectedOrder.user?.phone || '',
           },
           address: {
             street: selectedOrder.shippingDetails?.address?.street || '',
             city: selectedOrder.shippingDetails?.address?.city || '',
             state: selectedOrder.shippingDetails?.address?.state || '',
-            pincode: selectedOrder.shippingDetails?.address?.pincode || ''
+            pincode: selectedOrder.shippingDetails?.address?.pincode || '',
           },
-          items: items
+          items: items,
         }));
       } else {
         // For sell orders, use the existing API call
-        adminService.getOrderPickupDetails(orderId)
+        adminService
+          .getOrderPickupDetails(orderId)
           .then(response => {
             const orderDetails = response.data;
             setFormData(prev => ({
@@ -480,14 +499,14 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
               orderNumber: orderDetails.orderNumber,
               customer: {
                 name: orderDetails.customer?.name || '',
-                phone: orderDetails.customer?.phone || ''
+                phone: orderDetails.customer?.phone || '',
               },
               address: {
                 street: orderDetails.address?.street || '',
                 city: orderDetails.address?.city || '',
                 state: orderDetails.address?.state || '',
-                pincode: orderDetails.address?.pincode || ''
-              }
+                pincode: orderDetails.address?.pincode || '',
+              },
             }));
           })
           .catch(error => {
@@ -499,14 +518,14 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
               orderNumber: selectedOrder.orderNumber,
               customer: {
                 name: selectedOrder.customer?.name || '',
-                phone: selectedOrder.customer?.phone || ''
+                phone: selectedOrder.customer?.phone || '',
               },
               address: {
                 street: selectedOrder.address?.street || '',
                 city: selectedOrder.address?.city || '',
                 state: selectedOrder.address?.state || '',
-                pincode: selectedOrder.address?.pincode || ''
-              }
+                pincode: selectedOrder.address?.pincode || '',
+              },
             }));
           });
       }
@@ -517,27 +536,29 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
     // Debug: Log form data to check address fields
     console.log('Form data before submit:', formData);
     console.log('Address data:', formData.address);
-    
+
     // Validate required address fields
     const requiredAddressFields = ['street', 'city', 'state', 'pincode'];
-    const missingFields = requiredAddressFields.filter(field => !formData.address[field] || formData.address[field].trim() === '');
-    
+    const missingFields = requiredAddressFields.filter(
+      field => !formData.address[field] || formData.address[field].trim() === ''
+    );
+
     if (missingFields.length > 0) {
       alert(`Please fill in the following required address fields: ${missingFields.join(', ')}`);
       return;
     }
-    
+
     // Validate required customer fields
     if (!formData.customer.name || formData.customer.name.trim() === '') {
       alert('Customer name is required');
       return;
     }
-    
+
     if (!formData.customer.phone || formData.customer.phone.trim() === '') {
       alert('Customer phone is required');
       return;
     }
-    
+
     const submitData = {
       // Fix orderType enum - backend expects 'Order' or 'SellOrder', not 'buy' or 'sell'
       orderType: formData.orderType === 'buy' ? 'Order' : 'SellOrder',
@@ -545,64 +566,74 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
       assignedTo: formData.assignedTo,
       scheduledDate: formData.scheduledDate,
       // Fix scheduledTimeSlot enum - backend expects specific time ranges
-      scheduledTimeSlot: formData.timeSlot === 'morning' ? '09:00-12:00' : 
-                        formData.timeSlot === 'afternoon' ? '12:00-15:00' :
-                        formData.timeSlot === 'evening' ? '15:00-18:00' :
-                        formData.timeSlot === 'night' ? '18:00-21:00' :
-                        '09:00-12:00', // default to morning if not recognized
+      scheduledTimeSlot:
+        formData.timeSlot === 'morning'
+          ? '09:00-12:00'
+          : formData.timeSlot === 'afternoon'
+            ? '12:00-15:00'
+            : formData.timeSlot === 'evening'
+              ? '15:00-18:00'
+              : formData.timeSlot === 'night'
+                ? '18:00-21:00'
+                : '09:00-12:00', // default to morning if not recognized
       status: formData.status,
       specialInstructions: formData.instructions,
       // Fix priority enum - backend expects 'low', 'medium', 'high', 'urgent', not 'normal'
       priority: 'medium', // changed from 'normal' to 'medium'
-      
+
       // Fix items format - backend expects array of objects, not strings
-      items: formData.items ? formData.items.split(',').map(item => {
-        const trimmedItem = item.trim();
-        // Extract quantity if present in format "Item Name (Qty: 2)"
-        const qtyMatch = trimmedItem.match(/^(.+?)\s*\(Qty:\s*(\d+)\)$/);
-        if (qtyMatch) {
-          return {
-            name: qtyMatch[1].trim(),
-            quantity: parseInt(qtyMatch[2]),
-            description: '',
-            estimatedValue: 0
-          };
-        }
-        return {
-          name: trimmedItem,
-          quantity: 1,
-          description: '',
-          estimatedValue: 0
-        };
-      }).filter(item => item.name) : [],
-      
+      items: formData.items
+        ? formData.items
+            .split(',')
+            .map(item => {
+              const trimmedItem = item.trim();
+              // Extract quantity if present in format "Item Name (Qty: 2)"
+              const qtyMatch = trimmedItem.match(/^(.+?)\s*\(Qty:\s*(\d+)\)$/);
+              if (qtyMatch) {
+                return {
+                  name: qtyMatch[1].trim(),
+                  quantity: parseInt(qtyMatch[2]),
+                  description: '',
+                  estimatedValue: 0,
+                };
+              }
+              return {
+                name: trimmedItem,
+                quantity: 1,
+                description: '',
+                estimatedValue: 0,
+              };
+            })
+            .filter(item => item.name)
+        : [],
+
       // Nested customer structure for backend processing
       customer: {
         name: formData.customer.name.trim(),
         phone: formData.customer.phone.trim(),
-        email: formData.customer.email || ''
+        email: formData.customer.email || '',
       },
-      
+
       // Nested address structure with zipCode (not pincode) - ensure all fields are populated
       address: {
         street: formData.address.street.trim(),
         city: formData.address.city.trim(),
         state: formData.address.state.trim(),
         zipCode: formData.address.pincode.trim(), // backend expects zipCode, not pincode
-        landmark: formData.address.landmark || ''
+        landmark: formData.address.landmark || '',
       },
-      
+
       // Include product information if selected
       ...(formData.selectedProduct && {
         productId: formData.selectedProduct,
-        productNumber: formData.productNumber
+        productNumber: formData.productNumber,
       }),
       // Include order information if selected
       ...(formData.selectedOrderId && {
-        orderId: formData.selectedOrderId
-      })
+        orderId: formData.selectedOrderId,
+      }),
     };
-    
+
     // Debug: Log submit data to verify structure
     console.log('Submit data:', submitData);
     onSubmit(submitData);
@@ -612,23 +643,20 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
     <div>
       <FormGroup>
         <Label>Order Type</Label>
-        <Select 
-          value={formData.orderType}
-          onChange={(e) => handleOrderTypeChange(e.target.value)}
-        >
+        <Select value={formData.orderType} onChange={e => handleOrderTypeChange(e.target.value)}>
           <option value="sell">Sell Order</option>
           <option value="buy">Buy Order</option>
         </Select>
       </FormGroup>
-      
+
       {/* Only show Product Selection for sell orders */}
       {formData.orderType === 'sell' && (
         <>
           <FormGroup>
             <Label>Product Selection</Label>
-            <Select 
+            <Select
               value={formData.selectedProduct}
-              onChange={(e) => handleProductChange(e.target.value)}
+              onChange={e => handleProductChange(e.target.value)}
               disabled={loadingProducts}
             >
               <option value="">Select Product</option>
@@ -638,14 +666,16 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
                 </option>
               ))}
             </Select>
-            {loadingProducts && <div style={{ fontSize: '12px', color: '#666' }}>Loading products...</div>}
+            {loadingProducts && (
+              <div style={{ fontSize: '12px', color: '#666' }}>Loading products...</div>
+            )}
           </FormGroup>
           <FormGroup>
             <Label>Product Number</Label>
-            <Input 
-              type="text" 
+            <Input
+              type="text"
               value={formData.productNumber}
-              onChange={(e) => handleInputChange('productNumber', e.target.value)}
+              onChange={e => handleInputChange('productNumber', e.target.value)}
               placeholder="Product number (auto-filled when product selected)"
               readOnly={!!formData.selectedProduct}
             />
@@ -654,15 +684,16 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
       )}
       <FormGroup>
         <Label>Select Order ({formData.orderType === 'sell' ? 'Sell Orders' : 'Buy Orders'})</Label>
-        <Select 
+        <Select
           value={formData.selectedOrderId}
-          onChange={(e) => handleOrderChange(e.target.value)}
+          onChange={e => handleOrderChange(e.target.value)}
           disabled={loadingOrders}
         >
           <option value="">Select Order</option>
           {orders.map(order => (
             <option key={order._id} value={order._id}>
-              {order.user?.name || 'Unknown Customer'} - {order.items?.[0]?.product?.name || 'Unknown Product'}
+              {order.user?.name || 'Unknown Customer'} -{' '}
+              {order.items?.[0]?.product?.name || 'Unknown Product'}
             </option>
           ))}
         </Select>
@@ -670,87 +701,87 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
       </FormGroup>
       <FormGroup>
         <Label>Order Number</Label>
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           value={formData.orderNumber}
-          onChange={(e) => handleInputChange('orderNumber', e.target.value)}
+          onChange={e => handleInputChange('orderNumber', e.target.value)}
           placeholder="Order number (auto-filled when order selected)"
           readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
         />
       </FormGroup>
       <FormGroup>
         <Label>Customer Name</Label>
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           value={formData.customer.name}
-          onChange={(e) => handleInputChange('customer.name', e.target.value)}
+          onChange={e => handleInputChange('customer.name', e.target.value)}
           placeholder="Customer name (auto-filled when order selected)"
           readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
         />
       </FormGroup>
       <FormGroup>
         <Label>Customer Phone</Label>
-        <Input 
-          type="tel" 
+        <Input
+          type="tel"
           value={formData.customer.phone}
-          onChange={(e) => handleInputChange('customer.phone', e.target.value)}
+          onChange={e => handleInputChange('customer.phone', e.target.value)}
           placeholder="Phone number (auto-filled when order selected)"
           readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
         />
       </FormGroup>
       <FormGroup>
         <Label>Street Address</Label>
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           value={formData.address.street}
-          onChange={(e) => handleInputChange('address.street', e.target.value)}
+          onChange={e => handleInputChange('address.street', e.target.value)}
           placeholder="Street address (auto-filled when order selected)"
           readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
         />
       </FormGroup>
       <FormGroup>
         <Label>City</Label>
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           value={formData.address.city}
-          onChange={(e) => handleInputChange('address.city', e.target.value)}
+          onChange={e => handleInputChange('address.city', e.target.value)}
           placeholder="City (auto-filled when order selected)"
           readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
         />
       </FormGroup>
       <FormGroup>
         <Label>State</Label>
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           value={formData.address.state}
-          onChange={(e) => handleInputChange('address.state', e.target.value)}
+          onChange={e => handleInputChange('address.state', e.target.value)}
           placeholder="State (auto-filled when order selected)"
           readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
         />
       </FormGroup>
       <FormGroup>
         <Label>Pincode</Label>
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           value={formData.address.pincode}
-          onChange={(e) => handleInputChange('address.pincode', e.target.value)}
+          onChange={e => handleInputChange('address.pincode', e.target.value)}
           placeholder="Pincode (auto-filled when order selected)"
           readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
         />
       </FormGroup>
       <FormGroup>
         <Label>Scheduled Date</Label>
-        <Input 
-          type="date" 
+        <Input
+          type="date"
           value={formData.scheduledDate}
-          onChange={(e) => handleInputChange('scheduledDate', e.target.value)}
+          onChange={e => handleInputChange('scheduledDate', e.target.value)}
         />
       </FormGroup>
       <FormGroup>
         <Label>Time Slot</Label>
-        <Select 
+        <Select
           value={formData.timeSlot}
-          onChange={(e) => handleInputChange('timeSlot', e.target.value)}
+          onChange={e => handleInputChange('timeSlot', e.target.value)}
         >
           <option value="morning">Morning (10:00 AM - 3:00 PM)</option>
           <option value="afternoon">Afternoon (3:00 PM - 6:00 PM)</option>
@@ -758,14 +789,12 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
       </FormGroup>
       <FormGroup>
         <Label>Assign Agent</Label>
-        <Select 
+        <Select
           value={formData.assignedTo}
-          onChange={(e) => handleInputChange('assignedTo', e.target.value)}
+          onChange={e => handleInputChange('assignedTo', e.target.value)}
           disabled={loadingAgents}
         >
-          <option value="">
-            {loadingAgents ? 'Loading agents...' : 'Select Agent'}
-          </option>
+          <option value="">{loadingAgents ? 'Loading agents...' : 'Select Agent'}</option>
           {agents.map(agent => (
             <option key={agent._id} value={agent._id}>
               {agent.name} - {agent.type} {agent.email && `(${agent.email})`}
@@ -773,9 +802,7 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
           ))}
         </Select>
         {loadingAgents && (
-          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-            Loading agents...
-          </div>
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>Loading agents...</div>
         )}
         {!loadingAgents && agents.length === 0 && (
           <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
@@ -790,10 +817,7 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
       </FormGroup>
       <FormGroup>
         <Label>Status</Label>
-        <Select 
-          value={formData.status}
-          onChange={(e) => handleInputChange('status', e.target.value)}
-        >
+        <Select value={formData.status} onChange={e => handleInputChange('status', e.target.value)}>
           <option value="scheduled">Scheduled</option>
           <option value="confirmed">Confirmed</option>
           <option value="in_transit">In Transit</option>
@@ -804,25 +828,23 @@ const PickupForm = ({ pickup, agents, loadingAgents, products, loadingProducts, 
       </FormGroup>
       <FormGroup>
         <Label>Items (comma separated)</Label>
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           value={formData.items}
-          onChange={(e) => handleInputChange('items', e.target.value)}
+          onChange={e => handleInputChange('items', e.target.value)}
           placeholder="Enter items to pickup"
         />
       </FormGroup>
       <FormGroup>
         <Label>Special Instructions</Label>
-        <TextArea 
+        <TextArea
           value={formData.instructions}
-          onChange={(e) => handleInputChange('instructions', e.target.value)}
-          placeholder="Any special instructions for the pickup..." 
+          onChange={e => handleInputChange('instructions', e.target.value)}
+          placeholder="Any special instructions for the pickup..."
         />
       </FormGroup>
       <ModalActions>
-        <CancelButton onClick={onCancel}>
-          Cancel
-        </CancelButton>
+        <CancelButton onClick={onCancel}>Cancel</CancelButton>
         <SubmitButton onClick={handleSubmit}>
           {pickup ? 'Update Pickup' : 'Create Pickup'}
         </SubmitButton>
@@ -873,7 +895,7 @@ const PickupManagement = () => {
       setProducts([
         { _id: '1', name: 'iPhone 13', brand: 'Apple', model: 'A2482' },
         { _id: '2', name: 'Samsung Galaxy S21', brand: 'Samsung', model: 'SM-G991B' },
-        { _id: '3', name: 'MacBook Pro', brand: 'Apple', model: 'MBP16' }
+        { _id: '3', name: 'MacBook Pro', brand: 'Apple', model: 'MBP16' },
       ]);
     } finally {
       setLoadingProducts(false);
@@ -884,14 +906,14 @@ const PickupManagement = () => {
     try {
       setLoadingOrders(true);
       let response;
-      
+
       if (orderType === 'buy') {
         response = await adminService.getBuyOrdersForPickup();
       } else {
         response = await adminService.getOrdersForPickup();
       }
-      
-      if (response ) {
+
+      if (response) {
         setOrders(response.orders);
       } else if (response && Array.isArray(response)) {
         setOrders(response);
@@ -903,13 +925,56 @@ const PickupManagement = () => {
     } catch (error) {
       console.error('Error fetching orders:', error);
       // Fallback to mock data based on order type
-      const mockData = orderType === 'buy' ? [
-        { _id: '1', orderNumber: 'BUY-001', customer: { name: 'John Doe' }, address: { street: '123 Main St', city: 'Mumbai', state: 'Maharashtra', pincode: '400001' } },
-        { _id: '2', orderNumber: 'BUY-002', customer: { name: 'Jane Smith' }, address: { street: '456 Oak Ave', city: 'Delhi', state: 'Delhi', pincode: '110001' } }
-      ] : [
-        { _id: '1', orderNumber: 'ORD-001', customer: { name: 'John Doe' }, address: { street: '123 Main St', city: 'Mumbai', state: 'Maharashtra', pincode: '400001' } },
-        { _id: '2', orderNumber: 'ORD-002', customer: { name: 'Jane Smith' }, address: { street: '456 Oak Ave', city: 'Delhi', state: 'Delhi', pincode: '110001' } }
-      ];
+      const mockData =
+        orderType === 'buy'
+          ? [
+              {
+                _id: '1',
+                orderNumber: 'BUY-001',
+                customer: { name: 'John Doe' },
+                address: {
+                  street: '123 Main St',
+                  city: 'Mumbai',
+                  state: 'Maharashtra',
+                  pincode: '400001',
+                },
+              },
+              {
+                _id: '2',
+                orderNumber: 'BUY-002',
+                customer: { name: 'Jane Smith' },
+                address: {
+                  street: '456 Oak Ave',
+                  city: 'Delhi',
+                  state: 'Delhi',
+                  pincode: '110001',
+                },
+              },
+            ]
+          : [
+              {
+                _id: '1',
+                orderNumber: 'ORD-001',
+                customer: { name: 'John Doe' },
+                address: {
+                  street: '123 Main St',
+                  city: 'Mumbai',
+                  state: 'Maharashtra',
+                  pincode: '400001',
+                },
+              },
+              {
+                _id: '2',
+                orderNumber: 'ORD-002',
+                customer: { name: 'Jane Smith' },
+                address: {
+                  street: '456 Oak Ave',
+                  city: 'Delhi',
+                  state: 'Delhi',
+                  pincode: '110001',
+                },
+              },
+            ];
       setOrders(mockData);
     } finally {
       setLoadingOrders(false);
@@ -920,27 +985,26 @@ const PickupManagement = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = {
         page: currentPage,
         limit: 10,
         search: searchTerm,
-        status: statusFilter !== 'all' ? statusFilter : undefined
+        status: statusFilter !== 'all' ? statusFilter : undefined,
       };
-      
+
       const response = await pickupService.getAllPickups(params);
-      
+
       // Handle response structure
       const pickupData = response.data || response;
       const pickupsArray = pickupData.docs || pickupData.pickups || pickupData || [];
-      
+
       setPickups(pickupsArray);
       setTotalPages(pickupData.totalPages || pickupData.pages || 1);
-      
     } catch (error) {
       console.error('Error fetching pickups:', error);
       setError('Failed to fetch pickups. Please try again.');
-      
+
       // Fallback to mock data if API fails
       setPickups([
         {
@@ -948,13 +1012,13 @@ const PickupManagement = () => {
           orderNumber: 'ORD001',
           customer: {
             name: 'John Doe',
-            phone: '+91 9876543210'
+            phone: '+91 9876543210',
           },
           address: {
             street: '123 Main St',
             city: 'Mumbai',
             state: 'Maharashtra',
-            pincode: '400001'
+            pincode: '400001',
           },
           scheduledDate: '2024-01-25',
           timeSlot: 'morning',
@@ -962,8 +1026,8 @@ const PickupManagement = () => {
           assignedTo: null,
           items: ['iPhone 14 Pro'],
           priority: 'normal',
-          createdAt: '2024-01-20T10:00:00Z'
-        }
+          createdAt: '2024-01-20T10:00:00Z',
+        },
       ]);
     } finally {
       setLoading(false);
@@ -974,71 +1038,71 @@ const PickupManagement = () => {
     try {
       setLoadingAgents(true);
       console.log('Fetching agents...');
-      
+
       // Try to fetch users with admin service first
       const usersResponse = await adminService.getAllUsers({ limit: 100 });
       console.log('Users response:', usersResponse);
-      
+
       const allUsers = usersResponse.users || usersResponse.data || [];
       console.log('All users:', allUsers);
-      
+
       // Filter for agents and drivers
-      const agents = allUsers.filter(user => 
-        user.role === 'agent' || 
-        user.role === 'driver' || 
-        user.role === 'pickup_agent' ||
-        user.type === 'agent' ||
-        user.type === 'driver'
+      const agents = allUsers.filter(
+        user =>
+          user.role === 'agent' ||
+          user.role === 'driver' ||
+          user.role === 'pickup_agent' ||
+          user.type === 'agent' ||
+          user.type === 'driver'
       );
-      
+
       console.log('Filtered agents:', agents);
-      
+
       // If no specific agents found, try pickup service
       if (agents.length === 0) {
         console.log('No agents found in users, trying pickup service...');
         const [driversResponse, agentsResponse] = await Promise.all([
-          pickupService.getDrivers({ limit: 100 }).catch((err) => {
+          pickupService.getDrivers({ limit: 100 }).catch(err => {
             console.log('Error fetching drivers:', err);
             return { users: [] };
           }),
-          pickupService.getPickupAgents({ limit: 100 }).catch((err) => {
+          pickupService.getPickupAgents({ limit: 100 }).catch(err => {
             console.log('Error fetching pickup agents:', err);
             return { users: [] };
-          })
+          }),
         ]);
-        
+
         const drivers = driversResponse.users || driversResponse.data || [];
         const pickupAgents = agentsResponse.users || agentsResponse.data || [];
-        
+
         console.log('Drivers:', drivers);
         console.log('Pickup agents:', pickupAgents);
-        
+
         // Combine and format agents
         const combinedAgents = [
           ...drivers.map(driver => ({ ...driver, type: 'driver' })),
-          ...pickupAgents.map(agent => ({ ...agent, type: 'pickup_agent' }))
+          ...pickupAgents.map(agent => ({ ...agent, type: 'pickup_agent' })),
         ];
-        
+
         console.log('Combined agents:', combinedAgents);
         setAgents(combinedAgents);
       } else {
-        const formattedAgents = agents.map(agent => ({ 
-          ...agent, 
-          type: agent.role || agent.type || 'agent' 
+        const formattedAgents = agents.map(agent => ({
+          ...agent,
+          type: agent.role || agent.type || 'agent',
         }));
         console.log('Setting agents:', formattedAgents);
         setAgents(formattedAgents);
       }
-      
     } catch (error) {
       console.error('Error fetching agents:', error);
       console.error('Error details:', error.response?.data || error.message);
-      
+
       // Fallback to mock agents
       const mockAgents = [
         { _id: '1', name: 'Agent A', email: 'agent.a@example.com', type: 'driver' },
         { _id: '2', name: 'Agent B', email: 'agent.b@example.com', type: 'pickup_agent' },
-        { _id: '3', name: 'Driver C', email: 'driver.c@example.com', type: 'driver' }
+        { _id: '3', name: 'Driver C', email: 'driver.c@example.com', type: 'driver' },
       ];
       console.log('Using mock agents:', mockAgents);
       setAgents(mockAgents);
@@ -1053,18 +1117,19 @@ const PickupManagement = () => {
     scheduled: pickups.filter(p => p.status === 'scheduled').length,
     confirmed: pickups.filter(p => p.status === 'confirmed').length,
     in_transit: pickups.filter(p => p.status === 'in_transit').length,
-    completed: pickups.filter(p => p.status === 'completed').length
+    completed: pickups.filter(p => p.status === 'completed').length,
   };
 
   const filteredPickups = pickups.filter(pickup => {
-    const matchesSearch = pickup.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         pickup.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         pickup.customer?.phone?.includes(searchTerm);
+    const matchesSearch =
+      pickup.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pickup.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pickup.customer?.phone?.includes(searchTerm);
     const matchesStatus = statusFilter === 'all' || pickup.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const handleCreatePickup = async (pickupData) => {
+  const handleCreatePickup = async pickupData => {
     try {
       setLoading(true);
       await pickupService.createPickup(pickupData);
@@ -1078,7 +1143,7 @@ const PickupManagement = () => {
     }
   };
 
-  const handleEditPickup = async (pickupData) => {
+  const handleEditPickup = async pickupData => {
     try {
       setLoading(true);
       await pickupService.updatePickup(selectedPickup._id, pickupData);
@@ -1119,17 +1184,17 @@ const PickupManagement = () => {
     }
   };
 
-  const handleViewPickup = (pickup) => {
+  const handleViewPickup = pickup => {
     setModalType('view');
     setSelectedPickup(pickup);
     setShowModal(true);
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleDateString('en-IN');
   };
 
-  const formatTimeSlot = (slot) => {
+  const formatTimeSlot = slot => {
     return slot === 'morning' ? '10:00 AM - 3:00 PM' : '3:00 PM - 6:00 PM';
   };
 
@@ -1160,18 +1225,20 @@ const PickupManagement = () => {
             <SearchInput
               placeholder="Search by customer, order number, or phone..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </SearchBox>
           <FilterButton onClick={() => {}}>
             <Filter size={16} />
             Filter
           </FilterButton>
-          <CreateButton onClick={() => {
-            setModalType('create');
-            setSelectedPickup(null);
-            setShowModal(true);
-          }}>
+          <CreateButton
+            onClick={() => {
+              setModalType('create');
+              setSelectedPickup(null);
+              setShowModal(true);
+            }}
+          >
             <Plus size={16} />
             Create Pickup
           </CreateButton>
@@ -1211,7 +1278,7 @@ const PickupManagement = () => {
           <div>Status</div>
           <div>Actions</div>
         </TableHeader>
-        
+
         {filteredPickups.map(pickup => (
           <TableRow key={pickup._id}>
             <div>
@@ -1251,18 +1318,18 @@ const PickupManagement = () => {
                   </div>
                 </div>
               ) : (
-                <select 
-                  onChange={(e) => {
+                <select
+                  onChange={e => {
                     if (e.target.value) {
                       handleAssignPickup(pickup._id, e.target.value);
                     }
                   }}
                   defaultValue=""
-                  style={{ 
-                    padding: '4px 8px', 
-                    border: '1px solid #ddd', 
+                  style={{
+                    padding: '4px 8px',
+                    border: '1px solid #ddd',
                     borderRadius: '4px',
-                    fontSize: '12px'
+                    fontSize: '12px',
                   }}
                 >
                   <option value="">Assign Agent</option>
@@ -1283,15 +1350,17 @@ const PickupManagement = () => {
               <ActionButton onClick={() => handleViewPickup(pickup)}>
                 <Eye size={16} />
               </ActionButton>
-              <ActionButton onClick={() => {
-                setModalType('edit');
-                setSelectedPickup(pickup);
-                setShowModal(true);
-              }}>
+              <ActionButton
+                onClick={() => {
+                  setModalType('edit');
+                  setSelectedPickup(pickup);
+                  setShowModal(true);
+                }}
+              >
                 <Edit size={16} />
               </ActionButton>
               {pickup.status === 'pending' && (
-                <ActionButton 
+                <ActionButton
                   onClick={() => handleStatusUpdate(pickup._id, 'assigned')}
                   style={{ color: '#28a745' }}
                 >
@@ -1305,15 +1374,18 @@ const PickupManagement = () => {
 
       {showModal && (
         <Modal onClick={() => setShowModal(false)}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
+          <ModalContent onClick={e => e.stopPropagation()}>
             <ModalHeader>
               <ModalTitle>
-                {modalType === 'create' ? 'Create New Pickup' : 
-                 modalType === 'edit' ? 'Edit Pickup' : 'Pickup Details'}
+                {modalType === 'create'
+                  ? 'Create New Pickup'
+                  : modalType === 'edit'
+                    ? 'Edit Pickup'
+                    : 'Pickup Details'}
               </ModalTitle>
               <CloseButton onClick={() => setShowModal(false)}>×</CloseButton>
             </ModalHeader>
-            
+
             {modalType === 'view' && selectedPickup && (
               <div>
                 <FormGroup>
@@ -1322,18 +1394,25 @@ const PickupManagement = () => {
                 </FormGroup>
                 <FormGroup>
                   <Label>Customer</Label>
-                  <div>{selectedPickup.customer?.name || 'N/A'} - {selectedPickup.customer?.phone || 'N/A'}</div>
+                  <div>
+                    {selectedPickup.customer?.name || 'N/A'} -{' '}
+                    {selectedPickup.customer?.phone || 'N/A'}
+                  </div>
                 </FormGroup>
                 <FormGroup>
                   <Label>Address</Label>
                   <div>
-                    {selectedPickup.address?.street || ''} {selectedPickup.address?.city || ''}<br/>
+                    {selectedPickup.address?.street || ''} {selectedPickup.address?.city || ''}
+                    <br />
                     {selectedPickup.address?.state || ''} {selectedPickup.address?.pincode || ''}
                   </div>
                 </FormGroup>
                 <FormGroup>
                   <Label>Scheduled Date & Time</Label>
-                  <div>{formatDate(selectedPickup.scheduledDate)} - {formatTimeSlot(selectedPickup.timeSlot)}</div>
+                  <div>
+                    {formatDate(selectedPickup.scheduledDate)} -{' '}
+                    {formatTimeSlot(selectedPickup.timeSlot)}
+                  </div>
                 </FormGroup>
                 <FormGroup>
                   <Label>Items</Label>
@@ -1351,7 +1430,7 @@ const PickupManagement = () => {
                 </FormGroup>
               </div>
             )}
-            
+
             {(modalType === 'create' || modalType === 'edit') && (
               <PickupForm
                 pickup={selectedPickup}
@@ -1363,7 +1442,7 @@ const PickupManagement = () => {
                 loadingOrders={loadingOrders}
                 onSubmit={modalType === 'create' ? handleCreatePickup : handleEditPickup}
                 onCancel={() => setShowModal(false)}
-                onOrderTypeChange={(orderType) => fetchOrders(orderType)}
+                onOrderTypeChange={orderType => fetchOrders(orderType)}
               />
             )}
           </ModalContent>

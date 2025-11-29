@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { 
+import {
   SellFlowWizard,
   DeviceSelection,
   QuestionnaireStep,
@@ -8,14 +8,14 @@ import {
   AccessorySelection,
   PriceCalculation,
   OrderPlacement,
-  OrderConfirmation
+  OrderConfirmation,
 } from '../../components/sell';
-import { 
+import {
   SellOrdersManagement,
   SellDefectsManagement,
   SellAccessoriesManagement,
   SellSessionsManagement,
-  SellConfigurationManagement
+  SellConfigurationManagement,
 } from '../admin';
 import { theme } from '../../theme';
 
@@ -89,8 +89,8 @@ const TabContainer = styled.div`
 const Tab = styled.button`
   padding: 12px 20px;
   border: none;
-  background: ${props => props.active ? theme.colors.primary : 'transparent'};
-  color: ${props => props.active ? 'white' : theme.colors.text.secondary};
+  background: ${props => (props.active ? theme.colors.primary : 'transparent')};
+  color: ${props => (props.active ? 'white' : theme.colors.text.secondary)};
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
@@ -98,8 +98,8 @@ const Tab = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${props => props.active ? theme.colors.primaryHover : theme.colors.background};
-    color: ${props => props.active ? 'white' : theme.colors.text.primary};
+    background: ${props => (props.active ? theme.colors.primaryHover : theme.colors.background)};
+    color: ${props => (props.active ? 'white' : theme.colors.text.primary)};
   }
 `;
 
@@ -113,18 +113,26 @@ const StatusBadge = styled.div`
   font-weight: 500;
   background: ${props => {
     switch (props.status) {
-      case 'working': return theme.colors.success + '20';
-      case 'error': return theme.colors.error + '20';
-      case 'warning': return theme.colors.warning + '20';
-      default: return theme.colors.background;
+      case 'working':
+        return theme.colors.success + '20';
+      case 'error':
+        return theme.colors.error + '20';
+      case 'warning':
+        return theme.colors.warning + '20';
+      default:
+        return theme.colors.background;
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'working': return theme.colors.success;
-      case 'error': return theme.colors.error;
-      case 'warning': return theme.colors.warning;
-      default: return theme.colors.text.secondary;
+      case 'working':
+        return theme.colors.success;
+      case 'error':
+        return theme.colors.error;
+      case 'warning':
+        return theme.colors.warning;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
 `;
@@ -145,50 +153,50 @@ const SellTestPage = () => {
       title: 'Complete Sell Flow Wizard',
       description: 'Full customer journey from device selection to order confirmation',
       component: <SellFlowWizard />,
-      status: 'working'
+      status: 'working',
     },
     device: {
       title: 'Device Selection',
       description: 'Product selection and variant choosing interface',
       component: <DeviceSelection onNext={() => {}} />,
-      status: 'working'
+      status: 'working',
     },
     questionnaire: {
       title: 'Device Questionnaire',
       description: 'Dynamic questionnaire for device condition assessment',
       component: <QuestionnaireStep sessionData={{}} onNext={() => {}} />,
-      status: 'working'
+      status: 'working',
     },
     defects: {
       title: 'Defect Selection',
       description: 'Interface for selecting device defects and damage',
       component: <DefectSelection sessionData={{}} onNext={() => {}} onBack={() => {}} />,
-      status: 'working'
+      status: 'working',
     },
     accessories: {
       title: 'Accessory Selection',
       description: 'Interface for selecting included accessories',
       component: <AccessorySelection sessionData={{}} onNext={() => {}} onBack={() => {}} />,
-      status: 'working'
+      status: 'working',
     },
     pricing: {
       title: 'Price Calculation',
       description: 'Final offer display with detailed pricing breakdown',
       component: <PriceCalculation sessionData={{}} onNext={() => {}} onBack={() => {}} />,
-      status: 'working'
+      status: 'working',
     },
     order: {
       title: 'Order Placement',
       description: 'Customer details collection and order creation',
       component: <OrderPlacement sessionData={{}} onNext={() => {}} onBack={() => {}} />,
-      status: 'working'
+      status: 'working',
     },
     confirmation: {
       title: 'Order Confirmation',
       description: 'Order success confirmation and next steps',
       component: <OrderConfirmation orderData={{}} onSellAnother={() => {}} onGoHome={() => {}} />,
-      status: 'working'
-    }
+      status: 'working',
+    },
   };
 
   const adminComponents = {
@@ -196,32 +204,32 @@ const SellTestPage = () => {
       title: 'Orders Management',
       description: 'Comprehensive admin interface for managing sell orders',
       component: <SellOrdersManagement />,
-      status: 'working'
+      status: 'working',
     },
     defects: {
       title: 'Defects Management',
       description: 'Admin interface for managing device defects and pricing impacts',
       component: <SellDefectsManagement />,
-      status: 'working'
+      status: 'working',
     },
     accessories: {
       title: 'Accessories Management',
       description: 'Admin interface for managing device accessories and pricing',
       component: <SellAccessoriesManagement />,
-      status: 'working'
+      status: 'working',
     },
     sessions: {
       title: 'Sessions Management',
       description: 'Admin interface for monitoring and managing sell sessions',
       component: <SellSessionsManagement />,
-      status: 'working'
+      status: 'working',
     },
     configuration: {
       title: 'Configuration Management',
       description: 'Admin interface for managing sell module settings and configuration',
       component: <SellConfigurationManagement />,
-      status: 'working'
-    }
+      status: 'working',
+    },
   };
 
   return (
@@ -229,8 +237,8 @@ const SellTestPage = () => {
       <Header>
         <Title>Sell Module Test Page</Title>
         <Description>
-          This page demonstrates all the sell module components working together. 
-          Test both customer-facing and admin interfaces to ensure proper integration.
+          This page demonstrates all the sell module components working together. Test both
+          customer-facing and admin interfaces to ensure proper integration.
         </Description>
       </Header>
 
@@ -243,7 +251,8 @@ const SellTestPage = () => {
           </StatusBadge>
         </SectionTitle>
         <SectionDescription>
-          These components handle the complete customer sell journey from device selection to order confirmation.
+          These components handle the complete customer sell journey from device selection to order
+          confirmation.
         </SectionDescription>
 
         <TabContainer>
@@ -258,9 +267,7 @@ const SellTestPage = () => {
           ))}
         </TabContainer>
 
-        <ComponentWrapper>
-          {customerComponents[activeCustomerTab].component}
-        </ComponentWrapper>
+        <ComponentWrapper>{customerComponents[activeCustomerTab].component}</ComponentWrapper>
       </TestSection>
 
       <TestSection>
@@ -272,24 +279,19 @@ const SellTestPage = () => {
           </StatusBadge>
         </SectionTitle>
         <SectionDescription>
-          These components provide comprehensive admin interfaces for managing all aspects of the sell module.
+          These components provide comprehensive admin interfaces for managing all aspects of the
+          sell module.
         </SectionDescription>
 
         <TabContainer>
           {Object.entries(adminComponents).map(([key, component]) => (
-            <Tab
-              key={key}
-              active={activeAdminTab === key}
-              onClick={() => setActiveAdminTab(key)}
-            >
+            <Tab key={key} active={activeAdminTab === key} onClick={() => setActiveAdminTab(key)}>
               {component.title}
             </Tab>
           ))}
         </TabContainer>
 
-        <ComponentWrapper>
-          {adminComponents[activeAdminTab].component}
-        </ComponentWrapper>
+        <ComponentWrapper>{adminComponents[activeAdminTab].component}</ComponentWrapper>
       </TestSection>
     </Container>
   );

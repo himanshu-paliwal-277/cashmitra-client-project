@@ -11,7 +11,7 @@ class PickupService {
       if (params.status) queryParams.append('status', params.status);
       if (params.startDate) queryParams.append('startDate', params.startDate);
       if (params.endDate) queryParams.append('endDate', params.endDate);
-      
+
       const response = await api.get(`/pickups?${queryParams}`);
       return response.data;
     } catch (error) {
@@ -115,7 +115,7 @@ class PickupService {
       if (params.startDate) queryParams.append('startDate', params.startDate);
       if (params.endDate) queryParams.append('endDate', params.endDate);
       if (params.agentId) queryParams.append('agentId', params.agentId);
-      
+
       const response = await api.get(`/pickups/analytics?${queryParams}`);
       return response.data;
     } catch (error) {
@@ -130,7 +130,7 @@ class PickupService {
       const queryParams = new URLSearchParams();
       if (params.status) queryParams.append('status', params.status);
       if (params.date) queryParams.append('date', params.date);
-      
+
       const response = await api.get(`/pickups/agent/${agentId}?${queryParams}`);
       return response.data;
     } catch (error) {
@@ -148,7 +148,7 @@ class PickupService {
       if (params.limit) queryParams.append('limit', params.limit || 100); // Get more drivers
       if (params.search) queryParams.append('search', params.search);
       queryParams.append('isVerified', 'true'); // Only verified drivers
-      
+
       const response = await api.get(`/admin/users?${queryParams}`);
       return response.data;
     } catch (error) {
@@ -166,7 +166,7 @@ class PickupService {
       if (params.limit) queryParams.append('limit', params.limit || 100);
       if (params.search) queryParams.append('search', params.search);
       queryParams.append('isVerified', 'true'); // Only verified agents
-      
+
       const response = await api.get(`/admin/users?${queryParams}`);
       return response.data;
     } catch (error) {

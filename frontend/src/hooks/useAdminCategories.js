@@ -15,15 +15,15 @@ export const useAdminCategories = () => {
       const response = await adminService.getCategories();
       setCategories(response.data || response);
       setTotalCategories(response.data?.length || response.length || 0);
-      
+
       // Set category stats
       const data = response.data || response;
       setCategoryStats({
         totalCategories: data.length || 0,
         parentCategories: data.filter(cat => !cat.parentId)?.length || 0,
-        subCategories: data.filter(cat => cat.parentId)?.length || 0
+        subCategories: data.filter(cat => cat.parentId)?.length || 0,
       });
-      
+
       return response;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch categories');
@@ -33,21 +33,24 @@ export const useAdminCategories = () => {
     }
   }, []);
 
-  const addCategory = useCallback(async (categoryData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await adminService.createCategory(categoryData);
-      // Refresh categories list after adding
-      await fetchCategories();
-      return response;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to add category');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchCategories]);
+  const addCategory = useCallback(
+    async categoryData => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await adminService.createCategory(categoryData);
+        // Refresh categories list after adding
+        await fetchCategories();
+        return response;
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to add category');
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchCategories]
+  );
 
   const editCategory = useCallback(async (id, categoryData) => {
     setLoading(true);
@@ -55,8 +58,8 @@ export const useAdminCategories = () => {
     try {
       const response = await adminService.updateCategory(id, categoryData);
       // Update the category in the local state
-      setCategories(prevCategories => 
-        prevCategories.map(category => 
+      setCategories(prevCategories =>
+        prevCategories.map(category =>
           category.id === id ? { ...category, ...categoryData } : category
         )
       );
@@ -69,7 +72,7 @@ export const useAdminCategories = () => {
     }
   }, []);
 
-  const removeCategory = useCallback(async (id) => {
+  const removeCategory = useCallback(async id => {
     setLoading(true);
     setError(null);
     try {
@@ -100,7 +103,7 @@ export const useAdminCategories = () => {
     addCategory,
     editCategory,
     updateCategory: editCategory,
-    removeCategory
+    removeCategory,
   };
 };
 

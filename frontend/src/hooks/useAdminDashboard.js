@@ -1,9 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { 
-  getDashboardStats, 
-  getRecentOrders, 
-  getRecentPartners 
-} from '../services/adminService';
+import { getDashboardStats, getRecentOrders, getRecentPartners } from '../services/adminService';
 
 export const useAdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -62,11 +58,7 @@ export const useAdminDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      await Promise.all([
-        fetchDashboardStats(),
-        fetchRecentOrders(),
-        fetchRecentPartners()
-      ]);
+      await Promise.all([fetchDashboardStats(), fetchRecentOrders(), fetchRecentPartners()]);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load dashboard data');
       throw err;
@@ -89,6 +81,6 @@ export const useAdminDashboard = () => {
     fetchDashboardStats,
     fetchRecentOrders,
     fetchRecentPartners,
-    loadDashboardData
+    loadDashboardData,
   };
 };

@@ -16,7 +16,7 @@ import {
   User,
   Phone,
   MapPin,
-  CreditCard
+  CreditCard,
 } from 'lucide-react';
 
 const OrdersContainer = styled.div`
@@ -45,8 +45,9 @@ const HeaderActions = styled.div`
 `;
 
 const Button = styled.button`
-  background: ${props => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${props => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
+  background: ${props =>
+    props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
+  color: ${props => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
   border: 1px solid ${props => props.theme.colors.primary};
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -56,9 +57,10 @@ const Button = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
+
   &:hover {
-    background: ${props => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
+    background: ${props =>
+      props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
     color: white;
   }
 `;
@@ -75,7 +77,7 @@ const StatCard = styled.div`
   padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   text-align: center;
 `;
 
@@ -118,7 +120,7 @@ const SearchInput = styled.input`
   border: 1px solid ${props => props.theme.colors.border};
   border-radius: 8px;
   font-size: 1rem;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
@@ -139,7 +141,7 @@ const FilterSelect = styled.select`
   border-radius: 8px;
   background: white;
   cursor: pointer;
-  
+
   &:focus {
     outline: none;
     border-color: ${props => props.theme.colors.primary};
@@ -155,13 +157,15 @@ const OrderCard = styled.div`
   background: white;
   border-radius: 12px;
   border: 1px solid ${props => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -217,26 +221,42 @@ const StatusBadge = styled.span`
   margin-left: auto;
   background: ${props => {
     switch (props.status) {
-      case 'pending': return '#FEF3C7';
-      case 'confirmed': return '#DBEAFE';
-      case 'processing': return '#E0E7FF';
-      case 'shipped': return '#FEF3C7';
-      case 'delivered': return '#D1FAE5';
-      case 'cancelled': return '#FEE2E2';
-      case 'returned': return '#F3F4F6';
-      default: return '#F3F4F6';
+      case 'pending':
+        return '#FEF3C7';
+      case 'confirmed':
+        return '#DBEAFE';
+      case 'processing':
+        return '#E0E7FF';
+      case 'shipped':
+        return '#FEF3C7';
+      case 'delivered':
+        return '#D1FAE5';
+      case 'cancelled':
+        return '#FEE2E2';
+      case 'returned':
+        return '#F3F4F6';
+      default:
+        return '#F3F4F6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'pending': return '#92400E';
-      case 'confirmed': return '#1E40AF';
-      case 'processing': return '#5B21B6';
-      case 'shipped': return '#92400E';
-      case 'delivered': return '#065F46';
-      case 'cancelled': return '#991B1B';
-      case 'returned': return '#374151';
-      default: return '#374151';
+      case 'pending':
+        return '#92400E';
+      case 'confirmed':
+        return '#1E40AF';
+      case 'processing':
+        return '#5B21B6';
+      case 'shipped':
+        return '#92400E';
+      case 'delivered':
+        return '#065F46';
+      case 'cancelled':
+        return '#991B1B';
+      case 'returned':
+        return '#374151';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -250,7 +270,7 @@ const CustomerInfo = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -291,7 +311,7 @@ const ProductItem = styled.div`
   background: ${props => props.theme.colors.background};
   border-radius: 8px;
   margin-bottom: 0.75rem;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -352,23 +372,34 @@ const OrderActions = styled.div`
 const ActionButton = styled.button`
   background: ${props => {
     switch (props.variant) {
-      case 'primary': return props.theme.colors.primary;
-      case 'success': return '#10B981';
-      case 'warning': return '#F59E0B';
-      case 'danger': return '#EF4444';
-      default: return 'transparent';
+      case 'primary':
+        return props.theme.colors.primary;
+      case 'success':
+        return '#10B981';
+      case 'warning':
+        return '#F59E0B';
+      case 'danger':
+        return '#EF4444';
+      default:
+        return 'transparent';
     }
   }};
-  color: ${props => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
-  border: 1px solid ${props => {
-    switch (props.variant) {
-      case 'primary': return props.theme.colors.primary;
-      case 'success': return '#10B981';
-      case 'warning': return '#F59E0B';
-      case 'danger': return '#EF4444';
-      default: return props.theme.colors.border;
-    }
-  }};
+  color: ${props => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
+  border: 1px solid
+    ${props => {
+      switch (props.variant) {
+        case 'primary':
+          return props.theme.colors.primary;
+        case 'success':
+          return '#10B981';
+        case 'warning':
+          return '#F59E0B';
+        case 'danger':
+          return '#EF4444';
+        default:
+          return props.theme.colors.border;
+      }
+    }};
   padding: 0.5rem 1rem;
   border-radius: 6px;
   font-size: 0.875rem;
@@ -378,7 +409,7 @@ const ActionButton = styled.button`
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  
+
   &:hover {
     opacity: 0.9;
     transform: translateY(-1px);
@@ -394,7 +425,7 @@ function Orders() {
     { label: 'Total Orders', value: '156' },
     { label: 'Pending', value: '12' },
     { label: 'Processing', value: '8' },
-    { label: 'Delivered', value: '134' }
+    { label: 'Delivered', value: '134' },
   ];
 
   const orders = [
@@ -404,25 +435,25 @@ function Orders() {
       customer: {
         name: 'Amit Sharma',
         phone: '+91 98765 43210',
-        email: 'amit.sharma@email.com'
+        email: 'amit.sharma@email.com',
       },
       address: {
         street: '123 MG Road',
         city: 'Bangalore',
         state: 'Karnataka',
-        pincode: '560001'
+        pincode: '560001',
       },
       products: [
         {
           name: 'iPhone 13 Pro',
           sku: 'APL-IP13P-128',
           price: '₹89,999',
-          quantity: 1
-        }
+          quantity: 1,
+        },
       ],
       total: '₹89,999',
       status: 'processing',
-      paymentMethod: 'Credit Card'
+      paymentMethod: 'Credit Card',
     },
     {
       id: '#ORD-002',
@@ -430,25 +461,25 @@ function Orders() {
       customer: {
         name: 'Priya Patel',
         phone: '+91 87654 32109',
-        email: 'priya.patel@email.com'
+        email: 'priya.patel@email.com',
       },
       address: {
         street: '456 Park Street',
         city: 'Mumbai',
         state: 'Maharashtra',
-        pincode: '400001'
+        pincode: '400001',
       },
       products: [
         {
           name: 'Samsung Galaxy S22',
           sku: 'SAM-GS22-256',
           price: '₹65,999',
-          quantity: 1
-        }
+          quantity: 1,
+        },
       ],
       total: '₹65,999',
       status: 'delivered',
-      paymentMethod: 'UPI'
+      paymentMethod: 'UPI',
     },
     {
       id: '#ORD-003',
@@ -456,68 +487,71 @@ function Orders() {
       customer: {
         name: 'Rohit Singh',
         phone: '+91 76543 21098',
-        email: 'rohit.singh@email.com'
+        email: 'rohit.singh@email.com',
       },
       address: {
         street: '789 Civil Lines',
         city: 'Delhi',
         state: 'Delhi',
-        pincode: '110001'
+        pincode: '110001',
       },
       products: [
         {
           name: 'OnePlus 10 Pro',
           sku: 'OPL-10P-256',
           price: '₹54,999',
-          quantity: 1
-        }
+          quantity: 1,
+        },
       ],
       total: '₹54,999',
       status: 'pending',
-      paymentMethod: 'Wallet'
-    }
+      paymentMethod: 'Wallet',
+    },
   ];
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customer.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customer.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
-      case 'pending': return <Clock size={12} />;
-      case 'confirmed': return <CheckCircle size={12} />;
-      case 'processing': return <Package size={12} />;
-      case 'shipped': return <Truck size={12} />;
-      case 'delivered': return <CheckCircle size={12} />;
-      case 'cancelled': return <X size={12} />;
-      case 'returned': return <AlertTriangle size={12} />;
-      default: return null;
+      case 'pending':
+        return <Clock size={12} />;
+      case 'confirmed':
+        return <CheckCircle size={12} />;
+      case 'processing':
+        return <Package size={12} />;
+      case 'shipped':
+        return <Truck size={12} />;
+      case 'delivered':
+        return <CheckCircle size={12} />;
+      case 'cancelled':
+        return <X size={12} />;
+      case 'returned':
+        return <AlertTriangle size={12} />;
+      default:
+        return null;
     }
   };
 
-  const getActionButtons = (status) => {
+  const getActionButtons = status => {
     switch (status) {
       case 'pending':
         return [
           { label: 'Confirm', variant: 'success', icon: <CheckCircle size={14} /> },
-          { label: 'Cancel', variant: 'danger', icon: <X size={14} /> }
+          { label: 'Cancel', variant: 'danger', icon: <X size={14} /> },
         ];
       case 'confirmed':
-        return [
-          { label: 'Start Processing', variant: 'primary', icon: <Package size={14} /> }
-        ];
+        return [{ label: 'Start Processing', variant: 'primary', icon: <Package size={14} /> }];
       case 'processing':
-        return [
-          { label: 'Mark Shipped', variant: 'warning', icon: <Truck size={14} /> }
-        ];
+        return [{ label: 'Mark Shipped', variant: 'warning', icon: <Truck size={14} /> }];
       case 'shipped':
-        return [
-          { label: 'Mark Delivered', variant: 'success', icon: <CheckCircle size={14} /> }
-        ];
+        return [{ label: 'Mark Delivered', variant: 'success', icon: <CheckCircle size={14} /> }];
       default:
         return [];
     }
@@ -556,14 +590,11 @@ function Orders() {
               type="text"
               placeholder="Search orders by ID or customer name..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
             />
           </SearchContainer>
-          
-          <FilterSelect
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
+
+          <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
@@ -572,11 +603,8 @@ function Orders() {
             <option value="delivered">Delivered</option>
             <option value="cancelled">Cancelled</option>
           </FilterSelect>
-          
-          <FilterSelect
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-          >
+
+          <FilterSelect value={dateFilter} onChange={e => setDateFilter(e.target.value)}>
             <option value="all">All Time</option>
             <option value="today">Today</option>
             <option value="week">This Week</option>
@@ -586,7 +614,7 @@ function Orders() {
       </FiltersSection>
 
       <OrdersGrid>
-        {filteredOrders.map((order) => (
+        {filteredOrders.map(order => (
           <OrderCard key={order.id}>
             <OrderHeader>
               <OrderInfo>
@@ -596,7 +624,7 @@ function Orders() {
                   {new Date(order.date).toLocaleDateString('en-IN', {
                     year: 'numeric',
                     month: 'short',
-                    day: 'numeric'
+                    day: 'numeric',
                   })}
                 </OrderDate>
               </OrderInfo>
@@ -608,7 +636,7 @@ function Orders() {
                 </StatusBadge>
               </OrderAmount>
             </OrderHeader>
-            
+
             <OrderContent>
               <CustomerInfo>
                 <InfoSection>
@@ -625,7 +653,7 @@ function Orders() {
                     {order.customer.phone}
                   </InfoItem>
                 </InfoSection>
-                
+
                 <InfoSection>
                   <InfoTitle>
                     <MapPin size={16} />
@@ -640,7 +668,7 @@ function Orders() {
                   </InfoItem>
                 </InfoSection>
               </CustomerInfo>
-              
+
               <ProductsList>
                 {order.products.map((product, index) => (
                   <ProductItem key={index}>
@@ -658,7 +686,7 @@ function Orders() {
                   </ProductItem>
                 ))}
               </ProductsList>
-              
+
               <OrderActions>
                 <ActionButton variant="outline">
                   <Eye size={14} />

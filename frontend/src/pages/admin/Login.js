@@ -14,7 +14,11 @@ const LoginContainer = styled.div`
   align-items: center;
   min-height: 100vh;
   padding: ${theme.spacing[6]};
-  background: linear-gradient(135deg, ${theme.colors.primary[50]} 0%, ${theme.colors.primary[100]} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primary[50]} 0%,
+    ${theme.colors.primary[100]} 100%
+  );
 `;
 
 const LoginCard = styled(Card)`
@@ -68,27 +72,27 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
-    
+
     // Clear field-specific error when user types
     if (errors[name]) {
       setErrors({
         ...errors,
-        [name]: ''
+        [name]: '',
       });
     }
-    
+
     // Clear general login error when user makes changes
     if (loginError) {
       setLoginError('');
@@ -97,42 +101,42 @@ const AdminLogin = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const { login } = useAdminAuth();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsLoading(true);
     setLoginError('');
-    
+
     try {
       const result = await login(formData.email, formData.password);
-      
+
       if (!result.success) {
         throw new Error(result.error || 'Login failed');
       }
-      
+
       // Redirect to admin dashboard
       navigate('/admin/dashboard');
     } catch (error) {
@@ -151,14 +155,14 @@ const AdminLogin = () => {
             <Title>Admin Login</Title>
             <Subtitle>Enter your credentials to access the admin panel</Subtitle>
           </LoginHeader>
-          
+
           {loginError && (
             <ErrorMessage>
               <AlertCircle size={16} />
               {loginError}
             </ErrorMessage>
           )}
-          
+
           <Form onSubmit={handleSubmit}>
             <Input
               type="email"
@@ -171,7 +175,7 @@ const AdminLogin = () => {
               leftIcon={<Mail size={18} />}
               required={true}
             />
-            
+
             <Input
               type="password"
               name="password"
@@ -183,14 +187,8 @@ const AdminLogin = () => {
               leftIcon={<Lock size={18} />}
               required={true}
             />
-            
-            <Button 
-              type="submit" 
-              variant="primary" 
-              size="lg" 
-              fullWidth={true}
-              disabled={isLoading}
-            >
+
+            <Button type="submit" variant="primary" size="lg" fullWidth={true} disabled={isLoading}>
               {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </Form>

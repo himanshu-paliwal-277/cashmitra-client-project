@@ -44,12 +44,12 @@ const DefectsGrid = styled.div`
 `;
 
 const DefectCard = styled.div`
-  border: 2px solid ${props => props.selected ? '#667eea' : '#e0e0e0'};
+  border: 2px solid ${props => (props.selected ? '#667eea' : '#e0e0e0')};
   border-radius: 15px;
   padding: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: ${props => props.selected ? '#f8f9ff' : 'white'};
+  background: ${props => (props.selected ? '#f8f9ff' : 'white')};
 
   &:hover {
     border-color: #667eea;
@@ -150,7 +150,7 @@ const NoDefectsMessage = styled.div`
 const SellDefects = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [defects, setDefects] = useState([]);
   const [selectedDefects, setSelectedDefects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -163,7 +163,7 @@ const SellDefects = () => {
       navigate('/sell');
       return;
     }
-console.log('answers',answers)
+    console.log('answers', answers);
 
     fetchDefects();
   }, [product, productId, navigate]);
@@ -172,7 +172,7 @@ console.log('answers',answers)
     try {
       setLoading(true);
       setError(null);
-      
+
       const defectsData = await sellService.getCustomerDefects(productId);
       setDefects(defectsData || []);
     } catch (err) {
@@ -183,7 +183,7 @@ console.log('answers',answers)
     }
   };
 
-  const handleDefectToggle = (defect) => {
+  const handleDefectToggle = defect => {
     setSelectedDefects(prev => {
       const isSelected = prev.some(d => d.id === defect.id);
       if (isSelected) {
@@ -206,8 +206,8 @@ console.log('answers',answers)
         answers,
         productId,
         variantId,
-        selectedDefects
-      }
+        selectedDefects,
+      },
     });
   };
 
@@ -239,31 +239,23 @@ console.log('answers',answers)
           </NoDefectsMessage>
         ) : (
           <DefectsGrid>
-            {defects.map((defect) => (
+            {defects.map(defect => (
               <DefectCard
                 key={defect.id}
                 selected={selectedDefects.some(d => d.id === defect.id)}
                 onClick={() => handleDefectToggle(defect)}
               >
                 <DefectName>{defect.name || defect.title}</DefectName>
-                {defect.description && (
-                  <DefectDescription>{defect.description}</DefectDescription>
-                )}
-                {defect.priceDeduction && (
-                  <DefectPrice>-₹{defect.priceDeduction}</DefectPrice>
-                )}
+                {defect.description && <DefectDescription>{defect.description}</DefectDescription>}
+                {defect.priceDeduction && <DefectPrice>-₹{defect.priceDeduction}</DefectPrice>}
               </DefectCard>
             ))}
           </DefectsGrid>
         )}
 
         <ButtonContainer>
-          <BackButton onClick={handleBack}>
-            Back
-          </BackButton>
-          <ContinueButton onClick={handleContinue}>
-            Continue to Accessories
-          </ContinueButton>
+          <BackButton onClick={handleBack}>Back</BackButton>
+          <ContinueButton onClick={handleContinue}>Continue to Accessories</ContinueButton>
         </ButtonContainer>
       </Container>
     </PageContainer>

@@ -1,6 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircle, Package, Truck, MapPin, CreditCard, Calendar, Download, Share2, MessageCircle, ArrowRight, Home, ShoppingBag, Star, Sparkles, Gift, Phone, Mail, HelpCircle } from 'lucide-react';
+import {
+  CheckCircle,
+  Package,
+  Truck,
+  MapPin,
+  CreditCard,
+  Calendar,
+  Download,
+  Share2,
+  MessageCircle,
+  ArrowRight,
+  Home,
+  ShoppingBag,
+  Star,
+  Sparkles,
+  Gift,
+  Phone,
+  Mail,
+  HelpCircle,
+} from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -11,33 +30,33 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
   const navigate = useNavigate();
   const { currentOrder, clearOrderData } = useAuth();
   const [isLoaded, setIsLoaded] = useState(false);
-  
+
   // Get order data from context first, then navigation state or props
   const orderResponse = currentOrder || location.state?.orderData || orderData;
   const order = orderResponse?.data?.order || orderResponse?.order || orderResponse;
   const currentDate = new Date();
-  const deliveryDate = new Date(currentDate.getTime() + (3 * 24 * 60 * 60 * 1000)); // 3 days from now
-  
+  const deliveryDate = new Date(currentDate.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 days from now
+
   // Helper function to format currency
-  const formatCurrency = (amount) => {
+  const formatCurrency = amount => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
-  
+
   // Helper function to format address
-  const formatAddress = (address) => {
+  const formatAddress = address => {
     if (!address) return 'Address not provided';
     const { street, city, state, pincode, country } = address;
     return `${street || ''}\n${city || ''}, ${state || ''} ${pincode || ''}\n${country || ''}`.trim();
   };
-  
+
   useEffect(() => {
     setIsLoaded(true);
-    
+
     // Cleanup order data when component unmounts
     return () => {
       if (currentOrder) {
@@ -51,30 +70,35 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
       icon: CheckCircle,
       title: 'Order Confirmed',
       description: 'Your order has been placed successfully',
-      date: order?.createdAt ? new Date(order.createdAt).toLocaleDateString() : currentDate.toLocaleDateString(),
-      completed: true
+      date: order?.createdAt
+        ? new Date(order.createdAt).toLocaleDateString()
+        : currentDate.toLocaleDateString(),
+      completed: true,
     },
     {
       icon: Package,
       title: 'Processing',
       description: 'Your order is being prepared for shipment',
       date: 'Within 24 hours',
-      completed: order?.status === 'processing' || order?.status === 'shipped' || order?.status === 'delivered'
+      completed:
+        order?.status === 'processing' ||
+        order?.status === 'shipped' ||
+        order?.status === 'delivered',
     },
     {
       icon: Truck,
       title: 'Shipped',
       description: 'Your order is on its way to you',
       date: 'Expected tomorrow',
-      completed: order?.status === 'shipped' || order?.status === 'delivered'
+      completed: order?.status === 'shipped' || order?.status === 'delivered',
     },
     {
       icon: Home,
       title: 'Delivered',
       description: 'Your order will be delivered',
       date: deliveryDate.toLocaleDateString(),
-      completed: order?.status === 'delivered'
-    }
+      completed: order?.status === 'delivered',
+    },
   ];
 
   const quickActions = [
@@ -85,7 +109,7 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
       onClick: () => {
         console.log('Download invoice');
         // Add download functionality here
-      }
+      },
     },
     {
       icon: Share2,
@@ -94,7 +118,7 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
       onClick: () => {
         console.log('Share order');
         // Add share functionality here
-      }
+      },
     },
     {
       icon: Package,
@@ -103,8 +127,8 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
       onClick: () => {
         console.log('Track package');
         // Add tracking functionality here
-      }
-    }
+      },
+    },
   ];
 
   const handleContinueShopping = () => {
@@ -155,8 +179,8 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                   {timeline.map((item, index) => {
                     const IconComponent = item.icon;
                     return (
-                      <div 
-                        key={index} 
+                      <div
+                        key={index}
                         className={`timeline-item ${item.completed ? 'completed' : ''}`}
                         style={{ animationDelay: `${index * 0.1}s` }}
                       >
@@ -181,17 +205,17 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                   Order Items
                 </h2>
                 {order?.items?.map((item, index) => (
-                  <div 
-                    key={item._id || index} 
+                  <div
+                    key={item._id || index}
                     className="order-item"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="item-image">
-                      <img 
-                        src={item.product?.images?.[0] || "/api/placeholder/100/100"} 
-                        alt={item.product?.name || 'Product'} 
-                        onError={(e) => {
-                          e.target.src = "/api/placeholder/100/100";
+                      <img
+                        src={item.product?.images?.[0] || '/api/placeholder/100/100'}
+                        alt={item.product?.name || 'Product'}
+                        onError={e => {
+                          e.target.src = '/api/placeholder/100/100';
                         }}
                       />
                     </div>
@@ -242,7 +266,7 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                       {formatAddress(order?.shippingDetails?.address)}
                     </div>
                   </div>
-                  
+
                   <div className="info-card">
                     <div className="info-header">
                       <div className="info-icon">
@@ -251,16 +275,22 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                       <h3 className="info-title payment">Payment Method</h3>
                     </div>
                     <div className="info-content">
-                      {order?.paymentDetails?.method || 'Not specified'}<br />
-                      <span className={`status-badge ${
-                        order?.paymentDetails?.status === 'completed' ? 'success' :
-                        order?.paymentDetails?.status === 'pending' ? 'warning' : 'error'
-                      }`}>
+                      {order?.paymentDetails?.method || 'Not specified'}
+                      <br />
+                      <span
+                        className={`status-badge ${
+                          order?.paymentDetails?.status === 'completed'
+                            ? 'success'
+                            : order?.paymentDetails?.status === 'pending'
+                              ? 'warning'
+                              : 'error'
+                        }`}
+                      >
                         {order?.paymentDetails?.status || 'Pending'}
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="info-card">
                     <div className="info-header">
                       <div className="info-icon">
@@ -269,11 +299,12 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                       <h3 className="info-title method">Order Type</h3>
                     </div>
                     <div className="info-content">
-                      {order?.orderType === 'buy' ? 'Purchase Order' : 'Sell Order'}<br />
+                      {order?.orderType === 'buy' ? 'Purchase Order' : 'Sell Order'}
+                      <br />
                       Standard Processing
                     </div>
                   </div>
-                  
+
                   <div className="info-card">
                     <div className="info-header">
                       <div className="info-icon">
@@ -282,12 +313,14 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                       <h3 className="info-title date">Order Date</h3>
                     </div>
                     <div className="info-content">
-                      {order?.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      }) : 'Date not available'}
+                      {order?.createdAt
+                        ? new Date(order.createdAt).toLocaleDateString('en-IN', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })
+                        : 'Date not available'}
                     </div>
                   </div>
                 </div>
@@ -323,11 +356,17 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                 <h3 className="action-title">Order Summary</h3>
                 <div className="summary-row">
                   <span className="summary-label subtotal">Subtotal</span>
-                  <span className="summary-value">{formatCurrency(order?.totalAmount - (order?.commission?.amount || 0))}</span>
+                  <span className="summary-value">
+                    {formatCurrency(order?.totalAmount - (order?.commission?.amount || 0))}
+                  </span>
                 </div>
                 <div className="summary-row">
-                  <span className="summary-label commission">Commission ({((order?.commission?.rate || 0) * 100).toFixed(1)}%)</span>
-                  <span className="summary-value">{formatCurrency(order?.commission?.amount || 0)}</span>
+                  <span className="summary-label commission">
+                    Commission ({((order?.commission?.rate || 0) * 100).toFixed(1)}%)
+                  </span>
+                  <span className="summary-value">
+                    {formatCurrency(order?.commission?.amount || 0)}
+                  </span>
                 </div>
                 <div className="summary-row">
                   <span className="summary-label">Delivery</span>
@@ -335,7 +374,9 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                 </div>
                 <div className="summary-row total">
                   <span className="summary-label total">Total Paid</span>
-                  <span className="summary-value total">{formatCurrency(order?.totalAmount || 0)}</span>
+                  <span className="summary-value total">
+                    {formatCurrency(order?.totalAmount || 0)}
+                  </span>
                 </div>
               </div>
 
@@ -355,7 +396,7 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                       <span className="support-value">+91 9999999999</span>
                     </div>
                   </div>
-                  
+
                   <div className="support-item">
                     <div className="support-icon">
                       <Mail size={16} />
@@ -365,7 +406,7 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                       <span className="support-value">support@cashify.com</span>
                     </div>
                   </div>
-                  
+
                   <div className="support-item">
                     <div className="support-icon">
                       <MessageCircle size={16} />
@@ -375,7 +416,7 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
                       <span className="support-value">Available 24/7</span>
                     </div>
                   </div>
-                  
+
                   <div className="support-item">
                     <div className="support-icon">
                       <HelpCircle size={16} />

@@ -7,7 +7,10 @@ const LoginPage = () => {
     <>
       <Helmet>
         <title>Login - Cashmitra</title>
-        <meta name="description" content="Sign in to your Cashmitra account to access your dashboard, manage your devices, and track your transactions." />
+        <meta
+          name="description"
+          content="Sign in to your Cashmitra account to access your dashboard, manage your devices, and track your transactions."
+        />
         <meta name="keywords" content="login, sign in, cashmitra, account, authentication" />
       </Helmet>
       <Login />

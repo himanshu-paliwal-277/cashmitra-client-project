@@ -26,19 +26,21 @@ const useWebSocket = (url, options = {}) => {
         setIsConnected(true);
         setError(null);
         reconnectAttemptsRef.current = 0;
-        
+
         // Send authentication message
-        ws.send(JSON.stringify({
-          type: 'auth',
-          token: token
-        }));
+        ws.send(
+          JSON.stringify({
+            type: 'auth',
+            token: token,
+          })
+        );
       };
 
-      ws.onmessage = (event) => {
+      ws.onmessage = event => {
         try {
           const data = JSON.parse(event.data);
           setLastMessage(data);
-          
+
           // Handle different message types
           if (options.onMessage) {
             options.onMessage(data);
@@ -48,7 +50,7 @@ const useWebSocket = (url, options = {}) => {
         }
       };
 
-      ws.onclose = (event) => {
+      ws.onclose = event => {
         console.log('WebSocket disconnected:', event.code, event.reason);
         setIsConnected(false);
         setSocket(null);
@@ -56,8 +58,10 @@ const useWebSocket = (url, options = {}) => {
         // Attempt to reconnect if not a manual close
         if (event.code !== 1000 && reconnectAttemptsRef.current < maxReconnectAttempts) {
           reconnectAttemptsRef.current += 1;
-          console.log(`Attempting to reconnect... (${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
-          
+          console.log(
+            `Attempting to reconnect... (${reconnectAttemptsRef.current}/${maxReconnectAttempts})`
+          );
+
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
           }, reconnectInterval);
@@ -66,7 +70,7 @@ const useWebSocket = (url, options = {}) => {
         }
       };
 
-      ws.onerror = (error) => {
+      ws.onerror = error => {
         console.error('WebSocket error:', error);
         setError('WebSocket connection error');
       };
@@ -82,43 +86,52 @@ const useWebSocket = (url, options = {}) => {
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
     }
-    
+
     if (socket) {
       socket.close(1000, 'Manual disconnect');
     }
-    
+
     setSocket(null);
     setIsConnected(false);
     setError(null);
   }, [socket]);
 
-  const sendMessage = useCallback((message) => {
-    if (socket && isConnected) {
-      try {
-        socket.send(JSON.stringify(message));
-        return true;
-      } catch (err) {
-        console.error('Error sending WebSocket message:', err);
-        setError('Failed to send message');
-        return false;
+  const sendMessage = useCallback(
+    message => {
+      if (socket && isConnected) {
+        try {
+          socket.send(JSON.stringify(message));
+          return true;
+        } catch (err) {
+          console.error('Error sending WebSocket message:', err);
+          setError('Failed to send message');
+          return false;
+        }
       }
-    }
-    return false;
-  }, [socket, isConnected]);
+      return false;
+    },
+    [socket, isConnected]
+  );
 
-  const subscribe = useCallback((channel) => {
-    return sendMessage({
-      type: 'subscribe',
-      channel: channel
-    });
-  }, [sendMessage]);
+  const subscribe = useCallback(
+    channel => {
+      return sendMessage({
+        type: 'subscribe',
+        channel: channel,
+      });
+    },
+    [sendMessage]
+  );
 
-  const unsubscribe = useCallback((channel) => {
-    return sendMessage({
-      type: 'unsubscribe',
-      channel: channel
-    });
-  }, [sendMessage]);
+  const unsubscribe = useCallback(
+    channel => {
+      return sendMessage({
+        type: 'unsubscribe',
+        channel: channel,
+      });
+    },
+    [sendMessage]
+  );
 
   useEffect(() => {
     if (options.autoConnect !== false) {
@@ -139,7 +152,7 @@ const useWebSocket = (url, options = {}) => {
     disconnect,
     sendMessage,
     subscribe,
-    unsubscribe
+    unsubscribe,
   };
 };
 

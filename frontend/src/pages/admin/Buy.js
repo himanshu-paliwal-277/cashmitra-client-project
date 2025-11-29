@@ -40,7 +40,7 @@ const ActionButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
@@ -66,7 +66,7 @@ const SearchInput = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   font-size: 0.875rem;
-  
+
   &:focus {
     outline: none;
     border-color: #10b981;
@@ -84,7 +84,7 @@ const FilterButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s;
-  
+
   &:hover {
     background: #e5e7eb;
   }
@@ -130,7 +130,7 @@ const ProductCard = styled.div`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: all 0.2s;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -199,8 +199,8 @@ const ActionButtons = styled.div`
 
 const IconButton = styled.button`
   flex: 1;
-  background: ${props => props.primary ? '#10b981' : '#f3f4f6'};
-  color: ${props => props.primary ? 'white' : '#6b7280'};
+  background: ${props => (props.primary ? '#10b981' : '#f3f4f6')};
+  color: ${props => (props.primary ? 'white' : '#6b7280')};
   border: none;
   padding: 0.75rem;
   border-radius: 0.375rem;
@@ -212,10 +212,10 @@ const IconButton = styled.button`
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s;
-  
+
   &:hover {
-    background: ${props => props.primary ? '#059669' : '#e5e7eb'};
-    color: ${props => props.primary ? 'white' : '#374151'};
+    background: ${props => (props.primary ? '#059669' : '#e5e7eb')};
+    color: ${props => (props.primary ? 'white' : '#374151')};
   }
 `;
 
@@ -226,18 +226,26 @@ const StatusBadge = styled.span`
   font-weight: 600;
   background: ${props => {
     switch (props.status) {
-      case 'available': return '#d1fae5';
-      case 'sold': return '#fee2e2';
-      case 'reserved': return '#fef3c7';
-      default: return '#f3f4f6';
+      case 'available':
+        return '#d1fae5';
+      case 'sold':
+        return '#fee2e2';
+      case 'reserved':
+        return '#fef3c7';
+      default:
+        return '#f3f4f6';
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'available': return '#065f46';
-      case 'sold': return '#991b1b';
-      case 'reserved': return '#92400e';
-      default: return '#374151';
+      case 'available':
+        return '#065f46';
+      case 'sold':
+        return '#991b1b';
+      case 'reserved':
+        return '#92400e';
+      default:
+        return '#374151';
     }
   }};
 `;
@@ -251,7 +259,7 @@ const Buy = () => {
     total: 0,
     available: 0,
     sold: 0,
-    avgPrice: 0
+    avgPrice: 0,
   });
 
   const {
@@ -259,7 +267,7 @@ const Buy = () => {
     stats: hookStats,
     loading: hookLoading,
     error: hookError,
-    updateOrderStatus
+    updateOrderStatus,
   } = useAdminBuy();
 
   useEffect(() => {
@@ -275,20 +283,22 @@ const Buy = () => {
     { label: 'Average Price', value: `₹${stats.avgPrice.toLocaleString()}`, color: '#8b5cf6' },
   ];
 
-  const filteredProducts = products.filter(order =>
-    order.items?.some(item => 
-      (item.product?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.product?.brand || '').toLowerCase().includes(searchTerm.toLowerCase())
-    ) ||
-    (order.user?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (order.user?.email || '').toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = products.filter(
+    order =>
+      order.items?.some(
+        item =>
+          (item.product?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (item.product?.brand || '').toLowerCase().includes(searchTerm.toLowerCase())
+      ) ||
+      (order.user?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.user?.email || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -300,7 +310,7 @@ const Buy = () => {
     }
   };
 
-  const handleViewOrder = (orderId) => {
+  const handleViewOrder = orderId => {
     navigate(`/admin/buy/order/${orderId}`);
   };
 
@@ -331,7 +341,7 @@ const Buy = () => {
           type="text"
           placeholder="Search by product name or brand..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
         />
         <FilterButton>
           <Filter size={16} />
@@ -343,43 +353,52 @@ const Buy = () => {
         <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
       ) : (
         <ProductsGrid>
-          {filteredProducts.map((order) => (
+          {filteredProducts.map(order => (
             <ProductCard key={order._id}>
               <ProductImage>
                 {order.items?.[0]?.product?.images?.[0] ? (
-                  <img 
-                    src={order.items[0].product.images[0].replace(/`/g, '').trim()} 
+                  <img
+                    src={order.items[0].product.images[0].replace(/`/g, '').trim()}
                     alt={order.items[0].product.name}
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover' 
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
                     }}
-                    onError={(e) => {
+                    onError={e => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'flex';
                     }}
                   />
                 ) : null}
-                <div style={{ 
-                  display: order.items?.[0]?.product?.images?.[0] ? 'none' : 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '100%',
-                  height: '100%'
-                }}>
+                <div
+                  style={{
+                    display: order.items?.[0]?.product?.images?.[0] ? 'none' : 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '100%',
+                    height: '100%',
+                  }}
+                >
                   <Package size={48} />
                 </div>
               </ProductImage>
-              
+
               <ProductInfo>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '1rem',
+                  }}
+                >
                   <ProductName>{order.items?.[0]?.product?.name || 'N/A'}</ProductName>
                   <StatusBadge status={order.status}>
                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                   </StatusBadge>
                 </div>
-                
+
                 <ProductDetails>
                   <DetailRow>
                     <DetailLabel>Brand:</DetailLabel>
@@ -407,32 +426,68 @@ const Buy = () => {
                   </DetailRow>
                   <DetailRow>
                     <DetailLabel>Payment:</DetailLabel>
-                    <DetailValue>{order.paymentDetails?.method || 'N/A'} ({order.paymentDetails?.status || 'N/A'})</DetailValue>
+                    <DetailValue>
+                      {order.paymentDetails?.method || 'N/A'} (
+                      {order.paymentDetails?.status || 'N/A'})
+                    </DetailValue>
                   </DetailRow>
                   <DetailRow>
                     <DetailLabel>Commission:</DetailLabel>
-                    <DetailValue>₹{order.commission?.amount?.toLocaleString() || '0'} ({(order.commission?.rate * 100 || 0)}%)</DetailValue>
+                    <DetailValue>
+                      ₹{order.commission?.amount?.toLocaleString() || '0'} (
+                      {order.commission?.rate * 100 || 0}%)
+                    </DetailValue>
                   </DetailRow>
                   <DetailRow>
                     <DetailLabel>Created:</DetailLabel>
                     <DetailValue>{formatDate(order.createdAt)}</DetailValue>
                   </DetailRow>
                 </ProductDetails>
-                
+
                 <PriceSection>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
                     <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>MRP:</span>
-                    <span style={{ fontSize: '0.875rem', color: '#6b7280', textDecoration: 'line-through' }}>
+                    <span
+                      style={{
+                        fontSize: '0.875rem',
+                        color: '#6b7280',
+                        textDecoration: 'line-through',
+                      }}
+                    >
                       ₹{order.items?.[0]?.product?.pricing?.mrp?.toLocaleString() || '0'}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Discounted Price:</span>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
+                    <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                      Discounted Price:
+                    </span>
                     <span style={{ fontSize: '0.875rem', color: '#10b981', fontWeight: '600' }}>
-                      ₹{order.items?.[0]?.product?.pricing?.discountedPrice?.toLocaleString() || '0'}
+                      ₹
+                      {order.items?.[0]?.product?.pricing?.discountedPrice?.toLocaleString() || '0'}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '0.5rem',
+                    }}
+                  >
                     <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Discount:</span>
                     <span style={{ fontSize: '0.875rem', color: '#f59e0b', fontWeight: '600' }}>
                       {order.items?.[0]?.product?.pricing?.discountPercent || 0}% OFF
@@ -440,30 +495,35 @@ const Buy = () => {
                   </div>
                   <Price>Total: ₹{order.totalAmount?.toLocaleString() || '0'}</Price>
                 </PriceSection>
-                
+
                 {order.shippingDetails?.address && (
-                  <div style={{ 
-                    background: '#f3f4f6', 
-                    padding: '0.75rem', 
-                    borderRadius: '0.5rem', 
-                    marginBottom: '1rem',
-                    fontSize: '0.75rem',
-                    color: '#6b7280'
-                  }}>
-                    <strong>Shipping Address:</strong><br />
-                    {order.shippingDetails.address.street}, {order.shippingDetails.address.city}<br />
-                    {order.shippingDetails.address.state} - {order.shippingDetails.address.pincode}<br />
+                  <div
+                    style={{
+                      background: '#f3f4f6',
+                      padding: '0.75rem',
+                      borderRadius: '0.5rem',
+                      marginBottom: '1rem',
+                      fontSize: '0.75rem',
+                      color: '#6b7280',
+                    }}
+                  >
+                    <strong>Shipping Address:</strong>
+                    <br />
+                    {order.shippingDetails.address.street}, {order.shippingDetails.address.city}
+                    <br />
+                    {order.shippingDetails.address.state} - {order.shippingDetails.address.pincode}
+                    <br />
                     {order.shippingDetails.address.country}
                   </div>
                 )}
-                
+
                 <ActionButtons>
                   <IconButton primary onClick={() => handleViewOrder(order._id)}>
                     <Eye size={16} />
                     View
                   </IconButton>
                   {order.status === 'pending' && (
-                    <IconButton 
+                    <IconButton
                       onClick={() => handleStatusUpdate(order._id, 'confirmed')}
                       style={{ background: '#10b981', color: 'white' }}
                     >
