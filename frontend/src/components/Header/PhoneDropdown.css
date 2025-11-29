@@ -1,0 +1,267 @@
+.phone-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  min-width: 600px;
+  max-width: 800px;
+  margin-top: 8px;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.phone-dropdown-content {
+  padding: 20px;
+}
+
+.phone-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.phone-dropdown-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.view-all-btn {
+  background: none;
+  border: none;
+  color: #00c851;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.view-all-btn:hover {
+  background-color: #f0f9f4;
+  color: #00a843;
+}
+
+.phone-dropdown-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #00c851;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.phone-dropdown-error {
+  text-align: center;
+  padding: 40px 20px;
+  color: #e74c3c;
+}
+
+.phone-dropdown-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.phone-dropdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.phone-dropdown-item {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.phone-dropdown-item:hover {
+  border-color: #00c851;
+  box-shadow: 0 4px 12px rgba(0, 200, 81, 0.1);
+  transform: translateY(-2px);
+}
+
+.phone-item-image {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.phone-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.phone-dropdown-item:hover .phone-item-image img {
+  transform: scale(1.05);
+}
+
+.phone-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.phone-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.phone-item-brand {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  font-weight: 500;
+}
+
+.phone-item-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #00c851;
+  margin-top: 4px;
+}
+
+.phone-item-condition {
+  font-size: 11px;
+  background: #e8f5e8;
+  color: #00a843;
+  padding: 2px 6px;
+  border-radius: 12px;
+  align-self: flex-start;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .phone-dropdown {
+    min-width: 300px;
+    max-width: 90vw;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .phone-dropdown-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .phone-dropdown-content {
+    padding: 16px;
+  }
+
+  .phone-item-image {
+    height: 60px;
+  }
+
+  .phone-item-name {
+    font-size: 13px;
+  }
+
+  .phone-item-price {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .phone-dropdown {
+    min-width: 280px;
+  }
+
+  .phone-dropdown-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .phone-dropdown-item {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .phone-item-image {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+
+  .phone-item-info {
+    flex: 1;
+  }
+}
+
+/* Scrollbar Styling */
+.phone-dropdown-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.phone-dropdown-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.phone-dropdown-grid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.phone-dropdown-grid::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

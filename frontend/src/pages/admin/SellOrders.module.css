@@ -1,0 +1,77 @@
+/* src/pages/SellOrders/SellOrders.module.css */
+.container { padding: 2rem; background: #f8fafc; min-height: 100vh; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.title { font-size: 2rem; font-weight: 700; color: #1f2937; display: flex; align-items: center; gap: 0.75rem; }
+
+.statsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.statCard { background: white; padding: 1.5rem; border-radius: .75rem; box-shadow: 0 1px 3px rgba(0,0,0,.1); border-left: 4px solid; }
+.statValue { font-size: 2rem; font-weight: 700; color: #1f2937; margin-bottom: .5rem; }
+.statLabel { font-size: .875rem; color: #6b7280; font-weight: 500; }
+
+.filterSection { background: white; padding: 1.5rem; border-radius: .75rem; box-shadow: 0 1px 3px rgba(0,0,0,.1); margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+.searchInput { flex: 1; min-width: 300px; padding: .75rem 1rem; border: 1px solid #d1d5db; border-radius: .5rem; font-size: .875rem; }
+.searchInput:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+.filterBtn { background: #f3f4f6; border: 1px solid #d1d5db; padding: .75rem 1rem; border-radius: .5rem; cursor: pointer; display: flex; align-items: center; gap: .5rem; }
+.filterBtn:hover { background: #e5e7eb; }
+
+.loading, .noOrders { text-align: center; padding: 3rem; color: #6b7280; font-size: 1.1rem; }
+
+.ordersGrid { display: grid; gap: 1.5rem; }
+.orderCard { background: white; border-radius: .75rem; box-shadow: 0 1px 3px rgba(0,0,0,.1); padding: 1.5rem; transition: .2s; }
+.orderCard:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,.1); }
+
+.orderHeader { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+.orderInfo h3 { margin: 0; font-size: 1.125rem; font-weight: 600; color: #1f2937; }
+.customerName { font-size: .875rem; color: #6b7280; }
+.orderDate { font-size: .75rem; color: #9ca3af; }
+.orderStatus { display: flex; align-items: center; gap: .5rem; }
+
+.statusBadge { padding: .25rem .75rem; border-radius: 9999px; font-size: .75rem; font-weight: 600; }
+.status_draft { background:#fef3c7; color:#92400e; }
+.status_confirmed { background:#dbeafe; color:#1e40af; }
+.status_picked { background:#e0e7ff; color:#3730a3; }
+.status_paid { background:#d1fae5; color:#065f46; }
+.status_cancelled { background:#fee2e2; color:#991b1b; }
+
+.orderDetails { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.detailItem { background: #f9fafb; padding: 1rem; border-radius: .5rem; }
+.detailLabel { font-size: .75rem; color: #6b7280; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .25rem; }
+.detailValue { font-weight: 600; color: #1f2937; }
+.priceReduction { display: flex; align-items: center; gap: .25rem; color: #ef4444; font-weight: 600; }
+.agentInfo { color: #10b981; font-weight: 600; }
+.agentContact { font-size: .75rem; color: #6b7280; margin-top: 2px; }
+.agentSelect { padding: .5rem; border: 1px solid #d1d5db; border-radius: .375rem; width: 100%; font-size: .875rem; }
+
+.actionButtons { display: flex; gap: .5rem; flex-wrap: wrap; }
+.btnPrimary { background: #3b82f6; color: white; border: none; padding: .5rem 1rem; border-radius: .375rem; cursor: pointer; display: flex; align-items: center; gap: .5rem; font-weight: 500; }
+.btnPrimary:hover { background: #2563eb; }
+.btnSecondary { background: #f3f4f6; color: #6b7280; border: none; padding: .5rem 1rem; border-radius: .375rem; cursor: pointer; display: flex; align-items: center; gap: .5rem; }
+.btnSecondary:hover { background: #e5e7eb; color: #374151; }
+
+.pagination { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem; padding: 1.5rem; background: white; border-radius: .75rem; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.pageBtn { padding: .5rem 1.5rem; border: none; background: #3b82f6; color: white; border-radius: .375rem; cursor: pointer; }
+.pageBtn:disabled { background: #9ca3af; cursor: not-allowed; }
+.pageBtn:hover:not(:disabled) { background: #2563eb; }
+.pageInfo { color: #6b7280; font-weight: 500; }
+
+/* Modal */
+.modalOverlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+.modal { background: white; border-radius: .75rem; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,.1); }
+.modalHeader { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid #e5e7eb; }
+.modalHeader h2 { margin: 0; font-size: 1.5rem; font-weight: 700; }
+.closeBtn { background: none; border: none; font-size: 2rem; cursor: pointer; color: #6b7280; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: .375rem; }
+.closeBtn:hover { background: #f3f4f6; color: #1f2937; }
+.modalBody { padding: 1.5rem; }
+.section { margin-bottom: 2rem; }
+.sectionTitle { font-size: 1.125rem; font-weight: 600; margin: 0 0 1rem; padding-bottom: .5rem; border-bottom: 2px solid #e5e7eb; }
+.infoGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+.infoItem { background: #f9fafb; padding: 1rem; border-radius: .5rem; }
+.pricingTable { background: #f9fafb; padding: 1rem; border-radius: .5rem; }
+.pricingTable > div { display: flex; justify-content: space-between; padding: .75rem 0; border-bottom: 1px solid #e5e7eb; }
+.pricingTable > div:last-child { border-bottom: none; }
+.reductionRow { background: #fee2e2; border-radius: .375rem; margin: .5rem 0; }
+.redText { color: #ef4444; font-weight: 600; }
+.totalRow { background: #dbeafe; border-radius: .375rem; margin-top: .5rem; padding: .75rem; font-weight: 700; }
+.addressBox { background: #f9fafb; padding: 1rem; border-radius: .5rem; border-left: 4px solid #3b82f6; }
+.addressBox p { margin: .25rem 0; }
+.notesBox { background: #fffbeb; border: 1px solid #fef3c7; padding: 1rem; border-radius: .5rem; color: #92400e; }
