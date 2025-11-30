@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import './index.tailwind.css';
@@ -7,11 +6,9 @@ import App from './App';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <HelmetProvider>
-      <App />
-    </HelmetProvider>
-  </React.StrictMode>
+  <HelmetProvider>
+    <App />
+  </HelmetProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
