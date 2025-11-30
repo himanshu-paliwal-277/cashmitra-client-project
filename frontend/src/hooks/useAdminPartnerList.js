@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import adminService from '../services/adminService';
 
 const useAdminPartnerList = () => {
   const [partners, setPartners] = useState([]);

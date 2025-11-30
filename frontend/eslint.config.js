@@ -1,36 +1,32 @@
 // ESLint v9 Flat Config (ESM)
-
 import js from '@eslint/js';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import unusedImportsPlugin from 'eslint-plugin-unused-imports';
 
 export default [
-  // ⛔ Ignore folders
   {
     ignores: ['node_modules', 'dist', 'build', 'public', 'vite.config.js'],
   },
 
-  // ✅ Base JS rules
   js.configs.recommended,
 
-  // ✅ React + JSX support
   {
     files: ['src/**/*.{js,jsx}'],
 
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-
-      // 🔥 REQUIRED for JSX to work (your missing part)
-      ecmaFeatures: {
-        jsx: true,
-      },
-
       globals: {
         window: 'readonly',
         document: 'readonly',
         console: 'readonly',
         URLSearchParams: 'readonly',
+        localStorage: 'readonly',
+        fetch: 'readonly', // ✅ add fetch
+        Headers: 'readonly', // optional for fetch API
+        Request: 'readonly',
+        Response: 'readonly',
       },
     },
 
@@ -43,10 +39,20 @@ export default [
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
+      'unused-imports': unusedImportsPlugin,
     },
 
     rules: {
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      // 🔹 Unused variables
+      'no-unused-vars': 'off',
+      'unused-imports/no-unused-vars': [
+        'warn',
+        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+      ],
+
+      // 🔹 Unused imports
+      'unused-imports/no-unused-imports': 'error',
+
       'no-console': 'off',
 
       // React
