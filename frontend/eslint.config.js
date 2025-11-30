@@ -5,18 +5,27 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 
 export default [
+  // ⛔ Ignore folders
   {
     ignores: ['node_modules', 'dist', 'build', 'public', 'vite.config.js'],
   },
 
+  // ✅ Base JS rules
   js.configs.recommended,
 
+  // ✅ React + JSX support
   {
     files: ['src/**/*.{js,jsx}'],
 
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
+
+      // 🔥 REQUIRED for JSX to work (your missing part)
+      ecmaFeatures: {
+        jsx: true,
+      },
+
       globals: {
         window: 'readonly',
         document: 'readonly',

@@ -412,7 +412,9 @@ const MobileNavLink = styled(Link)`
   color: ${theme.colors.text.primary};
   text-decoration: none;
   border-radius: 8px;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 
   &:hover,
   &.active {
@@ -509,18 +511,15 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) =
     setOpenNavDropdown(null);
   };
 
-  const handleLinkClick = (path) => {
-    if(path) navigate(path);
+  const handleLinkClick = path => {
+    if (path) navigate(path);
     closeAllMenus();
   };
-  
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = event => {
-      if (
-        profileDropdownRef.current &&
-        !profileDropdownRef.current.contains(event.target)
-      ) {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
         setIsProfileDropdownOpen(false);
       }
       // Note: We don't close nav dropdown on outside click anymore, as it's hover-based.
@@ -530,7 +529,7 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) =
   }, []);
 
   // Handlers for hover-based navigation dropdown
-  const handleNavMouseEnter = (itemId) => {
+  const handleNavMouseEnter = itemId => {
     if (navDropdownTimer) clearTimeout(navDropdownTimer);
     setOpenNavDropdown(itemId);
   };
@@ -560,20 +559,20 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) =
     { id: 'sell-gadgets', label: 'Sell Gadgets', href: '/sell' },
     { id: 'buy-refurbished', label: 'Buy Refurbished', href: '/buy-device' },
   ];
-  
+
   // Mobile-specific links
   const mobileOnlyLinks = [
     { to: '/about', label: 'About Us', icon: <Info /> },
     { to: '/orders', label: 'Track Orders', icon: <Package /> },
     { to: '/help', label: 'Help & Support', icon: <HelpCircle /> },
   ];
-  
+
   return (
     <NavContainer>
       <TopBar>
         <LogoSection to="/">
           <LogoImage src="/main-logo.png" alt="Cashmitra Logo" />
-          <BrandText className='!text-green-700 !font-extrabold'>CASHMITRA</BrandText>
+          <BrandText className="!text-green-700 !font-extrabold">CASHMITRA</BrandText>
         </LogoSection>
 
         <SearchSection>
@@ -592,7 +591,11 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) =
             <ChevronDown size={14} />
           </LocationButton>
 
-          <CartButton onClick={() => handleLinkClick('/buy/cart')} title="Shopping Cart" $itemCount={0}>
+          <CartButton
+            onClick={() => handleLinkClick('/buy/cart')}
+            title="Shopping Cart"
+            $itemCount={0}
+          >
             <ShoppingCart size={20} />
           </CartButton>
 
@@ -614,13 +617,26 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) =
                 <DropdownItem onClick={() => handleLinkClick('/account/addresses')}>
                   <MapPin /> Saved Addresses
                 </DropdownItem>
-                <DropdownItem className="logout" onClick={() => { onLogout?.(); closeAllMenus(); }}>
+                <DropdownItem
+                  className="logout"
+                  onClick={() => {
+                    onLogout?.();
+                    closeAllMenus();
+                  }}
+                >
                   <LogOut /> Logout
                 </DropdownItem>
               </DropdownMenu>
             </ProfileDropdownContainer>
           ) : (
-            <LoginButton variant="primary" size="sm" onClick={() => { onLogin?.(); closeAllMenus(); }}>
+            <LoginButton
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                onLogin?.();
+                closeAllMenus();
+              }}
+            >
               Login
             </LoginButton>
           )}
@@ -633,21 +649,29 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) =
 
       <BottomNavBar ref={navDropdownRef}>
         {navItems.map(item => (
-          <NavItemWrapper 
+          <NavItemWrapper
             key={item.id}
             onMouseEnter={() => item.hasDropdown && handleNavMouseEnter(item.id)}
             onMouseLeave={() => item.hasDropdown && handleNavMouseLeave()}
           >
             <NavItem
               onClick={() => !item.hasDropdown && handleLinkClick(item.href)}
-              className={openNavDropdown === item.id || (!item.hasDropdown && currentPath === item.href) ? 'active' : ''}
+              className={
+                openNavDropdown === item.id || (!item.hasDropdown && currentPath === item.href)
+                  ? 'active'
+                  : ''
+              }
             >
               {item.label}
-              {item.hasDropdown && <ChevronDown style={{transform: openNavDropdown === item.id ? 'rotate(180deg)' : 'none'}} />}
+              {item.hasDropdown && (
+                <ChevronDown
+                  style={{ transform: openNavDropdown === item.id ? 'rotate(180deg)' : 'none' }}
+                />
+              )}
             </NavItem>
             {item.hasDropdown && (
               <NavDropdownWrapper $isOpen={openNavDropdown === item.id}>
-                <item.dropdownComponent isVisible={true} onLinkClick={handleLinkClick}/>
+                <item.dropdownComponent isVisible={true} onLinkClick={handleLinkClick} />
               </NavDropdownWrapper>
             )}
           </NavItemWrapper>
@@ -666,12 +690,12 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) =
 
         <MobileNavSection>
           {navItems.map(item => (
-            <MobileCollapsibleNavItem key={item.id} item={item} onLinkClick={handleLinkClick}/>
+            <MobileCollapsibleNavItem key={item.id} item={item} onLinkClick={handleLinkClick} />
           ))}
         </MobileNavSection>
 
         <MobileNavSection>
-           {mobileOnlyLinks.map(link => (
+          {mobileOnlyLinks.map(link => (
             <MobileNavLink
               key={link.to}
               to={link.to}
@@ -690,12 +714,25 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) =
               <MobileNavLink to="/profile" onClick={() => handleLinkClick('/profile')}>
                 <Settings /> My Profile
               </MobileNavLink>
-              <DropdownItem className="logout" onClick={() => { onLogout?.(); closeAllMenus(); }}>
+              <DropdownItem
+                className="logout"
+                onClick={() => {
+                  onLogout?.();
+                  closeAllMenus();
+                }}
+              >
                 <LogOut /> Logout
               </DropdownItem>
             </>
           ) : (
-            <LoginButton variant="primary" fullWidth onClick={() => { onLogin?.(); closeAllMenus(); }}>
+            <LoginButton
+              variant="primary"
+              fullWidth
+              onClick={() => {
+                onLogin?.();
+                closeAllMenus();
+              }}
+            >
               Login
             </LoginButton>
           )}

@@ -43,7 +43,7 @@ const PrivacyHero = () => {
             {[
               { icon: Shield, label: 'Data Protected', value: '100%' },
               { icon: Lock, label: 'Encrypted', value: '256-bit' },
-              { icon: Eye, label: 'Transparent', value: 'Always' }
+              { icon: Eye, label: 'Transparent', value: 'Always' },
             ].map((item, index) => {
               const Icon = item.icon;
               return (

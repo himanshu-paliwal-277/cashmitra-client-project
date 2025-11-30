@@ -7,19 +7,19 @@ const ContactForm = () => {
     email: '',
     phone: '',
     subject: '',
-    message: ''
+    message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -37,7 +37,7 @@ const ContactForm = () => {
         email: '',
         phone: '',
         subject: '',
-        message: ''
+        message: '',
       });
     }, 3000);
   };
@@ -67,7 +67,9 @@ const ContactForm = () => {
         {/* Header */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-grey-900 mb-3">Send us a Message</h2>
-          <p className="text-grey-600">Fill out the form below and we'll get back to you as soon as possible.</p>
+          <p className="text-grey-600">
+            Fill out the form below and we'll get back to you as soon as possible.
+          </p>
         </div>
 
         {/* Form */}
@@ -118,9 +120,7 @@ const ContactForm = () => {
 
             {/* Phone Field */}
             <div className="group">
-              <label className="block text-sm font-semibold text-grey-700 mb-2">
-                Phone Number
-              </label>
+              <label className="block text-sm font-semibold text-grey-700 mb-2">Phone Number</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-grey-400 group-focus-within:text-primary-600 transition-colors">
                   <Phone className="w-5 h-5" />
@@ -180,9 +180,7 @@ const ContactForm = () => {
             disabled={isSubmitting}
             className="group relative w-full inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-xl overflow-hidden transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            <span className="relative z-10">
-              {isSubmitting ? 'Sending...' : 'Send Message'}
-            </span>
+            <span className="relative z-10">{isSubmitting ? 'Sending...' : 'Send Message'}</span>
             {!isSubmitting && (
               <Send className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
             )}

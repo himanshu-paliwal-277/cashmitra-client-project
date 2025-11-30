@@ -13,11 +13,11 @@ const PrivacyTableOfContents = () => {
     { id: 'your-rights', title: 'Your Privacy Rights' },
     { id: 'cookies', title: 'Cookies and Tracking' },
     { id: 'third-party', title: 'Third-Party Links' },
-    { id: 'children', title: 'Children\'s Privacy' },
+    { id: 'children', title: "Children's Privacy" },
     { id: 'data-retention', title: 'Data Retention' },
     { id: 'international', title: 'International Transfers' },
     { id: 'updates', title: 'Policy Updates' },
-    { id: 'contact', title: 'Contact Us' }
+    { id: 'contact', title: 'Contact Us' },
   ];
 
   useEffect(() => {
@@ -42,13 +42,13 @@ const PrivacyTableOfContents = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (id) => {
+  const scrollToSection = id => {
     const element = document.getElementById(id);
     if (element) {
       const offsetTop = element.offsetTop - 100;
       window.scrollTo({
         top: offsetTop,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   };
@@ -76,17 +76,23 @@ const PrivacyTableOfContents = () => {
                   : 'hover:bg-grey-50 text-grey-700 border-l-4 border-transparent'
               }`}
             >
-              <span className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center text-[10px] sm:text-xs font-bold transition-all duration-300 ${
-                activeSection === section.id
-                  ? 'bg-gradient-to-br from-primary-500 to-primary-700 text-white'
-                  : 'bg-grey-100 text-grey-600 group-hover:bg-primary-100 group-hover:text-primary-600'
-              }`}>
+              <span
+                className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center text-[10px] sm:text-xs font-bold transition-all duration-300 ${
+                  activeSection === section.id
+                    ? 'bg-gradient-to-br from-primary-500 to-primary-700 text-white'
+                    : 'bg-grey-100 text-grey-600 group-hover:bg-primary-100 group-hover:text-primary-600'
+                }`}
+              >
                 {index + 1}
               </span>
               <span className="flex-1 text-xs sm:text-sm leading-tight">{section.title}</span>
-              <ChevronRight className={`w-3 h-3 sm:w-4 sm:h-4 transition-all duration-300 flex-shrink-0 ${
-                activeSection === section.id ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'
-              }`} />
+              <ChevronRight
+                className={`w-3 h-3 sm:w-4 sm:h-4 transition-all duration-300 flex-shrink-0 ${
+                  activeSection === section.id
+                    ? 'opacity-100 translate-x-0'
+                    : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'
+                }`}
+              />
             </button>
           ))}
         </nav>

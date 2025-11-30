@@ -1,4 +1,14 @@
-import { CheckCircle, AlertTriangle, Info, Clock, Package, CreditCard, XCircle, RefreshCw, ShieldCheck } from 'lucide-react';
+import {
+  CheckCircle,
+  AlertTriangle,
+  Info,
+  Clock,
+  Package,
+  CreditCard,
+  XCircle,
+  RefreshCw,
+  ShieldCheck,
+} from 'lucide-react';
 
 const ReturnsContent = () => {
   const sections = [
@@ -6,8 +16,8 @@ const ReturnsContent = () => {
       id: 'overview',
       title: '1. Returns Policy Overview',
       content: [
-        'At Cashmitra, we want you to be completely satisfied with your purchase. If you\'re not happy with your device for any reason, we offer a hassle-free return and refund policy.',
-        'This policy applies to all devices purchased through our platform, whether bought online or from our partner stores.'
+        "At Cashmitra, we want you to be completely satisfied with your purchase. If you're not happy with your device for any reason, we offer a hassle-free return and refund policy.",
+        'This policy applies to all devices purchased through our platform, whether bought online or from our partner stores.',
       ],
       list: [
         '7-day return window from the date of delivery',
@@ -15,15 +25,15 @@ const ReturnsContent = () => {
         'Free return pickup for defective products',
         'No questions asked for manufacturing defects',
         'Easy online return initiation process',
-        'Transparent refund tracking'
-      ]
+        'Transparent refund tracking',
+      ],
     },
     {
       id: 'eligibility',
       title: '2. Return Eligibility Criteria',
       content: [
         'To be eligible for a return, your device must meet the following conditions:',
-        'We reserve the right to reject returns that do not meet these criteria.'
+        'We reserve the right to reject returns that do not meet these criteria.',
       ],
       list: [
         'Return request initiated within 7 days of delivery',
@@ -33,16 +43,17 @@ const ReturnsContent = () => {
         'Device not altered, modified, or repaired by unauthorized parties',
         'IMEI/Serial number matches the delivered product',
         'All original tags, stickers, and seals intact',
-        'No signs of usage beyond initial inspection'
+        'No signs of usage beyond initial inspection',
       ],
-      important: 'Please inspect your device immediately upon delivery. Report any issues within 48 hours for the fastest resolution.'
+      important:
+        'Please inspect your device immediately upon delivery. Report any issues within 48 hours for the fastest resolution.',
     },
     {
       id: 'non-returnable',
       title: '3. Non-Returnable Items',
       content: [
         'For hygiene, safety, and legal reasons, the following items cannot be returned:',
-        'These restrictions are in place to protect all our customers and comply with applicable regulations.'
+        'These restrictions are in place to protect all our customers and comply with applicable regulations.',
       ],
       list: [
         'Devices with customer-induced physical or liquid damage',
@@ -51,56 +62,63 @@ const ReturnsContent = () => {
         'Custom-configured or personalized devices',
         'Accessories that have been opened or used (earphones, chargers)',
         'Devices reported as lost or stolen',
-        'Products purchased from unauthorized third parties'
+        'Products purchased from unauthorized third parties',
       ],
-      warning: 'Returns involving suspected fraud will be investigated and may result in account suspension and legal action.'
+      warning:
+        'Returns involving suspected fraud will be investigated and may result in account suspension and legal action.',
     },
     {
       id: 'process',
       title: '4. Return Process - Step by Step',
       content: [
         'Returning your device is easy. Follow these simple steps to initiate and complete your return:',
-        'Our customer support team is available to assist you at every step of the process.'
+        'Our customer support team is available to assist you at every step of the process.',
       ],
       steps: [
         {
           number: 1,
           title: 'Initiate Return Request',
-          description: 'Log into your account, go to "My Orders", select the product, and click "Return Item". Choose a reason for return and submit the request.'
+          description:
+            'Log into your account, go to "My Orders", select the product, and click "Return Item". Choose a reason for return and submit the request.',
         },
         {
           number: 2,
           title: 'Return Approval',
-          description: 'Our team will review your request within 24 hours. You\'ll receive an email with return approval and pickup details.'
+          description:
+            "Our team will review your request within 24 hours. You'll receive an email with return approval and pickup details.",
         },
         {
           number: 3,
           title: 'Package the Device',
-          description: 'Pack the device securely in its original packaging with all accessories, manuals, and the invoice. Keep it ready for pickup.'
+          description:
+            'Pack the device securely in its original packaging with all accessories, manuals, and the invoice. Keep it ready for pickup.',
         },
         {
           number: 4,
           title: 'Pickup Scheduled',
-          description: 'Our logistics partner will pick up the package from your address at the scheduled time. Ensure someone is available to hand over the package.'
+          description:
+            'Our logistics partner will pick up the package from your address at the scheduled time. Ensure someone is available to hand over the package.',
         },
         {
           number: 5,
           title: 'Quality Check',
-          description: 'Once we receive the device, our team will conduct a quality check within 2-3 business days to verify the condition.'
+          description:
+            'Once we receive the device, our team will conduct a quality check within 2-3 business days to verify the condition.',
         },
         {
           number: 6,
           title: 'Refund Processed',
-          description: 'If the device passes quality check, your refund will be initiated within 24 hours. You\'ll receive the amount in 7-10 business days.'
-        }
-      ]
+          description:
+            "If the device passes quality check, your refund will be initiated within 24 hours. You'll receive the amount in 7-10 business days.",
+        },
+      ],
     },
     {
       id: 'refund-methods',
       title: '5. Refund Methods and Timeline',
       content: [
         'We offer multiple refund options to ensure convenience. The refund timeline depends on the payment method used during purchase.',
-        'All refunds are processed after successful quality inspection of the returned product.'
+        'All refunds are processed after successful quality inspection of the returned product.',
       ],
       list: [
         'Original Payment Method: 7-10 business days (recommended)',
@@ -108,16 +126,17 @@ const ReturnsContent = () => {
         'Cashmitra Wallet: Instant credit upon approval',
         'Store Credit: Instant credit with 5% bonus value',
         'Cash (for in-store purchases): Available at partner stores within 3 days',
-        'UPI: 3-5 business days'
+        'UPI: 3-5 business days',
       ],
-      important: 'Refund timeline starts from the date of quality check approval, not from the date of return initiation.'
+      important:
+        'Refund timeline starts from the date of quality check approval, not from the date of return initiation.',
     },
     {
       id: 'partial-refunds',
       title: '6. Partial Refunds and Deductions',
       content: [
         'In certain cases, we may issue partial refunds instead of full refunds. This happens when the returned device does not meet our eligibility criteria but is still acceptable for return.',
-        'Deductions are made transparently and communicated to you before final processing.'
+        'Deductions are made transparently and communicated to you before final processing.',
       ],
       list: [
         'Minor scratches or cosmetic damage: 5-10% deduction',
@@ -125,16 +144,17 @@ const ReturnsContent = () => {
         'Opened sealed accessories: 20-30% deduction',
         'Damaged packaging: 5% deduction',
         'Late return (8-10 days): 10% restocking fee',
-        'Missing invoice/receipt: 5% deduction (if verified through other means)'
+        'Missing invoice/receipt: 5% deduction (if verified through other means)',
       ],
-      warning: 'If the device is found to be in significantly worse condition than described, we reserve the right to reject the return or propose a revised refund amount.'
+      warning:
+        'If the device is found to be in significantly worse condition than described, we reserve the right to reject the return or propose a revised refund amount.',
     },
     {
       id: 'replacement',
       title: '7. Replacement Policy',
       content: [
         'For defective products or devices with manufacturing defects, we offer direct replacement instead of refund.',
-        'Replacements are subject to product availability and quality check verification.'
+        'Replacements are subject to product availability and quality check verification.',
       ],
       list: [
         'Manufacturing defects: Free replacement within 7 days',
@@ -143,16 +163,17 @@ const ReturnsContent = () => {
         'Replacement pickup and delivery free of charge',
         'Replacement warranty starts from new delivery date',
         'Up to 2 replacement attempts before refund option',
-        'Replacement processed faster than refunds (3-5 days)'
+        'Replacement processed faster than refunds (3-5 days)',
       ],
-      important: 'Replacement option is available only for defective or damaged products, not for change of mind or buyer\'s remorse.'
+      important:
+        "Replacement option is available only for defective or damaged products, not for change of mind or buyer's remorse.",
     },
     {
       id: 'defective-products',
       title: '8. Defective or Damaged Products',
       content: [
         'If you receive a defective or damaged product, please report it immediately for the fastest resolution.',
-        'We take full responsibility for shipping damage and manufacturing defects.'
+        'We take full responsibility for shipping damage and manufacturing defects.',
       ],
       list: [
         'Report defects within 48 hours of delivery',
@@ -161,16 +182,17 @@ const ReturnsContent = () => {
         'Priority processing for defect-related returns',
         'Option to choose between replacement or full refund',
         'Compensation for inconvenience on a case-by-case basis',
-        'Extended return window (up to 14 days) for hidden defects'
+        'Extended return window (up to 14 days) for hidden defects',
       ],
-      important: 'For DOA (Dead on Arrival) devices, contact us immediately at support@cashmitra.com or call +91 9876543210 for priority assistance.'
+      important:
+        'For DOA (Dead on Arrival) devices, contact us immediately at support@cashmitra.com or call +91 9876543210 for priority assistance.',
     },
     {
       id: 'seller-devices',
       title: '9. Returns for Devices You Sold to Us',
       content: [
         'This section applies to customers who sold their devices to Cashmitra and later changed their mind.',
-        'Once a device is sold and payment is completed, the transaction is final. However, we understand special circumstances may arise.'
+        'Once a device is sold and payment is completed, the transaction is final. However, we understand special circumstances may arise.',
       ],
       list: [
         'Sold devices cannot be returned after payment completion',
@@ -179,16 +201,17 @@ const ReturnsContent = () => {
         'Device must still be in our possession (not yet processed)',
         'Refund of received payment minus cancellation fee',
         'Maximum 1 cancellation per customer per year',
-        'Cancellation requests must be made via customer support'
+        'Cancellation requests must be made via customer support',
       ],
-      warning: 'Once a device is processed, refurbished, or sold to another customer, buyback cancellation is no longer possible under any circumstances.'
+      warning:
+        'Once a device is processed, refurbished, or sold to another customer, buyback cancellation is no longer possible under any circumstances.',
     },
     {
       id: 'shipping-charges',
       title: '10. Return Shipping and Pickup',
       content: [
         'We offer free return pickup for most returns. However, shipping charges may apply in certain situations.',
-        'Our logistics partners will handle the pickup and ensure safe transit of your returned device.'
+        'Our logistics partners will handle the pickup and ensure safe transit of your returned device.',
       ],
       list: [
         'Free return pickup for defective/damaged products',
@@ -197,16 +220,17 @@ const ReturnsContent = () => {
         'Return pickup scheduled within 24-48 hours of approval',
         'Packaging material provided free for defective returns',
         'Pickup rescheduling allowed once without charges',
-        'Insurance coverage included for all return shipments'
+        'Insurance coverage included for all return shipments',
       ],
-      important: 'For remote areas, return pickup may take 3-5 business days. We recommend using our authorized logistics partners for safe returns.'
+      important:
+        'For remote areas, return pickup may take 3-5 business days. We recommend using our authorized logistics partners for safe returns.',
     },
     {
       id: 'cancellation',
       title: '11. Order Cancellation Policy',
       content: [
         'You can cancel your order before it is shipped without any charges. Once shipped, standard return policy applies.',
-        'Cancellations are processed instantly if requested before order dispatch.'
+        'Cancellations are processed instantly if requested before order dispatch.',
       ],
       list: [
         'Free cancellation before order dispatch',
@@ -215,15 +239,15 @@ const ReturnsContent = () => {
         'Partial cancellation available for multi-item orders',
         'Once shipped, return policy applies (no direct cancellation)',
         'Auto-cancellation after 7 days of non-delivery attempts',
-        'Email confirmation sent for all cancellations'
-      ]
+        'Email confirmation sent for all cancellations',
+      ],
     },
     {
       id: 'exceptions',
       title: '12. Special Cases and Exceptions',
       content: [
         'We understand that exceptional circumstances may require flexibility in our return policy.',
-        'The following cases will be reviewed on an individual basis by our customer support team.'
+        'The following cases will be reviewed on an individual basis by our customer support team.',
       ],
       list: [
         'Medical emergencies preventing timely return',
@@ -232,23 +256,24 @@ const ReturnsContent = () => {
         'Multiple defects in replacement devices',
         'Extended warranty claims beyond 7-day window',
         'Force majeure events (natural disasters, lockdowns)',
-        'Legal or regulatory issues with the device'
+        'Legal or regulatory issues with the device',
       ],
-      important: 'For special cases, please contact our customer support team with detailed information and supporting documents for review.'
+      important:
+        'For special cases, please contact our customer support team with detailed information and supporting documents for review.',
     },
     {
       id: 'contact',
       title: '13. Contact for Returns Support',
       content: [
         'Need help with a return? Our dedicated returns support team is here to assist you:',
-        'We aim to respond to all return inquiries within 24 hours.'
-      ]
-    }
+        'We aim to respond to all return inquiries within 24 hours.',
+      ],
+    },
   ];
 
   return (
     <div className="space-y-8 sm:space-y-12">
-      {sections.map((section) => (
+      {sections.map(section => (
         <div
           key={section.id}
           id={section.id}
@@ -274,7 +299,10 @@ const ReturnsContent = () => {
           {section.list && (
             <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
               {section.list.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-2 sm:gap-3 text-sm sm:text-base text-grey-700">
+                <li
+                  key={idx}
+                  className="flex items-start gap-2 sm:gap-3 text-sm sm:text-base text-grey-700"
+                >
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0 mt-0.5 sm:mt-1" />
                   <span className="leading-relaxed">{item}</span>
                 </li>
@@ -297,8 +325,12 @@ const ReturnsContent = () => {
 
                   {/* Step Content */}
                   <div className="ml-6 sm:ml-8">
-                    <h4 className="text-base sm:text-lg font-bold text-grey-900 mb-2">{step.title}</h4>
-                    <p className="text-xs sm:text-sm text-grey-600 leading-relaxed">{step.description}</p>
+                    <h4 className="text-base sm:text-lg font-bold text-grey-900 mb-2">
+                      {step.title}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-grey-600 leading-relaxed">
+                      {step.description}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -311,7 +343,9 @@ const ReturnsContent = () => {
               <div className="flex items-start gap-2 sm:gap-3">
                 <Info className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-sm sm:text-base font-semibold text-blue-900 mb-1">Important</h4>
+                  <h4 className="text-sm sm:text-base font-semibold text-blue-900 mb-1">
+                    Important
+                  </h4>
                   <p className="text-xs sm:text-sm text-blue-800">{section.important}</p>
                 </div>
               </div>
@@ -342,8 +376,13 @@ const ReturnsContent = () => {
                   </div>
                   <h4 className="text-base sm:text-lg font-bold text-grey-900">Returns Email</h4>
                 </div>
-                <p className="text-xs sm:text-sm text-grey-600 mb-2">For return and refund inquiries:</p>
-                <a href="mailto:returns@cashmitra.com" className="text-sm sm:text-base text-primary-600 font-semibold hover:underline">
+                <p className="text-xs sm:text-sm text-grey-600 mb-2">
+                  For return and refund inquiries:
+                </p>
+                <a
+                  href="mailto:returns@cashmitra.com"
+                  className="text-sm sm:text-base text-primary-600 font-semibold hover:underline"
+                >
                   returns@cashmitra.com
                 </a>
               </div>
@@ -357,7 +396,10 @@ const ReturnsContent = () => {
                   <h4 className="text-base sm:text-lg font-bold text-grey-900">Helpline</h4>
                 </div>
                 <p className="text-xs sm:text-sm text-grey-600 mb-2">Call us for urgent returns:</p>
-                <a href="tel:+919876543210" className="text-sm sm:text-base text-accent-600 font-semibold hover:underline">
+                <a
+                  href="tel:+919876543210"
+                  className="text-sm sm:text-base text-accent-600 font-semibold hover:underline"
+                >
                   +91 9876543210
                 </a>
                 <p className="text-xs text-grey-500 mt-2">Mon-Sun: 9AM - 9PM</p>
@@ -370,10 +412,13 @@ const ReturnsContent = () => {
       {/* Final Summary Notice */}
       <div className="bg-gradient-to-br from-grey-900 to-grey-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center text-white shadow-xl">
         <RefreshCw className="w-10 h-10 sm:w-12 sm:h-12 text-primary-400 mx-auto mb-4" />
-        <h3 className="text-xl sm:text-2xl text-white font-bold mb-3 sm:mb-4">Your Satisfaction Guaranteed</h3>
+        <h3 className="text-xl sm:text-2xl text-white font-bold mb-3 sm:mb-4">
+          Your Satisfaction Guaranteed
+        </h3>
         <p className="text-sm sm:text-base text-grey-300 max-w-2xl mx-auto leading-relaxed">
-          We stand behind the quality of our products. If you're not 100% satisfied with your purchase,
-          our easy return process ensures you get a hassle-free resolution. Shop with confidence at Cashmitra.
+          We stand behind the quality of our products. If you're not 100% satisfied with your
+          purchase, our easy return process ensures you get a hassle-free resolution. Shop with
+          confidence at Cashmitra.
         </p>
         <div className="mt-4 sm:mt-6 inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
           <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-primary-400" />

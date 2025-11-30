@@ -43,7 +43,7 @@ const TermsHero = () => {
             {[
               { icon: CheckCircle, label: 'Clear Terms', value: '100%' },
               { icon: Scale, label: 'Fair Policy', value: 'Always' },
-              { icon: AlertCircle, label: 'Your Rights', value: 'Protected' }
+              { icon: AlertCircle, label: 'Your Rights', value: 'Protected' },
             ].map((item, index) => {
               const Icon = item.icon;
               return (

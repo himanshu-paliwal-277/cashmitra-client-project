@@ -25,7 +25,10 @@ const About = () => {
           name="keywords"
           content="about cashmitra, device trading platform, buy sell phones, pre-owned devices, sustainable technology"
         />
-        <meta property="og:title" content="About Cashmitra - India's Most Trusted Device Trading Platform" />
+        <meta
+          property="og:title"
+          content="About Cashmitra - India's Most Trusted Device Trading Platform"
+        />
         <meta
           property="og:description"
           content="Discover how Cashmitra is making device trading transparent, secure, and sustainable. Join 50,000+ satisfied customers."

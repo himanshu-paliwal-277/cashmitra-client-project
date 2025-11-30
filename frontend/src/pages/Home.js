@@ -807,9 +807,6 @@ const Home = () => {
     <>
       {/* Header */}
       {/* <Header /> */}
-      <div className="flex items-center justify-center w-full h-32 bg-blue-400 text-white">
-        <p className="font-semibold">Tailwind Css is Applied</p>
-      </div>
 
       {/* Banner */}
       <Banner />

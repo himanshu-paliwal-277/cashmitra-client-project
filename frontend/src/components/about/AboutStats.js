@@ -36,7 +36,7 @@ const AboutStats = () => {
     },
   ];
 
-  const getColorClasses = (color) => {
+  const getColorClasses = color => {
     const colorMap = {
       primary: {
         bg: 'bg-primary-100',
@@ -99,23 +99,26 @@ const AboutStats = () => {
             const Icon = stat.icon;
 
             return (
-              <div
-                key={index}
-                className="group relative"
-              >
+              <div key={index} className="group relative">
                 {/* Glassmorphism Card */}
                 <div className="relative bg-white/70 backdrop-blur-lg rounded-3xl p-8 border-2 border-white shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 overflow-hidden">
                   {/* Animated Background Gradient */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                  ></div>
 
                   {/* Floating Icon Background */}
                   <div className="absolute -right-8 -top-8 w-32 h-32 bg-gradient-to-br ${stat.gradient} rounded-full opacity-5 group-hover:opacity-10 group-hover:scale-150 transition-all duration-700"></div>
 
                   <div className="relative z-10">
                     {/* Icon with Pulse Effect */}
-                    <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${stat.gradient} mb-6 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 relative`}>
+                    <div
+                      className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${stat.gradient} mb-6 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 relative`}
+                    >
                       <Icon className="w-8 h-8 text-white" />
-                      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${stat.gradient} animate-ping opacity-20`}></div>
+                      <div
+                        className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${stat.gradient} animate-ping opacity-20`}
+                      ></div>
                     </div>
 
                     {/* Value with Counter Animation */}
@@ -124,27 +127,29 @@ const AboutStats = () => {
                     </div>
 
                     {/* Label */}
-                    <div className="text-lg font-semibold text-grey-800 mb-2">
-                      {stat.label}
-                    </div>
+                    <div className="text-lg font-semibold text-grey-800 mb-2">{stat.label}</div>
 
                     {/* Description */}
-                    <div className="text-sm text-grey-600 leading-relaxed">
-                      {stat.description}
-                    </div>
+                    <div className="text-sm text-grey-600 leading-relaxed">{stat.description}</div>
                   </div>
 
                   {/* Bottom Accent Line */}
-                  <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`}></div>
+                  <div
+                    className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`}
+                  ></div>
 
                   {/* Corner Decoration */}
                   <div className="absolute top-0 right-0 w-20 h-20 overflow-hidden">
-                    <div className={`absolute w-8 h-8 bg-gradient-to-br ${stat.gradient} transform rotate-45 translate-x-6 -translate-y-6 opacity-10 group-hover:opacity-30 transition-opacity duration-300`}></div>
+                    <div
+                      className={`absolute w-8 h-8 bg-gradient-to-br ${stat.gradient} transform rotate-45 translate-x-6 -translate-y-6 opacity-10 group-hover:opacity-30 transition-opacity duration-300`}
+                    ></div>
                   </div>
                 </div>
 
                 {/* Glow Effect */}
-                <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 -z-10`}></div>
+                <div
+                  className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 -z-10`}
+                ></div>
               </div>
             );
           })}
@@ -156,10 +161,14 @@ const AboutStats = () => {
           <div className="relative bg-gradient-to-r from-primary-50 via-white to-accent-50 rounded-3xl p-8 border-2 border-white shadow-xl backdrop-blur-sm overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-5">
-              <div className="h-full w-full" style={{
-                backgroundImage: 'linear-gradient(rgba(76, 111, 255, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(76, 111, 255, 0.5) 1px, transparent 1px)',
-                backgroundSize: '20px 20px'
-              }}></div>
+              <div
+                className="h-full w-full"
+                style={{
+                  backgroundImage:
+                    'linear-gradient(rgba(76, 111, 255, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(76, 111, 255, 0.5) 1px, transparent 1px)',
+                  backgroundSize: '20px 20px',
+                }}
+              ></div>
             </div>
 
             <div className="relative z-10">
@@ -177,14 +186,18 @@ const AboutStats = () => {
                     Trusted by Leading Brands Nationwide
                   </h3>
                   <p className="text-grey-600">
-                    Partnered with certified retailers and backed by industry-leading security standards
+                    Partnered with certified retailers and backed by industry-leading security
+                    standards
                   </p>
                 </div>
 
                 {/* Trust Badges */}
                 <div className="flex gap-4 flex-shrink-0">
                   {['ISO', 'SSL', 'PCI'].map((badge, i) => (
-                    <div key={i} className="flex items-center justify-center w-16 h-16 bg-white rounded-xl shadow-md border border-grey-200 hover:scale-110 transition-transform duration-300">
+                    <div
+                      key={i}
+                      className="flex items-center justify-center w-16 h-16 bg-white rounded-xl shadow-md border border-grey-200 hover:scale-110 transition-transform duration-300"
+                    >
                       <span className="text-xs font-bold text-grey-700">{badge}</span>
                     </div>
                   ))}

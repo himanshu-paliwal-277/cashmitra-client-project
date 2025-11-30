@@ -6,33 +6,33 @@ const ContactInfo = () => {
       icon: MapPin,
       title: 'Visit Our Office',
       details: ['123 Business Park, Sector 18', 'Gurugram, Haryana 122001', 'India'],
-      color: 'primary'
+      color: 'primary',
     },
     {
       icon: Phone,
       title: 'Call Us',
       details: ['+91 9876543210', '+91 9876543211', 'Mon-Sun: 9AM - 9PM'],
-      color: 'accent'
+      color: 'accent',
     },
     {
       icon: Mail,
       title: 'Email Us',
       details: ['support@cashmitra.com', 'sales@cashmitra.com', 'We reply within 24 hours'],
-      color: 'info'
+      color: 'info',
     },
     {
       icon: Clock,
       title: 'Working Hours',
       details: ['Monday - Saturday: 9AM - 9PM', 'Sunday: 10AM - 6PM', 'Public Holidays: Closed'],
-      color: 'warning'
-    }
+      color: 'warning',
+    },
   ];
 
   const socialLinks = [
     { icon: Facebook, label: 'Facebook', url: '#', color: 'from-blue-500 to-blue-700' },
     { icon: Twitter, label: 'Twitter', url: '#', color: 'from-sky-500 to-sky-700' },
     { icon: Instagram, label: 'Instagram', url: '#', color: 'from-pink-500 to-pink-700' },
-    { icon: Linkedin, label: 'LinkedIn', url: '#', color: 'from-blue-600 to-blue-800' }
+    { icon: Linkedin, label: 'LinkedIn', url: '#', color: 'from-blue-600 to-blue-800' },
   ];
 
   return (
@@ -47,11 +47,15 @@ const ContactInfo = () => {
               className="group relative bg-white rounded-2xl p-6 border-2 border-grey-100 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
             >
               {/* Glow Effect */}
-              <div className={`absolute inset-0 bg-gradient-to-br from-${item.color}-500 to-${item.color}-700 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 -z-10`}></div>
+              <div
+                className={`absolute inset-0 bg-gradient-to-br from-${item.color}-500 to-${item.color}-700 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 -z-10`}
+              ></div>
 
               <div className="relative">
                 {/* Icon */}
-                <div className={`inline-flex p-4 bg-gradient-to-br from-${item.color}-500 to-${item.color}-700 rounded-xl shadow-lg mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                <div
+                  className={`inline-flex p-4 bg-gradient-to-br from-${item.color}-500 to-${item.color}-700 rounded-xl shadow-lg mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}
+                >
                   <Icon className="w-6 h-6 text-white" />
                 </div>
 
@@ -69,7 +73,9 @@ const ContactInfo = () => {
               </div>
 
               {/* Bottom Accent */}
-              <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-${item.color}-500 to-${item.color}-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-b-2xl`}></div>
+              <div
+                className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-${item.color}-500 to-${item.color}-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-b-2xl`}
+              ></div>
             </div>
           );
         })}
@@ -109,7 +115,9 @@ const ContactInfo = () => {
 
       {/* Social Media */}
       <div className="bg-gradient-to-br from-grey-50 to-white rounded-2xl p-8 border-2 border-grey-100 shadow-lg">
-        <h3 className="text-xl font-bold text-grey-900 mb-6 text-center">Follow Us on Social Media</h3>
+        <h3 className="text-xl font-bold text-grey-900 mb-6 text-center">
+          Follow Us on Social Media
+        </h3>
 
         <div className="flex flex-wrap justify-center gap-4">
           {socialLinks.map((social, index) => {
@@ -122,8 +130,12 @@ const ContactInfo = () => {
                 rel="noopener noreferrer"
                 className="group relative"
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${social.color} rounded-xl blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-300`}></div>
-                <div className={`relative inline-flex p-4 bg-gradient-to-br ${social.color} rounded-xl shadow-lg hover:scale-110 hover:rotate-6 transition-all duration-300`}>
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${social.color} rounded-xl blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-300`}
+                ></div>
+                <div
+                  className={`relative inline-flex p-4 bg-gradient-to-br ${social.color} rounded-xl shadow-lg hover:scale-110 hover:rotate-6 transition-all duration-300`}
+                >
                   <Icon className="w-6 h-6 text-white" />
                 </div>
               </a>

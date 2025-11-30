@@ -14,7 +14,9 @@ const ReturnsHero = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-primary-100 mb-4 sm:mb-6 hover:scale-105 transition-transform duration-300">
             <RefreshCw className="w-4 h-4 text-primary-600 animate-pulse" />
-            <span className="text-xs sm:text-sm font-semibold text-grey-700">Hassle-Free Returns</span>
+            <span className="text-xs sm:text-sm font-semibold text-grey-700">
+              Hassle-Free Returns
+            </span>
           </div>
 
           {/* Main Heading */}
@@ -43,7 +45,7 @@ const ReturnsHero = () => {
             {[
               { icon: Clock, label: 'Return Window', value: '7 Days' },
               { icon: RefreshCw, label: 'Easy Process', value: '3 Steps' },
-              { icon: ShieldCheck, label: 'Refund Time', value: '7-10 Days' }
+              { icon: ShieldCheck, label: 'Refund Time', value: '7-10 Days' },
             ].map((item, index) => {
               const Icon = item.icon;
               return (

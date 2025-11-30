@@ -27,7 +27,8 @@ const ContactHero = () => {
 
           {/* Description */}
           <p className="text-lg sm:text-xl text-grey-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Have questions about selling or buying devices? Our dedicated support team is ready to assist you 24/7.
+            Have questions about selling or buying devices? Our dedicated support team is ready to
+            assist you 24/7.
           </p>
 
           {/* Quick Contact Options */}
@@ -36,7 +37,7 @@ const ContactHero = () => {
               { icon: Phone, label: 'Call Us', value: '+91 9876543210', color: 'primary' },
               { icon: Mail, label: 'Email Us', value: 'support@cashmitra.com', color: 'accent' },
               { icon: MessageCircle, label: 'Live Chat', value: 'Start Chat', color: 'info' },
-              { icon: MapPin, label: 'Visit Us', value: 'Find Location', color: 'warning' }
+              { icon: MapPin, label: 'Visit Us', value: 'Find Location', color: 'warning' },
             ].map((item, index) => {
               const Icon = item.icon;
               return (
@@ -45,18 +46,24 @@ const ContactHero = () => {
                   className="group relative bg-white/70 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-white shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
                 >
                   {/* Icon */}
-                  <div className={`inline-flex p-2 sm:p-3 bg-gradient-to-br from-${item.color}-500 to-${item.color}-700 rounded-lg sm:rounded-xl shadow-lg mb-3 sm:mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                  <div
+                    className={`inline-flex p-2 sm:p-3 bg-gradient-to-br from-${item.color}-500 to-${item.color}-700 rounded-lg sm:rounded-xl shadow-lg mb-3 sm:mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}
+                  >
                     <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
 
                   {/* Label */}
-                  <div className="text-xs sm:text-sm font-semibold text-grey-700 mb-1">{item.label}</div>
+                  <div className="text-xs sm:text-sm font-semibold text-grey-700 mb-1">
+                    {item.label}
+                  </div>
 
                   {/* Value */}
                   <div className="text-[10px] sm:text-xs text-grey-600 truncate">{item.value}</div>
 
                   {/* Hover Effect */}
-                  <div className={`absolute inset-0 bg-gradient-to-br from-${item.color}-100 to-transparent rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 -z-10`}></div>
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br from-${item.color}-100 to-transparent rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 -z-10`}
+                  ></div>
                 </div>
               );
             })}
