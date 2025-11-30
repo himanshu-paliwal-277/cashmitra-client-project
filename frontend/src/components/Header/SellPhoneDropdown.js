@@ -4,7 +4,7 @@ import { adminService } from '../../services/adminService';
 import './SellPhoneDropdown.css';
 import useAdminCategories from '../../hooks/useAdminCategories';
 
-const SellPhoneDropdown = ({ isVisible = true, onClose }) => {
+const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }) => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,14 +24,17 @@ const SellPhoneDropdown = ({ isVisible = true, onClose }) => {
   }, [hookCategories, hookLoading]);
 
   const handleCategoryClick = category => {
-    // Navigate to sell page with category
-    navigate(`/sell?category=${category.name}`);
-    if (onClose) onClose();
+    const path = `/sell?category=${category.name}`;
+    navigate(path);
+    onClose?.();
+    onLinkClick(path);
   };
 
   const handleViewAllClick = () => {
-    navigate('/sell');
-    if (onClose) onClose();
+    const path = '/sell';
+    navigate(path);
+    onClose?.();
+    onLinkClick(path);
   };
 
   if (loading) {

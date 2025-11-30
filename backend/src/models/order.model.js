@@ -1,0 +1,136 @@
+const mongoose = require('mongoose');
+
+const orderSchema = new mongoose.Schema(
+  {
+    assessmentId: {
+      type: String,
+      unique: true,
+      sparse: true, // Allow null values but ensure uniqueness when present
+    },
+    orderType: {
+      type: String,
+      enum: ['sell', 'buy'],
+      required: true,
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: false, // Make user optional for assessment orders
+    },
+    partner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Partner',
+      required: false, // Make partner optional for assessment orders
+    },
+    items: [
+      {
+        inventory: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Inventory',
+        },
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'BuyProduct',
+        },
+        condition: {
+          screenCondition: String,
+          bodyCondition: String,
+          batteryHealth: String,
+          functionalIssues: String,
+        },
+        price: Number,
+        quantity: {
+          type: Number,
+          default: 1,
+        },
+      },
+    ],
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    commission: {
+      rate: {
+        type: Number,
+        required: true,
+      },
+      amount: {
+        type: Number,
+        required: true,
+      },
+    },
+    paymentDetails: {
+      method: {
+        type: String,
+        enum: ['UPI', 'netbanking', 'Wallet', 'Cash','card'],
+        required: true,
+      },
+      transactionId: String,
+      status: {
+        type: String,
+        enum: ['pending', 'completed', 'failed', 'refunded','confirmed'],
+        default: 'pending',
+      },
+      paidAt: Date,
+    },
+    shippingDetails: {
+      address: {
+        street: String,
+        city: String,
+        state: String,
+        pincode: String,
+        country: {
+          type: String,
+          default: 'India',
+        },
+      },
+      contactPhone: String,
+      trackingId: String,
+      deliveryMethod: {
+        type: String,
+        enum: ['Cashmitra Logistics', 'Shop Delivery', 'Pickup'],
+      },
+      estimatedDelivery: Date,
+      deliveredAt: Date,
+    },
+    status: {
+      type: String,
+      enum: [
+        'pending',
+        'confirmed',
+        'processing',
+        'verified',
+        'shipped',
+        'delivered',
+        'completed',
+        'cancelled',
+        'refunded',
+      ],
+      default: 'pending',
+    },
+    statusHistory: [
+      {
+        status: String,
+        timestamp: {
+          type: Date,
+          default: Date.now,
+        },
+        note: String,
+      },
+    ],
+    notes: String,
+  },
+  { timestamps: true }
+);
+
+// Create indexes for efficient querying
+orderSchema.index({ user: 1 });
+orderSchema.index({ partner: 1 });
+orderSchema.index({ orderType: 1 });
+orderSchema.index({ status: 1 });
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ assessmentId: 1 });
+
+const Order = mongoose.model('Order', orderSchema);
+
+module.exports = { Order };

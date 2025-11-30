@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import Button from '../ui/Button';
+import PhoneDropdown from '../Header/PhoneDropdown';
+import SellPhoneDropdown from '../Header/SellPhoneDropdown';
 import {
   Menu,
   X,
@@ -15,287 +17,120 @@ import {
   LogOut,
   ShoppingCart,
   Search,
+  Info,
+  Store,
+  ChevronDown,
 } from 'lucide-react';
 
+// Main Navigation Container
 const NavContainer = styled.nav`
-  background: ${theme.colors.white};
+  background: white;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   border-bottom: 1px solid ${theme.colors.grey[200]};
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   position: sticky;
   top: 0;
   z-index: ${theme.zIndex.sticky};
-  backdrop-filter: blur(10px);
 `;
 
-const NavContent = styled.div`
-  max-width: 1400px;
+// Top Bar - Logo, Search, Actions
+const TopBar = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
   margin: 0 auto;
-  padding: 0 ${theme.spacing[4]};
+  padding: 1rem 2rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 72px;
-  gap: ${theme.spacing[3]};
+  gap: 2rem;
 
-  @media (min-width: ${theme.breakpoints.sm}) {
-    padding: 0 ${theme.spacing[6]};
-  }
-
-  @media (min-width: ${theme.breakpoints.lg}) {
-    padding: 0 ${theme.spacing[8]};
+  @media (max-width: ${theme.breakpoints.lg}) {
+    padding: 1rem 1.5rem;
+    gap: 1.25rem;
   }
 
   @media (max-width: ${theme.breakpoints.md}) {
-    height: 64px;
-    padding: 0 ${theme.spacing[3]};
+    padding: 0.75rem 1rem;
+    justify-content: space-between;
+    gap: 0.75rem;
   }
 `;
 
-const Logo = styled.div`
+// Logo Section
+const LogoSection = styled(Link)`
   display: flex;
   align-items: center;
-  gap: ${theme.spacing[2]};
-  cursor: pointer;
-  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
 
   &:hover {
-    transform: scale(1.05);
+    opacity: 0.8;
   }
 `;
 
 const LogoImage = styled.img`
-  height: 48px;
+  height: 40px;
   width: auto;
-  object-fit: contain;
-  transition: all 0.3s ease;
 
   @media (max-width: ${theme.breakpoints.md}) {
-    height: 40px;
+    height: 32px;
+  }
+`;
+
+const BrandText = styled.h1`
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0 0.5rem;
+  letter-spacing: -0.5px;
+  color: ${theme.colors.primary.main};
+
+  @media (max-width: ${theme.breakpoints.md}) {
+    font-size: 1.375rem;
   }
 
   @media (max-width: ${theme.breakpoints.sm}) {
-    height: 36px;
-  }
-`;
-
-const NavActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-
-  @media (max-width: ${theme.breakpoints.md}) {
     display: none;
   }
 `;
 
-const MobileMenuButton = styled.button`
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: 2px solid ${theme.colors.grey[200]};
-  background: white;
-  color: ${theme.colors.text.primary};
-  cursor: pointer;
-  border-radius: ${theme.borderRadius.lg};
-  transition: all ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-  &:hover {
-    background: linear-gradient(135deg, rgba(0, 200, 83, 0.05) 0%, rgba(0, 230, 118, 0.05) 100%);
-    border-color: ${theme.colors.primary.main};
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 200, 83, 0.2);
-  }
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    display: flex;
-  }
-`;
-
-const MobileMenu = styled.div`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  padding: ${theme.spacing[3]};
-  display: ${props => (props.$isOpen ? 'block' : 'none')};
-  max-height: calc(100vh - 80px);
-  overflow-y: auto;
-
-  @media (min-width: ${theme.breakpoints.lg}) {
-    display: none;
-  }
-`;
-
-const MobileNavLinks = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[1]};
-  margin-bottom: ${theme.spacing[3]};
-`;
-
-const MobileNavLink = styled(Link)`
-  font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${theme.colors.text.primary};
-  text-decoration: none;
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border-radius: ${theme.borderRadius.md};
-  transition: all ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  background: white;
-  border-left: 3px solid transparent;
-
-  &:hover {
-    color: ${theme.colors.primary.main};
-    background: ${theme.colors.grey[50]};
-    border-left-color: ${theme.colors.primary.main};
-  }
-
-  &.active {
-    color: ${theme.colors.primary.main};
-    background: ${theme.colors.primary[50]};
-    border-left-color: ${theme.colors.primary.main};
-  }
-`;
-
-const MobileActions = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[1]};
-  padding-top: ${theme.spacing[3]};
-  border-top: 1px solid ${theme.colors.grey[200]};
-`;
-
-const IconButton = styled.button`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: 2px solid ${theme.colors.grey[200]};
-  background: white;
-  color: ${theme.colors.text.primary};
-  cursor: pointer;
-  border-radius: ${theme.borderRadius.lg};
-  transition: all ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-  &:hover {
-    background: linear-gradient(135deg, rgba(0, 200, 83, 0.05) 0%, rgba(0, 230, 118, 0.05) 100%);
-    color: ${theme.colors.primary.main};
-    border-color: ${theme.colors.primary.main};
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 200, 83, 0.2);
-  }
-`;
-
-const ProfileDropdown = styled.div`
-  position: relative;
-  display: inline-block;
-`;
-
-const DropdownMenu = styled.div`
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: ${theme.colors.white};
-  border: 1px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.lg};
-  box-shadow: ${theme.shadows.lg};
+// Search Section
+const SearchSection = styled.div`
+  flex: 1;
+  max-width: 600px;
   min-width: 200px;
-  z-index: ${theme.zIndex.dropdown};
-  opacity: ${props => (props.$isOpen ? 1 : 0)};
-  visibility: ${props => (props.$isOpen ? 'visible' : 'hidden')};
-  transform: ${props => (props.$isOpen ? 'translateY(0)' : 'translateY(-10px)')};
-  transition: all ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
-  margin-top: ${theme.spacing[2]};
-`;
 
-const DropdownItem = styled.button`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: none;
-  background: none;
-  color: ${theme.colors.text.primary};
-  font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${theme.typography.fontWeight.medium};
-  text-align: left;
-  cursor: pointer;
-  transition: background ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
-
-  &:first-child {
-    border-radius: ${theme.borderRadius.lg} ${theme.borderRadius.lg} 0 0;
+  @media (max-width: ${theme.breakpoints.md}) {
+    display: none;
   }
-
-  &:last-child {
-    border-radius: 0 0 ${theme.borderRadius.lg} ${theme.borderRadius.lg};
-    color: ${theme.colors.error.main};
-  }
-
-  &:hover {
-    background: ${theme.colors.grey[50]};
-  }
-
-  &:last-child:hover {
-    background: ${theme.colors.error[50]};
-  }
-`;
-
-const DropdownDivider = styled.div`
-  height: 1px;
-  background: ${theme.colors.grey[200]};
-  margin: ${theme.spacing[1]} 0;
 `;
 
 const SearchContainer = styled.div`
-  display: flex;
-  align-items: center;
-  background: ${theme.colors.grey[50]};
-  border: 2px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  flex: 1;
-  max-width: 500px;
-  transition: all ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
-
-  &:focus-within {
-    border-color: ${theme.colors.primary.main};
-    box-shadow: 0 4px 16px rgba(0, 200, 83, 0.2);
-    background: linear-gradient(135deg, rgba(0, 200, 83, 0.02) 0%, rgba(0, 230, 118, 0.02) 100%);
-  }
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    max-width: 350px;
-  }
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    max-width: 250px;
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    display: none;
-  }
+  position: relative;
+  width: 100%;
 `;
 
 const SearchInput = styled.input`
-  flex: 1;
-  border: none;
-  background: none;
-  outline: none;
-  font-size: ${theme.typography.fontSize.sm};
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  border: 1.5px solid ${theme.colors.grey[300]};
+  border-radius: 8px;
+  font-size: 14px;
   color: ${theme.colors.text.primary};
+  background: ${theme.colors.grey[50]};
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: ${theme.colors.primary.main};
+    background: white;
+    box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
+  }
 
   &::placeholder {
     color: ${theme.colors.text.secondary};
@@ -303,275 +138,569 @@ const SearchInput = styled.input`
 `;
 
 const SearchIcon = styled.div`
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   color: ${theme.colors.text.secondary};
-  margin-right: ${theme.spacing[2]};
+  pointer-events: none;
 `;
 
-const CartButton = styled.button`
+// Actions Section
+const ActionsSection = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  background: white;
-  border: 2px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.lg};
-  color: ${theme.colors.text.primary};
-  cursor: pointer;
-  transition: all ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  position: relative;
+  gap: 1rem;
+  flex-shrink: 0;
 
-  &:hover {
-    background: linear-gradient(135deg, rgba(0, 200, 83, 0.05) 0%, rgba(0, 230, 118, 0.05) 100%);
-    border-color: ${theme.colors.primary.main};
-    color: ${theme.colors.primary.main};
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 200, 83, 0.2);
+  @media (max-width: ${theme.breakpoints.md}) {
+    gap: 0.5rem;
   }
 `;
 
-const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const navigate = useNavigate();
-  const dropdownRef = useRef(null);
+const LocationButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: 1px solid ${theme.colors.grey[300]};
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${theme.colors.text.primary};
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  &:hover {
+    background: ${theme.colors.grey[50]};
+    border-color: ${theme.colors.grey[400]};
+  }
 
-  const toggleProfileDropdown = () => {
-    setIsProfileDropdownOpen(!isProfileDropdownOpen);
-  };
+  @media (max-width: ${theme.breakpoints.lg}) {
+    display: none;
+  }
+`;
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = event => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsProfileDropdownOpen(false);
-      }
-    };
+const IconButton = styled.button`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: ${theme.colors.text.primary};
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+  &:hover {
+    background: ${theme.colors.grey[100]};
+    color: ${theme.colors.primary.main};
+  }
 
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
+  @media (max-width: ${theme.breakpoints.md}) {
+    width: 36px;
+    height: 36px;
+  }
+`;
 
-  const handleTrackClick = () => {
-    // Navigate to order tracking page
-    navigate('/orders');
-  };
+const CartButton = styled(IconButton)`
+  &::after {
+    content: '${props => (props.$itemCount > 0 ? props.$itemCount : '')}';
+    display: ${props => (props.$itemCount > 0 ? 'flex' : 'none')};
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background: ${theme.colors.error.main};
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 9px;
+    align-items: center;
+    justify-content: center;
+  }
+`;
 
-  const handleHelpClick = () => {
-    // Navigate to help/support page
-    navigate('/help');
-  };
+const LoginButton = styled(Button)`
+  padding: 0.625rem 1.5rem;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
 
-  const handleCartClick = () => {
-    navigate('/buy/cart');
-    closeMobileMenu();
-  };
+  @media (max-width: ${theme.breakpoints.sm}) {
+    padding: 0.5rem 1rem;
+    font-size: 13px;
+  }
+`;
 
-  const handleProfileClick = () => {
-    navigate('/profile');
-    setIsProfileDropdownOpen(false);
-  };
+// Profile Dropdown
+const ProfileDropdownContainer = styled.div`
+  position: relative;
+`;
 
-  const handleOrdersClick = () => {
-    navigate('/orders');
-    setIsProfileDropdownOpen(false);
-  };
+const DropdownMenu = styled.div`
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border: 1px solid ${theme.colors.grey[200]};
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  min-width: 220px;
+  z-index: ${theme.zIndex.dropdown};
+  opacity: ${props => (props.$isOpen ? 1 : 0)};
+  visibility: ${props => (props.$isOpen ? 'visible' : 'hidden')};
+  transform: ${props => (props.$isOpen ? 'translateY(0)' : 'translateY(-8px)')};
+  transition: all 0.2s ease;
+  overflow: hidden;
+`;
 
-  const handleAddressesClick = () => {
-    navigate('/account/addresses');
-    setIsProfileDropdownOpen(false);
-  };
+const DropdownItem = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: ${theme.colors.text.primary};
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
 
-  const handleLogoutClick = () => {
-    onLogout?.();
-    setIsProfileDropdownOpen(false);
-  };
+  &:hover {
+    background: ${theme.colors.grey[50]};
+  }
 
-  const navItems = [
-    { to: '/sell', label: 'Sell', icon: <Package size={20} /> },
-    { to: '/buy', label: 'Buy', icon: <ShoppingCart size={20} /> },
-    { onClick: handleCartClick, label: 'Cart', icon: <ShoppingCart size={20} /> },
-    { onClick: handleTrackClick, label: 'Track', icon: <Package size={20} /> },
-    { onClick: handleHelpClick, label: 'Help', icon: <HelpCircle size={20} /> },
-  ];
+  &.logout {
+    color: ${theme.colors.error.main};
+    border-top: 1px solid ${theme.colors.grey[100]};
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+`;
+
+// Bottom Navigation Bar
+const BottomNavBar = styled.div`
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-top: 1px solid ${theme.colors.grey[200]};
+
+  @media (max-width: ${theme.breakpoints.lg}) {
+    padding: 0 1.5rem;
+  }
+
+  @media (max-width: ${theme.breakpoints.md}) {
+    display: none;
+  }
+`;
+
+const NavItemWrapper = styled.div`
+  position: relative;
+`;
+
+const NavItem = styled.button`
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${theme.colors.text.primary};
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    color: ${theme.colors.primary.main};
+    background: ${theme.colors.grey[50]};
+  }
+
+  &.active {
+    color: ${theme.colors.primary.main};
+    font-weight: 600;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 1.25rem;
+      right: 1.25rem;
+      height: 3px;
+      background: ${theme.colors.primary.main};
+      border-radius: 2px 2px 0 0;
+    }
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s ease;
+  }
+`;
+
+const NavDropdownWrapper = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: ${theme.zIndex.dropdown};
+  padding-top: 8px;
+  display: ${props => (props.$isOpen ? 'block' : 'none')};
+`;
+
+// Mobile Menu
+const MobileMenuButton = styled(IconButton)`
+  display: none;
+  @media (max-width: ${theme.breakpoints.md}) {
+    display: flex;
+  }
+`;
+
+const MobileMenuContainer = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid ${theme.colors.grey[200]};
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  z-index: 999;
+  padding: 1rem;
+  display: ${props => (props.$isOpen ? 'block' : 'none')};
+  max-height: calc(100vh - 60px); // Adjust based on TopBar height
+  overflow-y: auto;
+`;
+
+const MobileSearchContainer = styled.div`
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid ${theme.colors.grey[200]};
+`;
+
+const MobileNavSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 1rem;
+`;
+
+const MobileNavLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: ${theme.colors.text.primary};
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover,
+  &.active {
+    background: ${theme.colors.grey[100]};
+    color: ${theme.colors.primary.main};
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+const MobileCollapsibleTrigger = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: ${theme.colors.text.primary};
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  user-select: none;
+
+  &:hover {
+    background: ${theme.colors.grey[100]};
+  }
+
+  svg {
+    transition: transform 0.2s ease;
+    transform: ${props => (props.$isOpen ? 'rotate(180deg)' : 'rotate(0)')};
+  }
+`;
+
+const MobileCollapsibleContent = styled.div`
+  padding: 0.5rem 0 0.5rem 1rem;
+  border-left: 2px solid ${theme.colors.grey[200]};
+  margin-left: 20px;
+`;
+
+const MobileActions = styled.div`
+  padding-top: 1rem;
+  border-top: 1px solid ${theme.colors.grey[200]};
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const MobileCollapsibleNavItem = ({ item, onLinkClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!item.hasDropdown) {
+    return (
+      <MobileNavLink to={item.href} onClick={onLinkClick}>
+        {item.label}
+      </MobileNavLink>
+    );
+  }
+
+  const DropdownComponent = item.dropdownComponent;
 
   return (
+    <div>
+      <MobileCollapsibleTrigger $isOpen={isOpen} onClick={() => setIsOpen(!isOpen)}>
+        <span>{item.label}</span>
+        <ChevronDown size={20} />
+      </MobileCollapsibleTrigger>
+      {isOpen && (
+        <MobileCollapsibleContent>
+          <DropdownComponent isVisible={true} onLinkClick={onLinkClick} />
+        </MobileCollapsibleContent>
+      )}
+    </div>
+  );
+};
+
+// Main Navigation Component
+const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }) => {
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [openNavDropdown, setOpenNavDropdown] = useState(null);
+  const [navDropdownTimer, setNavDropdownTimer] = useState(null);
+
+  const profileDropdownRef = useRef(null);
+  const navDropdownRef = useRef(null);
+
+  const closeAllMenus = () => {
+    setIsMobileMenuOpen(false);
+    setIsProfileDropdownOpen(false);
+    setOpenNavDropdown(null);
+  };
+
+  const handleLinkClick = (path) => {
+    if(path) navigate(path);
+    closeAllMenus();
+  };
+  
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = event => {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target)
+      ) {
+        setIsProfileDropdownOpen(false);
+      }
+      // Note: We don't close nav dropdown on outside click anymore, as it's hover-based.
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Handlers for hover-based navigation dropdown
+  const handleNavMouseEnter = (itemId) => {
+    if (navDropdownTimer) clearTimeout(navDropdownTimer);
+    setOpenNavDropdown(itemId);
+  };
+
+  const handleNavMouseLeave = () => {
+    const timer = setTimeout(() => {
+      setOpenNavDropdown(null);
+    }, 200);
+    setNavDropdownTimer(timer);
+  };
+
+  // Main navigation items
+  const navItems = [
+    {
+      id: 'buy-phone',
+      label: 'Buy Phone',
+      hasDropdown: true,
+      dropdownComponent: PhoneDropdown,
+    },
+    {
+      id: 'sell-phone',
+      label: 'Sell Phone',
+      href: '/sell-device',
+      hasDropdown: true,
+      dropdownComponent: SellPhoneDropdown,
+    },
+    { id: 'sell-gadgets', label: 'Sell Gadgets', href: '/sell' },
+    { id: 'buy-refurbished', label: 'Buy Refurbished', href: '/buy-device' },
+  ];
+  
+  // Mobile-specific links
+  const mobileOnlyLinks = [
+    { to: '/about', label: 'About Us', icon: <Info /> },
+    { to: '/orders', label: 'Track Orders', icon: <Package /> },
+    { to: '/help', label: 'Help & Support', icon: <HelpCircle /> },
+  ];
+  
+  return (
     <NavContainer>
-      <NavContent>
-        {/* Logo */}
-        <Logo onClick={() => navigate('/')}>
-          <LogoImage src="/logo.jpeg" alt="Cashify Logo" />
-        </Logo>
+      <TopBar>
+        <LogoSection to="/">
+          <LogoImage src="/main-logo.png" alt="Cashmitra Logo" />
+          <BrandText className='!text-green-700 !font-extrabold'>CASHMITRA</BrandText>
+        </LogoSection>
 
-        {/* Search Bar */}
-        <SearchContainer>
-          <SearchIcon>
-            <Search size={18} />
-          </SearchIcon>
-          <SearchInput type="text" placeholder="Search for mobiles, accessories & More" />
-        </SearchContainer>
+        <SearchSection>
+          <SearchContainer>
+            <SearchIcon>
+              <Search size={18} />
+            </SearchIcon>
+            <SearchInput type="text" placeholder="Search for mobiles, accessories & more" />
+          </SearchContainer>
+        </SearchSection>
 
-        {/* Desktop Actions */}
-        <NavActions>
-          {/* Cart Button */}
-          <CartButton onClick={() => navigate('/buy/cart')} title="Shopping Cart">
+        <ActionsSection>
+          <LocationButton>
+            <MapPin size={16} />
+            Gurgaon
+            <ChevronDown size={14} />
+          </LocationButton>
+
+          <CartButton onClick={() => handleLinkClick('/buy/cart')} title="Shopping Cart" $itemCount={0}>
             <ShoppingCart size={20} />
           </CartButton>
 
           {isAuthenticated ? (
-            <ProfileDropdown ref={dropdownRef}>
-              <IconButton onClick={toggleProfileDropdown}>
+            <ProfileDropdownContainer ref={profileDropdownRef}>
+              <IconButton
+                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                title="My Account"
+              >
                 <User size={20} />
               </IconButton>
               <DropdownMenu $isOpen={isProfileDropdownOpen}>
-                <DropdownItem onClick={handleProfileClick}>
-                  <Settings size={16} />
-                  My Profile
+                <DropdownItem onClick={() => handleLinkClick('/profile')}>
+                  <Settings /> My Profile
                 </DropdownItem>
-                <DropdownItem onClick={handleOrdersClick}>
-                  <Package size={16} />
-                  My Orders
+                <DropdownItem onClick={() => handleLinkClick('/orders')}>
+                  <Package /> My Orders
                 </DropdownItem>
-                <DropdownItem onClick={handleAddressesClick}>
-                  <MapPin size={16} />
-                  Saved Addresses
+                <DropdownItem onClick={() => handleLinkClick('/account/addresses')}>
+                  <MapPin /> Saved Addresses
                 </DropdownItem>
-                <DropdownDivider />
-                <DropdownItem onClick={handleLogoutClick}>
-                  <LogOut size={16} />
-                  Logout
+                <DropdownItem className="logout" onClick={() => { onLogout?.(); closeAllMenus(); }}>
+                  <LogOut /> Logout
                 </DropdownItem>
               </DropdownMenu>
-            </ProfileDropdown>
+            </ProfileDropdownContainer>
           ) : (
-            <Button variant="primary" size="sm" leftIcon={<LogIn size={16} />} onClick={onLogin}>
+            <LoginButton variant="primary" size="sm" onClick={() => { onLogin?.(); closeAllMenus(); }}>
               Login
-            </Button>
+            </LoginButton>
           )}
-        </NavActions>
 
-        {/* Mobile Menu Button */}
-        <MobileMenuButton onClick={toggleMobileMenu}>
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </MobileMenuButton>
-      </NavContent>
+          <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </MobileMenuButton>
+        </ActionsSection>
+      </TopBar>
 
-      {/* Mobile Menu */}
-      <MobileMenu $isOpen={isMobileMenuOpen}>
-        <MobileNavLinks>
-          {navItems.map((item, index) => {
-            if (item.to) {
-              return (
-                <MobileNavLink
-                  key={item.to}
-                  to={item.to}
-                  className={currentPath === item.to ? 'active' : ''}
-                  onClick={closeMobileMenu}
-                >
-                  {item.icon}
-                  {item.label}
-                </MobileNavLink>
-              );
-            } else {
-              return (
-                <MobileNavLink
-                  key={index}
-                  as="button"
-                  onClick={() => {
-                    item.onClick();
-                    closeMobileMenu();
-                  }}
-                  style={{
-                    border: 'none',
-                    background: 'none',
-                    cursor: 'pointer',
-                    width: '100%',
-                    textAlign: 'left',
-                  }}
-                >
-                  {item.icon}
-                  {item.label}
-                </MobileNavLink>
-              );
-            }
-          })}
-        </MobileNavLinks>
+      <BottomNavBar ref={navDropdownRef}>
+        {navItems.map(item => (
+          <NavItemWrapper 
+            key={item.id}
+            onMouseEnter={() => item.hasDropdown && handleNavMouseEnter(item.id)}
+            onMouseLeave={() => item.hasDropdown && handleNavMouseLeave()}
+          >
+            <NavItem
+              onClick={() => !item.hasDropdown && handleLinkClick(item.href)}
+              className={openNavDropdown === item.id || (!item.hasDropdown && currentPath === item.href) ? 'active' : ''}
+            >
+              {item.label}
+              {item.hasDropdown && <ChevronDown style={{transform: openNavDropdown === item.id ? 'rotate(180deg)' : 'none'}} />}
+            </NavItem>
+            {item.hasDropdown && (
+              <NavDropdownWrapper $isOpen={openNavDropdown === item.id}>
+                <item.dropdownComponent isVisible={true} onLinkClick={handleLinkClick}/>
+              </NavDropdownWrapper>
+            )}
+          </NavItemWrapper>
+        ))}
+      </BottomNavBar>
+
+      <MobileMenuContainer $isOpen={isMobileMenuOpen}>
+        <MobileSearchContainer>
+          <SearchContainer>
+            <SearchIcon>
+              <Search size={18} />
+            </SearchIcon>
+            <SearchInput type="text" placeholder="Search devices..." />
+          </SearchContainer>
+        </MobileSearchContainer>
+
+        <MobileNavSection>
+          {navItems.map(item => (
+            <MobileCollapsibleNavItem key={item.id} item={item} onLinkClick={handleLinkClick}/>
+          ))}
+        </MobileNavSection>
+
+        <MobileNavSection>
+           {mobileOnlyLinks.map(link => (
+            <MobileNavLink
+              key={link.to}
+              to={link.to}
+              className={currentPath === link.to ? 'active' : ''}
+              onClick={() => handleLinkClick(link.to)}
+            >
+              {link.icon}
+              {link.label}
+            </MobileNavLink>
+          ))}
+        </MobileNavSection>
 
         <MobileActions>
           {isAuthenticated ? (
             <>
-              <Button
-                variant="ghost"
-                fullWidth
-                leftIcon={<Settings size={20} />}
-                onClick={() => {
-                  handleProfileClick();
-                  closeMobileMenu();
-                }}
-              >
-                My Profile
-              </Button>
-              <Button
-                variant="ghost"
-                fullWidth
-                leftIcon={<Package size={20} />}
-                onClick={() => {
-                  handleOrdersClick();
-                  closeMobileMenu();
-                }}
-              >
-                My Orders
-              </Button>
-              <Button
-                variant="ghost"
-                fullWidth
-                leftIcon={<MapPin size={20} />}
-                onClick={() => {
-                  handleAddressesClick();
-                  closeMobileMenu();
-                }}
-              >
-                Saved Addresses
-              </Button>
-              <Button
-                variant="ghost"
-                fullWidth
-                leftIcon={<LogOut size={20} />}
-                onClick={() => {
-                  handleLogoutClick();
-                  closeMobileMenu();
-                }}
-                style={{ color: '#dc2626' }}
-              >
-                Logout
-              </Button>
+              <MobileNavLink to="/profile" onClick={() => handleLinkClick('/profile')}>
+                <Settings /> My Profile
+              </MobileNavLink>
+              <DropdownItem className="logout" onClick={() => { onLogout?.(); closeAllMenus(); }}>
+                <LogOut /> Logout
+              </DropdownItem>
             </>
           ) : (
-            <Button
-              variant="primary"
-              fullWidth
-              leftIcon={<LogIn size={16} />}
-              onClick={() => {
-                onLogin?.();
-                closeMobileMenu();
-              }}
-            >
+            <LoginButton variant="primary" fullWidth onClick={() => { onLogin?.(); closeAllMenus(); }}>
               Login
-            </Button>
+            </LoginButton>
           )}
         </MobileActions>
-      </MobileMenu>
+      </MobileMenuContainer>
     </NavContainer>
   );
 };
