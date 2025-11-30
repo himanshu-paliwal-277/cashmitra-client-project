@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { productCategoriesAPI } from '../../api/productCategories';
 import './PhoneDropdown.css';
 
-const PhoneDropdown = ({ isVisible = true, onClose }) => {
+const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }) => {
   const navigate = useNavigate();
   const [phones, setPhones] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -132,13 +132,17 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
   };
 
   const handlePhoneClick = phone => {
-    navigate(`/buy/product/${phone._id}`);
-    onClose();
+    const path = `/buy/product/${phone._id}`;
+    navigate(path);
+    onClose?.();
+    onLinkClick(path);
   };
 
   const handleViewAllClick = () => {
-    navigate('/buy?category=mobile');
-    onClose();
+    const path = '/buy?category=mobile';
+    navigate(path);
+    onClose?.();
+    onLinkClick(path);
   };
 
   if (!isVisible) return null;
@@ -178,9 +182,6 @@ const PhoneDropdown = ({ isVisible = true, onClose }) => {
                   <img
                     src={phone.image || phone.images?.[0] || '/placeholder-phone.jpg'}
                     alt={phone.name}
-                    onError={e => {
-                      e.target.src = '/placeholder-phone.jpg';
-                    }}
                   />
                 </div>
                 <div className="phone-item-info">
