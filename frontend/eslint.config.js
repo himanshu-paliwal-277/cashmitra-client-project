@@ -44,7 +44,7 @@ export default [
 
     rules: {
       // 🔹 Unused variables
-      'no-unused-vars': 'off',
+      'no-unused-vars': 'warn',
       'unused-imports/no-unused-vars': [
         'warn',
         { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
