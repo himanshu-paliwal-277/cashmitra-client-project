@@ -1,322 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
-import { theme } from '../../theme';
-import Button from '../../components/ui/Button';
-import { ArrowLeft } from 'lucide-react';
 import { createSellOfferSession } from '../../services/sellService';
-
-const PageContainer = styled.div`
-  min-height: calc(100vh - 72px);
-  background: ${theme.colors.background.paper};
-  padding: ${theme.spacing[4]} 0;
-`;
-
-const TopNav = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 ${theme.spacing[4]};
-  background: white;
-  border-bottom: 1px solid ${theme.colors.grey[200]};
-  height: 60px;
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-
-  .nav-links {
-    display: flex;
-    gap: ${theme.spacing[4]};
-
-    a {
-      color: ${theme.colors.text.secondary};
-      text-decoration: none;
-
-      &:hover {
-        color: ${theme.colors.primary.main};
-      }
-    }
-  }
-
-  .back-btn {
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[2]};
-    color: ${theme.colors.primary.main};
-    cursor: pointer;
-    font-size: ${theme.typography.fontSize.sm};
-  }
-`;
-
-const MainContent = styled.div`
-  display: flex;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: ${theme.spacing[4]};
-  gap: ${theme.spacing[6]};
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    flex-direction: column;
-    padding: ${theme.spacing[2]};
-  }
-`;
-
-const ProductSection = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const ProductImage = styled.div`
-  width: 100%;
-  height: 400px;
-  background: ${theme.colors.grey[100]};
-  border-radius: ${theme.borderRadius.lg};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 48px;
-  color: ${theme.colors.text.secondary};
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: ${theme.borderRadius.lg};
-  }
-`;
-
-const ProductInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[2]};
-`;
-
-const ProductName = styled.h2`
-  font-size: ${theme.typography.fontSize['2xl']};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
-
-const SellingPrice = styled.div`
-  font-size: ${theme.typography.fontSize['3xl']};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.error.main};
-  margin: ${theme.spacing[1]} 0;
-`;
-
-const RecalculateBtn = styled(Button)`
-  align-self: flex-start;
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  font-size: ${theme.typography.fontSize.sm};
-`;
-
-const FeaturesRow = styled.div`
-  display: flex;
-  gap: ${theme.spacing[4]};
-  margin-top: auto;
-`;
-
-const FeatureItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-  flex: 1;
-
-  .icon {
-    width: 40px;
-    height: 40px;
-    background: ${theme.colors.primary[100]};
-    border-radius: ${theme.borderRadius.full};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: ${theme.colors.primary.main};
-    font-size: 20px;
-  }
-
-  .label {
-    font-size: ${theme.typography.fontSize.sm};
-    text-align: center;
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const PriceSummarySection = styled.div`
-  flex: 0 0 300px;
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const PriceSummaryBox = styled.div`
-  background: white;
-  border: 1px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[4]};
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[3]};
-`;
-
-const PriceRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: ${theme.typography.fontSize.sm};
-
-  .label {
-    color: ${theme.colors.text.secondary};
-  }
-
-  .value {
-    font-weight: ${theme.typography.fontWeight.medium};
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const TotalRow = styled(PriceRow)`
-  border-top: 1px solid ${theme.colors.grey[200]};
-  padding-top: ${theme.spacing[3]};
-  margin-top: ${theme.spacing[2]};
-  font-size: ${theme.typography.fontSize.base};
-
-  .value {
-    font-weight: ${theme.typography.fontWeight.bold};
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const SellNowBtn = styled(Button)`
-  background: ${theme.colors.success.main};
-  color: white;
-  padding: ${theme.spacing[3]};
-  font-size: ${theme.typography.fontSize.base};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  border-radius: ${theme.borderRadius.md};
-  border: none;
-
-  &:hover {
-    background: ${theme.colors.success[600]};
-  }
-`;
-
-const SpecialOffers = styled.div`
-  background: white;
-  border: 1px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[4]};
-`;
-
-const OffersTitle = styled.div`
-  font-size: ${theme.typography.fontSize.base};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[3]};
-`;
-
-const OfferItem = styled.label`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[2]};
-  border: 1px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.md};
-  cursor: pointer;
-  margin-bottom: ${theme.spacing[2]};
-
-  input[type='radio'] {
-    margin: 0;
-  }
-
-  .offer-content {
-    flex: 1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .offer-brand {
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacing[2]};
-
-    .logo {
-      width: 32px;
-      height: 32px;
-      background: ${theme.colors.grey[100]};
-      border-radius: ${theme.borderRadius.full};
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: ${theme.typography.fontSize.sm};
-      font-weight: ${theme.typography.fontWeight.bold};
-    }
-  }
-
-  .offer-extra {
-    text-align: right;
-
-    .percent {
-      font-size: ${theme.typography.fontSize.sm};
-      color: ${theme.colors.text.secondary};
-    }
-
-    .amount {
-      font-size: ${theme.typography.fontSize.base};
-      font-weight: ${theme.typography.fontWeight.medium};
-      color: ${theme.colors.text.primary};
-    }
-
-    .tcs {
-      font-size: ${theme.typography.fontSize.xs};
-      color: ${theme.colors.text.hint};
-    }
-  }
-`;
-
-const BottomSection = styled.div`
-  background: white;
-  border: 1px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[4]};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    flex-direction: column;
-    gap: ${theme.spacing[3]};
-    text-align: center;
-  }
-`;
-
-const WhatsappToggle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const PaymentOptions = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-
-  .option {
-    width: 40px;
-    height: 40px;
-    background: ${theme.colors.grey[100]};
-    border-radius: ${theme.borderRadius.full};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: ${theme.typography.fontSize.xs};
-    font-weight: ${theme.typography.fontWeight.bold};
-  }
-`;
+import {
+  Zap,
+  Truck,
+  Shield,
+  Package,
+  CheckCircle,
+  Loader,
+  RefreshCw,
+  ArrowRight,
+  Tag,
+} from 'lucide-react';
 
 const PriceQuote = () => {
   const [searchParams] = useSearchParams();
@@ -327,7 +22,6 @@ const PriceQuote = () => {
   const [priceData, setPriceData] = useState(null);
   const [productDetails, setProductDetails] = useState(null);
   const [selectedOffer, setSelectedOffer] = useState(null);
-  const [whatsappOptIn, setWhatsappOptIn] = useState(false);
   const [offerSessionData, setOfferSessionData] = useState(null);
   const [isLoadingOffers, setIsLoadingOffers] = useState(false);
 
@@ -339,7 +33,7 @@ const PriceQuote = () => {
     const basePrice = data.selectedVariant?.basePrice || 0;
     let percentDelta = 0;
     let absDelta = 0;
-    console.log('basePrice', basePrice);
+
     // Process answers
     Object.values(data.answers || {}).forEach(ans => {
       if (ans.delta) {
@@ -352,7 +46,7 @@ const PriceQuote = () => {
       }
     });
 
-    // Process defects (note: data has duplicates, but we sum all)
+    // Process defects
     (data.selectedDefects || []).forEach(def => {
       if (def.delta) {
         const adjust = def.delta.sign === '-' ? -1 : 1;
@@ -377,13 +71,11 @@ const PriceQuote = () => {
     });
 
     const adjustedPrice = Math.round(basePrice * (1 + percentDelta / 100) + absDelta);
-    console.log('adjustedPrice', adjustedPrice);
     return adjustedPrice;
   };
 
-  // Use offers from API response or fallback to default offers
   const offers = offerSessionData?.offers || [
-    { id: 'amazon', brand: 'a', percent: 2, tcs: true },
+    { id: 'amazon', brand: 'A', percent: 2, tcs: true },
     { id: 'flipkart', brand: 'F', percent: 3.5, tcs: true },
     { id: 'croma', brand: 'C', percent: 1, tcs: true },
   ];
@@ -393,7 +85,7 @@ const PriceQuote = () => {
       const quotedPrice = calculatePrice(assessmentData);
       const processingFee = 49;
       const pickupCharge = 0;
-      const totalAmount = quotedPrice - processingFee; // As per screenshot logic
+      const totalAmount = quotedPrice - processingFee;
 
       setPriceData({
         quotedPrice,
@@ -407,18 +99,14 @@ const PriceQuote = () => {
         variant: assessmentData.selectedVariant.label,
       });
 
-      // Call sell offer session API
       createOfferSession();
     }
   }, [assessmentData, product]);
 
   const createOfferSession = async () => {
-    console.log('assessmentData', assessmentData);
-    console.log('product', product);
     if (!assessmentData || !product) return;
     setIsLoadingOffers(true);
     try {
-      // Extract the variant ID from assessment data
       const variantId = assessmentData.selectedVariant?.id || assessmentData.selectedVariant?._id;
       const userData = JSON.parse(localStorage.getItem('userData'));
 
@@ -430,9 +118,6 @@ const PriceQuote = () => {
         defects: assessmentData.selectedDefects?.map(d => d.key || d.id) || [],
         accessories:
           assessmentData.selectedAccessories?.map(a => {
-            // Handle different data structures:
-            // - If it's a full object, use _id or id
-            // - If it's already a string/ID, use it directly
             if (typeof a === 'object' && a !== null) {
               return a._id || a.id || a.key;
             }
@@ -440,7 +125,6 @@ const PriceQuote = () => {
           }) || [],
       };
 
-      console.log('Sending offer data:', offerData);
       const response = await createSellOfferSession(offerData);
       setOfferSessionData(response.data);
     } catch (error) {
@@ -458,20 +142,13 @@ const PriceQuote = () => {
     }).format(price);
   };
 
-  const handleBack = () => {
-    navigate(`/sell?category=${category}&brand=${brand}&model=${model}`);
-  };
-
   const handleSellNow = async () => {
     try {
-      // Create offer session first and wait for the response
-      // await createOfferSession();
-
       navigate('/sell/pickup', {
         state: {
           assessmentData,
           product,
-          sessionId: offerSessionData?.sessionId, // Add sessionId from the API response
+          sessionId: offerSessionData?.sessionId,
           priceData: {
             quotedPrice: calculatePrice(assessmentData),
             processingFee: 49,
@@ -482,7 +159,6 @@ const PriceQuote = () => {
       });
     } catch (error) {
       console.error('Error creating session before navigation:', error);
-      // Still navigate but without sessionId if there's an error
       navigate('/sell/pickup', {
         state: {
           assessmentData,
@@ -503,108 +179,210 @@ const PriceQuote = () => {
   };
 
   if (!priceData || !productDetails) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader className="w-16 h-16 text-blue-600 animate-spin" />
+          <p className="text-slate-600 font-medium">Calculating your quote...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <PageContainer>
-      <MainContent>
-        <ProductSection>
-          <ProductImage>
-            <img src={productDetails.images?.[0] || ''} alt={productDetails.name} />
-          </ProductImage>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Header Section */}
+      <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-8 px-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
 
-          <ProductInfo>
-            <ProductName>
-              Apple {productDetails.name} ({productDetails.variant})
-            </ProductName>
-            <SellingPrice>{formatPrice(priceData.quotedPrice)}</SellingPrice>
-            <RecalculateBtn
-              variant="outline"
-              onClick={() => {
-                /* Recalculate logic */
-              }}
-            >
-              Recalculate
-            </RecalculateBtn>
-          </ProductInfo>
+        <div className="max-w-7xl mx-auto relative z-10 text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-3">🎉 Your Price Quote is Ready!</h1>
+          <p className="text-lg text-blue-100">Great news! Here&apos;s what your device is worth</p>
+        </div>
+      </div>
 
-          <FeaturesRow>
-            <FeatureItem>
-              <div className="icon">⚡</div>
-              <div className="label">Fast Payments</div>
-            </FeatureItem>
-            <FeatureItem>
-              <div className="icon">🚚</div>
-              <div className="label">Free Pickup</div>
-            </FeatureItem>
-            <FeatureItem>
-              <div className="icon">🛡️</div>
-              <div className="label">100% Safe</div>
-            </FeatureItem>
-          </FeaturesRow>
-        </ProductSection>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Product Section - Left Side */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Product Card */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Product Image */}
+                <div className="w-full h-80 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center overflow-hidden">
+                  {productDetails.images?.[0] ? (
+                    <img
+                      src={productDetails.images[0]}
+                      alt={productDetails.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Package className="w-24 h-24 text-slate-400" />
+                  )}
+                </div>
 
-        <PriceSummarySection>
-          <PriceSummaryBox>
-            <div style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: theme.spacing[3] }}>
-              Price Summary
-            </div>
-            <PriceRow>
-              <span className="label">Base Price</span>
-              <span className="value">{formatPrice(priceData.quotedPrice)}</span>
-            </PriceRow>
-            <PriceRow>
-              <span className="label">Pickup charges</span>
-              <span className="value">Free ₹0</span>
-            </PriceRow>
-            <PriceRow>
-              <span className="label">Processing Fee</span>
-              <span className="value">₹49</span>
-            </PriceRow>
-            <TotalRow>
-              <span className="label">Total Amount</span>
-              <span className="value">{formatPrice(priceData.totalAmount)}</span>
-            </TotalRow>
-            <SellNowBtn onClick={handleSellNow}>Sell Now</SellNowBtn>
-          </PriceSummaryBox>
+                {/* Product Info */}
+                <div className="flex flex-col justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                      {productDetails.brand || 'Apple'} {productDetails.name}
+                    </h2>
+                    <p className="text-slate-600 mb-6">({productDetails.variant})</p>
 
-          <SpecialOffers>
-            <OffersTitle>Special Offers</OffersTitle>
-            {isLoadingOffers ? (
-              <div style={{ textAlign: 'center', padding: theme.spacing[4] }}>
-                Loading offers...
-              </div>
-            ) : (
-              offers.map(offer => (
-                <OfferItem key={offer.id}>
-                  <input
-                    type="radio"
-                    name="offer"
-                    value={offer.id}
-                    checked={selectedOffer === offer.id}
-                    onChange={() => handleOfferChange(offer.id)}
-                  />
-                  <div className="offer-content">
-                    <div className="offer-brand">
-                      <div className="logo">{offer.brand}</div>
-                      <span>{offer.id.charAt(0).toUpperCase() + offer.id.slice(1)}</span>
+                    {/* Price Display */}
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 mb-6 border-2 border-green-300">
+                      <p className="text-sm text-slate-600 mb-1">Your Device Value</p>
+                      <p className="text-4xl font-bold text-green-600">
+                        {formatPrice(priceData.quotedPrice)}
+                      </p>
                     </div>
-                    <div className="offer-extra">
-                      <div className="percent">+{offer.percent}%</div>
-                      <div className="amount">
-                        ₹{Math.round((priceData.quotedPrice * offer.percent) / 100)}
-                      </div>
-                      {offer.tcs && <div className="tcs">TCS applicable</div>}
-                    </div>
+
+                    <button
+                      onClick={() => window.history.back()}
+                      className="inline-flex items-center gap-2 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      Recalculate
+                    </button>
                   </div>
-                </OfferItem>
-              ))
-            )}
-          </SpecialOffers>
-        </PriceSummarySection>
-      </MainContent>
-    </PageContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Features */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-white rounded-xl shadow-lg p-6 text-center border border-slate-200">
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Zap className="w-7 h-7 text-white" />
+                </div>
+                <p className="text-sm font-semibold text-slate-900">Fast Payments</p>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-lg p-6 text-center border border-slate-200">
+                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Truck className="w-7 h-7 text-white" />
+                </div>
+                <p className="text-sm font-semibold text-slate-900">Free Pickup</p>
+              </div>
+
+              <div className="bg-white rounded-xl shadow-lg p-6 text-center border border-slate-200">
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Shield className="w-7 h-7 text-white" />
+                </div>
+                <p className="text-sm font-semibold text-slate-900">100% Safe</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Price Summary Section - Right Side */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Price Summary */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200 sticky top-8">
+              <h3 className="text-xl font-bold text-slate-900 mb-6">Price Summary</h3>
+
+              <div className="space-y-4 mb-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-600">Base Price</span>
+                  <span className="font-semibold text-slate-900">
+                    {formatPrice(priceData.quotedPrice)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-600">Pickup charges</span>
+                  <span className="font-semibold text-green-600">Free ₹0</span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-600">Processing Fee</span>
+                  <span className="font-semibold text-slate-900">₹49</span>
+                </div>
+
+                <div className="border-t-2 border-slate-200 pt-4 mt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-slate-900">Total Amount</span>
+                    <span className="text-2xl font-bold text-green-600">
+                      {formatPrice(priceData.totalAmount)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleSellNow}
+                className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold text-lg rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center justify-center gap-2"
+              >
+                Sell Now
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Special Offers */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200">
+              <div className="flex items-center gap-2 mb-4">
+                <Tag className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-bold text-slate-900">Special Offers</h3>
+              </div>
+
+              {isLoadingOffers ? (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <Loader className="w-8 h-8 text-blue-600 animate-spin mb-2" />
+                  <p className="text-sm text-slate-600">Loading offers...</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {offers.map(offer => {
+                    const isSelected = selectedOffer === offer.id;
+                    const bonusAmount = Math.round((priceData.quotedPrice * offer.percent) / 100);
+
+                    return (
+                      <label
+                        key={offer.id}
+                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                          isSelected
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="offer"
+                          value={offer.id}
+                          checked={isSelected}
+                          onChange={() => handleOfferChange(offer.id)}
+                          className="w-5 h-5 text-blue-600"
+                        />
+
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="w-10 h-10 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full flex items-center justify-center font-bold text-slate-700">
+                            {offer.brand}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-slate-900 capitalize">{offer.id}</p>
+                            {offer.tcs && <p className="text-xs text-slate-500">TCS applicable</p>}
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-sm text-green-600 font-semibold">+{offer.percent}%</p>
+                          <p className="text-lg font-bold text-slate-900">₹{bonusAmount}</p>
+                        </div>
+
+                        {isSelected && (
+                          <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0" />
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

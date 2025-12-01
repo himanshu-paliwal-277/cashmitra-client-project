@@ -1,9 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import styled from 'styled-components';
-import { theme } from '../../theme';
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
 import {
   CheckCircle,
   Home,
@@ -25,349 +21,23 @@ import {
   ExternalLink,
 } from 'lucide-react';
 
-const PageContainer = styled.div`
-  min-height: calc(100vh - 72px);
-  background: linear-gradient(
-    135deg,
-    ${theme.colors.accent[50]} 0%,
-    ${theme.colors.primary[50]} 100%
-  );
-  padding: ${theme.spacing[8]} 0;
-`;
-
-const Container = styled.div`
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 0 ${theme.spacing[4]};
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    padding: 0 ${theme.spacing[6]};
-  }
-`;
-
-const SuccessHeader = styled.div`
-  text-align: center;
-  margin-bottom: ${theme.spacing[8]};
-`;
-
-const SuccessIcon = styled.div`
-  width: 80px;
-  height: 80px;
-  background: ${theme.colors.accent.main};
-  border-radius: ${theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto ${theme.spacing[4]};
-  box-shadow: ${theme.shadows.lg};
-  animation: bounce 0.6s ease-out;
-
-  @keyframes bounce {
-    0%,
-    20%,
-    53%,
-    80%,
-    100% {
-      transform: translate3d(0, 0, 0);
-    }
-    40%,
-    43% {
-      transform: translate3d(0, -8px, 0);
-    }
-    70% {
-      transform: translate3d(0, -4px, 0);
-    }
-    90% {
-      transform: translate3d(0, -2px, 0);
-    }
-  }
-`;
-
-const SuccessTitle = styled.h1`
-  font-size: ${theme.typography.fontSize['3xl']};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[3]};
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    font-size: ${theme.typography.fontSize['2xl']};
-  }
-`;
-
-const SuccessSubtitle = styled.p`
-  font-size: ${theme.typography.fontSize.lg};
-  color: ${theme.colors.text.secondary};
-  max-width: 600px;
-  margin: 0 auto ${theme.spacing[4]};
-`;
-
-const BookingId = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  background: white;
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border-radius: ${theme.borderRadius.full};
-  border: 2px solid ${theme.colors.accent.main};
-  font-family: ${theme.typography.fontFamily.mono};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.accent.main};
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${theme.colors.accent[50]};
-    transform: translateY(-1px);
-  }
-`;
-
-const ContentGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: ${theme.spacing[6]};
-
-  @media (min-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: 2fr 1fr;
-  }
-`;
-
-const MainContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[6]};
-`;
-
-const SidebarContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const InfoCard = styled(Card)`
-  background: white;
-  border: 1px solid ${theme.colors.grey[200]};
-  box-shadow: ${theme.shadows.sm};
-`;
-
-const SectionTitle = styled.h3`
-  font-size: ${theme.typography.fontSize.lg};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[4]};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const InfoGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: ${theme.spacing[4]};
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`;
-
-const InfoItem = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[3]};
-  background: ${theme.colors.grey[50]};
-  border-radius: ${theme.borderRadius.md};
-`;
-
-const InfoIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  background: ${theme.colors.primary[100]};
-  color: ${theme.colors.primary.main};
-  border-radius: ${theme.borderRadius.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-`;
-
-const InfoContent = styled.div`
-  flex: 1;
-`;
-
-const InfoLabel = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const InfoValue = styled.div`
-  font-size: ${theme.typography.fontSize.base};
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${theme.colors.text.primary};
-`;
-
-const DeviceInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[4]};
-  background: ${theme.colors.grey[50]};
-  border-radius: ${theme.borderRadius.lg};
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const BrandLogo = styled.div`
-  width: 48px;
-  height: 48px;
-  background: ${props => props.bgColor || theme.colors.grey[100]};
-  border-radius: ${theme.borderRadius.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: ${theme.typography.fontSize.lg};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${props => props.textColor || theme.colors.text.primary};
-`;
-
-const DeviceDetails = styled.div`
-  flex: 1;
-`;
-
-const DeviceName = styled.div`
-  font-size: ${theme.typography.fontSize.base};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const DeviceSpecs = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const PriceDisplay = styled.div`
-  text-align: right;
-`;
-
-const PriceAmount = styled.div`
-  font-size: ${theme.typography.fontSize.xl};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.accent.main};
-`;
-
-const PriceLabel = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const TimelineCard = styled(InfoCard)`
-  position: relative;
-`;
-
-const TimelineStep = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: ${theme.spacing[4]};
-  padding: ${theme.spacing[4]} 0;
-  position: relative;
-
-  &:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    left: 20px;
-    top: 60px;
-    bottom: -16px;
-    width: 2px;
-    background: ${props => (props.completed ? theme.colors.accent.main : theme.colors.grey[300])};
-  }
-`;
-
-const StepIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: ${theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: ${props => (props.completed ? theme.colors.accent.main : theme.colors.grey[300])};
-  color: white;
-  font-weight: ${theme.typography.fontWeight.semibold};
-  z-index: 1;
-  position: relative;
-`;
-
-const StepContent = styled.div`
-  flex: 1;
-  padding-top: ${theme.spacing[2]};
-`;
-
-const StepTitle = styled.div`
-  font-size: ${theme.typography.fontSize.base};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const StepDescription = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const StepTime = styled.div`
-  font-size: ${theme.typography.fontSize.xs};
-  color: ${theme.colors.text.hint};
-  margin-top: ${theme.spacing[1]};
-`;
-
-const ActionButtons = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: ${theme.spacing[3]};
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`;
-
-const ActionButton = styled(Button)`
-  justify-content: center;
-`;
-
-const QuickActions = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: ${theme.spacing[4]};
-  margin-top: ${theme.spacing[8]};
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    flex-direction: column;
-    align-items: center;
-  }
-`;
-
 const BookingConfirmation = () => {
   const location = useLocation();
   const [copied, setCopied] = useState(false);
 
-  // Extract data from navigation state
-  const { bookingData, orderData } = location.state || {};
-
-  // Extract additional data from orderData and location state if available
   const {
-    assessmentData,
-    product,
+    bookingData,
+    orderData,
     priceData,
-    category,
+    product,
     brand: brandData,
     model: modelData,
   } = location.state || {};
 
-  // Use the brand and model from location state or fallback to bookingData
   const brand = brandData || bookingData?.brand;
   const model = modelData || bookingData?.model;
   const priceQuote = priceData || bookingData?.priceQuote;
 
-  // Extract contact information from orderData or bookingData
   const contactInfo = {
     fullName: orderData?.pickup?.address?.fullName || bookingData?.fullName || 'N/A',
     phone: orderData?.pickup?.address?.phone || bookingData?.phone || 'N/A',
@@ -376,7 +46,6 @@ const BookingConfirmation = () => {
     pincode: orderData?.pickup?.address?.pincode || bookingData?.pincode || 'N/A',
   };
 
-  // Extract pickup details
   const pickupDetails = {
     date: orderData?.pickup?.slot?.date || bookingData?.pickupDate,
     timeSlot: orderData?.pickup?.slot?.window || bookingData?.timeSlot,
@@ -425,7 +94,7 @@ const BookingConfirmation = () => {
       description: 'Your pickup has been successfully scheduled',
       time: 'Just now',
       completed: true,
-      icon: <CheckCircle size={20} />,
+      icon: CheckCircle,
     },
     {
       id: 2,
@@ -433,7 +102,7 @@ const BookingConfirmation = () => {
       description: 'Our pickup executive will contact you soon',
       time: 'Within 2 hours',
       completed: false,
-      icon: <User size={20} />,
+      icon: User,
     },
     {
       id: 3,
@@ -441,7 +110,7 @@ const BookingConfirmation = () => {
       description: 'Executive will collect and verify your device',
       time: formatDate(pickupDetails.date),
       completed: false,
-      icon: <Truck size={20} />,
+      icon: Truck,
     },
     {
       id: 4,
@@ -449,283 +118,289 @@ const BookingConfirmation = () => {
       description: 'Instant payment after device verification',
       time: 'Same day',
       completed: false,
-      icon: <CreditCard size={20} />,
+      icon: CreditCard,
     },
   ];
 
   return (
-    <PageContainer>
-      <Container>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Success Header */}
-        <SuccessHeader>
-          <SuccessIcon>
-            <CheckCircle size={40} color="white" />
-          </SuccessIcon>
+        <div className="text-center mb-12">
+          <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl animate-bounce">
+            <CheckCircle className="w-10 h-10 text-white" />
+          </div>
 
-          <SuccessTitle>🎉 Booking Confirmed!</SuccessTitle>
-          <SuccessSubtitle>
-            Your device pickup has been successfully scheduled. We'll take care of everything from
-            here.
-          </SuccessSubtitle>
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
+            🎉 Booking Confirmed!
+          </h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-6">
+            Your device pickup has been successfully scheduled. We&apos;ll take care of everything
+            from here.
+          </p>
 
-          <BookingId onClick={copyBookingId}>
+          <button
+            onClick={copyBookingId}
+            className="inline-flex items-center gap-3 bg-white px-6 py-3 rounded-full border-2 border-green-500 font-mono font-semibold text-green-600 hover:bg-green-50 transition-all shadow-lg hover:shadow-xl"
+          >
             Booking ID: {bookingId}
-            <Copy size={16} />
-            {copied && <span style={{ color: theme.colors.accent.main }}>Copied!</span>}
-          </BookingId>
-        </SuccessHeader>
+            <Copy className="w-4 h-4" />
+            {copied && <span className="text-green-600">Copied!</span>}
+          </button>
+        </div>
 
-        <ContentGrid>
-          <MainContent>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
             {/* Booking Details */}
-            <InfoCard>
-              <Card.Body>
-                <SectionTitle>📋 Booking Details</SectionTitle>
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                📋 Booking Details
+              </h3>
 
-                <DeviceInfo>
-                  <BrandLogo
-                    bgColor={brand?.bgColor || '#007bff'}
-                    textColor={brand?.textColor || '#fff'}
-                  >
-                    {brand?.logo || brand?.name?.charAt(0) || 'B'}
-                  </BrandLogo>
-                  <DeviceDetails>
-                    <DeviceName>{model?.name || product?.name || 'Device'}</DeviceName>
-                    <DeviceSpecs>
-                      {brand?.name || 'Brand'} • {model?.year || 'Year'}
-                    </DeviceSpecs>
-                  </DeviceDetails>
-                  <PriceDisplay>
-                    <PriceAmount>
-                      {formatPrice(priceQuote?.finalPrice || bookingData?.finalPrice || 0)}
-                    </PriceAmount>
-                    <PriceLabel>You'll receive</PriceLabel>
-                  </PriceDisplay>
-                </DeviceInfo>
+              {/* Device Info */}
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
+                  {brand?.logo || brand?.name?.charAt(0) || 'B'}
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-slate-900">
+                    {model?.name || product?.name || 'Device'}
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    {brand?.name || 'Brand'} • {model?.year || 'Year'}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-green-600">
+                    {formatPrice(priceQuote?.finalPrice || bookingData?.finalPrice || 0)}
+                  </p>
+                  <p className="text-xs text-slate-600">You&apos;ll receive</p>
+                </div>
+              </div>
 
-                <InfoGrid>
-                  <InfoItem>
-                    <InfoIcon>
-                      <Calendar size={20} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Pickup Date</InfoLabel>
-                      <InfoValue>{formatDate(pickupDetails.date)}</InfoValue>
-                    </InfoContent>
-                  </InfoItem>
+              {/* Info Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600 mb-1">Pickup Date</p>
+                    <p className="font-semibold text-slate-900">{formatDate(pickupDetails.date)}</p>
+                  </div>
+                </div>
 
-                  <InfoItem>
-                    <InfoIcon>
-                      <Clock size={20} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Time Slot</InfoLabel>
-                      <InfoValue>{formatTimeSlot(pickupDetails.timeSlot)}</InfoValue>
-                    </InfoContent>
-                  </InfoItem>
+                <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600 mb-1">Time Slot</p>
+                    <p className="font-semibold text-slate-900">
+                      {formatTimeSlot(pickupDetails.timeSlot)}
+                    </p>
+                  </div>
+                </div>
 
-                  <InfoItem>
-                    <InfoIcon>
-                      <User size={20} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Contact Person</InfoLabel>
-                      <InfoValue>{contactInfo.fullName}</InfoValue>
-                    </InfoContent>
-                  </InfoItem>
+                <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600 mb-1">Contact Person</p>
+                    <p className="font-semibold text-slate-900">{contactInfo.fullName}</p>
+                  </div>
+                </div>
 
-                  <InfoItem>
-                    <InfoIcon>
-                      <Phone size={20} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Phone Number</InfoLabel>
-                      <InfoValue>{contactInfo.phone}</InfoValue>
-                    </InfoContent>
-                  </InfoItem>
-                </InfoGrid>
-              </Card.Body>
-            </InfoCard>
+                <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
+                  <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600 mb-1">Phone Number</p>
+                    <p className="font-semibold text-slate-900">{contactInfo.phone}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Pickup Address */}
-            <InfoCard>
-              <Card.Body>
-                <SectionTitle>
-                  <MapPin size={20} />
-                  Pickup Address
-                </SectionTitle>
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-blue-600" />
+                Pickup Address
+              </h3>
 
-                <InfoItem>
-                  <InfoIcon>
-                    <MapPin size={20} />
-                  </InfoIcon>
-                  <InfoContent>
-                    <InfoValue>
-                      {contactInfo.address}
-                      <br />
-                      {contactInfo.city} - {contactInfo.pincode}
-                    </InfoValue>
-                    {orderData?.pickup?.specialInstructions && (
-                      <div
-                        style={{
-                          marginTop: theme.spacing[2],
-                          fontSize: theme.typography.fontSize.sm,
-                          color: theme.colors.text.secondary,
-                          fontStyle: 'italic',
-                        }}
-                      >
-                        Note: {orderData.pickup.specialInstructions}
-                      </div>
-                    )}
-                  </InfoContent>
-                </InfoItem>
-              </Card.Body>
-            </InfoCard>
+              <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
+                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">
+                    {contactInfo.address}
+                    <br />
+                    {contactInfo.city} - {contactInfo.pincode}
+                  </p>
+                  {orderData?.pickup?.specialInstructions && (
+                    <p className="text-sm text-slate-600 italic mt-2">
+                      Note: {orderData.pickup.specialInstructions}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Process Timeline */}
-            <TimelineCard>
-              <Card.Body>
-                <SectionTitle>🚀 What Happens Next</SectionTitle>
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
+              <h3 className="text-xl font-bold text-slate-900 mb-6">🚀 What Happens Next</h3>
 
-                {timelineSteps.map((step, index) => (
-                  <TimelineStep key={step.id} completed={step.completed}>
-                    <StepIcon completed={step.completed}>
-                      {step.completed ? <CheckCircle size={20} /> : step.icon}
-                    </StepIcon>
-                    <StepContent>
-                      <StepTitle>{step.title}</StepTitle>
-                      <StepDescription>{step.description}</StepDescription>
-                      <StepTime>{step.time}</StepTime>
-                    </StepContent>
-                  </TimelineStep>
-                ))}
-              </Card.Body>
-            </TimelineCard>
-          </MainContent>
+              <div className="space-y-6">
+                {timelineSteps.map((step, index) => {
+                  const StepIcon = step.icon;
+                  return (
+                    <div key={step.id} className="flex items-start gap-4 relative">
+                      {/* Connector Line */}
+                      {index < timelineSteps.length - 1 && (
+                        <div
+                          className={`absolute left-5 top-12 bottom-0 w-0.5 ${
+                            step.completed ? 'bg-green-500' : 'bg-slate-300'
+                          }`}
+                        ></div>
+                      )}
 
-          <SidebarContent>
+                      {/* Step Icon */}
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 z-10 ${
+                          step.completed ? 'bg-green-500 text-white' : 'bg-slate-300 text-slate-600'
+                        }`}
+                      >
+                        <StepIcon className="w-5 h-5" />
+                      </div>
+
+                      {/* Step Content */}
+                      <div className="flex-1 pt-1">
+                        <p className="font-semibold text-slate-900 mb-1">{step.title}</p>
+                        <p className="text-sm text-slate-600 mb-1">{step.description}</p>
+                        <p className="text-xs text-slate-500">{step.time}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
             {/* Quick Actions */}
-            <InfoCard>
-              <Card.Body>
-                <SectionTitle>⚡ Quick Actions</SectionTitle>
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">⚡ Quick Actions</h3>
 
-                <ActionButtons>
-                  <ActionButton variant="primary" leftIcon={<Download size={16} />} size="sm">
-                    Download Receipt
-                  </ActionButton>
+              <div className="grid grid-cols-2 gap-3">
+                <button className="flex flex-col items-center gap-2 p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
+                  <Download className="w-5 h-5 text-blue-600" />
+                  <span className="text-xs font-semibold text-slate-900">Download</span>
+                </button>
 
-                  <ActionButton variant="secondary" leftIcon={<Share2 size={16} />} size="sm">
-                    Share Details
-                  </ActionButton>
+                <button className="flex flex-col items-center gap-2 p-4 bg-green-50 hover:bg-green-100 rounded-xl transition-colors">
+                  <Share2 className="w-5 h-5 text-green-600" />
+                  <span className="text-xs font-semibold text-slate-900">Share</span>
+                </button>
 
-                  <ActionButton variant="ghost" leftIcon={<MessageCircle size={16} />} size="sm">
-                    Contact Support
-                  </ActionButton>
+                <button className="flex flex-col items-center gap-2 p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors">
+                  <MessageCircle className="w-5 h-5 text-purple-600" />
+                  <span className="text-xs font-semibold text-slate-900">Support</span>
+                </button>
 
-                  <ActionButton variant="ghost" leftIcon={<Bell size={16} />} size="sm">
-                    Set Reminders
-                  </ActionButton>
-                </ActionButtons>
-              </Card.Body>
-            </InfoCard>
+                <button className="flex flex-col items-center gap-2 p-4 bg-amber-50 hover:bg-amber-100 rounded-xl transition-colors">
+                  <Bell className="w-5 h-5 text-amber-600" />
+                  <span className="text-xs font-semibold text-slate-900">Reminders</span>
+                </button>
+              </div>
+            </div>
 
             {/* Support Info */}
-            <InfoCard>
-              <Card.Body>
-                <SectionTitle>🆘 Need Help?</SectionTitle>
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">🆘 Need Help?</h3>
 
-                <div style={{ marginBottom: theme.spacing[4] }}>
-                  <InfoItem>
-                    <InfoIcon>
-                      <Phone size={20} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Customer Support</InfoLabel>
-                      <InfoValue>1800-123-4567</InfoValue>
-                    </InfoContent>
-                  </InfoItem>
+              <div className="space-y-3 mb-4">
+                <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Customer Support</p>
+                    <p className="font-semibold text-slate-900">1800-123-4567</p>
+                  </div>
                 </div>
 
-                <div style={{ marginBottom: theme.spacing[4] }}>
-                  <InfoItem>
-                    <InfoIcon>
-                      <Mail size={20} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Email Support</InfoLabel>
-                      <InfoValue>support@cashmitra.com</InfoValue>
-                    </InfoContent>
-                  </InfoItem>
+                <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600">Email Support</p>
+                    <p className="font-semibold text-slate-900 text-sm">support@cashmitra.com</p>
+                  </div>
                 </div>
+              </div>
 
-                <ActionButton
-                  variant="accent"
-                  leftIcon={<ExternalLink size={16} />}
-                  size="sm"
-                  fullWidth
-                >
-                  Track Your Order
-                </ActionButton>
-              </Card.Body>
-            </InfoCard>
+              <button className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg flex items-center justify-center gap-2">
+                <ExternalLink className="w-4 h-4" />
+                Track Your Order
+              </button>
+            </div>
 
             {/* Service Features */}
-            <InfoCard>
-              <Card.Body>
-                <SectionTitle>✨ Our Promise</SectionTitle>
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">✨ Our Promise</h3>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[3] }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
-                    <Shield size={16} color={theme.colors.accent.main} />
-                    <span style={{ fontSize: theme.typography.fontSize.sm }}>
-                      100% Secure Process
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
-                    <Truck size={16} color={theme.colors.accent.main} />
-                    <span style={{ fontSize: theme.typography.fontSize.sm }}>
-                      Free Doorstep Pickup
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
-                    <CreditCard size={16} color={theme.colors.accent.main} />
-                    <span style={{ fontSize: theme.typography.fontSize.sm }}>Instant Payment</span>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
-                    <CheckCircle size={16} color={theme.colors.accent.main} />
-                    <span style={{ fontSize: theme.typography.fontSize.sm }}>
-                      Transparent Pricing
-                    </span>
-                  </div>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <span className="text-sm text-slate-700">100% Secure Process</span>
                 </div>
-              </Card.Body>
-            </InfoCard>
-          </SidebarContent>
-        </ContentGrid>
 
-        {/* Quick Actions */}
-        <QuickActions>
-          <Button
-            variant="secondary"
-            leftIcon={<Home size={20} />}
+                <div className="flex items-center gap-3">
+                  <Truck className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <span className="text-sm text-slate-700">Free Doorstep Pickup</span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <CreditCard className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <span className="text-sm text-slate-700">Instant Payment</span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <span className="text-sm text-slate-700">Transparent Pricing</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Actions */}
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-12">
+          <button
             onClick={() => (window.location.href = '/')}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-700 font-semibold rounded-xl hover:bg-slate-100 transition-all shadow-lg border-2 border-slate-200"
           >
+            <Home className="w-5 h-5" />
             Back to Home
-          </Button>
+          </button>
 
-          <Button
-            variant="primary"
-            rightIcon={<ArrowRight size={20} />}
+          <button
             onClick={() => (window.location.href = '/sell')}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
           >
             Sell Another Device
-          </Button>
-        </QuickActions>
-      </Container>
-    </PageContainer>
+            <ArrowRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

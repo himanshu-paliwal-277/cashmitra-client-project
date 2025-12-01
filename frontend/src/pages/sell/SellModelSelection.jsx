@@ -1,223 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
-
-const Container = styled.div`
-  min-height: 100vh;
-  background: #f8f9fa;
-  padding: 20px 0;
-`;
-
-const Header = styled.div`
-  background: white;
-  padding: 16px 0;
-  border-bottom: 1px solid #e9ecef;
-  margin-bottom: 40px;
-`;
-
-const HeaderContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const Logo = styled.div`
-  font-size: 24px;
-  font-weight: bold;
-  color: #00c853;
-`;
-
-const LoginButton = styled.button`
-  background: #00c853;
-  color: white;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-`;
-
-const MainContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-`;
-
-const Breadcrumb = styled.div`
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 20px;
-
-  a {
-    color: #666;
-    text-decoration: none;
-
-    &:hover {
-      color: #00c853;
-    }
-  }
-
-  span {
-    margin: 0 8px;
-  }
-`;
-
-const Title = styled.h1`
-  font-size: 28px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-`;
-
-const Subtitle = styled.p`
-  color: #666;
-  margin-bottom: 40px;
-`;
-
-const ContentWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 40px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-`;
-
-const ProductSection = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 40px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-`;
-
-const ProductImage = styled.div`
-  width: 200px;
-  height: 300px;
-  margin: 0 auto 40px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-`;
-
-const VariantSection = styled.div`
-  margin-bottom: 40px;
-`;
-
-const VariantTitle = styled.h3`
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 20px;
-`;
-
-const VariantGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-`;
-
-const VariantOption = styled.button`
-  padding: 16px 20px;
-  border: 2px solid ${props => (props.selected ? '#00C853' : '#e9ecef')};
-  background: ${props => (props.selected ? '#f0fff4' : 'white')};
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  color: ${props => (props.selected ? '#00C853' : '#333')};
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: #00c853;
-    background: #f0fff4;
-  }
-`;
-
-const GetValueButton = styled.button`
-  width: 100%;
-  background: #e9ecef;
-  color: #666;
-  border: none;
-  padding: 16px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: not-allowed;
-  margin-top: 20px;
-
-  &.active {
-    background: #00c853;
-    color: white;
-    cursor: pointer;
-
-    &:hover {
-      background: #00a844;
-    }
-  }
-`;
-
-const Sidebar = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  height: fit-content;
-`;
-
-const SidebarImage = styled.div`
-  width: 80px;
-  height: 120px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-`;
-
-const SidebarTitle = styled.h4`
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 16px;
-`;
-
-const SidebarSection = styled.div`
-  margin-bottom: 20px;
-`;
-
-const SidebarSectionTitle = styled.h5`
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-`;
-
-const SidebarText = styled.p`
-  font-size: 14px;
-  color: #666;
-  margin: 0;
-`;
+import {
+  Home,
+  ChevronRight,
+  Package,
+  Monitor,
+  Battery,
+  CheckCircle,
+  ArrowRight,
+} from 'lucide-react';
 
 const SellModelSelection = () => {
   const navigate = useNavigate();
@@ -263,35 +55,34 @@ const SellModelSelection = () => {
 
   if (loading) {
     return (
-      <Container>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '50vh',
-          }}
-        >
-          Loading...
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-slate-600 font-medium">Loading product details...</p>
         </div>
-      </Container>
+      </div>
     );
   }
 
   if (!product) {
     return (
-      <Container>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '50vh',
-          }}
-        >
-          Product not found
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Package className="w-8 h-8 text-red-600" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Product Not Found</h3>
+          <p className="text-slate-600 mb-6">
+            The product you&apos;re looking for doesn&apos;t exist.
+          </p>
+          <button
+            onClick={() => navigate('/sell')}
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg"
+          >
+            Back to Categories
+          </button>
         </div>
-      </Container>
+      </div>
     );
   }
 
@@ -308,123 +99,215 @@ const SellModelSelection = () => {
   // Dynamic breadcrumb and title
   const brandName = product.brand || 'Brand';
   const productName = product.name || 'Product';
-  const categoryName = product.categoryId?.displayName || product.categoryId?.name || 'Category';
+  const basePrice = product.pricing?.discountedPrice || product.basePrice || '2,160';
 
   return (
-    <Container>
-      <Header>
-        <HeaderContent>
-          <Logo>CASHIFY</Logo>
-          <LoginButton>Login</LoginButton>
-        </HeaderContent>
-      </Header>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Header Section */}
+      <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-8 px-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
 
-      <MainContent>
-        <Breadcrumb>
-          <a href="/">Home</a>
-          <span>&gt;</span>
-          <a href="/sell">Sell Old Mobile Phone</a>
-          <span>&gt;</span>
-          <a href={`/sell/${brandName.toLowerCase()}`}>Sell Old {brandName}</a>
-          <span>&gt;</span>
-          <span>
-            Sell Old {brandName} {productName}
-          </span>
-        </Breadcrumb>
-
-        <Title>
-          Sell Old {brandName} {productName}
-        </Title>
-        <Subtitle>
-          <span style={{ color: '#00C853' }}>₹{product.pricing?.discountedPrice || '2,160'}+</span>{' '}
-          already sold on Cashify
-        </Subtitle>
-
-        <ContentWrapper>
-          <ProductSection>
-            <ProductImage>
-              {productImage ? (
-                <img src={productImage} alt={productName} />
-              ) : (
-                <div style={{ color: '#999' }}>No Image</div>
-              )}
-            </ProductImage>
-
-            <VariantSection>
-              <VariantTitle>Choose a variant</VariantTitle>
-              <VariantGrid>
-                {variants.map((variant, index) => (
-                  <VariantOption
-                    key={index}
-                    selected={selectedVariant === variant}
-                    onClick={() => handleVariantSelect(variant)}
-                  >
-                    {typeof variant === 'string'
-                      ? variant
-                      : `${variant.storage || variant.memory || 'Unknown'}`}
-                  </VariantOption>
-                ))}
-              </VariantGrid>
-            </VariantSection>
-
-            <GetValueButton
-              className={selectedVariant ? 'active' : ''}
-              onClick={handleGetValue}
-              disabled={!selectedVariant}
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm mb-6 text-blue-100 flex-wrap">
+            <a
+              href="/"
+              className="flex items-center gap-1 hover:text-white transition-colors group"
             >
-              Get Exact Value
-            </GetValueButton>
-          </ProductSection>
-
-          <Sidebar>
-            <SidebarImage>
-              {productImage ? (
-                <img src={productImage} alt={productName} />
-              ) : (
-                <div style={{ color: '#999' }}>No Image</div>
-              )}
-            </SidebarImage>
-
-            <SidebarTitle>
+              <Home className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span>Home</span>
+            </a>
+            <ChevronRight className="w-4 h-4" />
+            <a href="/sell" className="hover:text-white transition-colors">
+              Sell Device
+            </a>
+            <ChevronRight className="w-4 h-4" />
+            <a
+              href={`/sell/${brandName.toLowerCase()}`}
+              className="hover:text-white transition-colors"
+            >
+              {brandName}
+            </a>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-white font-medium">
               {brandName} {productName}
-            </SidebarTitle>
+            </span>
+          </nav>
 
-            <SidebarSection>
-              <SidebarSectionTitle>Get Upto</SidebarSectionTitle>
-              <SidebarText style={{ color: '#00C853', fontSize: '18px', fontWeight: '600' }}>
-                ₹{product.pricing?.discountedPrice || '2,160'}
-              </SidebarText>
-            </SidebarSection>
+          {/* Page Header */}
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3">
+              Sell {brandName} {productName}
+            </h1>
+            <p className="text-lg text-blue-100">
+              <span className="text-green-400 font-bold">₹{basePrice}+</span> already sold on our
+              platform
+            </p>
+          </div>
+        </div>
+      </div>
 
-            <SidebarSection>
-              <SidebarSectionTitle>Device Evaluation</SidebarSectionTitle>
-            </SidebarSection>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Product Section - Left Side */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
+              {/* Product Image */}
+              <div className="w-48 h-72 mx-auto mb-8 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center overflow-hidden shadow-lg">
+                {productImage ? (
+                  <img
+                    src={productImage}
+                    alt={productName}
+                    className="max-w-full max-h-full object-contain p-4"
+                  />
+                ) : (
+                  <Package className="w-20 h-20 text-slate-400" />
+                )}
+              </div>
 
-            <SidebarSection>
-              <SidebarSectionTitle>Screen Condition</SidebarSectionTitle>
-            </SidebarSection>
+              {/* Variant Selection */}
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <CheckCircle className="w-6 h-6 text-blue-600" />
+                  Choose a variant
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {variants.map((variant, index) => {
+                    const variantText =
+                      typeof variant === 'string'
+                        ? variant
+                        : `${variant.storage || variant.memory || 'Unknown'}`;
+                    const isSelected = selectedVariant === variant;
 
-            <SidebarSection>
-              <SidebarSectionTitle>Device Details</SidebarSectionTitle>
-              {product.productDetails?.display?.size && (
-                <SidebarText>Display: {product.productDetails.display.size}</SidebarText>
-              )}
-              {product.productDetails?.battery?.capacity && (
-                <SidebarText>Battery: {product.productDetails.battery.capacity}</SidebarText>
-              )}
-              {product.productDetails?.design?.weight && (
-                <SidebarText>Weight: {product.productDetails.design.weight}</SidebarText>
-              )}
-              {product.availability && (
-                <SidebarText>
-                  {product.availability.inStock ? 'In Stock' : 'Out of Stock'}
-                </SidebarText>
-              )}
-            </SidebarSection>
-          </Sidebar>
-        </ContentWrapper>
-      </MainContent>
-    </Container>
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => handleVariantSelect(variant)}
+                        className={`p-4 rounded-xl font-semibold text-center transition-all border-2 ${
+                          isSelected
+                            ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-500 text-green-700 shadow-lg scale-105'
+                            : 'bg-white border-slate-200 text-slate-700 hover:border-blue-400 hover:bg-blue-50'
+                        }`}
+                      >
+                        {variantText}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Get Value Button */}
+              <button
+                onClick={handleGetValue}
+                disabled={!selectedVariant}
+                className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${
+                  selectedVariant
+                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:scale-105'
+                    : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                }`}
+              >
+                Get Exact Value
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Sidebar - Right Side */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200 sticky top-8">
+              {/* Product Image Thumbnail */}
+              <div className="w-24 h-36 mx-auto mb-4 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center overflow-hidden">
+                {productImage ? (
+                  <img
+                    src={productImage}
+                    alt={productName}
+                    className="max-w-full max-h-full object-contain p-2"
+                  />
+                ) : (
+                  <Package className="w-12 h-12 text-slate-400" />
+                )}
+              </div>
+
+              {/* Product Name */}
+              <h4 className="text-lg font-bold text-slate-900 text-center mb-6">
+                {brandName} {productName}
+              </h4>
+
+              {/* Price Section */}
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-6 border-2 border-green-200">
+                <p className="text-sm text-slate-600 mb-1">Get Up To</p>
+                <p className="text-3xl font-bold text-green-600">₹{basePrice}</p>
+              </div>
+
+              {/* Device Details */}
+              <div className="space-y-4">
+                <h5 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                  Device Details
+                </h5>
+
+                {product.productDetails?.display?.size && (
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Monitor className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-600">Display</p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {product.productDetails.display.size}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {product.productDetails?.battery?.capacity && (
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Battery className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-600">Battery</p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {product.productDetails.battery.capacity}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {product.productDetails?.design?.weight && (
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <CheckCircle className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-600">Weight</p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {product.productDetails.design.weight}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {product.availability && (
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Package className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-600">Availability</p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {product.availability.inStock ? 'In Stock' : 'Out of Stock'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
