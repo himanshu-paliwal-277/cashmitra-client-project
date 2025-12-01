@@ -1,145 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
-import { theme } from '../../theme';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
-
-const LoginContainer = styled.div`
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(
-    135deg,
-    ${theme.colors.primary[50]} 0%,
-    ${theme.colors.accent[50]} 100%
-  );
-  padding: ${theme.spacing[4]};
-`;
-
-const LoginCard = styled.div`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.xl};
-  box-shadow: ${theme.shadows.xl};
-  padding: ${theme.spacing[8]};
-  width: 100%;
-  max-width: 400px;
-`;
-
-const Logo = styled.div`
-  text-align: center;
-  margin-bottom: ${theme.spacing[8]};
-`;
-
-const LogoIcon = styled.div`
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(
-    135deg,
-    ${theme.colors.primary.main} 0%,
-    ${theme.colors.accent.main} 100%
-  );
-  border-radius: ${theme.borderRadius.lg};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.white};
-  font-weight: ${theme.typography.fontWeight.bold};
-  font-size: ${theme.typography.fontSize['2xl']};
-  margin: 0 auto ${theme.spacing[4]};
-`;
-
-const Title = styled.h1`
-  font-size: ${theme.typography.fontSize['2xl']};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
-
-const Subtitle = styled.p`
-  font-size: ${theme.typography.fontSize.base};
-  color: ${theme.colors.text.secondary};
-  margin: ${theme.spacing[2]} 0 0;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[6]};
-`;
-
-const InputGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const PasswordInputWrapper = styled.div`
-  position: relative;
-`;
-
-const PasswordToggle = styled.button`
-  position: absolute;
-  right: ${theme.spacing[3]};
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: ${theme.colors.text.secondary};
-  cursor: pointer;
-  padding: ${theme.spacing[1]};
-  border-radius: ${theme.borderRadius.sm};
-
-  &:hover {
-    color: ${theme.colors.text.primary};
-    background: ${theme.colors.grey[100]};
-  }
-`;
-
-const ErrorMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  color: ${theme.colors.error.main};
-  font-size: ${theme.typography.fontSize.sm};
-  background: ${theme.colors.error[50]};
-  border: 1px solid ${theme.colors.error[200]};
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing[3]};
-`;
-
-const ForgotPassword = styled(Link)`
-  color: ${theme.colors.primary.main};
-  text-decoration: none;
-  font-size: ${theme.typography.fontSize.sm};
-  text-align: right;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const SignupLink = styled.div`
-  text-align: center;
-  margin-top: ${theme.spacing[6]};
-  padding-top: ${theme.spacing[6]};
-  border-top: 1px solid ${theme.colors.grey[200]};
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-
-  a {
-    color: ${theme.colors.primary.main};
-    text-decoration: none;
-    font-weight: ${theme.typography.fontWeight.medium};
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -209,23 +73,29 @@ const Login = () => {
   };
 
   return (
-    <LoginContainer>
-      <LoginCard>
-        <Logo>
-          <LogoIcon>C</LogoIcon>
-          <Title>Welcome Back</Title>
-          <Subtitle>Sign in to your Cashmitra account</Subtitle>
-        </Logo>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-[400px]">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="w-[60px] h-[60px] bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4">
+            C
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 m-0">Welcome Back</h1>
+          <p className="text-base text-gray-600 mt-2 mb-0">Sign in to your Cashmitra account</p>
+        </div>
 
-        <Form onSubmit={handleSubmit}>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          {/* Error Message */}
           {error && (
-            <ErrorMessage>
+            <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 border border-red-200 rounded-md p-3">
               <AlertCircle size={16} />
               {error}
-            </ErrorMessage>
+            </div>
           )}
 
-          <InputGroup>
+          {/* Input Group */}
+          <div className="flex flex-col gap-4">
             <Input
               type="email"
               name="email"
@@ -238,7 +108,7 @@ const Login = () => {
               required
             />
 
-            <PasswordInputWrapper>
+            <div className="relative">
               <Input
                 type={showPassword ? 'text' : 'password'}
                 name="password"
@@ -250,18 +120,26 @@ const Login = () => {
                 autoComplete="current-password"
                 required
               />
-              <PasswordToggle
+              <button
                 type="button"
                 onClick={togglePasswordVisibility}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none text-gray-600 cursor-pointer p-1 rounded-sm hover:text-gray-900 hover:bg-gray-100"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </PasswordToggle>
-            </PasswordInputWrapper>
-          </InputGroup>
+              </button>
+            </div>
+          </div>
 
-          <ForgotPassword to="/forgot-password">Forgot your password?</ForgotPassword>
+          {/* Forgot Password */}
+          <Link
+            to="/forgot-password"
+            className="text-blue-500 no-underline text-sm text-right hover:underline"
+          >
+            Forgot your password?
+          </Link>
 
+          {/* Submit Button */}
           <Button
             type="submit"
             variant="primary"
@@ -272,13 +150,17 @@ const Login = () => {
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </Button>
-        </Form>
+        </form>
 
-        <SignupLink>
-          Don't have an account? <Link to="/signup">Sign up</Link>
-        </SignupLink>
-      </LoginCard>
-    </LoginContainer>
+        {/* Signup Link */}
+        <div className="text-center mt-6 pt-6 border-t border-gray-200 text-sm text-gray-600">
+          Don't have an account?{' '}
+          <Link to="/signup" className="text-blue-500 no-underline font-medium hover:underline">
+            Sign up
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 

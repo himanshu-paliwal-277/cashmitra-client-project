@@ -1,211 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { theme } from '../../theme';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
-import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle, CheckCircle } from 'lucide-react';
-
-const SignupContainer = styled.div`
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(
-    135deg,
-    ${theme.colors.primary[50]} 0%,
-    ${theme.colors.accent[50]} 100%
-  );
-  padding: ${theme.spacing[4]};
-`;
-
-const SignupCard = styled.div`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.xl};
-  box-shadow: ${theme.shadows.xl};
-  padding: ${theme.spacing[8]};
-  width: 100%;
-  max-width: 450px;
-`;
-
-const Logo = styled.div`
-  text-align: center;
-  margin-bottom: ${theme.spacing[8]};
-`;
-
-const LogoIcon = styled.div`
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(
-    135deg,
-    ${theme.colors.primary.main} 0%,
-    ${theme.colors.accent.main} 100%
-  );
-  border-radius: ${theme.borderRadius.lg};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.white};
-  font-weight: ${theme.typography.fontWeight.bold};
-  font-size: ${theme.typography.fontSize['2xl']};
-  margin: 0 auto ${theme.spacing[4]};
-`;
-
-const Title = styled.h1`
-  font-size: ${theme.typography.fontSize['2xl']};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
-
-const Subtitle = styled.p`
-  font-size: ${theme.typography.fontSize.base};
-  color: ${theme.colors.text.secondary};
-  margin: ${theme.spacing[2]} 0 0;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[5]};
-`;
-
-const InputGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const PasswordInputWrapper = styled.div`
-  position: relative;
-`;
-
-const PasswordToggle = styled.button`
-  position: absolute;
-  right: ${theme.spacing[3]};
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: ${theme.colors.text.secondary};
-  cursor: pointer;
-  padding: ${theme.spacing[1]};
-  border-radius: ${theme.borderRadius.sm};
-
-  &:hover {
-    color: ${theme.colors.text.primary};
-    background: ${theme.colors.grey[100]};
-  }
-`;
-
-const ErrorMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  color: ${theme.colors.error.main};
-  font-size: ${theme.typography.fontSize.sm};
-  background: ${theme.colors.error[50]};
-  border: 1px solid ${theme.colors.error[200]};
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing[3]};
-`;
-
-const PasswordStrength = styled.div`
-  margin-top: ${theme.spacing[2]};
-`;
-
-const StrengthBar = styled.div`
-  height: 4px;
-  background: ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.full};
-  overflow: hidden;
-  margin-bottom: ${theme.spacing[2]};
-`;
-
-const StrengthFill = styled.div`
-  height: 100%;
-  transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
-  background: ${props => {
-    switch (props.strength) {
-      case 1:
-        return theme.colors.error.main;
-      case 2:
-        return theme.colors.warning.main;
-      case 3:
-        return theme.colors.accent.main;
-      case 4:
-        return theme.colors.success.main;
-      default:
-        return theme.colors.grey[300];
-    }
-  }};
-  width: ${props => (props.strength / 4) * 100}%;
-`;
-
-const StrengthText = styled.div`
-  font-size: ${theme.typography.fontSize.xs};
-  color: ${props => {
-    switch (props.strength) {
-      case 1:
-        return theme.colors.error.main;
-      case 2:
-        return theme.colors.warning.main;
-      case 3:
-        return theme.colors.accent.main;
-      case 4:
-        return theme.colors.success.main;
-      default:
-        return theme.colors.text.secondary;
-    }
-  }};
-`;
-
-const CheckboxWrapper = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: ${theme.spacing[3]};
-  margin: ${theme.spacing[2]} 0;
-`;
-
-const Checkbox = styled.input`
-  margin: 0;
-  margin-top: 2px;
-`;
-
-const CheckboxLabel = styled.label`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-  line-height: 1.5;
-
-  a {
-    color: ${theme.colors.primary.main};
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
-
-const LoginLink = styled.div`
-  text-align: center;
-  margin-top: ${theme.spacing[6]};
-  padding-top: ${theme.spacing[6]};
-  border-top: 1px solid ${theme.colors.grey[200]};
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-
-  a {
-    color: ${theme.colors.primary.main};
-    text-decoration: none;
-    font-weight: ${theme.typography.fontWeight.medium};
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
+import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle } from 'lucide-react';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -244,6 +42,36 @@ const Signup = () => {
         return 'Strong';
       default:
         return '';
+    }
+  };
+
+  const getPasswordStrengthColor = strength => {
+    switch (strength) {
+      case 1:
+        return 'bg-red-500';
+      case 2:
+        return 'bg-yellow-500';
+      case 3:
+        return 'bg-purple-500';
+      case 4:
+        return 'bg-green-500';
+      default:
+        return 'bg-gray-300';
+    }
+  };
+
+  const getPasswordStrengthTextColor = strength => {
+    switch (strength) {
+      case 1:
+        return 'text-red-500';
+      case 2:
+        return 'text-yellow-500';
+      case 3:
+        return 'text-purple-500';
+      case 4:
+        return 'text-green-500';
+      default:
+        return 'text-gray-600';
     }
   };
 
@@ -331,23 +159,31 @@ const Signup = () => {
   };
 
   return (
-    <SignupContainer>
-      <SignupCard>
-        <Logo>
-          <LogoIcon>C</LogoIcon>
-          <Title>Create Account</Title>
-          <Subtitle>Join Cashmitra and start trading today</Subtitle>
-        </Logo>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-[450px]">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="w-[60px] h-[60px] bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4">
+            C
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 m-0">Create Account</h1>
+          <p className="text-base text-gray-600 mt-2 mb-0">
+            Join Cashmitra and start trading today
+          </p>
+        </div>
 
-        <Form onSubmit={handleSubmit}>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {/* Error Message */}
           {error && (
-            <ErrorMessage>
+            <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 border border-red-200 rounded-md p-3">
               <AlertCircle size={16} />
               {error}
-            </ErrorMessage>
+            </div>
           )}
 
-          <InputGroup>
+          {/* Input Group */}
+          <div className="flex flex-col gap-4">
             <Input
               type="text"
               name="name"
@@ -384,7 +220,7 @@ const Signup = () => {
               required
             />
 
-            <PasswordInputWrapper>
+            <div className="relative">
               <Input
                 type={showPassword ? 'text' : 'password'}
                 name="password"
@@ -396,45 +232,58 @@ const Signup = () => {
                 autoComplete="new-password"
                 required
               />
-              <PasswordToggle
+              <button
                 type="button"
                 onClick={togglePasswordVisibility}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none text-gray-600 cursor-pointer p-1 rounded-sm hover:text-gray-900 hover:bg-gray-100"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </PasswordToggle>
-              {formData.password && (
-                <PasswordStrength>
-                  <StrengthBar>
-                    <StrengthFill strength={passwordStrength} />
-                  </StrengthBar>
-                  <StrengthText strength={passwordStrength}>
-                    {getPasswordStrengthText(passwordStrength)}
-                  </StrengthText>
-                </PasswordStrength>
-              )}
-            </PasswordInputWrapper>
-          </InputGroup>
+              </button>
 
-          <CheckboxWrapper>
-            <Checkbox
+              {/* Password Strength Indicator */}
+              {formData.password && (
+                <div className="mt-2">
+                  <div className="h-1 bg-gray-200 rounded-full overflow-hidden mb-2">
+                    <div
+                      className={`h-full transition-all duration-300 ease-in-out ${getPasswordStrengthColor(passwordStrength)}`}
+                      style={{ width: `${(passwordStrength / 4) * 100}%` }}
+                    />
+                  </div>
+                  <div className={`text-xs ${getPasswordStrengthTextColor(passwordStrength)}`}>
+                    {getPasswordStrengthText(passwordStrength)}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Terms Checkbox */}
+          <div className="flex items-start gap-3 my-2">
+            <input
               type="checkbox"
               id="agreeToTerms"
               name="agreeToTerms"
               checked={formData.agreeToTerms}
               onChange={handleChange}
+              className="m-0 mt-0.5"
             />
-            <CheckboxLabel htmlFor="agreeToTerms">
-              I agree to the <Link to="/terms">Terms of Service</Link> and{' '}
-              <Link to="/privacy">Privacy Policy</Link>
+            <label htmlFor="agreeToTerms" className="text-sm text-gray-600 leading-6">
+              I agree to the{' '}
+              <Link to="/terms" className="text-blue-500 no-underline hover:underline">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link to="/privacy" className="text-blue-500 no-underline hover:underline">
+                Privacy Policy
+              </Link>
               {validationErrors.agreeToTerms && (
-                <div style={{ color: theme.colors.error.main, marginTop: theme.spacing[1] }}>
-                  {validationErrors.agreeToTerms}
-                </div>
+                <div className="text-red-500 mt-1">{validationErrors.agreeToTerms}</div>
               )}
-            </CheckboxLabel>
-          </CheckboxWrapper>
+            </label>
+          </div>
 
+          {/* Submit Button */}
           <Button
             type="submit"
             variant="primary"
@@ -445,13 +294,17 @@ const Signup = () => {
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </Button>
-        </Form>
+        </form>
 
-        <LoginLink>
-          Already have an account? <Link to="/login">Sign in</Link>
-        </LoginLink>
-      </SignupCard>
-    </SignupContainer>
+        {/* Login Link */}
+        <div className="text-center mt-6 pt-6 border-t border-gray-200 text-sm text-gray-600">
+          Already have an account?{' '}
+          <Link to="/login" className="text-blue-500 no-underline font-medium hover:underline">
+            Sign in
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 
