@@ -17,6 +17,11 @@ export default [
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
       globals: {
         window: 'readonly',
         document: 'readonly',
@@ -43,19 +48,21 @@ export default [
     },
 
     rules: {
-      // 🔹 Unused variables
-      'no-unused-vars': 'warn',
+      // 🔹 Unused variables - disable built-in rule in favor of unused-imports plugin
+      'no-unused-vars': 'off',
       'unused-imports/no-unused-vars': [
         'warn',
         { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
       ],
 
-      // 🔹 Unused imports
-      'unused-imports/no-unused-imports': 'error',
+      // 🔹 Unused imports - remove them automatically
+      'unused-imports/no-unused-imports': 'warn',
 
       'no-console': 'off',
 
       // React
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
 
