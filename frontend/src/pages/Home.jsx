@@ -2,7 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import Banner from '../components/Banner/Banner';
+// import Banner from '../components/Banner/Banner';
+import HeroCarousel from '../components/HeroCarousel/HeroCarousel';
 import ServicesSection from '../components/ServicesSection/ServicesSection';
 import BuyProductsList from '../components/BuyProductsList/BuyProductsList';
 // import { mobileProducts, laptopProducts } from '../data/products';
@@ -163,8 +164,8 @@ const Home = () => {
 
   return (
     <>
-      {/* Banner */}
-      <Banner />
+      {/* Hero Carousel */}
+      <HeroCarousel />
 
       {/* Services Section */}
       <ServicesSection />
@@ -173,10 +174,12 @@ const Home = () => {
       <section className="relative bg-gradient-to-br from-blue-50 to-purple-50 py-16 pb-20 text-center overflow-hidden">
         {/* Animated background */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-          <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle,_rgba(59,130,246,0.1)_0%,_transparent_70%)]" 
-               style={{
-                 animation: 'float 20s ease-in-out infinite',
-               }} />
+          <div
+            className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle,_rgba(59,130,246,0.1)_0%,_transparent_70%)]"
+            style={{
+              animation: 'float 20s ease-in-out infinite',
+            }}
+          />
         </div>
 
         <div className="relative z-10 max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -187,7 +190,7 @@ const Home = () => {
             Get the best price for your mobile, tablet, or laptop through our network of verified
             local partner shops. Safe, fast, and hassle-free.
           </p>
-          
+
           {/* Hero Actions */}
           <div className="flex gap-4 justify-center flex-wrap mb-12">
             <Button
@@ -231,13 +234,11 @@ const Home = () => {
       {/* How It Works */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-semibold text-center mb-4 text-gray-900">
-            How it works
-          </h2>
+          <h2 className="text-3xl font-semibold text-center mb-4 text-gray-900">How it works</h2>
           <p className="text-lg text-gray-600 text-center mb-12 max-w-[600px] mx-auto">
             Simple 4-step process to sell your device safely and get paid instantly
           </p>
-          
+
           {/* Steps Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
             {steps.map((step, index) => (
@@ -246,12 +247,12 @@ const Home = () => {
                 {index < steps.length - 1 && (
                   <div className="hidden lg:block absolute top-10 -right-4 w-8 h-0.5 bg-blue-500" />
                 )}
-                
+
                 {/* Step Number */}
                 <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                   {step.number}
                 </div>
-                
+
                 <h3 className="text-lg font-semibold mb-2 text-gray-900">{step.title}</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
               </div>
@@ -269,7 +270,7 @@ const Home = () => {
           <p className="text-lg text-gray-600 text-center mb-12 max-w-[600px] mx-auto">
             Join thousands of satisfied customers who have sold their devices through Cashmitra
           </p>
-          
+
           {/* Testimonial Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
             {testimonials.map(testimonial => (
@@ -281,12 +282,10 @@ const Home = () => {
                       <Star key={i} size={16} fill="currentColor" />
                     ))}
                   </div>
-                  
+
                   {/* Testimonial Text */}
-                  <p className="italic mb-4 leading-relaxed text-gray-700">
-                    "{testimonial.text}"
-                  </p>
-                  
+                  <p className="italic mb-4 leading-relaxed text-gray-700">"{testimonial.text}"</p>
+
                   {/* Author */}
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
