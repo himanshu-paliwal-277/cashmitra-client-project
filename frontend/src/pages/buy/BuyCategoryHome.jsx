@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { theme } from '../../theme';
 import { getBuySuperCategories, getBuyCategories } from '../../services/productService';
 import {
   Smartphone,
@@ -15,398 +13,57 @@ import {
   Shield,
   Truck,
   RotateCcw,
+  TrendingUp,
+  Zap,
+  Star,
 } from 'lucide-react';
 
-const PageContainer = styled.div`
-  min-height: calc(100vh - 72px);
-  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-`;
-
-const HeroSection = styled.section`
-  background: linear-gradient(
-    135deg,
-    ${theme.colors.primary.main} 0%,
-    ${theme.colors.primary.dark} 100%
-  );
-  padding: 3rem 1rem;
-  text-align: center;
-  color: white;
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    padding: 4rem 2rem;
-  }
-`;
-
-const HeroTitle = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    font-size: 2.5rem;
-  }
-`;
-
-const HeroSubtitle = styled.p`
-  font-size: 1.1rem;
-  opacity: 0.9;
-  max-width: 600px;
-  margin: 0 auto;
-`;
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    padding: 0 2rem;
-  }
-`;
-
-const FeaturesBar = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  padding: 1.5rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  margin-top: -2rem;
-  position: relative;
-  z-index: 10;
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    grid-template-columns: repeat(4, 1fr);
-    padding: 2rem;
-  }
-`;
-
-const FeatureItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-
-  svg {
-    color: ${theme.colors.primary.main};
-    flex-shrink: 0;
-  }
-`;
-
-const FeatureText = styled.div`
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: ${theme.colors.text.primary};
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    font-size: 0.95rem;
-  }
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: ${theme.colors.text.primary};
-  text-align: center;
-  margin: 3rem 0 0.5rem 0;
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    font-size: 2rem;
-    margin: 4rem 0 0.5rem 0;
-  }
-`;
-
-const SectionSubtitle = styled.p`
-  font-size: 1rem;
-  color: ${theme.colors.text.secondary};
-  text-align: center;
-  margin-bottom: 2rem;
-`;
-
-const SuperCategorySection = styled.section`
-  margin-bottom: 3rem;
-`;
-
-const SuperCategoryHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  padding: 0 0.5rem;
-`;
-
-const SuperCategoryTitle = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: ${theme.colors.text.primary};
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-
-  svg {
-    color: ${theme.colors.primary.main};
-  }
-`;
-
-const ViewAllLink = styled.button`
-  background: none;
-  border: none;
-  color: ${theme.colors.primary.main};
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const CategoriesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  @media (min-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: repeat(5, 1fr);
-  }
-`;
-
-const CategoryCard = styled.div`
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem 1rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    border-color: ${theme.colors.primary.main};
-  }
-`;
-
-const CategoryImage = styled.div`
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 1rem;
-  border-radius: 12px;
-  background: ${theme.colors.background.light};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  svg {
-    color: ${theme.colors.text.hint};
-  }
-`;
-
-const CategoryName = styled.h4`
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: ${theme.colors.text.primary};
-  margin-bottom: 0.25rem;
-`;
-
-const SuperCategoryCard = styled.div`
-  background: linear-gradient(
-    135deg,
-    ${props => props.$bgColor || '#667eea'}15 0%,
-    ${props => props.$bgColor || '#667eea'}05 100%
-  );
-  border: 2px solid ${props => props.$bgColor || '#667eea'}20;
-  border-radius: 20px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-`;
-
-const SuperCategoryIcon = styled.div`
-  width: 70px;
-  height: 70px;
-  margin: 0 auto 1rem;
-  border-radius: 16px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  svg {
-    color: ${props => props.$iconColor || theme.colors.primary.main};
-  }
-`;
-
-const SuperCategoryName = styled.h3`
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: ${theme.colors.text.primary};
-  text-align: center;
-  margin-bottom: 0.5rem;
-`;
-
-const SuperCategoryDesc = styled.p`
-  font-size: 0.85rem;
-  color: ${theme.colors.text.secondary};
-  text-align: center;
-`;
-
-const MainGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-bottom: 3rem;
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  @media (min-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: repeat(5, 1fr);
-  }
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-
-  svg {
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
-const ErrorContainer = styled.div`
-  text-align: center;
-  padding: 3rem;
-  background: white;
-  border-radius: 16px;
-  margin: 2rem 0;
-`;
-
-const ErrorText = styled.p`
-  color: ${theme.colors.error.main};
-  margin-bottom: 1rem;
-`;
-
-const RetryButton = styled.button`
-  background: ${theme.colors.primary.main};
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-
-  &:hover {
-    background: ${theme.colors.primary.dark};
-  }
-`;
-
-const PopularCategoriesSection = styled.section`
-  margin-bottom: 3rem;
-  padding: 2rem;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border-radius: 20px;
-`;
-
-const PopularCategoriesTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: ${theme.colors.text.primary};
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-
-  svg {
-    color: ${theme.colors.primary.main};
-  }
-`;
-
-const PopularCategoriesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  @media (min-width: ${theme.breakpoints.md}) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  @media (min-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: repeat(5, 1fr);
-  }
-`;
-
-// Icon mapping for super categories
 const getIconForSuperCategory = name => {
   const nameLower = name?.toLowerCase() || '';
   if (nameLower.includes('mobile') || nameLower.includes('phone')) {
-    return { icon: <Smartphone size={32} />, color: '#3b82f6' };
+    return {
+      icon: <Smartphone className="w-8 h-8" />,
+      color: '#3b82f6',
+      bgGradient: 'from-blue-500 to-cyan-500',
+    };
   }
   if (nameLower.includes('tablet') || nameLower.includes('ipad')) {
-    return { icon: <Tablet size={32} />, color: '#8b5cf6' };
+    return {
+      icon: <Tablet className="w-8 h-8" />,
+      color: '#8b5cf6',
+      bgGradient: 'from-purple-500 to-pink-500',
+    };
   }
   if (nameLower.includes('laptop') || nameLower.includes('macbook')) {
-    return { icon: <Laptop size={32} />, color: '#10b981' };
+    return {
+      icon: <Laptop className="w-8 h-8" />,
+      color: '#10b981',
+      bgGradient: 'from-green-500 to-emerald-500',
+    };
   }
   if (nameLower.includes('watch') || nameLower.includes('smart')) {
-    return { icon: <Watch size={32} />, color: '#f59e0b' };
+    return {
+      icon: <Watch className="w-8 h-8" />,
+      color: '#f59e0b',
+      bgGradient: 'from-amber-500 to-orange-500',
+    };
   }
   if (
     nameLower.includes('accessor') ||
     nameLower.includes('headphone') ||
     nameLower.includes('earphone')
   ) {
-    return { icon: <Headphones size={32} />, color: '#ef4444' };
+    return {
+      icon: <Headphones className="w-8 h-8" />,
+      color: '#ef4444',
+      bgGradient: 'from-red-500 to-rose-500',
+    };
   }
-  return { icon: <Smartphone size={32} />, color: '#6366f1' };
+  return {
+    icon: <Smartphone className="w-8 h-8" />,
+    color: '#6366f1',
+    bgGradient: 'from-indigo-500 to-purple-500',
+  };
 };
 
 const BuyCategoryHome = () => {
@@ -439,145 +96,263 @@ const BuyCategoryHome = () => {
   }, []);
 
   const handleCategoryClick = category => {
-    // Navigate to buy/marketplace page with category filter
     navigate(`/buy?category=${encodeURIComponent(category.name)}`);
   };
 
   if (loading) {
     return (
-      <PageContainer>
-        <LoadingContainer>
-          <Loader size={48} />
-        </LoadingContainer>
-      </PageContainer>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-lg text-slate-600">Loading categories...</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <PageContainer>
-      <HeroSection>
-        <Container>
-          <HeroTitle>Buy Refurbished Devices</HeroTitle>
-          <HeroSubtitle>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-16 px-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-4xl text-white sm:text-5xl lg:text-6xl font-bold mb-4">
+            Buy Refurbished Devices
+          </h1>
+          <p className="text-xl sm:text-2xl text-blue-100 max-w-3xl mx-auto">
             Get premium quality refurbished gadgets at unbeatable prices. Fully tested, certified,
             and with warranty!
-          </HeroSubtitle>
-        </Container>
-      </HeroSection>
+          </p>
+        </div>
+      </section>
 
-      <Container>
-        <FeaturesBar>
-          <FeatureItem>
-            <Award size={24} />
-            <FeatureText>Quality Certified</FeatureText>
-          </FeatureItem>
-          <FeatureItem>
-            <Truck size={24} />
-            <FeatureText>Free Delivery</FeatureText>
-          </FeatureItem>
-          <FeatureItem>
-            <RotateCcw size={24} />
-            <FeatureText>Easy Returns</FeatureText>
-          </FeatureItem>
-          <FeatureItem>
-            <Shield size={24} />
-            <FeatureText>Warranty Included</FeatureText>
-          </FeatureItem>
-        </FeaturesBar>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Features Bar */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 -mt-12 relative z-10 border border-slate-200">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { icon: <Award className="w-6 h-6" />, text: 'Quality Certified', color: 'blue' },
+              { icon: <Truck className="w-6 h-6" />, text: 'Free Delivery', color: 'green' },
+              { icon: <RotateCcw className="w-6 h-6" />, text: 'Easy Returns', color: 'purple' },
+              { icon: <Shield className="w-6 h-6" />, text: 'Warranty Included', color: 'amber' },
+            ].map((feature, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    feature.color === 'blue'
+                      ? 'bg-blue-100 text-blue-600'
+                      : feature.color === 'green'
+                        ? 'bg-green-100 text-green-600'
+                        : feature.color === 'purple'
+                          ? 'bg-purple-100 text-purple-600'
+                          : 'bg-amber-100 text-amber-600'
+                  }`}
+                >
+                  {feature.icon}
+                </div>
+                <span className="text-sm sm:text-base font-semibold text-slate-900">
+                  {feature.text}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
 
-        {/* Popular Buy Categories */}
+        {/* Popular Categories */}
         {categories.length > 0 && (
-          <PopularCategoriesSection>
-            <PopularCategoriesTitle>
-              <Award size={28} />
-              Popular Categories
-            </PopularCategoriesTitle>
-            <PopularCategoriesGrid>
+          <section className="mt-12 bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-6 sm:p-8 border border-blue-200">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                <Star className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">Popular Categories</h3>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {categories.slice(0, 5).map(category => {
                 const { icon } = getIconForSuperCategory(category.name);
                 return (
-                  <CategoryCard key={category._id} onClick={() => handleCategoryClick(category)}>
-                    <CategoryImage>
-                      {category.image ? <img src={category.image} alt={category.name} /> : icon}
-                    </CategoryImage>
-                    <CategoryName>{category.name}</CategoryName>
-                  </CategoryCard>
+                  <button
+                    key={category._id}
+                    onClick={() => handleCategoryClick(category)}
+                    className="bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:scale-105 border border-slate-200 group"
+                  >
+                    <div className="w-20 h-20 mx-auto mb-4 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden group-hover:bg-blue-50 transition-colors">
+                      {category.image ? (
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-slate-600 group-hover:text-blue-600 transition-colors">
+                          {icon}
+                        </div>
+                      )}
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-900 text-center group-hover:text-blue-600 transition-colors">
+                      {category.name}
+                    </h4>
+                  </button>
                 );
               })}
-            </PopularCategoriesGrid>
-          </PopularCategoriesSection>
+            </div>
+          </section>
         )}
 
         {error ? (
-          <ErrorContainer>
-            <ErrorText>{error}</ErrorText>
-            <RetryButton onClick={fetchData}>Try Again</RetryButton>
-          </ErrorContainer>
+          <div className="mt-12 bg-white rounded-2xl shadow-lg p-12 text-center border border-slate-200">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Award className="w-8 h-8 text-red-600" />
+            </div>
+            <p className="text-red-600 text-lg mb-6">{error}</p>
+            <button
+              onClick={fetchData}
+              className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
         ) : (
           <>
-            <SectionTitle>What would you like to buy?</SectionTitle>
-            <SectionSubtitle>Choose a category to explore amazing deals</SectionSubtitle>
+            {/* Main Section Title */}
+            <div className="text-center mt-16 mb-12">
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
+                What would you like to buy?
+              </h2>
+              <p className="text-lg text-slate-600">Choose a category to explore amazing deals</p>
+            </div>
 
             {/* Main Super Categories Grid */}
-            <MainGrid>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 mb-16">
               {superCategories.map(superCat => {
-                const { icon, color } = getIconForSuperCategory(superCat.name);
+                const { icon, bgGradient } = getIconForSuperCategory(superCat.name);
                 return (
-                  <SuperCategoryCard key={superCat._id} $bgColor={color}>
-                    <SuperCategoryIcon $iconColor={color}>
-                      {superCat.image ? <img src={superCat.image} alt={superCat.name} /> : icon}
-                    </SuperCategoryIcon>
-                    <SuperCategoryName>{superCat.name}</SuperCategoryName>
-                    {superCat.description && (
-                      <SuperCategoryDesc>{superCat.description}</SuperCategoryDesc>
-                    )}
-                  </SuperCategoryCard>
+                  <button
+                    key={superCat._id}
+                    onClick={() => navigate('/buy')}
+                    className="group relative bg-white rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-slate-200 hover:border-transparent overflow-hidden"
+                  >
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${bgGradient} opacity-0 group-hover:opacity-10 transition-opacity`}
+                    />
+                    <div className="relative">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 bg-white rounded-2xl shadow-lg flex items-center justify-center overflow-hidden group-hover:shadow-xl transition-shadow">
+                        {superCat.image ? (
+                          <img
+                            src={superCat.image}
+                            alt={superCat.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="text-slate-600 group-hover:scale-110 transition-transform">
+                            {icon}
+                          </div>
+                        )}
+                      </div>
+                      <h3 className="text-base sm:text-lg font-bold text-slate-900 text-center mb-2 group-hover:text-blue-600 transition-colors">
+                        {superCat.name}
+                      </h3>
+                      {superCat.description && (
+                        <p className="text-xs text-slate-600 text-center line-clamp-2">
+                          {superCat.description}
+                        </p>
+                      )}
+                    </div>
+                  </button>
                 );
               })}
-            </MainGrid>
+            </div>
 
             {/* Categories under each Super Category */}
             {superCategories.map(superCat => {
               if (!superCat.categories || superCat.categories.length === 0) return null;
 
-              const { icon } = getIconForSuperCategory(superCat.name);
+              const { icon, bgGradient } = getIconForSuperCategory(superCat.name);
 
               return (
-                <SuperCategorySection key={superCat._id}>
-                  <SuperCategoryHeader>
-                    <SuperCategoryTitle>
-                      {React.cloneElement(icon, { size: 24 })}
-                      {superCat.name}
-                    </SuperCategoryTitle>
-                    <ViewAllLink onClick={() => navigate('/buy')}>
-                      View All <ChevronRight size={16} />
-                    </ViewAllLink>
-                  </SuperCategoryHeader>
+                <section key={superCat._id} className="mb-16">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-12 h-12 bg-gradient-to-r ${bgGradient} rounded-xl flex items-center justify-center text-white`}
+                      >
+                        {icon}
+                      </div>
+                      <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">
+                        {superCat.name}
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => navigate('/buy')}
+                      className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-semibold transition-colors group"
+                    >
+                      View All
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
 
-                  <CategoriesGrid>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {superCat.categories.slice(0, 5).map(category => (
-                      <CategoryCard
+                      <button
                         key={category._id}
                         onClick={() => handleCategoryClick(category)}
+                        className="bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:scale-105 border border-slate-200 group"
                       >
-                        <CategoryImage>
+                        <div className="w-20 h-20 mx-auto mb-4 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden group-hover:bg-blue-50 transition-colors">
                           {category.image ? (
-                            <img src={category.image} alt={category.name} />
+                            <img
+                              src={category.image}
+                              alt={category.name}
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
-                            <Smartphone size={32} />
+                            <Smartphone className="w-8 h-8 text-slate-600 group-hover:text-blue-600 transition-colors" />
                           )}
-                        </CategoryImage>
-                        <CategoryName>{category.name}</CategoryName>
-                      </CategoryCard>
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-900 text-center group-hover:text-blue-600 transition-colors">
+                          {category.name}
+                        </h4>
+                      </button>
                     ))}
-                  </CategoriesGrid>
-                </SuperCategorySection>
+                  </div>
+                </section>
               );
             })}
           </>
         )}
-      </Container>
-    </PageContainer>
+
+        {/* Why Choose Us Section */}
+        <section className="mt-16 mb-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 sm:p-12 text-white">
+          <h2 className="text-3xl font-bold text-center mb-8 text-white">Why Choose Us?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <TrendingUp className="w-8 h-8" />,
+                title: 'Best Prices',
+                desc: 'Up to 70% off on retail prices',
+              },
+              {
+                icon: <Zap className="w-8 h-8" />,
+                title: 'Quick Delivery',
+                desc: 'Get your device in 2-3 days',
+              },
+              {
+                icon: <Shield className="w-8 h-8" />,
+                title: 'Secure Shopping',
+                desc: '100% safe and secure payments',
+              },
+            ].map((item, index) => (
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mx-auto mb-4">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-white">{item.title}</h3>
+                <p className="text-blue-100">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
   );
 };
 

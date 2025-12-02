@@ -1,9 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { theme } from '../../theme';
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
 import sellService from '../../services/sellService';
 import {
   ArrowLeft,
@@ -11,242 +7,15 @@ import {
   ArrowRight,
   Loader,
   Package,
-  Star,
-  DollarSign,
   Check,
+  TrendingUp,
+  Shield,
+  Zap,
+  Award,
 } from 'lucide-react';
-
-const PageContainer = styled.div`
-  min-height: calc(100vh - 72px);
-  background: ${theme.colors.background.paper};
-  padding: ${theme.spacing[8]} 0;
-`;
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 ${theme.spacing[4]};
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    padding: 0 ${theme.spacing[6]};
-  }
-
-  @media (min-width: ${theme.breakpoints.lg}) {
-    padding: 0 ${theme.spacing[8]};
-  }
-`;
-
-const Breadcrumb = styled.nav`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  margin-bottom: ${theme.spacing[8]};
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const BreadcrumbLink = styled.a`
-  color: ${theme.colors.primary.main};
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const BreadcrumbSeparator = styled.span`
-  color: ${theme.colors.text.hint};
-`;
-
-const BackButton = styled(Button)`
-  margin-bottom: ${theme.spacing[6]};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const ProductHeader = styled.div`
-  text-align: center;
-  margin-bottom: ${theme.spacing[12]};
-`;
-
-const ProductTitle = styled.h1`
-  font-size: ${theme.typography.fontSize['4xl']};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[4]};
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    font-size: ${theme.typography.fontSize['3xl']};
-  }
-`;
-
-const ProductSubtitle = styled.p`
-  font-size: ${theme.typography.fontSize.lg};
-  color: ${theme.colors.text.secondary};
-  margin-bottom: ${theme.spacing[6]};
-`;
-
-const SoldCount = styled.p`
-  font-size: ${theme.typography.fontSize.base};
-  color: ${theme.colors.accent.main};
-  font-weight: ${theme.typography.fontWeight.medium};
-`;
-
-const ProductContent = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: ${theme.spacing[12]};
-  align-items: start;
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: 1fr;
-    gap: ${theme.spacing[8]};
-  }
-`;
-
-const ProductImageSection = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ProductImage = styled.div`
-  width: 300px;
-  height: 400px;
-  background: ${theme.colors.background.light};
-  border-radius: ${theme.borderRadius['2xl']};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: ${theme.shadows.lg};
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: ${theme.borderRadius['2xl']};
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    width: 250px;
-    height: 320px;
-  }
-`;
-
-const VariantSection = styled.div`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius['2xl']};
-  padding: ${theme.spacing[8]};
-  box-shadow: ${theme.shadows.base};
-`;
-
-const VariantTitle = styled.h3`
-  font-size: ${theme.typography.fontSize.xl};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[6]};
-`;
-
-const VariantGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[8]};
-`;
-
-const VariantCard = styled(Card)`
-  cursor: pointer;
-  transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
-  border: 2px solid
-    ${props => (props.selected ? theme.colors.primary.main : theme.colors.border.light)};
-  background: ${props => (props.selected ? theme.colors.primary[50] : theme.colors.white)};
-  text-align: center;
-  padding: ${theme.spacing[4]};
-  position: relative;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${theme.shadows.lg};
-    border-color: ${theme.colors.primary.main};
-  }
-`;
-
-const VariantLabel = styled.div`
-  font-size: ${theme.typography.fontSize.base};
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[2]};
-`;
-
-const VariantPrice = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const SelectedIcon = styled.div`
-  position: absolute;
-  top: ${theme.spacing[2]};
-  right: ${theme.spacing[2]};
-  width: 20px;
-  height: 20px;
-  background: ${theme.colors.primary.main};
-  border-radius: ${theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.white};
-`;
-
-const GetValueButton = styled(Button)`
-  width: 100%;
-  font-size: ${theme.typography.fontSize.lg};
-  padding: ${theme.spacing[4]} ${theme.spacing[6]};
-  margin-top: ${theme.spacing[6]};
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const LoadingText = styled.p`
-  color: ${theme.colors.text.secondary};
-  font-size: ${theme.typography.fontSize.lg};
-`;
-
-const ErrorContainer = styled.div`
-  text-align: center;
-  padding: ${theme.spacing[12]} ${theme.spacing[4]};
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius['2xl']};
-  box-shadow: ${theme.shadows.base};
-`;
-
-const ErrorTitle = styled.h3`
-  font-size: ${theme.typography.fontSize.xl};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[3]};
-`;
-
-const ErrorText = styled.p`
-  font-size: ${theme.typography.fontSize.base};
-  color: ${theme.colors.text.secondary};
-  margin-bottom: ${theme.spacing[6]};
-`;
 
 const ProductVariantSelection = ({ onContinue, onBack }) => {
   const { productId } = useParams();
-  console.log('productId: ', productId);
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
@@ -271,7 +40,6 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
       if (response && response.success && response.data) {
         const productData = response.data;
 
-        // Set product details from the API response
         const product = {
           id: productData._id || productData.id,
           name: productData.name,
@@ -285,10 +53,9 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
           createdBy: productData.createdBy,
           createdAt: productData.createdAt,
           updatedAt: productData.updatedAt,
-          soldCount: 1250, // Default value, can be updated if available in API
+          soldCount: 1250,
         };
 
-        // Set variants from the API response
         const variants =
           productData.variants?.map(variant => ({
             id: variant._id || variant.id,
@@ -296,16 +63,12 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
             label: variant.label,
             basePrice: variant.basePrice,
             isActive: variant.isActive,
-            name: variant.label, // For backward compatibility
+            name: variant.label,
           })) || [];
 
         setProduct(product);
         setVariants(variants);
-
-        console.log('Product loaded:', product);
-        console.log('Variants loaded:', variants);
       } else {
-        // Mock data for testing if API fails
         const mockProduct = {
           id: productId,
           name: 'iPhone 14 Pro',
@@ -339,14 +102,12 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
 
   const handleGetExactValue = () => {
     if (selectedVariant && product && onContinue) {
-      // onContinue(product, selectedVariant);
       const variantId = selectedVariant._id || selectedVariant.id;
       const categoryId = product.categoryId;
       navigate(
         `/sell/product/${product.id}/variant/${variantId}/condition?categoryId=${categoryId}`
       );
     } else if (selectedVariant && product) {
-      // Navigate to condition page with product, variant, and category IDs
       const variantId = selectedVariant._id || selectedVariant.id;
       const categoryId = product.categoryId;
       navigate(
@@ -369,125 +130,259 @@ const ProductVariantSelection = ({ onContinue, onBack }) => {
 
   if (loading) {
     return (
-      <PageContainer>
-        <Container>
-          <LoadingContainer>
-            <Loader size={48} className="animate-spin" />
-            <LoadingText>Loading product details...</LoadingText>
-          </LoadingContainer>
-        </Container>
-      </PageContainer>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center p-6">
+        <div className="text-center">
+          <Loader className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-lg text-slate-600">Loading product details...</p>
+        </div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <PageContainer>
-        <Container>
-          <ErrorContainer>
-            <ErrorTitle>Oops! Something went wrong</ErrorTitle>
-            <ErrorText>{error}</ErrorText>
-            <Button onClick={() => fetchProductDetails()}>Try Again</Button>
-          </ErrorContainer>
-        </Container>
-      </PageContainer>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12 text-center max-w-md border border-slate-200">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Package className="w-8 h-8 text-red-600" />
+          </div>
+          <h3 className="text-2xl font-bold text-slate-900 mb-3">Oops! Something went wrong</h3>
+          <p className="text-slate-600 mb-6">{error}</p>
+          <button
+            onClick={() => fetchProductDetails()}
+            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
-    <PageContainer>
-      <Container>
-        <Breadcrumb>
-          <BreadcrumbLink onClick={() => handleBreadcrumbClick('/')}>
-            <Home size={16} />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 py-8 px-4 sm:py-12">
+      <div className="max-w-7xl mx-auto">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 mb-8 text-sm text-slate-600 flex-wrap">
+          <button
+            onClick={() => handleBreadcrumbClick('/')}
+            className="flex items-center gap-1 text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            <Home className="w-4 h-4" />
             Home
-          </BreadcrumbLink>
-          <BreadcrumbSeparator>
-            <ArrowRight size={16} />
-          </BreadcrumbSeparator>
-          <BreadcrumbLink onClick={() => handleBreadcrumbClick('/sell')}>
+          </button>
+          <ArrowRight className="w-4 h-4 text-slate-400" />
+          <button
+            onClick={() => handleBreadcrumbClick('/sell')}
+            className="text-blue-600 hover:text-blue-700 transition-colors"
+          >
             Sell Old Mobile Phone
-          </BreadcrumbLink>
-          <BreadcrumbSeparator>
-            <ArrowRight size={16} />
-          </BreadcrumbSeparator>
-          <span>{product?.category || 'Product'}</span>
-          <BreadcrumbSeparator>
-            <ArrowRight size={16} />
-          </BreadcrumbSeparator>
-          <span>{product?.name}</span>
-        </Breadcrumb>
+          </button>
+          <ArrowRight className="w-4 h-4 text-slate-400" />
+          <span className="text-slate-900 font-medium">{product?.category || 'Product'}</span>
+          <ArrowRight className="w-4 h-4 text-slate-400" />
+          <span className="text-slate-900 font-medium">{product?.name}</span>
+        </nav>
 
-        <BackButton variant="outline" onClick={handleBackClick}>
-          <ArrowLeft size={20} />
+        {/* Back Button */}
+        <button
+          onClick={handleBackClick}
+          className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 hover:border-slate-400 transition-all mb-8 group"
+        >
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           Back to Products
-        </BackButton>
+        </button>
 
-        <ProductHeader>
-          <ProductTitle>{product?.name}</ProductTitle>
-          <SoldCount>{product?.soldCount}+ already sold on Cashify</SoldCount>
-        </ProductHeader>
+        {/* Product Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">{product?.name}</h1>
+          <div className="flex items-center justify-center gap-2 text-blue-600">
+            <TrendingUp className="w-5 h-5" />
+            <p className="text-lg font-semibold">{product?.soldCount}+ already sold</p>
+          </div>
+        </div>
 
-        <ProductContent>
-          <ProductImageSection>
-            <ProductImage>
-              {product?.images && product.images.length > 0 ? (
-                <img src={product.images[0]} alt={product.name} />
+        {/* Trust Badges */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          {[
+            { icon: <Shield className="w-6 h-6" />, text: 'Secure Process', color: 'blue' },
+            { icon: <Zap className="w-6 h-6" />, text: 'Instant Payment', color: 'green' },
+            { icon: <Award className="w-6 h-6" />, text: 'Best Price', color: 'purple' },
+            { icon: <Package className="w-6 h-6" />, text: 'Free Pickup', color: 'amber' },
+          ].map((badge, index) => (
+            <div
+              key={index}
+              className={`bg-white rounded-xl p-4 text-center border border-slate-200 shadow-sm hover:shadow-md transition-shadow`}
+            >
+              <div
+                className={`inline-flex items-center justify-center w-12 h-12 rounded-lg mb-2 ${
+                  badge.color === 'blue'
+                    ? 'bg-blue-100 text-blue-600'
+                    : badge.color === 'green'
+                      ? 'bg-green-100 text-green-600'
+                      : badge.color === 'purple'
+                        ? 'bg-purple-100 text-purple-600'
+                        : 'bg-amber-100 text-amber-600'
+                }`}
+              >
+                {badge.icon}
+              </div>
+              <p className="text-sm font-semibold text-slate-900">{badge.text}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          {/* Product Image */}
+          <div className="lg:col-span-1 flex justify-center">
+            <div className="w-full max-w-sm">
+              <div className="aspect-[3/4] bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex items-center justify-center">
+                {product?.images && product.images.length > 0 ? (
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Package className="w-20 h-20 text-slate-300" />
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Variant Selection */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
+              <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">
+                Choose a variant
+              </h3>
+
+              {variants.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    {variants.map(variant => (
+                      <button
+                        key={variant.id}
+                        onClick={() => handleVariantSelect(variant)}
+                        className={`relative p-6 rounded-xl border-2 transition-all duration-300 hover:scale-105 text-left ${
+                          selectedVariant?.id === variant.id
+                            ? 'border-blue-500 bg-blue-50 shadow-lg'
+                            : 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-md'
+                        }`}
+                      >
+                        {selectedVariant?.id === variant.id && (
+                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                            <Check className="w-5 h-5 text-white" />
+                          </div>
+                        )}
+
+                        <div className="mb-3">
+                          <p
+                            className={`text-base font-semibold ${
+                              selectedVariant?.id === variant.id
+                                ? 'text-blue-600'
+                                : 'text-slate-900'
+                            }`}
+                          >
+                            {variant.label || variant.storage || variant.name || 'Variant'}
+                          </p>
+                        </div>
+
+                        <div
+                          className={`text-sm font-medium ${
+                            selectedVariant?.id === variant.id ? 'text-blue-600' : 'text-slate-600'
+                          }`}
+                        >
+                          {variant.basePrice
+                            ? `₹${variant.basePrice.toLocaleString()}+`
+                            : 'Get Quote'}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Selected Variant Info */}
+                  {selectedVariant && (
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-6 border border-blue-200">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Check className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-bold text-slate-900 mb-1">
+                            Selected Variant
+                          </h4>
+                          <p className="text-slate-700 mb-2">{selectedVariant.label}</p>
+                          <p className="text-2xl font-bold text-blue-600">
+                            ₹{selectedVariant.basePrice?.toLocaleString()}+
+                          </p>
+                          <p className="text-sm text-slate-600 mt-1">
+                            Final price depends on device condition
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    disabled={!selectedVariant}
+                    onClick={handleGetExactValue}
+                    className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 disabled:from-slate-300 disabled:to-slate-300 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
+                  >
+                    Get Exact Value
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </>
               ) : (
-                <Package size={80} color={theme.colors.text.hint} />
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Package className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">No variants available</h3>
+                  <p className="text-slate-600 mb-6">
+                    This product doesn't have any variants available at the moment.
+                  </p>
+                  <button
+                    onClick={handleBackClick}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+                  >
+                    Back to Products
+                  </button>
+                </div>
               )}
-            </ProductImage>
-          </ProductImageSection>
+            </div>
 
-          <VariantSection>
-            <VariantTitle>Choose a variant</VariantTitle>
-
-            {variants.length > 0 ? (
-              <>
-                <VariantGrid>
-                  {variants.map(variant => (
-                    <VariantCard
-                      key={variant.id}
-                      selected={selectedVariant?.id === variant.id}
-                      onClick={() => handleVariantSelect(variant)}
-                    >
-                      {selectedVariant?.id === variant.id && (
-                        <SelectedIcon>
-                          <Check size={12} />
-                        </SelectedIcon>
-                      )}
-                      <VariantLabel>
-                        {variant.label || variant.storage || variant.name || 'Variant'}
-                      </VariantLabel>
-                      <VariantPrice>
-                        {variant.basePrice ? `₹${variant.basePrice}+` : 'Get Quote'}
-                      </VariantPrice>
-                    </VariantCard>
-                  ))}
-                </VariantGrid>
-
-                <GetValueButton
-                  variant="primary"
-                  size="lg"
-                  disabled={!selectedVariant}
-                  onClick={handleGetExactValue}
-                >
-                  Get Exact Value
-                </GetValueButton>
-              </>
-            ) : (
-              <ErrorContainer>
-                <ErrorTitle>No variants available</ErrorTitle>
-                <ErrorText>
-                  This product doesn't have any variants available at the moment.
-                </ErrorText>
-                <Button onClick={handleBackClick}>Back to Products</Button>
-              </ErrorContainer>
-            )}
-          </VariantSection>
-        </ProductContent>
-      </Container>
-    </PageContainer>
+            {/* How It Works */}
+            <div className="mt-8 bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200">
+              <h3 className="text-xl font-bold text-slate-900 mb-6">How It Works</h3>
+              <div className="space-y-4">
+                {[
+                  { step: '1', title: 'Select Variant', desc: 'Choose your device configuration' },
+                  {
+                    step: '2',
+                    title: 'Check Condition',
+                    desc: 'Answer a few questions about your device',
+                  },
+                  { step: '3', title: 'Get Quote', desc: 'Receive instant valuation' },
+                  { step: '4', title: 'Schedule Pickup', desc: 'Free doorstep collection' },
+                ].map((item, index) => (
+                  <div key={index} className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                      {item.step}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 mb-1">{item.title}</h4>
+                      <p className="text-sm text-slate-600">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

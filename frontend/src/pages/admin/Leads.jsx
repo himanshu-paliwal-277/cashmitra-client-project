@@ -1,257 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { Users, Plus, Search, Filter, Eye, Edit, Phone, Mail, MessageSquare } from 'lucide-react';
+/**
+ * @fileoverview Leads Management Component
+ * @description Admin interface for managing customer leads
+ * @author Cashify Development Team
+ * @version 2.0.0
+ */
 
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-  }
-`;
-
-const FilterSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  min-width: 300px;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const FilterButton = styled.button`
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #e5e7eb;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid ${props => props.color || '#3b82f6'};
-`;
-
-const StatValue = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
-`;
-
-const LeadsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
-`;
-
-const LeadCard = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const LeadHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-`;
-
-const LeadName = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-`;
-
-const LeadScore = styled.div`
-  background: ${props => {
-    if (props.score >= 80) return '#10b981';
-    if (props.score >= 60) return '#f59e0b';
-    return '#ef4444';
-  }};
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-`;
-
-const LeadInfo = styled.div`
-  margin-bottom: 1rem;
-`;
-
-const InfoRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const LeadInterest = styled.div`
-  background: #f3f4f6;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  color: #374151;
-  margin-bottom: 1rem;
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-`;
-
-const IconButton = styled.button`
-  background: ${props => (props.primary ? '#3b82f6' : '#f3f4f6')};
-  color: ${props => (props.primary ? 'white' : '#6b7280')};
-  border: none;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: ${props => (props.primary ? '#2563eb' : '#e5e7eb')};
-    color: ${props => (props.primary ? 'white' : '#374151')};
-  }
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: ${props => {
-    switch (props.status) {
-      case 'new':
-        return '#dbeafe';
-      case 'contacted':
-        return '#fef3c7';
-      case 'qualified':
-        return '#d1fae5';
-      case 'converted':
-        return '#dcfce7';
-      case 'lost':
-        return '#fee2e2';
-      default:
-        return '#f3f4f6';
-    }
-  }};
-  color: ${props => {
-    switch (props.status) {
-      case 'new':
-        return '#1e40af';
-      case 'contacted':
-        return '#92400e';
-      case 'qualified':
-        return '#065f46';
-      case 'converted':
-        return '#166534';
-      case 'lost':
-        return '#991b1b';
-      default:
-        return '#374151';
-    }
-  }};
-`;
+import { useState, useEffect } from 'react';
+import { cn } from '../../lib/utils';
+import Card from '../../components/ui/Card';
+import {
+  Users,
+  Plus,
+  Search,
+  Filter,
+  Eye,
+  Phone,
+  Mail,
+  MessageSquare,
+  TrendingUp,
+  UserCheck,
+  Target,
+  RefreshCw,
+} from 'lucide-react';
 
 const Leads = () => {
   const [leads, setLeads] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     // Mock data - replace with actual API call
@@ -300,6 +76,28 @@ const Leads = () => {
         source: 'Google Ads',
         createdAt: '2024-01-12',
       },
+      {
+        id: 5,
+        name: 'Vikram Singh',
+        email: 'vikram.singh@email.com',
+        phone: '+91 9876543214',
+        interest: 'OnePlus 11 - Selling',
+        score: 55,
+        status: 'new',
+        source: 'Website',
+        createdAt: '2024-01-11',
+      },
+      {
+        id: 6,
+        name: 'Anjali Reddy',
+        email: 'anjali.reddy@email.com',
+        phone: '+91 9876543215',
+        interest: 'AirPods Pro - Buying',
+        score: 38,
+        status: 'lost',
+        source: 'Referral',
+        createdAt: '2024-01-10',
+      },
     ];
 
     setTimeout(() => {
@@ -309,112 +107,206 @@ const Leads = () => {
   }, []);
 
   const stats = [
-    { label: 'Total Leads', value: '2,456', color: '#3b82f6' },
-    { label: 'New Leads', value: '123', color: '#10b981' },
-    { label: 'Qualified Leads', value: '89', color: '#f59e0b' },
-    { label: 'Conversion Rate', value: '24.5%', color: '#8b5cf6' },
+    { label: 'Total Leads', value: '2,456', color: 'bg-blue-500', icon: Users },
+    { label: 'New Leads', value: '123', color: 'bg-green-500', icon: TrendingUp },
+    { label: 'Qualified Leads', value: '89', color: 'bg-amber-500', icon: UserCheck },
+    { label: 'Conversion Rate', value: '24.5%', color: 'bg-purple-500', icon: Target },
   ];
 
-  const filteredLeads = leads.filter(
-    lead =>
+  const filteredLeads = leads.filter(lead => {
+    const matchesSearch =
       lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.interest.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      lead.interest.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const getScoreColor = score => {
+    if (score >= 80) return 'bg-green-500';
+    if (score >= 60) return 'bg-amber-500';
+    return 'bg-red-500';
+  };
+
+  const getStatusColor = status => {
+    const colors = {
+      new: 'bg-blue-100 text-blue-800',
+      contacted: 'bg-yellow-100 text-yellow-800',
+      qualified: 'bg-teal-100 text-teal-800',
+      converted: 'bg-green-100 text-green-800',
+      lost: 'bg-red-100 text-red-800',
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="flex flex-col items-center justify-center py-12 text-gray-600">
+          <RefreshCw size={32} className="animate-spin mb-4" />
+          <p className="text-lg">Loading leads...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <Container>
-      <Header>
-        <Title>
-          <Users size={32} />
-          Leads Management
-        </Title>
-        <ActionButton>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-amber-500 rounded-lg">
+            <Users size={32} className="text-white" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Leads Management</h1>
+        </div>
+        <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-amber-500 text-white hover:bg-amber-600 shadow-md hover:shadow-lg transition-all">
           <Plus size={20} />
           Add New Lead
-        </ActionButton>
-      </Header>
+        </button>
+      </div>
 
-      <StatsGrid>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {stats.map((stat, index) => (
-          <StatCard key={index} color={stat.color}>
-            <StatValue>{stat.value}</StatValue>
-            <StatLabel>{stat.label}</StatLabel>
-          </StatCard>
+          <Card
+            key={index}
+            className="p-6 border-l-4"
+            style={{ borderLeftColor: stat.color.replace('bg-', '#') }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className={cn('p-3 rounded-xl text-white', stat.color)}>
+                <stat.icon size={24} />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+            <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+          </Card>
         ))}
-      </StatsGrid>
+      </div>
 
-      <FilterSection>
-        <SearchInput
-          type="text"
-          placeholder="Search by name, email, or interest..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-        />
-        <FilterButton>
-          <Filter size={16} />
-          Filters
-        </FilterButton>
-      </FilterSection>
+      {/* Filters Section */}
+      <Card className="mb-6 p-6">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by name, email, or interest..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+            />
+          </div>
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+          >
+            <option value="all">All Status</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="qualified">Qualified</option>
+            <option value="converted">Converted</option>
+            <option value="lost">Lost</option>
+          </select>
+          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 transition-all">
+            <Filter size={16} />
+            More Filters
+          </button>
+        </div>
+      </Card>
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
+      {/* Leads Grid */}
+      {filteredLeads.length === 0 ? (
+        <div className="text-center py-16 px-4">
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users size={32} className="text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No leads found</h3>
+          <p className="text-gray-600">
+            {searchTerm || statusFilter !== 'all'
+              ? 'Try adjusting your search or filters'
+              : 'Start by adding your first lead'}
+          </p>
+        </div>
       ) : (
-        <LeadsGrid>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredLeads.map(lead => (
-            <LeadCard key={lead.id}>
-              <LeadHeader>
-                <div>
-                  <LeadName>{lead.name}</LeadName>
-                  <StatusBadge status={lead.status}>
-                    {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
-                  </StatusBadge>
+            <Card key={lead.id} hoverable className="flex flex-col">
+              <Card.Body className="flex-1">
+                {/* Lead Header */}
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{lead.name}</h3>
+                    <span
+                      className={cn(
+                        'inline-block px-3 py-1 rounded-full text-xs font-semibold capitalize',
+                        getStatusColor(lead.status)
+                      )}
+                    >
+                      {lead.status}
+                    </span>
+                  </div>
+                  <div
+                    className={cn(
+                      'px-3 py-1 rounded-full text-white text-xs font-bold',
+                      getScoreColor(lead.score)
+                    )}
+                  >
+                    {lead.score}
+                  </div>
                 </div>
-                <LeadScore score={lead.score}>{lead.score}</LeadScore>
-              </LeadHeader>
 
-              <LeadInfo>
-                <InfoRow>
-                  <Mail size={14} />
-                  {lead.email}
-                </InfoRow>
-                <InfoRow>
-                  <Phone size={14} />
-                  {lead.phone}
-                </InfoRow>
-                <InfoRow>
-                  <span style={{ fontWeight: '500' }}>Source:</span>
-                  {lead.source}
-                </InfoRow>
-              </LeadInfo>
+                {/* Lead Info */}
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Mail size={14} className="text-amber-600 flex-shrink-0" />
+                    <span className="truncate">{lead.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Phone size={14} className="text-amber-600 flex-shrink-0" />
+                    <span>{lead.phone}</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm text-gray-600">
+                    <span className="font-medium flex-shrink-0">Source:</span>
+                    <span>{lead.source}</span>
+                  </div>
+                </div>
 
-              <LeadInterest>
-                <strong>Interest:</strong> {lead.interest}
-              </LeadInterest>
+                {/* Lead Interest */}
+                <div className="bg-gray-50 p-3 rounded-lg mb-4">
+                  <div className="text-xs font-medium text-gray-700 mb-1">Interest</div>
+                  <div className="text-sm text-gray-900">{lead.interest}</div>
+                </div>
 
-              <ActionButtons>
-                <IconButton primary>
-                  <Eye size={14} />
-                  View
-                </IconButton>
-                <IconButton>
-                  <Phone size={14} />
-                  Call
-                </IconButton>
-                <IconButton>
-                  <Mail size={14} />
-                  Email
-                </IconButton>
-                <IconButton>
-                  <MessageSquare size={14} />
-                  Note
-                </IconButton>
-              </ActionButtons>
-            </LeadCard>
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2">
+                  <button className="flex items-center gap-1 px-3 py-2 text-xs font-medium rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition-colors">
+                    <Eye size={14} />
+                    View
+                  </button>
+                  <button className="flex items-center gap-1 px-3 py-2 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    <Phone size={14} />
+                    Call
+                  </button>
+                  <button className="flex items-center gap-1 px-3 py-2 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    <Mail size={14} />
+                    Email
+                  </button>
+                  <button className="flex items-center gap-1 px-3 py-2 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    <MessageSquare size={14} />
+                    Note
+                  </button>
+                </div>
+              </Card.Body>
+            </Card>
           ))}
-        </LeadsGrid>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

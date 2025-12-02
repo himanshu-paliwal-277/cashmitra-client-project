@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+/**
+ * @fileoverview Buy Orders Management Component
+ * @description Admin interface for managing buy orders
+ * @author Cashify Development Team
+ * @version 2.0.0
+ */
+
+import { useState, useEffect } from 'react';
+import { cn } from '../../lib/utils';
+import Card from '../../components/ui/Card';
 import {
   Package,
   Search,
@@ -10,255 +18,17 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  RefreshCw,
+  DollarSign,
+  ShoppingBag,
+  TrendingUp,
 } from 'lucide-react';
-
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const FilterSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  min-width: 300px;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
-`;
-
-const FilterButton = styled.button`
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #e5e7eb;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid ${props => props.color || '#10b981'};
-`;
-
-const StatValue = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
-`;
-
-const OrdersGrid = styled.div`
-  display: grid;
-  gap: 1.5rem;
-`;
-
-const OrderCard = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const OrderHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const OrderInfo = styled.div`
-  flex: 1;
-`;
-
-const OrderId = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 0.5rem 0;
-`;
-
-const CustomerName = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 0.25rem;
-`;
-
-const OrderDate = styled.div`
-  font-size: 0.75rem;
-  color: #9ca3af;
-`;
-
-const OrderStatus = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: ${props => {
-    switch (props.status) {
-      case 'pending':
-        return '#fef3c7';
-      case 'confirmed':
-        return '#dbeafe';
-      case 'shipped':
-        return '#e0e7ff';
-      case 'delivered':
-        return '#d1fae5';
-      case 'cancelled':
-        return '#fee2e2';
-      default:
-        return '#f3f4f6';
-    }
-  }};
-  color: ${props => {
-    switch (props.status) {
-      case 'pending':
-        return '#92400e';
-      case 'confirmed':
-        return '#1e40af';
-      case 'shipped':
-        return '#3730a3';
-      case 'delivered':
-        return '#065f46';
-      case 'cancelled':
-        return '#991b1b';
-      default:
-        return '#374151';
-    }
-  }};
-`;
-
-const OrderDetails = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const DetailItem = styled.div`
-  background: #f9fafb;
-  padding: 1rem;
-  border-radius: 0.5rem;
-`;
-
-const DetailLabel = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.25rem;
-`;
-
-const DetailValue = styled.div`
-  font-size: 0.875rem;
-  color: #1f2937;
-  font-weight: 600;
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-`;
-
-const IconButton = styled.button`
-  background: ${props => (props.primary ? '#10b981' : '#f3f4f6')};
-  color: ${props => (props.primary ? 'white' : '#6b7280')};
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.2s;
-
-  &:hover {
-    background: ${props => (props.primary ? '#059669' : '#e5e7eb')};
-    color: ${props => (props.primary ? 'white' : '#374151')};
-  }
-`;
 
 const BuyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     // Mock data - replace with actual API call
@@ -315,6 +85,19 @@ const BuyOrders = () => {
         paymentMethod: 'Credit Card',
         estimatedDelivery: '2024-01-19',
       },
+      {
+        id: 'BO-2024-005',
+        customerName: 'Vikram Patel',
+        customerEmail: 'vikram.patel@email.com',
+        product: 'OnePlus 9 Pro',
+        condition: 'Good',
+        price: 28000,
+        status: 'cancelled',
+        orderDate: '2024-01-12',
+        deliveryAddress: 'Bangalore, Karnataka',
+        paymentMethod: 'UPI',
+        estimatedDelivery: '2024-01-15',
+      },
     ];
 
     setTimeout(() => {
@@ -324,18 +107,22 @@ const BuyOrders = () => {
   }, []);
 
   const stats = [
-    { label: 'Total Buy Orders', value: '856', color: '#10b981' },
-    { label: 'Pending Orders', value: '45', color: '#f59e0b' },
-    { label: 'Shipped Orders', value: '123', color: '#3b82f6' },
-    { label: 'Total Revenue', value: '₹32.4L', color: '#8b5cf6' },
+    { label: 'Total Buy Orders', value: '856', color: 'bg-green-500', icon: ShoppingBag },
+    { label: 'Pending Orders', value: '45', color: 'bg-amber-500', icon: Clock },
+    { label: 'Shipped Orders', value: '123', color: 'bg-blue-500', icon: Truck },
+    { label: 'Total Revenue', value: '₹32.4L', color: 'bg-purple-500', icon: DollarSign },
   ];
 
-  const filteredOrders = orders.filter(
-    order =>
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch =
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.product.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      order.product.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusIcon = status => {
     switch (status) {
@@ -354,103 +141,194 @@ const BuyOrders = () => {
     }
   };
 
+  const getStatusColor = status => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      confirmed: 'bg-blue-100 text-blue-800',
+      shipped: 'bg-indigo-100 text-indigo-800',
+      delivered: 'bg-green-100 text-green-800',
+      cancelled: 'bg-red-100 text-red-800',
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="flex flex-col items-center justify-center py-12 text-gray-600">
+          <RefreshCw size={32} className="animate-spin mb-4" />
+          <p className="text-lg">Loading orders...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Container>
-      <Header>
-        <Title>
-          <Package size={32} />
-          Buy Orders
-        </Title>
-      </Header>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-8">
+        <div className="p-2 bg-green-500 rounded-lg">
+          <Package size={32} className="text-white" />
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Buy Orders</h1>
+      </div>
 
-      <StatsGrid>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {stats.map((stat, index) => (
-          <StatCard key={index} color={stat.color}>
-            <StatValue>{stat.value}</StatValue>
-            <StatLabel>{stat.label}</StatLabel>
-          </StatCard>
+          <Card
+            key={index}
+            className="p-6 border-l-4"
+            style={{ borderLeftColor: stat.color.replace('bg-', '#').replace('500', '') }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className={cn('p-3 rounded-xl text-white', stat.color)}>
+                <stat.icon size={24} />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+            <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+          </Card>
         ))}
-      </StatsGrid>
+      </div>
 
-      <FilterSection>
-        <SearchInput
-          type="text"
-          placeholder="Search by order ID, customer name, or product..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-        />
-        <FilterButton>
-          <Filter size={16} />
-          Filters
-        </FilterButton>
-      </FilterSection>
+      {/* Filters Section */}
+      <Card className="mb-6 p-6">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by order ID, customer name, or product..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+            />
+          </div>
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-green-500 transition-all">
+            <Filter size={16} />
+            More Filters
+          </button>
+        </div>
+      </Card>
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
+      {/* Orders Grid */}
+      {filteredOrders.length === 0 ? (
+        <div className="text-center py-16 px-4">
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Package size={32} className="text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders found</h3>
+          <p className="text-gray-600">
+            {searchTerm || statusFilter !== 'all'
+              ? 'Try adjusting your search or filters'
+              : 'No buy orders have been placed yet'}
+          </p>
+        </div>
       ) : (
-        <OrdersGrid>
+        <div className="space-y-6">
           {filteredOrders.map(order => (
-            <OrderCard key={order.id}>
-              <OrderHeader>
-                <OrderInfo>
-                  <OrderId>{order.id}</OrderId>
-                  <CustomerName>{order.customerName}</CustomerName>
-                  <OrderDate>{order.orderDate}</OrderDate>
-                </OrderInfo>
-                <OrderStatus>
-                  {getStatusIcon(order.status)}
-                  <StatusBadge status={order.status}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                  </StatusBadge>
-                </OrderStatus>
-              </OrderHeader>
+            <Card key={order.id} hoverable>
+              <Card.Body>
+                {/* Order Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{order.id}</h3>
+                    <p className="text-sm text-gray-600 mb-1">{order.customerName}</p>
+                    <p className="text-xs text-gray-500">{order.orderDate}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(order.status)}
+                    <span
+                      className={cn(
+                        'px-3 py-1 rounded-full text-xs font-semibold capitalize',
+                        getStatusColor(order.status)
+                      )}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
 
-              <OrderDetails>
-                <DetailItem>
-                  <DetailLabel>Product</DetailLabel>
-                  <DetailValue>{order.product}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <DetailLabel>Condition</DetailLabel>
-                  <DetailValue>{order.condition}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <DetailLabel>Price</DetailLabel>
-                  <DetailValue>₹{order.price.toLocaleString()}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <DetailLabel>Payment Method</DetailLabel>
-                  <DetailValue>{order.paymentMethod}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <DetailLabel>Delivery Address</DetailLabel>
-                  <DetailValue>{order.deliveryAddress}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <DetailLabel>Est. Delivery</DetailLabel>
-                  <DetailValue>{order.estimatedDelivery}</DetailValue>
-                </DetailItem>
-              </OrderDetails>
+                {/* Order Details Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Product
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">{order.product}</div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Condition
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">{order.condition}</div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Price
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      ₹{order.price.toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Payment Method
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">{order.paymentMethod}</div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Delivery Address
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      {order.deliveryAddress}
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Est. Delivery
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      {order.estimatedDelivery}
+                    </div>
+                  </div>
+                </div>
 
-              <ActionButtons>
-                <IconButton primary>
-                  <Eye size={16} />
-                  View Details
-                </IconButton>
-                <IconButton>
-                  <Edit size={16} />
-                  Update Status
-                </IconButton>
-                <IconButton>
-                  <Truck size={16} />
-                  Track Order
-                </IconButton>
-              </ActionButtons>
-            </OrderCard>
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2">
+                  <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors">
+                    <Eye size={16} />
+                    View Details
+                  </button>
+                  <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    <Edit size={16} />
+                    Update Status
+                  </button>
+                  <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    <Truck size={16} />
+                    Track Order
+                  </button>
+                </div>
+              </Card.Body>
+            </Card>
           ))}
-        </OrdersGrid>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

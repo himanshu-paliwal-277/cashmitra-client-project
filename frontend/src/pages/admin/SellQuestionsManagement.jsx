@@ -1,14 +1,8 @@
-/**
- * @fileoverview Sell Questions Management Admin Page
- * @description Admin interface for managing sell questions and their options
- * @author Cashify Development Team
- * @version 1.1.0
- */
-
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect } from 'react';
+import { cn } from '../../lib/utils';
 import useSellQuestions from '../../hooks/useSellQuestions';
 import QuestionModal from '../../components/admin/QuestionModal';
+import Card from '../../components/ui/Card';
 import {
   HelpCircle,
   Plus,
@@ -31,523 +25,6 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import adminService from '../../services/adminService';
-
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-`;
-
-const ActionButton = styled.button`
-  background: ${props => (props.variant === 'primary' ? '#f59e0b' : 'white')};
-  color: ${props => (props.variant === 'primary' ? 'white' : '#374151')};
-  border: 1px solid ${props => (props.variant === 'primary' ? '#f59e0b' : '#d1d5db')};
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background: ${props => (props.variant === 'primary' ? '#d97706' : '#f9fafb')};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const StatIcon = styled.div`
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.75rem;
-  background: ${props => props.color};
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatContent = styled.div`
-  flex: 1;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const FiltersSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-`;
-
-const FiltersRow = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-`;
-
-const SearchContainer = styled.div`
-  position: relative;
-  flex: 1;
-  min-width: 300px;
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-`;
-
-const SearchIcon = styled.div`
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6b7280;
-`;
-
-const FilterSelect = styled.select`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  min-width: 150px;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-`;
-
-const ViewToggle = styled.div`
-  display: flex;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  overflow: hidden;
-`;
-
-const ViewButton = styled.button`
-  padding: 0.75rem;
-  border: none;
-  background: ${props => (props.active ? '#f59e0b' : 'white')};
-  color: ${props => (props.active ? 'white' : '#6b7280')};
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: ${props => (props.active ? '#d97706' : '#f9fafb')};
-  }
-`;
-
-const QuestionsSection = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-
-const SectionHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-`;
-
-const QuestionsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
-  padding: 1.5rem;
-`;
-
-const QuestionCard = styled.div`
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  transition: all 0.2s;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-  }
-`;
-
-const QuestionHeader = styled.div`
-  padding: 1rem;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-`;
-
-const QuestionInfo = styled.div`
-  flex: 1;
-`;
-
-const QuestionTitle = styled.h3`
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 0.5rem 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const QuestionMeta = styled.div`
-  display: flex;
-  gap: 1rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const QuestionBadge = styled.div`
-  background: ${props => {
-    switch (props.type) {
-      case 'radio':
-        return '#dcfce7';
-      case 'checkbox':
-        return '#dbeafe';
-      case 'select':
-        return '#fef3c7';
-      case 'multiselect':
-        return '#f3e8ff';
-      case 'slider':
-        return '#ffedd5';
-      case 'toggle':
-        return '#ffe4e6';
-      default:
-        return '#f3f4f6';
-    }
-  }};
-  color: ${props => {
-    switch (props.type) {
-      case 'radio':
-        return '#166534';
-      case 'checkbox':
-        return '#1e40af';
-      case 'select':
-        return '#92400e';
-      case 'multiselect':
-        return '#6b21a8';
-      case 'slider':
-        return '#c2410c';
-      case 'toggle':
-        return '#be123c';
-      default:
-        return '#374151';
-    }
-  }};
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: capitalize;
-`;
-
-const QuestionContent = styled.div`
-  padding: 1rem;
-`;
-
-const OptionsContainer = styled.div`
-  margin-bottom: 1rem;
-`;
-
-const OptionsTitle = styled.div`
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const OptionsList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const OptionItem = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem;
-  background: #f9fafb;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-`;
-
-const OptionText = styled.span`
-  flex: 1;
-  color: #374151;
-`;
-
-const OptionValue = styled.span`
-  color: #6b7280;
-  font-weight: 500;
-`;
-
-const QuestionActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  padding: 1rem;
-  border-top: 1px solid #e5e7eb;
-  background: #f9fafb;
-`;
-
-const ActionButtonSmall = styled.button`
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  background: white;
-  color: #374151;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f9fafb;
-    border-color: #f59e0b;
-    color: #f59e0b;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const QuestionTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHeader = styled.th`
-  text-align: left;
-  padding: 1rem;
-  border-bottom: 1px solid #e5e7eb;
-  font-weight: 600;
-  color: #374151;
-  background: #f9fafb;
-  cursor: pointer;
-  user-select: none;
-
-  &:hover {
-    background: #f3f4f6;
-  }
-`;
-
-const TableRow = styled.tr`
-  &:hover {
-    background: #f9fafb;
-  }
-`;
-
-const TableCell = styled.td`
-  padding: 1rem;
-  border-bottom: 1px solid #e5e7eb;
-  color: #374151;
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: capitalize;
-  background: ${props => (props.status === 'active' ? '#dcfce7' : '#fee2e2')};
-  color: ${props => (props.status === 'active' ? '#166534' : '#dc2626')};
-`;
-
-const LoadingSpinner = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem;
-  color: #6b7280;
-`;
-
-const ErrorMessage = styled.div`
-  background: #fee2e2;
-  color: #dc2626;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  margin: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 3rem;
-  color: #6b7280;
-`;
-
-const Pagination = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  gap: 1rem;
-`;
-
-const PaginationInfo = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const PaginationControls = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const PaginationButton = styled.button`
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  background: white;
-  color: #374151;
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-
-  &:hover:not(:disabled) {
-    background: #f9fafb;
-    border-color: #f59e0b;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  &.active {
-    background: #f59e0b;
-    color: white;
-    border-color: #f59e0b;
-  }
-`;
-
-const OrderControls = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-`;
-
-const OrderButton = styled.button`
-  padding: 0.25rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.25rem;
-  background: white;
-  color: #6b7280;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f9fafb;
-    color: #f59e0b;
-    border-color: #f59e0b;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
 
 const SellQuestionsManagement = () => {
   const {
@@ -605,25 +82,25 @@ const SellQuestionsManagement = () => {
       label: 'Total Questions',
       value: pagination.total || 0,
       icon: HelpCircle,
-      color: '#f59e0b',
+      color: 'bg-amber-500',
     },
     {
       label: 'Active Questions',
       value: questions.filter(q => deriveStatus(q) === 'active').length,
       icon: TrendingUp,
-      color: '#10b981',
+      color: 'bg-emerald-500',
     },
     {
       label: 'Total Options',
       value: questions.reduce((sum, q) => sum + getDisplayOptions(q).length, 0),
       icon: Tag,
-      color: '#3b82f6',
+      color: 'bg-blue-500',
     },
     {
       label: 'Question Types',
       value: new Set(questions.map(q => deriveType(q))).size,
       icon: Grid,
-      color: '#8b5cf6',
+      color: 'bg-purple-500',
     },
   ];
 
@@ -735,193 +212,277 @@ const SellQuestionsManagement = () => {
     }
   };
 
-  const renderQuestionCard = question => (
-    <QuestionCard key={question._id}>
-      <QuestionHeader>
-        <QuestionInfo>
-          <QuestionTitle>{question.title}</QuestionTitle>
-          <QuestionMeta>
-            <span>Order: {question.order}</span>
-            <span>•</span>
-            <span>Category: {question.categoryId?.name || question.categoryId || 'Unknown'}</span>
-            <span>•</span>
-            <span>{getDisplayOptions(question).length} options</span>
-          </QuestionMeta>
-        </QuestionInfo>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.5rem',
-            alignItems: 'flex-end',
-          }}
-        >
-          <QuestionBadge type={deriveType(question)}>
-            {questionTypes.find(t => t.id === deriveType(question))?.name || deriveType(question)}
-          </QuestionBadge>
-          <OrderControls>
-            <OrderButton
-              onClick={() => handleReorder(question._id, 'up')}
-              disabled={question.order === 1}
-            >
-              <ChevronUp size={14} />
-            </OrderButton>
-            <OrderButton
-              onClick={() => handleReorder(question._id, 'down')}
-              disabled={question.order === questions.length}
-            >
-              <ChevronDown size={14} />
-            </OrderButton>
-          </OrderControls>
-        </div>
-      </QuestionHeader>
+  const getTypeBadgeColor = type => {
+    const colors = {
+      radio: 'bg-green-100 text-green-800',
+      checkbox: 'bg-blue-100 text-blue-800',
+      select: 'bg-yellow-100 text-yellow-800',
+      multiselect: 'bg-purple-100 text-purple-800',
+      slider: 'bg-orange-100 text-orange-800',
+      toggle: 'bg-pink-100 text-pink-800',
+    };
+    return colors[type] || 'bg-gray-100 text-gray-800';
+  };
 
-      <QuestionContent>
-        {question.description && (
-          <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem' }}>
-            {question.description}
+  const renderQuestionCard = question => (
+    <Card key={question._id} hoverable className="flex flex-col h-full transition-all duration-200">
+      <Card.Header divider className="bg-gray-50">
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
+              {question.title}
+            </h3>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+              <span className="font-medium">Order: {question.order}</span>
+              <span>•</span>
+              <span className="truncate">
+                {question.categoryId?.name || question.categoryId || 'Unknown'}
+              </span>
+              <span>•</span>
+              <span>{getDisplayOptions(question).length} options</span>
+            </div>
           </div>
+          <div className="flex flex-col gap-2 items-end">
+            <span
+              className={cn(
+                'px-2 py-1 rounded text-xs font-medium capitalize whitespace-nowrap',
+                getTypeBadgeColor(deriveType(question))
+              )}
+            >
+              {questionTypes.find(t => t.id === deriveType(question))?.name || deriveType(question)}
+            </span>
+            <div className="flex gap-1">
+              <button
+                onClick={() => handleReorder(question._id, 'up')}
+                disabled={question.order === 1}
+                className="p-1 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronUp size={14} />
+              </button>
+              <button
+                onClick={() => handleReorder(question._id, 'down')}
+                disabled={question.order === questions.length}
+                className="p-1 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronDown size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </Card.Header>
+
+      <Card.Body className="flex-1">
+        {question.description && (
+          <p className="text-sm text-gray-600 mb-4 line-clamp-2">{question.description}</p>
         )}
 
         {getDisplayOptions(question).length > 0 && (
-          <OptionsContainer>
-            <OptionsTitle>
+          <div>
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
               <Tag size={14} />
               Options ({getDisplayOptions(question).length})
-            </OptionsTitle>
-            <OptionsList>
+            </div>
+            <div className="space-y-1">
               {getDisplayOptions(question)
                 .slice(0, 3)
                 .map((option, index) => (
-                  <OptionItem key={index}>
-                    <OptionText>{option.label}</OptionText>
-                    <OptionValue>
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
+                  >
+                    <span className="text-gray-700 truncate flex-1">{option.label}</span>
+                    <span className="text-gray-600 font-medium ml-2">
                       {option.delta
                         ? `${option.delta.sign}${option.delta.value}${option.delta.type === 'percent' ? '%' : ''}`
                         : option.value}
-                    </OptionValue>
-                  </OptionItem>
+                    </span>
+                  </div>
                 ))}
               {getDisplayOptions(question).length > 3 && (
-                <OptionItem>
-                  <OptionText style={{ fontStyle: 'italic' }}>
-                    +{getDisplayOptions(question).length - 3} more options...
-                  </OptionText>
-                </OptionItem>
+                <div className="p-2 bg-gray-50 rounded text-sm text-gray-500 italic text-center">
+                  +{getDisplayOptions(question).length - 3} more options...
+                </div>
               )}
-            </OptionsList>
-          </OptionsContainer>
+            </div>
+          </div>
         )}
-      </QuestionContent>
+      </Card.Body>
 
-      <QuestionActions>
-        <ActionButtonSmall
-          onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
-        >
-          <Eye size={14} />
-          View
-        </ActionButtonSmall>
-        <ActionButtonSmall onClick={() => handleEditQuestion(question)}>
-          <Edit size={14} />
-          Edit
-        </ActionButtonSmall>
-        <ActionButtonSmall onClick={() => handleDeleteQuestion(question._id)}>
-          <Trash2 size={14} />
-          Delete
-        </ActionButtonSmall>
-      </QuestionActions>
-    </QuestionCard>
+      <Card.Footer divider className="bg-gray-50">
+        <div className="flex gap-2">
+          <button
+            onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
+            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+          >
+            <Eye size={14} />
+            View
+          </button>
+          <button
+            onClick={() => handleEditQuestion(question)}
+            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+          >
+            <Edit size={14} />
+            Edit
+          </button>
+          <button
+            onClick={() => handleDeleteQuestion(question._id)}
+            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-red-500 hover:text-red-600 transition-colors"
+          >
+            <Trash2 size={14} />
+            Delete
+          </button>
+        </div>
+      </Card.Footer>
+    </Card>
   );
 
   const renderQuestionTable = () => (
-    <QuestionTable>
-      <thead>
-        <tr>
-          <TableHeader onClick={() => handleSort('order')}>
-            Order{' '}
-            {sortBy === 'order' &&
-              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
-          </TableHeader>
-          <TableHeader onClick={() => handleSort('title')}>
-            Question{' '}
-            {sortBy === 'title' &&
-              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
-          </TableHeader>
-          <TableHeader onClick={() => handleSort('uiType')}>
-            Type{' '}
-            {sortBy === 'uiType' &&
-              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
-          </TableHeader>
-          <TableHeader>Category</TableHeader>
-          <TableHeader>Options</TableHeader>
-          <TableHeader onClick={() => handleSort('isActive')}>
-            Status{' '}
-            {sortBy === 'isActive' &&
-              (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
-          </TableHeader>
-          <TableHeader>Actions</TableHeader>
-        </tr>
-      </thead>
-      <tbody>
-        {questions.map(question => (
-          <TableRow key={question._id}>
-            <TableCell>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontWeight: 600 }}>{question.order}</span>
-                <OrderControls>
-                  <OrderButton
-                    onClick={() => handleReorder(question._id, 'up')}
-                    disabled={question.order === 1}
-                  >
-                    <ChevronUp size={12} />
-                  </OrderButton>
-                  <OrderButton
-                    onClick={() => handleReorder(question._id, 'down')}
-                    disabled={question.order === questions.length}
-                  >
-                    <ChevronDown size={12} />
-                  </OrderButton>
-                </OrderControls>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-50">
+            <th
+              onClick={() => handleSort('order')}
+              className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                Order
+                {sortBy === 'order' &&
+                  (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
               </div>
-            </TableCell>
-            <TableCell>
-              <div style={{ fontWeight: 600 }}>{question.title}</div>
-              {question.description && (
-                <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.25rem' }}>
-                  {question.description.substring(0, 60)}...
+            </th>
+            <th
+              onClick={() => handleSort('title')}
+              className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                Question
+                {sortBy === 'title' &&
+                  (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+              </div>
+            </th>
+            <th
+              onClick={() => handleSort('uiType')}
+              className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                Type
+                {sortBy === 'uiType' &&
+                  (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+              </div>
+            </th>
+            <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700">
+              Category
+            </th>
+            <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700">
+              Options
+            </th>
+            <th
+              onClick={() => handleSort('isActive')}
+              className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                Status
+                {sortBy === 'isActive' &&
+                  (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+              </div>
+            </th>
+            <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {questions.map(question => (
+            <tr key={question._id} className="hover:bg-gray-50 transition-colors">
+              <td className="px-4 py-3 border-b border-gray-200">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-gray-900">{question.order}</span>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => handleReorder(question._id, 'up')}
+                      disabled={question.order === 1}
+                      className="p-0.5 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:text-amber-600 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronUp size={12} />
+                    </button>
+                    <button
+                      onClick={() => handleReorder(question._id, 'down')}
+                      disabled={question.order === questions.length}
+                      className="p-0.5 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:text-amber-600 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronDown size={12} />
+                    </button>
+                  </div>
                 </div>
-              )}
-            </TableCell>
-            <TableCell>
-              <QuestionBadge type={deriveType(question)}>
-                {questionTypes.find(t => t.id === deriveType(question))?.name ||
-                  deriveType(question)}
-              </QuestionBadge>
-            </TableCell>
-            <TableCell>{question.categoryId?.name || question.categoryId || 'Unknown'}</TableCell>
-            <TableCell>{getDisplayOptions(question).length}</TableCell>
-            <TableCell>
-              <StatusBadge status={deriveStatus(question)}>{deriveStatus(question)}</StatusBadge>
-            </TableCell>
-            <TableCell>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <ActionButtonSmall
-                  onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200">
+                <div className="font-semibold text-gray-900">{question.title}</div>
+                {question.description && (
+                  <div className="text-sm text-gray-600 mt-1 truncate max-w-md">
+                    {question.description.substring(0, 60)}...
+                  </div>
+                )}
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200">
+                <span
+                  className={cn(
+                    'px-2 py-1 rounded text-xs font-medium capitalize',
+                    getTypeBadgeColor(deriveType(question))
+                  )}
                 >
-                  <Eye size={14} />
-                </ActionButtonSmall>
-                <ActionButtonSmall onClick={() => handleEditQuestion(question)}>
-                  <Edit size={14} />
-                </ActionButtonSmall>
-                <ActionButtonSmall onClick={() => handleDeleteQuestion(question._id)}>
-                  <Trash2 size={14} />
-                </ActionButtonSmall>
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </tbody>
-    </QuestionTable>
+                  {questionTypes.find(t => t.id === deriveType(question))?.name ||
+                    deriveType(question)}
+                </span>
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+                {question.categoryId?.name || question.categoryId || 'Unknown'}
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+                {getDisplayOptions(question).length}
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200">
+                <span
+                  className={cn(
+                    'px-2 py-1 rounded text-xs font-medium capitalize',
+                    deriveStatus(question) === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  )}
+                >
+                  {deriveStatus(question)}
+                </span>
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
+                    className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+                    title="View"
+                  >
+                    <Eye size={14} />
+                  </button>
+                  <button
+                    onClick={() => handleEditQuestion(question)}
+                    className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+                    title="Edit"
+                  >
+                    <Edit size={14} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteQuestion(question._id)}
+                    className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-red-500 hover:text-red-600 transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 
   const renderPagination = () => {
@@ -930,130 +491,159 @@ const SellQuestionsManagement = () => {
 
     for (let i = 1; i <= Math.min(totalPages, 5); i++) {
       pages.push(
-        <PaginationButton
+        <button
           key={i}
-          className={currentPage === i ? 'active' : ''}
+          className={cn(
+            'px-3 py-2 text-sm border rounded transition-colors',
+            currentPage === i
+              ? 'bg-amber-500 text-white border-amber-500'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-amber-500'
+          )}
           onClick={() => setCurrentPage(i)}
         >
           {i}
-        </PaginationButton>
+        </button>
       );
     }
 
     return (
-      <Pagination>
-        <PaginationInfo>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-6 py-4 border-t border-gray-200">
+        <div className="text-sm text-gray-600">
           Showing {(currentPage - 1) * pagination.limit + 1} to{' '}
           {Math.min(currentPage * pagination.limit, pagination.total)} of {pagination.total}{' '}
           questions
-        </PaginationInfo>
-        <PaginationControls>
-          <PaginationButton
+        </div>
+        <div className="flex gap-2">
+          <button
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
+            className="px-3 py-2 text-sm border border-gray-300 rounded bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Previous
-          </PaginationButton>
+          </button>
           {pages}
-          <PaginationButton
+          <button
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
+            className="px-3 py-2 text-sm border border-gray-300 rounded bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Next
-          </PaginationButton>
-        </PaginationControls>
-      </Pagination>
+          </button>
+        </div>
+      </div>
     );
   };
 
   if (loading && questions.length === 0) {
     return (
-      <Container>
-        <LoadingSpinner>
-          <RefreshCw size={24} className="animate-spin" />
-          Loading questions...
-        </LoadingSpinner>
-      </Container>
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="flex flex-col items-center justify-center py-12 text-gray-600">
+          <RefreshCw size={32} className="animate-spin mb-4" />
+          <p className="text-lg">Loading questions...</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <Title>
-          <HelpCircle size={32} />
-          Sell Questions Management
-        </Title>
-        <HeaderActions>
-          <ActionButton onClick={fetchQuestions} disabled={loading}>
-            <RefreshCw size={16} />
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-amber-500 rounded-lg">
+            <HelpCircle size={32} className="text-white" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Sell Questions Management
+          </h1>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={fetchQuestions}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
             Refresh
-          </ActionButton>
-          <ActionButton>
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 transition-all">
             <Download size={16} />
             Export
-          </ActionButton>
-          <ActionButton variant="primary" onClick={handleAddQuestion}>
+          </button>
+          <button
+            onClick={handleAddQuestion}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-amber-500 text-white hover:bg-amber-600 shadow-md hover:shadow-lg transition-all"
+          >
             <Plus size={16} />
             Add Question
-          </ActionButton>
-        </HeaderActions>
-      </Header>
+          </button>
+        </div>
+      </div>
 
+      {/* Error Message */}
       {error && (
-        <ErrorMessage>
-          <AlertCircle size={16} />
-          {error}
+        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 flex items-center gap-3">
+          <AlertCircle size={20} />
+          <span className="flex-1">{error}</span>
           <button
             onClick={clearError}
-            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit' }}
+            className="text-red-800 hover:text-red-900 transition-colors"
           >
-            <X size={16} />
+            <X size={20} />
           </button>
-        </ErrorMessage>
+        </div>
       )}
 
-      <StatsGrid>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {stats.map((stat, index) => (
-          <StatCard key={index}>
-            <StatIcon color={stat.color}>
+          <Card key={index} className="flex items-center gap-4 p-6">
+            <div className={cn('p-3 rounded-xl text-white', stat.color)}>
               <stat.icon size={24} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{stat.value}</StatValue>
-              <StatLabel>{stat.label}</StatLabel>
-            </StatContent>
-          </StatCard>
+            </div>
+            <div className="flex-1">
+              <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+              <div className="text-sm text-gray-600">{stat.label}</div>
+            </div>
+          </Card>
         ))}
-      </StatsGrid>
+      </div>
 
-      <FiltersSection>
-        <FiltersRow>
-          <SearchContainer>
-            <SearchIcon>
-              <Search size={16} />
-            </SearchIcon>
-            <SearchInput
+      {/* Filters Section */}
+      <Card className="mb-8 p-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search Input */}
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
               type="text"
               placeholder="Search questions by title or description..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' && handleSearch()}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
             />
-          </SearchContainer>
+          </div>
 
-          <FilterSelect value={selectedType} onChange={e => setSelectedType(e.target.value)}>
+          {/* Type Filter */}
+          <select
+            value={selectedType}
+            onChange={e => setSelectedType(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+          >
             <option value="">All Types</option>
             {questionTypes.map(type => (
               <option key={type.id} value={type.id}>
                 {type.name}
               </option>
             ))}
-          </FilterSelect>
+          </select>
 
-          <FilterSelect
+          {/* Category Filter */}
+          <select
             value={selectedCategory}
             onChange={e => setSelectedCategory(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
           >
             <option value="">All Categories</option>
             {categories.map(category => (
@@ -1061,55 +651,87 @@ const SellQuestionsManagement = () => {
                 {category.name}
               </option>
             ))}
-          </FilterSelect>
+          </select>
 
-          <FilterSelect value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)}>
+          {/* Status Filter */}
+          <select
+            value={selectedStatus}
+            onChange={e => setSelectedStatus(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+          >
             <option value="">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
-          </FilterSelect>
+          </select>
 
-          <ActionButton onClick={handleSearch}>
+          {/* Filter Button */}
+          <button
+            onClick={handleSearch}
+            className="flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition-all whitespace-nowrap"
+          >
             <Filter size={16} />
             Filter
-          </ActionButton>
+          </button>
 
-          <ViewToggle>
-            <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
+          {/* View Toggle */}
+          <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={cn(
+                'p-2.5 transition-colors',
+                viewMode === 'grid'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-white text-gray-600 hover:bg-gray-50'
+              )}
+            >
               <Grid size={16} />
-            </ViewButton>
-            <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'p-2.5 transition-colors border-l border-gray-300',
+                viewMode === 'list'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-white text-gray-600 hover:bg-gray-50'
+              )}
+            >
               <List size={16} />
-            </ViewButton>
-          </ViewToggle>
-        </FiltersRow>
-      </FiltersSection>
+            </button>
+          </div>
+        </div>
+      </Card>
 
-      <QuestionsSection>
-        <SectionHeader>
-          <SectionTitle>Questions ({pagination.total || 0})</SectionTitle>
-        </SectionHeader>
+      {/* Questions Section */}
+      <Card className="overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Questions ({pagination.total || 0})
+          </h2>
+        </div>
 
         {questions.length === 0 ? (
-          <EmptyState>
-            <HelpCircle size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
-            <div>No questions found</div>
-            <div style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
+          <div className="text-center py-16 px-4">
+            <HelpCircle size={48} className="mx-auto mb-4 text-gray-400" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No questions found</h3>
+            <p className="text-sm text-gray-600">
               Try adjusting your search criteria or add a new question
-            </div>
-          </EmptyState>
+            </p>
+          </div>
         ) : (
           <>
             {viewMode === 'grid' ? (
-              <QuestionsGrid>{questions.map(renderQuestionCard)}</QuestionsGrid>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6">
+                {questions.map(renderQuestionCard)}
+              </div>
             ) : (
               renderQuestionTable()
             )}
             {pagination.totalPages > 1 && renderPagination()}
           </>
         )}
-      </QuestionsSection>
+      </Card>
 
+      {/* Question Modal */}
       <QuestionModal
         isOpen={isQuestionModalOpen}
         onClose={handleCloseModal}
@@ -1119,7 +741,7 @@ const SellQuestionsManagement = () => {
         categories={categories}
         selectedCategoryId={selectedCategory}
       />
-    </Container>
+    </div>
   );
 };
 

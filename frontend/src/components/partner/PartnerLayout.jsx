@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import {
   Menu,
   X,
@@ -10,14 +9,10 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  ChevronDown,
   FolderTree,
   ShoppingCart,
-  TrendingUp,
-  FileText,
   ShoppingBag,
   RotateCcw,
-  Tag,
   Smartphone,
   HelpCircle,
   UserCheck,
@@ -29,333 +24,19 @@ import {
   Gift,
   Calculator,
   CreditCard,
-  Wallet,
   AlertTriangle,
   Clock,
   Truck,
   Shield,
-  Plus,
-  Upload,
-  Grid,
-  History,
-  Receipt,
-  Target,
-  Bell,
-  MessageSquare,
-  User,
 } from 'lucide-react';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
-
-const LayoutContainer = styled.div`
-  display: flex;
-  height: 100vh;
-  background-color: #f8fafc;
-`;
-
-const Sidebar = styled.aside`
-  width: 280px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-right: 1px solid #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  z-index: 1000;
-  transform: ${props => (props.$isOpen ? 'translateX(0)' : 'translateX(-100%)')};
-  transition: transform 0.3s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-  @media (min-width: 1024px) {
-    position: static;
-    transform: translateX(0);
-  }
-`;
-
-const SidebarHeader = styled.div`
-  padding: 1.5rem 1.5rem 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-  }
-`;
-
-const Logo = styled.h1`
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: #3b82f6;
-  margin: 0;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.025em;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:hover {
-    background-color: #f1f5f9;
-    color: #374151;
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-
-  @media (min-width: 1024px) {
-    display: none;
-  }
-`;
-
-const SidebarNav = styled.nav`
-  flex: 1;
-  padding: 1.5rem 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #e2e8f0 transparent;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
-    border-radius: 2px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: #cbd5e1;
-  }
-`;
-
-const NavSection = styled.div`
-  margin-bottom: 2rem;
-
-  &:last-child {
-    margin-bottom: 1rem;
-  }
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 1rem 0;
-  padding: 0 1.5rem;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -0.5rem;
-    left: 1.5rem;
-    right: 1.5rem;
-    height: 1px;
-    background: linear-gradient(to right, #e2e8f0, transparent);
-  }
-`;
-
-const NavItem = styled(Link)`
-  display: flex;
-  align-items: center;
-  padding: 0.875rem 1.5rem;
-  margin: 0.25rem 1rem;
-  color: ${props => (props.$active ? '#3b82f6' : '#64748b')};
-  text-decoration: none;
-  font-weight: ${props => (props.$active ? '600' : '500')};
-  font-size: 0.875rem;
-  background-color: ${props => (props.$active ? 'rgba(59, 130, 246, 0.1)' : 'transparent')};
-  border-radius: 0.5rem;
-  border-left: ${props => (props.$active ? '3px solid #3b82f6' : '3px solid transparent')};
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-
-  &:hover {
-    background-color: rgba(59, 130, 246, 0.05);
-    color: #3b82f6;
-    transform: translateX(2px);
-  }
-
-  &:active {
-    transform: translateX(1px);
-  }
-`;
-
-const NavIcon = styled.span`
-  margin-right: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-`;
-
-const MobileMenuButton = styled.button`
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid #e2e8f0;
-  color: #374151;
-  cursor: pointer;
-  padding: 0.75rem;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow:
-    0 1px 3px 0 rgba(0, 0, 0, 0.1),
-    0 1px 2px 0 rgba(0, 0, 0, 0.06);
-
-  &:hover {
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    color: #1f2937;
-    transform: translateY(-1px);
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  @media (min-width: 1024px) {
-    display: none;
-  }
-`;
-
-const MainContent = styled.main`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding: 2rem;
-  background-color: #fafbfc;
-  min-height: 100vh;
-  overflow-y: auto;
-
-  @media (max-width: 1023px) {
-    margin-left: 0;
-    padding: 1.5rem 1rem;
-  }
-`;
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  display: ${props => (props.$isOpen ? 'block' : 'none')};
-
-  @media (min-width: 1024px) {
-    display: none;
-  }
-`;
-
-const UserSection = styled.div`
-  padding: 1.5rem;
-  border-top: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-`;
-
-const UserInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-`;
-
-const UserAvatar = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #10b981, #059669);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 0.875rem;
-`;
-
-const UserDetails = styled.div`
-  flex: 1;
-`;
-
-const UserName = styled.div`
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 0.875rem;
-`;
-
-const UserRole = styled.div`
-  font-size: 0.75rem;
-  color: #64748b;
-`;
-
-const LogoutButton = styled.button`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    transform: translateY(-1px);
-  }
-`;
 
 const PartnerLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { partner, logout, roleTemplate, hasMenuPermission } = usePartnerAuth();
+  const { partner, logout, roleTemplate } = usePartnerAuth();
 
-  // Permission key mapping for each navigation item
   const permissionMap = {
     '/partner/dashboard': 'dashboard',
     '/partner/buy/categories': 'buyCategories',
@@ -479,104 +160,120 @@ const PartnerLayout = () => {
   };
 
   return (
-    <LayoutContainer>
-      <Sidebar $isOpen={sidebarOpen}>
-        <SidebarHeader>
-          <Logo>Partner Panel</Logo>
-          <CloseButton onClick={() => setSidebarOpen(false)}>
-            <X size={20} />
-          </CloseButton>
-        </SidebarHeader>
+    <div className="flex h-screen bg-slate-50">
+      {/* Sidebar */}
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col transform transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        } shadow-xl lg:shadow-none`}
+      >
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-purple-50">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Partner Panel
+          </h1>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
+          >
+            <X className="w-5 h-5 text-slate-600" />
+          </button>
+        </div>
 
-        <SidebarNav>
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-6">
           {navigationItems.map((section, sectionIndex) => {
-            // Filter items based on permissions
             const filteredItems = section.items.filter(item => {
               const permissionKey = permissionMap[item.path];
-
-              // If no permission key defined or no roleTemplate, show all items (for backward compatibility)
-              if (!permissionKey || !roleTemplate) {
-                return true;
-              }
-
-              // Check if partner has permission for this menu item
+              if (!permissionKey || !roleTemplate) return true;
               return roleTemplate.permissions && roleTemplate.permissions.includes(permissionKey);
             });
 
-            // Don't render section if no items have permission
-            if (filteredItems.length === 0) {
-              return null;
-            }
+            if (filteredItems.length === 0) return null;
 
             return (
-              <NavSection key={sectionIndex}>
-                <SectionTitle>{section.section}</SectionTitle>
-                {filteredItems.map((item, itemIndex) => {
-                  const IconComponent = item.icon;
-                  return (
-                    <NavItem
-                      key={itemIndex}
-                      to={item.path}
-                      $active={location.pathname === item.path}
-                      onClick={() => setSidebarOpen(false)}
-                    >
-                      <NavIcon>
-                        <IconComponent size={18} />
-                      </NavIcon>
-                      {item.label}
-                    </NavItem>
-                  );
-                })}
-              </NavSection>
+              <div key={sectionIndex}>
+                <h3 className="px-3 mb-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  {section.section}
+                </h3>
+                <div className="space-y-1">
+                  {filteredItems.map((item, itemIndex) => {
+                    const IconComponent = item.icon;
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link
+                        key={itemIndex}
+                        to={item.path}
+                        onClick={() => setSidebarOpen(false)}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                          isActive
+                            ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-600'
+                            : 'text-slate-700 hover:bg-slate-50 hover:text-blue-600 border-l-4 border-transparent'
+                        }`}
+                      >
+                        <IconComponent className="w-5 h-5 flex-shrink-0" />
+                        <span className="truncate">{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
+        </nav>
 
-          <NavSection>
-            <NavItem
-              as="button"
-              onClick={handleLogout}
-              style={{
-                background: 'none',
-                border: 'none',
-                width: '100%',
-                textAlign: 'left',
-                cursor: 'pointer',
-                color: '#64748b',
-                fontSize: '0.875rem',
-              }}
-            >
-              <NavIcon>
-                <LogOut size={18} />
-              </NavIcon>
-              Logout
-            </NavItem>
-          </NavSection>
-        </SidebarNav>
-
-        <UserSection>
-          <UserInfo>
-            <UserAvatar>{partner?.name?.charAt(0)?.toUpperCase() || 'P'}</UserAvatar>
-            <UserDetails>
-              <UserName>{partner?.name || 'Partner'}</UserName>
-              <UserRole>{partner?.shopName || 'Partner Shop'}</UserRole>
-            </UserDetails>
-          </UserInfo>
-          <LogoutButton onClick={handleLogout}>
-            <LogOut size={16} />
+        {/* User Section */}
+        <div className="p-4 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white font-semibold">
+              {partner?.name?.charAt(0)?.toUpperCase() || 'P'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-slate-900 truncate">
+                {partner?.name || 'Partner'}
+              </div>
+              <div className="text-xs text-slate-600 truncate">
+                {partner?.shopName || 'Partner Shop'}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all shadow-md hover:shadow-lg"
+          >
+            <LogOut className="w-4 h-4" />
             Logout
-          </LogoutButton>
-        </UserSection>
-      </Sidebar>
+          </button>
+        </div>
+      </aside>
 
-      <Overlay $isOpen={sidebarOpen} onClick={() => setSidebarOpen(false)} />
+      {/* Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-      <MainContent>
-        <MobileMenuButton onClick={() => setSidebarOpen(true)}>
-          <Menu size={20} />
-        </MobileMenuButton>
-        <Outlet />
-      </MainContent>
-    </LayoutContainer>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile Menu Button */}
+        <div className="lg:hidden p-4 bg-white border-b border-slate-200">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 border border-slate-200 rounded-lg hover:from-blue-100 hover:to-purple-100 transition-all"
+          >
+            <Menu className="w-5 h-5 text-slate-700" />
+            <span className="text-sm font-medium text-slate-700">Menu</span>
+          </button>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50">
+          <Outlet />
+        </div>
+      </main>
+    </div>
   );
 };
 

@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { theme } from '../../theme';
+import { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import {
-  FolderTree,
   Plus,
   Edit,
   Trash2,
@@ -12,8 +9,6 @@ import {
   Save,
   X,
   Search,
-  Filter,
-  MoreVertical,
   Package,
   Smartphone,
   Laptop,
@@ -29,327 +24,6 @@ import {
   Loader,
 } from 'lucide-react';
 import { API_BASE_URL } from '../../config/api';
-
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-  }
-`;
-
-const Content = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 400px;
-  gap: 2rem;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Section = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-
-const SectionHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-`;
-
-const SearchContainer = styled.div`
-  position: relative;
-  width: 300px;
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-`;
-
-const SearchIcon = styled.div`
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6b7280;
-`;
-
-const CategoryTree = styled.div`
-  padding: 1rem;
-`;
-
-const CategoryItem = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f9fafb;
-  }
-`;
-
-const ExpandButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0.25rem;
-  margin-right: 0.5rem;
-  cursor: pointer;
-  color: #6b7280;
-
-  &:hover {
-    color: #374151;
-  }
-`;
-
-const CategoryIcon = styled.div`
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.5rem;
-  background: ${props => (props.isParent ? '#f59e0b' : '#f3f4f6')};
-  color: ${props => (props.isParent ? 'white' : '#6b7280')};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 0.75rem;
-  flex-shrink: 0;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 0.5rem;
-  }
-`;
-
-const CategoryContent = styled.div`
-  flex: 1;
-`;
-
-const CategoryName = styled.div`
-  font-weight: 500;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-`;
-
-const CategoryInfo = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const CategoryActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  opacity: 0;
-  transition: opacity 0.2s;
-
-  ${CategoryItem}:hover & {
-    opacity: 1;
-  }
-`;
-
-const ActionButtonSmall = styled.button`
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  color: #6b7280;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-`;
-
-const FormContainer = styled.div`
-  padding: 1.5rem;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-`;
-
-const Label = styled.label`
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.5rem;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-`;
-
-const Textarea = styled.textarea`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  resize: vertical;
-  min-height: 80px;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-`;
-
-const FormActions = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-`;
-
-const Button = styled.button`
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  ${props =>
-    props.variant === 'primary'
-      ? `
-    background: #f59e0b;
-    color: white;
-    border: none;
-    
-    &:hover {
-      background: #d97706;
-    }
-  `
-      : `
-    background: #f3f4f6;
-    color: #374151;
-    border: 1px solid #d1d5db;
-    
-    &:hover {
-      background: #e5e7eb;
-    }
-  `}
-`;
-
-const Toast = styled.div`
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  background: ${props => (props.type === 'success' ? '#f59e0b' : '#dc2626')};
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  z-index: 1000;
-  animation: slideIn 0.3s ease-out;
-
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-`;
 
 const SellCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -391,7 +65,6 @@ const SellCategories = () => {
     try {
       setLoading(true);
       const response = await adminService.getCategories();
-      console.log('Sell categories fetched:', response.data);
       setCategories(response.data || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -404,7 +77,6 @@ const SellCategories = () => {
   const fetchSuperCategories = async () => {
     try {
       const response = await adminService.getSellSuperCategories();
-      console.log('Sell super categories fetched:', response.data);
       setSuperCategories(response.data || []);
     } catch (error) {
       console.error('Error fetching super categories:', error);
@@ -437,8 +109,10 @@ const SellCategories = () => {
       try {
         await adminService.deleteCategory(categoryId);
         fetchCategories();
+        showToast('Category deleted successfully');
       } catch (error) {
         console.error('Error deleting category:', error);
+        showToast('Failed to delete category', 'error');
       }
     }
   };
@@ -516,7 +190,7 @@ const SellCategories = () => {
 
   const renderCategoryIcon = iconName => {
     const IconComponent = categoryIcons[iconName] || Package;
-    return <IconComponent size={16} />;
+    return <IconComponent className="w-4 h-4" />;
   };
 
   const renderCategory = (category, level = 0) => {
@@ -526,46 +200,66 @@ const SellCategories = () => {
 
     return (
       <div key={category.id}>
-        <CategoryItem style={{ paddingLeft: `${level * 20 + 12}px` }}>
+        <div
+          className="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors group"
+          style={{ paddingLeft: `${level * 20 + 12}px` }}
+        >
           {hasChildren && (
-            <ExpandButton onClick={() => handleToggleExpand(category.id)}>
-              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-            </ExpandButton>
+            <button
+              onClick={() => handleToggleExpand(category.id)}
+              className="p-1 mr-2 hover:bg-slate-200 rounded transition-colors"
+            >
+              {isExpanded ? (
+                <ChevronDown className="w-4 h-4 text-slate-600" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-slate-600" />
+              )}
+            </button>
           )}
 
-          <CategoryIcon isParent={hasChildren}>{renderCategoryIcon(category.icon)}</CategoryIcon>
+          <div
+            className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 flex-shrink-0 overflow-hidden ${
+              hasChildren ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600'
+            }`}
+          >
+            {category.image ? (
+              <img
+                src={category.image}
+                alt={category.name}
+                className="w-full h-full object-cover rounded-lg"
+              />
+            ) : (
+              renderCategoryIcon(category.icon)
+            )}
+          </div>
 
-          <CategoryContent>
-            <CategoryName>{category.name}</CategoryName>
-            <CategoryInfo>
+          <div className="flex-1">
+            <div className="font-medium text-slate-900 mb-1">{category.name}</div>
+            <div className="text-xs text-slate-600">
               {category.superCategory && (
-                <span
-                  style={{
-                    background: '#fef3c7',
-                    color: '#92400e',
-                    padding: '0.125rem 0.5rem',
-                    borderRadius: '0.25rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500',
-                    marginRight: '0.5rem',
-                  }}
-                >
+                <span className="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-medium mr-2">
                   {category.superCategory.name}
                 </span>
               )}
               {children.length} subcategories
-            </CategoryInfo>
-          </CategoryContent>
+            </div>
+          </div>
 
-          <CategoryActions>
-            <ActionButtonSmall onClick={() => handleEditCategory(category)}>
-              <Edit size={14} />
-            </ActionButtonSmall>
-            <ActionButtonSmall onClick={() => handleDeleteCategory(category.id)}>
-              <Trash2 size={14} />
-            </ActionButtonSmall>
-          </CategoryActions>
-        </CategoryItem>
+          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={() => handleEditCategory(category)}
+              className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-600"
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleDeleteCategory(category.id)}
+              className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
 
         {hasChildren && isExpanded && (
           <div>{children.map(child => renderCategory(child, level + 1))}</div>
@@ -575,71 +269,88 @@ const SellCategories = () => {
   };
 
   return (
-    <Container>
-      <Header>
-        <Title>
-          <TrendingDown size={32} />
+    <div className="p-4 sm:p-6 lg:p-8 bg-slate-50 min-h-screen">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 flex items-center gap-3">
+          <TrendingDown className="w-8 h-8 text-amber-600" />
           Sell Categories
-        </Title>
-        <ActionButton onClick={resetForm}>
-          <Plus size={20} />
+        </h1>
+        <button
+          onClick={resetForm}
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg hover:shadow-xl"
+        >
+          <Plus className="w-5 h-5" />
           Add Category
-        </ActionButton>
-      </Header>
+        </button>
+      </div>
 
-      <Content>
-        <Section>
-          <SectionHeader>
-            <SectionTitle>Categories</SectionTitle>
-            <SearchContainer>
-              <SearchIcon>
-                <Search size={16} />
-              </SearchIcon>
-              <SearchInput
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Categories List */}
+        <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h2 className="text-xl font-semibold text-slate-900">Categories</h2>
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
                 type="text"
                 placeholder="Search categories..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
-            </SearchContainer>
-          </SectionHeader>
+            </div>
+          </div>
 
-          <CategoryTree>
+          <div className="p-4">
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
-            ) : mainCategories.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
-                No categories found
+              <div className="text-center py-12">
+                <Loader className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-2" />
+                <p className="text-slate-600">Loading categories...</p>
               </div>
+            ) : mainCategories.length === 0 ? (
+              <div className="text-center py-12 text-slate-600">No categories found</div>
             ) : (
               mainCategories.map(category => renderCategory(category))
             )}
-          </CategoryTree>
-        </Section>
+          </div>
+        </div>
 
-        <Section>
-          <SectionHeader>
-            <SectionTitle>{editingCategory ? 'Edit Category' : 'Add New Category'}</SectionTitle>
-          </SectionHeader>
+        {/* Form */}
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden h-fit sticky top-8">
+          <div className="px-6 py-4 border-b border-slate-200">
+            <h2 className="text-xl font-semibold text-slate-900">
+              {editingCategory ? 'Edit Category' : 'Add New Category'}
+            </h2>
+          </div>
 
-          <FormContainer>
-            <FormGroup>
-              <Label>Category Name *</Label>
-              <Input
+          <div className="p-6 space-y-6">
+            {/* Category Name */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Category Name <span className="text-red-500">*</span>
+              </label>
+              <input
                 type="text"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter category name"
                 disabled={isSubmitting}
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent disabled:bg-slate-50"
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label>Super Category (optional)</Label>
-              <Select
+            {/* Super Category */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Super Category (optional)
+              </label>
+              <select
                 value={formData.superCategory}
                 onChange={e => setFormData({ ...formData, superCategory: e.target.value })}
                 disabled={isSubmitting}
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent disabled:bg-slate-50"
               >
                 <option value="">Select a super category</option>
                 {superCategories.map(superCat => (
@@ -647,44 +358,30 @@ const SellCategories = () => {
                     {superCat.name}
                   </option>
                 ))}
-              </Select>
-            </FormGroup>
+              </select>
+            </div>
 
-            <FormGroup>
-              <Label>Category Image {editingCategory ? '(optional to change)' : '*'}</Label>
+            {/* Image Upload */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Category Image{' '}
+                {editingCategory ? '(optional to change)' : <span className="text-red-500">*</span>}
+              </label>
               {!imagePreview ? (
                 <div
-                  style={{
-                    padding: '2rem',
-                    border: '2px dashed #d1d5db',
-                    borderRadius: '0.5rem',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    background: '#f9fafb',
-                    transition: 'all 0.2s',
-                  }}
                   onClick={() => document.getElementById('sellCatImageInput').click()}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = '#f59e0b';
-                    e.currentTarget.style.background = '#fffbeb';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = '#d1d5db';
-                    e.currentTarget.style.background = '#f9fafb';
-                  }}
+                  className="p-8 border-2 border-dashed border-slate-300 rounded-xl text-center cursor-pointer bg-slate-50 hover:border-amber-500 hover:bg-amber-50 transition-all"
                 >
-                  <Upload size={32} style={{ color: '#6b7280', margin: '0 auto 0.5rem' }} />
-                  <div style={{ color: '#374151', fontWeight: '500', marginBottom: '0.25rem' }}>
+                  <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                  <div className="text-slate-700 font-medium mb-1">
                     Click to upload or drag & drop
                   </div>
-                  <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                    PNG, JPG, GIF up to 10MB
-                  </div>
+                  <div className="text-sm text-slate-500">PNG, JPG, GIF up to 10MB</div>
                   <input
                     id="sellCatImageInput"
                     type="file"
                     accept="image/*"
-                    style={{ display: 'none' }}
+                    className="hidden"
                     disabled={isSubmitting}
                     onChange={e => {
                       const file = e.target.files[0];
@@ -698,23 +395,8 @@ const SellCategories = () => {
                   />
                 </div>
               ) : (
-                <div
-                  style={{
-                    position: 'relative',
-                    borderRadius: '0.5rem',
-                    overflow: 'hidden',
-                    border: '1px solid #e5e7eb',
-                  }}
-                >
-                  <img
-                    src={imagePreview}
-                    alt="preview"
-                    style={{
-                      width: '100%',
-                      height: '200px',
-                      objectFit: 'cover',
-                    }}
-                  />
+                <div className="relative rounded-xl overflow-hidden border-2 border-slate-200">
+                  <img src={imagePreview} alt="preview" className="w-full h-48 object-cover" />
                   <button
                     type="button"
                     onClick={() => {
@@ -722,82 +404,64 @@ const SellCategories = () => {
                       setImagePreview('');
                     }}
                     disabled={isSubmitting}
-                    style={{
-                      position: 'absolute',
-                      top: '0.5rem',
-                      right: '0.5rem',
-                      background: '#fff',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '0.375rem',
-                      padding: '0.5rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                      transition: 'all 0.2s',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = '#fee2e2';
-                      e.currentTarget.style.borderColor = '#dc2626';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = '#fff';
-                      e.currentTarget.style.borderColor = '#e5e7eb';
-                    }}
+                    className="absolute top-2 right-2 flex items-center gap-1 px-3 py-2 bg-white border border-slate-200 rounded-lg hover:bg-red-50 hover:border-red-500 transition-all shadow-lg"
                   >
-                    <X size={16} />
-                    <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>Remove</span>
+                    <X className="w-4 h-4" />
+                    <span className="text-sm font-medium">Remove</span>
                   </button>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: '0.5rem',
-                      left: '0.5rem',
-                      background: 'rgba(0, 0, 0, 0.6)',
-                      color: 'white',
-                      padding: '0.25rem 0.5rem',
-                      borderRadius: '0.25rem',
-                      fontSize: '0.75rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                    }}
-                  >
-                    <ImageIcon size={14} />
+                  <div className="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 bg-black/60 text-white rounded text-xs">
+                    <ImageIcon className="w-3 h-3" />
                     {imageFile ? imageFile.name : 'Current image'}
                   </div>
                 </div>
               )}
-            </FormGroup>
+            </div>
 
-            <FormActions>
+            {/* Actions */}
+            <div className="flex gap-3 pt-4">
               {editingCategory && (
-                <Button onClick={resetForm} disabled={isSubmitting}>
-                  <X size={16} />
+                <button
+                  onClick={resetForm}
+                  disabled={isSubmitting}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 border-2 border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-all disabled:opacity-50"
+                >
+                  <X className="w-4 h-4" />
                   Cancel
-                </Button>
+                </button>
               )}
-              <Button
-                variant="primary"
+              <button
                 onClick={handleSaveCategory}
                 disabled={isSubmitting || !formData.name.trim()}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
+                {isSubmitting ? (
+                  <Loader className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
                 {editingCategory ? 'Update Category' : 'Create Category'}
-              </Button>
-            </FormActions>
-          </FormContainer>
-        </Section>
-      </Content>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      {/* Toast */}
       {toast && (
-        <Toast type={toast.type}>
-          {toast.type === 'success' ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+        <div
+          className={`fixed top-4 right-4 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl z-50 animate-slide-in ${
+            toast.type === 'success' ? 'bg-amber-500 text-white' : 'bg-red-500 text-white'
+          }`}
+        >
+          {toast.type === 'success' ? (
+            <CheckCircle className="w-5 h-5" />
+          ) : (
+            <AlertCircle className="w-5 h-5" />
+          )}
           {toast.message}
-        </Toast>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 
