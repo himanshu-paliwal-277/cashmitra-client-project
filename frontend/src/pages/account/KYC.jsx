@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import { useState } from 'react';
 import {
   Shield,
   CheckCircle,
@@ -9,389 +8,15 @@ import {
   Camera,
   FileText,
   User,
-  CreditCard,
   MapPin,
-  Phone,
-  Mail,
-  Calendar,
   ArrowRight,
   RefreshCw,
   Eye,
   Download,
   X,
+  ArrowLeft,
+  Info,
 } from 'lucide-react';
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
-
-const KYCContainer = styled.div`
-  min-height: 100vh;
-  background: ${props => props.theme.colors.background.primary};
-  padding: ${props => props.theme.spacing.xl} 0;
-`;
-
-const Container = styled.div`
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 ${props => props.theme.spacing.md};
-`;
-
-const KYCHeader = styled.div`
-  text-align: center;
-  margin-bottom: ${props => props.theme.spacing.xl};
-`;
-
-const PageTitle = styled.h1`
-  font-size: ${props => props.theme.typography.fontSize['3xl']};
-  font-weight: ${props => props.theme.typography.fontWeight.bold};
-  color: ${props => props.theme.colors.text.primary};
-  margin-bottom: ${props => props.theme.spacing.sm};
-`;
-
-const PageSubtitle = styled.p`
-  font-size: ${props => props.theme.typography.fontSize.lg};
-  color: ${props => props.theme.colors.text.secondary};
-  max-width: 600px;
-  margin: 0 auto;
-`;
-
-const StatusCard = styled(Card)`
-  padding: ${props => props.theme.spacing.xl};
-  margin-bottom: ${props => props.theme.spacing.xl};
-  text-align: center;
-
-  ${props => {
-    switch (props.status) {
-      case 'verified':
-        return `
-          background: linear-gradient(135deg, ${props.theme.colors.success.light} 0%, ${props.theme.colors.success.main} 100%);
-          color: white;
-        `;
-      case 'pending':
-        return `
-          background: linear-gradient(135deg, ${props.theme.colors.warning.light} 0%, ${props.theme.colors.warning.main} 100%);
-          color: white;
-        `;
-      case 'rejected':
-        return `
-          background: linear-gradient(135deg, ${props.theme.colors.error.light} 0%, ${props.theme.colors.error.main} 100%);
-          color: white;
-        `;
-      default:
-        return `
-          background: ${props.theme.colors.background.primary};
-          border: 2px dashed ${props.theme.colors.border.primary};
-        `;
-    }
-  }}
-`;
-
-const StatusIcon = styled.div`
-  width: 80px;
-  height: 80px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: ${props => props.theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto ${props => props.theme.spacing.lg};
-`;
-
-const StatusTitle = styled.h2`
-  font-size: ${props => props.theme.typography.fontSize['2xl']};
-  font-weight: ${props => props.theme.typography.fontWeight.bold};
-  margin-bottom: ${props => props.theme.spacing.sm};
-`;
-
-const StatusDescription = styled.p`
-  font-size: ${props => props.theme.typography.fontSize.md};
-  opacity: 0.9;
-  margin-bottom: ${props => props.theme.spacing.lg};
-`;
-
-const ProgressBar = styled.div`
-  width: 100%;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: ${props => props.theme.borderRadius.full};
-  overflow: hidden;
-  margin-bottom: ${props => props.theme.spacing.lg};
-`;
-
-const ProgressFill = styled.div`
-  height: 100%;
-  background: white;
-  border-radius: ${props => props.theme.borderRadius.full};
-  width: ${props => props.progress}%;
-  transition: width 0.3s ease;
-`;
-
-const StepsContainer = styled.div`
-  display: grid;
-  gap: ${props => props.theme.spacing.lg};
-  margin-bottom: ${props => props.theme.spacing.xl};
-`;
-
-const StepCard = styled(Card)`
-  padding: ${props => props.theme.spacing.xl};
-  transition: all 0.2s ease;
-
-  ${props => {
-    if (props.completed) {
-      return `
-        background: ${props.theme.colors.success.light};
-        border-color: ${props.theme.colors.success.main};
-      `;
-    }
-    if (props.active) {
-      return `
-        border-color: ${props.theme.colors.primary.main};
-        box-shadow: 0 0 0 3px ${props.theme.colors.primary.light};
-      `;
-    }
-    return '';
-  }}
-`;
-
-const StepHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.md};
-  margin-bottom: ${props => props.theme.spacing.lg};
-`;
-
-const StepNumber = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: ${props => props.theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: ${props => props.theme.typography.fontWeight.bold};
-  flex-shrink: 0;
-
-  ${props => {
-    if (props.completed) {
-      return `
-        background: ${props.theme.colors.success.main};
-        color: white;
-      `;
-    }
-    if (props.active) {
-      return `
-        background: ${props.theme.colors.primary.main};
-        color: white;
-      `;
-    }
-    return `
-      background: ${props.theme.colors.background.secondary};
-      color: ${props.theme.colors.text.secondary};
-    `;
-  }}
-`;
-
-const StepInfo = styled.div`
-  flex: 1;
-`;
-
-const StepTitle = styled.h3`
-  font-size: ${props => props.theme.typography.fontSize.lg};
-  font-weight: ${props => props.theme.typography.fontWeight.bold};
-  color: ${props => props.theme.colors.text.primary};
-  margin-bottom: ${props => props.theme.spacing.xs};
-`;
-
-const StepDescription = styled.p`
-  font-size: ${props => props.theme.typography.fontSize.md};
-  color: ${props => props.theme.colors.text.secondary};
-`;
-
-const StepContent = styled.div`
-  margin-left: 56px;
-
-  @media (max-width: ${props => props.theme.breakpoints.sm}) {
-    margin-left: 0;
-  }
-`;
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${props => props.theme.spacing.md};
-  margin-bottom: ${props => props.theme.spacing.lg};
-
-  @media (max-width: ${props => props.theme.breakpoints.sm}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: ${props => props.theme.spacing.md};
-
-  &.full-width {
-    grid-column: 1 / -1;
-  }
-`;
-
-const Label = styled.label`
-  display: block;
-  font-size: ${props => props.theme.typography.fontSize.sm};
-  font-weight: ${props => props.theme.typography.fontWeight.medium};
-  color: ${props => props.theme.colors.text.primary};
-  margin-bottom: ${props => props.theme.spacing.xs};
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: ${props => props.theme.spacing.md};
-  border: 1px solid ${props => props.theme.colors.border.primary};
-  border-radius: ${props => props.theme.borderRadius.md};
-  font-size: ${props => props.theme.typography.fontSize.md};
-  color: ${props => props.theme.colors.text.primary};
-  background: ${props => props.theme.colors.background.primary};
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary.main};
-    box-shadow: 0 0 0 3px ${props => props.theme.colors.primary.light};
-  }
-
-  &:disabled {
-    background: ${props => props.theme.colors.background.secondary};
-    color: ${props => props.theme.colors.text.secondary};
-  }
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: ${props => props.theme.spacing.md};
-  border: 1px solid ${props => props.theme.colors.border.primary};
-  border-radius: ${props => props.theme.borderRadius.md};
-  font-size: ${props => props.theme.typography.fontSize.md};
-  color: ${props => props.theme.colors.text.primary};
-  background: ${props => props.theme.colors.background.primary};
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary.main};
-  }
-`;
-
-const UploadArea = styled.div`
-  border: 2px dashed ${props => props.theme.colors.border.primary};
-  border-radius: ${props => props.theme.borderRadius.md};
-  padding: ${props => props.theme.spacing.xl};
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: ${props => props.theme.colors.primary.main};
-    background: ${props => props.theme.colors.primary.light};
-  }
-
-  &.has-file {
-    border-color: ${props => props.theme.colors.success.main};
-    background: ${props => props.theme.colors.success.light};
-  }
-`;
-
-const UploadIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  background: ${props => props.theme.colors.background.secondary};
-  border-radius: ${props => props.theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto ${props => props.theme.spacing.md};
-  color: ${props => props.theme.colors.text.secondary};
-`;
-
-const UploadText = styled.p`
-  font-size: ${props => props.theme.typography.fontSize.md};
-  color: ${props => props.theme.colors.text.primary};
-  margin-bottom: ${props => props.theme.spacing.xs};
-`;
-
-const UploadSubtext = styled.p`
-  font-size: ${props => props.theme.typography.fontSize.sm};
-  color: ${props => props.theme.colors.text.secondary};
-`;
-
-const DocumentsList = styled.div`
-  display: grid;
-  gap: ${props => props.theme.spacing.md};
-  margin-top: ${props => props.theme.spacing.lg};
-`;
-
-const DocumentItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.md};
-  padding: ${props => props.theme.spacing.md};
-  background: ${props => props.theme.colors.background.secondary};
-  border-radius: ${props => props.theme.borderRadius.md};
-`;
-
-const DocumentIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  background: ${props => props.theme.colors.primary.light};
-  color: ${props => props.theme.colors.primary.main};
-  border-radius: ${props => props.theme.borderRadius.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-`;
-
-const DocumentInfo = styled.div`
-  flex: 1;
-  min-width: 0;
-`;
-
-const DocumentName = styled.div`
-  font-size: ${props => props.theme.typography.fontSize.md};
-  font-weight: ${props => props.theme.typography.fontWeight.medium};
-  color: ${props => props.theme.colors.text.primary};
-  margin-bottom: ${props => props.theme.spacing.xs};
-`;
-
-const DocumentStatus = styled.div`
-  font-size: ${props => props.theme.typography.fontSize.sm};
-  color: ${props => props.theme.colors.text.secondary};
-`;
-
-const DocumentActions = styled.div`
-  display: flex;
-  gap: ${props => props.theme.spacing.xs};
-`;
-
-const ActionButton = styled.button`
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: ${props => props.theme.colors.background.primary};
-  color: ${props => props.theme.colors.text.secondary};
-  border-radius: ${props => props.theme.borderRadius.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${props => props.theme.colors.primary.light};
-    color: ${props => props.theme.colors.primary.main};
-  }
-`;
-
-const StepActions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: ${props => props.theme.spacing.md};
-  margin-top: ${props => props.theme.spacing.lg};
-`;
 
 const KYC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -425,28 +50,28 @@ const KYC = () => {
       id: 1,
       title: 'Personal Information',
       description: 'Provide your basic personal details',
-      icon: <User size={20} />,
+      icon: User,
       completed: currentStep > 1,
     },
     {
       id: 2,
       title: 'Contact Information',
       description: 'Add your contact and address details',
-      icon: <MapPin size={20} />,
+      icon: MapPin,
       completed: currentStep > 2,
     },
     {
       id: 3,
       title: 'Document Upload',
       description: 'Upload required identity documents',
-      icon: <FileText size={20} />,
+      icon: FileText,
       completed: currentStep > 3,
     },
     {
       id: 4,
       title: 'Verification',
       description: 'Review and submit for verification',
-      icon: <Shield size={20} />,
+      icon: Shield,
       completed: kycStatus === 'verified',
     },
   ];
@@ -455,40 +80,45 @@ const KYC = () => {
     switch (kycStatus) {
       case 'verified':
         return {
-          icon: <CheckCircle size={40} />,
+          icon: CheckCircle,
           title: 'KYC Verified',
           description:
             'Your identity has been successfully verified. You can now access all features.',
           progress: 100,
+          color: 'green',
         };
       case 'pending':
         return {
-          icon: <Clock size={40} />,
+          icon: Clock,
           title: 'Verification Pending',
           description:
             "Your documents are under review. We'll notify you once verification is complete.",
           progress: 75,
+          color: 'yellow',
         };
       case 'rejected':
         return {
-          icon: <AlertCircle size={40} />,
+          icon: AlertCircle,
           title: 'Verification Failed',
           description:
             'Some documents need to be resubmitted. Please check the requirements and try again.',
           progress: 50,
+          color: 'red',
         };
       default:
         return {
-          icon: <Shield size={40} />,
+          icon: Shield,
           title: 'Complete Your KYC',
           description:
             'Verify your identity to unlock all features and increase transaction limits.',
           progress: (currentStep - 1) * 25,
+          color: 'blue',
         };
     }
   };
 
   const statusInfo = getStatusInfo();
+  const StatusIcon = statusInfo.icon;
 
   const handleInputChange = (section, field, value) => {
     setFormData(prev => ({
@@ -524,109 +154,139 @@ const KYC = () => {
     switch (currentStep) {
       case 1:
         return (
-          <FormGrid>
-            <FormGroup>
-              <Label>Full Name *</Label>
-              <Input
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Full Name <span className="text-red-500">*</span>
+              </label>
+              <input
                 type="text"
                 value={formData.personalInfo.fullName}
                 onChange={e => handleInputChange('personalInfo', 'fullName', e.target.value)}
                 placeholder="Enter your full name"
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label>Date of Birth *</Label>
-              <Input
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Date of Birth <span className="text-red-500">*</span>
+              </label>
+              <input
                 type="date"
                 value={formData.personalInfo.dateOfBirth}
                 onChange={e => handleInputChange('personalInfo', 'dateOfBirth', e.target.value)}
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label>Gender *</Label>
-              <Select
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Gender <span className="text-red-500">*</span>
+              </label>
+              <select
                 value={formData.personalInfo.gender}
                 onChange={e => handleInputChange('personalInfo', 'gender', e.target.value)}
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
                 <option value="">Select Gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
                 <option value="other">Other</option>
-              </Select>
-            </FormGroup>
+              </select>
+            </div>
 
-            <FormGroup>
-              <Label>Father's Name</Label>
-              <Input
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Father&apos;s Name
+              </label>
+              <input
                 type="text"
                 value={formData.personalInfo.fatherName}
                 onChange={e => handleInputChange('personalInfo', 'fatherName', e.target.value)}
                 placeholder="Enter father's name"
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup className="full-width">
-              <Label>Mother's Name</Label>
-              <Input
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Mother&apos;s Name
+              </label>
+              <input
                 type="text"
                 value={formData.personalInfo.motherName}
                 onChange={e => handleInputChange('personalInfo', 'motherName', e.target.value)}
                 placeholder="Enter mother's name"
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
-            </FormGroup>
-          </FormGrid>
+            </div>
+          </div>
         );
 
       case 2:
         return (
-          <FormGrid>
-            <FormGroup>
-              <Label>Email Address *</Label>
-              <Input
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Email Address <span className="text-red-500">*</span>
+              </label>
+              <input
                 type="email"
                 value={formData.contactInfo.email}
                 onChange={e => handleInputChange('contactInfo', 'email', e.target.value)}
                 placeholder="Enter email address"
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label>Phone Number *</Label>
-              <Input
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Phone Number <span className="text-red-500">*</span>
+              </label>
+              <input
                 type="tel"
                 value={formData.contactInfo.phone}
                 onChange={e => handleInputChange('contactInfo', 'phone', e.target.value)}
                 placeholder="Enter phone number"
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup className="full-width">
-              <Label>Address *</Label>
-              <Input
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Address <span className="text-red-500">*</span>
+              </label>
+              <input
                 type="text"
                 value={formData.contactInfo.address}
                 onChange={e => handleInputChange('contactInfo', 'address', e.target.value)}
                 placeholder="Enter complete address"
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label>City *</Label>
-              <Input
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                City <span className="text-red-500">*</span>
+              </label>
+              <input
                 type="text"
                 value={formData.contactInfo.city}
                 onChange={e => handleInputChange('contactInfo', 'city', e.target.value)}
                 placeholder="Enter city"
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label>State *</Label>
-              <Select
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                State <span className="text-red-500">*</span>
+              </label>
+              <select
                 value={formData.contactInfo.state}
                 onChange={e => handleInputChange('contactInfo', 'state', e.target.value)}
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
                 <option value="">Select State</option>
                 <option value="maharashtra">Maharashtra</option>
@@ -634,118 +294,126 @@ const KYC = () => {
                 <option value="karnataka">Karnataka</option>
                 <option value="tamil-nadu">Tamil Nadu</option>
                 <option value="gujarat">Gujarat</option>
-              </Select>
-            </FormGroup>
+              </select>
+            </div>
 
-            <FormGroup>
-              <Label>PIN Code *</Label>
-              <Input
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                PIN Code <span className="text-red-500">*</span>
+              </label>
+              <input
                 type="text"
                 value={formData.contactInfo.pincode}
                 onChange={e => handleInputChange('contactInfo', 'pincode', e.target.value)}
                 placeholder="Enter PIN code"
+                maxLength="6"
+                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
-            </FormGroup>
-          </FormGrid>
+            </div>
+          </div>
         );
 
       case 3:
         return (
           <div>
-            <FormGrid>
-              <FormGroup>
-                <Label>Aadhar Card *</Label>
-                <UploadArea>
-                  <UploadIcon>
-                    <Upload size={24} />
-                  </UploadIcon>
-                  <UploadText>Upload Aadhar Card</UploadText>
-                  <UploadSubtext>PDF, JPG, PNG (Max 5MB)</UploadSubtext>
-                </UploadArea>
-              </FormGroup>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Aadhar Card <span className="text-red-500">*</span>
+                </label>
+                <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer group">
+                  <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-100 transition-colors">
+                    <Upload className="w-6 h-6 text-slate-500 group-hover:text-blue-600" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-700 mb-1">Upload Aadhar Card</p>
+                  <p className="text-xs text-slate-500">PDF, JPG, PNG (Max 5MB)</p>
+                </div>
+              </div>
 
-              <FormGroup>
-                <Label>PAN Card *</Label>
-                <UploadArea>
-                  <UploadIcon>
-                    <Upload size={24} />
-                  </UploadIcon>
-                  <UploadText>Upload PAN Card</UploadText>
-                  <UploadSubtext>PDF, JPG, PNG (Max 5MB)</UploadSubtext>
-                </UploadArea>
-              </FormGroup>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  PAN Card <span className="text-red-500">*</span>
+                </label>
+                <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer group">
+                  <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-100 transition-colors">
+                    <Upload className="w-6 h-6 text-slate-500 group-hover:text-blue-600" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-700 mb-1">Upload PAN Card</p>
+                  <p className="text-xs text-slate-500">PDF, JPG, PNG (Max 5MB)</p>
+                </div>
+              </div>
 
-              <FormGroup>
-                <Label>Bank Statement</Label>
-                <UploadArea>
-                  <UploadIcon>
-                    <Upload size={24} />
-                  </UploadIcon>
-                  <UploadText>Upload Bank Statement</UploadText>
-                  <UploadSubtext>PDF (Last 3 months)</UploadSubtext>
-                </UploadArea>
-              </FormGroup>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Bank Statement
+                </label>
+                <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer group">
+                  <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-100 transition-colors">
+                    <Upload className="w-6 h-6 text-slate-500 group-hover:text-blue-600" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-700 mb-1">Upload Bank Statement</p>
+                  <p className="text-xs text-slate-500">PDF (Last 3 months)</p>
+                </div>
+              </div>
 
-              <FormGroup>
-                <Label>Profile Photo *</Label>
-                <UploadArea>
-                  <UploadIcon>
-                    <Camera size={24} />
-                  </UploadIcon>
-                  <UploadText>Upload Photo</UploadText>
-                  <UploadSubtext>JPG, PNG (Max 2MB)</UploadSubtext>
-                </UploadArea>
-              </FormGroup>
-            </FormGrid>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Profile Photo <span className="text-red-500">*</span>
+                </label>
+                <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer group">
+                  <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-100 transition-colors">
+                    <Camera className="w-6 h-6 text-slate-500 group-hover:text-blue-600" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-700 mb-1">Upload Photo</p>
+                  <p className="text-xs text-slate-500">JPG, PNG (Max 2MB)</p>
+                </div>
+              </div>
+            </div>
 
-            <DocumentsList>
-              <DocumentItem>
-                <DocumentIcon>
-                  <FileText size={20} />
-                </DocumentIcon>
-                <DocumentInfo>
-                  <DocumentName>aadhar_card.pdf</DocumentName>
-                  <DocumentStatus>Uploaded • 2.3 MB</DocumentStatus>
-                </DocumentInfo>
-                <DocumentActions>
-                  <ActionButton>
-                    <Eye size={16} />
-                  </ActionButton>
-                  <ActionButton>
-                    <Download size={16} />
-                  </ActionButton>
-                  <ActionButton>
-                    <X size={16} />
-                  </ActionButton>
-                </DocumentActions>
-              </DocumentItem>
-            </DocumentsList>
+            {/* Sample uploaded document */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-slate-900 mb-1">aadhar_card.pdf</p>
+                  <p className="text-sm text-slate-600">Uploaded • 2.3 MB</p>
+                </div>
+                <div className="flex gap-2">
+                  <button className="w-10 h-10 bg-white hover:bg-green-100 rounded-lg flex items-center justify-center transition-colors">
+                    <Eye className="w-5 h-5 text-slate-600" />
+                  </button>
+                  <button className="w-10 h-10 bg-white hover:bg-green-100 rounded-lg flex items-center justify-center transition-colors">
+                    <Download className="w-5 h-5 text-slate-600" />
+                  </button>
+                  <button className="w-10 h-10 bg-white hover:bg-red-100 rounded-lg flex items-center justify-center transition-colors">
+                    <X className="w-5 h-5 text-red-600" />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         );
 
       case 4:
         return (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Shield size={80} style={{ color: '#10B981', marginBottom: '24px' }} />
-            <h3 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>
-              Ready for Verification
-            </h3>
-            <p
-              style={{
-                fontSize: '16px',
-                color: '#6B7280',
-                marginBottom: '32px',
-                maxWidth: '500px',
-                margin: '0 auto 32px',
-              }}
-            >
-              Please review all the information you've provided. Once submitted, our team will
+          <div className="text-center py-12">
+            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+              <Shield className="w-10 h-10 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-slate-900 mb-4">Ready for Verification</h3>
+            <p className="text-slate-600 mb-8 max-w-md mx-auto">
+              Please review all the information you&apos;ve provided. Once submitted, our team will
               verify your documents within 24-48 hours.
             </p>
-            <Button variant="primary" size="lg" onClick={handleSubmit}>
+            <button
+              onClick={handleSubmit}
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+            >
               Submit for Verification
-              <ArrowRight size={20} />
-            </Button>
+              <ArrowRight className="w-5 h-5" />
+            </button>
           </div>
         );
 
@@ -754,89 +422,179 @@ const KYC = () => {
     }
   };
 
+  // Status screens for verified/pending
   if (kycStatus === 'verified' || kycStatus === 'pending') {
+    const bgGradient =
+      kycStatus === 'verified' ? 'from-green-500 to-emerald-600' : 'from-yellow-500 to-orange-600';
+
     return (
-      <KYCContainer>
-        <Container>
-          <StatusCard status={kycStatus}>
-            <StatusIcon>{statusInfo.icon}</StatusIcon>
-            <StatusTitle>{statusInfo.title}</StatusTitle>
-            <StatusDescription>{statusInfo.description}</StatusDescription>
-            <ProgressBar>
-              <ProgressFill progress={statusInfo.progress} />
-            </ProgressBar>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto">
+          <div
+            className={`bg-gradient-to-br ${bgGradient} rounded-2xl shadow-2xl p-8 sm:p-12 text-center text-white`}
+          >
+            <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6">
+              <StatusIcon className="w-12 h-12" />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white">{statusInfo.title}</h2>
+            <p className="text-lg opacity-90 mb-8 max-w-xl mx-auto">{statusInfo.description}</p>
+
+            {/* Progress Bar */}
+            <div className="w-full max-w-md mx-auto bg-white/20 rounded-full h-3 mb-8 overflow-hidden">
+              <div
+                className="h-full bg-white rounded-full transition-all duration-500"
+                style={{ width: `${statusInfo.progress}%` }}
+              ></div>
+            </div>
+
             {kycStatus === 'pending' && (
-              <Button
-                variant="ghost"
-                style={{ background: 'rgba(255,255,255,0.2)', color: 'white' }}
-              >
-                <RefreshCw size={16} />
+              <button className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-xl hover:bg-white/30 transition-all border-2 border-white/30">
+                <RefreshCw className="w-5 h-5" />
                 Check Status
-              </Button>
+              </button>
             )}
-          </StatusCard>
-        </Container>
-      </KYCContainer>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <KYCContainer>
-      <Container>
-        <KYCHeader>
-          <PageTitle>KYC Verification</PageTitle>
-          <PageSubtitle>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg mb-4">
+            <Shield className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">KYC Verification</h1>
+          <p className="text-slate-600 max-w-2xl mx-auto">
             Complete your Know Your Customer (KYC) verification to unlock all features and increase
             your transaction limits.
-          </PageSubtitle>
-        </KYCHeader>
+          </p>
+        </div>
 
-        <StatusCard>
-          <StatusIcon>{statusInfo.icon}</StatusIcon>
-          <StatusTitle>{statusInfo.title}</StatusTitle>
-          <StatusDescription>{statusInfo.description}</StatusDescription>
-          <ProgressBar>
-            <ProgressFill progress={statusInfo.progress} />
-          </ProgressBar>
-        </StatusCard>
+        {/* Status Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 text-center border-2 border-slate-200">
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <StatusIcon className="w-10 h-10 text-blue-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">{statusInfo.title}</h2>
+          <p className="text-slate-600 mb-6">{statusInfo.description}</p>
 
-        <StepsContainer>
-          {steps.map(step => (
-            <StepCard key={step.id} active={step.id === currentStep} completed={step.completed}>
-              <StepHeader>
-                <StepNumber active={step.id === currentStep} completed={step.completed}>
-                  {step.completed ? <CheckCircle size={20} /> : step.id}
-                </StepNumber>
-                <StepInfo>
-                  <StepTitle>{step.title}</StepTitle>
-                  <StepDescription>{step.description}</StepDescription>
-                </StepInfo>
-              </StepHeader>
+          {/* Progress Bar */}
+          <div className="w-full max-w-md mx-auto bg-slate-200 rounded-full h-2.5 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500"
+              style={{ width: `${statusInfo.progress}%` }}
+            ></div>
+          </div>
+        </div>
 
-              {step.id === currentStep && (
-                <StepContent>
-                  {renderStepContent()}
+        {/* Steps Progress Indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            {steps.map((step, index) => {
+              const StepIcon = step.icon;
+              const isActive = step.id === currentStep;
+              const isCompleted = step.completed;
 
-                  <StepActions>
-                    {currentStep > 1 && (
-                      <Button variant="ghost" onClick={handlePrevStep}>
-                        Previous
-                      </Button>
-                    )}
-                    {currentStep < 4 && (
-                      <Button variant="primary" onClick={handleNextStep}>
-                        Next Step
-                        <ArrowRight size={16} />
-                      </Button>
-                    )}
-                  </StepActions>
-                </StepContent>
-              )}
-            </StepCard>
-          ))}
-        </StepsContainer>
-      </Container>
-    </KYCContainer>
+              return (
+                <div key={step.id} className="flex items-center flex-1">
+                  <div className="flex flex-col items-center flex-1">
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all ${
+                        isCompleted
+                          ? 'bg-green-500 text-white shadow-lg'
+                          : isActive
+                            ? 'bg-blue-600 text-white shadow-lg scale-110'
+                            : 'bg-slate-200 text-slate-500'
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <CheckCircle className="w-6 h-6" />
+                      ) : (
+                        <StepIcon className="w-6 h-6" />
+                      )}
+                    </div>
+                    <p
+                      className={`text-xs mt-2 font-medium hidden sm:block ${isActive ? 'text-blue-600' : 'text-slate-600'}`}
+                    >
+                      {step.title}
+                    </p>
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div
+                      className={`h-1 flex-1 mx-2 rounded ${isCompleted ? 'bg-green-500' : 'bg-slate-200'}`}
+                    ></div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Current Step Card */}
+        <div className="bg-white rounded-2xl shadow-xl border-2 border-slate-200 overflow-hidden">
+          {/* Step Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                {(() => {
+                  const CurrentStepIcon = steps[currentStep - 1].icon;
+                  return <CurrentStepIcon className="w-6 h-6" />;
+                })()}
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">{steps[currentStep - 1].title}</h3>
+                <p className="text-blue-100 text-sm">{steps[currentStep - 1].description}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Step Content */}
+          <div className="p-6 sm:p-8">
+            {/* Info Banner */}
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-blue-900">
+                  All fields marked with <span className="text-red-500 font-bold">*</span> are
+                  mandatory. Please ensure all information is accurate.
+                </p>
+              </div>
+            </div>
+
+            {renderStepContent()}
+
+            {/* Navigation Buttons */}
+            {currentStep < 4 && (
+              <div className="flex flex-wrap gap-4 justify-center items-center mt-8 pt-6 border-t-2 border-slate-200">
+                <button
+                  onClick={handlePrevStep}
+                  disabled={currentStep === 1}
+                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+                    currentStep === 1
+                      ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                      : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                  }`}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  Previous
+                </button>
+                <button
+                  onClick={handleNextStep}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  Next Step
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

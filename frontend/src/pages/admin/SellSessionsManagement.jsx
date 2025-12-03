@@ -2,680 +2,54 @@
  * @fileoverview Sell Sessions Management Component
  * @description Admin interface for managing sell offer sessions and their lifecycle
  * @author Cashify Development Team
- * @version 1.0.0
+ * @version 2.0.0
  */
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { theme } from '../../theme';
+import { useState, useEffect } from 'react';
 import useSellSessions from '../../hooks/useSellSessions';
 import useSellProducts from '../../hooks/useSellProducts';
 import useSellDefects from '../../hooks/useSellDefects';
 import useSellAccessories from '../../hooks/useSellAccessories';
 import {
   Search,
-  Filter,
   Download,
   RefreshCw,
   Plus,
-  Eye,
-  Edit,
-  Trash2,
   MoreVertical,
   Clock,
   CheckCircle,
   XCircle,
   AlertCircle,
   DollarSign,
-  User,
-  Calendar,
-  Phone,
-  MapPin,
   Package,
   TrendingUp,
   TrendingDown,
   Activity,
   Settings,
-  Grid,
-  List,
-  ChevronDown,
-  ExternalLink,
-  MessageSquare,
-  Star,
-  Timer,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  X,
+  Sparkles,
+  User,
+  Phone,
+  Calendar,
+  ShoppingBag,
 } from 'lucide-react';
-
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
-
-const Subtitle = styled.p`
-  color: ${theme.colors.text.secondary};
-  margin: 0.5rem 0 0 0;
-  font-size: 1rem;
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 1rem;
-`;
-
-const Button = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &.primary {
-    background-color: ${theme.colors.primary};
-    color: white;
-
-    &:hover {
-      background-color: ${theme.colors.primaryDark};
-    }
-  }
-
-  &.secondary {
-    background-color: white;
-    color: ${theme.colors.text.primary};
-    border: 1px solid ${theme.colors.border};
-
-    &:hover {
-      background-color: #f8fafc;
-    }
-  }
-`;
-
-const FiltersSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-`;
-
-const FiltersRow = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-`;
-
-const SearchInput = styled.div`
-  position: relative;
-  flex: 1;
-  min-width: 300px;
-
-  input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 1px solid ${theme.colors.border};
-    border-radius: 8px;
-    font-size: 0.875rem;
-
-    &:focus {
-      outline: none;
-      border-color: ${theme.colors.primary};
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-  }
-
-  svg {
-    position: absolute;
-    left: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: ${theme.colors.text.secondary};
-    width: 1rem;
-    height: 1rem;
-  }
-`;
-
-const FilterSelect = styled.select`
-  padding: 0.75rem 1rem;
-  border: 1px solid ${theme.colors.border};
-  border-radius: 8px;
-  font-size: 0.875rem;
-  background: white;
-  min-width: 150px;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
-  .stat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-
-  .stat-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &.sessions {
-      background-color: #e0e7ff;
-      color: #4f46e5;
-    }
-
-    &.active {
-      background-color: #dcfce7;
-      color: #16a34a;
-    }
-
-    &.completed {
-      background-color: #e0e7ff;
-      color: #4f46e5;
-    }
-
-    &.expired {
-      background-color: #fee2e2;
-      color: #dc2626;
-    }
-  }
-
-  .stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: ${theme.colors.text.primary};
-    margin-bottom: 0.25rem;
-  }
-
-  .stat-label {
-    color: ${theme.colors.text.secondary};
-    font-size: 0.875rem;
-  }
-
-  .stat-change {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.75rem;
-    margin-top: 0.5rem;
-
-    &.positive {
-      color: #16a34a;
-    }
-
-    &.negative {
-      color: #dc2626;
-    }
-  }
-`;
-
-const SessionsTable = styled.div`
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-
-const TableHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid ${theme.colors.border};
-`;
-
-const TableTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
-
-const TableActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHead = styled.thead`
-  background-color: #f8fafc;
-`;
-
-const TableRow = styled.tr`
-  border-bottom: 1px solid ${theme.colors.border};
-
-  &:hover {
-    background-color: #f8fafc;
-  }
-`;
-
-const TableHeader2 = styled.th`
-  text-align: left;
-  padding: 1rem;
-  font-weight: 600;
-  color: ${theme.colors.text.primary};
-  font-size: 0.875rem;
-`;
-
-const TableCell = styled.td`
-  padding: 1rem;
-  color: ${theme.colors.text.primary};
-  font-size: 0.875rem;
-`;
-
-const Badge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-
-  &.active {
-    background-color: #dcfce7;
-    color: #16a34a;
-  }
-
-  &.completed {
-    background-color: #e0e7ff;
-    color: #4f46e5;
-  }
-
-  &.expired {
-    background-color: #fee2e2;
-    color: #dc2626;
-  }
-
-  &.pending {
-    background-color: #fef3c7;
-    color: #d97706;
-  }
-`;
-
-const ActionMenu = styled.div`
-  position: relative;
-  display: inline-block;
-`;
-
-const ActionButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  color: ${theme.colors.text.secondary};
-
-  &:hover {
-    background-color: #f3f4f6;
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const DeviceInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  .device-image {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 4px;
-    background-color: #f3f4f6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .device-details {
-    .device-name {
-      font-weight: 500;
-      font-size: 0.875rem;
-    }
-
-    .device-model {
-      font-size: 0.75rem;
-      color: ${theme.colors.text.secondary};
-    }
-  }
-`;
-
-const UserInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  .user-avatar {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    background-color: ${theme.colors.primary};
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 500;
-    font-size: 0.75rem;
-  }
-
-  .user-details {
-    .user-name {
-      font-weight: 500;
-      font-size: 0.875rem;
-    }
-
-    .user-contact {
-      font-size: 0.75rem;
-      color: ${theme.colors.text.secondary};
-    }
-  }
-`;
-
-// Modal Components
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-
-  h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: ${theme.colors.text.primary};
-    margin: 0;
-  }
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  color: ${theme.colors.text.secondary};
-
-  &:hover {
-    background-color: #f3f4f6;
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  &.full-width {
-    grid-column: 1 / -1;
-  }
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-  color: ${theme.colors.text.primary};
-  font-size: 0.875rem;
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid ${theme.colors.border};
-  border-radius: 8px;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid ${theme.colors.border};
-  border-radius: 8px;
-  font-size: 0.875rem;
-  background: white;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const TextArea = styled.textarea`
-  padding: 0.75rem;
-  border: 1px solid ${theme.colors.border};
-  border-radius: 8px;
-  font-size: 0.875rem;
-  min-height: 100px;
-  resize: vertical;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const ModalActions = styled.div`
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 2rem;
-`;
-
-// Pagination Components
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  border-top: 1px solid ${theme.colors.border};
-  background: white;
-`;
-
-const PaginationInfo = styled.div`
-  color: ${theme.colors.text.secondary};
-  font-size: 0.875rem;
-`;
-
-const PaginationControls = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const PaginationButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid ${theme.colors.border};
-  border-radius: 6px;
-  background: white;
-  color: ${theme.colors.text.primary};
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover:not(:disabled) {
-    background-color: #f8fafc;
-    border-color: ${theme.colors.primary};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  &.active {
-    background-color: ${theme.colors.primary};
-    color: white;
-    border-color: ${theme.colors.primary};
-  }
-`;
-
-const PageNumbers = styled.div`
-  display: flex;
-  gap: 0.25rem;
-`;
-
-const ItemsPerPageSelect = styled.select`
-  padding: 0.5rem;
-  border: 1px solid ${theme.colors.border};
-  border-radius: 6px;
-  font-size: 0.875rem;
-  background: white;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary};
-  }
-`;
-
-const MultiSelectContainer = styled.div`
-  border: 1px solid ${theme.colors.border};
-  border-radius: 8px;
-  min-height: 2.5rem;
-  padding: 0.5rem;
-  background: white;
-
-  &:focus-within {
-    border-color: ${theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const MultiSelectItem = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  background-color: ${theme.colors.primary};
-  color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  margin: 0.125rem;
-`;
-
-const MultiSelectRemove = styled.button`
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 0;
-  width: 1rem;
-  height: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2px;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-`;
-
-const MultiSelectDropdown = styled.select`
-  width: 100%;
-  padding: 0.5rem;
-  border: none;
-  background: transparent;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-  }
-`;
 
 const SellSessionsManagement = () => {
   const {
     sessions: hookSessions,
     loading: hookLoading,
-    error: hookError,
     createSession,
     getUserSessions,
     deleteSession,
     extendSession,
     cleanExpiredSessions,
-    clearError,
   } = useSellSessions();
 
-  // Products hook
   const {
     products,
     variants,
@@ -684,10 +58,7 @@ const SellSessionsManagement = () => {
     fetchVariants,
   } = useSellProducts();
 
-  // Defects hook
   const { defects, loading: defectsLoading, fetchDefects } = useSellDefects();
-
-  // Accessories hook
   const { accessories, loading: accessoriesLoading, fetchAccessories } = useSellAccessories();
 
   const [sessions, setSessions] = useState([]);
@@ -696,12 +67,8 @@ const SellSessionsManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [deviceFilter, setDeviceFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
-
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
-  // Modal state for Create Session
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createFormData, setCreateFormData] = useState({
     productId: '',
@@ -711,19 +78,13 @@ const SellSessionsManagement = () => {
     accessories: [],
   });
 
-  // State for dropdown options - variants now comes from hook
-  // const [variants, setVariants] = useState([]);
-
-  // useEffect to fetch initial data
   useEffect(() => {
     getUserSessions();
-    // Fetch dropdown data when component mounts
     fetchProducts();
     fetchDefects();
     fetchAccessories();
   }, []);
 
-  // Mock data for demonstration
   const mockSessions = [
     {
       id: 'SES001',
@@ -812,7 +173,6 @@ const SellSessionsManagement = () => {
   ];
 
   useEffect(() => {
-    // Simulate API call
     setTimeout(() => {
       setSessions(mockSessions);
       setLoading(false);
@@ -826,17 +186,14 @@ const SellSessionsManagement = () => {
       session.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || session.status === statusFilter;
     const matchesDevice = deviceFilter === 'all' || session.deviceType === deviceFilter;
-
     return matchesSearch && matchesStatus && matchesDevice;
   });
 
-  // Pagination calculations
   const totalPages = Math.ceil(filteredSessions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedSessions = filteredSessions.slice(startIndex, endIndex);
 
-  // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, deviceFilter, dateFilter]);
@@ -863,10 +220,18 @@ const SellSessionsManagement = () => {
     }
   };
 
-  // Handle Create Session Modal
+  const getStatusBadge = status => {
+    const styles = {
+      active: 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white',
+      completed: 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white',
+      expired: 'bg-gradient-to-r from-red-500 to-rose-600 text-white',
+      pending: 'bg-gradient-to-r from-amber-500 to-orange-600 text-white',
+    };
+    return styles[status] || styles.pending;
+  };
+
   const handleCreateSession = async () => {
     setShowCreateModal(true);
-    // Ensure data is loaded when modal opens
     if (products.length === 0) await fetchProducts();
     if (defects.length === 0) await fetchDefects();
     if (accessories.length === 0) await fetchAccessories();
@@ -889,18 +254,15 @@ const SellSessionsManagement = () => {
       [field]: value,
     }));
 
-    // When product changes, fetch its variants
     if (field === 'productId' && value) {
       handleProductChange(value);
     }
   };
 
-  // Handle product selection and fetch variants
   const handleProductChange = async productId => {
     if (productId) {
       try {
         await fetchVariants(productId);
-        // Reset variant selection when product changes
         setCreateFormData(prev => ({
           ...prev,
           variantId: '',
@@ -909,13 +271,11 @@ const SellSessionsManagement = () => {
         console.error('Error fetching variants:', error);
       }
     }
-    // Don't reset variants here since they come from the hook
   };
 
   const handleSubmitCreateSession = async e => {
     e.preventDefault();
 
-    // Validation
     if (!createFormData.productId) {
       alert('Please select a product');
       return;
@@ -927,7 +287,6 @@ const SellSessionsManagement = () => {
     }
 
     try {
-      // Call the actual API
       const sessionData = {
         productId: createFormData.productId,
         variantId: createFormData.variantId,
@@ -936,14 +295,11 @@ const SellSessionsManagement = () => {
         accessories: createFormData.accessories,
       };
 
-      // Use the createSession from the hook
       const result = await createSession(sessionData);
 
       if (result) {
-        // Session created successfully
         alert('Session created successfully!');
         handleCloseCreateModal();
-        // Refresh sessions list
         getUserSessions();
       }
     } catch (error) {
@@ -954,325 +310,446 @@ const SellSessionsManagement = () => {
 
   if (loading) {
     return (
-      <Container>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '50vh',
-          }}
-        >
-          <RefreshCw className="animate-spin" size={24} />
-          <span style={{ marginLeft: '0.5rem' }}>Loading sessions...</span>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 flex items-center justify-center p-8">
+        <div className="flex flex-col items-center gap-4">
+          <RefreshCw className="text-blue-600 animate-spin" size={48} />
+          <p className="text-gray-700 font-semibold text-lg">Loading sessions...</p>
         </div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <div>
-          <Title>Sell Sessions Management</Title>
-          <Subtitle>Manage sell offer sessions and track their progress</Subtitle>
-        </div>
-        <ActionButtons>
-          <Button className="secondary">
-            <Download size={16} />
-            Export
-          </Button>
-          <Button className="secondary">
-            <RefreshCw size={16} />
-            Refresh
-          </Button>
-          <Button className="primary" onClick={handleCreateSession}>
-            <Plus size={16} />
-            New Session
-          </Button>
-        </ActionButtons>
-      </Header>
-
-      <StatsGrid>
-        <StatCard>
-          <div className="stat-header">
-            <div className="stat-icon sessions">
-              <Activity size={20} />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+              <Activity className="text-white" size={28} />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Sell Sessions Management
+              </h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Manage sell offer sessions and track their progress
+              </p>
             </div>
           </div>
-          <div className="stat-value">{stats.totalSessions}</div>
-          <div className="stat-label">Total Sessions</div>
-          <div className="stat-change positive">
-            <TrendingUp size={12} />
-            +5 this week
-          </div>
-        </StatCard>
 
-        <StatCard>
-          <div className="stat-header">
-            <div className="stat-icon active">
-              <Clock size={20} />
-            </div>
-          </div>
-          <div className="stat-value">{stats.activeSessions}</div>
-          <div className="stat-label">Active Sessions</div>
-          <div className="stat-change positive">
-            <TrendingUp size={12} />
-            +2 today
-          </div>
-        </StatCard>
-
-        <StatCard>
-          <div className="stat-header">
-            <div className="stat-icon completed">
-              <CheckCircle size={20} />
-            </div>
-          </div>
-          <div className="stat-value">{stats.completedSessions}</div>
-          <div className="stat-label">Completed</div>
-          <div className="stat-change positive">
-            <TrendingUp size={12} />
-            +3 this week
-          </div>
-        </StatCard>
-
-        <StatCard>
-          <div className="stat-header">
-            <div className="stat-icon expired">
-              <XCircle size={20} />
-            </div>
-          </div>
-          <div className="stat-value">{stats.expiredSessions}</div>
-          <div className="stat-label">Expired</div>
-          <div className="stat-change negative">
-            <TrendingDown size={12} />
-            -1 this week
-          </div>
-        </StatCard>
-      </StatsGrid>
-
-      <FiltersSection>
-        <FiltersRow>
-          <SearchInput>
-            <Search />
-            <input
-              type="text"
-              placeholder="Search sessions..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </SearchInput>
-
-          <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-            <option value="expired">Expired</option>
-            <option value="pending">Pending</option>
-          </FilterSelect>
-
-          <FilterSelect value={deviceFilter} onChange={e => setDeviceFilter(e.target.value)}>
-            <option value="all">All Devices</option>
-            <option value="Mobile">Mobile</option>
-            <option value="Laptop">Laptop</option>
-            <option value="Tablet">Tablet</option>
-          </FilterSelect>
-
-          <FilterSelect value={dateFilter} onChange={e => setDateFilter(e.target.value)}>
-            <option value="all">All Time</option>
-            <option value="today">Today</option>
-            <option value="week">This Week</option>
-            <option value="month">This Month</option>
-          </FilterSelect>
-        </FiltersRow>
-      </FiltersSection>
-
-      <SessionsTable>
-        <TableHeader>
-          <TableTitle>Sessions ({filteredSessions.length})</TableTitle>
-          <TableActions>
-            <Button className="secondary">
-              <Filter size={16} />
-              Filter
-            </Button>
-            <Button className="secondary">
-              <Settings size={16} />
-              Columns
-            </Button>
-          </TableActions>
-        </TableHeader>
-
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeader2>Session ID</TableHeader2>
-              <TableHeader2>Customer</TableHeader2>
-              <TableHeader2>Device</TableHeader2>
-              <TableHeader2>Offer Price</TableHeader2>
-              <TableHeader2>Final Price</TableHeader2>
-              <TableHeader2>Status</TableHeader2>
-              <TableHeader2>Duration</TableHeader2>
-              <TableHeader2>Expires</TableHeader2>
-              <TableHeader2>Actions</TableHeader2>
-            </TableRow>
-          </TableHead>
-          <tbody>
-            {paginatedSessions.map(session => (
-              <TableRow key={session.id}>
-                <TableCell>
-                  <div style={{ fontWeight: '500' }}>{session.id}</div>
-                </TableCell>
-                <TableCell>
-                  <UserInfo>
-                    <div className="user-avatar">{session.userName.charAt(0)}</div>
-                    <div className="user-details">
-                      <div className="user-name">{session.userName}</div>
-                      <div className="user-contact">{session.userPhone}</div>
-                    </div>
-                  </UserInfo>
-                </TableCell>
-                <TableCell>
-                  <DeviceInfo>
-                    <div className="device-image">
-                      <Package size={16} />
-                    </div>
-                    <div className="device-details">
-                      <div className="device-name">
-                        {session.deviceBrand} {session.deviceModel}
-                      </div>
-                      <div className="device-model">
-                        {session.deviceType} • {session.deviceCondition}
-                      </div>
-                    </div>
-                  </DeviceInfo>
-                </TableCell>
-                <TableCell>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                    <DollarSign size={14} />₹{session.offerPrice.toLocaleString()}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                    <DollarSign size={14} />
-                    {session.finalPrice > 0 ? `₹${session.finalPrice.toLocaleString()}` : '-'}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge className={session.status}>
-                    {getStatusIcon(session.status)}
-                    {session.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>{session.sessionDuration}</TableCell>
-                <TableCell>
-                  <div style={{ fontSize: '0.75rem' }}>
-                    {new Date(session.expiresAt).toLocaleDateString()}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <ActionMenu>
-                    <ActionButton>
-                      <MoreVertical size={16} />
-                    </ActionButton>
-                  </ActionMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </tbody>
-        </Table>
-
-        {/* Pagination Controls */}
-        <PaginationContainer>
-          <PaginationInfo>
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredSessions.length)} of{' '}
-            {filteredSessions.length} sessions
-          </PaginationInfo>
-
-          <PaginationControls>
-            <ItemsPerPageSelect
-              value={itemsPerPage}
-              onChange={e => setItemsPerPage(Number(e.target.value))}
+          <div className="flex flex-wrap items-center gap-3">
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm">
+              <Download size={18} />
+              <span className="hidden sm:inline">Export</span>
+            </button>
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm">
+              <RefreshCw size={18} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+            <button
+              onClick={handleCreateSession}
+              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
             >
-              <option value={5}>5 per page</option>
-              <option value={10}>10 per page</option>
-              <option value={25}>25 per page</option>
-              <option value={50}>50 per page</option>
-            </ItemsPerPageSelect>
+              <Plus size={18} />
+              New Session
+            </button>
+          </div>
+        </div>
 
-            <PageNumbers>
-              <PaginationButton onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
-                First
-              </PaginationButton>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-blue-100 overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
+            <div className="relative flex items-start justify-between mb-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Activity className="text-white" size={24} />
+              </div>
+            </div>
+            <div className="relative">
+              <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                {stats.totalSessions}
+              </p>
+              <p className="text-sm font-medium text-gray-600 mb-2">Total Sessions</p>
+              <div className="flex items-center gap-1 text-emerald-600 text-xs font-medium">
+                <TrendingUp size={12} />
+                +5 this week
+              </div>
+            </div>
+          </div>
 
-              <PaginationButton
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </PaginationButton>
+          <div className="relative bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-cyan-100 overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
+            <div className="relative flex items-start justify-between mb-4">
+              <div className="p-3 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Clock className="text-white" size={24} />
+              </div>
+            </div>
+            <div className="relative">
+              <p className="text-4xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-2">
+                {stats.activeSessions}
+              </p>
+              <p className="text-sm font-medium text-gray-600 mb-2">Active Sessions</p>
+              <div className="flex items-center gap-1 text-emerald-600 text-xs font-medium">
+                <TrendingUp size={12} />
+                +2 today
+              </div>
+            </div>
+          </div>
 
-              {/* Page Numbers */}
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
+          <div className="relative bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-emerald-100 overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
+            <div className="relative flex items-start justify-between mb-4">
+              <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <CheckCircle className="text-white" size={24} />
+              </div>
+            </div>
+            <div className="relative">
+              <p className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
+                {stats.completedSessions}
+              </p>
+              <p className="text-sm font-medium text-gray-600 mb-2">Completed</p>
+              <div className="flex items-center gap-1 text-emerald-600 text-xs font-medium">
+                <TrendingUp size={12} />
+                +3 this week
+              </div>
+            </div>
+          </div>
 
-                return (
-                  <PaginationButton
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={currentPage === pageNum ? 'active' : ''}
+          <div className="relative bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-red-100 overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
+            <div className="relative flex items-start justify-between mb-4">
+              <div className="p-3 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <XCircle className="text-white" size={24} />
+              </div>
+            </div>
+            <div className="relative">
+              <p className="text-4xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent mb-2">
+                {stats.expiredSessions}
+              </p>
+              <p className="text-sm font-medium text-gray-600 mb-2">Expired</p>
+              <div className="flex items-center gap-1 text-red-600 text-xs font-medium">
+                <TrendingDown size={12} />
+                -1 this week
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters Section */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
+              <input
+                type="text"
+                placeholder="Search by customer, device, or session ID..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
+              />
+            </div>
+
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 font-medium text-gray-700 min-w-[150px]"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="expired">Expired</option>
+              <option value="pending">Pending</option>
+            </select>
+
+            <select
+              value={deviceFilter}
+              onChange={e => setDeviceFilter(e.target.value)}
+              className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 font-medium text-gray-700 min-w-[150px]"
+            >
+              <option value="all">All Devices</option>
+              <option value="Mobile">Mobile</option>
+              <option value="Laptop">Laptop</option>
+              <option value="Tablet">Tablet</option>
+            </select>
+
+            <select
+              value={dateFilter}
+              onChange={e => setDateFilter(e.target.value)}
+              className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 font-medium text-gray-700 min-w-[150px]"
+            >
+              <option value="all">All Time</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Sessions Table */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                Sessions ({filteredSessions.length})
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">
+                {filteredSessions.length !== sessions.length &&
+                  `Filtered from ${sessions.length} total sessions`}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm">
+                <Filter size={16} />
+                <span className="hidden sm:inline">Filter</span>
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm">
+                <Settings size={16} />
+                <span className="hidden sm:inline">Columns</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Session ID
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Customer
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Device
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Offer Price
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Final Price
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Status
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Duration
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Expires
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {paginatedSessions.map(session => (
+                  <tr
+                    key={session.id}
+                    className="hover:bg-blue-50/50 transition-colors duration-150"
                   >
-                    {pageNum}
-                  </PaginationButton>
-                );
-              })}
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-gray-900">{session.id}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                          {session.userName.charAt(0)}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900">{session.userName}</div>
+                          <div className="text-sm text-gray-500 flex items-center gap-1">
+                            <Phone size={12} />
+                            {session.userPhone}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+                          <Package size={20} className="text-gray-600" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900">
+                            {session.deviceBrand} {session.deviceModel}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {session.deviceType} • {session.deviceCondition}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1 text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                        <DollarSign size={16} />₹{session.offerPrice.toLocaleString()}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1 text-lg font-bold text-gray-900">
+                        {session.finalPrice > 0 ? (
+                          <>
+                            <DollarSign size={16} />₹{session.finalPrice.toLocaleString()}
+                          </>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(session.status)}`}
+                      >
+                        {getStatusIcon(session.status)}
+                        {session.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                        <Calendar size={14} />
+                        {session.sessionDuration}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-600">
+                        {new Date(session.expiresAt).toLocaleDateString()}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-150 text-gray-600 hover:text-gray-900">
+                        <MoreVertical size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-              <PaginationButton
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </PaginationButton>
+          {/* Pagination */}
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-sm text-gray-600">
+              Showing {startIndex + 1} to {Math.min(endIndex, filteredSessions.length)} of{' '}
+              {filteredSessions.length} sessions
+            </div>
 
-              <PaginationButton
-                onClick={() => setCurrentPage(totalPages)}
-                disabled={currentPage === totalPages}
+            <div className="flex items-center gap-3">
+              <select
+                value={itemsPerPage}
+                onChange={e => setItemsPerPage(Number(e.target.value))}
+                className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Last
-              </PaginationButton>
-            </PageNumbers>
-          </PaginationControls>
-        </PaginationContainer>
-      </SessionsTable>
+                <option value={5}>5 per page</option>
+                <option value={10}>10 per page</option>
+                <option value={25}>25 per page</option>
+                <option value={50}>50 per page</option>
+              </select>
+
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className="p-2 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                >
+                  <ChevronsLeft size={16} />
+                </button>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`px-4 py-2 border rounded-lg font-medium transition-all duration-200 ${
+                        currentPage === pageNum
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-transparent shadow-md'
+                          : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                >
+                  <ChevronRight size={16} />
+                </button>
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="p-2 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                >
+                  <ChevronsRight size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Create Session Modal */}
       {showCreateModal && (
-        <ModalOverlay onClick={handleCloseCreateModal}>
-          <ModalContent onClick={e => e.stopPropagation()}>
-            <ModalHeader>
-              <h2>Create New Session</h2>
-              <CloseButton onClick={handleCloseCreateModal}>
-                <XCircle size={20} />
-              </CloseButton>
-            </ModalHeader>
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={handleCloseCreateModal}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <Sparkles className="text-blue-600" size={24} />
+                  Create New Session
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">Set up a new sell offer session</p>
+              </div>
+              <button
+                onClick={handleCloseCreateModal}
+                className="p-2 hover:bg-white rounded-lg transition-colors duration-150 text-gray-600 hover:text-gray-900"
+              >
+                <X size={24} />
+              </button>
+            </div>
 
-            <form onSubmit={handleSubmitCreateSession}>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Product *</Label>
-                  <Select
+            <form onSubmit={handleSubmitCreateSession} className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Product <span className="text-red-500">*</span>
+                  </label>
+                  <select
                     value={createFormData.productId}
                     onChange={e => handleCreateFormChange('productId', e.target.value)}
                     required
                     disabled={productsLoading}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
                   >
                     <option value="">
                       {productsLoading ? 'Loading products...' : 'Select Product'}
@@ -1282,16 +759,19 @@ const SellSessionsManagement = () => {
                         {product.name}
                       </option>
                     ))}
-                  </Select>
-                </FormGroup>
+                  </select>
+                </div>
 
-                <FormGroup>
-                  <Label>Variant *</Label>
-                  <Select
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Variant <span className="text-red-500">*</span>
+                  </label>
+                  <select
                     value={createFormData.variantId}
                     onChange={e => handleCreateFormChange('variantId', e.target.value)}
                     required
                     disabled={!createFormData.productId || variants.length === 0}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
                   >
                     <option value="">
                       {!createFormData.productId
@@ -1305,163 +785,171 @@ const SellSessionsManagement = () => {
                         {variant.label} - ₹{variant.basePrice}
                       </option>
                     ))}
-                  </Select>
-                </FormGroup>
+                  </select>
+                </div>
+              </div>
 
-                <FormGroup className="full-width">
-                  <Label>Answers (JSON)</Label>
-                  <TextArea
-                    value={
-                      typeof createFormData.answers === 'string'
-                        ? createFormData.answers
-                        : JSON.stringify(createFormData.answers, null, 2)
+              <div className="space-y-2 mb-6">
+                <label className="block text-sm font-semibold text-gray-700">Answers (JSON)</label>
+                <textarea
+                  value={
+                    typeof createFormData.answers === 'string'
+                      ? createFormData.answers
+                      : JSON.stringify(createFormData.answers, null, 2)
+                  }
+                  onChange={e => {
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      handleCreateFormChange('answers', parsed);
+                    } catch {
+                      handleCreateFormChange('answers', e.target.value);
                     }
+                  }}
+                  placeholder='{"condition": "excellent", "accessories": ["charger", "box"]}'
+                  rows="4"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 font-mono text-sm"
+                />
+                <p className="text-xs text-gray-500">Enter answers as JSON object (optional)</p>
+              </div>
+
+              <div className="space-y-2 mb-6">
+                <label className="block text-sm font-semibold text-gray-700">Defects</label>
+                <div className="border border-gray-200 rounded-xl p-4 bg-gray-50 hover:bg-white transition-all duration-200 min-h-[80px]">
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {createFormData.defects.map(defectId => {
+                      const defect = defects.find(d => d._id === defectId);
+                      return (
+                        <div
+                          key={defectId}
+                          className="inline-flex items-center gap-2 bg-gradient-to-r from-red-500 to-rose-600 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-md"
+                        >
+                          {defect ? defect.title : defectId}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedDefects = createFormData.defects.filter(
+                                id => id !== defectId
+                              );
+                              handleCreateFormChange('defects', updatedDefects);
+                            }}
+                            className="hover:bg-white/20 rounded-full p-0.5 transition-colors"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <select
+                    value=""
                     onChange={e => {
-                      try {
-                        const parsed = JSON.parse(e.target.value);
-                        handleCreateFormChange('answers', parsed);
-                      } catch {
-                        handleCreateFormChange('answers', e.target.value);
+                      if (e.target.value && !createFormData.defects.includes(e.target.value)) {
+                        const updatedDefects = [...createFormData.defects, e.target.value];
+                        handleCreateFormChange('defects', updatedDefects);
                       }
+                      e.target.value = '';
                     }}
-                    placeholder='{"condition": "excellent", "accessories": ["charger", "box"]}'
-                    rows="4"
-                  />
-                  <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
-                    Enter answers as JSON object (optional)
-                  </small>
-                </FormGroup>
+                    disabled={defectsLoading}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
+                  >
+                    <option value="">
+                      {defectsLoading ? 'Loading defects...' : 'Select defects to add'}
+                    </option>
+                    {defects
+                      .filter(defect => !createFormData.defects.includes(defect._id))
+                      .map(defect => (
+                        <option key={defect._id} value={defect._id}>
+                          {defect.title}{' '}
+                          {defect.delta &&
+                            `(${defect.delta.sign}${defect.delta.value}${defect.delta.type === 'abs' ? '₹' : '%'})`}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Select defects that apply to this device (optional)
+                </p>
+              </div>
 
-                <FormGroup className="full-width">
-                  <Label>Defects</Label>
-                  <MultiSelectContainer>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-                      {createFormData.defects.map(defectId => {
-                        const defect = defects.find(d => d._id === defectId);
-                        return (
-                          <MultiSelectItem key={defectId}>
-                            {defect ? defect.title : defectId}
-                            <MultiSelectRemove
-                              type="button"
-                              onClick={() => {
-                                const updatedDefects = createFormData.defects.filter(
-                                  id => id !== defectId
-                                );
-                                handleCreateFormChange('defects', updatedDefects);
-                              }}
-                            >
-                              ×
-                            </MultiSelectRemove>
-                          </MultiSelectItem>
-                        );
-                      })}
-                    </div>
-                    <MultiSelectDropdown
-                      value=""
-                      onChange={e => {
-                        if (e.target.value && !createFormData.defects.includes(e.target.value)) {
-                          const updatedDefects = [...createFormData.defects, e.target.value];
-                          handleCreateFormChange('defects', updatedDefects);
-                        }
-                        e.target.value = '';
-                      }}
-                      disabled={defectsLoading}
-                    >
-                      <option value="">
-                        {defectsLoading ? 'Loading defects...' : 'Select defects to add'}
-                      </option>
-                      {defects
-                        .filter(defect => !createFormData.defects.includes(defect._id))
-                        .map(defect => (
-                          <option key={defect._id} value={defect._id}>
-                            {defect.title}{' '}
-                            {defect.delta &&
-                              `(${defect.delta.sign}${defect.delta.value}${defect.delta.type === 'abs' ? '₹' : '%'})`}
-                          </option>
-                        ))}
-                    </MultiSelectDropdown>
-                  </MultiSelectContainer>
-                  <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
-                    Select defects that apply to this device (optional)
-                  </small>
-                </FormGroup>
+              <div className="space-y-2 mb-6">
+                <label className="block text-sm font-semibold text-gray-700">Accessories</label>
+                <div className="border border-gray-200 rounded-xl p-4 bg-gray-50 hover:bg-white transition-all duration-200 min-h-[80px]">
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {createFormData.accessories.map(accessoryId => {
+                      const accessory = accessories.find(a => a._id === accessoryId);
+                      return (
+                        <div
+                          key={accessoryId}
+                          className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-md"
+                        >
+                          {accessory ? accessory.title : accessoryId}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedAccessories = createFormData.accessories.filter(
+                                id => id !== accessoryId
+                              );
+                              handleCreateFormChange('accessories', updatedAccessories);
+                            }}
+                            className="hover:bg-white/20 rounded-full p-0.5 transition-colors"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <select
+                    value=""
+                    onChange={e => {
+                      if (e.target.value && !createFormData.accessories.includes(e.target.value)) {
+                        const updatedAccessories = [...createFormData.accessories, e.target.value];
+                        handleCreateFormChange('accessories', updatedAccessories);
+                      }
+                      e.target.value = '';
+                    }}
+                    disabled={accessoriesLoading}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
+                  >
+                    <option value="">
+                      {accessoriesLoading ? 'Loading accessories...' : 'Select accessories to add'}
+                    </option>
+                    {accessories
+                      .filter(accessory => !createFormData.accessories.includes(accessory._id))
+                      .map(accessory => (
+                        <option key={accessory._id} value={accessory._id}>
+                          {accessory.title}{' '}
+                          {accessory.delta &&
+                            `(${accessory.delta.sign}${accessory.delta.value}${accessory.delta.type === 'abs' ? '₹' : '%'})`}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Select accessories included with this device (optional)
+                </p>
+              </div>
 
-                <FormGroup className="full-width">
-                  <Label>Accessories</Label>
-                  <MultiSelectContainer>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-                      {createFormData.accessories.map(accessoryId => {
-                        const accessory = accessories.find(a => a._id === accessoryId);
-                        return (
-                          <MultiSelectItem key={accessoryId}>
-                            {accessory ? accessory.title : accessoryId}
-                            <MultiSelectRemove
-                              type="button"
-                              onClick={() => {
-                                const updatedAccessories = createFormData.accessories.filter(
-                                  id => id !== accessoryId
-                                );
-                                handleCreateFormChange('accessories', updatedAccessories);
-                              }}
-                            >
-                              ×
-                            </MultiSelectRemove>
-                          </MultiSelectItem>
-                        );
-                      })}
-                    </div>
-                    <MultiSelectDropdown
-                      value=""
-                      onChange={e => {
-                        if (
-                          e.target.value &&
-                          !createFormData.accessories.includes(e.target.value)
-                        ) {
-                          const updatedAccessories = [
-                            ...createFormData.accessories,
-                            e.target.value,
-                          ];
-                          handleCreateFormChange('accessories', updatedAccessories);
-                        }
-                        e.target.value = '';
-                      }}
-                      disabled={accessoriesLoading}
-                    >
-                      <option value="">
-                        {accessoriesLoading
-                          ? 'Loading accessories...'
-                          : 'Select accessories to add'}
-                      </option>
-                      {accessories
-                        .filter(accessory => !createFormData.accessories.includes(accessory._id))
-                        .map(accessory => (
-                          <option key={accessory._id} value={accessory._id}>
-                            {accessory.title}{' '}
-                            {accessory.delta &&
-                              `(${accessory.delta.sign}${accessory.delta.value}${accessory.delta.type === 'abs' ? '₹' : '%'})`}
-                          </option>
-                        ))}
-                    </MultiSelectDropdown>
-                  </MultiSelectContainer>
-                  <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
-                    Select accessories included with this device (optional)
-                  </small>
-                </FormGroup>
-              </FormGrid>
-
-              <ModalActions>
-                <Button type="button" className="secondary" onClick={handleCloseCreateModal}>
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={handleCloseCreateModal}
+                  className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
+                >
                   Cancel
-                </Button>
-                <Button type="submit" className="primary">
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
+                >
                   Create Session
-                </Button>
-              </ModalActions>
+                </button>
+              </div>
             </form>
-          </ModalContent>
-        </ModalOverlay>
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

@@ -1,281 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import styled from 'styled-components';
 import sellService from '../../services/sellService';
-
-const Container = styled.div`
-  min-height: 100vh;
-  background: #f8f9fa;
-  padding: 20px 0;
-`;
-
-const Header = styled.div`
-  background: white;
-  padding: 16px 0;
-  border-bottom: 1px solid #e9ecef;
-  margin-bottom: 40px;
-`;
-
-const HeaderContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const Logo = styled.div`
-  font-size: 24px;
-  font-weight: bold;
-  color: #00c853;
-`;
-
-const LoginButton = styled.button`
-  background: #00c853;
-  color: white;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-`;
-
-const MainContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-`;
-
-const Breadcrumb = styled.div`
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 20px;
-
-  a {
-    color: #666;
-    text-decoration: none;
-
-    &:hover {
-      color: #00c853;
-    }
-  }
-
-  span {
-    margin: 0 8px;
-  }
-`;
-
-const Title = styled.h1`
-  font-size: 28px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-`;
-
-const Subtitle = styled.p`
-  color: #666;
-  margin-bottom: 40px;
-`;
-
-const ContentWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 40px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-`;
-
-const AccessoriesSection = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 40px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 30px;
-  text-align: center;
-`;
-
-const AccessoryGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 40px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const AccessoryOption = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px 20px;
-  border: 2px solid ${props => (props.selected ? '#00C853' : '#e9ecef')};
-  background: ${props => (props.selected ? '#f0fff4' : 'white')};
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: #00c853;
-    background: #f0fff4;
-  }
-`;
-
-const AccessoryIcon = styled.div`
-  width: 80px;
-  height: 80px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-  font-size: 32px;
-  color: #666;
-`;
-
-const AccessoryLabel = styled.span`
-  font-size: 16px;
-  font-weight: 500;
-  color: ${props => (props.selected ? '#00C853' : '#333')};
-  text-align: center;
-`;
-
-const AccessoryDescription = styled.p`
-  font-size: 14px;
-  color: #666;
-  text-align: center;
-  margin-top: 8px;
-  margin-bottom: 0;
-`;
-
-const ContinueButton = styled.button`
-  width: 100%;
-  background: #00c853;
-  color: white;
-  border: none;
-  padding: 16px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 20px;
-
-  &:hover {
-    background: #00a844;
-  }
-`;
-
-const Sidebar = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  height: fit-content;
-`;
-
-const SidebarImage = styled.div`
-  width: 80px;
-  height: 120px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-`;
-
-const SidebarTitle = styled.h4`
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 16px;
-`;
-
-const SidebarSection = styled.div`
-  margin-bottom: 20px;
-`;
-
-const SidebarSectionTitle = styled.h5`
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 8px;
-`;
-
-const SidebarText = styled.p`
-  font-size: 14px;
-  color: #666;
-  margin: 0;
-`;
-
-const ProgressIndicator = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-
-  .step {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #e9ecef;
-    margin-right: 8px;
-
-    &.active {
-      background: #00c853;
-    }
-  }
-
-  .label {
-    font-size: 14px;
-    color: #666;
-  }
-`;
-
-const PriceSection = styled.div`
-  background: #f0fff4;
-  border: 1px solid #00c853;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-`;
-
-const PriceTitle = styled.h5`
-  font-size: 16px;
-  font-weight: 600;
-  color: #00c853;
-  margin-bottom: 8px;
-`;
-
-const PriceAmount = styled.div`
-  font-size: 24px;
-  font-weight: 700;
-  color: #00c853;
-`;
+import {
+  Home,
+  ChevronRight,
+  Package,
+  CheckCircle,
+  Loader,
+  ArrowRight,
+  Box,
+  Plus,
+  AlertCircle,
+} from 'lucide-react';
 
 const SellAccessories = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
 
-  // Get data from previous pages (location.state) or use URL parameter
   const {
     product,
     answers,
@@ -286,9 +28,8 @@ const SellAccessories = () => {
     deviceEvaluation,
     screenDefects,
   } = location.state || {};
-  const currentProductId = productId || id;
 
-  // Handle different data structures from different previous pages
+  const currentProductId = productId || id;
   const finalSelectedDefects = selectedDefects || screenDefects || [];
   const finalAnswers = answers || deviceEvaluation || {};
 
@@ -303,16 +44,14 @@ const SellAccessories = () => {
       setLoading(false);
       return;
     }
-    console.log('Fetching accessories for category ID:', product);
 
     fetchAccessories();
-  }, [product, navigate]);
+  }, [product]);
 
   const fetchAccessories = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('Fetching accessories for category ID:', product.data);
       const accessoriesData = await sellService.getCustomerAccessories(product.data.categoryId._id);
       setAccessories(accessoriesData || []);
     } catch (err) {
@@ -335,11 +74,10 @@ const SellAccessories = () => {
   };
 
   const handleContinue = () => {
-    // Navigate to quote page with all collected data
     navigate('/sell/quote', {
       state: {
         assessmentData: {
-          productId,
+          productId: currentProductId,
           variantId,
           selectedVariant,
           answers: finalAnswers,
@@ -354,131 +92,292 @@ const SellAccessories = () => {
 
   if (!product) {
     return (
-      <Container>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '50vh',
-          }}
-        >
-          Product information not found
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Package className="w-8 h-8 text-red-600" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Product Information Not Found</h3>
+          <p className="text-slate-600 mb-6">Please start from the beginning.</p>
+          <button
+            onClick={() => navigate('/sell')}
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg"
+          >
+            Back to Categories
+          </button>
         </div>
-      </Container>
+      </div>
     );
   }
 
+  const brandName = product.brand || product.data?.brand || 'Brand';
+  const productName = product.model || product.name || product.data?.name || 'Product';
+  const basePrice = product.pricing?.discountedPrice || product.basePrice || '2,160';
+  const productImage =
+    product.images && product.images['0'] ? product.images['0'].replace(/["`]/g, '') : null;
+
+  // Calculate total accessory value
+  const totalAccessoryValue = selectedAccessories.reduce(
+    (sum, acc) => sum + (acc.delta?.value || 0),
+    0
+  );
+
   return (
-    <Container>
-      <Header>
-        <HeaderContent>
-          <Logo>CASHIFY</Logo>
-          <LoginButton>Login</LoginButton>
-        </HeaderContent>
-      </Header>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Header Section */}
+      <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-8 px-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
 
-      <MainContent>
-        <Breadcrumb>
-          <a href="/">Home</a>
-          <span>&gt;</span>
-          <a href="/sell">Sell Old Mobile Phone</a>
-          <span>&gt;</span>
-          <a href="/sell/apple">Sell Old Apple</a>
-          <span>&gt;</span>
-          <span>Sell Old Apple iPhone 6S</span>
-        </Breadcrumb>
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 text-sm mb-6 text-blue-100 flex-wrap">
+            <a
+              href="/"
+              className="flex items-center gap-1 hover:text-white transition-colors group"
+            >
+              <Home className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span>Home</span>
+            </a>
+            <ChevronRight className="w-4 h-4" />
+            <a href="/sell" className="hover:text-white transition-colors">
+              Sell Device
+            </a>
+            <ChevronRight className="w-4 h-4" />
+            <a
+              href={`/sell/${brandName.toLowerCase()}`}
+              className="hover:text-white transition-colors"
+            >
+              {brandName}
+            </a>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-white font-medium">Accessories</span>
+          </nav>
 
-        <Title>
-          Sell Old {product?.brand} {product?.model} (
-          {selectedVariant?.label || selectedVariant || 'Unknown Variant'})
-        </Title>
-        <Subtitle>
-          <span style={{ color: '#00C853' }}>₹2,160+</span> already sold on Cashify
-        </Subtitle>
+          {/* Page Header */}
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3">
+              Sell {brandName} {productName} ({selectedVariant})
+            </h1>
+            <p className="text-lg text-blue-100">
+              <span className="text-green-400 font-bold">₹{basePrice}+</span> already sold on our
+              platform
+            </p>
+          </div>
+        </div>
+      </div>
 
-        <ContentWrapper>
-          <AccessoriesSection>
-            <ProgressIndicator>
-              <div className="step active"></div>
-              <div className="step active"></div>
-              <div className="step active"></div>
-              <div className="step"></div>
-              <span className="label">Accessories</span>
-            </ProgressIndicator>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Accessories Section - Left Side */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
+              {/* Progress Indicator */}
+              <div className="mb-8">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                  <div className="w-3 h-3 bg-slate-300 rounded-full"></div>
+                  <span className="ml-2 text-sm font-semibold text-slate-700">Accessories</span>
+                </div>
+              </div>
 
-            <SectionTitle>Do you have the following?</SectionTitle>
+              <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">
+                Do you have the following accessories?
+              </h2>
 
-            {loading ? (
-              <div style={{ textAlign: 'center', padding: '2rem' }}>Loading accessories...</div>
-            ) : error ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>{error}</div>
-            ) : (
-              <AccessoryGrid>
-                {accessories.map(accessory => (
-                  <AccessoryOption
-                    key={accessory._id}
-                    selected={selectedAccessories.some(a => a._id === accessory._id)}
-                    onClick={() => handleAccessoryToggle(accessory)}
-                  >
-                    <AccessoryIcon>📱</AccessoryIcon>
-                    <AccessoryLabel
-                      selected={selectedAccessories.some(a => a._id === accessory._id)}
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-16">
+                  <Loader className="w-12 h-12 text-blue-600 animate-spin mb-4" />
+                  <p className="text-slate-600 font-medium">Loading accessories...</p>
+                </div>
+              ) : error ? (
+                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-red-900 font-semibold mb-1">{error}</p>
+                      <button
+                        onClick={fetchAccessories}
+                        className="text-sm text-red-700 hover:text-red-900 underline"
+                      >
+                        Try again
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : accessories.length === 0 ? (
+                <div className="text-center py-12">
+                  <Box className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-600">No accessories available for this device</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                  {accessories.map(accessory => {
+                    const isSelected = selectedAccessories.some(a => a._id === accessory._id);
+                    return (
+                      <div
+                        key={accessory._id}
+                        onClick={() => handleAccessoryToggle(accessory)}
+                        className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-500 shadow-lg scale-105'
+                            : 'bg-white border-slate-200 hover:border-blue-400 hover:bg-blue-50'
+                        }`}
+                      >
+                        <div className="flex flex-col items-center text-center">
+                          <div
+                            className={`w-20 h-20 rounded-xl flex items-center justify-center mb-4 ${
+                              isSelected ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600'
+                            }`}
+                          >
+                            {isSelected ? (
+                              <CheckCircle className="w-10 h-10" />
+                            ) : (
+                              <Box className="w-10 h-10" />
+                            )}
+                          </div>
+                          <h3
+                            className={`text-lg font-bold mb-2 ${
+                              isSelected ? 'text-green-700' : 'text-slate-900'
+                            }`}
+                          >
+                            {accessory.title}
+                          </h3>
+                          <div className="flex items-center gap-1 text-green-600 font-semibold">
+                            <Plus className="w-4 h-4" />
+                            <span>₹{accessory.delta?.value || 0}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Total Bonus */}
+              {totalAccessoryValue > 0 && (
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl p-4 mb-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                        <Plus className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-600">Total Accessory Bonus</p>
+                        <p className="text-2xl font-bold text-green-600">+₹{totalAccessoryValue}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Continue Button */}
+              <button
+                onClick={handleContinue}
+                disabled={loading}
+                className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${
+                  loading
+                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:scale-105'
+                }`}
+              >
+                Get Final Quote
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Sidebar - Right Side */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200 sticky top-8">
+              {/* Product Image */}
+              <div className="w-24 h-36 mx-auto mb-4 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center overflow-hidden">
+                {productImage ? (
+                  <img
+                    src={productImage}
+                    alt={productName}
+                    className="max-w-full max-h-full object-contain p-2"
+                  />
+                ) : (
+                  <Package className="w-12 h-12 text-slate-400" />
+                )}
+              </div>
+
+              {/* Product Name */}
+              <h4 className="text-lg font-bold text-slate-900 text-center mb-6">
+                {brandName} {productName}
+                <span className="block text-sm text-slate-600 mt-1">({selectedVariant})</span>
+              </h4>
+
+              {/* Price Section */}
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-6 border-2 border-green-200">
+                <p className="text-sm text-slate-600 mb-1">Estimated Value</p>
+                <p className="text-3xl font-bold text-green-600">₹{basePrice}</p>
+                {totalAccessoryValue > 0 && (
+                  <p className="text-sm text-green-700 mt-2">
+                    + ₹{totalAccessoryValue} (accessories)
+                  </p>
+                )}
+              </div>
+
+              {/* Assessment Progress */}
+              <div className="space-y-4">
+                <h5 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                  Assessment Progress
+                </h5>
+
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <p className="text-xs font-semibold text-slate-700">Questions: Completed</p>
+                  </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <p className="text-xs font-semibold text-slate-700">
+                      Defects: {finalSelectedDefects?.length || 0} selected
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-4 h-4 rounded-full flex items-center justify-center ${
+                        selectedAccessories.length > 0 ? 'bg-green-600' : 'bg-slate-300'
+                      }`}
                     >
-                      {accessory.title}
-                    </AccessoryLabel>
-                    <AccessoryDescription>+₹{accessory.delta.value}</AccessoryDescription>
-                  </AccessoryOption>
-                ))}
-              </AccessoryGrid>
-            )}
+                      {selectedAccessories.length > 0 && (
+                        <CheckCircle className="w-3 h-3 text-white" />
+                      )}
+                    </div>
+                    <p className="text-xs font-semibold text-slate-700">
+                      Accessories: {selectedAccessories.length} selected
+                    </p>
+                  </div>
+                </div>
 
-            <ContinueButton onClick={handleContinue} disabled={loading}>
-              Get Final Quote
-            </ContinueButton>
-          </AccessoriesSection>
-
-          <Sidebar>
-            <SidebarImage>
-              {product.images && product.images['0'] ? (
-                <img src={product.images['0'].replace(/["`]/g, '')} alt={product.name} />
-              ) : (
-                <div style={{ color: '#999' }}>No Image</div>
-              )}
-            </SidebarImage>
-
-            <SidebarTitle>
-              {product?.brand} {product?.model}
-            </SidebarTitle>
-
-            <PriceSection>
-              <PriceTitle>Estimated Value</PriceTitle>
-              <PriceAmount>₹{product?.pricing?.discountedPrice || 'TBD'}</PriceAmount>
-            </PriceSection>
-
-            <SidebarSection>
-              <SidebarSectionTitle>Assessment Progress</SidebarSectionTitle>
-              <SidebarText>Questions: Completed</SidebarText>
-              <SidebarText>Defects: {finalSelectedDefects?.length || 0} selected</SidebarText>
-              <SidebarText>Accessories: {selectedAccessories.length} selected</SidebarText>
-            </SidebarSection>
-
-            <SidebarSection>
-              <SidebarSectionTitle>Accessories</SidebarSectionTitle>
-              {selectedAccessories.length > 0 ? (
-                selectedAccessories.map(accessory => (
-                  <SidebarText key={accessory._id}>
-                    {accessory.title}: +₹{accessory.delta.value}
-                  </SidebarText>
-                ))
-              ) : (
-                <SidebarText>No accessories selected</SidebarText>
-              )}
-            </SidebarSection>
-          </Sidebar>
-        </ContentWrapper>
-      </MainContent>
-    </Container>
+                {/* Selected Accessories */}
+                {selectedAccessories.length > 0 && (
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <p className="text-xs font-semibold text-slate-700 mb-2">
+                      Selected Accessories
+                    </p>
+                    {selectedAccessories.map(accessory => (
+                      <div key={accessory._id} className="flex items-center justify-between mb-1">
+                        <p className="text-xs text-slate-600">• {accessory.title}</p>
+                        <p className="text-xs text-green-600 font-semibold">
+                          +₹{accessory.delta?.value || 0}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

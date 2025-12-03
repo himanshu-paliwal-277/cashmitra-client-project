@@ -1,254 +1,29 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * @fileoverview Buy Products Management Component
+ * @description Admin interface for managing buy orders and products
+ * @author Cashify Development Team
+ * @version 2.0.0
+ */
+
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { cn } from '../../lib/utils';
 import useAdminBuy from '../../hooks/useAdminBuy';
-import { ShoppingBag, Plus, Search, Filter, Eye, Edit, Trash2, Package } from 'lucide-react';
-
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-  }
-`;
-
-const FilterSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  min-width: 300px;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
-`;
-
-const FilterButton = styled.button`
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #e5e7eb;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid ${props => props.color || '#10b981'};
-`;
-
-const StatValue = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
-`;
-
-const ProductsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-`;
-
-const ProductCard = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const ProductImage = styled.div`
-  height: 200px;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
-`;
-
-const ProductInfo = styled.div`
-  padding: 1.5rem;
-`;
-
-const ProductName = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 0.5rem 0;
-`;
-
-const ProductDetails = styled.div`
-  margin-bottom: 1rem;
-`;
-
-const DetailRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-`;
-
-const DetailLabel = styled.span`
-  color: #6b7280;
-`;
-
-const DetailValue = styled.span`
-  color: #1f2937;
-  font-weight: 500;
-`;
-
-const PriceSection = styled.div`
-  background: #f9fafb;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const Price = styled.div`
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #10b981;
-  text-align: center;
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const IconButton = styled.button`
-  flex: 1;
-  background: ${props => (props.primary ? '#10b981' : '#f3f4f6')};
-  color: ${props => (props.primary ? 'white' : '#6b7280')};
-  border: none;
-  padding: 0.75rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.2s;
-
-  &:hover {
-    background: ${props => (props.primary ? '#059669' : '#e5e7eb')};
-    color: ${props => (props.primary ? 'white' : '#374151')};
-  }
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: ${props => {
-    switch (props.status) {
-      case 'available':
-        return '#d1fae5';
-      case 'sold':
-        return '#fee2e2';
-      case 'reserved':
-        return '#fef3c7';
-      default:
-        return '#f3f4f6';
-    }
-  }};
-  color: ${props => {
-    switch (props.status) {
-      case 'available':
-        return '#065f46';
-      case 'sold':
-        return '#991b1b';
-      case 'reserved':
-        return '#92400e';
-      default:
-        return '#374151';
-    }
-  }};
-`;
+import Card from '../../components/ui/Card';
+import {
+  ShoppingBag,
+  Plus,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Trash2,
+  Package,
+  RefreshCw,
+  TrendingUp,
+  CheckCircle,
+  DollarSign,
+} from 'lucide-react';
 
 const Buy = () => {
   const navigate = useNavigate();
@@ -266,7 +41,6 @@ const Buy = () => {
     buyOrders: hookBuyOrders,
     stats: hookStats,
     loading: hookLoading,
-    error: hookError,
     updateOrderStatus,
   } = useAdminBuy();
 
@@ -277,10 +51,20 @@ const Buy = () => {
   }, [hookBuyOrders, hookStats, hookLoading]);
 
   const statsDisplay = [
-    { label: 'Total Products', value: stats.total.toLocaleString(), color: '#10b981' },
-    { label: 'Available', value: stats.available.toString(), color: '#3b82f6' },
-    { label: 'Sold Today', value: stats.sold.toString(), color: '#f59e0b' },
-    { label: 'Average Price', value: `₹${stats.avgPrice.toLocaleString()}`, color: '#8b5cf6' },
+    {
+      label: 'Total Products',
+      value: stats.total.toLocaleString(),
+      color: 'bg-green-500',
+      icon: ShoppingBag,
+    },
+    { label: 'Available', value: stats.available.toString(), color: 'bg-blue-500', icon: Package },
+    { label: 'Sold Today', value: stats.sold.toString(), color: 'bg-amber-500', icon: TrendingUp },
+    {
+      label: 'Average Price',
+      value: `₹${stats.avgPrice.toLocaleString()}`,
+      color: 'bg-purple-500',
+      icon: DollarSign,
+    },
   ];
 
   const filteredProducts = products.filter(
@@ -314,234 +98,254 @@ const Buy = () => {
     navigate(`/admin/buy/order/${orderId}`);
   };
 
+  const getStatusColor = status => {
+    const colors = {
+      available: 'bg-teal-100 text-teal-800',
+      sold: 'bg-red-100 text-red-800',
+      reserved: 'bg-yellow-100 text-yellow-800',
+      pending: 'bg-blue-100 text-blue-800',
+      confirmed: 'bg-green-100 text-green-800',
+      cancelled: 'bg-gray-100 text-gray-800',
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="flex flex-col items-center justify-center py-12 text-gray-600">
+          <RefreshCw size={32} className="animate-spin mb-4" />
+          <p className="text-lg">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Container>
-      <Header>
-        <Title>
-          <ShoppingBag size={32} />
-          Buy Products
-        </Title>
-        <ActionButton>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-green-500 rounded-lg">
+            <ShoppingBag size={32} className="text-white" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Buy Products</h1>
+        </div>
+        <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 shadow-md hover:shadow-lg transition-all">
           <Plus size={20} />
           Add Product
-        </ActionButton>
-      </Header>
+        </button>
+      </div>
 
-      <StatsGrid>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {statsDisplay.map((stat, index) => (
-          <StatCard key={index} color={stat.color}>
-            <StatValue>{stat.value}</StatValue>
-            <StatLabel>{stat.label}</StatLabel>
-          </StatCard>
+          <Card
+            key={index}
+            className="p-6 border-l-4"
+            style={{ borderLeftColor: stat.color.replace('bg-', '#').replace('500', '') }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className={cn('p-3 rounded-xl text-white', stat.color)}>
+                <stat.icon size={24} />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
+            <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+          </Card>
         ))}
-      </StatsGrid>
+      </div>
 
-      <FilterSection>
-        <SearchInput
-          type="text"
-          placeholder="Search by product name or brand..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-        />
-        <FilterButton>
-          <Filter size={16} />
-          Filters
-        </FilterButton>
-      </FilterSection>
+      {/* Filters Section */}
+      <Card className="mb-6 p-6">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by product name, brand, customer..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+            />
+          </div>
+          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-green-500 transition-all">
+            <Filter size={16} />
+            Filters
+          </button>
+        </div>
+      </Card>
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
+      {/* Products Grid */}
+      {filteredProducts.length === 0 ? (
+        <div className="text-center py-16 px-4">
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Package size={32} className="text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
+          <p className="text-gray-600">
+            {searchTerm
+              ? 'Try adjusting your search criteria'
+              : 'Start by adding your first product'}
+          </p>
+        </div>
       ) : (
-        <ProductsGrid>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredProducts.map(order => (
-            <ProductCard key={order._id}>
-              <ProductImage>
+            <Card key={order._id} hoverable className="flex flex-col overflow-hidden">
+              {/* Product Image */}
+              <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
                 {order.items?.[0]?.product?.images?.[0] ? (
                   <img
                     src={order.items[0].product.images[0].replace(/`/g, '').trim()}
                     alt={order.items[0].product.name}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
+                    className="w-full h-full object-cover"
                     onError={e => {
                       e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
                     }}
                   />
-                ) : null}
-                <div
-                  style={{
-                    display: order.items?.[0]?.product?.images?.[0] ? 'none' : 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '100%',
-                    height: '100%',
-                  }}
-                >
-                  <Package size={48} />
-                </div>
-              </ProductImage>
+                ) : (
+                  <Package size={48} className="text-gray-400" />
+                )}
+              </div>
 
-              <ProductInfo>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    marginBottom: '1rem',
-                  }}
-                >
-                  <ProductName>{order.items?.[0]?.product?.name || 'N/A'}</ProductName>
-                  <StatusBadge status={order.status}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                  </StatusBadge>
+              <Card.Body className="flex-1">
+                {/* Product Header */}
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 flex-1 line-clamp-2">
+                    {order.items?.[0]?.product?.name || 'N/A'}
+                  </h3>
+                  <span
+                    className={cn(
+                      'ml-2 px-3 py-1 rounded-full text-xs font-semibold capitalize whitespace-nowrap',
+                      getStatusColor(order.status)
+                    )}
+                  >
+                    {order.status}
+                  </span>
                 </div>
 
-                <ProductDetails>
-                  <DetailRow>
-                    <DetailLabel>Brand:</DetailLabel>
-                    <DetailValue>{order.items?.[0]?.product?.brand || 'N/A'}</DetailValue>
-                  </DetailRow>
-                  <DetailRow>
-                    <DetailLabel>Quantity:</DetailLabel>
-                    <DetailValue>{order.items?.[0]?.quantity || 1}</DetailValue>
-                  </DetailRow>
-                  <DetailRow>
-                    <DetailLabel>Customer:</DetailLabel>
-                    <DetailValue>{order.user?.name || 'N/A'}</DetailValue>
-                  </DetailRow>
-                  <DetailRow>
-                    <DetailLabel>Email:</DetailLabel>
-                    <DetailValue>{order.user?.email || 'N/A'}</DetailValue>
-                  </DetailRow>
-                  <DetailRow>
-                    <DetailLabel>Phone:</DetailLabel>
-                    <DetailValue>{order.user?.phone || 'N/A'}</DetailValue>
-                  </DetailRow>
-                  <DetailRow>
-                    <DetailLabel>Order Type:</DetailLabel>
-                    <DetailValue>{order.orderType || 'Buy'}</DetailValue>
-                  </DetailRow>
-                  <DetailRow>
-                    <DetailLabel>Payment:</DetailLabel>
-                    <DetailValue>
+                {/* Product Details */}
+                <div className="space-y-2 mb-4 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Brand:</span>
+                    <span className="text-gray-900 font-medium">
+                      {order.items?.[0]?.product?.brand || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Quantity:</span>
+                    <span className="text-gray-900 font-medium">
+                      {order.items?.[0]?.quantity || 1}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Customer:</span>
+                    <span className="text-gray-900 font-medium truncate ml-2">
+                      {order.user?.name || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Email:</span>
+                    <span className="text-gray-900 font-medium truncate ml-2">
+                      {order.user?.email || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Phone:</span>
+                    <span className="text-gray-900 font-medium">{order.user?.phone || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Payment:</span>
+                    <span className="text-gray-900 font-medium">
                       {order.paymentDetails?.method || 'N/A'} (
                       {order.paymentDetails?.status || 'N/A'})
-                    </DetailValue>
-                  </DetailRow>
-                  <DetailRow>
-                    <DetailLabel>Commission:</DetailLabel>
-                    <DetailValue>
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Commission:</span>
+                    <span className="text-gray-900 font-medium">
                       ₹{order.commission?.amount?.toLocaleString() || '0'} (
                       {order.commission?.rate * 100 || 0}%)
-                    </DetailValue>
-                  </DetailRow>
-                  <DetailRow>
-                    <DetailLabel>Created:</DetailLabel>
-                    <DetailValue>{formatDate(order.createdAt)}</DetailValue>
-                  </DetailRow>
-                </ProductDetails>
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Created:</span>
+                    <span className="text-gray-900 font-medium">{formatDate(order.createdAt)}</span>
+                  </div>
+                </div>
 
-                <PriceSection>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '0.5rem',
-                    }}
-                  >
-                    <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>MRP:</span>
-                    <span
-                      style={{
-                        fontSize: '0.875rem',
-                        color: '#6b7280',
-                        textDecoration: 'line-through',
-                      }}
-                    >
+                {/* Price Section */}
+                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                  <div className="flex justify-between items-center mb-2 text-sm">
+                    <span className="text-gray-600">MRP:</span>
+                    <span className="text-gray-600 line-through">
                       ₹{order.items?.[0]?.product?.pricing?.mrp?.toLocaleString() || '0'}
                     </span>
                   </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '0.5rem',
-                    }}
-                  >
-                    <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                      Discounted Price:
-                    </span>
-                    <span style={{ fontSize: '0.875rem', color: '#10b981', fontWeight: '600' }}>
+                  <div className="flex justify-between items-center mb-2 text-sm">
+                    <span className="text-gray-600">Discounted Price:</span>
+                    <span className="text-green-600 font-semibold">
                       ₹
                       {order.items?.[0]?.product?.pricing?.discountedPrice?.toLocaleString() || '0'}
                     </span>
                   </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '0.5rem',
-                    }}
-                  >
-                    <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Discount:</span>
-                    <span style={{ fontSize: '0.875rem', color: '#f59e0b', fontWeight: '600' }}>
+                  <div className="flex justify-between items-center mb-3 text-sm">
+                    <span className="text-gray-600">Discount:</span>
+                    <span className="text-amber-600 font-semibold">
                       {order.items?.[0]?.product?.pricing?.discountPercent || 0}% OFF
                     </span>
                   </div>
-                  <Price>Total: ₹{order.totalAmount?.toLocaleString() || '0'}</Price>
-                </PriceSection>
+                  <div className="text-center pt-3 border-t border-gray-200">
+                    <div className="text-xl font-bold text-green-600">
+                      Total: ₹{order.totalAmount?.toLocaleString() || '0'}
+                    </div>
+                  </div>
+                </div>
 
+                {/* Shipping Address */}
                 {order.shippingDetails?.address && (
-                  <div
-                    style={{
-                      background: '#f3f4f6',
-                      padding: '0.75rem',
-                      borderRadius: '0.5rem',
-                      marginBottom: '1rem',
-                      fontSize: '0.75rem',
-                      color: '#6b7280',
-                    }}
-                  >
-                    <strong>Shipping Address:</strong>
-                    <br />
-                    {order.shippingDetails.address.street}, {order.shippingDetails.address.city}
-                    <br />
-                    {order.shippingDetails.address.state} - {order.shippingDetails.address.pincode}
-                    <br />
-                    {order.shippingDetails.address.country}
+                  <div className="bg-blue-50 p-3 rounded-lg mb-4 text-xs text-gray-700">
+                    <div className="font-semibold mb-1">Shipping Address:</div>
+                    <div>
+                      {order.shippingDetails.address.street}, {order.shippingDetails.address.city}
+                    </div>
+                    <div>
+                      {order.shippingDetails.address.state} -{' '}
+                      {order.shippingDetails.address.pincode}
+                    </div>
+                    <div>{order.shippingDetails.address.country}</div>
                   </div>
                 )}
 
-                <ActionButtons>
-                  <IconButton primary onClick={() => handleViewOrder(order._id)}>
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleViewOrder(order._id)}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
+                  >
                     <Eye size={16} />
                     View
-                  </IconButton>
+                  </button>
                   {order.status === 'pending' && (
-                    <IconButton
+                    <button
                       onClick={() => handleStatusUpdate(order._id, 'confirmed')}
-                      style={{ background: '#10b981', color: 'white' }}
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors"
                     >
-                      <Edit size={16} />
+                      <CheckCircle size={16} />
                       Confirm
-                    </IconButton>
+                    </button>
                   )}
-                  <IconButton>
+                  <button className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-red-50 text-red-600 border border-red-300 hover:bg-red-100 transition-colors">
                     <Trash2 size={16} />
-                    Delete
-                  </IconButton>
-                </ActionButtons>
-              </ProductInfo>
-            </ProductCard>
+                  </button>
+                </div>
+              </Card.Body>
+            </Card>
           ))}
-        </ProductsGrid>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

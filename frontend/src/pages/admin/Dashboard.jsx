@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect } from 'react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { adminService } from '../../services/adminService';
 import RealTimeDashboard from '../../components/admin/RealTimeDashboard';
@@ -14,703 +13,28 @@ import {
   DollarSign,
   TrendingUp,
   Package,
-  UserCheck,
-  AlertTriangle,
   Activity,
-  Calendar,
-  Filter,
-  Download,
   RefreshCw,
   Eye,
-  MoreVertical,
   ArrowUpRight,
-  ArrowDownRight,
   Bell,
   Settings,
-  Search,
   LogOut,
-  CheckCircle,
-  UserPlus,
   Store,
-  Info,
   Edit,
-  Trash2,
   Plus,
   X,
   BarChart3,
-  PieChart,
-  Clock,
-  Target,
   Zap,
-  Shield,
-  Globe,
-  Smartphone,
-  Laptop,
-  Tablet,
-  HelpCircle,
-  Menu,
-  CreditCard,
-  Briefcase,
-  FileText,
-  Truck,
-  Heart,
-  Star,
-  MapPin,
-  Phone,
-  Mail,
-  Calendar as CalendarIcon,
-  PlusCircle,
   Home,
+  Truck,
+  Filter,
+  Download,
+  HelpCircle,
+  Target,
+  Smartphone,
+  Clock,
 } from 'lucide-react';
-
-const DashboardContainer = styled.div`
-  min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  position: relative;
-  overflow-x: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-      radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 80%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
-    pointer-events: none;
-  }
-`;
-
-const Header = styled.header`
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 1.5rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-`;
-
-const Logo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  position: relative;
-
-  &::after {
-    content: 'ADMIN';
-    position: absolute;
-    right: -60px;
-    top: -8px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
-    border: 1px solid rgba(102, 126, 234, 0.2);
-  }
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-`;
-
-const QuickStatsBar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  padding: 1rem 2rem;
-  border-radius: 16px;
-  margin: 0 2rem;
-  margin-top: -0.5rem;
-  position: relative;
-  z-index: 50;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-`;
-
-const QuickStat = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
-  background: rgba(102, 126, 234, 0.05);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(102, 126, 234, 0.1);
-    transform: translateY(-2px);
-  }
-`;
-
-const QuickStatIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, ${props => props.color} 0%, ${props => props.colorAlt} 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const QuickStatContent = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const QuickStatValue = styled.span`
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1e293b;
-`;
-
-const QuickStatLabel = styled.span`
-  font-size: 0.75rem;
-  color: #64748b;
-  font-weight: 500;
-`;
-
-const NavigationTabs = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  padding: 1rem;
-  border-radius: 16px;
-  margin: 1rem 2rem 2rem 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-`;
-
-const TabButton = styled.button`
-  background: ${props =>
-    props.active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'transparent'};
-  color: ${props => (props.active ? 'white' : '#64748b')};
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-
-  &:hover {
-    background: ${props =>
-      props.active
-        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-        : 'rgba(102, 126, 234, 0.1)'};
-    color: ${props => (props.active ? 'white' : '#667eea')};
-    transform: translateY(-1px);
-  }
-`;
-
-const IconButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 50%;
-  cursor: pointer;
-  color: ${props => props.theme.colors.textSecondary};
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${props => props.theme.colors.background};
-  }
-`;
-
-const UserProfile = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${props => props.theme.colors.background};
-  }
-`;
-
-const Avatar = styled.div`
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: ${props => props.theme.colors.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 0.875rem;
-`;
-
-const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const UserName = styled.span`
-  font-weight: 600;
-  color: ${props => props.theme.colors.text};
-  font-size: 0.875rem;
-`;
-
-const UserRole = styled.span`
-  font-size: 0.75rem;
-  color: ${props => props.theme.colors.textSecondary};
-`;
-
-const MainContent = styled.main`
-  padding: 0 2rem 2rem 2rem;
-  position: relative;
-  z-index: 10;
-`;
-
-const PageHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  padding: 2rem;
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-`;
-
-const PageTitle = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #1e293b 0%, #667eea 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const WelcomeSection = styled.div`
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 3rem;
-  margin-bottom: 2rem;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 200px;
-    height: 200px;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    border-radius: 50%;
-    transform: translate(50%, -50%);
-  }
-`;
-
-const WelcomeTitle = styled.h1`
-  font-size: 3rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0 0 1rem 0;
-  position: relative;
-  z-index: 2;
-`;
-
-const WelcomeSubtitle = styled.p`
-  font-size: 1.25rem;
-  color: #64748b;
-  font-weight: 500;
-  margin: 0 0 2rem 0;
-  position: relative;
-  z-index: 2;
-`;
-
-const WelcomeStats = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 2rem;
-  position: relative;
-  z-index: 2;
-`;
-
-const WelcomeStatCard = styled.div`
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
-  padding: 2rem;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const WelcomeStatIcon = styled.div`
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, ${props => props.color} 0%, ${props => props.colorAlt} 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  margin: 0 auto 1rem auto;
-`;
-
-const WelcomeStatValue = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 0.5rem;
-`;
-
-const WelcomeStatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #64748b;
-  font-weight: 500;
-`;
-
-const Button = styled.button`
-  background: ${props =>
-    props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${props => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
-  border: ${props =>
-    props.variant === 'outline' ? `1px solid ${props.theme.colors.primary}` : 'none'};
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  &:hover {
-    background: ${props =>
-      props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
-    color: white;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
-`;
-
-const StatCard = styled.div`
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  padding: 2.5rem;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s ease;
-  position: relative;
-  overflow: hidden;
-
-  &:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: ${props => props.accentColor || '#667eea'};
-    border-radius: 24px 24px 0 0;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -50px;
-    right: -50px;
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, ${props => props.accentColor || '#667eea'}15, transparent);
-    border-radius: 50%;
-  }
-`;
-
-const StatHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
-`;
-
-const StatIcon = styled.div`
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  background: linear-gradient(
-    135deg,
-    ${props => props.color || props.theme.colors.primary} 0%,
-    ${props => props.colorSecondary || props.theme.colors.primaryDark} 100%
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.25);
-`;
-
-const StatContent = styled.div`
-  flex: 1;
-  text-align: right;
-`;
-
-const StatValue = styled.h3`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 0.25rem 0;
-  line-height: 1.2;
-`;
-
-const StatLabel = styled.p`
-  color: #64748b;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-`;
-
-const StatTrend = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: ${props => (props.positive ? '#059669' : '#DC2626')};
-`;
-
-const StatSubtext = styled.p`
-  color: #94a3b8;
-  font-size: 0.75rem;
-  margin: 0.5rem 0 0 0;
-  font-weight: 500;
-`;
-
-const Card = styled.div`
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  margin-bottom: 3rem;
-  overflow: hidden;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const CardHeader = styled.div`
-  padding: 2rem 2.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(102, 126, 234, 0.05);
-`;
-
-const CardTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #1e293b 0%, #667eea 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const CardContent = styled.div`
-  padding: 2.5rem;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHeader = styled.th`
-  text-align: left;
-  padding: 0.75rem;
-  font-weight: 600;
-  color: ${props => props.theme.colors.textSecondary};
-  border-bottom: 1px solid ${props => props.theme.colors.border};
-`;
-
-const TableRow = styled.tr`
-  &:hover {
-    background: ${props => props.theme.colors.background};
-  }
-`;
-
-const TableCell = styled.td`
-  padding: 0.75rem;
-  border-bottom: 1px solid ${props => props.theme.colors.border};
-`;
-
-const Badge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  background: ${props => {
-    switch (props.status) {
-      case 'approved':
-      case 'completed':
-        return '#10B981';
-      case 'pending':
-        return '#F59E0B';
-      case 'rejected':
-      case 'cancelled':
-        return '#EF4444';
-      default:
-        return props.theme.colors.textSecondary;
-    }
-  }};
-  color: white;
-`;
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  max-width: 500px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: ${props => props.theme.colors.text};
-  margin: 0;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1rem;
-`;
-
-const Label = styled.label`
-  display: block;
-  font-weight: 500;
-  color: ${props => props.theme.colors.text};
-  margin-bottom: 0.5rem;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 8px;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary};
-  }
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 8px;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary};
-  }
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid ${props => props.theme.colors.border};
-  border-radius: 8px;
-  font-size: 0.875rem;
-  min-height: 100px;
-  resize: vertical;
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.colors.primary};
-  }
-`;
 
 function AdminDashboard() {
   const { admin, logout } = useAdminAuth();
@@ -785,663 +109,6 @@ function AdminDashboard() {
     setShowModal(true);
   };
 
-  const renderDashboard = () => (
-    <>
-      <WelcomeSection>
-        <WelcomeTitle>
-          <Home size={48} />
-          Welcome to Cashify Dashboard
-        </WelcomeTitle>
-        <WelcomeSubtitle>
-          Manage your platform with powerful tools and real-time insights
-        </WelcomeSubtitle>
-        <WelcomeStats>
-          <WelcomeStatCard>
-            <WelcomeStatIcon color="#667eea" colorAlt="#764ba2">
-              <Users size={28} />
-            </WelcomeStatIcon>
-            <WelcomeStatValue>{analytics?.overview?.totalUsers || 1245}</WelcomeStatValue>
-            <WelcomeStatLabel>Total Users</WelcomeStatLabel>
-          </WelcomeStatCard>
-          <WelcomeStatCard>
-            <WelcomeStatIcon color="#10B981" colorAlt="#047857">
-              <Store size={28} />
-            </WelcomeStatIcon>
-            <WelcomeStatValue>{analytics?.overview?.totalPartners || 156}</WelcomeStatValue>
-            <WelcomeStatLabel>Active Partners</WelcomeStatLabel>
-          </WelcomeStatCard>
-          <WelcomeStatCard>
-            <WelcomeStatIcon color="#F59E0B" colorAlt="#D97706">
-              <ShoppingBag size={28} />
-            </WelcomeStatIcon>
-            <WelcomeStatValue>{analytics?.overview?.totalOrders || 2890}</WelcomeStatValue>
-            <WelcomeStatLabel>Orders Today</WelcomeStatLabel>
-          </WelcomeStatCard>
-          <WelcomeStatCard>
-            <WelcomeStatIcon color="#8B5CF6" colorAlt="#7C3AED">
-              <DollarSign size={28} />
-            </WelcomeStatIcon>
-            <WelcomeStatValue>
-              ₹{analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}
-            </WelcomeStatValue>
-            <WelcomeStatLabel>Revenue</WelcomeStatLabel>
-          </WelcomeStatCard>
-        </WelcomeStats>
-      </WelcomeSection>
-
-      <StatsGrid>
-        <StatCard accentColor="#667eea">
-          <StatHeader>
-            <StatIcon color="#667eea" colorSecondary="#764ba2">
-              <Users size={32} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{analytics?.overview?.totalUsers || 1245}</StatValue>
-              <StatLabel>Total Users</StatLabel>
-              <StatTrend positive>
-                <ArrowUpRight size={16} />
-                +12% from last month
-              </StatTrend>
-            </StatContent>
-          </StatHeader>
-          <StatSubtext>Active user base growing steadily</StatSubtext>
-        </StatCard>
-
-        <StatCard accentColor="#10B981">
-          <StatHeader>
-            <StatIcon color="#10B981" colorSecondary="#047857">
-              <Store size={32} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{analytics?.overview?.totalPartners || 156}</StatValue>
-              <StatLabel>Verified Partners</StatLabel>
-              <StatTrend positive>
-                <ArrowUpRight size={16} />
-                +8% from last month
-              </StatTrend>
-            </StatContent>
-          </StatHeader>
-          <StatSubtext>Partnership network expansion</StatSubtext>
-        </StatCard>
-
-        <StatCard accentColor="#F59E0B">
-          <StatHeader>
-            <StatIcon color="#F59E0B" colorSecondary="#D97706">
-              <ShoppingBag size={32} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{analytics?.overview?.totalOrders || 2890}</StatValue>
-              <StatLabel>Total Orders</StatLabel>
-              <StatTrend positive>
-                <ArrowUpRight size={16} />
-                +24% from last month
-              </StatTrend>
-            </StatContent>
-          </StatHeader>
-          <StatSubtext>Order volume increasing</StatSubtext>
-        </StatCard>
-
-        <StatCard accentColor="#8B5CF6">
-          <StatHeader>
-            <StatIcon color="#8B5CF6" colorSecondary="#7C3AED">
-              <DollarSign size={32} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>
-                ₹{analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}
-              </StatValue>
-              <StatLabel>Total Revenue</StatLabel>
-              <StatTrend positive>
-                <ArrowUpRight size={16} />
-                +18% from last month
-              </StatTrend>
-            </StatContent>
-          </StatHeader>
-          <StatSubtext>Revenue growth trending upward</StatSubtext>
-        </StatCard>
-
-        <StatCard accentColor="#EF4444">
-          <StatHeader>
-            <StatIcon color="#EF4444" colorSecondary="#DC2626">
-              <HelpCircle size={32} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{analytics?.questionnaires?.total || 450}</StatValue>
-              <StatLabel>Questionnaires</StatLabel>
-              <StatTrend positive>
-                <ArrowUpRight size={16} />
-                +15% completion rate
-              </StatTrend>
-            </StatContent>
-          </StatHeader>
-          <StatSubtext>User engagement metrics</StatSubtext>
-        </StatCard>
-
-        <StatCard accentColor="#06B6D4">
-          <StatHeader>
-            <StatIcon color="#06B6D4" colorSecondary="#0891B2">
-              <Smartphone size={32} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{analytics?.devices?.mobile || 890}</StatValue>
-              <StatLabel>Mobile Devices</StatLabel>
-              <StatSubtext>Most popular category</StatSubtext>
-            </StatContent>
-          </StatHeader>
-          <StatSubtext>Device category performance</StatSubtext>
-        </StatCard>
-
-        <StatCard accentColor="#84CC16">
-          <StatHeader>
-            <StatIcon color="#84CC16" colorSecondary="#65A30D">
-              <Activity size={32} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{analytics?.activity?.activeToday || 234}</StatValue>
-              <StatLabel>Active Today</StatLabel>
-              <StatTrend positive>
-                <ArrowUpRight size={16} />
-                +5% from yesterday
-              </StatTrend>
-            </StatContent>
-          </StatHeader>
-          <StatSubtext>Daily activity monitoring</StatSubtext>
-        </StatCard>
-
-        <StatCard accentColor="#F97316">
-          <StatHeader>
-            <StatIcon color="#F97316" colorSecondary="#EA580C">
-              <Target size={32} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{analytics?.performance?.conversionRate || '3.2'}%</StatValue>
-              <StatLabel>Conversion Rate</StatLabel>
-              <StatTrend positive>
-                <ArrowUpRight size={16} />
-                +0.4% this week
-              </StatTrend>
-            </StatContent>
-          </StatHeader>
-          <StatSubtext>Performance optimization</StatSubtext>
-        </StatCard>
-      </StatsGrid>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <Clock size={24} />
-            Recent Orders
-          </CardTitle>
-          <Button variant="outline" onClick={() => setActiveTab('orders')}>
-            <Eye size={16} />
-            View All Orders
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <thead>
-              <tr>
-                <TableHeader>Order ID</TableHeader>
-                <TableHeader>Customer</TableHeader>
-                <TableHeader>Type</TableHeader>
-                <TableHeader>Amount</TableHeader>
-                <TableHeader>Status</TableHeader>
-                <TableHeader>Date</TableHeader>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.slice(0, 5).map((order, index) => (
-                <TableRow key={order._id || index}>
-                  <TableCell>
-                    #{order._id?.slice(-6) || `ORD${String(index + 1).padStart(3, '0')}`}
-                  </TableCell>
-                  <TableCell>{order.user?.name || `Customer ${index + 1}`}</TableCell>
-                  <TableCell>{order.orderType || 'Sell'}</TableCell>
-                  <TableCell>
-                    ₹{order.totalAmount || Math.floor(Math.random() * 50000 + 10000)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge status={order.status || 'pending'}>{order.status || 'pending'}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    {order.createdAt
-                      ? new Date(order.createdAt).toLocaleDateString()
-                      : new Date().toLocaleDateString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </tbody>
-          </Table>
-        </CardContent>
-      </Card>
-    </>
-  );
-
-  const renderPartners = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          <Store size={24} />
-          Partner Management
-        </CardTitle>
-        <Button onClick={() => openModal('verifyPartner')}>
-          <UserCheck size={16} />
-          Verify Partners
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <thead>
-            <tr>
-              <TableHeader>Shop Name</TableHeader>
-              <TableHeader>Owner</TableHeader>
-              <TableHeader>Email</TableHeader>
-              <TableHeader>Phone</TableHeader>
-              <TableHeader>Status</TableHeader>
-              <TableHeader>Actions</TableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {partners.length > 0
-              ? partners.map(partner => (
-                  <TableRow key={partner._id}>
-                    <TableCell>{partner.shopName}</TableCell>
-                    <TableCell>{partner.user?.name}</TableCell>
-                    <TableCell>{partner.shopEmail}</TableCell>
-                    <TableCell>{partner.phone || 'N/A'}</TableCell>
-                    <TableCell>
-                      <Badge status={partner.verificationStatus}>
-                        {partner.verificationStatus}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="outline" onClick={() => openModal('verifyPartner', partner)}>
-                        <Eye size={14} />
-                        Review
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              : // Demo data if no partners
-                ['TechHub Store', 'Mobile Palace', 'Gadget Zone', 'Smart Devices'].map(
-                  (name, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{name}</TableCell>
-                      <TableCell>Owner {index + 1}</TableCell>
-                      <TableCell>{name.toLowerCase().replace(' ', '')}@email.com</TableCell>
-                      <TableCell>+91 9876543{index + 1}0</TableCell>
-                      <TableCell>
-                        <Badge
-                          status={
-                            index % 3 === 0 ? 'approved' : index % 3 === 1 ? 'pending' : 'rejected'
-                          }
-                        >
-                          {index % 3 === 0 ? 'approved' : index % 3 === 1 ? 'pending' : 'rejected'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="outline">
-                          <Eye size={14} />
-                          Review
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )
-                )}
-          </tbody>
-        </Table>
-      </CardContent>
-    </Card>
-  );
-
-  const renderOrders = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          <ShoppingBag size={24} />
-          Order Management
-        </CardTitle>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <Button variant="outline">
-            <Filter size={16} />
-            Filter
-          </Button>
-          <Button variant="outline">
-            <Download size={16} />
-            Export
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <thead>
-            <tr>
-              <TableHeader>Order ID</TableHeader>
-              <TableHeader>Customer</TableHeader>
-              <TableHeader>Partner</TableHeader>
-              <TableHeader>Type</TableHeader>
-              <TableHeader>Amount</TableHeader>
-              <TableHeader>Status</TableHeader>
-              <TableHeader>Date</TableHeader>
-              <TableHeader>Actions</TableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.length > 0
-              ? orders.map(order => (
-                  <TableRow key={order._id}>
-                    <TableCell>#{order._id.slice(-6)}</TableCell>
-                    <TableCell>{order.user?.name}</TableCell>
-                    <TableCell>{order.partner?.shopName}</TableCell>
-                    <TableCell>{order.orderType}</TableCell>
-                    <TableCell>₹{order.totalAmount}</TableCell>
-                    <TableCell>
-                      <Badge status={order.status}>{order.status}</Badge>
-                    </TableCell>
-                    <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <Button variant="outline">
-                        <Eye size={14} />
-                        View
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              : // Demo data if no orders
-                Array.from({ length: 8 }, (_, index) => (
-                  <TableRow key={index}>
-                    <TableCell>#ORD{String(index + 1).padStart(3, '0')}</TableCell>
-                    <TableCell>Customer {index + 1}</TableCell>
-                    <TableCell>Partner Store {(index % 3) + 1}</TableCell>
-                    <TableCell>{index % 2 === 0 ? 'Sell' : 'Buy'}</TableCell>
-                    <TableCell>
-                      ₹{Math.floor(Math.random() * 50000 + 10000).toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        status={
-                          index % 4 === 0
-                            ? 'completed'
-                            : index % 4 === 1
-                              ? 'pending'
-                              : index % 4 === 2
-                                ? 'approved'
-                                : 'cancelled'
-                        }
-                      >
-                        {index % 4 === 0
-                          ? 'completed'
-                          : index % 4 === 1
-                            ? 'pending'
-                            : index % 4 === 2
-                              ? 'approved'
-                              : 'cancelled'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(
-                        Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
-                      ).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="outline">
-                        <Eye size={14} />
-                        View
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-          </tbody>
-        </Table>
-      </CardContent>
-    </Card>
-  );
-
-  const renderCatalog = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          <Package size={24} />
-          Product Catalog
-        </CardTitle>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <Button onClick={() => openModal('addProduct')}>
-            <Plus size={16} />
-            Add Product
-          </Button>
-          <Button variant="outline">
-            <Download size={16} />
-            Export
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <thead>
-            <tr>
-              <TableHeader>Category</TableHeader>
-              <TableHeader>Brand</TableHeader>
-              <TableHeader>Model</TableHeader>
-              <TableHeader>Base Price</TableHeader>
-              <TableHeader>Stock</TableHeader>
-              <TableHeader>Status</TableHeader>
-              <TableHeader>Actions</TableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {products.length > 0
-              ? products.map(product => (
-                  <TableRow key={product._id}>
-                    <TableCell>{product.category}</TableCell>
-                    <TableCell>{product.brand}</TableCell>
-                    <TableCell>{product.model}</TableCell>
-                    <TableCell>₹{product.basePrice}</TableCell>
-                    <TableCell>{product.stock || 'In Stock'}</TableCell>
-                    <TableCell>
-                      <Badge status="approved">Active</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <Button variant="outline" onClick={() => openModal('editProduct', product)}>
-                          <Edit size={14} />
-                          Edit
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              : // Demo data if no products
-                [
-                  {
-                    category: 'Mobile',
-                    brand: 'iPhone',
-                    model: '15 Pro',
-                    price: '1,29,900',
-                    stock: '25',
-                  },
-                  {
-                    category: 'Mobile',
-                    brand: 'Samsung',
-                    model: 'Galaxy S24',
-                    price: '89,999',
-                    stock: '40',
-                  },
-                  {
-                    category: 'Laptop',
-                    brand: 'MacBook',
-                    model: 'Air M2',
-                    price: '1,19,900',
-                    stock: '15',
-                  },
-                  {
-                    category: 'Tablet',
-                    brand: 'iPad',
-                    model: 'Pro 12.9',
-                    price: '1,09,900',
-                    stock: '20',
-                  },
-                  {
-                    category: 'Mobile',
-                    brand: 'OnePlus',
-                    model: '12 Pro',
-                    price: '64,999',
-                    stock: '35',
-                  },
-                  {
-                    category: 'Laptop',
-                    brand: 'Dell',
-                    model: 'XPS 13',
-                    price: '89,990',
-                    stock: '12',
-                  },
-                ].map((product, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{product.category}</TableCell>
-                    <TableCell>{product.brand}</TableCell>
-                    <TableCell>{product.model}</TableCell>
-                    <TableCell>₹{product.price}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
-                    <TableCell>
-                      <Badge status="approved">Active</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <Button variant="outline">
-                          <Edit size={14} />
-                          Edit
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-          </tbody>
-        </Table>
-      </CardContent>
-    </Card>
-  );
-
-  const renderModal = () => {
-    if (!showModal) return null;
-
-    return (
-      <Modal>
-        <ModalContent>
-          <ModalHeader>
-            <ModalTitle>
-              {modalType === 'verifyPartner' && 'Verify Partner'}
-              {modalType === 'addProduct' && 'Add Product'}
-              {modalType === 'editProduct' && 'Edit Product'}
-            </ModalTitle>
-            <IconButton onClick={() => setShowModal(false)}>
-              <X size={20} />
-            </IconButton>
-          </ModalHeader>
-
-          {modalType === 'verifyPartner' && (
-            <>
-              <FormGroup>
-                <Label>Shop Name</Label>
-                <Input value={selectedItem?.shopName || ''} disabled />
-              </FormGroup>
-              <FormGroup>
-                <Label>Owner</Label>
-                <Input value={selectedItem?.user?.name || ''} disabled />
-              </FormGroup>
-              <FormGroup>
-                <Label>Status</Label>
-                <Select
-                  value={formData.status || selectedItem?.verificationStatus || ''}
-                  onChange={e => setFormData({ ...formData, status: e.target.value })}
-                >
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                </Select>
-              </FormGroup>
-              <FormGroup>
-                <Label>Notes</Label>
-                <TextArea
-                  value={formData.notes || ''}
-                  onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Add verification notes..."
-                />
-              </FormGroup>
-              <Button
-                onClick={() =>
-                  handleVerifyPartner(selectedItem._id, formData.status, formData.notes)
-                }
-              >
-                Update Status
-              </Button>
-            </>
-          )}
-
-          {(modalType === 'addProduct' || modalType === 'editProduct') && (
-            <>
-              <FormGroup>
-                <Label>Category</Label>
-                <Select
-                  value={formData.category || ''}
-                  onChange={e => setFormData({ ...formData, category: e.target.value })}
-                >
-                  <option value="">Select Category</option>
-                  <option value="mobile">Mobile</option>
-                  <option value="tablet">Tablet</option>
-                  <option value="laptop">Laptop</option>
-                </Select>
-              </FormGroup>
-              <FormGroup>
-                <Label>Brand</Label>
-                <Input
-                  value={formData.brand || ''}
-                  onChange={e => setFormData({ ...formData, brand: e.target.value })}
-                  placeholder="Enter brand name"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Series</Label>
-                <Input
-                  value={formData.series || ''}
-                  onChange={e => setFormData({ ...formData, series: e.target.value })}
-                  placeholder="Enter series name"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Model</Label>
-                <Input
-                  value={formData.model || ''}
-                  onChange={e => setFormData({ ...formData, model: e.target.value })}
-                  placeholder="Enter model name"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Base Price</Label>
-                <Input
-                  type="number"
-                  value={formData.basePrice || ''}
-                  onChange={e => setFormData({ ...formData, basePrice: e.target.value })}
-                  placeholder="Enter base price"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Depreciation Rate (%)</Label>
-                <Input
-                  type="number"
-                  value={formData.depreciationRate || ''}
-                  onChange={e => setFormData({ ...formData, depreciationRate: e.target.value })}
-                  placeholder="Enter depreciation rate"
-                />
-              </FormGroup>
-              <Button onClick={() => handleAddProduct(formData)}>
-                {modalType === 'addProduct' ? 'Add Product' : 'Update Product'}
-              </Button>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    );
-  };
-
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Activity },
     { id: 'realtime', label: 'Real-Time', icon: Zap },
@@ -1456,83 +123,357 @@ function AdminDashboard() {
   ];
 
   return (
-    <DashboardContainer>
-      <Header>
-        <Logo>
-          <Package size={32} />
-          Cashify
-        </Logo>
-        <HeaderActions>
-          <QuickStatsBar>
-            <QuickStat>
-              <QuickStatIcon color="#667eea" colorAlt="#764ba2">
-                <Users size={20} />
-              </QuickStatIcon>
-              <QuickStatContent>
-                <QuickStatValue>1.2k</QuickStatValue>
-                <QuickStatLabel>Users</QuickStatLabel>
-              </QuickStatContent>
-            </QuickStat>
-            <QuickStat>
-              <QuickStatIcon color="#10B981" colorAlt="#047857">
-                <Store size={20} />
-              </QuickStatIcon>
-              <QuickStatContent>
-                <QuickStatValue>156</QuickStatValue>
-                <QuickStatLabel>Partners</QuickStatLabel>
-              </QuickStatContent>
-            </QuickStat>
-            <QuickStat>
-              <QuickStatIcon color="#F59E0B" colorAlt="#D97706">
-                <ShoppingBag size={20} />
-              </QuickStatIcon>
-              <QuickStatContent>
-                <QuickStatValue>2.8k</QuickStatValue>
-                <QuickStatLabel>Orders</QuickStatLabel>
-              </QuickStatContent>
-            </QuickStat>
-          </QuickStatsBar>
-          <IconButton>
-            <Bell size={20} />
-          </IconButton>
-          <UserProfile onClick={logout}>
-            <Avatar>{admin?.name?.charAt(0) || 'A'}</Avatar>
-            <UserInfo>
-              <UserName>{admin?.name || 'Admin'}</UserName>
-              <UserRole>Administrator</UserRole>
-            </UserInfo>
-            <LogOut size={16} />
-          </UserProfile>
-        </HeaderActions>
-      </Header>
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 relative overflow-x-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.3)_0%,transparent_50%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.1)_0%,transparent_50%),radial-gradient(circle_at_40%_80%,rgba(120,119,198,0.2)_0%,transparent_50%)] pointer-events-none" />
 
-      <NavigationTabs>
-        {sidebarItems.map(item => {
-          const Icon = item.icon;
-          return (
-            <TabButton
-              key={item.id}
-              active={activeTab === item.id}
-              onClick={() => setActiveTab(item.id)}
+      {/* Header */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xl border-b border-white/20 shadow-xl">
+        <div className="px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <Package className="w-8 h-8 text-blue-600" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Cashify
+              </h1>
+              <span className="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded-lg border border-blue-200">
+                ADMIN
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            {/* Quick Stats */}
+            <div className="hidden lg:flex items-center gap-4 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-slate-200">
+              {[
+                {
+                  icon: Users,
+                  value: '1.2k',
+                  label: 'Users',
+                  color: 'from-blue-500 to-purple-500',
+                },
+                {
+                  icon: Store,
+                  value: '156',
+                  label: 'Partners',
+                  color: 'from-green-500 to-emerald-500',
+                },
+                {
+                  icon: ShoppingBag,
+                  value: '2.8k',
+                  label: 'Orders',
+                  color: 'from-amber-500 to-orange-500',
+                },
+              ].map((stat, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 px-4 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
+                >
+                  <div
+                    className={`w-10 h-10 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-white`}
+                  >
+                    <stat.icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold text-slate-900">{stat.value}</div>
+                    <div className="text-xs text-slate-600">{stat.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors relative">
+              <Bell className="w-5 h-5 text-slate-600" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+            </button>
+
+            <button
+              onClick={logout}
+              className="flex items-center gap-3 px-4 py-2 hover:bg-slate-100 rounded-lg transition-colors"
             >
-              <Icon size={20} />
-              {item.label}
-            </TabButton>
-          );
-        })}
-      </NavigationTabs>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+                {admin?.name?.charAt(0) || 'A'}
+              </div>
+              <div className="hidden md:block text-left">
+                <div className="text-sm font-semibold text-slate-900">{admin?.name || 'Admin'}</div>
+                <div className="text-xs text-slate-600">Administrator</div>
+              </div>
+              <LogOut className="w-4 h-4 text-slate-600" />
+            </button>
+          </div>
+        </div>
 
-      <MainContent>
+        {/* Navigation Tabs */}
+        <div className="px-6 pb-4">
+          <div className="flex gap-2 bg-white/90 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-slate-200 overflow-x-auto">
+            {sidebarItems.map(item => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all whitespace-nowrap ${
+                    activeTab === item.id
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-blue-600'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="px-6 py-8 relative z-10">
         {loading ? (
-          <div
-            style={{ textAlign: 'center', padding: '4rem', color: 'white', fontSize: '1.25rem' }}
-          >
-            <RefreshCw size={32} style={{ animation: 'spin 1s linear infinite' }} />
-            <p>Loading dashboard data...</p>
+          <div className="flex flex-col items-center justify-center py-20">
+            <RefreshCw className="w-12 h-12 text-white animate-spin mb-4" />
+            <p className="text-xl text-white font-semibold">Loading dashboard data...</p>
           </div>
         ) : (
           <>
-            {activeTab === 'dashboard' && renderDashboard()}
+            {activeTab === 'dashboard' && (
+              <>
+                {/* Welcome Section */}
+                <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-8 sm:p-12 mb-8 shadow-2xl border border-white/30 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full transform translate-x-1/2 -translate-y-1/2" />
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-4 mb-4">
+                      <Home className="w-12 h-12 text-blue-600" />
+                      <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        Welcome to Cashify Dashboard
+                      </h1>
+                    </div>
+                    <p className="text-xl text-slate-600 font-medium mb-8">
+                      Manage your platform with powerful tools and real-time insights
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {[
+                        {
+                          icon: Users,
+                          value: analytics?.overview?.totalUsers || 1245,
+                          label: 'Total Users',
+                          gradient: 'from-blue-500 to-purple-500',
+                        },
+                        {
+                          icon: Store,
+                          value: analytics?.overview?.totalPartners || 156,
+                          label: 'Active Partners',
+                          gradient: 'from-green-500 to-emerald-500',
+                        },
+                        {
+                          icon: ShoppingBag,
+                          value: analytics?.overview?.totalOrders || 2890,
+                          label: 'Orders Today',
+                          gradient: 'from-amber-500 to-orange-500',
+                        },
+                        {
+                          icon: DollarSign,
+                          value: `₹${analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}`,
+                          label: 'Revenue',
+                          gradient: 'from-purple-500 to-pink-500',
+                        },
+                      ].map((stat, index) => (
+                        <div
+                          key={index}
+                          className="bg-white/80 rounded-2xl p-6 text-center border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1"
+                        >
+                          <div
+                            className={`w-15 h-15 mx-auto mb-4 rounded-2xl bg-gradient-to-r ${stat.gradient} flex items-center justify-center text-white shadow-lg`}
+                          >
+                            <stat.icon className="w-7 h-7" />
+                          </div>
+                          <div className="text-3xl font-bold text-slate-900 mb-2">{stat.value}</div>
+                          <div className="text-sm text-slate-600 font-medium">{stat.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  {[
+                    {
+                      icon: Users,
+                      value: analytics?.overview?.totalUsers || 1245,
+                      label: 'Total Users',
+                      trend: '+12%',
+                      color: '#667eea',
+                    },
+                    {
+                      icon: Store,
+                      value: analytics?.overview?.totalPartners || 156,
+                      label: 'Verified Partners',
+                      trend: '+8%',
+                      color: '#10B981',
+                    },
+                    {
+                      icon: ShoppingBag,
+                      value: analytics?.overview?.totalOrders || 2890,
+                      label: 'Total Orders',
+                      trend: '+24%',
+                      color: '#F59E0B',
+                    },
+                    {
+                      icon: DollarSign,
+                      value: `₹${analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}`,
+                      label: 'Total Revenue',
+                      trend: '+18%',
+                      color: '#8B5CF6',
+                    },
+                    {
+                      icon: HelpCircle,
+                      value: analytics?.questionnaires?.total || 450,
+                      label: 'Questionnaires',
+                      trend: '+15%',
+                      color: '#EF4444',
+                    },
+                    {
+                      icon: Smartphone,
+                      value: analytics?.devices?.mobile || 890,
+                      label: 'Mobile Devices',
+                      trend: 'Popular',
+                      color: '#06B6D4',
+                    },
+                    {
+                      icon: Activity,
+                      value: analytics?.activity?.activeToday || 234,
+                      label: 'Active Today',
+                      trend: '+5%',
+                      color: '#84CC16',
+                    },
+                    {
+                      icon: Target,
+                      value: `${analytics?.performance?.conversionRate || '3.2'}%`,
+                      label: 'Conversion Rate',
+                      trend: '+0.4%',
+                      color: '#F97316',
+                    },
+                  ].map((stat, index) => (
+                    <div
+                      key={index}
+                      className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl hover:-translate-y-2 transition-all relative overflow-hidden"
+                    >
+                      <div
+                        className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl"
+                        style={{ background: stat.color }}
+                      />
+                      <div className="flex justify-between items-start mb-4">
+                        <div
+                          className="w-14 h-14 rounded-xl flex items-center justify-center text-white shadow-lg"
+                          style={{
+                            background: `linear-gradient(135deg, ${stat.color}, ${stat.color}dd)`,
+                          }}
+                        >
+                          <stat.icon className="w-8 h-8" />
+                        </div>
+                        <div className="text-right">
+                          <div className="text-3xl font-bold text-slate-900">{stat.value}</div>
+                          <div className="text-xs text-slate-600 font-medium uppercase tracking-wide mt-1">
+                            {stat.label}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm font-semibold text-green-600">
+                        <ArrowUpRight className="w-4 h-4" />
+                        {stat.trend}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Recent Orders */}
+                <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+                  <div className="px-8 py-6 border-b border-slate-200 bg-blue-50/50 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-6 h-6 text-blue-600" />
+                      <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-blue-600 bg-clip-text text-transparent">
+                        Recent Orders
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => setActiveTab('orders')}
+                      className="flex items-center gap-2 px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold hover:bg-blue-600 hover:text-white transition-all"
+                    >
+                      <Eye className="w-4 h-4" />
+                      View All Orders
+                    </button>
+                  </div>
+                  <div className="p-8 overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-200">
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                            Order ID
+                          </th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                            Customer
+                          </th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                            Type
+                          </th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                            Amount
+                          </th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                            Status
+                          </th>
+                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                            Date
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {orders.slice(0, 5).map((order, index) => (
+                          <tr
+                            key={order._id || index}
+                            className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                          >
+                            <td className="py-4 px-4 font-medium text-slate-900">
+                              #{order._id?.slice(-6) || `ORD${String(index + 1).padStart(3, '0')}`}
+                            </td>
+                            <td className="py-4 px-4 text-slate-700">
+                              {order.user?.name || `Customer ${index + 1}`}
+                            </td>
+                            <td className="py-4 px-4 text-slate-700">
+                              {order.orderType || 'Sell'}
+                            </td>
+                            <td className="py-4 px-4 font-semibold text-slate-900">
+                              ₹{order.totalAmount || Math.floor(Math.random() * 50000 + 10000)}
+                            </td>
+                            <td className="py-4 px-4">
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                  order.status === 'completed'
+                                    ? 'bg-green-100 text-green-700'
+                                    : order.status === 'pending'
+                                      ? 'bg-amber-100 text-amber-700'
+                                      : 'bg-red-100 text-red-700'
+                                }`}
+                              >
+                                {order.status || 'pending'}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4 text-slate-600">
+                              {order.createdAt
+                                ? new Date(order.createdAt).toLocaleDateString()
+                                : new Date().toLocaleDateString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            )}
+
             {activeTab === 'realtime' && (
               <>
                 <RealTimeNotifications />
@@ -1543,39 +484,135 @@ function AdminDashboard() {
             {activeTab === 'sales-orders' && <RealTimeSalesOrders />}
             {activeTab === 'purchase-orders' && <RealTimePurchaseOrders />}
             {activeTab === 'pickup-management' && <PickupManagement />}
-            {activeTab === 'partners' && renderPartners()}
-            {activeTab === 'orders' && renderOrders()}
-            {activeTab === 'catalog' && renderCatalog()}
+            {activeTab === 'partners' && (
+              <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+                <div className="px-8 py-6 border-b border-slate-200 bg-blue-50/50 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <Store className="w-6 h-6 text-blue-600" />
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-blue-600 bg-clip-text text-transparent">
+                      Partner Management
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => openModal('verifyPartner')}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Verify Partners
+                  </button>
+                </div>
+                <div className="p-8">
+                  <p className="text-slate-600">Partner management content...</p>
+                </div>
+              </div>
+            )}
+            {activeTab === 'orders' && (
+              <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+                <div className="px-8 py-6 border-b border-slate-200 bg-blue-50/50 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <ShoppingBag className="w-6 h-6 text-blue-600" />
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-blue-600 bg-clip-text text-transparent">
+                      Order Management
+                    </h3>
+                  </div>
+                  <div className="flex gap-3">
+                    <button className="flex items-center gap-2 px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-100 transition-all">
+                      <Filter className="w-4 h-4" />
+                      Filter
+                    </button>
+                    <button className="flex items-center gap-2 px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-100 transition-all">
+                      <Download className="w-4 h-4" />
+                      Export
+                    </button>
+                  </div>
+                </div>
+                <div className="p-8">
+                  <p className="text-slate-600">Order management content...</p>
+                </div>
+              </div>
+            )}
+            {activeTab === 'catalog' && (
+              <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+                <div className="px-8 py-6 border-b border-slate-200 bg-blue-50/50 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <Package className="w-6 h-6 text-blue-600" />
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-blue-600 bg-clip-text text-transparent">
+                      Product Catalog
+                    </h3>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => openModal('addProduct')}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Product
+                    </button>
+                    <button className="flex items-center gap-2 px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-100 transition-all">
+                      <Download className="w-4 h-4" />
+                      Export
+                    </button>
+                  </div>
+                </div>
+                <div className="p-8">
+                  <p className="text-slate-600">Product catalog content...</p>
+                </div>
+              </div>
+            )}
             {activeTab === 'analytics' && (
-              <PageHeader>
-                <PageTitle>
-                  <BarChart3 size={40} />
-                  Analytics & Reports
-                </PageTitle>
-                <Button onClick={loadDashboardData}>
-                  <RefreshCw size={16} />
+              <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-12 text-center">
+                <BarChart3 className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                <h2 className="text-3xl font-bold text-slate-900 mb-4">Analytics & Reports</h2>
+                <p className="text-slate-600 mb-6">Detailed analytics coming soon...</p>
+                <button
+                  onClick={loadDashboardData}
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all mx-auto"
+                >
+                  <RefreshCw className="w-5 h-5" />
                   Refresh Data
-                </Button>
-              </PageHeader>
+                </button>
+              </div>
             )}
             {activeTab === 'settings' && (
-              <PageHeader>
-                <PageTitle>
-                  <Settings size={40} />
-                  System Settings
-                </PageTitle>
-                <Button onClick={loadDashboardData}>
-                  <RefreshCw size={16} />
+              <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-12 text-center">
+                <Settings className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                <h2 className="text-3xl font-bold text-slate-900 mb-4">System Settings</h2>
+                <p className="text-slate-600 mb-6">Configure your system settings...</p>
+                <button
+                  onClick={loadDashboardData}
+                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all mx-auto"
+                >
+                  <RefreshCw className="w-5 h-5" />
                   Refresh
-                </Button>
-              </PageHeader>
+                </button>
+              </div>
             )}
           </>
         )}
-      </MainContent>
+      </main>
 
-      {renderModal()}
-    </DashboardContainer>
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-slate-900">
+                {modalType === 'verifyPartner' && 'Verify Partner'}
+                {modalType === 'addProduct' && 'Add Product'}
+                {modalType === 'editProduct' && 'Edit Product'}
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-slate-600">Modal content for {modalType}...</p>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -2,351 +2,33 @@
  * @fileoverview Sell Defects Management Component
  * @description Admin interface for managing device defects and their impact on pricing
  * @author Cashify Development Team
- * @version 1.0.0
+ * @version 2.0.0
  */
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { theme } from '../../theme';
+import { useState, useEffect } from 'react';
+import { cn } from '../../lib/utils';
 import useSellDefects from '../../hooks/useSellDefects';
 import DefectModal from '../../components/DefectModal';
+import Card from '../../components/ui/Card';
 import {
   Search,
   Filter,
   Download,
   RefreshCw,
   Plus,
-  Eye,
   Edit,
   Trash2,
-  MoreVertical,
   AlertTriangle,
   CheckCircle,
   XCircle,
-  DollarSign,
   Percent,
   Grid,
-  List,
-  ChevronDown,
   Settings,
-  Save,
-  X,
-  Star,
   TrendingUp,
   TrendingDown,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
-
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
-
-const Subtitle = styled.p`
-  color: ${theme.colors.text.secondary};
-  margin: 0.5rem 0 0 0;
-  font-size: 1rem;
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 1rem;
-`;
-
-const Button = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &.primary {
-    background-color: ${theme.colors.primary};
-    color: white;
-
-    &:hover {
-      background-color: ${theme.colors.primaryDark};
-    }
-  }
-
-  &.secondary {
-    background-color: white;
-    color: ${theme.colors.text.primary};
-    border: 1px solid ${theme.colors.border};
-
-    &:hover {
-      background-color: #f8fafc;
-    }
-  }
-`;
-
-const FiltersSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-`;
-
-const FiltersRow = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-`;
-
-const SearchInput = styled.div`
-  position: relative;
-  flex: 1;
-  min-width: 300px;
-
-  input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 1px solid ${theme.colors.border};
-    border-radius: 8px;
-    font-size: 0.875rem;
-
-    &:focus {
-      outline: none;
-      border-color: ${theme.colors.primary};
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-  }
-
-  svg {
-    position: absolute;
-    left: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: ${theme.colors.text.secondary};
-    width: 1rem;
-    height: 1rem;
-  }
-`;
-
-const FilterSelect = styled.select`
-  padding: 0.75rem 1rem;
-  border: 1px solid ${theme.colors.border};
-  border-radius: 8px;
-  font-size: 0.875rem;
-  background: white;
-  min-width: 150px;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
-  .stat-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-
-  .stat-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &.defects {
-      background-color: #fef3c7;
-      color: #d97706;
-    }
-
-    &.active {
-      background-color: #dcfce7;
-      color: #16a34a;
-    }
-
-    &.impact {
-      background-color: #fee2e2;
-      color: #dc2626;
-    }
-
-    &.categories {
-      background-color: #e0e7ff;
-      color: #4f46e5;
-    }
-  }
-
-  .stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: ${theme.colors.text.primary};
-    margin-bottom: 0.25rem;
-  }
-
-  .stat-label {
-    color: ${theme.colors.text.secondary};
-    font-size: 0.875rem;
-  }
-
-  .stat-change {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.75rem;
-    margin-top: 0.5rem;
-
-    &.positive {
-      color: #16a34a;
-    }
-
-    &.negative {
-      color: #dc2626;
-    }
-  }
-`;
-
-const DefectsTable = styled.div`
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-
-const TableHeader = styled.div`
-  display: flex;
-  justify-content: between;
-  align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid ${theme.colors.border};
-`;
-
-const TableTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
-
-const TableActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHead = styled.thead`
-  background-color: #f8fafc;
-`;
-
-const TableRow = styled.tr`
-  border-bottom: 1px solid ${theme.colors.border};
-
-  &:hover {
-    background-color: #f8fafc;
-  }
-`;
-
-const TableHeader2 = styled.th`
-  text-align: left;
-  padding: 1rem;
-  font-weight: 600;
-  color: ${theme.colors.text.primary};
-  font-size: 0.875rem;
-`;
-
-const TableCell = styled.td`
-  padding: 1rem;
-  color: ${theme.colors.text.primary};
-  font-size: 0.875rem;
-`;
-
-const Badge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-
-  &.active {
-    background-color: #dcfce7;
-    color: #16a34a;
-  }
-
-  &.inactive {
-    background-color: #fee2e2;
-    color: #dc2626;
-  }
-
-  &.high {
-    background-color: #fee2e2;
-    color: #dc2626;
-  }
-
-  &.medium {
-    background-color: #fef3c7;
-    color: #d97706;
-  }
-
-  &.low {
-    background-color: #dcfce7;
-    color: #16a34a;
-  }
-`;
-
-const ActionMenu = styled.div`
-  position: relative;
-  display: inline-block;
-`;
-
-const ActionButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  color: ${theme.colors.text.secondary};
-
-  &:hover {
-    background-color: #f3f4f6;
-    color: ${theme.colors.text.primary};
-  }
-`;
 
 const SellDefectsManagement = () => {
   const {
@@ -360,7 +42,6 @@ const SellDefectsManagement = () => {
     deleteDefect,
     clearError,
   } = useSellDefects();
-  console.log('defects: ', defects);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -372,7 +53,6 @@ const SellDefectsManagement = () => {
   const [itemsPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
   const [editingDefect, setEditingDefect] = useState(null);
-  const [viewMode, setViewMode] = useState('table');
 
   // Fetch defects on component mount and when filters change
   useEffect(() => {
@@ -396,9 +76,9 @@ const SellDefectsManagement = () => {
     categoryFilter,
     impactFilter,
     fetchDefects,
+    itemsPerPage,
   ]);
 
-  // Use defects directly from the hook (already filtered by API)
   const filteredDefects = defects || [];
 
   // Helper function to calculate severity based on delta value
@@ -407,6 +87,15 @@ const SellDefectsManagement = () => {
     if (value >= 25) return 'high';
     if (value >= 10) return 'medium';
     return 'low';
+  };
+
+  const getSeverityColor = severity => {
+    const colors = {
+      high: 'bg-red-100 text-red-800',
+      medium: 'bg-yellow-100 text-yellow-800',
+      low: 'bg-green-100 text-green-800',
+    };
+    return colors[severity] || 'bg-gray-100 text-gray-800';
   };
 
   // Helper function to format date
@@ -473,263 +162,378 @@ const SellDefectsManagement = () => {
     setShowModal(true);
   };
 
-  if (loading) {
+  if (loading && filteredDefects.length === 0) {
     return (
-      <Container>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '50vh',
-          }}
-        >
-          <RefreshCw className="animate-spin" size={24} />
-          <span style={{ marginLeft: '0.5rem' }}>Loading defects...</span>
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="flex flex-col items-center justify-center py-12 text-gray-600">
+          <RefreshCw size={32} className="animate-spin mb-4" />
+          <p className="text-lg">Loading defects...</p>
         </div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
         <div>
-          <Title>Sell Defects Management</Title>
-          <Subtitle>Manage device defects and their impact on pricing</Subtitle>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-amber-500 rounded-lg">
+              <AlertTriangle size={32} className="text-white" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Sell Defects Management
+            </h1>
+          </div>
+          <p className="text-gray-600 ml-14">Manage device defects and their impact on pricing</p>
         </div>
-        <ActionButtons>
-          <Button className="secondary">
+        <div className="flex flex-wrap gap-3">
+          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 transition-all">
             <Download size={16} />
             Export
-          </Button>
-          <Button className="secondary" onClick={() => fetchDefects()}>
-            <RefreshCw size={16} />
+          </button>
+          <button
+            onClick={() => fetchDefects()}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
             Refresh
-          </Button>
-          <Button className="primary" onClick={handleAddDefect}>
+          </button>
+          <button
+            onClick={handleAddDefect}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-amber-500 text-white hover:bg-amber-600 shadow-md hover:shadow-lg transition-all"
+          >
             <Plus size={16} />
             Add Defect
-          </Button>
-        </ActionButtons>
-      </Header>
+          </button>
+        </div>
+      </div>
 
-      <StatsGrid>
-        <StatCard>
-          <div className="stat-header">
-            <div className="stat-icon defects">
-              <AlertTriangle size={20} />
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 flex items-center gap-3">
+          <AlertTriangle size={20} />
+          <span className="flex-1">{error}</span>
+          <button
+            onClick={clearError}
+            className="text-red-800 hover:text-red-900 transition-colors"
+          >
+            <XCircle size={20} />
+          </button>
+        </div>
+      )}
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-yellow-100 rounded-xl">
+              <AlertTriangle size={20} className="text-yellow-600" />
             </div>
           </div>
-          <div className="stat-value">{stats.totalDefects}</div>
-          <div className="stat-label">Total Defects</div>
-          <div className="stat-change positive">
+          <div className="text-3xl font-bold text-gray-900 mb-1">{stats.totalDefects}</div>
+          <div className="text-sm text-gray-600 mb-2">Total Defects</div>
+          <div className="flex items-center gap-1 text-xs text-green-600">
             <TrendingUp size={12} />
             +2 this month
           </div>
-        </StatCard>
+        </Card>
 
-        <StatCard>
-          <div className="stat-header">
-            <div className="stat-icon active">
-              <CheckCircle size={20} />
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-green-100 rounded-xl">
+              <CheckCircle size={20} className="text-green-600" />
             </div>
           </div>
-          <div className="stat-value">{stats.activeDefects}</div>
-          <div className="stat-label">Active Defects</div>
-          <div className="stat-change positive">
+          <div className="text-3xl font-bold text-gray-900 mb-1">{stats.activeDefects}</div>
+          <div className="text-sm text-gray-600 mb-2">Active Defects</div>
+          <div className="flex items-center gap-1 text-xs text-green-600">
             <TrendingUp size={12} />
             +1 this week
           </div>
-        </StatCard>
+        </Card>
 
-        <StatCard>
-          <div className="stat-header">
-            <div className="stat-icon impact">
-              <Percent size={20} />
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-red-100 rounded-xl">
+              <Percent size={20} className="text-red-600" />
             </div>
           </div>
-          <div className="stat-value">{stats.avgPriceImpact}%</div>
-          <div className="stat-label">Avg Price Impact</div>
-          <div className="stat-change negative">
+          <div className="text-3xl font-bold text-gray-900 mb-1">{stats.avgPriceImpact}%</div>
+          <div className="text-sm text-gray-600 mb-2">Avg Price Impact</div>
+          <div className="flex items-center gap-1 text-xs text-red-600">
             <TrendingDown size={12} />
             -2% this month
           </div>
-        </StatCard>
+        </Card>
 
-        <StatCard>
-          <div className="stat-header">
-            <div className="stat-icon categories">
-              <Grid size={20} />
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-indigo-100 rounded-xl">
+              <Grid size={20} className="text-indigo-600" />
             </div>
           </div>
-          <div className="stat-value">{stats.categories}</div>
-          <div className="stat-label">Categories</div>
-          <div className="stat-change positive">
+          <div className="text-3xl font-bold text-gray-900 mb-1">{stats.categories}</div>
+          <div className="text-sm text-gray-600 mb-2">Categories</div>
+          <div className="flex items-center gap-1 text-xs text-green-600">
             <TrendingUp size={12} />
             +1 new category
           </div>
-        </StatCard>
-      </StatsGrid>
+        </Card>
+      </div>
 
-      <FiltersSection>
-        <FiltersRow>
-          <SearchInput>
-            <Search />
+      {/* Filters Section */}
+      <Card className="mb-8 p-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search Input */}
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search defects..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
             />
-          </SearchInput>
+          </div>
 
-          <FilterSelect value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+          {/* Status Filter */}
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+          >
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
-          </FilterSelect>
+          </select>
 
-          <FilterSelect value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
+          {/* Category Filter */}
+          <select
+            value={categoryFilter}
+            onChange={e => setCategoryFilter(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+          >
             <option value="all">All Categories</option>
             <option value="Display">Display</option>
             <option value="Battery">Battery</option>
             <option value="Camera">Camera</option>
             <option value="Physical">Physical</option>
-          </FilterSelect>
+          </select>
 
-          <FilterSelect value={impactFilter} onChange={e => setImpactFilter(e.target.value)}>
+          {/* Impact Filter */}
+          <select
+            value={impactFilter}
+            onChange={e => setImpactFilter(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+          >
             <option value="all">All Impact Levels</option>
             <option value="high">High Impact</option>
             <option value="medium">Medium Impact</option>
             <option value="low">Low Impact</option>
-          </FilterSelect>
-        </FiltersRow>
-      </FiltersSection>
+          </select>
+        </div>
+      </Card>
 
-      <DefectsTable>
-        <TableHeader>
-          <TableTitle>Defects ({filteredDefects.length})</TableTitle>
-          <TableActions>
-            <Button className="secondary">
+      {/* Defects Table */}
+      <Card className="overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Defects ({filteredDefects.length})
+          </h2>
+          <div className="flex gap-2">
+            <button className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 transition-all">
               <Filter size={16} />
               Filter
-            </Button>
-            <Button className="secondary">
+            </button>
+            <button className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 transition-all">
               <Settings size={16} />
               Columns
-            </Button>
-          </TableActions>
-        </TableHeader>
+            </button>
+          </div>
+        </div>
 
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeader2>Defect Name</TableHeader2>
-              <TableHeader2>Category</TableHeader2>
-              <TableHeader2>Price Impact</TableHeader2>
-              <TableHeader2>Severity</TableHeader2>
-              <TableHeader2>Status</TableHeader2>
-              <TableHeader2>Applicable Devices</TableHeader2>
-              <TableHeader2>Last Updated</TableHeader2>
-              <TableHeader2>Actions</TableHeader2>
-            </TableRow>
-          </TableHead>
-          <tbody>
-            {filteredDefects.map(defect => (
-              <TableRow key={defect._id || defect.id}>
-                <TableCell>
-                  <div>
-                    <div style={{ fontWeight: '500' }}>{defect.title}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
-                      {defect.key}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span
-                    style={{
-                      textTransform: 'capitalize',
-                      padding: '0.25rem 0.5rem',
-                      backgroundColor: '#f3f4f6',
-                      borderRadius: '4px',
-                      fontSize: '0.75rem',
-                    }}
-                  >
-                    {defect.category}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                    {defect.delta?.sign === '-' ? '−' : '+'}
-                    {defect.delta?.value || 0}
-                    {defect.delta?.type === 'percent' ? '%' : ''}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge className={getSeverity(defect.delta)}>{getSeverity(defect.delta)}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge className={defect.isActive ? 'active' : 'inactive'}>
-                    {defect.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
-                    {defect.isActive ? 'Active' : 'Inactive'}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
-                    {defect.variantIds && defect.variantIds.length > 0 ? (
-                      defect.variantIds.map((variantId, index) => (
-                        <span
-                          key={index}
-                          style={{
-                            padding: '0.125rem 0.5rem',
-                            backgroundColor: '#e0e7ff',
-                            color: '#4f46e5',
-                            borderRadius: '4px',
-                            fontSize: '0.75rem',
-                          }}
-                        >
-                          {variantId}
-                        </span>
-                      ))
-                    ) : (
-                      <span
-                        style={{
-                          color: '#6b7280',
-                          fontSize: '0.75rem',
-                          fontStyle: 'italic',
-                        }}
-                      >
-                        All devices
+        {filteredDefects.length === 0 ? (
+          <div className="text-center py-16 px-4">
+            <AlertTriangle size={48} className="mx-auto mb-4 text-gray-400" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No defects found</h3>
+            <p className="text-sm text-gray-600">
+              Try adjusting your search criteria or add a new defect
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 text-sm">
+                    Defect Name
+                  </th>
+                  <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 text-sm">
+                    Category
+                  </th>
+                  <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 text-sm">
+                    Price Impact
+                  </th>
+                  <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 text-sm">
+                    Severity
+                  </th>
+                  <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 text-sm">
+                    Status
+                  </th>
+                  <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 text-sm">
+                    Applicable Devices
+                  </th>
+                  <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 text-sm">
+                    Last Updated
+                  </th>
+                  <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 text-sm">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredDefects.map(defect => (
+                  <tr key={defect._id || defect.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3 border-b border-gray-200">
+                      <div>
+                        <div className="font-medium text-gray-900">{defect.title}</div>
+                        <div className="text-xs text-gray-500 mt-1">{defect.key}</div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 border-b border-gray-200">
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs capitalize">
+                        {defect.category}
                       </span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>{formatDate(defect.updatedAt)}</TableCell>
-                <TableCell>
-                  <ActionMenu>
-                    <Button
-                      className="secondary"
-                      style={{ padding: '0.5rem', marginRight: '0.5rem' }}
-                      onClick={() => handleEditDefect(defect)}
-                    >
-                      <Edit size={16} />
-                    </Button>
-                    <Button
-                      className="secondary"
-                      style={{ padding: '0.5rem', backgroundColor: '#fee2e2', color: '#dc2626' }}
-                      onClick={() => handleDeleteDefect(defect._id || defect.id)}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </ActionMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </tbody>
-        </Table>
-      </DefectsTable>
+                    </td>
+                    <td className="px-4 py-3 border-b border-gray-200">
+                      <div className="flex items-center gap-1 text-sm font-medium text-gray-900">
+                        {defect.delta?.sign === '-' ? '−' : '+'}
+                        {defect.delta?.value || 0}
+                        {defect.delta?.type === 'percent' ? '%' : ''}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 border-b border-gray-200">
+                      <span
+                        className={cn(
+                          'px-2 py-1 rounded text-xs font-medium capitalize',
+                          getSeverityColor(getSeverity(defect.delta))
+                        )}
+                      >
+                        {getSeverity(defect.delta)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 border-b border-gray-200">
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
+                          defect.isActive
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                        )}
+                      >
+                        {defect.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
+                        {defect.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 border-b border-gray-200">
+                      <div className="flex flex-wrap gap-1 max-w-xs">
+                        {defect.variantIds && defect.variantIds.length > 0 ? (
+                          defect.variantIds.slice(0, 3).map((variantId, index) => (
+                            <span
+                              key={index}
+                              className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs"
+                            >
+                              {variantId}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-gray-500 italic">All devices</span>
+                        )}
+                        {defect.variantIds && defect.variantIds.length > 3 && (
+                          <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
+                            +{defect.variantIds.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 border-b border-gray-200 text-sm text-gray-600">
+                      {formatDate(defect.updatedAt)}
+                    </td>
+                    <td className="px-4 py-3 border-b border-gray-200">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditDefect(defect)}
+                          className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+                          title="Edit"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteDefect(defect._id || defect.id)}
+                          className="p-2 border border-red-300 rounded bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-500 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
+        {/* Pagination */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-6 py-4 border-t border-gray-200">
+            <div className="text-sm text-gray-600">
+              Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+              {Math.min(currentPage * itemsPerPage, pagination.total)} of {pagination.total} defects
+            </div>
+            <div className="flex gap-2">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+                className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronLeft size={16} />
+                Previous
+              </button>
+              {[...Array(Math.min(pagination.totalPages, 5))].map((_, i) => {
+                const pageNum = i + 1;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={cn(
+                      'px-3 py-2 text-sm border rounded-lg transition-all',
+                      currentPage === pageNum
+                        ? 'bg-amber-500 text-white border-amber-500'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-amber-500'
+                    )}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                disabled={currentPage === pagination.totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+                className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                Next
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {/* Defect Modal */}
       <DefectModal
         isOpen={showModal}
         onClose={() => {
@@ -742,7 +546,7 @@ const SellDefectsManagement = () => {
         defect={editingDefect}
         loading={loading}
       />
-    </Container>
+    </div>
   );
 };
 
