@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 // import Banner from '../components/Banner/Banner';
-import HeroCarousel from '../components/HeroCarousel/HeroCarousel';
-import ServicesSection from '../components/ServicesSection/ServicesSection';
-import BuyProductsList from '../components/BuyProductsList/BuyProductsList';
+import HeroCarousel from '../components/home/HeroCarousel';
+import ServicesSection from '../components/home/ServicesSection';
+// import BuyProductsList from '../components/BuyProductsList/BuyProductsList';
 // import { mobileProducts, laptopProducts } from '../data/products';
 // import useCatalogProducts from '../hooks/useCatalogProducts';
 import {
@@ -19,6 +19,8 @@ import {
   ArrowRight,
   Users,
 } from 'lucide-react';
+import HomeBanner from '../components/home/HomeBanner';
+import BuyProductsList from '../components/home/BuyProductsList/BuyProductsList';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -170,61 +172,8 @@ const Home = () => {
       {/* Services Section */}
       <ServicesSection />
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 to-purple-50 py-16 pb-20 text-center overflow-hidden">
-        {/* Animated background */}
-        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-          <div
-            className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-[radial-gradient(circle,_rgba(59,130,246,0.1)_0%,_transparent_70%)]"
-            style={{
-              animation: 'float 20s ease-in-out infinite',
-            }}
-          />
-        </div>
-
-        <div className="relative z-10 max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-5xl md:text-4xl sm:text-3xl font-bold text-gray-900 mb-6 leading-tight">
-            Sell your device in minutes
-          </h1>
-          <p className="text-xl md:text-lg text-gray-600 mb-8 max-w-[600px] mx-auto leading-relaxed">
-            Get the best price for your mobile, tablet, or laptop through our network of verified
-            local partner shops. Safe, fast, and hassle-free.
-          </p>
-
-          {/* Hero Actions */}
-          <div className="flex gap-4 justify-center flex-wrap mb-12">            <Button
-              variant="primary"
-              size="lg"
-              rightIcon={<ArrowRight size={20} />}
-              onClick={() => navigate('/sell-device')}
-            >
-              Start Selling
-            </Button>            <Button variant="secondary" size="lg" onClick={() => navigate('/buy')}>
-              Browse Devices
-            </Button>
-          </div>
-
-          {/* Trust Badges */}
-          <div className="flex justify-center items-center gap-8 flex-wrap opacity-80">
-            <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-              <Shield size={20} />
-              <span>100% Safe & Secure</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-              <Clock size={20} />
-              <span>Instant Payment</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-              <Truck size={20} />
-              <span>Free Pickup</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-              <Users size={20} />
-              <span>50,000+ Happy Customers</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Home Banner */}
+      <HomeBanner />
 
       {/* Buy Products Section */}
       <BuyProductsList />
@@ -271,7 +220,9 @@ const Home = () => {
 
           {/* Testimonial Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-            {testimonials.map(testimonial => (              <Card key={testimonial.id} className="relative">                <Card.Body>
+            {testimonials.map(testimonial => (
+              <Card key={testimonial.id} className="relative">
+                <Card.Body>
                   {/* Star Rating */}
                   <div className="flex gap-1 mb-3 text-yellow-500">
                     {[...Array(testimonial.rating)].map((_, i) => (
@@ -293,7 +244,8 @@ const Home = () => {
                       </h4>
                       <p className="text-sm text-gray-500 m-0">{testimonial.location}</p>
                     </div>
-                  </div>                </Card.Body>
+                  </div>
+                </Card.Body>
               </Card>
             ))}
           </div>

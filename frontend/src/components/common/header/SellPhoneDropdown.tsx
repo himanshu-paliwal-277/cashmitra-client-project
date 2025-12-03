@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminService } from '../../services/adminService';
+import { adminService } from '../../../services/adminService';
 import './SellPhoneDropdown.css';
-import useAdminCategories from '../../hooks/useAdminCategories';
+import useAdminCategories from '../../../hooks/useAdminCategories';
 
 const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: any) => {
   const navigate = useNavigate();

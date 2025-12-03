@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { theme } from '../../theme';
-import Button from '../ui/Button';
-import PhoneDropdown from '../Header/PhoneDropdown';
-import SellPhoneDropdown from '../Header/SellPhoneDropdown';
+// import { theme } from '../../theme';
+// import Button from '../ui/Button';
+// import PhoneDropdown from '../Header/PhoneDropdown';
+// import SellPhoneDropdown from '../Header/SellPhoneDropdown';
 import {
   Menu,
   X,
@@ -21,6 +21,10 @@ import {
   Store,
   ChevronDown,
 } from 'lucide-react';
+import theme from '../../../theme';
+import Button from '../../ui/Button';
+import SellPhoneDropdown from './SellPhoneDropdown';
+import PhoneDropdown from './PhoneDropdown';
 
 // Main Header Container
 const NavContainer = styled.nav`

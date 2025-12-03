@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, ArrowRight } from 'lucide-react';
-import adminService from '../../services/adminService';
+// import adminService from '../../services/adminService';
 import './BuyProductsList.css';
+import adminService from '../../../services/adminService';
 
 const BuyProductsList = () => {
   const [products, setProducts] = useState([]);

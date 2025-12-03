@@ -1,7 +1,10 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import Navigation from './Header';
-import Footer from './Footer';
+
+import Footer from '../common/footer/Footer';
+import Header from '../common/header/Header';
+// import Header from '../common/header/Header';
+// import Header from './Header';
 
 const MainLayout = () => {
   const location = useLocation();
@@ -15,7 +18,7 @@ const MainLayout = () => {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <Navigation
+      <Header
         isAuthenticated={!!user}
         onLogin={handleLogin}
         onLogout={logout}

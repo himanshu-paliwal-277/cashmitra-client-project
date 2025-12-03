@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { productCategoriesAPI } from '../../api/productCategories';
+import { productCategoriesAPI } from '../../../api/productCategories';
 import './PhoneDropdown.css';
 
 const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: any) => {

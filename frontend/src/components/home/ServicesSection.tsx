@@ -1,5 +1,4 @@
 import React from 'react';
-import './ServicesSection.css';
 
 const ServicesSection = () => {
   const ourServices = [
@@ -135,33 +134,49 @@ const ServicesSection = () => {
   ];
 
   return (
-    <div className="services-section">
-      <div className="services-container">
-        {/* Our Services Section */}
-        <div className="services-block">
-          <h2 className="services-title">Our Services</h2>
-          <div className="services-grid">
+    <div className="py-12 md:py-12 bg-gray-100">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Our Services */}
+        <div className="mb-16">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-8 text-center">
+            Our Services
+          </h2>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 justify-items-center">
             {ourServices.map(service => (
-              <div key={service.id} className="service-item">
-                <div className="service-image-wrapper">
-                  <img src={service.image} alt={service.alt} className="service-image" />
-                </div>
-                <p className="service-title">{service.title}</p>
+              <div
+                key={service.id}
+                className="flex flex-col items-center text-center p-4 bg-white rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer w-full"
+              >
+                <img
+                  src={service.image}
+                  alt={service.alt}
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover mb-3"
+                />
+                <p className="text-sm font-medium text-gray-700">{service.title}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Sell Your Old Device Section */}
-        <div className="services-block">
-          <h2 className="services-title">Sell Your Old Device Now</h2>
-          <div className="services-grid">
+        {/* Sell Services */}
+        <div className="mb-6">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-8 text-center">
+            Sell Your Old Device Now
+          </h2>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 justify-items-center">
             {sellServices.map(service => (
-              <div key={service.id} className="service-item">
-                <div className="service-image-wrapper">
-                  <img src={service.image} alt={service.alt} className="service-image" />
-                </div>
-                <p className="service-title">{service.title}</p>
+              <div
+                key={service.id}
+                className="flex flex-col items-center text-center p-4 bg-white rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer w-full"
+              >
+                <img
+                  src={service.image}
+                  alt={service.alt}
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover mb-3"
+                />
+                <p className="text-sm font-medium text-gray-700">{service.title}</p>
               </div>
             ))}
           </div>
