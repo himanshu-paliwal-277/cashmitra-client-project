@@ -1,291 +1,133 @@
-import React from 'react';
-import styled from 'styled-components';
-import { theme } from '../../theme';
+import * as React from 'react';
+import { cn } from '../../lib/utils';
 
-const StyledCard = styled.div.withConfig({
-  shouldForwardProp: prop =>
-    !['shadow', 'rounded', 'bordered', 'hoverable', 'clickable', 'fullHeight'].includes(prop),
-})`
-  background: ${theme.colors.white};
-  border-radius: ${props => {
-    switch (props.rounded) {
-      case 'sm':
-        return theme.borderRadius.md;
-      case 'lg':
-        return theme.borderRadius['2xl'];
-      case 'xl':
-        return theme.borderRadius['3xl'];
-      default:
-        return theme.borderRadius.xl;
-    }
-  }};
-  box-shadow: ${props => {
-    switch (props.shadow) {
-      case 'none':
-        return theme.shadows.none;
-      case 'sm':
-        return theme.shadows.sm;
-      case 'md':
-        return theme.shadows.md;
-      case 'lg':
-        return theme.shadows.lg;
-      case 'xl':
-        return theme.shadows.xl;
-      default:
-        return theme.shadows.base;
-    }
-  }};
-  border: ${props => (props.bordered ? `1px solid ${theme.colors.grey[200]}` : 'none')};
-  overflow: hidden;
-  transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
+const Card = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn('rounded-lg border bg-white text-gray-900 shadow-sm', className)}
+    {...props}
+  />
+));
+Card.displayName = 'Card';
 
-  ${props =>
-    props.hoverable &&
-    `
-    cursor: pointer;
-    
-    &:hover {
-      box-shadow: ${theme.shadows.lg};
-      transform: translateY(-2px);
-    }
-  `}
+const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props} />
+));
+CardHeader.displayName = 'CardHeader';
 
-  ${props =>
-    props.clickable &&
-    `
-    cursor: pointer;
-    
-    &:hover {
-      box-shadow: ${theme.shadows.md};
-    }
-    
-    &:active {
-      transform: scale(0.98);
-    }
-  `}
-  
-  ${props =>
-    props.fullHeight &&
-    `
-    height: 100%;
-  `}
-`;
+const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn('text-2xl font-semibold leading-none tracking-tight', className)}
+    {...props}
+  />
+));
+CardTitle.displayName = 'CardTitle';
 
-const CardHeader = styled.div`
-  padding: ${props => {
-    switch (props.size) {
-      case 'sm':
-        return `${theme.spacing[3]} ${theme.spacing[4]}`;
-      case 'lg':
-        return `${theme.spacing[6]} ${theme.spacing[8]}`;
-      default:
-        return `${theme.spacing[4]} ${theme.spacing[6]}`;
-    }
-  }};
-  border-bottom: ${props => (props.divider ? `1px solid ${theme.colors.grey[200]}` : 'none')};
+const CardDescription = React.forwardRef(({ className, ...props }, ref) => (
+  <p ref={ref} className={cn('text-sm text-gray-600', className)} {...props} />
+));
+CardDescription.displayName = 'CardDescription';
 
-  ${props =>
-    props.centered &&
-    `
-    text-align: center;
-  `}
-`;
+const CardContent = React.forwardRef(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
+));
+CardContent.displayName = 'CardContent';
 
-const CardBody = styled.div`
-  padding: ${props => {
-    switch (props.size) {
-      case 'sm':
-        return `${theme.spacing[3]} ${theme.spacing[4]}`;
-      case 'lg':
-        return `${theme.spacing[6]} ${theme.spacing[8]}`;
-      default:
-        return `${theme.spacing[4]} ${theme.spacing[6]}`;
-    }
-  }};
+const CardFooter = React.forwardRef(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn('flex items-center p-6 pt-0', className)} {...props} />
+));
+CardFooter.displayName = 'CardFooter';
 
-  ${props =>
-    props.noPadding &&
-    `
-    padding: 0;
-  `}
+const CardAction = React.forwardRef(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn('flex items-center', className)} {...props} />
+));
+CardAction.displayName = 'CardAction';
 
-  ${props =>
-    props.centered &&
-    `
-    text-align: center;
-  `}
-`;
+// Legacy aliases for backward compatibility
+const CardBody = CardContent;
+CardBody.displayName = 'CardBody';
 
-const CardFooter = styled.div`
-  padding: ${props => {
-    switch (props.size) {
-      case 'sm':
-        return `${theme.spacing[3]} ${theme.spacing[4]}`;
-      case 'lg':
-        return `${theme.spacing[6]} ${theme.spacing[8]}`;
-      default:
-        return `${theme.spacing[4]} ${theme.spacing[6]}`;
-    }
-  }};
-  border-top: ${props => (props.divider ? `1px solid ${theme.colors.grey[200]}` : 'none')};
-  background: ${props => (props.muted ? theme.colors.grey[50] : 'transparent')};
+const CardSubtitle = CardDescription;
+CardSubtitle.displayName = 'CardSubtitle';
 
-  ${props =>
-    props.centered &&
-    `
-    text-align: center;
-  `}
-`;
+const CardText = React.forwardRef(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn('text-base text-gray-900 leading-normal mb-3 last:mb-0', className)}
+    {...props}
+  />
+));
+CardText.displayName = 'CardText';
 
-const CardImage = styled.div`
-  width: 100%;
-  height: ${props => props.height || '200px'};
-  background-image: url(${props => props.src});
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  ${props =>
-    props.overlay &&
-    `
-    position: relative;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: ${props.overlay};
-    }
-  `}
-`;
-
-const CardTitle = styled.h3`
-  font-size: ${props => {
-    switch (props.size) {
-      case 'sm':
-        return theme.typography.fontSize.lg;
-      case 'lg':
-        return theme.typography.fontSize['2xl'];
-      default:
-        return theme.typography.fontSize.xl;
-    }
-  }};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0 0 ${theme.spacing[2]} 0;
-  line-height: ${theme.typography.lineHeight.tight};
-`;
-
-const CardSubtitle = styled.p`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-  margin: 0 0 ${theme.spacing[3]} 0;
-  line-height: ${theme.typography.lineHeight.normal};
-`;
-
-const CardText = styled.p`
-  font-size: ${theme.typography.fontSize.base};
-  color: ${theme.colors.text.primary};
-  line-height: ${theme.typography.lineHeight.normal};
-  margin: 0 0 ${theme.spacing[3]} 0;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const CardBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  font-size: ${theme.typography.fontSize.xs};
-  font-weight: ${theme.typography.fontWeight.medium};
-  border-radius: ${theme.borderRadius.full};
-  text-transform: uppercase;
-  letter-spacing: ${theme.typography.letterSpacing.wide};
-
-  ${props => {
-    switch (props.variant) {
-      case 'primary':
-        return `
-          background: ${theme.colors.primary[100]};
-          color: ${theme.colors.primary[800]};
-        `;
-      case 'accent':
-        return `
-          background: ${theme.colors.accent[100]};
-          color: ${theme.colors.accent[800]};
-        `;
-      case 'warning':
-        return `
-          background: ${theme.colors.warning[100]};
-          color: ${theme.colors.warning[800]};
-        `;
-      case 'error':
-        return `
-          background: ${theme.colors.error[100]};
-          color: ${theme.colors.error[800]};
-        `;
-      default:
-        return `
-          background: ${theme.colors.grey[100]};
-          color: ${theme.colors.grey[800]};
-        `;
-    }
-  }}
-`;
-
-// Main Card Component
-const Card = ({
-  children,
-  shadow = 'base',
-  rounded = 'md',
-  bordered = false,
-  hoverable = false,
-  clickable = false,
-  fullHeight = false,
-  className,
-  onClick,
-  ...props
-}) => {
-  return (
-    <StyledCard
-      shadow={shadow}
-      rounded={rounded}
-      bordered={bordered}
-      hoverable={hoverable}
-      clickable={clickable}
-      fullHeight={fullHeight}
-      className={className}
-      onClick={onClick}
+const CardImage = React.forwardRef(
+  ({ className, src, height = '200px', overlay, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn('w-full bg-cover bg-center bg-no-repeat relative', className)}
+      style={{
+        height,
+        backgroundImage: `url(${src})`,
+      }}
       {...props}
     >
-      {children}
-    </StyledCard>
-  );
-};
+      {overlay && <div className="absolute inset-0" style={{ background: overlay }} />}
+    </div>
+  )
+);
+CardImage.displayName = 'CardImage';
 
-// Export all components
+const CardBadge = React.forwardRef(({ className, variant = 'default', ...props }, ref) => {
+  const variantClasses = {
+    default: 'bg-gray-100 text-gray-800',
+    primary: 'bg-blue-100 text-blue-800',
+    accent: 'bg-green-100 text-green-800',
+    warning: 'bg-yellow-100 text-yellow-800',
+    error: 'bg-red-100 text-red-800',
+  };
+
+  return (
+    <span
+      ref={ref}
+      className={cn(
+        'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full uppercase tracking-wide',
+        variantClasses[variant] || variantClasses.default,
+        className
+      )}
+      {...props}
+    />
+  );
+});
+CardBadge.displayName = 'CardBadge';
+
+// Attach subcomponents to Card (shadcn style + legacy support)
 Card.Header = CardHeader;
-Card.Body = CardBody;
-Card.Footer = CardFooter;
-Card.Image = CardImage;
 Card.Title = CardTitle;
+Card.Description = CardDescription;
+Card.Content = CardContent;
+Card.Footer = CardFooter;
+Card.Action = CardAction;
+
+// Legacy support
+Card.Body = CardBody;
 Card.Subtitle = CardSubtitle;
 Card.Text = CardText;
+Card.Image = CardImage;
 Card.Badge = CardBadge;
 
 export default Card;
 export {
+  Card,
   CardHeader,
-  CardBody,
-  CardFooter,
-  CardImage,
   CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  CardAction,
+  // Legacy exports
+  CardBody,
   CardSubtitle,
   CardText,
+  CardImage,
   CardBadge,
 };

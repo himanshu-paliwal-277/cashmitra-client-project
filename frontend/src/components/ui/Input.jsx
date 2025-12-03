@@ -1,259 +1,89 @@
-import React, { useState, forwardRef } from 'react';
-import styled from 'styled-components';
-import { theme } from '../../theme';
-import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import * as React from 'react';
+import { AlertCircle } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
-const InputWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[2]};
-  width: 100%;
-`;
-
-const Label = styled.label`
-  font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${theme.colors.text.primary};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-
-  ${props =>
-    props.required &&
-    `
-    &::after {
-      content: '*';
-      color: ${theme.colors.error.main};
-      margin-left: ${theme.spacing[1]};
-    }
-  `}
-`;
-
-const InputContainer = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-`;
-
-const StyledInput = styled.input`
-  width: 100%;
-  padding: ${props => {
-    switch (props.size) {
-      case 'sm':
-        return `${theme.spacing[2]} ${theme.spacing[3]}`;
-      case 'lg':
-        return `${theme.spacing[4]} ${theme.spacing[5]}`;
-      default:
-        return `${theme.spacing[3]} ${theme.spacing[4]}`;
-    }
-  }};
-  font-size: ${props => {
-    switch (props.size) {
-      case 'sm':
-        return theme.typography.fontSize.sm;
-      case 'lg':
-        return theme.typography.fontSize.lg;
-      default:
-        return theme.typography.fontSize.base;
-    }
-  }};
-  border: 2px solid
-    ${props => {
-      if (props.error) return theme.colors.error.main;
-      if (props.success) return theme.colors.accent.main;
-      return theme.colors.grey[300];
-    }};
-  border-radius: ${theme.borderRadius.lg};
-  background: ${theme.colors.white};
-  color: ${theme.colors.text.primary};
-  transition: all ${theme.transitions.duration.fast} ${theme.transitions.easing.easeInOut};
-
-  ${props =>
-    props.$hasLeftIcon &&
-    `
-    padding-left: ${theme.spacing[10]};
-  `}
-
-  ${props =>
-    props.$hasRightIcon &&
-    `
-    padding-right: ${theme.spacing[10]};
-  `}
-  
-  &::placeholder {
-    color: ${theme.colors.text.hint};
-  }
-
-  &:focus {
-    outline: none;
-    border-color: ${props => {
-      if (props.error) return theme.colors.error.main;
-      if (props.success) return theme.colors.accent.main;
-      return theme.colors.primary.main;
-    }};
-    box-shadow: 0 0 0 3px
-      ${props => {
-        if (props.error) return `${theme.colors.error.main}20`;
-        if (props.success) return `${theme.colors.accent.main}20`;
-        return `${theme.colors.primary.main}20`;
-      }};
-  }
-
-  &:disabled {
-    background: ${theme.colors.grey[100]};
-    color: ${theme.colors.text.disabled};
-    cursor: not-allowed;
-    border-color: ${theme.colors.grey[200]};
-  }
-
-  &:read-only {
-    background: ${theme.colors.grey[50]};
-    cursor: default;
-  }
-`;
-
-const IconContainer = styled.div`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  ${props => (props.left ? `left: ${theme.spacing[3]};` : `right: ${theme.spacing[3]};`)}
-  color: ${props => {
-    if (props.error) return theme.colors.error.main;
-    if (props.success) return theme.colors.accent.main;
-    return theme.colors.text.hint;
-  }};
-  cursor: ${props => (props.clickable ? 'pointer' : 'default')};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-`;
-
-const HelperText = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${props => {
-    if (props.error) return theme.colors.error.main;
-    if (props.success) return theme.colors.accent.main;
-    return theme.colors.text.secondary;
-  }};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-`;
-
-const CharacterCount = styled.span`
-  font-size: ${theme.typography.fontSize.xs};
-  color: ${props => (props.exceeded ? theme.colors.error.main : theme.colors.text.hint)};
-  margin-left: auto;
-`;
-
-const Input = forwardRef(
+const Input = React.forwardRef(
   (
     {
-      label,
-      helperText,
+      className,
+      type,
       error,
-      success,
-      required = false,
-      size = 'md',
+      label,
       leftIcon,
       rightIcon,
-      type = 'text',
-      maxLength,
-      showCharacterCount = false,
-      className,
+      helperText,
+      required,
       id,
       ...props
     },
     ref
   ) => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [value, setValue] = useState(props.value || props.defaultValue || '');
-
-    const isPassword = type === 'password';
-    const inputType = isPassword && showPassword ? 'text' : type;
-
-    const handleChange = e => {
-      setValue(e.target.value);
-      if (props.onChange) {
-        props.onChange(e);
-      }
-    };
-
-    const togglePasswordVisibility = () => {
-      setShowPassword(!showPassword);
-    };
-
-    const characterCount = value.length;
-    const isCharacterCountExceeded = maxLength && characterCount > maxLength;
+    const generatedId = React.useId();
+    const inputId = id || `input-${generatedId}`;
+    const hasError = !!error;
 
     return (
-      <InputWrapper className={className}>
+      <div className="flex flex-col gap-2 w-full">
         {label && (
-          <Label htmlFor={id} required={required}>
+          <label
+            htmlFor={inputId}
+            className="text-sm font-medium text-gray-900 flex items-center gap-1"
+          >
             {label}
-          </Label>
+            {required && <span className="text-red-500 ml-1">*</span>}
+          </label>
         )}
 
-        <InputContainer>
+        <div className="relative flex items-center">
           {leftIcon && (
-            <IconContainer left error={error} success={success}>
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 flex items-center justify-center pointer-events-none">
               {leftIcon}
-            </IconContainer>
+            </div>
           )}
 
-          <StyledInput
+          <input
+            id={inputId}
+            type={type}
+            className={cn(
+              'flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200',
+              hasError
+                ? 'border-red-500 focus-visible:ring-red-500'
+                : 'border-gray-300 focus-visible:ring-blue-500',
+              leftIcon && 'pl-10',
+              rightIcon && 'pr-10',
+              className
+            )}
             ref={ref}
-            id={id}
-            type={inputType}
-            size={size}
-            error={error}
-            success={success}
-            $hasLeftIcon={!!leftIcon}
-            $hasRightIcon={!!rightIcon || isPassword}
-            maxLength={maxLength}
-            value={value}
-            onChange={handleChange}
+            aria-invalid={hasError}
+            aria-describedby={error ? `${inputId}-error` : undefined}
             {...props}
           />
 
-          {isPassword && (
-            <IconContainer
-              right
-              clickable
-              onClick={togglePasswordVisibility}
-              error={error}
-              success={success}
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </IconContainer>
-          )}
-
-          {rightIcon && !isPassword && (
-            <IconContainer right error={error} success={success}>
+          {rightIcon && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 flex items-center justify-center pointer-events-none">
               {rightIcon}
-            </IconContainer>
+            </div>
           )}
-        </InputContainer>
+        </div>
 
-        {(helperText || error || success || showCharacterCount) && (
-          <HelperText error={error} success={success}>
-            {error && <AlertCircle size={16} />}
-            {success && <CheckCircle size={16} />}
-            <span>{error || success || helperText}</span>
-            {showCharacterCount && maxLength && (
-              <CharacterCount exceeded={isCharacterCountExceeded}>
-                {characterCount}/{maxLength}
-              </CharacterCount>
+        {(error || helperText) && (
+          <div
+            id={`${inputId}-error`}
+            className={cn(
+              'text-sm flex items-center gap-1',
+              hasError ? 'text-red-500' : 'text-gray-600'
             )}
-          </HelperText>
+          >
+            {hasError && <AlertCircle size={16} />}
+            <span>{error || helperText}</span>
+          </div>
         )}
-      </InputWrapper>
+      </div>
     );
   }
 );
 
 Input.displayName = 'Input';
 
+export { Input };
 export default Input;
