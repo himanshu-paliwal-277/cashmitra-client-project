@@ -12,6 +12,7 @@ import Contact from './pages/Contact';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import ReturnsRefund from './pages/ReturnsRefund';
+import NotFound from './pages/NotFound';
 
 // Sell Flow Pages
 import CategorySelection from './pages/sell/CategorySelection';
@@ -509,6 +510,9 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: any) => {
           <Route path="/admin/reports" element={<Reports />} />
         </Route>
       </Route>
+
+      {/* 404 Not Found - Catch all unmatched routes */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };

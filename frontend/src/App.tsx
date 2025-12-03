@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from 'styled-components';
@@ -11,6 +11,8 @@ import { CartProvider } from './contexts/CartContext';
 import { AdminAuthProvider } from './contexts/AdminAuthContext';
 import { PartnerAuthProvider } from './contexts/PartnerAuthContext';
 import { AgentAuthProvider } from './contexts/AgentAuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
+import { FullScreenLoader } from './components/Loader';
 
 // Import the new AppRoutes component
 import AppRoutes from './AppRoutes';
@@ -65,7 +67,9 @@ function AppContent() {
       )}
 
       <main>
-        <AppRoutes sellFlowData={sellFlowData} updateSellFlowData={updateSellFlowData} />
+        <Suspense fallback={<FullScreenLoader text="Loading..." />}>
+          <AppRoutes sellFlowData={sellFlowData} updateSellFlowData={updateSellFlowData} />
+        </Suspense>
       </main>
 
       {showNavAndFooter && <Footer />}
@@ -87,22 +91,24 @@ function AppContent() {
  */
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyles />
-      <Router>
-        <AuthProvider>
-          <CartProvider>
-            <AdminAuthProvider>
-              <PartnerAuthProvider>
-                <AgentAuthProvider>
-                  <AppContent />
-                </AgentAuthProvider>
-              </PartnerAuthProvider>
-            </AdminAuthProvider>
-          </CartProvider>
-        </AuthProvider>
-      </Router>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <GlobalStyles />
+        <Router>
+          <AuthProvider>
+            <CartProvider>
+              <AdminAuthProvider>
+                <PartnerAuthProvider>
+                  <AgentAuthProvider>
+                    <AppContent />
+                  </AgentAuthProvider>
+                </PartnerAuthProvider>
+              </AdminAuthProvider>
+            </CartProvider>
+          </AuthProvider>
+        </Router>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 
