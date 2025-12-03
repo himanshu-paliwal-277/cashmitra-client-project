@@ -1,6 +1,6 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import Navigation from './Navigation';
+import Navigation from './Header';
 import Footer from './Footer';
 
 const MainLayout = () => {

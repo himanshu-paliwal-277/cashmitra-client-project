@@ -22,7 +22,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 
-// Main Navigation Container
+// Main Header Container
 const NavContainer = styled.nav`
   background: white;
   width: 100%;
@@ -291,7 +291,7 @@ const DropdownItem = styled.button`
   }
 `;
 
-// Bottom Navigation Bar
+// Bottom Header Bar
 const BottomNavBar = styled.div`
   max-width: 1400px;
   margin: 0 auto;
@@ -494,8 +494,8 @@ const MobileCollapsibleNavItem = ({ item, onLinkClick }: any) => {
   );
 };
 
-// Main Navigation Component
-const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }: any) => {
+// Main Header Component
+const Header = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }: any) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -528,7 +528,7 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }: a
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handlers for hover-based navigation dropdown
+  // Handlers for hover-based Header dropdown
   const handleNavMouseEnter = (itemId: any) => {
     if (navDropdownTimer) clearTimeout(navDropdownTimer);
     setOpenNavDropdown(itemId);
@@ -541,7 +541,7 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }: a
     setNavDropdownTimer(timer);
   };
 
-  // Main navigation items
+  // Main Header items
   const navItems = [
     {
       id: 'buy-phone',
@@ -742,4 +742,4 @@ const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }: a
   );
 };
 
-export default Navigation;
+export default Header;
