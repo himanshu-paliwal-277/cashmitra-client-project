@@ -14,7 +14,7 @@ import {
   Calendar,
   MapPin,
 } from 'lucide-react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { toast } from 'react-hot-toast';
 
@@ -330,7 +330,7 @@ const AgentDashboard = () => {
   const [dashboard, setDashboard] = useState(null);
   const [pickups, setPickups] = useState([]);
   const [loading, setLoading] = useState(true);
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { agent, logout, getAuthHeader } = useAgentAuth();
   const navigate = useNavigate();
 
@@ -349,7 +349,7 @@ const AgentDashboard = () => {
     } catch (error) {
       console.error('Failed to load dashboard:', error);
       toast.error('Failed to load dashboard');
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setDashboard({}); // Set to empty object on error
     }
   };
@@ -418,7 +418,7 @@ const AgentDashboard = () => {
           </LoadingSpinner>
         ) : (
           <>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {dashboard && dashboard.summary && (
               <StatsGrid>
                 <StatCard>
@@ -427,7 +427,7 @@ const AgentDashboard = () => {
                   </IconWrapper>
                   <StatInfo>
                     <h3>Pending Pickups</h3>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <p>{dashboard.summary?.pending || 0}</p>
                   </StatInfo>
                 </StatCard>
@@ -438,7 +438,7 @@ const AgentDashboard = () => {
                   </IconWrapper>
                   <StatInfo>
                     <h3>In Progress</h3>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <p>{dashboard.summary?.inProgress || 0}</p>
                   </StatInfo>
                 </StatCard>
@@ -449,7 +449,7 @@ const AgentDashboard = () => {
                   </IconWrapper>
                   <StatInfo>
                     <h3>Completed Today</h3>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <p>{dashboard.summary?.completed || 0}</p>
                   </StatInfo>
                 </StatCard>
@@ -460,7 +460,7 @@ const AgentDashboard = () => {
                   </IconWrapper>
                   <StatInfo>
                     <h3>Today's Earnings</h3>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <p>₹{dashboard.summary?.earnings || 0}</p>
                   </StatInfo>
                 </StatCard>
@@ -481,31 +481,31 @@ const AgentDashboard = () => {
               ) : (
                 <PickupsList>
                   {pickups.map(pickup => (
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <PickupCard key={pickup._id} onClick={() => handlePickupClick(pickup)}>
                       <PickupHeader>
                         <PickupInfo>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <h3>{pickup.productDetails?.name || 'Device Pickup'}</h3>
                           <p>
                             <Calendar />
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             Scheduled: {formatDate(pickup.scheduledDate)}
                           </p>
                           <p>
                             <MapPin />
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {pickup.pickupAddress?.city}, {pickup.pickupAddress?.pincode}
                           </p>
                         </PickupInfo>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <StatusBadge status={pickup.status}>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {formatStatus(pickup.status)}
                         </StatusBadge>
                       </PickupHeader>
 
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {pickup.status === 'agent_assigned' && (
                         <ActionButton>
                           <Navigation />

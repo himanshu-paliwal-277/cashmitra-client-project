@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import { adminService } from '../../services/adminService';
@@ -511,7 +511,7 @@ const UserManagement = () => {
       const usersArray = Array.isArray(userData) ? userData : [];
       console.log('Users Array:', usersArray); // Debug log
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setUsers(usersArray);
       setTotalPages(pages);
 
@@ -577,24 +577,24 @@ const UserManagement = () => {
   // Filter users based on search and filter criteria
   const filteredUsers = Array.isArray(users)
     ? users.filter(user => {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         if (!user || !user.name || !user.email) return false;
 
         const matchesSearch =
           searchTerm === '' ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           (user.phone && user.phone.toLowerCase().includes(searchTerm.toLowerCase()));
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         const matchesRole = roleFilter === 'all' || user.role === roleFilter;
         const matchesVerification =
           verificationFilter === 'all' ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           (verificationFilter === 'verified' && user.isVerified) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           (verificationFilter === 'unverified' && !user.isVerified);
 
         return matchesSearch && matchesRole && matchesVerification;
@@ -726,33 +726,33 @@ const UserManagement = () => {
             </TableHeader>
             <tbody>
               {filteredUsers.map(user => (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <TableRow key={user._id}>
                   <TableCell>
                     <UserInfo>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <UserAvatar>{getUserInitials(user.name)}</UserAvatar>
                       <UserDetails>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <UserName>{user.name}</UserName>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <UserEmail>{user.email}</UserEmail>
                       </UserDetails>
                     </UserInfo>
                   </TableCell>
                   <TableCell>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <Badge variant={user.role}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {user.role === 'admin' && <Shield size={12} />}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {user.role}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <Badge variant={user.isVerified ? 'verified' : 'unverified'}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {user.isVerified ? (
                         <>
                           <CheckCircle size={12} /> Verified
@@ -764,9 +764,9 @@ const UserManagement = () => {
                       )}
                     </Badge>
                   </TableCell>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <TableCell>{user.phone || 'N/A'}</TableCell>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <TableCell>{formatDate(user.createdAt)}</TableCell>
                   <TableCell>
                     <ActionsContainer>
@@ -775,12 +775,12 @@ const UserManagement = () => {
                       </ActionButton>
                       <ActionButton
                         title="Edit User"
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         onClick={() => navigate(`/admin/users/edit/${user._id}`)}
                       >
                         <Edit size={16} />
                       </ActionButton>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <ActionButton title="Delete User" onClick={() => handleDeleteUser(user._id)}>
                         <Trash2 size={16} />
                       </ActionButton>

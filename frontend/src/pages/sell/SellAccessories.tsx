@@ -40,7 +40,7 @@ const SellAccessories = () => {
 
   useEffect(() => {
     if (!product?.data?.categoryId) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Product category not found');
       setLoading(false);
       return;
@@ -57,7 +57,7 @@ const SellAccessories = () => {
       setAccessories(accessoriesData || []);
     } catch (err) {
       console.error('Error fetching accessories:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Failed to load accessories. Please try again.');
     } finally {
       setLoading(false);
@@ -65,12 +65,12 @@ const SellAccessories = () => {
   };
 
   const handleAccessoryToggle = (accessory: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setSelectedAccessories(prev => {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const isSelected = prev.some(a => a._id === accessory._id);
       if (isSelected) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         return prev.filter(a => a._id !== accessory._id);
       } else {
         return [...prev, accessory];
@@ -123,7 +123,7 @@ const SellAccessories = () => {
 
   // Calculate total accessory value
   const totalAccessoryValue = selectedAccessories.reduce(
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     (sum, acc) => sum + (acc.delta?.value || 0),
     0
   );
@@ -222,11 +222,11 @@ const SellAccessories = () => {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                   {accessories.map(accessory => {
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     const isSelected = selectedAccessories.some(a => a._id === accessory._id);
                     return (
                       <div
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         key={accessory._id}
                         onClick={() => handleAccessoryToggle(accessory)}
                         className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
@@ -252,12 +252,12 @@ const SellAccessories = () => {
                               isSelected ? 'text-green-700' : 'text-slate-900'
                             }`}
                           >
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {accessory.title}
                           </h3>
                           <div className="flex items-center gap-1 text-green-600 font-semibold">
                             <Plus className="w-4 h-4" />
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             <span>₹{accessory.delta?.value || 0}</span>
                           </div>
                         </div>
@@ -373,12 +373,12 @@ const SellAccessories = () => {
                       Selected Accessories
                     </p>
                     {selectedAccessories.map(accessory => (
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <div key={accessory._id} className="flex items-center justify-between mb-1">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <p className="text-xs text-slate-600">• {accessory.title}</p>
                         <p className="text-xs text-green-600 font-semibold">
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           +₹{accessory.delta?.value || 0}
                         </p>
                       </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled, { keyframes } from 'styled-components';
 import useAdminConditionQuestionnaire from '../../hooks/useAdminConditionQuestionnaire';
 import {
@@ -719,7 +719,7 @@ const ConditionQuestionnaire = () => {
 
   useEffect(() => {
     setQuestionnaires(hookQuestionnaires);
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setStats(hookStats);
     setLoading(hookLoading);
   }, [hookQuestionnaires, hookStats, hookLoading]);
@@ -727,7 +727,7 @@ const ConditionQuestionnaire = () => {
   // Pagination handlers
   const handlePageChange = (page: any) => {
     if (page >= 1 && page <= pagination.totalPages) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       fetchQuestionnaires({ page });
     }
   };
@@ -748,29 +748,29 @@ const ConditionQuestionnaire = () => {
     const newErrors = {};
 
     if (!formData.title?.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.title = 'Title is required';
     } else if (formData.title.trim().length < 3) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.title = 'Title must be at least 3 characters';
     } else if (formData.title.trim().length > 100) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.title = 'Title must be less than 100 characters';
     }
 
     if (!formData.description?.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.description = 'Description is required';
     } else if (formData.description.trim().length < 10) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.description = 'Description must be at least 10 characters';
     } else if (formData.description.trim().length > 500) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.description = 'Description must be less than 500 characters';
     }
 
     if (!formData.category?.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.category = 'Category is required';
     }
 
@@ -778,23 +778,23 @@ const ConditionQuestionnaire = () => {
     // Questions can be added later through editing
     if (formData.questions && formData.questions.length > 0) {
       formData.questions.forEach((question, index) => {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         if (!question.text?.trim()) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           newErrors[`question_${index}_text`] = 'Question text is required';
         }
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         if (!question.type) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           newErrors[`question_${index}_type`] = 'Question type is required';
         }
         if (
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           ['multiple_choice', 'checkbox'].includes(question.type) &&
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           (!question.options || question.options.length < 2)
         ) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           newErrors[`question_${index}_options`] =
             'At least 2 options are required for this question type';
         }
@@ -807,7 +807,7 @@ const ConditionQuestionnaire = () => {
 
   const handleInputChange = (field: any, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -876,69 +876,69 @@ const ConditionQuestionnaire = () => {
         },
         questions: [
           {
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             id: `question_${Date.now()}_0`,
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             title: 'What is the overall condition of the device?',
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             type: 'single_choice',
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             required: true,
             options: [
               {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 id: 'excellent',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 title: 'Excellent - Like new',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 description: '',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 type: 'excellent',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 priceImpact: 10,
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 sortOrder: 0,
               },
               {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 id: 'good',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 title: 'Good - Minor wear',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 description: '',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 type: 'good',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 priceImpact: 0,
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 sortOrder: 1,
               },
               {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 id: 'fair',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 title: 'Fair - Noticeable wear',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 description: '',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 type: 'fair',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 priceImpact: -10,
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 sortOrder: 2,
               },
               {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 id: 'poor',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 title: 'Poor - Significant damage',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 description: '',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 type: 'poor',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 priceImpact: -20,
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 sortOrder: 3,
               },
             ],
@@ -948,36 +948,36 @@ const ConditionQuestionnaire = () => {
     } else if (type === 'edit' && questionnaire) {
       // Transform questionnaire data to match form structure
       const transformedQuestionnaire = {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         title: questionnaire.title || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         description: questionnaire.description || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         category: questionnaire.category || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         subcategory: questionnaire.subcategory || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         brand: questionnaire.brand || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         model: questionnaire.model || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         version: questionnaire.version || '1.0.0',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         isActive: questionnaire.isActive !== false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         isDefault: questionnaire.isDefault || false,
         metadata: {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           estimatedTime: questionnaire.metadata?.estimatedTime || 5,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           difficulty: questionnaire.metadata?.difficulty || 'easy',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           tags: questionnaire.metadata?.tags || [],
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           instructions: questionnaire.metadata?.instructions || '',
         },
         questions:
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           questionnaire.questions?.map((q: any) => ({
             ...q,
 
@@ -1039,19 +1039,19 @@ const ConditionQuestionnaire = () => {
         questions: Array.isArray(formData.questions)
           ? formData.questions.map((q, index) => {
               const cleanedQuestion = {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 id: q.id || `question_${Date.now()}_${index}`,
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 title: q.title?.trim() || '',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 type: q.type || 'single_choice',
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 required: q.required !== false,
               };
 
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               if (q.type === 'single_choice' || q.type === 'multiple_choice') {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 const cleanedOptions = (Array.isArray(q.options) ? q.options : [])
                   .map((opt: any) => ({
                   id: opt.id || `option_${Date.now()}_${Math.random()}`,
@@ -1075,10 +1075,10 @@ const ConditionQuestionnaire = () => {
                   });
                 }
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 cleanedQuestion.options = cleanedOptions;
               } else {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 cleanedQuestion.options = [];
               }
 
@@ -1096,7 +1096,7 @@ const ConditionQuestionnaire = () => {
           setSubmitSuccess('Questionnaire created successfully!');
         }
       } else if (modalType === 'edit') {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         const result = await updateQuestionnaire(selectedQuestionnaire._id, cleanedData);
         if (result) {
           setSubmitSuccess('Questionnaire updated successfully!');
@@ -1111,17 +1111,17 @@ const ConditionQuestionnaire = () => {
       console.error('Error saving questionnaire:', error);
 
       // Handle backend validation errors
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         const backendErrors = error.response.data.errors.map((err: any) => err.message || err).join('; ');
         setSubmitError(`Validation failed: ${backendErrors}`);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       } else if (error.response?.data?.message) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setSubmitError(error.response.data.message);
       } else {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setSubmitError(error.message || 'Failed to save questionnaire. Please try again.');
       }
     } finally {
@@ -1142,20 +1142,20 @@ const ConditionQuestionnaire = () => {
   const filteredAndSortedQuestionnaires = React.useMemo(() => {
     let filtered = questionnaires.filter(questionnaire => {
       const matchesSearch =
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         questionnaire.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         questionnaire.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         questionnaire.category?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const matchesCategory = !categoryFilter || questionnaire.category === categoryFilter;
       const matchesStatus =
         statusFilter === '' ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         (statusFilter === 'active' && questionnaire.isActive) ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         (statusFilter === 'inactive' && !questionnaire.isActive);
 
       return matchesSearch && matchesCategory && matchesStatus;
@@ -1167,39 +1167,39 @@ const ConditionQuestionnaire = () => {
 
       switch (sortBy) {
         case 'title':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.title?.toLowerCase() || '';
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.title?.toLowerCase() || '';
           break;
         case 'category':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.category?.toLowerCase() || '';
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.category?.toLowerCase() || '';
           break;
         case 'questions':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.questions?.length || 0;
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.questions?.length || 0;
           break;
         case 'status':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.isActive ? 1 : 0;
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.isActive ? 1 : 0;
           break;
         case 'created':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = new Date(a.createdAt || 0);
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = new Date(b.createdAt || 0);
           break;
         default:
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.title?.toLowerCase() || '';
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.title?.toLowerCase() || '';
       }
 
@@ -1262,7 +1262,7 @@ const ConditionQuestionnaire = () => {
             <FileText size={24} />
           </StatIcon>
           <StatContent>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <StatValue>{stats.totalQuestionnaires || 0}</StatValue>
             <StatLabel>Total Questionnaires</StatLabel>
           </StatContent>
@@ -1273,7 +1273,7 @@ const ConditionQuestionnaire = () => {
             <Check size={24} />
           </StatIcon>
           <StatContent>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <StatValue>{stats.activeQuestionnaires || 0}</StatValue>
             <StatLabel>Active Questionnaires</StatLabel>
           </StatContent>
@@ -1284,7 +1284,7 @@ const ConditionQuestionnaire = () => {
             <BarChart3 size={24} />
           </StatIcon>
           <StatContent>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <StatValue>{stats.totalResponses || 0}</StatValue>
             <StatLabel>Total Responses</StatLabel>
           </StatContent>
@@ -1295,7 +1295,7 @@ const ConditionQuestionnaire = () => {
             <Calendar size={24} />
           </StatIcon>
           <StatContent>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <StatValue>{stats.avgCompletionTime || 0}min</StatValue>
             <StatLabel>Avg Completion Time</StatLabel>
           </StatContent>
@@ -1306,7 +1306,7 @@ const ConditionQuestionnaire = () => {
             <Settings size={24} />
           </StatIcon>
           <StatContent>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <StatValue>{stats.categoriesCount || 0}</StatValue>
             <StatLabel>Categories</StatLabel>
           </StatContent>
@@ -1386,37 +1386,37 @@ const ConditionQuestionnaire = () => {
 
           <QuestionnaireGrid>
             {filteredAndSortedQuestionnaires.map(questionnaire => (
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <QuestionnaireCard key={questionnaire._id}>
                 <CardHeader>
                   <CardInfo>
                     <CardTitle>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {getCategoryIcon(questionnaire.category)}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {questionnaire.title || 'Untitled Questionnaire'}
                     </CardTitle>
                     <CardSubtitle>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {questionnaire.description || 'No description provided'}
                     </CardSubtitle>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <CategoryBadge category={questionnaire.category}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {questionnaire.category?.charAt(0)?.toUpperCase() +
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         questionnaire.category?.slice(1) || 'General'}
                     </CategoryBadge>
                   </CardInfo>
                   <StatusToggle
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     active={questionnaire.isActive}
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     onClick={() => handleStatusToggle(questionnaire._id, questionnaire.isActive)}
                   >
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {questionnaire.isActive ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {questionnaire.isActive ? 'Active' : 'Inactive'}
                   </StatusToggle>
                 </CardHeader>
@@ -1424,20 +1424,20 @@ const ConditionQuestionnaire = () => {
                 <CardContent>
                   <QuestionCount>
                     <CountItem>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <CountValue>{questionnaire.questions?.length || 0}</CountValue>
                       <CountLabel>Questions</CountLabel>
                     </CountItem>
                     <CountItem>
                       <CountValue>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {questionnaire.questions?.filter((q: any) => q.required).length || 0}
                       </CountValue>
                       <CountLabel>Required</CountLabel>
                     </CountItem>
                     <CountItem>
                       <CountValue>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {questionnaire.questions?.filter((q: any) => q.type === 'multiple_choice')
                           .length || 0}
                       </CountValue>
@@ -1448,12 +1448,12 @@ const ConditionQuestionnaire = () => {
                   <MetaInfo>
                     <MetaItem>
                       <Calendar size={14} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       Created {new Date(questionnaire.createdAt).toLocaleDateString()}
                     </MetaItem>
                     <MetaItem>
                       <User size={14} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {questionnaire.createdBy?.name || questionnaire.createdBy || 'Admin'}
                     </MetaItem>
                   </MetaInfo>
@@ -1471,7 +1471,7 @@ const ConditionQuestionnaire = () => {
                       <Copy size={14} />
                     </IconButton>
 
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <IconButton danger onClick={() => handleDelete(questionnaire._id)}>
                       <Trash2 size={14} />
                     </IconButton>
@@ -1535,7 +1535,7 @@ const ConditionQuestionnaire = () => {
                       color: '#374151',
                     }}
                   >
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {selectedQuestionnaire.title}
                   </div>
                 </FormGroup>
@@ -1550,7 +1550,7 @@ const ConditionQuestionnaire = () => {
                       color: '#374151',
                     }}
                   >
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {selectedQuestionnaire.description || 'No description provided'}
                   </div>
                 </FormGroup>
@@ -1565,25 +1565,25 @@ const ConditionQuestionnaire = () => {
                       color: '#374151',
                     }}
                   >
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <CategoryBadge category={selectedQuestionnaire.category}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {getCategoryIcon(selectedQuestionnaire.category)}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {selectedQuestionnaire.category?.charAt(0)?.toUpperCase() +
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         selectedQuestionnaire.category?.slice(1) || 'General'}
                     </CategoryBadge>
                   </div>
                 </FormGroup>
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {selectedQuestionnaire.questions && selectedQuestionnaire.questions.length > 0 && (
                   <FormGroup>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <Label>Questions ({selectedQuestionnaire.questions.length})</Label>
                     <QuestionList>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {selectedQuestionnaire.questions.map((question: any, index: any) => (
                         <QuestionSection key={index}>
                           <QuestionHeader onClick={() => toggleQuestionExpansion(index)}>
@@ -1679,15 +1679,15 @@ const ConditionQuestionnaire = () => {
                     required
                     disabled={modalType === 'view'}
                     style={{
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       borderColor: errors.title ? '#dc2626' : '#d1d5db',
                     }}
                   />
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {errors.title && (
                     <ErrorMessage>
                       <AlertCircle size={16} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {errors.title}
                     </ErrorMessage>
                   )}
@@ -1702,15 +1702,15 @@ const ConditionQuestionnaire = () => {
                     placeholder="Enter questionnaire description"
                     disabled={modalType === 'view'}
                     style={{
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       borderColor: errors.description ? '#dc2626' : '#d1d5db',
                     }}
                   />
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {errors.description && (
                     <ErrorMessage>
                       <AlertCircle size={16} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {errors.description}
                     </ErrorMessage>
                   )}
@@ -1728,7 +1728,7 @@ const ConditionQuestionnaire = () => {
                     required
                     disabled={modalType === 'view'}
                     style={{
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       borderColor: errors.category ? '#dc2626' : '#d1d5db',
                     }}
                   >
@@ -1739,11 +1739,11 @@ const ConditionQuestionnaire = () => {
                       </option>
                     ))}
                   </Select>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {errors.category && (
                     <ErrorMessage>
                       <AlertCircle size={16} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {errors.category}
                     </ErrorMessage>
                   )}
@@ -1947,7 +1947,7 @@ const ConditionQuestionnaire = () => {
                               },
                             ],
                           };
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           setFormData(prev => ({
                             ...prev,
                             questions: [...prev.questions, newQuestion],
@@ -1967,11 +1967,11 @@ const ConditionQuestionnaire = () => {
                           <div style={{ flex: 1 }}>
                             <Input
                               type="text"
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               value={question.title}
                               onChange={(e: any) => {
                                 const updatedQuestions = [...formData.questions];
-                                {/* @ts-expect-error */}
+                                // @ts-expect-error
                                 updatedQuestions[questionIndex].title = e.target.value;
                                 setFormData(prev => ({ ...prev, questions: updatedQuestions }));
                               }}
@@ -1981,17 +1981,17 @@ const ConditionQuestionnaire = () => {
 
                             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                               <Select
-                                {/* @ts-expect-error */}
+                                // @ts-expect-error
                                 value={question.type}
                                 onChange={(e: any) => {
                                   const updatedQuestions = [...formData.questions];
-                                  {/* @ts-expect-error */}
+                                  // @ts-expect-error
                                   updatedQuestions[questionIndex].type = e.target.value;
                                   if (
                                     e.target.value === 'single_choice' ||
                                     e.target.value === 'multiple_choice'
                                   ) {
-                                    {/* @ts-expect-error */}
+                                    // @ts-expect-error
                                     updatedQuestions[questionIndex].options = [
                                       {
                                         id: 'option1',
@@ -2011,7 +2011,7 @@ const ConditionQuestionnaire = () => {
                                       },
                                     ];
                                   } else {
-                                    {/* @ts-expect-error */}
+                                    // @ts-expect-error
                                     updatedQuestions[questionIndex].options = [];
                                   }
                                   setFormData(prev => ({ ...prev, questions: updatedQuestions }));
@@ -2035,11 +2035,11 @@ const ConditionQuestionnaire = () => {
                               >
                                 <input
                                   type="checkbox"
-                                  {/* @ts-expect-error */}
+                                  // @ts-expect-error
                                   checked={question.required}
                                   onChange={e => {
                                     const updatedQuestions = [...formData.questions];
-                                    {/* @ts-expect-error */}
+                                    // @ts-expect-error
                                     updatedQuestions[questionIndex].required = e.target.checked;
                                     setFormData(prev => ({ ...prev, questions: updatedQuestions }));
                                   }}
@@ -2063,9 +2063,9 @@ const ConditionQuestionnaire = () => {
                           </ActionButton>
                         </QuestionHeader>
 
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {(question.type === 'single_choice' ||
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           question.type === 'multiple_choice') && (
                           <QuestionContent>
                             <div
@@ -2078,7 +2078,7 @@ const ConditionQuestionnaire = () => {
                             >
                               Options:
                             </div>
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {question.options.map((option: any, optionIndex: any) => (
                               <div
                                 key={optionIndex}
@@ -2094,7 +2094,7 @@ const ConditionQuestionnaire = () => {
                                   value={option.title}
                                   onChange={(e: any) => {
                                     const updatedQuestions = [...formData.questions];
-                                    {/* @ts-expect-error */}
+                                    // @ts-expect-error
                                     updatedQuestions[questionIndex].options[optionIndex].title =
                                       e.target.value;
                                     setFormData(prev => ({ ...prev, questions: updatedQuestions }));
@@ -2106,7 +2106,7 @@ const ConditionQuestionnaire = () => {
                                   value={option.type}
                                   onChange={(e: any) => {
                                     const updatedQuestions = [...formData.questions];
-                                    {/* @ts-expect-error */}
+                                    // @ts-expect-error
                                     updatedQuestions[questionIndex].options[optionIndex].type =
                                       e.target.value;
                                     setFormData(prev => ({ ...prev, questions: updatedQuestions }));
@@ -2123,7 +2123,7 @@ const ConditionQuestionnaire = () => {
                                   value={option.priceImpact}
                                   onChange={(e: any) => {
                                     const updatedQuestions = [...formData.questions];
-                                    {/* @ts-expect-error */}
+                                    // @ts-expect-error
                                     updatedQuestions[questionIndex].options[
                                       optionIndex
                                     ].priceImpact = parseInt(e.target.value) || 0;
@@ -2135,7 +2135,7 @@ const ConditionQuestionnaire = () => {
                                 <ActionButton
                                   onClick={() => {
                                     const updatedQuestions = [...formData.questions];
-                                    {/* @ts-expect-error */}
+                                    // @ts-expect-error
                                     updatedQuestions[questionIndex].options = updatedQuestions[
                                       questionIndex
                                     ].options.filter((_: any, index: any) => index !== optionIndex);
@@ -2152,17 +2152,17 @@ const ConditionQuestionnaire = () => {
                               onClick={() => {
                                 const updatedQuestions = [...formData.questions];
                                 const newOption = {
-                                  {/* @ts-expect-error */}
+                                  // @ts-expect-error
                                   id: `option_${Date.now()}_${updatedQuestions[questionIndex].options.length}`,
-                                  {/* @ts-expect-error */}
+                                  // @ts-expect-error
                                   title: `Option ${updatedQuestions[questionIndex].options.length + 1}`,
                                   description: '',
                                   type: 'good',
                                   priceImpact: 0,
-                                  {/* @ts-expect-error */}
+                                  // @ts-expect-error
                                   sortOrder: updatedQuestions[questionIndex].options.length,
                                 };
-                                {/* @ts-expect-error */}
+                                // @ts-expect-error
                                 updatedQuestions[questionIndex].options.push(newOption);
                                 setFormData(prev => ({ ...prev, questions: updatedQuestions }));
                               }}

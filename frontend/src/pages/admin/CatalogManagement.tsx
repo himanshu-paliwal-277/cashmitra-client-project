@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminCatalog } from '../../hooks/useAdminCatalog';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   Package,
@@ -514,7 +514,7 @@ function CatalogManagement() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { adminUser } = useAdminAuth();
   const {
     products: catalogProducts,
@@ -533,28 +533,28 @@ function CatalogManagement() {
     ? [
         {
           label: 'Total Products',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           value: productStats.totalProducts?.toLocaleString() || '0',
           icon: <Package size={20} />,
           color: '#3B82F6',
         },
         {
           label: 'Active Products',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           value: productStats.activeProducts?.toLocaleString() || '0',
           icon: <CheckCircle size={20} />,
           color: '#10B981',
         },
         {
           label: 'Inactive Products',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           value: productStats.pendingProducts?.toLocaleString() || '0',
           icon: <Clock size={20} />,
           color: '#F59E0B',
         },
         {
           label: 'Categories',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           value: productStats.categoriesCount?.toLocaleString() || '0',
           icon: <Layers size={20} />,
           color: '#8B5CF6',
@@ -591,35 +591,35 @@ function CatalogManagement() {
   const products =
     catalogProducts?.length > 0
       ? catalogProducts.map(product => ({
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           id: product._id,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           name: `${product.brand} ${product.model}`,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           category: product.category,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           brand: product.brand,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           model: product.model,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           series: product.series,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           price: product.basePrice ? `₹${product.basePrice.toLocaleString()}` : '₹0',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           basePrice: product.basePrice,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           variant: product.variant,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           status: product.isActive ? 'active' : 'inactive',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           images: product.images || [],
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           specifications: product.specifications,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           createdAt: product.createdAt,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           updatedAt: product.updatedAt,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           createdBy: product.createdBy,
         }))
       : [];
@@ -741,11 +741,11 @@ function CatalogManagement() {
               <option value="all">All Categories</option>
               {categories && categories.length > 0 ? (
                 categories.map(category => (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <option key={category.name || category} value={category.name || category}>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {(category.name || category).charAt(0).toUpperCase() +
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       (category.name || category).slice(1)}
                   </option>
                 ))
@@ -825,7 +825,7 @@ function CatalogManagement() {
               <AlertCircle size={40} />
             </EmptyIcon>
             <h4>Error loading products</h4>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <p>{error.message || 'Something went wrong. Please try again.'}</p>
             <Button variant="outline" onClick={handleRefresh} style={{ marginTop: '1rem' }}>
               Try Again

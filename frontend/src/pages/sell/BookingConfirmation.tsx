@@ -84,7 +84,7 @@ const BookingConfirmation = () => {
       '3-6': '3:00 PM - 6:00 PM',
       '6-9': '6:00 PM - 9:00 PM',
     };
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     return slots[slot] || slot;
   };
 

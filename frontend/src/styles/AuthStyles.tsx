@@ -1,4 +1,4 @@
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled, { keyframes } from 'styled-components';
 import { theme } from '../theme';
 

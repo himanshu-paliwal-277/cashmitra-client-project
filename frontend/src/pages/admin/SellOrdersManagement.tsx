@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import useSellOrders from '../../hooks/useSellOrders';
@@ -420,7 +420,7 @@ const OrderStatus = styled.div`
       case 'picked_up':
         return theme.colors.info[100];
       case 'inspected':
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         return theme.colors.secondary[100];
       case 'completed':
         return theme.colors.success[100];
@@ -439,7 +439,7 @@ const OrderStatus = styled.div`
       case 'picked_up':
         return theme.colors.info[700];
       case 'inspected':
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         return theme.colors.secondary[700];
       case 'completed':
         return theme.colors.success[700];
@@ -576,7 +576,7 @@ const TableRow = styled.tr`
   transition: all ${theme.transitions.duration.normal};
 
   &:hover {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     background: ${theme.colors.grey[25]};
   }
 
@@ -689,15 +689,15 @@ const SellOrdersManagement = () => {
     error,
     pagination,
     statistics,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     fetchOrders,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     fetchOrderById,
     updateOrderStatus,
     assignStaff,
     updatePickupDetails,
     deleteOrder,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     fetchStatistics,
   } = useSellOrders();
 
@@ -747,15 +747,15 @@ const SellOrdersManagement = () => {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(
         order =>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           order._id.toLowerCase().includes(searchLower) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           order.customerInfo?.fullName?.toLowerCase().includes(searchLower) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           order.customerInfo?.email?.toLowerCase().includes(searchLower) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           order.customerInfo?.phone?.includes(searchTerm) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           order.deviceInfo?.name?.toLowerCase().includes(searchLower)
       );
     }
@@ -858,14 +858,14 @@ const SellOrdersManagement = () => {
       case 'picked_up':
         return theme.colors.info.main;
       case 'inspected':
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         return theme.colors.secondary.main;
       case 'completed':
         return theme.colors.success.main;
       case 'cancelled':
         return theme.colors.error.main;
       default:
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         return theme.colors.grey.main;
     }
   };
@@ -947,11 +947,11 @@ const SellOrdersManagement = () => {
     <TableCell>
       <input
         type="checkbox"
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         checked={selectedOrders.includes(order._id)}
         onChange={e => {
           if (e.target.checked) {
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             setSelectedOrders([...selectedOrders, order._id]);
           } else {
             setSelectedOrders(selectedOrders.filter(id => id !== order._id));
@@ -1028,18 +1028,18 @@ const SellOrdersManagement = () => {
               <ShoppingBag size={24} />
             </StatIcon>
             <StatContent>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <StatValue>{statistics.totalOrders || 0}</StatValue>
               <StatLabel>Total Orders</StatLabel>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <StatChange positive={statistics.ordersGrowth >= 0}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {statistics.ordersGrowth >= 0 ? (
                   <TrendingUp size={12} />
                 ) : (
                   <TrendingDown size={12} />
                 )}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {Math.abs(statistics.ordersGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
@@ -1050,18 +1050,18 @@ const SellOrdersManagement = () => {
               <Clock size={24} />
             </StatIcon>
             <StatContent>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <StatValue>{statistics.pendingOrders || 0}</StatValue>
               <StatLabel>Pending Orders</StatLabel>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <StatChange positive={statistics.pendingGrowth <= 0}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {statistics.pendingGrowth <= 0 ? (
                   <TrendingDown size={12} />
                 ) : (
                   <TrendingUp size={12} />
                 )}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {Math.abs(statistics.pendingGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
@@ -1072,18 +1072,18 @@ const SellOrdersManagement = () => {
               <CheckCircle size={24} />
             </StatIcon>
             <StatContent>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <StatValue>{statistics.completedOrders || 0}</StatValue>
               <StatLabel>Completed Orders</StatLabel>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <StatChange positive={statistics.completedGrowth >= 0}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {statistics.completedGrowth >= 0 ? (
                   <TrendingUp size={12} />
                 ) : (
                   <TrendingDown size={12} />
                 )}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {Math.abs(statistics.completedGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
@@ -1094,18 +1094,18 @@ const SellOrdersManagement = () => {
               <DollarSign size={24} />
             </StatIcon>
             <StatContent>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <StatValue>{formatPrice(statistics.totalRevenue || 0)}</StatValue>
               <StatLabel>Total Revenue</StatLabel>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <StatChange positive={statistics.revenueGrowth >= 0}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {statistics.revenueGrowth >= 0 ? (
                   <TrendingUp size={12} />
                 ) : (
                   <TrendingDown size={12} />
                 )}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {Math.abs(statistics.revenueGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
@@ -1235,7 +1235,7 @@ const SellOrdersManagement = () => {
                         checked={selectedOrders.length === filteredOrders.length}
                         onChange={e => {
                           if (e.target.checked) {
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             setSelectedOrders(filteredOrders.map(order => order._id));
                           } else {
                             setSelectedOrders([]);
@@ -1261,7 +1261,7 @@ const SellOrdersManagement = () => {
             <Pagination>
               <PaginationInfo>
                 Showing {(currentPage - 1) * 12 + 1} to{' '}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {Math.min(currentPage * 12, pagination.totalItems)} of {pagination.totalItems}{' '}
                 orders
               </PaginationInfo>

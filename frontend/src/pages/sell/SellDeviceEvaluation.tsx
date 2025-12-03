@@ -172,7 +172,7 @@ const SellDeviceEvaluation = () => {
               <div className="space-y-8">
                 {questions.map((question, index) => {
                   const QuestionIcon = question.icon;
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   const isAnswered = answers[question.id] !== '';
 
                   return (
@@ -206,7 +206,7 @@ const SellDeviceEvaluation = () => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-16">
                         {question.options.map(option => {
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           const isSelected = answers[question.id] === option.value;
 
                           return (

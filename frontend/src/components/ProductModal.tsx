@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { adminService } from '../services/adminService';
 import { X, Upload, Star, Plus, Trash2, Save, AlertCircle, Image as ImageIcon } from 'lucide-react';
@@ -366,7 +366,7 @@ const ProductModal = ({
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           ...prev[parent],
           [child]: value,
         },
@@ -379,7 +379,7 @@ const ProductModal = ({
     }
 
     // Clear error when user starts typing
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -403,7 +403,7 @@ const ProductModal = ({
       }
     }
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setFormData(prev => ({
       ...prev,
       images: [...prev.images, ...uploadedImages],
@@ -443,23 +443,23 @@ const ProductModal = ({
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.name = 'Product name is required';
     }
 
     if (!formData.brand.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.brand = 'Brand is required';
     }
 
     if (!formData.categoryId) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.categoryId = 'Category is required';
     }
 
     if (formData.pricing.mrp && formData.pricing.discountedPrice) {
       if (parseFloat(formData.pricing.discountedPrice) >= parseFloat(formData.pricing.mrp)) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         newErrors['pricing.discountedPrice'] = 'Discounted price must be less than MRP';
       }
     }
@@ -482,7 +482,7 @@ const ProductModal = ({
       if (processedData.pricing.mrp && processedData.pricing.discountedPrice) {
         const mrp = parseFloat(processedData.pricing.mrp);
         const discounted = parseFloat(processedData.pricing.discountedPrice);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         processedData.pricing.discountPercent = Math.round(((mrp - discounted) / mrp) * 100);
       }
 
@@ -525,11 +525,11 @@ const ProductModal = ({
                   onChange={(e: any) => handleInputChange('name', e.target.value)}
                   placeholder="Enter product name"
                 />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.name && (
                   <ErrorMessage>
                     <AlertCircle size={14} />
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {errors.name}
                   </ErrorMessage>
                 )}
@@ -543,11 +543,11 @@ const ProductModal = ({
                   onChange={(e: any) => handleInputChange('brand', e.target.value)}
                   placeholder="Enter brand name"
                 />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.brand && (
                   <ErrorMessage>
                     <AlertCircle size={14} />
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {errors.brand}
                   </ErrorMessage>
                 )}
@@ -561,18 +561,18 @@ const ProductModal = ({
                 >
                   <option value="">Select a category</option>
                   {categories.map(category => (
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <option key={category._id} value={category._id}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {category.name}
                     </option>
                   ))}
                 </Select>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.categoryId && (
                   <ErrorMessage>
                     <AlertCircle size={14} />
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {errors.categoryId}
                   </ErrorMessage>
                 )}
@@ -612,11 +612,11 @@ const ProductModal = ({
                   min="0"
                   step="0.01"
                 />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors['pricing.discountedPrice'] && (
                   <ErrorMessage>
                     <AlertCircle size={14} />
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {errors['pricing.discountedPrice']}
                   </ErrorMessage>
                 )}
@@ -675,7 +675,7 @@ const ProductModal = ({
                     setDragOver(true);
                   }}
                   onDragLeave={() => setDragOver(false)}
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   onClick={() => document.getElementById('image-upload').click()}
                 >
                   <ImageIcon size={48} color="#6b7280" />
@@ -710,11 +710,11 @@ const ProductModal = ({
               </FormGroup>
             </FormGrid>
 
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {errors.submit && (
               <ErrorMessage style={{ marginTop: '1rem' }}>
                 <AlertCircle size={16} />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.submit}
               </ErrorMessage>
             )}

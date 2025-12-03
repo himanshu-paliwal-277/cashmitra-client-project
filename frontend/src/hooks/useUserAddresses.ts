@@ -15,7 +15,7 @@ const useUserAddresses = () => {
       setAddresses(response.data);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch addresses');
       throw err;
     } finally {
@@ -29,11 +29,11 @@ const useUserAddresses = () => {
     setError(null);
     try {
       const response = await api.post('/user/addresses', addressData);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setAddresses(prev => [...prev, response.data]);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to add address');
       throw err;
     } finally {
@@ -47,14 +47,14 @@ const useUserAddresses = () => {
     setError(null);
     try {
       const response = await api.put(`/user/addresses/${addressId}`, addressData);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setAddresses(prev =>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         prev.map(addr => ((addr._id || addr.id) === addressId ? response.data : addr))
       );
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to update address');
       throw err;
     } finally {
@@ -68,11 +68,11 @@ const useUserAddresses = () => {
     setError(null);
     try {
       const response = await api.delete(`/user/addresses/${addressId}`);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setAddresses(prev => prev.filter(addr => (addr._id || addr.id) !== addressId));
       return true;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to delete address');
       throw err;
     } finally {
@@ -86,18 +86,18 @@ const useUserAddresses = () => {
     setError(null);
     try {
       const response = await api.put(`/user/addresses/${addressId}/default`);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setAddresses(prev =>
         prev.map(addr => ({
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           ...addr,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           isDefault: addr.id === addressId,
         }))
       );
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to set default address');
       throw err;
     } finally {

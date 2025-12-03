@@ -22,9 +22,9 @@ const BrandSelection = () => {
   // Set selected category based on URL param
   useEffect(() => {
     if (categories && categoryId) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const category = categories.find(cat => cat.name === categoryId);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setSelectedCategory(category);
     }
   }, [categories, categoryId]);
@@ -33,13 +33,13 @@ const BrandSelection = () => {
   useEffect(() => {
     if (brands && selectedCategory) {
       let filtered = brands.filter(
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         brand => brand.categories && brand.categories.includes(selectedCategory.name)
       );
 
       if (searchQuery) {
         filtered = filtered.filter(
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           brand => brand.brand && brand.brand.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
@@ -54,7 +54,7 @@ const BrandSelection = () => {
 
   const handleNext = () => {
     if (selectedBrand) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       navigate(`/sell/model?category=${categoryId}&brand=${selectedBrand.brand}`);
     }
   };
@@ -140,7 +140,7 @@ const BrandSelection = () => {
             </a>
             <ChevronRight className="w-4 h-4" />
             <span className="text-white font-medium">
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {selectedCategory?.name || 'Select Brand'}
             </span>
           </nav>
@@ -148,11 +148,11 @@ const BrandSelection = () => {
           {/* Page Header */}
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 text-white">
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               Select your {selectedCategory?.name || 'device'} brand
             </h1>
             <p className="text-lg text-blue-100 max-w-2xl mx-auto">
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               Choose the brand of your {selectedCategory?.name?.toLowerCase() || 'device'} to
               continue with the selling process
             </p>
@@ -179,14 +179,14 @@ const BrandSelection = () => {
         {filteredBrands.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 mb-12">
             {filteredBrands.map(brand => {
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const colorScheme = getBrandColor(brand.brand);
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const isSelected = selectedBrand?._id === brand._id;
 
               return (
                 <div
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   key={brand._id}
                   onClick={() => handleBrandClick(brand)}
                   className={`bg-white rounded-2xl p-6 text-center cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-2 ${
@@ -197,14 +197,14 @@ const BrandSelection = () => {
                 >
                   {/* Brand Logo/Initials */}
                   <div
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     className={`w-20 h-20 ${colorScheme.light} rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform ${
                       isSelected ? 'scale-110' : 'group-hover:scale-110'
                     }`}
                   >
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <span className={`text-2xl font-bold ${colorScheme.text}`}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {getBrandInitials(brand.brand)}
                     </span>
                   </div>
@@ -215,7 +215,7 @@ const BrandSelection = () => {
                       isSelected ? 'text-blue-600' : 'text-slate-900'
                     }`}
                   >
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {brand.brand}
                   </h3>
 

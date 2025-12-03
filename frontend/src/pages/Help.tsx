@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../theme';
 import Button from '../components/ui/Button';
@@ -77,7 +77,7 @@ const SearchInput = styled.input`
   }
 
   &::placeholder {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     color: ${theme.colors.text.tertiary};
   }
 `;
@@ -87,7 +87,7 @@ const SearchIcon = styled(Search)`
   left: ${theme.spacing[4]};
   top: 50%;
   transform: translateY(-50%);
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   color: ${theme.colors.text.tertiary};
 `;
 
@@ -301,7 +301,7 @@ const Help = () => {
                   >
                     {option.available}
                   </ContactDescription>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <Button variant="primary" fullWidth>
                     {option.action}
                   </Button>

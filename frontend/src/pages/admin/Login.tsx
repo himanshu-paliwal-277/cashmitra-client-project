@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { theme } from '../../theme';
@@ -87,7 +87,7 @@ const AdminLogin = () => {
     });
 
     // Clear field-specific error when user types
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -105,18 +105,18 @@ const AdminLogin = () => {
     const newErrors = {};
 
     if (!formData.email) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.email = 'Email is invalid';
     }
 
     if (!formData.password) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.password = 'Password must be at least 6 characters';
     }
 
@@ -124,7 +124,7 @@ const AdminLogin = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { login } = useAdminAuth();
 
   const handleSubmit = async (e: any) => {
@@ -147,7 +147,7 @@ const AdminLogin = () => {
       // Redirect to admin dashboard
       navigate('/admin/dashboard');
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setLoginError(error.message || 'An error occurred during login');
     } finally {
       setIsLoading(false);
@@ -157,7 +157,7 @@ const AdminLogin = () => {
   return (
     <LoginContainer>
       <LoginCard shadow="lg">
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <Card.Body size="lg">
           <LoginHeader>
             <Logo>Cashmitra</Logo>
@@ -174,39 +174,39 @@ const AdminLogin = () => {
 
           <Form onSubmit={handleSubmit}>
             <Input
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               type="email"
               name="email"
               label="Email Address"
               placeholder="admin@example.com"
               value={formData.email}
               onChange={handleChange}
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               error={errors.email}
               leftIcon={<Mail size={18} />}
               required={true}
             />
 
             <Input
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               type="password"
               name="password"
               label="Password"
               placeholder="Enter your password"
               value={formData.password}
               onChange={handleChange}
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               error={errors.password}
               leftIcon={<Lock size={18} />}
               required={true}
             />
 
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Button type="submit" variant="primary" size="lg" fullWidth={true} disabled={isLoading}>
               {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </Form>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         </Card.Body>
       </LoginCard>
     </LoginContainer>

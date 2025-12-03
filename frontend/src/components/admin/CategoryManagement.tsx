@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import { adminService } from '../../services/adminService';
@@ -371,7 +371,7 @@ const CategoryManagement = () => {
   const handleSaveCategory = async () => {
     try {
       if (editingCategory) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         await adminService.updateCategory(editingCategory.id, formData);
       } else {
         await adminService.createCategory(formData);
@@ -408,24 +408,24 @@ const CategoryManagement = () => {
     if (!searchTerm) return categories;
     return categories.filter(
       category =>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         category.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 
   const renderCategoryIcon = (iconName: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const IconComponent = categoryIcons[iconName] || Package;
     return <IconComponent size={16} />;
   };
 
   const renderCategory = (category: any, level = 0) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const hasChildren = categories.some(cat => cat.parentId === category.id);
     const isExpanded = expandedCategories.has(category.id);
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const children = categories.filter(cat => cat.parentId === category.id);
 
     return (
@@ -463,7 +463,7 @@ const CategoryManagement = () => {
     );
   };
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const mainCategories = getFilteredCategories().filter(cat => !cat.parentId);
 
   return (
@@ -562,12 +562,12 @@ const CategoryManagement = () => {
               >
                 <option value="">None (Main Category)</option>
                 {categories
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   .filter(cat => !cat.parentId && cat.id !== editingCategory?.id)
                   .map(category => (
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <option key={category.id} value={category.id}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {category.name}
                     </option>
                   ))}

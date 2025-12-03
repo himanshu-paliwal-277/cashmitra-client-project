@@ -52,7 +52,7 @@ const useAdminPartnerApplications = () => {
         });
       }
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.message || 'Failed to fetch partner applications');
       console.error('Error fetching partner applications:', err);
     } finally {
@@ -72,12 +72,12 @@ const useAdminPartnerApplications = () => {
           notes
         );
         if (response.success) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           setApplications(prev =>
             prev.map(app =>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               app.id === applicationId
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ? { ...app, status, notes, updatedAt: new Date().toISOString() }
                 : app
             )
@@ -85,15 +85,15 @@ const useAdminPartnerApplications = () => {
 
           // Update stats
           setStats(prev => {
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             const oldApp = applications.find(app => app.id === applicationId);
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             if (oldApp && oldApp.status !== status) {
               return {
                 ...prev,
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 [oldApp.status]: Math.max(0, prev[oldApp.status] - 1),
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 [status]: prev[status] + 1,
               };
             }
@@ -104,10 +104,10 @@ const useAdminPartnerApplications = () => {
         }
         throw new Error('Failed to update application status');
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.message || 'Failed to update application status');
         console.error('Error updating application status:', err);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         return { success: false, error: err.message };
       } finally {
         setLoading(false);
@@ -170,7 +170,7 @@ const useAdminPartnerApplications = () => {
   // Get application by ID
   const getApplicationById = useCallback(
     (applicationId: any) => {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       return applications.find(app => app.id === applicationId);
     },
     [applications]
@@ -183,11 +183,11 @@ const useAdminPartnerApplications = () => {
 
       return applications.filter(
         app =>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           app.shopName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           app.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           app.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
     },

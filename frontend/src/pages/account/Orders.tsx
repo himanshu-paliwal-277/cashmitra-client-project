@@ -60,7 +60,7 @@ const statusLabel = (status: any) => {
 };
 
 const Orders = () => {
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { user } = useAuth();
   const {
     orders = [],
@@ -94,11 +94,11 @@ const Orders = () => {
 
     return orders.filter(o => {
       const txt = [
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         o?._id,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         o?.orderType,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ...(o?.items || []).flatMap((it: any) => [
           it?.product?.name,
           it?.product?.brand,
@@ -111,9 +111,9 @@ const Orders = () => {
 
       const matchSearch = !s || txt.includes(s);
       const matchStatus =
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         statusFilter === 'all' || (o?.status || '').toLowerCase() === statusFilter;
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const matchTime = timeOk(o?.createdAt);
       return matchSearch && matchStatus && matchTime;
     });
@@ -219,46 +219,46 @@ const Orders = () => {
         ) : (
           <div className="orders-list">
             {filtered.map(order => {
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const created = order?.createdAt
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ? new Date(order.createdAt).toLocaleDateString('en-IN', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
                   })
                 : '—';
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const status = (order?.status || 'unknown').toLowerCase();
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const payMethod = order?.paymentDetails?.method || '—';
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const payStatus = (order?.paymentDetails?.status || '—').toLowerCase();
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const address = order?.shippingDetails?.address || {};
               const commissionRate =
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 order?.commission?.rate != null ? Number(order.commission.rate) : null;
               const commissionAmt =
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 order?.commission?.amount != null ? Number(order.commission.amount) : null;
 
               return (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <div key={order._id} className="order-card simple">
                   {/* Top row */}
                   <div className="order-top">
                     <div className="order-top-left">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <h3 className="order-id">#{order._id}</h3>
                       <div className="order-chips">
                         <span className="chip">
                           <Calendar size={14} /> {created}
                         </span>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {order.orderType && (
                           <span className="chip outline">
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {(order.orderType || '').toUpperCase()}
                           </span>
                         )}
@@ -271,7 +271,7 @@ const Orders = () => {
                     <div className="order-total">
                       <div className="total-label">Total</div>
                       <div className="total-value">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         ₹{Number(order.totalAmount || 0).toLocaleString()}
                       </div>
                     </div>
@@ -285,7 +285,7 @@ const Orders = () => {
                         <Package size={16} /> Items
                       </div>
                       <div className="items-compact">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {(order.items || []).map((it: any, idx: any) => (
                           <div className="item-compact" key={idx}>
                             <div className="item-compact-img">
@@ -321,7 +321,7 @@ const Orders = () => {
                         <span
                           className={`v pill ${payStatus === 'paid' ? 'ok' : payStatus === 'pending' ? 'warn' : ''}`}
                         >
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {order?.paymentDetails?.status || '—'}
                         </span>
                       </div>
@@ -365,19 +365,19 @@ const Orders = () => {
 
                   {/* Actions (kept minimal) */}
                   <div className="order-actions simple">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <Link to={`/account/orders/${order._id}`} className="btn ghost">
                       <Eye size={16} />
                       <span>View Order</span>
                     </Link>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <button className="btn ghost" onClick={() => downloadInvoice(order._id)}>
                       <Download size={16} />
                       <span>Invoice</span>
                     </button>
 
                     {status === 'shipped' && (
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <button className="btn primary" onClick={() => trackOrder(order._id)}>
                         <Truck size={16} />
                         <span>Track</span>
@@ -387,7 +387,7 @@ const Orders = () => {
                     {(status === 'pending' ||
                       status === 'processing' ||
                       status === 'confirmed') && (
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <button className="btn danger" onClick={() => cancelOrder(order._id)}>
                         <X size={16} />
                         <span>Cancel</span>
@@ -395,7 +395,7 @@ const Orders = () => {
                     )}
 
                     {status === 'delivered' && (
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <button className="btn" onClick={() => requestReturn(order._id)}>
                         <RefreshCw size={16} />
                         <span>Return / Reorder</span>

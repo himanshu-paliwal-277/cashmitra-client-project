@@ -80,7 +80,7 @@ const Marketplace = () => {
       try {
         const categoriesData = await getBuyCategories();
         const allCategory = { _id: 'all', name: 'All', slug: 'all' };
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setCategories([allCategory, ...(categoriesData || [])]);
       } catch (err) {
         console.error('Error fetching categories:', err);
@@ -118,22 +118,22 @@ const Marketplace = () => {
         };
 
         if (selectedCategory && selectedCategory !== 'all') {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           params.category = selectedCategory;
         }
 
         if (searchQuery.trim()) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           params.search = searchQuery.trim();
         }
 
         if (filters.brand !== 'all') {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           params.brand = filters.brand;
         }
 
         if (sortBy !== 'popularity') {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           params.sortBy = sortBy;
         }
 
@@ -145,7 +145,7 @@ const Marketplace = () => {
         });
       } catch (err) {
         console.error('Error fetching buy products:', err);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError('Failed to load products. Please try again.');
       } finally {
         setIsLoading(false);
@@ -377,17 +377,17 @@ const Marketplace = () => {
           <h2 className="text-3xl font-bold text-slate-900 mb-6">Shop by Category</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {categories.map(category => {
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const IconComponent = getCategoryIcon(category.name);
               const isActive =
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 selectedCategory === category.name ||
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 (selectedCategory === 'all' && category._id === 'all');
 
               return (
                 <button
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   key={category._id}
                   onClick={() => handleCategoryClick(category)}
                   className={`p-6 rounded-2xl border-2 transition-all hover:scale-105 ${
@@ -396,12 +396,12 @@ const Marketplace = () => {
                       : 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-md'
                   }`}
                 >
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {category.image ? (
                     <img
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       src={category.image}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       alt={category.name}
                       className="w-12 h-12 mx-auto mb-3 object-contain"
                     />
@@ -417,7 +417,7 @@ const Marketplace = () => {
                       isActive ? 'text-blue-600' : 'text-slate-900'
                     }`}
                   >
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {category.name}
                   </h4>
                 </button>
@@ -499,7 +499,7 @@ const Marketplace = () => {
         {error ? (
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-slate-200">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <AlertCircle className="w-8 h-8 text-red-600" />
             </div>
             <h3 className="text-2xl font-bold text-slate-900 mb-2">Error Loading Products</h3>

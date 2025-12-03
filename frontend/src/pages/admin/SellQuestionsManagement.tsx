@@ -142,7 +142,7 @@ const SellQuestionsManagement = () => {
   const handleSaveQuestion = async (questionData: any) => {
     try {
       if (selectedQuestion) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         await updateQuestion(selectedQuestion._id, questionData);
       } else {
         await createQuestion(questionData);
@@ -185,32 +185,32 @@ const SellQuestionsManagement = () => {
 
   const handleReorder = async (questionId: any, direction: any) => {
     try {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const currentIndex = questions.findIndex(q => q._id === questionId);
       const newOrder =
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         direction === 'up' ? questions[currentIndex].order - 1 : questions[currentIndex].order + 1;
 
       if (newOrder >= 1 && newOrder <= questions.length) {
         const otherQuestion = questions.find(
           q =>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             q.order === newOrder &&
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             q.section === questions[currentIndex].section &&
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             (q.categoryId?._id || q.categoryId) ===
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               (questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId)
         );
         if (otherQuestion) {
           await reorderQuestions({
             categoryId:
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId,
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             section: questions[currentIndex].section,
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             questionIds: [questionId, otherQuestion._id],
           });
         }
@@ -230,13 +230,13 @@ const SellQuestionsManagement = () => {
       slider: 'bg-orange-100 text-orange-800',
       toggle: 'bg-pink-100 text-pink-800',
     };
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     return colors[type] || 'bg-gray-100 text-gray-800';
   };
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const renderQuestionCard = (question: any) => <Card key={question._id} hoverable className="flex flex-col h-full transition-all duration-200">
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     <Card.Header divider className="bg-gray-50">
       <div className="flex justify-between items-start gap-4">
         <div className="flex-1 min-w-0">
@@ -280,10 +280,10 @@ const SellQuestionsManagement = () => {
           </div>
         </div>
       </div>
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     </Card.Header>
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     <Card.Body className="flex-1">
       {question.description && (
         <p className="text-sm text-gray-600 mb-4 line-clamp-2">{question.description}</p>
@@ -319,10 +319,10 @@ const SellQuestionsManagement = () => {
           </div>
         </div>
       )}
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     </Card.Body>
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     <Card.Footer divider className="bg-gray-50">
       <div className="flex gap-2">
         <button
@@ -347,7 +347,7 @@ const SellQuestionsManagement = () => {
           Delete
         </button>
       </div>
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     </Card.Footer>
   </Card>;
 
@@ -409,26 +409,26 @@ const SellQuestionsManagement = () => {
         </thead>
         <tbody>
           {questions.map(question => (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <tr key={question._id} className="hover:bg-gray-50 transition-colors">
               <td className="px-4 py-3 border-b border-gray-200">
                 <div className="flex items-center gap-2">
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <span className="font-semibold text-gray-900">{question.order}</span>
                   <div className="flex gap-1">
                     <button
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       onClick={() => handleReorder(question._id, 'up')}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       disabled={question.order === 1}
                       className="p-0.5 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:text-amber-600 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronUp size={12} />
                     </button>
                     <button
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       onClick={() => handleReorder(question._id, 'down')}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       disabled={question.order === questions.length}
                       className="p-0.5 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:text-amber-600 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
@@ -438,12 +438,12 @@ const SellQuestionsManagement = () => {
                 </div>
               </td>
               <td className="px-4 py-3 border-b border-gray-200">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <div className="font-semibold text-gray-900">{question.title}</div>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {question.description && (
                   <div className="text-sm text-gray-600 mt-1 truncate max-w-md">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {question.description.substring(0, 60)}...
                   </div>
                 )}
@@ -460,7 +460,7 @@ const SellQuestionsManagement = () => {
                 </span>
               </td>
               <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {question.categoryId?.name || question.categoryId || 'Unknown'}
               </td>
               <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
@@ -481,7 +481,7 @@ const SellQuestionsManagement = () => {
               <td className="px-4 py-3 border-b border-gray-200">
                 <div className="flex gap-2">
                   <button
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
                     className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
                     title="View"
@@ -496,7 +496,7 @@ const SellQuestionsManagement = () => {
                     <Edit size={14} />
                   </button>
                   <button
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     onClick={() => handleDeleteQuestion(question._id)}
                     className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-red-500 hover:text-red-600 transition-colors"
                     title="Delete"
@@ -624,7 +624,7 @@ const SellQuestionsManagement = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {stats.map((stat, index) => (
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Card key={index} className="flex items-center gap-4 p-6">
             <div className={cn('p-3 rounded-xl text-white', stat.color)}>
               <stat.icon size={24} />
@@ -638,7 +638,7 @@ const SellQuestionsManagement = () => {
       </div>
 
       {/* Filters Section */}
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       <Card className="mb-8 p-6">
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Search Input */}
@@ -676,9 +676,9 @@ const SellQuestionsManagement = () => {
           >
             <option value="">All Categories</option>
             {categories.map(category => (
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <option key={category._id} value={category._id}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {category.name}
               </option>
             ))}
@@ -733,7 +733,7 @@ const SellQuestionsManagement = () => {
       </Card>
 
       {/* Questions Section */}
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       <Card className="overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-gray-900">

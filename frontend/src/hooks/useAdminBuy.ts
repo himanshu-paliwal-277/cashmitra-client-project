@@ -48,7 +48,7 @@ const useAdminBuy = () => {
         avgPrice: Math.round(avgPrice),
       });
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.message || 'Failed to fetch buy orders');
       console.error('Error fetching buy orders:', err);
     } finally {
@@ -80,10 +80,10 @@ const useAdminBuy = () => {
         await fetchBuyOrders();
         return { success: true };
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.message || 'Failed to update order status');
         console.error('Error updating order status:', err);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         return { success: false, error: err.message };
       } finally {
         setLoading(false);
@@ -116,10 +116,10 @@ const useAdminBuy = () => {
         await fetchBuyOrders();
         return { success: true };
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.message || 'Failed to create buy order');
         console.error('Error creating buy order:', err);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         return { success: false, error: err.message };
       } finally {
         setLoading(false);
@@ -151,10 +151,10 @@ const useAdminBuy = () => {
         await fetchBuyOrders();
         return { success: true };
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.message || 'Failed to delete buy order');
         console.error('Error deleting buy order:', err);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         return { success: false, error: err.message };
       } finally {
         setLoading(false);

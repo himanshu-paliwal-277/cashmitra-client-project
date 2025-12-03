@@ -108,7 +108,7 @@ const SellAccessoriesManagement = () => {
       limit: 12,
     };
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     fetchAccessories(filters);
     getAllCategories();
   }, [searchTerm, categoryFilter, statusFilter, sortBy, sortOrder, currentPage]);
@@ -122,15 +122,15 @@ const SellAccessoriesManagement = () => {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(
         accessory =>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           (accessory.title && accessory.title.toLowerCase().includes(searchLower)) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           (accessory.key && accessory.key.toLowerCase().includes(searchLower)) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           (accessory.categoryId?.name &&
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             accessory.categoryId.name.toLowerCase().includes(searchLower)) ||
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           (accessory.category && accessory.category.toLowerCase().includes(searchLower))
       );
     }
@@ -148,7 +148,7 @@ const SellAccessoriesManagement = () => {
       page: currentPage,
       limit: 12,
     };
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     fetchAccessories(filters);
   };
 
@@ -205,7 +205,7 @@ const SellAccessoriesManagement = () => {
     e.preventDefault();
     try {
       if (editingAccessory) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         await updateAccessory(editingAccessory._id, formData);
       } else {
         await createAccessory(formData);
@@ -312,9 +312,9 @@ const SellAccessoriesManagement = () => {
     const IconComponent = getAccessoryIcon(accessory.category || 'default');
 
     return (
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       <Card key={accessory._id} hoverable className="flex flex-col h-full">
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <Card.Header divider className="bg-gray-50">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -330,10 +330,10 @@ const SellAccessoriesManagement = () => {
               {accessory.isActive ? 'Active' : 'Inactive'}
             </span>
           </div>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         </Card.Header>
 
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <Card.Body className="flex-1">
           <p className="text-sm text-gray-600 mb-4">Key: {accessory.key || 'No Key'}</p>
 
@@ -357,10 +357,10 @@ const SellAccessoriesManagement = () => {
               {accessory.delta?.value || 0} {accessory.delta?.type === 'percent' ? '%' : '₹'}
             </div>
           </div>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         </Card.Body>
 
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <Card.Footer divider className="bg-gray-50">
           <div className="flex justify-between items-center">
             <div className="flex gap-2">
@@ -403,7 +403,7 @@ const SellAccessoriesManagement = () => {
               </button>
             </div>
           </div>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         </Card.Footer>
       </Card>
     );
@@ -420,11 +420,11 @@ const SellAccessoriesManagement = () => {
         <td className="px-4 py-3">
           <input
             type="checkbox"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             checked={selectedAccessories.includes(accessory._id)}
             onChange={e => {
               if (e.target.checked) {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 setSelectedAccessories([...selectedAccessories, accessory._id]);
               } else {
                 setSelectedAccessories(selectedAccessories.filter(id => id !== accessory._id));
@@ -558,7 +558,7 @@ const SellAccessoriesManagement = () => {
       </div>
 
       {/* Filters Section */}
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       <Card className="mb-6 p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="lg:col-span-2">
@@ -687,7 +687,7 @@ const SellAccessoriesManagement = () => {
               {filteredAccessories.map(renderAccessoryCard)}
             </div>
           ) : (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card className="overflow-hidden mb-8">
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
@@ -700,7 +700,7 @@ const SellAccessoriesManagement = () => {
                           onChange={e => {
                             if (e.target.checked) {
                               setSelectedAccessories(
-                                {/* @ts-expect-error */}
+                                // @ts-expect-error
                                 filteredAccessories.map(accessory => accessory._id)
                               );
                             } else {
@@ -744,7 +744,7 @@ const SellAccessoriesManagement = () => {
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
               <div className="text-sm text-gray-600">
                 Showing {(currentPage - 1) * 12 + 1} to{' '}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {Math.min(currentPage * 12, pagination.totalItems)} of {pagination.totalItems}{' '}
                 accessories
               </div>
@@ -820,9 +820,9 @@ const SellAccessoriesManagement = () => {
                     <option value="">Select a category</option>
                     {categories &&
                       categories.map(category => (
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <option key={category._id} value={category._id}>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {category.name}
                         </option>
                       ))}
@@ -856,7 +856,7 @@ const SellAccessoriesManagement = () => {
                     placeholder="Enter accessory title"
                     value={formData.title}
                     onChange={e => setFormData({ ...formData, title: e.target.value })}
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     maxLength="200"
                     required
                     className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"

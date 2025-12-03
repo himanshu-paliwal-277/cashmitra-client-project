@@ -18,7 +18,7 @@ import useUserAddresses from '../../hooks/useUserAddresses';
 import './SavedAddresses.css';
 
 const SavedAddresses = () => {
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { user } = useAuth();
   const {
     addresses,
@@ -111,7 +111,7 @@ const SavedAddresses = () => {
     try {
       setSaving(true);
       if (editingAddress) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         await updateAddress(editingAddress._id || editingAddress.id, formData);
       } else {
         await addAddress(formData);
@@ -167,7 +167,7 @@ const SavedAddresses = () => {
             <h1 className="addr-title">Saved Addresses</h1>
             <p className="addr-subtitle">Manage your delivery addresses</p>
           </div>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Button variant="primary" onClick={handleAddAddress}>
             <Plus size={18} />
             <span>Add New Address</span>
@@ -183,20 +183,20 @@ const SavedAddresses = () => {
         ) : addresses?.length > 0 ? (
           <div className="addr-grid">
             {addresses.map(address => {
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const id = address._id || address.id;
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const type = address.addressType || address.type || 'home';
               return (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <Card key={id} className={`addr-card ${address.isDefault ? 'is-default' : ''}`}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {address.isDefault && <span className="addr-badge">Default</span>}
 
                   <div className="addr-card-head">
                     <div className="addr-type">
                       {getAddressTypeIcon(type)}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <span>{address.title || getAddressTypeLabel(type)}</span>
                     </div>
                     <div className="addr-actions">
@@ -218,28 +218,28 @@ const SavedAddresses = () => {
                   </div>
 
                   <div className="addr-content">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <h3 className="addr-name">{address.fullName || address.name}</h3>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <p className="addr-line">{address.street || address.addressLine1}</p>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {address.addressLine2 && <p className="addr-line">{address.addressLine2}</p>}
                     <p className="addr-line">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {address.city}, {address.state} — {address.pincode}
                     </p>
 
                     <div className="addr-contact">
                       <div className="addr-contact-item">
                         <Phone size={14} />
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <span>{address.phone}</span>
                       </div>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {address.email && (
                         <div className="addr-contact-item">
                           <Mail size={14} />
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <span>{address.email}</span>
                         </div>
                       )}
@@ -250,7 +250,7 @@ const SavedAddresses = () => {
             })}
           </div>
         ) : (
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Card>
             <div className="addr-empty">
               <div className="addr-empty-icon">
@@ -260,7 +260,7 @@ const SavedAddresses = () => {
               <p className="addr-empty-desc">
                 Add your delivery addresses to make checkout faster and easier.
               </p>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <Button variant="primary" size="lg" onClick={handleAddAddress}>
                 <Plus size={18} /> <span>Add Your First Address</span>
               </Button>
@@ -487,11 +487,11 @@ const SavedAddresses = () => {
               </div>
 
               <footer className="addr-form-actions">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <Button type="button" variant="ghost" onClick={closeModal} disabled={saving}>
                   Cancel
                 </Button>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <Button type="submit" variant="primary" disabled={saving}>
                   {saving ? (
                     <>

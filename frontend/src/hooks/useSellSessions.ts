@@ -31,7 +31,7 @@ const useSellSessions = () => {
       setCurrentSession(response.data.session);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to create session');
       throw err;
     } finally {
@@ -54,7 +54,7 @@ const useSellSessions = () => {
       setSessions(response.data.data || []);
       return response.data.data || [];
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch sessions');
       throw err;
     } finally {
@@ -77,7 +77,7 @@ const useSellSessions = () => {
       setCurrentSession(response.data.session);
       return response.data.session;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch session');
       throw err;
     } finally {
@@ -101,7 +101,7 @@ const useSellSessions = () => {
       setCurrentSession(response.data.session);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to update session answers');
       throw err;
     } finally {
@@ -125,7 +125,7 @@ const useSellSessions = () => {
       setCurrentSession(response.data.session);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to update session defects');
       throw err;
     } finally {
@@ -149,7 +149,7 @@ const useSellSessions = () => {
       setCurrentSession(response.data.session);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to update session accessories');
       throw err;
     } finally {
@@ -172,7 +172,7 @@ const useSellSessions = () => {
       setCurrentPrice(response.data.price);
       return response.data.price;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to get current price');
       throw err;
     } finally {
@@ -199,7 +199,7 @@ const useSellSessions = () => {
       setCurrentSession(response.data.session);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to extend session');
       throw err;
     } finally {
@@ -221,17 +221,17 @@ const useSellSessions = () => {
         });
 
         // Remove from sessions list
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setSessions(prev => prev.filter(session => session._id !== sessionId));
 
         // Clear current session if it was deleted
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         if (currentSession?._id === sessionId) {
           setCurrentSession(null);
           setCurrentPrice(null);
         }
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to delete session');
         throw err;
       } finally {
@@ -255,7 +255,7 @@ const useSellSessions = () => {
 
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to clean expired sessions');
       throw err;
     } finally {
@@ -276,7 +276,7 @@ const useSellSessions = () => {
 
       return response.data.price;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to calculate price');
       throw err;
     } finally {

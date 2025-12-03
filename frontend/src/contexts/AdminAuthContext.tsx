@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { loginAdmin, getAdminProfile } from '../services/adminService';
 
 // Create the context
-{/* @ts-expect-error */}
+// @ts-expect-error
 const AdminAuthContext = createContext();
 
 // Custom hook to use the admin auth context
@@ -69,7 +69,7 @@ export const AdminAuthProvider = ({
 
       return data;
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(error.response?.data?.message || 'Login failed');
       throw error;
     } finally {
@@ -105,7 +105,7 @@ export const AdminAuthProvider = ({
       return profileData.admin;
     } catch (error) {
       console.error('Error refreshing profile:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (error.response?.status === 401) {
         logout();
       }

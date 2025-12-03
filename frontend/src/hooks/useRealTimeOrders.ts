@@ -3,19 +3,19 @@ import useWebSocket from './useWebSocket';
 
 const useRealTimeOrders = (orderType = 'all', options = {}) => {
   const {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     pollingInterval = 5000,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     enableWebSocket = true,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     maxRetries = 3,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     autoStart = true,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     onUpdate = null,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     onError = null,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     filters = {},
   } = options;
 
@@ -43,22 +43,22 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
   const mountedRef = useRef(true);
 
   // WebSocket connection
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
 
   const handleWebSocketMessage = useCallback((data: any) => {
     if (data.type === 'orderUpdate') {
       setOrders(prevOrders => {
         const updatedOrders = [...prevOrders];
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         const existingIndex = updatedOrders.findIndex(order => order._id === data.order._id);
 
         if (existingIndex >= 0) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           updatedOrders[existingIndex] = data.order;
         } else {
           // Add new order to the beginning
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           updatedOrders.unshift(data.order);
         }
 
@@ -70,7 +70,7 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
         setStatistics(data.statistics);
       }
     } else if (data.type === 'orderDeleted') {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setOrders(prevOrders => prevOrders.filter(order => order._id !== data.orderId));
     }
   }, []);
@@ -83,7 +83,7 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
   // Cleanup function
   const cleanup = useCallback(() => {
     if (wsRef.current) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       wsRef.current.close();
       wsRef.current = null;
     }
@@ -107,7 +107,7 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
 
     ordersData.forEach((order: any) => {
       if (stats.hasOwnProperty(order.status)) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         stats[order.status]++;
       }
     });
@@ -121,9 +121,9 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
       if (!mountedRef.current) return;
 
       setOrders(newOrders);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setStatistics(calculateStats(newOrders));
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setLastUpdated(new Date().toISOString());
       setError(null);
       retryCountRef.current = 0;
@@ -160,9 +160,9 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
 
         const queryParams = new URLSearchParams({
           type: orderType,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           limit: options.limit || 50,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           page: params.page || 1,
           ...params,
         });
@@ -189,13 +189,13 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
         }
       } catch (err) {
         console.error('Error fetching orders:', err);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.message);
       } finally {
         setLoading(false);
       }
     },
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     [orderType, options.limit]
   );
 

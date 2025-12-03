@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   LineChart,
@@ -271,14 +271,14 @@ const RealTimeCharts = ({
 
     // Group orders by date
     const dateGroups = {};
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     ordersData.forEach(order => {
       const orderDate = new Date(order.createdAt);
       if (orderDate >= startDate) {
         const dateKey = orderDate.toISOString().split('T')[0];
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         if (!dateGroups[dateKey]) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           dateGroups[dateKey] = {
             date: dateKey,
             orders: 0,
@@ -287,15 +287,15 @@ const RealTimeCharts = ({
             buyOrders: 0,
           };
         }
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         dateGroups[dateKey].orders += 1;
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         dateGroups[dateKey].revenue += order.totalAmount || 0;
         if (order.orderType === 'sell') {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           dateGroups[dateKey].sellOrders += 1;
         } else {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           dateGroups[dateKey].buyOrders += 1;
         }
       }
@@ -313,7 +313,7 @@ const RealTimeCharts = ({
 
       result.push({
         date: displayDate,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ...(dateGroups[dateKey] || { orders: 0, revenue: 0, sellOrders: 0, buyOrders: 0 }),
       });
     }
@@ -325,7 +325,7 @@ const RealTimeCharts = ({
   const statusDistribution = useMemo(() => {
     if (!ordersData.length) return [];
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const statusCounts = ordersData.reduce((acc, order) => {
       acc[order.status] = (acc[order.status] || 0) + 1;
       return acc;
@@ -334,7 +334,7 @@ const RealTimeCharts = ({
     return Object.entries(statusCounts).map(([status, count]) => ({
       name: status.charAt(0).toUpperCase() + status.slice(1),
       value: count,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       percentage: ((count / ordersData.length) * 100).toFixed(1),
     }));
   }, [ordersData]);
@@ -343,7 +343,7 @@ const RealTimeCharts = ({
   const typeDistribution = useMemo(() => {
     if (!ordersData.length) return [];
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const typeCounts = ordersData.reduce((acc, order) => {
       acc[order.orderType] = (acc[order.orderType] || 0) + 1;
       return acc;
@@ -352,7 +352,7 @@ const RealTimeCharts = ({
     return Object.entries(typeCounts).map(([type, count]) => ({
       name: type === 'sell' ? 'Sell Orders' : 'Buy Orders',
       value: count,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       percentage: ((count / ordersData.length) * 100).toFixed(1),
     }));
   }, [ordersData]);
@@ -360,10 +360,10 @@ const RealTimeCharts = ({
   // Calculate metrics
   const metrics = useMemo(() => {
     const totalOrders = ordersData.length;
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const totalRevenue = ordersData.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
     const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const completedOrders = ordersData.filter(order => order.status === 'delivered').length;
     const completionRate = totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
 

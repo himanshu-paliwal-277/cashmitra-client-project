@@ -5,7 +5,7 @@ import App from './App';
 import './index.css';
 import './index.tailwind.css';
 
-{/* @ts-expect-error */}
+// @ts-expect-error
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HelmetProvider>

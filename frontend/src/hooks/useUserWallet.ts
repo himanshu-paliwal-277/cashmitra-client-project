@@ -16,7 +16,7 @@ const useUserWallet = () => {
       setWallet(response.data);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch wallet details');
       throw err;
     } finally {
@@ -37,7 +37,7 @@ const useUserWallet = () => {
       setTransactions(response.data);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch transactions');
       throw err;
     } finally {
@@ -57,19 +57,19 @@ const useUserWallet = () => {
 
       // Update wallet balance
       setWallet(prev => ({
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ...prev,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         balance: prev.balance + amount,
       }));
 
       // Add transaction to list
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setTransactions(prev => [response.data.transaction, ...prev]);
 
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to add money to wallet');
       throw err;
     } finally {
@@ -89,19 +89,19 @@ const useUserWallet = () => {
 
       // Update wallet balance
       setWallet(prev => ({
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ...prev,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         balance: prev.balance - amount,
       }));
 
       // Add transaction to list
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setTransactions(prev => [response.data.transaction, ...prev]);
 
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to withdraw money');
       throw err;
     } finally {
@@ -122,19 +122,19 @@ const useUserWallet = () => {
 
       // Update wallet balance
       setWallet(prev => ({
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ...prev,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         balance: prev.balance - amount,
       }));
 
       // Add transaction to list
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setTransactions(prev => [response.data.transaction, ...prev]);
 
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to transfer money');
       throw err;
     } finally {
@@ -150,7 +150,7 @@ const useUserWallet = () => {
       const response = await api.get(`/user/wallet/transactions/${transactionId}`);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch transaction details');
       throw err;
     } finally {
@@ -180,7 +180,7 @@ const useUserWallet = () => {
 
       return true;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to download statement');
       throw err;
     } finally {

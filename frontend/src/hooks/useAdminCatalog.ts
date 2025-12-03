@@ -17,7 +17,7 @@ export const useAdminCatalog = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [productStats, setProductStats] = useState(null);
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { getAuthHeader } = useAdminAuth();
 
   const fetchProducts = useCallback(async (params = {}) => {
@@ -39,7 +39,7 @@ export const useAdminCatalog = () => {
 
       // Set product stats based on API response structure
       setProductStats({
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         totalProducts: response.pagination?.totalItems || response.totalProducts || 0,
         activeProducts: response.products?.filter((p: any) => p.isActive === true)?.length || 0,
         pendingProducts: response.products?.filter((p: any) => p.isActive === false)?.length || 0,
@@ -48,7 +48,7 @@ export const useAdminCatalog = () => {
 
       return response;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch products');
       throw err;
     } finally {
@@ -63,7 +63,7 @@ export const useAdminCatalog = () => {
       const response = await getProductById(id);
       return response.product;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch product');
       throw err;
     } finally {
@@ -81,7 +81,7 @@ export const useAdminCatalog = () => {
         fetchProducts();
         return response;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to add product');
         throw err;
       } finally {
@@ -97,14 +97,14 @@ export const useAdminCatalog = () => {
     try {
       const response = await updateProduct(id, productData);
       // Update the product in the local state
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setProducts(prevProducts =>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         prevProducts.map(product => (product._id === id ? { ...product, ...productData } : product))
       );
       return response;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to update product');
       throw err;
     } finally {
@@ -118,11 +118,11 @@ export const useAdminCatalog = () => {
     try {
       const response = await deleteProduct(id);
       // Remove the product from the local state
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setProducts(prevProducts => prevProducts.filter(product => product._id !== id));
       return response;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to delete product');
       throw err;
     } finally {

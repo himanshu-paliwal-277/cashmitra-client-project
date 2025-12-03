@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { X, Save, AlertCircle } from 'lucide-react';
 import adminService from '../services/adminService';
@@ -243,7 +243,7 @@ const DefectModal = ({
       setCategories(response.data || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setCategoriesError('Failed to fetch categories');
     } finally {
       setCategoriesLoading(false);
@@ -293,42 +293,42 @@ const DefectModal = ({
 
     // Category ID validation
     if (!formData.categoryId) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.categoryId = 'Please select a category';
     }
 
     // Section validation
     if (!formData.section) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.section = 'Section is required';
     }
 
     // Key validation
     if (!formData.key.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.key = 'Key is required';
     } else if (!/^[a-z0-9_]+$/.test(formData.key)) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.key = 'Key must contain only lowercase letters, numbers, and underscores';
     }
 
     // Title validation
     if (!formData.title.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.title = 'Title is required';
     }
 
     // Delta validation
     if (!formData.delta.type || !['abs', 'percent'].includes(formData.delta.type)) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.deltaType = 'Delta type must be either abs or percent';
     }
     if (!formData.delta.sign || !['+', '-'].includes(formData.delta.sign)) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.deltaSign = 'Delta sign must be either + or -';
     }
     if (formData.delta.value < 0) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.deltaValue = 'Delta value must be a non-negative number';
     }
 
@@ -353,7 +353,7 @@ const DefectModal = ({
     }));
 
     // Clear error when user starts typing
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -383,18 +383,18 @@ const DefectModal = ({
             >
               <option value="">Select a category</option>
               {categories.map(category => (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <option key={category._id} value={category._id}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {category.name}
                 </option>
               ))}
             </Select>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {errors.categoryId && (
               <ErrorMessage>
                 <AlertCircle size={16} />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.categoryId}
               </ErrorMessage>
             )}
@@ -413,11 +413,11 @@ const DefectModal = ({
                 </option>
               ))}
             </Select>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {errors.section && (
               <ErrorMessage>
                 <AlertCircle size={16} />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.section}
               </ErrorMessage>
             )}
@@ -431,11 +431,11 @@ const DefectModal = ({
               onChange={(e: any) => handleInputChange('key', e.target.value.toLowerCase())}
               placeholder="Enter key (lowercase, numbers, underscores only)"
             />
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {errors.key && (
               <ErrorMessage>
                 <AlertCircle size={16} />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.key}
               </ErrorMessage>
             )}
@@ -449,11 +449,11 @@ const DefectModal = ({
               onChange={(e: any) => handleInputChange('title', e.target.value)}
               placeholder="Enter defect title"
             />
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {errors.title && (
               <ErrorMessage>
                 <AlertCircle size={16} />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.title}
               </ErrorMessage>
             )}
@@ -510,11 +510,11 @@ const DefectModal = ({
                 />
               </div>
             </div>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {(errors.deltaType || errors.deltaSign || errors.deltaValue) && (
               <ErrorMessage>
                 <AlertCircle size={16} />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.deltaType || errors.deltaSign || errors.deltaValue}
               </ErrorMessage>
             )}

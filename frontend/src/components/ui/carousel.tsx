@@ -19,17 +19,17 @@ function useCarousel() {
 const Carousel = React.forwardRef(
   (
     {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       orientation = 'horizontal',
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       opts,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setApi,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       plugins,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       className,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       children,
       ...props
     },
@@ -99,7 +99,7 @@ const Carousel = React.forwardRef(
 
     return (
       <CarouselContext.Provider
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         value={{
           carouselRef,
           api: api,
@@ -112,7 +112,7 @@ const Carousel = React.forwardRef(
         }}
       >
         <div
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           ref={ref}
           onKeyDownCapture={handleKeyDown}
           className={cn('relative', className)}
@@ -128,14 +128,14 @@ const Carousel = React.forwardRef(
 );
 Carousel.displayName = 'Carousel';
 
-{/* @ts-expect-error */}
+// @ts-expect-error
 const CarouselContent = React.forwardRef(({ className, ...props }, ref) => {
   const { carouselRef, orientation } = useCarousel();
 
   return (
     <div ref={carouselRef} className="overflow-hidden">
       <div
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ref={ref}
         className={cn(
           'flex',
@@ -149,13 +149,13 @@ const CarouselContent = React.forwardRef(({ className, ...props }, ref) => {
 });
 CarouselContent.displayName = 'CarouselContent';
 
-{/* @ts-expect-error */}
+// @ts-expect-error
 const CarouselItem = React.forwardRef(({ className, ...props }, ref) => {
   const { orientation } = useCarousel();
 
   return (
     <div
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       ref={ref}
       role="group"
       aria-roledescription="slide"
@@ -171,13 +171,13 @@ const CarouselItem = React.forwardRef(({ className, ...props }, ref) => {
 CarouselItem.displayName = 'CarouselItem';
 
 const CarouselPrevious = React.forwardRef(
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   ({ className, variant = 'outline', size = 'icon', ...props }, ref) => {
     const { orientation, scrollPrev, canScrollPrev } = useCarousel();
 
     return (
       <button
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ref={ref}
         className={cn(
           'absolute h-8 w-8 rounded-full flex items-center justify-center',
@@ -202,13 +202,13 @@ const CarouselPrevious = React.forwardRef(
 CarouselPrevious.displayName = 'CarouselPrevious';
 
 const CarouselNext = React.forwardRef(
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   ({ className, variant = 'outline', size = 'icon', ...props }, ref) => {
     const { orientation, scrollNext, canScrollNext } = useCarousel();
 
     return (
       <button
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ref={ref}
         className={cn(
           'absolute h-8 w-8 rounded-full flex items-center justify-center',

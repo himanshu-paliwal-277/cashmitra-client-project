@@ -5,23 +5,23 @@ import { cn } from '../../lib/utils';
 const Input = React.forwardRef(
   (
     {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       className,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       type,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       error,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       label,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       leftIcon,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       rightIcon,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       helperText,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       required,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       id,
       ...props
     },
@@ -62,7 +62,7 @@ const Input = React.forwardRef(
               rightIcon && 'pr-10',
               className
             )}
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             ref={ref}
             aria-invalid={hasError}
             aria-describedby={error ? `${inputId}-error` : undefined}

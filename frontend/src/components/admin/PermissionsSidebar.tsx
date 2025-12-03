@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   X,
@@ -430,7 +430,7 @@ const PermissionsSidebar = ({
 
     try {
       setLoading(true);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setStatus({ type: 'loading', message: 'Loading permissions...' });
 
       const response = await partnerPermissionService.getPartnerPermissions(selectedPartner.id);
@@ -441,17 +441,17 @@ const PermissionsSidebar = ({
       setOriginalPermissions(permissionsData);
       setRoleTemplate(roleData);
       setHasChanges(false);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setStatus({ type: 'success', message: 'Permissions loaded successfully' });
 
       // Auto-expand first category
       if (PARTNER_MENU_ITEMS.length > 0) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setExpandedCategories({ [PARTNER_MENU_ITEMS[0].section]: true });
       }
     } catch (error) {
       console.error('Error loading permissions:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setStatus({ type: 'error', message: 'Failed to load permissions' });
       toast.error('Failed to load partner permissions');
     } finally {
@@ -478,9 +478,9 @@ const PermissionsSidebar = ({
     setPermissions(prev => ({
       ...prev,
       [permissionKey]: {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ...prev[permissionKey],
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         granted: !prev[permissionKey]?.granted,
       },
     }));
@@ -492,7 +492,7 @@ const PermissionsSidebar = ({
 
     try {
       setLoading(true);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setStatus({ type: 'loading', message: 'Applying role template...' });
 
       await partnerPermissionService.applyRoleTemplate(selectedPartner.id, templateKey);
@@ -501,10 +501,10 @@ const PermissionsSidebar = ({
       await loadPermissions();
 
       setRoleTemplate(templateKey);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setStatus({ type: 'success', message: 'Role template applied successfully' });
       toast.success(
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         `Role template "${PARTNER_ROLE_TEMPLATES[templateKey]?.label}" applied successfully`
       );
 
@@ -514,7 +514,7 @@ const PermissionsSidebar = ({
       }
     } catch (error) {
       console.error('Error applying role template:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setStatus({ type: 'error', message: 'Failed to apply role template' });
       toast.error('Failed to apply role template');
     } finally {
@@ -528,7 +528,7 @@ const PermissionsSidebar = ({
 
     try {
       setLoading(true);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setStatus({ type: 'loading', message: 'Saving permissions...' });
 
       await partnerPermissionService.updatePartnerPermissions(selectedPartner.id, {
@@ -538,7 +538,7 @@ const PermissionsSidebar = ({
 
       setOriginalPermissions(permissions);
       setHasChanges(false);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setStatus({ type: 'success', message: 'Permissions saved successfully' });
       toast.success('Partner permissions updated successfully');
 
@@ -548,7 +548,7 @@ const PermissionsSidebar = ({
       }
     } catch (error) {
       console.error('Error saving permissions:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setStatus({ type: 'error', message: 'Failed to save permissions' });
       toast.error('Failed to save permissions');
     } finally {
@@ -567,7 +567,7 @@ const PermissionsSidebar = ({
   const toggleCategory = (categoryName: any) => {
     setExpandedCategories(prev => ({
       ...prev,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       [categoryName]: !prev[categoryName],
     }));
   };
@@ -594,7 +594,7 @@ const PermissionsSidebar = ({
       'Support & Communication': HelpCircle,
       Settings: Settings,
     };
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     return iconMap[sectionName] || Settings;
   };
 
@@ -623,7 +623,7 @@ const PermissionsSidebar = ({
           <PartnerDetails>
             <PartnerName>{selectedPartner.shopName || selectedPartner.name}</PartnerName>
             <PartnerRole>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {PARTNER_ROLE_TEMPLATES[roleTemplate]?.label || 'Basic Partner'}
             </PartnerRole>
           </PartnerDetails>
@@ -631,15 +631,15 @@ const PermissionsSidebar = ({
 
         {/* Status Indicator */}
         {status && (
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <StatusIndicator $status={status.type}>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {status.type === 'loading' && <RefreshCw size={14} className="animate-spin" />}
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {status.type === 'success' && <CheckCircle size={14} />}
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {status.type === 'error' && <AlertCircle size={14} />}
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {status.message}
           </StatusIndicator>
         )}
@@ -681,7 +681,7 @@ const PermissionsSidebar = ({
         <PermissionsSection>
           {filteredMenuItems.map(section => {
             const IconComponent = getCategoryIcon(section.section);
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             const isExpanded = expandedCategories[section.section];
 
             return (
@@ -698,7 +698,7 @@ const PermissionsSidebar = ({
 
                 <PermissionsList $isExpanded={isExpanded}>
                   {section.items.map(item => {
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     const permissionData = permissions[item.requiredPermission];
                     const isEnabled = permissionData?.granted || false;
 

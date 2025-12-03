@@ -45,7 +45,7 @@ const useSellDefects = () => {
         totalPages: response.data.totalPages || 0,
       });
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch defects');
     } finally {
       setLoading(false);
@@ -65,7 +65,7 @@ const useSellDefects = () => {
       });
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch defect');
       throw err;
     } finally {
@@ -91,7 +91,7 @@ const useSellDefects = () => {
         await fetchDefects();
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to create defect');
         throw err;
       } finally {
@@ -119,7 +119,7 @@ const useSellDefects = () => {
         await fetchDefects();
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to update defect');
         throw err;
       } finally {
@@ -145,7 +145,7 @@ const useSellDefects = () => {
         // Refresh defects list
         await fetchDefects();
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to delete defect');
         throw err;
       } finally {
@@ -173,7 +173,7 @@ const useSellDefects = () => {
         await fetchDefects();
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to create defects');
         throw err;
       } finally {
@@ -201,7 +201,7 @@ const useSellDefects = () => {
         await fetchDefects();
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to reorder defects');
         throw err;
       } finally {
@@ -232,7 +232,7 @@ const useSellDefects = () => {
         await fetchDefects();
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to toggle defect status');
         throw err;
       } finally {
@@ -250,7 +250,7 @@ const useSellDefects = () => {
       const response = await api.get(`/sell-defects/category/${categoryId}`);
       return response.data.data || [];
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch defects');
       throw err;
     } finally {
@@ -265,7 +265,7 @@ const useSellDefects = () => {
       const response = await api.get(`/sell-defects/public/defect/${defectId}`);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch defect');
       throw err;
     } finally {

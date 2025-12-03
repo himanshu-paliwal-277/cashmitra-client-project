@@ -286,17 +286,17 @@ const PartnerPermissions = () => {
       // Edit existing template
       setEditingTemplate(template);
       setFormData({
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         name: template.name || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         displayName: template.displayName || template.label || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         description: template.description || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         color: template.color || '#3b82f6',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         permissions: template.permissions || [],
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         features: template.features || {
           bulkUpload: false,
           advancedAnalytics: false,
@@ -304,7 +304,7 @@ const PartnerPermissions = () => {
           customBranding: false,
           apiAccess: false,
         },
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         limits: template.limits || {
           maxInventoryItems: 100,
           maxMonthlyTransactions: 50,
@@ -352,10 +352,10 @@ const PartnerPermissions = () => {
   };
 
   const handlePermissionToggle = (permission: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setFormData(prev => ({
       ...prev,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       permissions: prev.permissions.includes(permission)
         ? prev.permissions.filter(p => p !== permission)
         : [...prev.permissions, permission],
@@ -367,7 +367,7 @@ const PartnerPermissions = () => {
       ...prev,
       features: {
         ...prev.features,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         [feature]: !prev.features[feature],
       },
     }));
@@ -415,7 +415,7 @@ const PartnerPermissions = () => {
       if (editingTemplate) {
         // Update existing template
         await partnerPermissionService.updateRoleTemplate(
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           editingTemplate.id || editingTemplate.name,
           templateData
         );
@@ -435,7 +435,7 @@ const PartnerPermissions = () => {
       }, 1000);
     } catch (err) {
       console.error('Error saving role template:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to save role template');
     } finally {
       setLoading(false);
@@ -465,7 +465,7 @@ const PartnerPermissions = () => {
       await loadRoleTemplates();
     } catch (err) {
       console.error('Error deleting role template:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to delete role template');
     } finally {
       setLoading(false);
@@ -523,36 +523,36 @@ const PartnerPermissions = () => {
           ) : (
             roleTemplates.map(template => (
               <div
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 key={template.id || template.name}
                 className="template-card"
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 style={{ borderLeft: `4px solid ${template.color || '#3b82f6'}` }}
               >
                 <div className="template-header">
                   <div
                     className="template-icon"
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     style={{ background: template.color || '#3b82f6' }}
                   >
                     <Crown size={20} />
                   </div>
                   <div className="template-info">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <h3>{template.displayName || template.label}</h3>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <p>{template.description}</p>
                   </div>
                 </div>
 
                 <div className="template-stats">
                   <div className="stat">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <strong>{(template.permissions || []).length}</strong>
                     <span>Permissions</span>
                   </div>
                   <div className="stat">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <strong>{Object.values(template.features || {}).filter(Boolean).length}</strong>
                     <span>Features</span>
                   </div>
@@ -641,7 +641,7 @@ const PartnerPermissions = () => {
                   value={formData.description}
                   onChange={handleInputChange}
                   placeholder="Brief description of this role"
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   rows="3"
                 />
               </div>
@@ -667,7 +667,7 @@ const PartnerPermissions = () => {
                     <h4>{category}</h4>
                     <div className="permission-checkboxes">
                       {permissions.map(permission => {
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         const isChecked = formData.permissions.includes(permission.name);
                         return (
                           <div

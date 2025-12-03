@@ -87,7 +87,7 @@ const SellProducts = () => {
     },
     {
       label: 'Active Products',
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       value: displayProducts.filter(p => p.status === 'active').length.toString(),
       icon: CheckCircle2,
       gradient: 'from-emerald-500 to-teal-600',
@@ -95,7 +95,7 @@ const SellProducts = () => {
     },
     {
       label: 'Total Variants',
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       value: displayProducts.reduce((sum, p) => sum + (p.variants?.length || 0), 0).toString(),
       icon: Sparkles,
       gradient: 'from-blue-500 to-indigo-600',
@@ -103,7 +103,7 @@ const SellProducts = () => {
     },
     {
       label: 'Categories',
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       value: new Set(displayProducts.map(p => p.categoryId?._id || p.categoryId)).size.toString(),
       icon: Grid,
       gradient: 'from-purple-500 to-pink-600',
@@ -135,7 +135,7 @@ const SellProducts = () => {
   const handleSaveProduct = async (productData: any) => {
     try {
       if (selectedProduct) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         await updateProduct(selectedProduct.id, productData);
       } else {
         await createProduct(productData);
@@ -156,7 +156,7 @@ const SellProducts = () => {
 
   const handleManageQuestions = (product: any) => {
     setSelectedProductForQuestions(product);
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     fetchQuestions({ productId: product._id || product.id });
   };
 
@@ -178,20 +178,20 @@ const SellProducts = () => {
     try {
       const dataWithProduct = {
         ...questionData,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
       };
 
       if (selectedQuestion) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         await updateQuestion(selectedQuestion._id || selectedQuestion.id, dataWithProduct);
       } else {
         await createQuestion(dataWithProduct);
       }
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       fetchQuestions({
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
       });
       setIsQuestionModalOpen(false);
@@ -206,9 +206,9 @@ const SellProducts = () => {
     if (window.confirm('Are you sure you want to delete this question?')) {
       try {
         await deleteQuestion(questionId);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         fetchQuestions({
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
         });
       } catch (error) {
@@ -224,17 +224,17 @@ const SellProducts = () => {
 
   const filteredProducts = displayProducts.filter(product => {
     const matchesSearch =
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       (product.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       (product.description?.toLowerCase() || '').includes(searchTerm.toLowerCase());
     const matchesCategory =
       !selectedCategory ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       product.categoryId?._id === selectedCategory ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       product.categoryId === selectedCategory;
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const matchesStatus = !selectedStatus || product.status === selectedStatus;
 
     return matchesSearch && matchesCategory && matchesStatus;
@@ -245,9 +245,9 @@ const SellProducts = () => {
     let bValue = b[sortBy];
 
     if (sortBy === 'price') {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       aValue = parseFloat(aValue) || 0;
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       bValue = parseFloat(bValue) || 0;
     }
 
@@ -264,7 +264,7 @@ const SellProducts = () => {
       inactive: 'bg-gradient-to-r from-red-500 to-rose-600 text-white',
       draft: 'bg-gradient-to-r from-gray-500 to-slate-600 text-white',
     };
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     return styles[status] || styles.draft;
   };
 
@@ -359,19 +359,19 @@ const SellProducts = () => {
         <tbody className="divide-y divide-gray-100">
           {sortedProducts.map(product => (
             <tr
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               key={product._id || product.id}
               className="hover:bg-amber-50/50 transition-colors duration-150"
             >
               <td className="px-6 py-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {product.images && product.images.length > 0 ? (
                       <img
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         src={product.images[0]}
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
@@ -380,23 +380,23 @@ const SellProducts = () => {
                     )}
                   </div>
                   <div className="min-w-0">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <div className="font-semibold text-gray-900 truncate">{product.name}</div>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <div className="text-sm text-gray-500 truncate">{product.slug}</div>
                   </div>
                 </div>
               </td>
               <td className="px-6 py-4 text-sm text-gray-600">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {product.categoryId?.name || product.categoryId?.displayName || 'Uncategorized'}
               </td>
               <td className="px-6 py-4">
                 <span className="text-lg font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                   $
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {product.variants && product.variants.length > 0
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     ? product.variants[0].basePrice
                     : 'N/A'}
                 </span>
@@ -404,16 +404,16 @@ const SellProducts = () => {
               <td className="px-6 py-4">
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
                   <Sparkles size={12} />
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {product.variants?.length || 0}
                 </span>
               </td>
               <td className="px-6 py-4">
                 <span
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(product.status)}`}
                 >
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {product.status}
                 </span>
               </td>
@@ -440,7 +440,7 @@ const SellProducts = () => {
                     <HelpCircle size={16} />
                   </button>
                   <button
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     onClick={() => handleDeleteProduct(product._id || product.id)}
                     className="p-2 hover:bg-red-100 rounded-lg transition-colors duration-150 text-red-600 hover:text-red-700"
                     title="Delete"
@@ -508,7 +508,7 @@ const SellProducts = () => {
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                       <HelpCircle className="text-amber-600" size={24} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       Questions for {selectedProductForQuestions.name}
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
@@ -552,13 +552,13 @@ const SellProducts = () => {
               <div className="p-6 space-y-4">
                 {questions.map(question => (
                   <div
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     key={question._id || question.id}
                     className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all duration-200"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <h4 className="text-lg font-semibold text-gray-900 flex-1">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {question.title}
                       </h4>
                       <div className="flex items-center gap-2 ml-4">
@@ -569,7 +569,7 @@ const SellProducts = () => {
                           <Edit size={16} />
                         </button>
                         <button
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           onClick={() => handleDeleteQuestion(question._id || question.id)}
                           className="p-2 hover:bg-red-100 rounded-lg transition-colors duration-150 text-red-600"
                         >
@@ -581,18 +581,18 @@ const SellProducts = () => {
                     <div className="flex flex-wrap gap-2 mb-3">
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
                         <FileText size={12} />
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {question.uiType}
                       </span>
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {question.section}
                       </span>
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {question.key}
                       </span>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {question.required && (
                         <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
                           Required
@@ -600,10 +600,10 @@ const SellProducts = () => {
                       )}
                     </div>
 
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {question.description && (
                       <p className="text-sm text-gray-600 leading-relaxed">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {question.description}
                       </p>
                     )}
@@ -665,9 +665,9 @@ const SellProducts = () => {
                 >
                   <option value="">All Categories</option>
                   {categories.map(category => (
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <option key={category.id} value={category.id}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {category.name}
                     </option>
                   ))}
@@ -690,9 +690,9 @@ const SellProducts = () => {
                   value={`${sortBy}-${sortOrder}`}
                   onChange={e => {
                     const [field, order] = e.target.value.split('-');
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     setSortBy(field);
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     setSortOrder(order);
                   }}
                   className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 font-medium text-gray-700 min-w-[160px]"
@@ -742,7 +742,7 @@ const SellProducts = () => {
                   </p>
                 </div>
                 <button
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   onClick={fetchProducts}
                   className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
                 >
@@ -805,7 +805,7 @@ const SellProducts = () => {
         question={selectedQuestion}
         onSave={handleSaveQuestion}
         products={displayProducts}
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         selectedProductId={selectedProductForQuestions?._id || selectedProductForQuestions?.id}
         loading={questionsLoading}
       />

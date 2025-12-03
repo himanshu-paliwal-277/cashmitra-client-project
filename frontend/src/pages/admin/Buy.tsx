@@ -69,14 +69,14 @@ const Buy = () => {
 
   const filteredProducts = products.filter(
     order =>
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       order.items?.some(
         (item: any) => (item.product?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item.product?.brand || '').toLowerCase().includes(searchTerm.toLowerCase())
       ) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       (order.user?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       (order.user?.email || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -109,7 +109,7 @@ const Buy = () => {
       confirmed: 'bg-green-100 text-green-800',
       cancelled: 'bg-gray-100 text-gray-800',
     };
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
@@ -143,7 +143,7 @@ const Buy = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {statsDisplay.map((stat, index) => (
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Card
             key={index}
             className="p-6 border-l-4"
@@ -161,7 +161,7 @@ const Buy = () => {
       </div>
 
       {/* Filters Section */}
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       <Card className="mb-6 p-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
@@ -197,20 +197,20 @@ const Buy = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredProducts.map(order => (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card key={order._id} hoverable className="flex flex-col overflow-hidden">
               {/* Product Image */}
               <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {order.items?.[0]?.product?.images?.[0] ? (
                   <img
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     src={order.items[0].product.images[0].replace(/`/g, '').trim()}
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     alt={order.items[0].product.name}
                     className="w-full h-full object-cover"
                     onError={e => {
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       e.target.style.display = 'none';
                     }}
                   />
@@ -219,22 +219,22 @@ const Buy = () => {
                 )}
               </div>
 
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <Card.Body className="flex-1">
                 {/* Product Header */}
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-lg font-semibold text-gray-900 flex-1 line-clamp-2">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {order.items?.[0]?.product?.name || 'N/A'}
                   </h3>
                   <span
                     className={cn(
                       'ml-2 px-3 py-1 rounded-full text-xs font-semibold capitalize whitespace-nowrap',
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       getStatusColor(order.status)
                     )}
                   >
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {order.status}
                   </span>
                 </div>
@@ -244,57 +244,57 @@ const Buy = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Brand:</span>
                     <span className="text-gray-900 font-medium">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.items?.[0]?.product?.brand || 'N/A'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Quantity:</span>
                     <span className="text-gray-900 font-medium">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.items?.[0]?.quantity || 1}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Customer:</span>
                     <span className="text-gray-900 font-medium truncate ml-2">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.user?.name || 'N/A'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Email:</span>
                     <span className="text-gray-900 font-medium truncate ml-2">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.user?.email || 'N/A'}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Phone:</span>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <span className="text-gray-900 font-medium">{order.user?.phone || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Payment:</span>
                     <span className="text-gray-900 font-medium">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.paymentDetails?.method || 'N/A'} (
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.paymentDetails?.status || 'N/A'})
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Commission:</span>
                     <span className="text-gray-900 font-medium">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       ₹{order.commission?.amount?.toLocaleString() || '0'} (
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.commission?.rate * 100 || 0}%)
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Created:</span>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <span className="text-gray-900 font-medium">{formatDate(order.createdAt)}</span>
                   </div>
                 </div>
@@ -304,7 +304,7 @@ const Buy = () => {
                   <div className="flex justify-between items-center mb-2 text-sm">
                     <span className="text-gray-600">MRP:</span>
                     <span className="text-gray-600 line-through">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       ₹{order.items?.[0]?.product?.pricing?.mrp?.toLocaleString() || '0'}
                     </span>
                   </div>
@@ -312,41 +312,41 @@ const Buy = () => {
                     <span className="text-gray-600">Discounted Price:</span>
                     <span className="text-green-600 font-semibold">
                       ₹
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.items?.[0]?.product?.pricing?.discountedPrice?.toLocaleString() || '0'}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mb-3 text-sm">
                     <span className="text-gray-600">Discount:</span>
                     <span className="text-amber-600 font-semibold">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.items?.[0]?.product?.pricing?.discountPercent || 0}% OFF
                     </span>
                   </div>
                   <div className="text-center pt-3 border-t border-gray-200">
                     <div className="text-xl font-bold text-green-600">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       Total: ₹{order.totalAmount?.toLocaleString() || '0'}
                     </div>
                   </div>
                 </div>
 
                 {/* Shipping Address */}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {order.shippingDetails?.address && (
                   <div className="bg-blue-50 p-3 rounded-lg mb-4 text-xs text-gray-700">
                     <div className="font-semibold mb-1">Shipping Address:</div>
                     <div>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.shippingDetails.address.street}, {order.shippingDetails.address.city}
                     </div>
                     <div>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.shippingDetails.address.state} -{' '}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.shippingDetails.address.pincode}
                     </div>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <div>{order.shippingDetails.address.country}</div>
                   </div>
                 )}
@@ -354,17 +354,17 @@ const Buy = () => {
                 {/* Action Buttons */}
                 <div className="flex gap-2">
                   <button
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     onClick={() => handleViewOrder(order._id)}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
                   >
                     <Eye size={16} />
                     View
                   </button>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {order.status === 'pending' && (
                     <button
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       onClick={() => handleStatusUpdate(order._id, 'confirmed')}
                       className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors"
                     >
@@ -376,7 +376,7 @@ const Buy = () => {
                     <Trash2 size={16} />
                   </button>
                 </div>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               </Card.Body>
             </Card>
           ))}

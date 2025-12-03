@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import Button from '../ui/Button';
@@ -528,7 +528,7 @@ const Navigation = ({
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: any) => {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
         setIsProfileDropdownOpen(false);
       }
@@ -548,7 +548,7 @@ const Navigation = ({
     const timer = setTimeout(() => {
       setOpenNavDropdown(null);
     }, 200);
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setNavDropdownTimer(timer);
   };
 

@@ -17,7 +17,7 @@ const useRealTimeAnalytics = (timeRange = '7d', options = {}) => {
   const [error, setError] = useState(null);
 
   // WebSocket connection
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
 
   const handleWebSocketMessage = useCallback((data: any) => {
@@ -62,7 +62,7 @@ const useRealTimeAnalytics = (timeRange = '7d', options = {}) => {
         }
       } catch (err) {
         console.error('Error fetching analytics:', err);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.message);
       } finally {
         setLoading(false);

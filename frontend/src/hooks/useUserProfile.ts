@@ -15,7 +15,7 @@ const useUserProfile = () => {
       setProfile(response.data);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch profile');
       throw err;
     } finally {
@@ -32,7 +32,7 @@ const useUserProfile = () => {
       setProfile(response.data);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to update profile');
       throw err;
     } finally {
@@ -54,11 +54,11 @@ const useUserProfile = () => {
         },
       });
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setProfile(prev => ({ ...prev, profilePicture: response.data.profilePicture }));
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to update profile picture');
       throw err;
     } finally {
@@ -74,7 +74,7 @@ const useUserProfile = () => {
       const response = await api.put('/user/profile/password', passwordData);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to change password');
       throw err;
     } finally {

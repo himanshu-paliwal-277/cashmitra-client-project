@@ -50,7 +50,7 @@ const useSellQuestions = () => {
         totalPages: response.data?.totalPages ?? 1,
       });
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch questions');
     } finally {
       setLoading(false);
@@ -70,7 +70,7 @@ const useSellQuestions = () => {
       });
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch question');
       throw err;
     } finally {
@@ -96,7 +96,7 @@ const useSellQuestions = () => {
         await fetchQuestions();
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to create question');
         throw err;
       } finally {
@@ -124,7 +124,7 @@ const useSellQuestions = () => {
         await fetchQuestions();
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to update question');
         throw err;
       } finally {
@@ -150,7 +150,7 @@ const useSellQuestions = () => {
         // Refresh questions list
         await fetchQuestions();
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to delete question');
         throw err;
       } finally {
@@ -178,7 +178,7 @@ const useSellQuestions = () => {
         await fetchQuestions();
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to reorder questions');
         throw err;
       } finally {
@@ -202,7 +202,7 @@ const useSellQuestions = () => {
       setOptions(response.data.options || []);
       return response.data.options || [];
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch options');
       throw err;
     } finally {
@@ -228,7 +228,7 @@ const useSellQuestions = () => {
         await fetchOptions(questionId);
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to create option');
         throw err;
       } finally {
@@ -260,7 +260,7 @@ const useSellQuestions = () => {
         await fetchOptions(questionId);
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to update option');
         throw err;
       } finally {
@@ -286,7 +286,7 @@ const useSellQuestions = () => {
         // Refresh options list
         await fetchOptions(questionId);
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to delete option');
         throw err;
       } finally {
@@ -318,7 +318,7 @@ const useSellQuestions = () => {
         await fetchOptions(questionId);
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to reorder options');
         throw err;
       } finally {
@@ -336,7 +336,7 @@ const useSellQuestions = () => {
       const response = await api.get(`/sell-questions/public/${productId}`);
       return response.data.questions || [];
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch questions');
       throw err;
     } finally {
@@ -351,7 +351,7 @@ const useSellQuestions = () => {
       const response = await api.get(`/sell-questions/public/question/${questionId}`);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch question');
       throw err;
     } finally {

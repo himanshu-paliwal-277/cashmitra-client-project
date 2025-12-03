@@ -11,7 +11,7 @@ import {
   canPerformAction,
 } from '../utils/partnerMenuPermissions';
 
-{/* @ts-expect-error */}
+// @ts-expect-error
 const PartnerAuthContext = createContext();
 
 export const usePartnerAuth = () => {
@@ -168,7 +168,7 @@ export const PartnerAuthProvider = ({
 
   // Check if partner has specific feature enabled
   const hasFeature = (featureName: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     return availableFeatures[featureName] || false;
   };
 
@@ -198,7 +198,7 @@ export const PartnerAuthProvider = ({
       const data = await response.json();
 
       if (response.ok) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         const updatedPartner = { ...partner, ...data.partner };
         setPartner(updatedPartner);
         localStorage.setItem('partnerData', JSON.stringify(updatedPartner));
@@ -217,9 +217,9 @@ export const PartnerAuthProvider = ({
 
   // Refresh permissions (useful after admin updates)
   const refreshPermissions = async () => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (partner?._id) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       await fetchPartnerPermissions(partner._id);
     }
   };
@@ -232,13 +232,13 @@ export const PartnerAuthProvider = ({
   // Get partner's verification status
   const getVerificationStatus = () => {
     return {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       isVerified: partner?.isVerified || false,
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       kycStatus: partner?.kycStatus || 'pending',
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       documentsStatus: partner?.documentsStatus || 'pending',
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       profileComplete: partner?.profileComplete || false,
     };
   };
@@ -272,11 +272,11 @@ export const PartnerAuthProvider = ({
     refreshPermissions,
 
     // Menu and feature methods (from utils)
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     getAvailableMenuItems: () => getAvailableMenuItems(permissions, roleTemplate),
     getBusinessLimits: () => getBusinessLimits(permissions, roleTemplate),
     getAvailableFeatures: () => getAvailableFeatures(permissions, roleTemplate),
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     hasMenuPermission: (menuId: any) => hasMenuPermission(permissions, roleTemplate, menuId),
 
     // Business logic methods

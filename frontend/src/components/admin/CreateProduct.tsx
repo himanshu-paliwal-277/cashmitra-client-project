@@ -4,7 +4,7 @@ import { adminService } from '../../services/adminService';
 import useAdminCategories from '../../hooks/useAdminCategories';
 import useAdminBrands from '../../hooks/useAdminBrands';
 import useAdminModels from '../../hooks/useAdminModels';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import {
@@ -485,7 +485,7 @@ const CreateProduct = () => {
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           ...prev[parent],
           [child]: value,
         },
@@ -504,7 +504,7 @@ const CreateProduct = () => {
           const categoryName = value.toLowerCase();
 
           const categoryBrands = brands.filter(
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             brand => brand.categories && brand.categories.includes(categoryName)
           );
           setFilteredBrands(categoryBrands);
@@ -519,7 +519,7 @@ const CreateProduct = () => {
           console.log('value: ', value);
           console.log('models: ', models);
           const categoryModals = models.filter(
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             model => model.brand.toLowerCase() === value.toLowerCase()
           );
 
@@ -537,12 +537,12 @@ const CreateProduct = () => {
     setFormData(prev => ({
       ...prev,
       [parent]: {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ...prev[parent],
         [child]: checked
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           ? [...(prev[parent][child] || []), value]
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           : (prev[parent][child] || []).filter((item: any) => item !== value),
       },
     }));
@@ -562,7 +562,7 @@ const CreateProduct = () => {
       const imageUrls = images
         .map(img => {
           if (typeof img === 'string') return img;
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           return img.url || img.file || '';
         })
         .filter(url => url); // Remove empty strings
@@ -590,18 +590,18 @@ const CreateProduct = () => {
         conditionFactors: formData.conditionFactors,
         specifications: {
           ...formData.specifications,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           ram: formData.variant.ram.trim() || formData.specifications?.ram,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           storage: formData.variant.storage.trim() || formData.specifications?.storage,
         },
         images: imageUrls,
         description: formData.description || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         shortDescription: formData.shortDescription || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         sku: formData.sku || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         barcode: formData.barcode || '',
         isActive: formData.isActive,
       };
@@ -613,7 +613,7 @@ const CreateProduct = () => {
         navigate('/admin/products');
       }, 2000);
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setMessage({ type: 'error', text: error.message || 'Failed to create product' });
     } finally {
       setLoading(false);
@@ -661,9 +661,9 @@ const CreateProduct = () => {
           >
             <option value="">Select Category</option>
             {categories.map(category => (
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <option key={category._id} value={category.name}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {category.name}
               </option>
             ))}
@@ -679,9 +679,9 @@ const CreateProduct = () => {
           >
             <option value="">Select Brand</option>
             {filteredBrands.map(brand => (
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <option key={brand._id} value={brand._id}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {brand.name || brand.brand}
               </option>
             ))}
@@ -697,9 +697,9 @@ const CreateProduct = () => {
           >
             <option value="">Select Series</option>
             {filteredModels.map(model => (
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <option key={model._id || model.id || model.model} value={model.model || model.value}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {model.model || model.model}
               </option>
             ))}
@@ -760,7 +760,7 @@ const CreateProduct = () => {
         <FormGroup>
           <Label>Short Description</Label>
           <TextArea
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.shortDescription}
             onChange={(e: any) => handleInputChange('shortDescription', e.target.value)}
             placeholder="Brief product description (max 160 characters)"
@@ -782,7 +782,7 @@ const CreateProduct = () => {
           <Label>SKU</Label>
           <Input
             type="text"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.sku}
             onChange={(e: any) => handleInputChange('sku', e.target.value)}
             placeholder="Stock Keeping Unit"
@@ -793,7 +793,7 @@ const CreateProduct = () => {
           <Label>Barcode</Label>
           <Input
             type="text"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.barcode}
             onChange={(e: any) => handleInputChange('barcode', e.target.value)}
             placeholder="Product barcode"
@@ -815,7 +815,7 @@ const CreateProduct = () => {
           <Label>Screen Size</Label>
           <Input
             type="text"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.specifications.screenSize}
             onChange={(e: any) => handleInputChange('specifications.screenSize', e.target.value)}
             placeholder="e.g., 6.1 inches, 13.3 inches"
@@ -874,7 +874,7 @@ const CreateProduct = () => {
           <Label>Processor</Label>
           <Input
             type="text"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.specifications.processor}
             onChange={(e: any) => handleInputChange('specifications.processor', e.target.value)}
             placeholder="e.g., A17 Pro, Intel Core i7"
@@ -884,7 +884,7 @@ const CreateProduct = () => {
         <FormGroup>
           <Label>Processor Brand</Label>
           <Select
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.specifications.processorBrand}
             onChange={(e: any) => handleInputChange('specifications.processorBrand', e.target.value)}
           >
@@ -901,7 +901,7 @@ const CreateProduct = () => {
         <FormGroup>
           <Label>RAM</Label>
           <Select
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.specifications.ram}
             onChange={(e: any) => handleInputChange('specifications.ram', e.target.value)}
           >
@@ -919,7 +919,7 @@ const CreateProduct = () => {
         <FormGroup>
           <Label>Storage</Label>
           <Select
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.specifications.storage}
             onChange={(e: any) => handleInputChange('specifications.storage', e.target.value)}
           >
@@ -936,7 +936,7 @@ const CreateProduct = () => {
         <FormGroup>
           <Label>Storage Type</Label>
           <Select
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.specifications.storageType}
             onChange={(e: any) => handleInputChange('specifications.storageType', e.target.value)}
           >
@@ -952,7 +952,7 @@ const CreateProduct = () => {
           <Label>Graphics Card</Label>
           <Input
             type="text"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.specifications.graphicsCard}
             onChange={(e: any) => handleInputChange('specifications.graphicsCard', e.target.value)}
             placeholder="e.g., Integrated, RTX 4060"
@@ -1060,7 +1060,7 @@ const CreateProduct = () => {
           <Label>Power Consumption</Label>
           <Input
             type="text"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.specifications.powerConsumption}
             onChange={(e: any) => handleInputChange('specifications.powerConsumption', e.target.value)}
             placeholder="e.g., 45W, 100W"
@@ -1278,7 +1278,7 @@ const CreateProduct = () => {
           <Label>Color</Label>
           <Input
             type="text"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             value={formData.specifications.color}
             onChange={(e: any) => handleInputChange('specifications.color', e.target.value)}
             placeholder="e.g., Space Black, Silver"

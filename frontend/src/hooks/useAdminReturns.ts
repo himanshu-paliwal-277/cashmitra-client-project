@@ -52,7 +52,7 @@ const useAdminReturns = () => {
         });
       }
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.message || 'Failed to fetch returns');
       console.error('Error fetching returns:', err);
     } finally {
@@ -68,12 +68,12 @@ const useAdminReturns = () => {
       try {
         const response = await adminService.updateReturnStatus(returnId, status, notes);
         if (response.success) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           setReturns(prev =>
             prev.map(returnItem =>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               returnItem.id === returnId
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ? { ...returnItem, status, notes, updatedAt: new Date().toISOString() }
                 : returnItem
             )
@@ -81,15 +81,15 @@ const useAdminReturns = () => {
 
           // Update stats
           setStats(prev => {
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             const oldReturn = returns.find(r => r.id === returnId);
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             if (oldReturn && oldReturn.status !== status) {
               return {
                 ...prev,
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 [oldReturn.status]: Math.max(0, prev[oldReturn.status] - 1),
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 [status]: prev[status] + 1,
               };
             }
@@ -100,10 +100,10 @@ const useAdminReturns = () => {
         }
         throw new Error('Failed to update return status');
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.message || 'Failed to update return status');
         console.error('Error updating return status:', err);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         return { success: false, error: err.message };
       } finally {
         setLoading(false);
@@ -166,7 +166,7 @@ const useAdminReturns = () => {
   // Get return by ID
   const getReturnById = useCallback(
     (returnId: any) => {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       return returns.find(returnItem => returnItem.id === returnId);
     },
     [returns]

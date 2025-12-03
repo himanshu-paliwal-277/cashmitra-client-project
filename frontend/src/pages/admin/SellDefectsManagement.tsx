@@ -66,7 +66,7 @@ const SellDefectsManagement = () => {
       category: categoryFilter !== 'all' ? categoryFilter : undefined,
       impact: impactFilter !== 'all' ? impactFilter : undefined,
     };
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     fetchDefects(params);
   }, [
     currentPage,
@@ -96,7 +96,7 @@ const SellDefectsManagement = () => {
       medium: 'bg-yellow-100 text-yellow-800',
       low: 'bg-green-100 text-green-800',
     };
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     return colors[severity] || 'bg-gray-100 text-gray-800';
   };
 
@@ -113,17 +113,17 @@ const SellDefectsManagement = () => {
 
   const stats = {
     totalDefects: pagination?.total || 0,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     activeDefects: filteredDefects.filter(d => d.isActive).length,
     avgPriceImpact:
       filteredDefects.length > 0
         ? Math.round(
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             filteredDefects.reduce((sum, d) => sum + Math.abs(d.delta?.value || 0), 0) /
               filteredDefects.length
           )
         : 0,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     categories: [...new Set(filteredDefects.map(d => d.category))].length,
   };
 
@@ -232,7 +232,7 @@ const SellDefectsManagement = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-yellow-100 rounded-xl">
@@ -247,7 +247,7 @@ const SellDefectsManagement = () => {
           </div>
         </Card>
 
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-green-100 rounded-xl">
@@ -262,7 +262,7 @@ const SellDefectsManagement = () => {
           </div>
         </Card>
 
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-red-100 rounded-xl">
@@ -277,7 +277,7 @@ const SellDefectsManagement = () => {
           </div>
         </Card>
 
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-indigo-100 rounded-xl">
@@ -294,7 +294,7 @@ const SellDefectsManagement = () => {
       </div>
 
       {/* Filters Section */}
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       <Card className="mb-8 p-6">
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Search Input */}
@@ -348,7 +348,7 @@ const SellDefectsManagement = () => {
       </Card>
 
       {/* Defects Table */}
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       <Card className="overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-xl font-semibold text-gray-900">
@@ -407,29 +407,29 @@ const SellDefectsManagement = () => {
               </thead>
               <tbody>
                 {filteredDefects.map(defect => (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <tr key={defect._id || defect.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 border-b border-gray-200">
                       <div>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <div className="font-medium text-gray-900">{defect.title}</div>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <div className="text-xs text-gray-500 mt-1">{defect.key}</div>
                       </div>
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200">
                       <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs capitalize">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {defect.category}
                       </span>
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200">
                       <div className="flex items-center gap-1 text-sm font-medium text-gray-900">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {defect.delta?.sign === '-' ? '−' : '+'}
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {defect.delta?.value || 0}
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {defect.delta?.type === 'percent' ? '%' : ''}
                       </div>
                     </td>
@@ -437,11 +437,11 @@ const SellDefectsManagement = () => {
                       <span
                         className={cn(
                           'px-2 py-1 rounded text-xs font-medium capitalize',
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           getSeverityColor(getSeverity(defect.delta))
                         )}
                       >
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {getSeverity(defect.delta)}
                       </span>
                     </td>
@@ -449,23 +449,23 @@ const SellDefectsManagement = () => {
                       <span
                         className={cn(
                           'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           defect.isActive
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                         )}
                       >
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {defect.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {defect.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200">
                       <div className="flex flex-wrap gap-1 max-w-xs">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {defect.variantIds && defect.variantIds.length > 0 ? (
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           defect.variantIds.slice(0, 3).map((variantId: any, index: any) => (
                             <span
                               key={index}
@@ -477,17 +477,17 @@ const SellDefectsManagement = () => {
                         ) : (
                           <span className="text-xs text-gray-500 italic">All devices</span>
                         )}
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {defect.variantIds && defect.variantIds.length > 3 && (
                           <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             +{defect.variantIds.length - 3}
                           </span>
                         )}
                       </div>
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200 text-sm text-gray-600">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {formatDate(defect.updatedAt)}
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200">
@@ -500,7 +500,7 @@ const SellDefectsManagement = () => {
                           <Edit size={16} />
                         </button>
                         <button
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           onClick={() => handleDeleteDefect(defect._id || defect.id)}
                           className="p-2 border border-red-300 rounded bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-500 transition-colors"
                           title="Delete"
@@ -570,7 +570,7 @@ const SellDefectsManagement = () => {
           setEditingDefect(null);
         }}
         onSave={
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           editingDefect ? (data: any) => handleUpdateDefect(editingDefect.id, data) : handleCreateDefect
         }
         defect={editingDefect}

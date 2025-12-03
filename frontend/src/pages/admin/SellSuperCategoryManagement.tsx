@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { Plus, Edit2, Trash2, Image as ImageIcon, Search } from 'lucide-react';
 import { API_BASE_URL } from '../../config/api';
@@ -52,7 +52,7 @@ const SellSuperCategoryManagement = () => {
       }
     } catch (err) {
       console.error('Error fetching super categories:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Error fetching super categories: ' + (err.message || 'Unknown error'));
     } finally {
       setLoading(false);
@@ -90,7 +90,7 @@ const SellSuperCategoryManagement = () => {
         alert(data.message || 'Failed to delete super category');
       }
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       alert('Error deleting super category: ' + err.message);
     }
   };
@@ -117,9 +117,9 @@ const SellSuperCategoryManagement = () => {
 
   const filteredCategories = superCategories.filter(category => {
     const matchesSearch =
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       category.description?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
@@ -175,12 +175,12 @@ const SellSuperCategoryManagement = () => {
       ) : (
         <Grid>
           {filteredCategories.map(category => (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card key={category._id}>
               <CardImage>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {category.image ? (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <img src={category.image} alt={category.name} />
                 ) : (
                   <ImageIcon size={48} color="#cbd5e0" />
@@ -188,28 +188,28 @@ const SellSuperCategoryManagement = () => {
               </CardImage>
               <CardContent>
                 <CardHeader>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <CategoryName>{category.name}</CategoryName>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <StatusBadge isActive={category.isActive}>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {category.isActive ? 'Active' : 'Inactive'}
                   </StatusBadge>
                 </CardHeader>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <CardDescription>{category.description || 'No description'}</CardDescription>
                 <CardFooter>
                   <CardMeta>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <MetaItem>Sort: {category.sortOrder || 0}</MetaItem>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <MetaItem>{new Date(category.createdAt).toLocaleDateString()}</MetaItem>
                   </CardMeta>
                   <CardActions>
                     <ActionButton onClick={() => handleEdit(category)}>
                       <Edit2 size={16} />
                     </ActionButton>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <ActionButton danger onClick={() => handleDelete(category._id)}>
                       <Trash2 size={16} />
                     </ActionButton>

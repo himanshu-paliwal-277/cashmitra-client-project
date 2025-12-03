@@ -57,7 +57,7 @@ const SellCategories = () => {
   }, []);
 
   const showToast = (message: any, type = 'success') => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
@@ -148,7 +148,7 @@ const SellCategories = () => {
       }
 
       if (editingCategory) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         await adminService.updateCategory(editingCategory.id, {
           name: formData.name.trim(),
           image: imageUrl,
@@ -168,7 +168,7 @@ const SellCategories = () => {
       resetForm();
     } catch (error) {
       console.error('Error saving category:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       showToast(error.message || 'Failed to save category', 'error');
     } finally {
       setIsSubmitting(false);
@@ -186,24 +186,24 @@ const SellCategories = () => {
   };
 
   const filteredCategories = categories.filter(category =>
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const mainCategories = filteredCategories.filter(category => !category.parentId);
 
   const renderCategoryIcon = (iconName: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const IconComponent = categoryIcons[iconName] || Package;
     return <IconComponent className="w-4 h-4" />;
   };
 
   const renderCategory = (category: any, level = 0) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const hasChildren = categories.some(cat => cat.parentId === category.id);
     const isExpanded = expandedCategories.has(category.id);
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const children = categories.filter(cat => cat.parentId === category.id);
 
     return (
@@ -362,9 +362,9 @@ const SellCategories = () => {
               >
                 <option value="">Select a super category</option>
                 {superCategories.map(superCat => (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <option key={superCat._id} value={superCat._id}>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {superCat.name}
                   </option>
                 ))}
@@ -379,7 +379,7 @@ const SellCategories = () => {
               </label>
               {!imagePreview ? (
                 <div
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   onClick={() => document.getElementById('sellCatImageInput').click()}
                   className="p-8 border-2 border-dashed border-slate-300 rounded-xl text-center cursor-pointer bg-slate-50 hover:border-amber-500 hover:bg-amber-50 transition-all"
                 >
@@ -395,13 +395,13 @@ const SellCategories = () => {
                     className="hidden"
                     disabled={isSubmitting}
                     onChange={e => {
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       const file = e.target.files[0];
                       if (file) {
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         setImageFile(file);
                         const reader = new FileReader();
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         reader.onloadend = () => setImagePreview(reader.result);
                         reader.readAsDataURL(file);
                       }
@@ -425,7 +425,7 @@ const SellCategories = () => {
                   </button>
                   <div className="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 bg-black/60 text-white rounded text-xs">
                     <ImageIcon className="w-3 h-3" />
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {imageFile ? imageFile.name : 'Current image'}
                   </div>
                 </div>
@@ -465,17 +465,17 @@ const SellCategories = () => {
       {toast && (
         <div
           className={`fixed top-4 right-4 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl z-50 animate-slide-in ${
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             toast.type === 'success' ? 'bg-amber-500 text-white' : 'bg-red-500 text-white'
           }`}
         >
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {toast.type === 'success' ? (
             <CheckCircle className="w-5 h-5" />
           ) : (
             <AlertCircle className="w-5 h-5" />
           )}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {toast.message}
         </div>
       )}

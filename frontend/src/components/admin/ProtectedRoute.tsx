@@ -7,7 +7,7 @@ import { useAdminAuth } from '../../contexts/AdminAuthContext';
  * Redirects to login page if user is not authenticated
  */
 const ProtectedRoute = () => {
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { isAuthenticated, isLoading } = useAdminAuth();
 
   // Show loading state while checking authentication

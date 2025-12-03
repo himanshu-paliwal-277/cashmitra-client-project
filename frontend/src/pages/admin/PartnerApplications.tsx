@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import useAdminPartnerApplications from '../../hooks/useAdminPartnerApplications';
 import {
@@ -562,14 +562,14 @@ const PartnerApplications = () => {
     loading: hookLoading,
     error: hookError,
     updateApplicationStatus,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     downloadDocument,
     fetchApplications,
   } = useAdminPartnerApplications();
 
   useEffect(() => {
     setApplications(hookApplications);
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setStats(hookStats);
     setLoading(hookLoading);
   }, [hookApplications, hookStats, hookLoading]);
@@ -577,9 +577,9 @@ const PartnerApplications = () => {
   const handleStatusUpdate = async (applicationId: any, newStatus: any, comments = '') => {
     try {
       await updateApplicationStatus(applicationId, newStatus, comments);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (selectedApplication && selectedApplication._id === applicationId) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setSelectedApplication({ ...selectedApplication, status: newStatus });
       }
     } catch (error) {
@@ -640,22 +640,22 @@ const PartnerApplications = () => {
       rejected: [],
     };
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     return statusFlow[currentStatus]?.includes(newStatus) || false;
   };
 
   const filteredApplications = applications.filter(application => {
     const matchesSearch =
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       application.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       application.applicantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       application.email?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const matchesStatus = !statusFilter || application.status === statusFilter;
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const matchesPriority = !priorityFilter || application.priority === priorityFilter;
 
     return matchesSearch && matchesStatus && matchesPriority;
@@ -775,53 +775,53 @@ const PartnerApplications = () => {
             </div>
           ) : (
             filteredApplications.map(application => (
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <ApplicationRow key={application._id}>
                 <ApplicantInfo>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <ApplicantName>{application.applicantName || 'N/A'}</ApplicantName>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <ApplicantEmail>{application.email || 'N/A'}</ApplicantEmail>
                 </ApplicantInfo>
 
                 <BusinessInfo>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <BusinessName>{application.businessName || 'N/A'}</BusinessName>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <BusinessType>{application.businessType || 'N/A'}</BusinessType>
                 </BusinessInfo>
 
                 <ContactInfo>
                   <ContactPhone>
                     <Phone size={12} />
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {application.phone || 'N/A'}
                   </ContactPhone>
                   <ContactLocation>
                     <MapPin size={12} style={{ display: 'inline', marginRight: '0.25rem' }} />
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {application.city || 'N/A'}, {application.state || 'N/A'}
                   </ContactLocation>
                 </ContactInfo>
 
                 <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {new Date(application.createdAt).toLocaleDateString()}
                 </div>
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <PriorityBadge priority={application.priority || 'medium'}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {application.priority?.charAt(0)?.toUpperCase() +
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     application.priority?.slice(1) || 'Medium'}
                 </PriorityBadge>
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <StatusBadge status={application.status}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {getStatusIcon(application.status)}
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {application.status?.charAt(0)?.toUpperCase() + application.status?.slice(1) ||
                     'Pending'}
                 </StatusBadge>
@@ -831,33 +831,33 @@ const PartnerApplications = () => {
                     <Eye size={14} />
                   </IconButton>
 
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {canUpdateStatus(application.status, 'under_review') && (
                     <IconButton
                       warning
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       onClick={() => handleStatusUpdate(application._id, 'under_review')}
                     >
                       <Eye size={14} />
                     </IconButton>
                   )}
 
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {canUpdateStatus(application.status, 'approved') && (
                     <IconButton
                       success
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       onClick={() => handleStatusUpdate(application._id, 'approved')}
                     >
                       <CheckCircle size={14} />
                     </IconButton>
                   )}
 
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {canUpdateStatus(application.status, 'rejected') && (
                     <IconButton
                       danger
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       onClick={() => handleStatusUpdate(application._id, 'rejected')}
                     >
                       <XCircle size={14} />
@@ -889,26 +889,26 @@ const PartnerApplications = () => {
                 <DetailItem>
                   <User size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Name:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedApplication.applicantName || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Mail size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Email:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedApplication.email || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Phone size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Phone:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedApplication.phone || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Calendar size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Applied Date:</DetailLabel>
                   <DetailValue>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {new Date(selectedApplication.createdAt).toLocaleDateString()}
                   </DetailValue>
                 </DetailItem>
@@ -924,37 +924,37 @@ const PartnerApplications = () => {
                 <DetailItem>
                   <Building size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Business Name:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedApplication.businessName || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Briefcase size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Business Type:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedApplication.businessType || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <CreditCard size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>GST Number:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedApplication.gstNumber || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <MapPin size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Address:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedApplication.address || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <MapPin size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>City:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedApplication.city || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <MapPin size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>State:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedApplication.state || 'N/A'}</DetailValue>
                 </DetailItem>
               </DetailGrid>
@@ -966,7 +966,7 @@ const PartnerApplications = () => {
                 Documents
               </SectionTitle>
               <DocumentsGrid>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {selectedApplication.documents?.map((doc: any, index: any) => (
                   <DocumentCard key={index}>
                     <DocumentIcon>
@@ -998,7 +998,7 @@ const PartnerApplications = () => {
               </DocumentsGrid>
             </DetailSection>
 
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {selectedApplication.experience && (
               <DetailSection>
                 <SectionTitle>
@@ -1013,20 +1013,20 @@ const PartnerApplications = () => {
                     color: '#374151',
                   }}
                 >
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {selectedApplication.experience}
                 </div>
               </DetailSection>
             )}
 
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {selectedApplication.comments && selectedApplication.comments.length > 0 && (
               <DetailSection>
                 <SectionTitle>
                   <MessageSquare size={20} />
                   Review Comments
                 </SectionTitle>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {selectedApplication.comments.map((comment: any, index: any) => (
                   <div
                     key={index}
@@ -1059,12 +1059,12 @@ const PartnerApplications = () => {
               </CommentSection>
 
               <ActionButtons2>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {canUpdateStatus(selectedApplication.status, 'under_review') && (
                   <Button
                     variant="warning"
                     onClick={() => {
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       handleStatusUpdate(selectedApplication._id, 'under_review', comment);
                       setShowDetailModal(false);
                     }}
@@ -1074,12 +1074,12 @@ const PartnerApplications = () => {
                   </Button>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {canUpdateStatus(selectedApplication.status, 'approved') && (
                   <Button
                     variant="success"
                     onClick={() => {
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       handleStatusUpdate(selectedApplication._id, 'approved', comment);
                       setShowDetailModal(false);
                     }}
@@ -1089,13 +1089,13 @@ const PartnerApplications = () => {
                   </Button>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {canUpdateStatus(selectedApplication.status, 'rejected') && (
                   <Button
                     variant="danger"
                     onClick={() => {
                       if (comment.trim()) {
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         handleStatusUpdate(selectedApplication._id, 'rejected', comment);
                         setShowDetailModal(false);
                       } else {
@@ -1108,12 +1108,12 @@ const PartnerApplications = () => {
                   </Button>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {canUpdateStatus(selectedApplication.status, 'on_hold') && (
                   <Button
                     variant="warning"
                     onClick={() => {
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       handleStatusUpdate(selectedApplication._id, 'on_hold', comment);
                       setShowDetailModal(false);
                     }}

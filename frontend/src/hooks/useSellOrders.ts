@@ -38,7 +38,7 @@ const useSellOrders = () => {
       setCurrentOrder(response.data.order);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to create order');
       throw err;
     } finally {
@@ -61,7 +61,7 @@ const useSellOrders = () => {
       setUserOrders(response.data.orders || []);
       return response.data.orders || [];
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch user orders');
       throw err;
     } finally {
@@ -84,7 +84,7 @@ const useSellOrders = () => {
       setCurrentOrder(response.data.order);
       return response.data.order;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch order');
       throw err;
     } finally {
@@ -120,7 +120,7 @@ const useSellOrders = () => {
 
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch orders');
       throw err;
     } finally {
@@ -143,21 +143,21 @@ const useSellOrders = () => {
         });
 
         // Update orders list
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setOrders(prev =>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           prev.map(order => (order._id === orderId ? { ...order, ...response.data.order } : order))
         );
 
         // Update current order if it matches
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         if (currentOrder?._id === orderId) {
           setCurrentOrder(response.data.order);
         }
 
         return response.data;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to update order status');
         throw err;
       } finally {
@@ -181,15 +181,15 @@ const useSellOrders = () => {
       });
 
       // Update orders list
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setOrders(prev =>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         prev.map(order => (order._id === orderId ? { ...order, ...response.data.order } : order))
       );
 
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to assign staff');
       throw err;
     } finally {
@@ -211,15 +211,15 @@ const useSellOrders = () => {
       });
 
       // Update orders list
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setOrders(prev =>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         prev.map(order => (order._id === orderId ? { ...order, ...response.data.order } : order))
       );
 
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to update pickup details');
       throw err;
     } finally {
@@ -241,7 +241,7 @@ const useSellOrders = () => {
 
       return response.data.orders || [];
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch orders by status');
       throw err;
     } finally {
@@ -264,7 +264,7 @@ const useSellOrders = () => {
       setStatistics(response.data.statistics);
       return response.data.statistics;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch order statistics');
       throw err;
     } finally {
@@ -286,16 +286,16 @@ const useSellOrders = () => {
         });
 
         // Remove from orders list
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setOrders(prev => prev.filter(order => order._id !== orderId));
 
         // Clear current order if it was deleted
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         if (currentOrder?._id === orderId) {
           setCurrentOrder(null);
         }
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to delete order');
         throw err;
       } finally {

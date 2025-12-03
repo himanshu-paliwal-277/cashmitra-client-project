@@ -138,7 +138,7 @@ const PickupBooking = () => {
     if (currentStep === 1) {
       // Validate address
       if (!formData.pincode || !formData.flatNo || !formData.locality) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setSubmitError('Please fill all required address fields');
         return;
       }
@@ -147,7 +147,7 @@ const PickupBooking = () => {
     } else if (currentStep === 2) {
       // Validate pickup
       if (!formData.selectedDate || !formData.selectedTime) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setSubmitError('Please select pickup date and time');
         return;
       }
@@ -156,7 +156,7 @@ const PickupBooking = () => {
     } else if (currentStep === 3) {
       // Validate payment
       if (!formData.paymentType) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setSubmitError('Please select a payment method');
         return;
       }
@@ -218,13 +218,13 @@ const PickupBooking = () => {
           orderNumber: `ORD${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`,
           pickup: {
             address: {
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               fullName: userData?.name || formData.fullName || 'User',
               phone: formData.alternateNumber || userData?.phone || '1234567890',
               street:
                 `${formData.flatNo}, ${formData.locality}${formData.landmark ? `, Near ${formData.landmark}` : ''}`.trim(),
               city: formData.city,
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               state: formData.state || 'Delhi',
               pincode: formData.pincode,
             },
@@ -261,7 +261,7 @@ const PickupBooking = () => {
         navigate('/sell/confirmation', { state: { bookingData, orderData } });
       } catch (error) {
         console.error('Error creating sell order:', error);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setSubmitError(error.message || 'Failed to create booking. Please try again.');
       } finally {
         setIsSubmitting(false);

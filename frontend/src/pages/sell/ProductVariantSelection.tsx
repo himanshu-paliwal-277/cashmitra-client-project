@@ -69,7 +69,7 @@ const ProductVariantSelection = ({
             name: variant.label
           })) || [];
 
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setProduct(product);
         setVariants(variants);
       } else {
@@ -89,14 +89,14 @@ const ProductVariantSelection = ({
           { id: 4, label: '6GB RAM, 1TB Storage', basePrice: 78000, isActive: true },
         ];
 
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setVariants(mockVariants);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setProduct(mockProduct);
       }
     } catch (error) {
       console.error('Error fetching product details:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Failed to load product details. Please try again.');
     } finally {
       setLoading(false);
@@ -109,21 +109,21 @@ const ProductVariantSelection = ({
 
   const handleGetExactValue = () => {
     if (selectedVariant && product && onContinue) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const variantId = selectedVariant._id || selectedVariant.id;
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const categoryId = product.categoryId;
       navigate(
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         `/sell/product/${product.id}/variant/${variantId}/condition?categoryId=${categoryId}`
       );
     } else if (selectedVariant && product) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const variantId = selectedVariant._id || selectedVariant.id;
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const categoryId = product.categoryId;
       navigate(
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         `/sell/product/${product.id}/variant/${variantId}/condition?categoryId=${categoryId}`
       );
     }
@@ -192,10 +192,10 @@ const ProductVariantSelection = ({
             Sell Old Mobile Phone
           </button>
           <ArrowRight className="w-4 h-4 text-slate-400" />
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <span className="text-slate-900 font-medium">{product?.category || 'Product'}</span>
           <ArrowRight className="w-4 h-4 text-slate-400" />
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <span className="text-slate-900 font-medium">{product?.name}</span>
         </nav>
 
@@ -210,11 +210,11 @@ const ProductVariantSelection = ({
 
         {/* Product Header */}
         <div className="text-center mb-12">
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">{product?.name}</h1>
           <div className="flex items-center justify-center gap-2 text-blue-600">
             <TrendingUp className="w-5 h-5" />
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <p className="text-lg font-semibold">{product?.soldCount}+ already sold</p>
           </div>
         </div>
@@ -255,12 +255,12 @@ const ProductVariantSelection = ({
           <div className="lg:col-span-1 flex justify-center">
             <div className="w-full max-w-sm">
               <div className="aspect-[3/4] bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex items-center justify-center">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {product?.images && product.images.length > 0 ? (
                   <img
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     src={product.images[0]}
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     alt={product.name}
                     className="w-full h-full object-cover"
                   />
@@ -283,17 +283,17 @@ const ProductVariantSelection = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     {variants.map(variant => (
                       <button
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         key={variant.id}
                         onClick={() => handleVariantSelect(variant)}
                         className={`relative p-6 rounded-xl border-2 transition-all duration-300 hover:scale-105 text-left ${
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           selectedVariant?.id === variant.id
                             ? 'border-blue-500 bg-blue-50 shadow-lg'
                             : 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-md'
                         }`}
                       >
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {selectedVariant?.id === variant.id && (
                           <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
                             <Check className="w-5 h-5 text-white" />
@@ -303,26 +303,26 @@ const ProductVariantSelection = ({
                         <div className="mb-3">
                           <p
                             className={`text-base font-semibold ${
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               selectedVariant?.id === variant.id
                                 ? 'text-blue-600'
                                 : 'text-slate-900'
                             }`}
                           >
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {variant.label || variant.storage || variant.name || 'Variant'}
                           </p>
                         </div>
 
                         <div
                           className={`text-sm font-medium ${
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             selectedVariant?.id === variant.id ? 'text-blue-600' : 'text-slate-600'
                           }`}
                         >
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {variant.basePrice
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             ? `₹${variant.basePrice.toLocaleString()}+`
                             : 'Get Quote'}
                         </div>
@@ -341,10 +341,10 @@ const ProductVariantSelection = ({
                           <h4 className="text-lg font-bold text-slate-900 mb-1">
                             Selected Variant
                           </h4>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <p className="text-slate-700 mb-2">{selectedVariant.label}</p>
                           <p className="text-2xl font-bold text-blue-600">
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             ₹{selectedVariant.basePrice?.toLocaleString()}+
                           </p>
                           <p className="text-sm text-slate-600 mt-1">

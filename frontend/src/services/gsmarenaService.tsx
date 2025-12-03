@@ -11,7 +11,7 @@ const OPENAI_API_KEY =
 
 class GSMArenaService {
   constructor() {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     this.openaiClient = axios.create({
       baseURL: 'https://api.openai.com/v1',
       headers: {
@@ -35,7 +35,7 @@ class GSMArenaService {
 
       const prompt = this.buildSearchPrompt(productName);
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const response = await this.openaiClient.post('/chat/completions', {
         model: 'gpt-4o', // Updated to more recent model for better accuracy
         messages: [
@@ -91,7 +91,7 @@ class GSMArenaService {
       return this.formatProductData(productData);
     } catch (error) {
       console.error('GSMArena search error:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const status = error.response?.status;
       if (status === 401) {
         throw new Error('API authentication failed. Check your API key.');
@@ -101,7 +101,7 @@ class GSMArenaService {
         throw new Error('API quota exceeded. Contact support.');
       } else if (status >= 500) {
         throw new Error('API service unavailable. Try again later.');
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       } else if (error.code === 'ETIMEDOUT') {
         throw new Error('Request timed out. Try again.');
       } else {
@@ -385,7 +385,7 @@ Important: Return only valid JSON. Fill based on known data for the product. If 
     try {
       if (!query || query.trim().length < 2) return [];
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const response = await this.openaiClient.post('/chat/completions', {
         model: 'gpt-3.5-turbo',
         messages: [

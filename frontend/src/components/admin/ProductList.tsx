@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import {
@@ -335,7 +335,7 @@ const ProductContent = styled.div`
 `;
 
 const ProductName = styled.h3`
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   font-size: ${theme.typography.fontSize.md};
   font-weight: ${theme.typography.fontWeight.semibold};
   color: ${theme.colors.text.primary};
@@ -630,7 +630,7 @@ const ProductList = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const response = await adminService.getCatalog(filters);
       console.log('response: ', response);
       setProducts(response.products || []);
@@ -673,7 +673,7 @@ const ProductList = () => {
       setMessage({ type: 'success', text: 'Product deleted successfully' });
       fetchProducts();
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setMessage({ type: 'error', text: error.message || 'Failed to delete product' });
     }
   };
@@ -685,7 +685,7 @@ const ProductList = () => {
       setMessage({ type: 'success', text: 'Product status updated successfully' });
       fetchProducts();
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setMessage({ type: 'error', text: error.message || 'Failed to update product status' });
     }
   };
@@ -730,13 +730,13 @@ const ProductList = () => {
 
   const filteredProducts = products.filter(product => {
     const matchesSearch =
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       product?.name?.toLowerCase().includes(filters.search.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       product?.brand?.toLowerCase().includes(filters.search.toLowerCase());
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const matchesCategory = !filters.category || product.category === filters.category;
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const matchesStatus = !filters.status || product.status === filters.status;
 
     return matchesSearch && matchesCategory && matchesStatus;
@@ -749,9 +749,9 @@ const ProductList = () => {
     let bValue = b[sortBy];
 
     if (sortBy === 'price') {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       aValue = parseFloat(aValue);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       bValue = parseFloat(bValue);
     }
 
@@ -859,9 +859,9 @@ const ProductList = () => {
             >
               <option value="">All Categories</option>
               {categories.map(category => (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <option key={category.id} value={category.id}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {category.name}
                 </option>
               ))}
@@ -947,15 +947,15 @@ const ProductList = () => {
             {sortedProducts.map(product => {
               const badgeType = getBadgeType(product);
               return (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <ProductCard key={product._id || product.id}>
                   <ProductImage>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {product.images && product.images.length > 0 ? (
                       <img
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         src={product.images[0]}
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         alt={`${product.brand} ${product.series} ${product.model}`}
                       />
                     ) : (
@@ -967,66 +967,66 @@ const ProductList = () => {
                   </ProductImage>
 
                   <ProductContent>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <ProductStatus isActive={product.isActive}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {product.isActive ? 'Active' : 'Inactive'}
                     </ProductStatus>
 
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <ProductBrand>{product.brand}</ProductBrand>
                     <ProductName>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {product.series} {product.model}
                     </ProductName>
 
                     <ProductPrice>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <CurrentPrice>{formatPrice(product.basePrice)}</CurrentPrice>
                     </ProductPrice>
 
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {product.variant && (
                       <ProductVariant>
                         <VariantTitle>Variant Details</VariantTitle>
                         <VariantInfo>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {product.variant.ram && (
                             <VariantItem>
                               <span>RAM:</span>
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               <span>{product.variant.ram}</span>
                             </VariantItem>
                           )}
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {product.variant.storage && (
                             <VariantItem>
                               <span>Storage:</span>
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               <span>{product.variant.storage}</span>
                             </VariantItem>
                           )}
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {product.variant.processor && (
                             <VariantItem>
                               <span>CPU:</span>
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               <span>{product.variant.processor}</span>
                             </VariantItem>
                           )}
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {product.variant.screenSize && (
                             <VariantItem>
                               <span>Screen:</span>
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               <span>{product.variant.screenSize}</span>
                             </VariantItem>
                           )}
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {product.variant.color && (
                             <VariantItem>
                               <span>Color:</span>
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               <span>{product.variant.color}</span>
                             </VariantItem>
                           )}
@@ -1034,16 +1034,16 @@ const ProductList = () => {
                       </ProductVariant>
                     )}
 
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {product.specifications && (
                       <ProductSpecs>
                         <SpecsTitle>Key Specifications</SpecsTitle>
                         <SpecsList>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {Object.entries(product.specifications)
                             .slice(0, 3)
                             .map(([key, value]) => (
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               <div key={key}>
                                 <strong>{key}:</strong> {value}
                               </div>
@@ -1053,15 +1053,15 @@ const ProductList = () => {
                     )}
 
                     <ProductMeta>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <span>Category: {product.category}</span>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <span>Created: {formatDate(product.createdAt)}</span>
                     </ProductMeta>
 
                     <ProductActions>
                       <ActionButton
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         onClick={() => navigate(`/admin/products/${product._id || product.id}`)}
                       >
                         <Eye size={14} />
@@ -1069,7 +1069,7 @@ const ProductList = () => {
                       </ActionButton>
                       <ActionButton
                         onClick={() =>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           navigate(`/admin/products/${product._id || product.id}/edit`)
                         }
                       >
@@ -1078,7 +1078,7 @@ const ProductList = () => {
                       </ActionButton>
                       <ActionButton
                         variant="danger"
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         onClick={() => handleDeleteProduct(product._id || product.id)}
                       >
                         <Trash2 size={14} />

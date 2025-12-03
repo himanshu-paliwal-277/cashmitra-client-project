@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAdminReports } from '../../hooks/useAdminReports';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   BarChart3,
@@ -273,7 +273,7 @@ function Reports() {
   const [endDate, setEndDate] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { adminUser } = useAdminAuth();
   const { salesData, inventoryData, loading, error, fetchSalesReport, fetchInventoryReport } =
     useAdminReports();
@@ -319,49 +319,49 @@ function Reports() {
   }, [dateRange, reportType, startDate, endDate, loadReports]);
 
   // Use real data if available, otherwise fallback to mock data
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const stats = salesData?.stats
     ? [
         {
           label: 'Total Revenue',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           value: `₹${(salesData.stats.totalRevenue || 0).toLocaleString()}`,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           change: `${salesData.stats.revenueChange || 0}%`,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           positive: (salesData.stats.revenueChange || 0) >= 0,
           icon: <DollarSign size={20} />,
           color: '#10B981',
         },
         {
           label: 'Total Orders',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           value: (salesData.stats.totalOrders || 0).toLocaleString(),
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           change: `${salesData.stats.ordersChange || 0}%`,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           positive: (salesData.stats.ordersChange || 0) >= 0,
           icon: <ShoppingCart size={20} />,
           color: '#3B82F6',
         },
         {
           label: 'Active Users',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           value: (salesData.stats.activeUsers || 0).toLocaleString(),
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           change: `${salesData.stats.usersChange || 0}%`,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           positive: (salesData.stats.usersChange || 0) >= 0,
           icon: <Users size={20} />,
           color: '#8B5CF6',
         },
         {
           label: 'Products Sold',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           value: (salesData.stats.productsSold || 0).toLocaleString(),
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           change: `${salesData.stats.productsChange || 0}%`,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           positive: (salesData.stats.productsChange || 0) >= 0,
           icon: <Package size={20} />,
           color: '#F59E0B',
@@ -403,9 +403,9 @@ function Reports() {
       ];
 
   // Use real data if available, otherwise fallback to mock data
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const topProducts = salesData?.topProducts
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     ? salesData.topProducts.map((product: any) => ({
     name: product.name,
     sales: product.sales,
@@ -420,9 +420,9 @@ function Reports() {
       ];
 
   // Use real data if available, otherwise fallback to mock data
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const topPartners = salesData?.topPartners
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     ? salesData.topPartners.map((partner: any) => ({
     name: partner.name,
     orders: partner.orders,

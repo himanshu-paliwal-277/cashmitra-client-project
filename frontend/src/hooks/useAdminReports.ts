@@ -15,7 +15,7 @@ export const useAdminReports = () => {
       setSalesData(response.data);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch sales report');
       throw err;
     } finally {
@@ -31,7 +31,7 @@ export const useAdminReports = () => {
       setInventoryData(response.data);
       return response.data;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch inventory report');
       throw err;
     } finally {

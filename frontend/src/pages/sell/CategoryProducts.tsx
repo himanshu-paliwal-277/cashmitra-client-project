@@ -45,15 +45,15 @@ const CategoryProducts = () => {
 
         // Extract unique brands from products
         const uniqueBrands = [...new Set(products.map((product: any) => product.brand).filter(Boolean))];
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setBrands(uniqueBrands);
       } else {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError('Failed to fetch products');
       }
     } catch (err) {
       console.error('Error fetching products:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Failed to load products. Please try again.');
     } finally {
       setLoading(false);
@@ -75,7 +75,7 @@ const CategoryProducts = () => {
 
     // Navigate to the sell model page with category, brand, and product ID parameters
     navigate(
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       `/sell/model?category=${encodeURIComponent(category)}&brand=${encodeURIComponent(product.brand || '')}&productId=${encodeURIComponent(product._id)}`
     );
   };
@@ -144,7 +144,7 @@ const CategoryProducts = () => {
         <div className="page-header">
           <h1 className="page-title">Sell Your {formatCategoryName(category)}</h1>
           <p className="page-subtitle">
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             Get the best price for your {category.toLowerCase()}. Choose your device below to get
             started.
           </p>
@@ -155,7 +155,7 @@ const CategoryProducts = () => {
           <div className="search-filter">
             <input
               type="text"
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               placeholder={`Search ${category.toLowerCase()} models...`}
               value={searchTerm}
               onChange={handleSearchChange}
@@ -183,7 +183,7 @@ const CategoryProducts = () => {
             <div className="products-grid">
               {products.map(product => (
                 <div
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   key={product._id}
                   className="product-card"
                   onClick={() => handleProductClick(product)}
@@ -191,38 +191,38 @@ const CategoryProducts = () => {
                   <div className="product-image-container">
                     <img
                       src={
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         product.images && product.images['0']
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           ? product.images['0']
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           : product.image || '/placeholder-product.jpg'
                       }
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       alt={product.name}
                       className="product-image"
                       onError={e => {
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         e.target.src = '/placeholder-product.jpg';
                       }}
                     />
                   </div>
                   <div className="product-info">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <h3 className="product-name">{product.name}</h3>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {product.brand && <p className="product-brand">{product.brand}</p>}
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {product.pricing?.discountedPrice && (
                       <p className="product-price">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         Starting from ₹{product.pricing.discountedPrice.toLocaleString()}
                       </p>
                     )}
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {!product.pricing?.discountedPrice && product.basePrice && (
                       <p className="product-price">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         Starting from ₹{product.basePrice.toLocaleString()}
                       </p>
                     )}
@@ -273,7 +273,7 @@ const CategoryProducts = () => {
             <p>
               {searchTerm || selectedBrand
                 ? 'Try adjusting your search or filter criteria.'
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 : `No ${category.toLowerCase()} products are currently available.`}
             </p>
           </div>

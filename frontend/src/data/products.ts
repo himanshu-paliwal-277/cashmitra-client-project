@@ -1071,7 +1071,7 @@ export const sortProducts = (products: any, sortBy: any) => {
       return sorted.sort((a, b) => b.discount - a.discount);
     case 'newest':
       return sorted.sort(
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         (a, b) => new Date(b.createdAt || '2024-01-01') - new Date(a.createdAt || '2024-01-01')
       );
     case 'popularity':

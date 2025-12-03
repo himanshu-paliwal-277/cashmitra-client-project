@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config/api';
 
-{/* @ts-expect-error */}
+// @ts-expect-error
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -62,9 +62,9 @@ export const AuthProvider = ({
       setUser(data);
       return { success: true, user: data };
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.message);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       return { success: false, error: err.message };
     } finally {
       setLoading(false);
@@ -97,9 +97,9 @@ export const AuthProvider = ({
       setUser(data);
       return { success: true, user: data };
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.message);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       return { success: false, error: err.message };
     } finally {
       setLoading(false);
@@ -114,7 +114,7 @@ export const AuthProvider = ({
   };
 
   const updateUser = (updatedUserData: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const updatedUser = { ...user, ...updatedUserData };
     setUser(updatedUser);
     localStorage.setItem('userData', JSON.stringify(updatedUser));

@@ -29,11 +29,11 @@ const Sell = () => {
   const { sellOrders: hookSellOrders, stats: hookStats, loading: hookLoading } = useAdminSell();
 
   useEffect(() => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (hookSellOrders && hookSellOrders.orders) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setSellOrders(hookSellOrders.orders);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const orders = hookSellOrders.orders;
       const totalOrders = orders.length;
       const pendingOrders = orders.filter((order: any) => order.status === 'pending').length;
@@ -81,11 +81,11 @@ const Sell = () => {
 
   const filteredOrders = sellOrders.filter(
     order =>
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       (order.assessmentId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       (order.notes || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       (order._id || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -191,60 +191,60 @@ const Sell = () => {
             <tbody className="divide-y divide-slate-200">
               {loading ? (
                 <tr>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <td colSpan="8" className="px-6 py-12 text-center text-slate-600">
                     Loading...
                   </td>
                 </tr>
               ) : filteredOrders.length === 0 ? (
                 <tr>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <td colSpan="8" className="px-6 py-12 text-center text-slate-600">
                     No sell orders found
                   </td>
                 </tr>
               ) : (
                 filteredOrders.map(order => (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <tr key={order._id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4 text-sm text-slate-900 font-medium">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.assessmentId || 'N/A'}
                     </td>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <td className="px-6 py-4 text-sm text-slate-700">{order.orderType || 'N/A'}</td>
                     <td className="px-6 py-4 text-sm text-slate-900 font-semibold">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       ₹{(order.totalAmount || 0).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-700">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       ₹{(order.commission?.amount || 0).toLocaleString()} (
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {((order.commission?.rate || 0) * 100).toFixed(1)}%)
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-700">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order.paymentDetails?.method || 'N/A'}
                     </td>
                     <td className="px-6 py-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           order.status === 'pending'
                             ? 'bg-amber-100 text-amber-700'
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             : order.status === 'approved'
                               ? 'bg-green-100 text-green-700'
                               : 'bg-red-100 text-red-700'
                         }`}
                       >
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-700">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {formatDate(order.createdAt)}
                     </td>
                     <td className="px-6 py-4">
@@ -295,39 +295,39 @@ const Sell = () => {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     { label: 'Order ID', value: selectedOrder._id },
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     { label: 'Assessment ID', value: selectedOrder.assessmentId },
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     { label: 'Order Type', value: selectedOrder.orderType },
                     {
                       label: 'Status',
                       value: (
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             selectedOrder.status === 'pending'
                               ? 'bg-amber-100 text-amber-700'
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               : selectedOrder.status === 'approved'
                                 ? 'bg-green-100 text-green-700'
                                 : 'bg-red-100 text-red-700'
                           }`}
                         >
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {selectedOrder.status.charAt(0).toUpperCase() +
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             selectedOrder.status.slice(1)}
                         </span>
                       ),
                     },
                     {
                       label: 'Total Amount',
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       value: `₹${(selectedOrder.totalAmount || 0).toLocaleString()}`,
                     },
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     { label: 'Created Date', value: formatDate(selectedOrder.createdAt) },
                   ].map((item, index) => (
                     <div
@@ -355,7 +355,7 @@ const Sell = () => {
                       Commission Rate
                     </div>
                     <div className="text-sm text-slate-900 font-medium">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {((selectedOrder.commission?.rate || 0) * 100).toFixed(1)}%
                     </div>
                   </div>
@@ -364,7 +364,7 @@ const Sell = () => {
                       Commission Amount
                     </div>
                     <div className="text-sm text-slate-900 font-medium">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       ₹{(selectedOrder.commission?.amount || 0).toLocaleString()}
                     </div>
                   </div>
@@ -383,7 +383,7 @@ const Sell = () => {
                       Payment Method
                     </div>
                     <div className="text-sm text-slate-900 font-medium">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {selectedOrder.paymentDetails?.method || 'N/A'}
                     </div>
                   </div>
@@ -394,17 +394,17 @@ const Sell = () => {
                     <div className="text-sm text-slate-900 font-medium">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           selectedOrder.paymentDetails?.status === 'completed'
                             ? 'bg-green-100 text-green-700'
                             : 'bg-amber-100 text-amber-700'
                         }`}
                       >
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {(selectedOrder.paymentDetails?.status || 'Unknown')
                           .charAt(0)
                           .toUpperCase() +
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           (selectedOrder.paymentDetails?.status || 'Unknown').slice(1)}
                       </span>
                     </div>
@@ -423,7 +423,7 @@ const Sell = () => {
                     Country
                   </div>
                   <div className="text-sm text-slate-900 font-medium">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {selectedOrder.shippingDetails?.address?.country || 'N/A'}
                   </div>
                 </div>
@@ -433,11 +433,11 @@ const Sell = () => {
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
                   <Package className="w-5 h-5 text-blue-600" />
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   Items ({selectedOrder.items?.length || 0})
                 </h3>
                 <div className="space-y-4">
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {selectedOrder.items?.map((item: any, index: any) => (
                     <div
                       key={item._id || index}
@@ -487,7 +487,7 @@ const Sell = () => {
                   Status History
                 </h3>
                 <div className="space-y-3">
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {selectedOrder.statusHistory?.map((history: any, index: any) => (
                     <div
                       key={history._id || index}
@@ -519,7 +519,7 @@ const Sell = () => {
               </div>
 
               {/* Notes */}
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {selectedOrder.notes && (
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
@@ -527,7 +527,7 @@ const Sell = () => {
                     Notes
                   </h3>
                   <div className="bg-slate-50 p-4 rounded-xl border-l-4 border-slate-500">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <div className="text-sm text-slate-900">{selectedOrder.notes}</div>
                   </div>
                 </div>

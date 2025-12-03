@@ -46,7 +46,7 @@ const HeroCarousel = () => {
 
   return (
     <div className="w-full my-8 relative main-container">
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       <Carousel
         plugins={[plugin.current]}
         className="w-full"
@@ -57,10 +57,10 @@ const HeroCarousel = () => {
           loop: true,
         }}
       >
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <CarouselContent>
           {bannerImages.map((image, index) => (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <CarouselItem key={image.id}>
               <div className="relative w-full h-[500px] lg:h-[400px] md:h-[350px] sm:h-[280px] overflow-hidden rounded-xl">
                 <img
@@ -86,9 +86,9 @@ const HeroCarousel = () => {
           ))}
         </CarouselContent>
 
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <CarouselPrevious className="left-4" />
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <CarouselNext className="right-4" />
       </Carousel>
     </div>

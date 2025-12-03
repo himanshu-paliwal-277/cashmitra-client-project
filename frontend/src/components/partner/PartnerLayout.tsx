@@ -35,7 +35,7 @@ const PartnerLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { partner, logout, roleTemplate } = usePartnerAuth();
 
   const permissionMap = {
@@ -185,7 +185,7 @@ const PartnerLayout = () => {
         <nav className="flex-1 overflow-y-auto p-4 space-y-6">
           {navigationItems.map((section, sectionIndex) => {
             const filteredItems = section.items.filter(item => {
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const permissionKey = permissionMap[item.path];
               if (!permissionKey || !roleTemplate) return true;
               return roleTemplate.permissions && roleTemplate.permissions.includes(permissionKey);

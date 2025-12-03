@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAgentAuth } from '../../contexts/AgentAuthContext';
 import { Mail, Lock, LogIn, Loader } from 'lucide-react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 
 const LoginContainer = styled.div`
@@ -143,7 +143,7 @@ const AgentLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { login } = useAgentAuth();
   const navigate = useNavigate();
 
@@ -170,7 +170,7 @@ const AgentLogin = () => {
       await login(formData.email, formData.password);
       navigate('/agent/dashboard');
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);

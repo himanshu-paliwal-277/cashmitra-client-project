@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { Upload, X, Save, Image as ImageIcon } from 'lucide-react';
 import { API_BASE_URL } from '../../config/api';
@@ -44,7 +44,7 @@ const SuperCategoryForm = ({
       [name]: type === 'checkbox' ? checked : value,
     }));
     // Clear error for this field
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -71,7 +71,7 @@ const SuperCategoryForm = ({
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
@@ -99,21 +99,21 @@ const SuperCategoryForm = ({
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.name = 'Name is required';
     } else if (formData.name.length > 50) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.name = 'Name must be 50 characters or less';
     }
 
     if (formData.description && formData.description.length > 200) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.description = 'Description must be 200 characters or less';
     }
 
     // Image is required only when creating new category
     if (!category && !imageFile && !imagePreview) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.image = 'Image is required';
     }
 
@@ -162,7 +162,7 @@ const SuperCategoryForm = ({
         try {
           imageUrl = await uploadImageToCloudinary(imageFile);
         } catch (uploadError) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           setErrors({ submit: 'Failed to upload image: ' + uploadError.message });
           setLoading(false);
           return;
@@ -212,7 +212,7 @@ const SuperCategoryForm = ({
       }
     } catch (err) {
       console.error('Error saving super category:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setErrors({ submit: 'Error saving super category: ' + err.message });
     } finally {
       setLoading(false);
@@ -236,10 +236,10 @@ const SuperCategoryForm = ({
               onChange={handleChange}
               placeholder="e.g., Mobile, Laptop, Watch"
               maxLength={50}
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               hasError={errors.name}
             />
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {errors.name && <ErrorText>{errors.name}</ErrorText>}
             <CharCount>{formData.name.length}/50</CharCount>
           </FormGroup>
@@ -253,10 +253,10 @@ const SuperCategoryForm = ({
               placeholder="Brief description of the super category"
               rows={4}
               maxLength={200}
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               hasError={errors.description}
             />
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {errors.description && <ErrorText>{errors.description}</ErrorText>}
             <CharCount>{formData.description.length}/200</CharCount>
           </FormGroup>
@@ -303,7 +303,7 @@ const SuperCategoryForm = ({
               </RemoveImageButton>
             </ImagePreview>
           ) : (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <DropZone onDrop={handleDrop} onDragOver={handleDragOver} hasError={errors.image}>
               <ImageIcon size={48} />
               <DropText>Drag and drop an image here</DropText>
@@ -322,11 +322,11 @@ const SuperCategoryForm = ({
             </DropZone>
           )}
 
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {errors.image && <ErrorText>{errors.image}</ErrorText>}
         </FormSection>
 
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         {errors.submit && <SubmitError>{errors.submit}</SubmitError>}
 
         <FormActions>

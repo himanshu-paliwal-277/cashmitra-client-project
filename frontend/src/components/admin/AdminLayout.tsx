@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   Menu,
@@ -284,7 +284,7 @@ const Overlay = styled.div`
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { adminUser, logout } = useAdminAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 

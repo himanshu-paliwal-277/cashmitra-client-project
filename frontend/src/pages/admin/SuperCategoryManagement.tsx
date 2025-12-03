@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { Plus, Edit2, Trash2, Image as ImageIcon, Search } from 'lucide-react';
 import { API_BASE_URL } from '../../config/api';
@@ -53,7 +53,7 @@ const SuperCategoryManagement = () => {
       }
     } catch (err) {
       console.error('Error fetching super categories:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Error fetching super categories: ' + (err.message || 'Unknown error'));
     } finally {
       setLoading(false);
@@ -91,7 +91,7 @@ const SuperCategoryManagement = () => {
         alert(data.message || 'Failed to delete super category');
       }
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       alert('Error deleting super category: ' + err.message);
     }
   };
@@ -186,42 +186,42 @@ const SuperCategoryManagement = () => {
       ) : (
         <Grid>
           {superCategories.map(category => (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card key={category._id}>
               <CardImage>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {category.image ? (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <img src={category.image} alt={category.name} />
                 ) : (
                   <PlaceholderImage>
                     <ImageIcon size={48} />
                   </PlaceholderImage>
                 )}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <StatusBadge active={category.isActive}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {category.isActive ? 'Active' : 'Inactive'}
                 </StatusBadge>
               </CardImage>
 
               <CardContent>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <CategoryName>{category.name}</CategoryName>
                 <CategoryDescription>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {category.description || 'No description'}
                 </CategoryDescription>
 
                 <CategoryStats>
                   <Stat>
                     <StatLabel>Categories:</StatLabel>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <StatValue>{category.categories?.length || 0}</StatValue>
                   </Stat>
                   <Stat>
                     <StatLabel>Order:</StatLabel>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <StatValue>{category.sortOrder || 0}</StatValue>
                   </Stat>
                 </CategoryStats>
@@ -232,7 +232,7 @@ const SuperCategoryManagement = () => {
                   <Edit2 size={18} />
                   Edit
                 </ActionButton>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <ActionButton onClick={() => handleDelete(category._id)} variant="delete">
                   <Trash2 size={18} />
                   Delete

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import Button from '../../components/ui/Button';
@@ -238,23 +238,23 @@ const SellMobile = ({
   const mobileBrands = brands.filter(brand => {
     // Check if brand has mobile category or if it's associated with mobile products
     return (
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       brand.categoryName === 'Mobile' ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       brand.categoryName === 'Mobile Phones' ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       brand.name === 'Apple' ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       brand.name === 'Samsung' ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       brand.name === 'OnePlus' ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       brand.name === 'Google' ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       brand.name === 'Xiaomi' ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       brand.name === 'Oppo' ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       brand.name === 'Vivo'
     );
   });
@@ -346,15 +346,15 @@ const SellMobile = ({
         <BrandGrid>
           {mobileBrands.map(brand => (
             <BrandCard
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               key={brand._id || brand.id}
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               className={selectedBrand?.name === brand.name ? 'selected' : ''}
               onClick={() => handleBrandSelect(brand)}
             >
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <BrandLogo>{brand.name?.charAt(0).toUpperCase()}</BrandLogo>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <BrandName>{brand.name}</BrandName>
             </BrandCard>
           ))}

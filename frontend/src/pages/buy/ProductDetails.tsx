@@ -45,7 +45,7 @@ const ICON_SIZE = 18;
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
@@ -85,7 +85,7 @@ const ProductDetails = () => {
         if (data.storageOptions?.length) setSelectedStorage(data.storageOptions[0]);
         if (data.colorOptions?.length) setSelectedColor(data.colorOptions[0]);
       } catch (e) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(e.message || 'Failed to load product details. Please try again.');
       } finally {
         setLoading(false);
@@ -98,7 +98,7 @@ const ProductDetails = () => {
     const el = railRef.current;
     if (!el) return;
     const step = 88; // thumbnail + gap
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     el.scrollBy({ top: step * dir, behavior: 'smooth' });
   };
 
@@ -106,20 +106,20 @@ const ProductDetails = () => {
     if (!product) return;
     addToCart(
       {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         _id: product._id,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         name: product.name,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         price: selectedVariant?.price || product.price,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         images: [product.images?.[0] || '/placeholder-phone.jpg'],
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         brand: product.brand || 'Unknown Brand',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         model: product.model || 'Unknown Model',
         condition: selectedCondition,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         inventoryId: product.inventoryId || product._id,
         variant: selectedVariant,
         storage: selectedStorage,
@@ -182,9 +182,9 @@ const ProductDetails = () => {
     );
   }
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const priceNow = product.pricing?.discountedPrice || selectedVariant?.price || product.price || 0;
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const mrp = product.pricing?.mrp || product.originalPrice || null;
   const discountPct = mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
 
@@ -201,15 +201,15 @@ const ProductDetails = () => {
         </button>
         <ChevronRight size={14} />
         <button
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           onClick={() => navigate(`/buy/category/${product?.categoryId?.name || 'Category'}`)}
           className="link"
         >
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {product?.categoryId?.name || 'Category'}
         </button>
         <ChevronRight size={14} />
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         <span className="muted">{product.name}</span>
       </nav>
 
@@ -225,19 +225,19 @@ const ProductDetails = () => {
               {(() => {
                 // Handle images as object with main, gallery, thumbnail properties
                 const imageArray = [];
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 if (product.images) {
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   if (product.images.main) imageArray.push(product.images.main.trim());
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   if (product.images.gallery) imageArray.push(product.images.gallery.trim());
                   if (
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     product.images.thumbnail &&
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     product.images.thumbnail !== product.images.gallery
                   ) {
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     imageArray.push(product.images.thumbnail.trim());
                   }
                 }
@@ -250,7 +250,7 @@ const ProductDetails = () => {
                     className={`rail-thumb ${i === selectedImageIndex ? 'active' : ''}`}
                     onClick={() => setSelectedImageIndex(i)}
                   >
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <img src={img} alt={`${product.name} ${i + 1}`} />
                   </button>
                 ));
@@ -266,19 +266,19 @@ const ProductDetails = () => {
               src={(() => {
                 // Handle images as object with main, gallery, thumbnail properties
                 const imageArray = [];
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 if (product.images) {
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   if (product.images.main) imageArray.push(product.images.main.trim());
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   if (product.images.gallery) imageArray.push(product.images.gallery.trim());
                   if (
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     product.images.thumbnail &&
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     product.images.thumbnail !== product.images.gallery
                   ) {
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     imageArray.push(product.images.thumbnail.trim());
                   }
                 }
@@ -286,7 +286,7 @@ const ProductDetails = () => {
                 const finalImages = imageArray.length > 0 ? imageArray : ['/placeholder-phone.jpg'];
                 return finalImages[selectedImageIndex] || '/placeholder-phone.jpg';
               })()}
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               alt={product.name}
             />
             <div className="pd__assured">
@@ -300,27 +300,27 @@ const ProductDetails = () => {
         <div className="pd__info">
           <div className="pd__title-row">
             <div className="pd__chips">
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {product.isRefurbished && <span className="chip chip-green">Refurbished</span>}
               <span className="chip">32-Point QC</span>
               <span className="chip">15-Day Refund</span>
               <span className="chip">12-Month Warranty</span>
             </div>
             <h1 className="pd__title">
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {product.name} <span className="muted">– Refurbished</span>
             </h1>
             <div className="pd__rating">
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <div className="stars">{renderStars(Math.round(product.averageRating || 5))}</div>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <span className="pd__rating-val">{product.averageRating || '5.0'}</span>
               <span className="dot" />
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <span className="muted">{product.totalReviews || 4} reviews</span>
               <span className="dot" />
               <span className="muted">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {product.trustMetrics?.devicesSold || product.soldCount || '500+'} sold
               </span>
             </div>
@@ -334,7 +334,7 @@ const ProductDetails = () => {
               {mrp ? <div className="mrp">₹{mrp.toLocaleString()}</div> : null}
             </div>
             <div className="pd__price-right">
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {product.paymentOptions?.emiAvailable && (
                 <div className="irow">
                   <CreditCard size={ICON_SIZE} />
@@ -391,14 +391,14 @@ const ProductDetails = () => {
           </div>
 
           {/* Condition / Storage / Color */}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {product.conditionOptions?.length ? (
             <div className="pd__picker">
               <h4>Condition</h4>
               <div className="pill-row">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {product.conditionOptions.map((c: any, i: any) => {
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   const active = selectedCondition?.label === c.label;
                   return (
                     <button
@@ -415,14 +415,14 @@ const ProductDetails = () => {
             </div>
           ) : null}
 
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {product.storageOptions?.length ? (
             <div className="pd__picker">
               <h4>Storage</h4>
               <div className="pill-row">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {product.storageOptions.map((s: any, i: any) => {
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   const active = selectedStorage?.size === s.size;
                   return (
                     <button
@@ -441,14 +441,14 @@ const ProductDetails = () => {
             </div>
           ) : null}
 
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {product.colorOptions?.length ? (
             <div className="pd__picker">
               <h4>Color</h4>
               <div className="color-row">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {product.colorOptions.map((c: any, i: any) => {
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   const active = selectedColor?.name === c.name;
                   return (
                     <button
@@ -502,11 +502,11 @@ const ProductDetails = () => {
               <Truck size={ICON_SIZE} />
               <div>
                 <div className="bold">
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {product.availability?.inStock ? 'Free Delivery' : 'Out of Stock'}
                 </div>
                 <div className="muted">
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {product.availability?.estimatedDelivery || 'Delivered in 2-3 business days'}
                 </div>
               </div>
@@ -556,7 +556,7 @@ const ProductDetails = () => {
             className={activeTab === 'reviews' ? 'active' : ''}
             onClick={() => setActiveTab('reviews')}
           >
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Star size={16} /> Reviews ({product.totalReviews || 4})
           </button>
           <button
@@ -588,9 +588,9 @@ const ProductDetails = () => {
                 icon={<Monitor size={ICON_SIZE} />}
                 label="Screen Size"
                 value={
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.productDetails?.display?.size ||
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.topSpecs?.screenSize ||
                   '6.7 inches'
                 }
@@ -599,9 +599,9 @@ const ProductDetails = () => {
                 icon={<Cpu size={ICON_SIZE} />}
                 label="Chipset"
                 value={
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.productDetails?.performance?.chipset ||
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.topSpecs?.chipset ||
                   'Google Tensor G3'
                 }
@@ -609,16 +609,16 @@ const ProductDetails = () => {
               <SpecTile
                 icon={<HardDrive size={ICON_SIZE} />}
                 label="Pixel Density"
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 value={product.topSpecs?.pixelDensity || '490 ppi'}
               />
               <SpecTile
                 icon={<Smartphone size={ICON_SIZE} />}
                 label="Network"
                 value={
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.productDetails?.networkConnectivity?.networkSupport ||
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.topSpecs?.networkSupport ||
                   '5G'
                 }
@@ -627,9 +627,9 @@ const ProductDetails = () => {
                 icon={<Smartphone size={ICON_SIZE} />}
                 label="SIM Slots"
                 value={
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.productDetails?.networkConnectivity?.simSlots ||
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.topSpecs?.simSlots ||
                   'Dual SIM, GSM+GSM'
                 }
@@ -643,15 +643,15 @@ const ProductDetails = () => {
               open={openKey === 'display'}
               onToggle={() => setOpenKey(openKey === 'display' ? '' : 'display')}
               rows={[
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Screen Size', product.productDetails?.display?.size || '6.7 inches'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Type', product.productDetails?.display?.technology || 'LTPO OLED'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Resolution', product.productDetails?.display?.resolution || '2992 × 1344'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Refresh Rate', product.productDetails?.display?.refreshRate || '120Hz'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Peak Brightness', product.topSpecs?.pixelDensity || '2400 nits peak'],
               ]}
             />
@@ -661,17 +661,17 @@ const ProductDetails = () => {
               open={openKey === 'performance'}
               onToggle={() => setOpenKey(openKey === 'performance' ? '' : 'performance')}
               rows={[
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Chipset', product.productDetails?.performance?.chipset || 'Google Tensor G3'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['GPU', product.productDetails?.performance?.gpu || 'Immortalis-G715s MC10'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['OS', product.productDetails?.performance?.os || 'Android 14'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Architecture', product.productDetails?.performance?.architecture || 'ARM64'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['RAM Type', product.productDetails?.memoryStorage?.ramType || 'LPDDR5X'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Storage Type', product.productDetails?.memoryStorage?.romType || 'UFS 3.1'],
               ]}
             />
@@ -683,18 +683,18 @@ const ProductDetails = () => {
               rows={[
                 [
                   'Rear Setup',
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.productDetails?.rearCamera?.setup || '50MP OIS + 48MP + 48MP',
                 ],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Front', product.productDetails?.frontCamera?.resolution || '10.5MP'],
                 [
                   'Video',
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.productDetails?.rearCamera?.videoRecording?.join(', ') ||
                     '4K60, 1080p240',
                 ],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Flash', product.productDetails?.rearCamera?.flash || 'LED'],
               ]}
             />
@@ -704,11 +704,11 @@ const ProductDetails = () => {
               open={openKey === 'battery'}
               onToggle={() => setOpenKey(openKey === 'battery' ? '' : 'battery')}
               rows={[
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Capacity', product.productDetails?.battery?.capacity || '5000 mAh'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Fast Charging', product.productDetails?.battery?.fastCharging || '30W'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Wireless', product.productDetails?.battery?.wirelessCharging || '23W'],
               ]}
             />
@@ -720,21 +720,21 @@ const ProductDetails = () => {
               rows={[
                 [
                   'Network',
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.productDetails?.networkConnectivity?.networkSupport || '5G / 4G',
                 ],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Wi-Fi', product.productDetails?.networkConnectivity?.wifi || 'Wi-Fi 6E'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Bluetooth', product.productDetails?.networkConnectivity?.bluetooth || '5.3'],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['NFC', product.productDetails?.networkConnectivity?.nfc ? 'Yes' : 'No'],
                 [
                   'GPS',
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.productDetails?.networkConnectivity?.gps || 'GPS, GLONASS, Galileo',
                 ],
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['SIM Slots', product.productDetails?.networkConnectivity?.simSlots || 'Dual SIM'],
               ]}
             />
@@ -744,23 +744,23 @@ const ProductDetails = () => {
               open={openKey === 'design'}
               onToggle={() => setOpenKey(openKey === 'design' ? '' : 'design')}
               rows={[
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ['Weight', product.productDetails?.design?.weight || '210 g'],
                 [
                   'Build',
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.productDetails?.design?.build || 'Aluminum, Gorilla Glass Victus 2',
                 ],
                 [
                   'Colors',
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   (product.productDetails?.design?.colors || ['Obsidian', 'Porcelain', 'Bay']).join(
                     ', '
                   ),
                 ],
                 [
                   'Fingerprint',
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   product.productDetails?.sensorsMisc?.fingerprintScanner ? 'Yes' : 'No',
                 ],
               ]}
@@ -772,10 +772,10 @@ const ProductDetails = () => {
           <div className="pd__reviews">
             <div className="summary">
               <div className="score">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <div className="big">{product.averageRating || '5.0'}</div>
                 <div className="stars big">
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {renderStars(Math.round(product.averageRating || 5))}
                 </div>
                 <div className="muted">out of 5</div>
@@ -910,11 +910,11 @@ const ProductDetails = () => {
       </section>
 
       {/* Description */}
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       {product.description && (
         <section className="pd__desc card">
           <h3>About this product</h3>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <p>{product.description}</p>
         </section>
       )}
@@ -954,7 +954,7 @@ const Acc = ({
     </button>
     {open && (
       <div className="kv-table">
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         {rows.map(([k, v], i: any) => (
           <div className="kv-row" key={i}>
             <div className="k">{k}</div>

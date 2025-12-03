@@ -19,7 +19,7 @@ export const useAdminCategories = () => {
       // Set category stats
       const data = response.data || response;
       setCategoryStats({
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         totalCategories: data.length || 0,
         parentCategories: data.filter((cat: any) => !cat.parentId)?.length || 0,
         subCategories: data.filter((cat: any) => cat.parentId)?.length || 0,
@@ -27,7 +27,7 @@ export const useAdminCategories = () => {
 
       return response;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch categories');
       throw err;
     } finally {
@@ -45,7 +45,7 @@ export const useAdminCategories = () => {
         await fetchCategories();
         return response;
       } catch (err) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError(err.response?.data?.message || 'Failed to add category');
         throw err;
       } finally {
@@ -61,16 +61,16 @@ export const useAdminCategories = () => {
     try {
       const response = await adminService.updateCategory(id, categoryData);
       // Update the category in the local state
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setCategories(prevCategories =>
         prevCategories.map(category =>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           category.id === id ? { ...category, ...categoryData } : category
         )
       );
       return response;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to update category');
       throw err;
     } finally {
@@ -84,11 +84,11 @@ export const useAdminCategories = () => {
     try {
       const response = await adminService.deleteCategory(id);
       // Remove the category from the local state
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setCategories(prevCategories => prevCategories.filter(category => category.id !== id));
       return response;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to delete category');
       throw err;
     } finally {

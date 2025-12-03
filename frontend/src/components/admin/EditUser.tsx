@@ -76,7 +76,7 @@ const EditUser = () => {
       [name]: type === 'checkbox' ? checked : value,
     }));
     // Clear error when user starts typing
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -86,23 +86,23 @@ const EditUser = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.name = 'Name is required';
     }
 
     if (!formData.email.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.email = 'Email is invalid';
     }
 
     if (!formData.phone.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.phone = 'Phone number is required';
     } else if (!/^[0-9]{10}$/.test(formData.phone.replace(/\D/g, ''))) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.phone = 'Phone number must be 10 digits';
     }
 
@@ -129,7 +129,7 @@ const EditUser = () => {
 
       // Add roleTemplate only if role is partner and a template is selected
       if (formData.role === 'partner' && formData.roleTemplate) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         userData.roleTemplate = formData.roleTemplate;
       }
 
@@ -138,7 +138,7 @@ const EditUser = () => {
       navigate('/admin/users');
     } catch (error) {
       console.error('Error updating user:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       alert(error.message || 'Failed to update user. Please try again.');
     } finally {
       setLoading(false);
@@ -159,7 +159,7 @@ const EditUser = () => {
       navigate('/admin/users');
     } catch (error) {
       console.error('Error deleting user:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       alert(error.message || 'Failed to delete user. Please try again.');
     } finally {
       setLoading(false);
@@ -173,7 +173,7 @@ const EditUser = () => {
       [name]: value,
     }));
     // Clear error when user starts typing
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (passwordErrors[name]) {
       setPasswordErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -183,18 +183,18 @@ const EditUser = () => {
     const newErrors = {};
 
     if (!passwordData.newPassword) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.newPassword = 'New password is required';
     } else if (passwordData.newPassword.length < 6) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.newPassword = 'Password must be at least 6 characters';
     }
 
     if (!passwordData.confirmPassword) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (passwordData.newPassword !== passwordData.confirmPassword) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
@@ -222,7 +222,7 @@ const EditUser = () => {
       setPasswordErrors({});
     } catch (error) {
       console.error('Error updating password:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       alert(error.message || 'Failed to update password. Please try again.');
     } finally {
       setPasswordLoading(false);
@@ -265,11 +265,11 @@ const EditUser = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 className={errors.name ? 'error' : ''}
                 placeholder="Enter full name"
               />
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {errors.name && <span className="error-message">{errors.name}</span>}
             </div>
 
@@ -281,11 +281,11 @@ const EditUser = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 className={errors.email ? 'error' : ''}
                 placeholder="Enter email address"
               />
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
           </div>
@@ -299,11 +299,11 @@ const EditUser = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 className={errors.phone ? 'error' : ''}
                 placeholder="Enter phone number"
               />
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {errors.phone && <span className="error-message">{errors.phone}</span>}
             </div>
 
@@ -332,9 +332,9 @@ const EditUser = () => {
                 >
                   <option value="">Select a role template (optional)</option>
                   {roleTemplates.map(template => (
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <option key={template._id || template.id} value={template._id || template.name}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {template.displayName} - {template.permissions?.length || 0} permissions
                     </option>
                   ))}
@@ -392,13 +392,13 @@ const EditUser = () => {
                   name="newPassword"
                   value={passwordData.newPassword}
                   onChange={handlePasswordChange}
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   className={passwordErrors.newPassword ? 'error' : ''}
                   placeholder="Enter new password (min. 6 characters)"
                 />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {passwordErrors.newPassword && (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <span className="error-message">{passwordErrors.newPassword}</span>
                 )}
               </div>
@@ -411,13 +411,13 @@ const EditUser = () => {
                   name="confirmPassword"
                   value={passwordData.confirmPassword}
                   onChange={handlePasswordChange}
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   className={passwordErrors.confirmPassword ? 'error' : ''}
                   placeholder="Confirm new password"
                 />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {passwordErrors.confirmPassword && (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <span className="error-message">{passwordErrors.confirmPassword}</span>
                 )}
               </div>

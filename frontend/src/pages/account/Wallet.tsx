@@ -134,7 +134,7 @@ const Wallet = () => {
           </div>
           <h3 className="text-xl font-bold text-slate-900 mb-2">Error Loading Wallet</h3>
           <p className="text-slate-600 mb-6">{error}</p>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Button variant="primary" onClick={() => window.location.reload()}>
             Retry
           </Button>

@@ -85,7 +85,7 @@ const BuyCategoryHome = () => {
       setCategories(catData || []);
     } catch (err) {
       console.error('Error fetching data:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.message || 'Failed to load categories');
     } finally {
       setLoading(false);
@@ -169,22 +169,22 @@ const BuyCategoryHome = () => {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {categories.slice(0, 5).map(category => {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 const { icon } = getIconForSuperCategory(category.name);
                 return (
                   <button
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     key={category._id}
                     onClick={() => handleCategoryClick(category)}
                     className="bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:scale-105 border border-slate-200 group"
                   >
                     <div className="w-20 h-20 mx-auto mb-4 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden group-hover:bg-blue-50 transition-colors">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {category.image ? (
                         <img
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           src={category.image}
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           alt={category.name}
                           className="w-full h-full object-cover"
                         />
@@ -195,7 +195,7 @@ const BuyCategoryHome = () => {
                       )}
                     </div>
                     <h4 className="text-sm font-bold text-slate-900 text-center group-hover:text-blue-600 transition-colors">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {category.name}
                     </h4>
                   </button>
@@ -231,11 +231,11 @@ const BuyCategoryHome = () => {
             {/* Main Super Categories Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 mb-16">
               {superCategories.map(superCat => {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 const { icon, bgGradient } = getIconForSuperCategory(superCat.name);
                 return (
                   <button
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     key={superCat._id}
                     onClick={() => navigate('/buy')}
                     className="group relative bg-white rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-slate-200 hover:border-transparent overflow-hidden"
@@ -245,12 +245,12 @@ const BuyCategoryHome = () => {
                     />
                     <div className="relative">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 bg-white rounded-2xl shadow-lg flex items-center justify-center overflow-hidden group-hover:shadow-xl transition-shadow">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {superCat.image ? (
                           <img
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             src={superCat.image}
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             alt={superCat.name}
                             className="w-full h-full object-cover"
                           />
@@ -261,13 +261,13 @@ const BuyCategoryHome = () => {
                         )}
                       </div>
                       <h3 className="text-base sm:text-lg font-bold text-slate-900 text-center mb-2 group-hover:text-blue-600 transition-colors">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {superCat.name}
                       </h3>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {superCat.description && (
                         <p className="text-xs text-slate-600 text-center line-clamp-2">
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {superCat.description}
                         </p>
                       )}
@@ -279,14 +279,14 @@ const BuyCategoryHome = () => {
 
             {/* Categories under each Super Category */}
             {superCategories.map(superCat => {
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               if (!superCat.categories || superCat.categories.length === 0) return null;
 
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const { icon, bgGradient } = getIconForSuperCategory(superCat.name);
 
               return (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <section key={superCat._id} className="mb-16">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
@@ -296,7 +296,7 @@ const BuyCategoryHome = () => {
                         {icon}
                       </div>
                       <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {superCat.name}
                       </h3>
                     </div>
@@ -310,7 +310,7 @@ const BuyCategoryHome = () => {
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {superCat.categories.slice(0, 5).map((category: any) => <button
                       key={category._id}
                       onClick={() => handleCategoryClick(category)}

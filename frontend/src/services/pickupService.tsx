@@ -5,24 +5,24 @@ class PickupService {
   async getAllPickups(params = {}) {
     try {
       const queryParams = new URLSearchParams();
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.page) queryParams.append('page', params.page);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.limit) queryParams.append('limit', params.limit);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.search) queryParams.append('search', params.search);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.status) queryParams.append('status', params.status);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.startDate) queryParams.append('startDate', params.startDate);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.endDate) queryParams.append('endDate', params.endDate);
 
       const response = await api.get(`/pickups?${queryParams}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching pickups:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -34,7 +34,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error fetching pickup:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -46,7 +46,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error creating pickup:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -58,7 +58,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error updating pickup:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -70,7 +70,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error updating pickup status:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -82,7 +82,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error assigning pickup:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -94,7 +94,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error reassigning pickup:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -106,7 +106,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error cancelling pickup:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -118,7 +118,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error rescheduling pickup:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -127,18 +127,18 @@ class PickupService {
   async getPickupAnalytics(params = {}) {
     try {
       const queryParams = new URLSearchParams();
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.startDate) queryParams.append('startDate', params.startDate);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.endDate) queryParams.append('endDate', params.endDate);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.agentId) queryParams.append('agentId', params.agentId);
 
       const response = await api.get(`/pickups/analytics?${queryParams}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching pickup analytics:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -147,16 +147,16 @@ class PickupService {
   async getAgentPickups(agentId: any, params = {}) {
     try {
       const queryParams = new URLSearchParams();
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.status) queryParams.append('status', params.status);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.date) queryParams.append('date', params.date);
 
       const response = await api.get(`/pickups/agent/${agentId}?${queryParams}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching agent pickups:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -166,11 +166,11 @@ class PickupService {
     try {
       const queryParams = new URLSearchParams();
       queryParams.append('role', 'driver'); // Filter for driver role
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.page) queryParams.append('page', params.page);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.limit) queryParams.append('limit', params.limit || 100); // Get more drivers
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.search) queryParams.append('search', params.search);
       queryParams.append('isVerified', 'true'); // Only verified drivers
 
@@ -178,7 +178,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error fetching drivers:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -188,11 +188,11 @@ class PickupService {
     try {
       const queryParams = new URLSearchParams();
       queryParams.append('role', 'pickup_agent'); // Filter for pickup_agent role
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.page) queryParams.append('page', params.page);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.limit) queryParams.append('limit', params.limit || 100);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.search) queryParams.append('search', params.search);
       queryParams.append('isVerified', 'true'); // Only verified agents
 
@@ -200,7 +200,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error fetching pickup agents:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -216,7 +216,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error uploading pickup images:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -228,7 +228,7 @@ class PickupService {
       return response.data;
     } catch (error) {
       console.error('Error sending communication:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }

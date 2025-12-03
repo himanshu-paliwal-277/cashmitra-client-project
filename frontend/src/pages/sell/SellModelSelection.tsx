@@ -88,23 +88,23 @@ const SellModelSelection = () => {
 
   // Get variants from API data or fallback to default
   const variants =
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     product.productDetails?.memoryStorage?.phoneVariants?.length > 0
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       ? product.productDetails.memoryStorage.phoneVariants
       : ['16 GB', '32 GB', '64 GB', '128 GB'];
 
   // Get product image
   const productImage =
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     product.images && product.images['0'] ? product.images['0'].replace(/["`]/g, '') : null;
 
   // Dynamic breadcrumb and title
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const brandName = product.brand || 'Brand';
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const productName = product.name || 'Product';
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const basePrice = product.pricing?.discountedPrice || product.basePrice || '2,160';
 
   return (
@@ -253,7 +253,7 @@ const SellModelSelection = () => {
                   Device Details
                 </h5>
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {product.productDetails?.display?.size && (
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -262,14 +262,14 @@ const SellModelSelection = () => {
                     <div>
                       <p className="text-xs text-slate-600">Display</p>
                       <p className="text-sm font-semibold text-slate-900">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {product.productDetails.display.size}
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {product.productDetails?.battery?.capacity && (
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -278,14 +278,14 @@ const SellModelSelection = () => {
                     <div>
                       <p className="text-xs text-slate-600">Battery</p>
                       <p className="text-sm font-semibold text-slate-900">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {product.productDetails.battery.capacity}
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {product.productDetails?.design?.weight && (
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -294,14 +294,14 @@ const SellModelSelection = () => {
                     <div>
                       <p className="text-xs text-slate-600">Weight</p>
                       <p className="text-sm font-semibold text-slate-900">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {product.productDetails.design.weight}
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {product.availability && (
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -310,7 +310,7 @@ const SellModelSelection = () => {
                     <div>
                       <p className="text-xs text-slate-600">Availability</p>
                       <p className="text-sm font-semibold text-slate-900">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {product.availability.inStock ? 'In Stock' : 'Out of Stock'}
                       </p>
                     </div>

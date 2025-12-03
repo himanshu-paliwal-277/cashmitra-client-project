@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 
-{/* @ts-expect-error */}
+// @ts-expect-error
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
 import GlobalStyles from './styles/GlobalStyles';
@@ -29,7 +29,7 @@ import AppRoutes from './AppRoutes';
 function AppContent() {
   const location = useLocation(); // ⚠️ Must be inside <Router>
   const navigate = useNavigate(); // ⚠️ Must be inside <Router>
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { user, logout } = useAuth(); // ⚠️ Must be inside <AuthProvider>
 
   const isAdminRoute = location.pathname.startsWith('/admin');

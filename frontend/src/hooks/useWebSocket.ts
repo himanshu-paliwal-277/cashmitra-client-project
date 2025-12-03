@@ -7,16 +7,16 @@ const useWebSocket = (url: any, options = {}) => {
   const [lastMessage, setLastMessage] = useState(null);
   const reconnectTimeoutRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const maxReconnectAttempts = options.maxReconnectAttempts || 5;
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const reconnectInterval = options.reconnectInterval || 3000;
 
   const connect = useCallback(() => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError('No authentication token found');
         return;
       }
@@ -45,9 +45,9 @@ const useWebSocket = (url: any, options = {}) => {
           setLastMessage(data);
 
           // Handle different message types
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           if (options.onMessage) {
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             options.onMessage(data);
           }
         } catch (err) {
@@ -67,27 +67,27 @@ const useWebSocket = (url: any, options = {}) => {
             `Attempting to reconnect... (${reconnectAttemptsRef.current}/${maxReconnectAttempts})`
           );
 
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
           }, reconnectInterval);
         } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           setError('Maximum reconnection attempts reached');
         }
       };
 
       ws.onerror = error => {
         console.error('WebSocket error:', error);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setError('WebSocket connection error');
       };
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setSocket(ws);
     } catch (err) {
       console.error('Error creating WebSocket connection:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Failed to create WebSocket connection');
     }
   }, [url, maxReconnectAttempts, reconnectInterval, options]);
@@ -98,7 +98,7 @@ const useWebSocket = (url: any, options = {}) => {
     }
 
     if (socket) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       socket.close(1000, 'Manual disconnect');
     }
 
@@ -111,12 +111,12 @@ const useWebSocket = (url: any, options = {}) => {
     (message: any) => {
       if (socket && isConnected) {
         try {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           socket.send(JSON.stringify(message));
           return true;
         } catch (err) {
           console.error('Error sending WebSocket message:', err);
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           setError('Failed to send message');
           return false;
         }
@@ -147,7 +147,7 @@ const useWebSocket = (url: any, options = {}) => {
   );
 
   useEffect(() => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (options.autoConnect !== false) {
       connect();
     }
@@ -155,7 +155,7 @@ const useWebSocket = (url: any, options = {}) => {
     return () => {
       disconnect();
     };
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   }, [connect, disconnect, options.autoConnect]);
 
   return {

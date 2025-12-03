@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled, { keyframes } from 'styled-components';
 import useAdminBrands from '../../hooks/useAdminBrands';
 import adminService from '../../services/adminService';
@@ -519,7 +519,7 @@ const Brands = () => {
       } catch (error) {
         console.error('Failed to fetch categories:', error);
         // Fallback to hardcoded categories if API fails
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setCategories(['Mobile Phones', 'Tablets', 'Laptops']);
       } finally {
         setCategoriesLoading(false);
@@ -533,25 +533,25 @@ const Brands = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.name = 'Brand name is required';
     } else if (formData.name.length < 2) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.name = 'Brand name must be at least 2 characters';
     }
 
     if (!formData.category) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.category = 'Category is required';
     }
 
     if (formData.website && !isValidUrl(formData.website)) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.website = 'Please enter a valid URL';
     }
 
     if (formData.description && formData.description.length > 500) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.description = 'Description must be less than 500 characters';
     }
 
@@ -590,9 +590,9 @@ const Brands = () => {
 
       if (editingBrand) {
         // For editing, we need to pass the current brand name for URL and new name in data
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         submitData.currentBrandName = editingBrand.brand;
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         await editBrand(editingBrand.brand, submitData);
       } else {
         await addBrand(submitData);
@@ -603,7 +603,7 @@ const Brands = () => {
       resetForm();
     } catch (error) {
       console.error('Error saving brand:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setErrors({ submit: error.message || 'Failed to save brand. Please try again.' });
     } finally {
       setIsSubmitting(false);
@@ -639,7 +639,7 @@ const Brands = () => {
     if (file) {
       setFormData({ ...formData, logo: file });
       const reader = new FileReader();
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       reader.onload = e => setLogoPreview(e.target.result);
       reader.readAsDataURL(file);
     }
@@ -662,7 +662,7 @@ const Brands = () => {
   const handleInputChange = (field: any, value: any) => {
     setFormData({ ...formData, [field]: value });
     // Clear error when user starts typing
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[field]) {
       setErrors({ ...errors, [field]: '' });
     }
@@ -671,19 +671,19 @@ const Brands = () => {
   const filteredAndSortedBrands = React.useMemo(() => {
     let filtered = brands.filter(brand => {
       const matchesSearch =
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         brand.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         brand.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus =
         !statusFilter ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         (statusFilter === 'active' && brand.isActive !== false) ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         (statusFilter === 'inactive' && brand.isActive === false);
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const matchesCategory = !categoryFilter || brand.category === categoryFilter;
 
       return matchesSearch && matchesStatus && matchesCategory;
@@ -695,39 +695,39 @@ const Brands = () => {
 
       switch (sortBy) {
         case 'name':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.brand?.toLowerCase() || '';
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.brand?.toLowerCase() || '';
           break;
         case 'category':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.category?.toLowerCase() || '';
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.category?.toLowerCase() || '';
           break;
         case 'products':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.productCount || 0;
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.productCount || 0;
           break;
         case 'models':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.modelCount || 0;
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.modelCount || 0;
           break;
         case 'status':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.isActive !== false ? 1 : 0;
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.isActive !== false ? 1 : 0;
           break;
         default:
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.brand?.toLowerCase() || '';
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.brand?.toLowerCase() || '';
       }
 
@@ -742,7 +742,7 @@ const Brands = () => {
   }, [brands, searchTerm, statusFilter, categoryFilter, sortBy, sortOrder]);
 
   const availableCategories = React.useMemo(() => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const categories = [...new Set(brands.map(brand => brand.category).filter(Boolean))];
     return categories.sort();
   }, [brands]);
@@ -845,12 +845,12 @@ const Brands = () => {
       ) : (
         <BrandsGrid>
           {filteredAndSortedBrands.map(brand => (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <BrandCard key={brand._id}>
               <BrandLogo>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {brand.logo ? (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <img src={brand.logo} alt={brand.brand} />
                 ) : (
                   <Tag size={32} style={{ color: '#9ca3af' }} />
@@ -858,46 +858,46 @@ const Brands = () => {
               </BrandLogo>
 
               <BrandInfo>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <BrandName>{brand.brand}</BrandName>
                 <BrandDescription>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {brand.description || 'No description available'}
                 </BrandDescription>
                 <CategoriesContainer>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {brand.categories &&
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     brand.categories.map((category: any, index: any) => (
                       <CategoryTag key={index}>{category}</CategoryTag>
                     ))}
                 </CategoriesContainer>
               </BrandInfo>
 
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <StatusBadge active={brand.isActive !== false}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {brand.isActive !== false ? 'Active' : 'Inactive'}
               </StatusBadge>
 
               <BrandStats>
                 <StatItem>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <StatValue>{brand.productCount || 0}</StatValue>
                   <StatLabel>Products</StatLabel>
                 </StatItem>
                 <StatItem>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <StatValue>{brand.modelCount || 0}</StatValue>
                   <StatLabel>Models</StatLabel>
                 </StatItem>
               </BrandStats>
 
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {brand.website && (
                 <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
                   <a
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     href={brand.website}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -913,7 +913,7 @@ const Brands = () => {
                   <Edit size={16} />
                   Edit
                 </IconButton>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <IconButton danger onClick={() => handleDelete(brand.brand)}>
                   <Trash2 size={16} />
                   Delete
@@ -940,7 +940,7 @@ const Brands = () => {
             </ModalHeader>
 
             <form onSubmit={handleSubmit}>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {errors.submit && <AlertMessage>{errors.submit}</AlertMessage>}
 
               <FormGroup>
@@ -951,11 +951,11 @@ const Brands = () => {
                   onChange={(e: any) => handleInputChange('name', e.target.value)}
                   required
                   style={{
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     borderColor: errors.name ? '#dc2626' : '#d1d5db',
                   }}
                 />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
               </FormGroup>
 
@@ -966,7 +966,7 @@ const Brands = () => {
                   onChange={(e: any) => handleInputChange('category', e.target.value)}
                   required
                   style={{
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     borderColor: errors.category ? '#dc2626' : '#d1d5db',
                   }}
                 >
@@ -976,13 +976,13 @@ const Brands = () => {
                   ) : (
                     categories.map(category => (
                       <option key={category} value={category}>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {category?.charAt(0)?.toUpperCase() + category?.slice(1)}
                       </option>
                     ))
                   )}
                 </Select>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.category && <ErrorMessage>{errors.category}</ErrorMessage>}
               </FormGroup>
 
@@ -993,11 +993,11 @@ const Brands = () => {
                   onChange={(e: any) => handleInputChange('description', e.target.value)}
                   placeholder="Brand description..."
                   style={{
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     borderColor: errors.description ? '#dc2626' : '#d1d5db',
                   }}
                 />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.description && <ErrorMessage>{errors.description}</ErrorMessage>}
                 <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
                   {formData.description.length}/500 characters
@@ -1012,11 +1012,11 @@ const Brands = () => {
                   onChange={(e: any) => handleInputChange('website', e.target.value)}
                   placeholder="https://example.com"
                   style={{
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     borderColor: errors.website ? '#dc2626' : '#d1d5db',
                   }}
                 />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.website && <ErrorMessage>{errors.website}</ErrorMessage>}
               </FormGroup>
 

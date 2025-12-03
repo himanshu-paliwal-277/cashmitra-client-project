@@ -168,7 +168,7 @@ const ContactForm = () => {
               value={formData.message}
               onChange={handleChange}
               required
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               rows="6"
               className="w-full px-4 py-4 bg-grey-50 border-2 border-grey-200 rounded-xl focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-100 outline-none transition-all duration-300 resize-none"
               placeholder="Tell us more about your inquiry..."

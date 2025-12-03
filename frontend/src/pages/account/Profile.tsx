@@ -22,7 +22,7 @@ import useUserProfile from '../../hooks/useUserProfile';
 import './Profile.css';
 
 const Profile = () => {
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { user } = useAuth();
   const { profile: profileData, loading, error, updateProfile } = useUserProfile();
 
@@ -40,22 +40,22 @@ const Profile = () => {
   useEffect(() => {
     if (profileData) {
       setEditData({
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         name: profileData.name || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         email: profileData.email || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         phone: profileData.phone || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         dateOfBirth: profileData.dateOfBirth || '',
         address:
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           profileData.address && typeof profileData.address === 'object'
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                 .replace(/^,\s*|,\s*,/g, ',')
                 .replace(/^,\s*|,\s*$/g, '')
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             : profileData.address || '',
       });
     }
@@ -65,22 +65,22 @@ const Profile = () => {
     if (profileData) {
       setEditData(prev => ({
         ...prev,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         name: profileData.name || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         email: profileData.email || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         phone: profileData.phone || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         dateOfBirth: profileData.dateOfBirth || '',
         address:
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           profileData.address && typeof profileData.address === 'object'
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                 .replace(/^,\s*|,\s*,/g, ',')
                 .replace(/^,\s*|,\s*$/g, '')
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             : profileData.address || '',
       }));
     }
@@ -103,22 +103,22 @@ const Profile = () => {
   const handleCancel = () => {
     if (profileData) {
       setEditData({
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         name: profileData.name || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         email: profileData.email || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         phone: profileData.phone || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         dateOfBirth: profileData.dateOfBirth || '',
         address:
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           profileData.address && typeof profileData.address === 'object'
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                 .replace(/^,\s*|,\s*,/g, ',')
                 .replace(/^,\s*|,\s*$/g, '')
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             : profileData.address || '',
       });
     }
@@ -165,9 +165,9 @@ const Profile = () => {
 
   const initials = loading
     ? 'L'
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     : profileData?.name
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       ? profileData.name
           .split(' ')
           .map((n: any) => n[0])
@@ -198,11 +198,11 @@ const Profile = () => {
               </div>
 
               <h2 className="prof-username">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {loading ? 'Loading...' : profileData?.name || 'User Name'}
               </h2>
               <div className="prof-email">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {loading ? 'Loading...' : profileData?.email || 'user@example.com'}
               </div>
 
@@ -273,7 +273,7 @@ const Profile = () => {
                     />
                   ) : (
                     <div className="prof-value">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {loading ? 'Loading...' : profileData?.name || 'Not provided'}
                     </div>
                   )}
@@ -296,7 +296,7 @@ const Profile = () => {
                     />
                   ) : (
                     <div className="prof-value">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {loading ? 'Loading...' : profileData?.email || 'Not provided'}
                       <Shield size={14} className="prof-value-ok" />
                     </div>
@@ -318,7 +318,7 @@ const Profile = () => {
                     />
                   ) : (
                     <div className="prof-value">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {loading ? 'Loading...' : profileData?.phone || 'Not provided'}
                     </div>
                   )}
@@ -341,9 +341,9 @@ const Profile = () => {
                     <div className="prof-value">
                       {loading
                         ? 'Loading...'
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         : profileData?.dateOfBirth
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           ? new Date(profileData.dateOfBirth).toLocaleDateString('en-IN', {
                               year: 'numeric',
                               month: 'long',
@@ -371,13 +371,13 @@ const Profile = () => {
                     <div className="prof-value">
                       {loading
                         ? 'Loading...'
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         : profileData?.address && typeof profileData.address === 'object'
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                               .replace(/^,\s*|,\s*,/g, ',')
                               .replace(/^,\s*|,\s*$/g, '') || 'Not provided'
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           : profileData?.address || 'Not provided'}
                     </div>
                   )}
@@ -386,12 +386,12 @@ const Profile = () => {
 
               {isEditing && (
                 <div className="prof-actions">
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <Button variant="ghost" size="md" onClick={handleCancel} disabled={saving}>
                     <X size={16} />
                     Cancel
                   </Button>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <Button variant="primary" size="md" onClick={handleSave} disabled={saving}>
                     <Save size={16} />
                     {saving ? 'Saving...' : 'Save Changes'}

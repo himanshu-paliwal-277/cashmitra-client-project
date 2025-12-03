@@ -2,10 +2,10 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
-{/* @ts-expect-error */}
+// @ts-expect-error
 const AgentAuthContext = createContext();
 
-{/* @ts-expect-error */}
+// @ts-expect-error
 const API_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
 
 export const AgentAuthProvider = ({
@@ -66,14 +66,14 @@ export const AgentAuthProvider = ({
       localStorage.setItem('agentUser', JSON.stringify(agentData));
 
       // Update state
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setAgent(agentData);
       setIsAuthenticated(true);
 
       toast.success('Login successful!');
       return true;
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const message = error.response?.data?.message || 'Login failed';
       toast.error(message);
       throw error;

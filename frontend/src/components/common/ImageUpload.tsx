@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { Upload, X, Image as ImageIcon, Loader, AlertCircle, Check } from 'lucide-react';
 import cloudinaryService from '../../services/cloudinaryService';
@@ -24,7 +24,7 @@ const DropZone = styled.div`
   ? theme.colors.primary.main
   : props.hasError
     ? theme.colors.error.main
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     : theme.colors.border.light};
   border-radius: 8px;
   padding: 2rem;
@@ -33,7 +33,7 @@ const DropZone = styled.div`
   ? `${theme.colors.primary.main}10`
   : props.hasError
     ? `${theme.colors.error.main}10`
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     : theme.colors.background.light};
   cursor: pointer;
   transition: all 0.3s ease;
@@ -83,9 +83,9 @@ const PreviewItem = styled.div`
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   background-color: ${theme.colors.background.light};
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   border: 1px solid ${theme.colors.border.light};
 `;
 
@@ -253,7 +253,7 @@ const ImageUpload = ({
       setErrors([]);
 
       // Create upload tracking objects
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const uploadTrackingFiles = validFiles.map((file, index) => ({
         id: `${Date.now()}_${index}`,
         file,
@@ -262,7 +262,7 @@ const ImageUpload = ({
         preview: URL.createObjectURL(file),
       }));
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setUploadingFiles(prev => [...prev, ...uploadTrackingFiles]);
 
       try {
@@ -275,7 +275,7 @@ const ImageUpload = ({
           },
         };
 
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         const uploadPromises = uploadTrackingFiles.map(async trackingFile => {
           try {
             const result = await cloudinaryService.uploadImage(trackingFile.file, {
@@ -284,12 +284,12 @@ const ImageUpload = ({
             });
 
             // Update tracking file status
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             setUploadingFiles(prev =>
               prev.map(f =>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 f.id === trackingFile.id
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   ? { ...f, status: result.success ? 'success' : 'error', progress: 100, result }
                   : f
               )
@@ -297,17 +297,17 @@ const ImageUpload = ({
 
             return result;
           } catch (error) {
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             setUploadingFiles(prev =>
               prev.map(f =>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 f.id === trackingFile.id
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   ? { ...f, status: 'error', progress: 100, error: error.message }
                   : f
               )
             );
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             return { success: false, error: error.message };
           }
         });
@@ -317,7 +317,7 @@ const ImageUpload = ({
         const failedUploads = results.filter(r => !r.success);
 
         if (failedUploads.length > 0) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           setErrors(failedUploads.map(f => f.error || 'Upload failed'));
         }
 
@@ -329,18 +329,18 @@ const ImageUpload = ({
         // Clean up tracking files after a delay
         setTimeout(() => {
           setUploadingFiles(prev =>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             prev.filter(f => !uploadTrackingFiles.some(tf => tf.id === f.id))
           );
         }, 2000);
       } catch (error) {
         console.error('Upload error:', error);
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setErrors(['Failed to upload images. Please try again.']);
 
         // Clean up failed uploads
         setUploadingFiles(prev =>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           prev.filter(f => !uploadTrackingFiles.some(tf => tf.id === f.id))
         );
       }
@@ -387,7 +387,7 @@ const ImageUpload = ({
 
   const handleClick = useCallback(() => {
     if (!disabled && fileInputRef.current) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       fileInputRef.current.click();
     }
   }, [disabled]);
@@ -404,7 +404,7 @@ const ImageUpload = ({
 
   const removeImage = useCallback(
     (index: any) => {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const newImages = value.filter((_, i) => i !== index);
       onChange(newImages);
     },
@@ -412,7 +412,7 @@ const ImageUpload = ({
   );
 
   const removeUploadingFile = useCallback((id: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setUploadingFiles(prev => prev.filter(f => f.id !== id));
   }, []);
 
@@ -444,7 +444,7 @@ const ImageUpload = ({
           <UploadSubtext>
             {multiple ? `Up to ${maxFiles} files` : 'Single file'} • Max{' '}
             {(maxFileSize / 1024 / 1024).toFixed(0)}MB each •
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}
           </UploadSubtext>
 
@@ -473,7 +473,7 @@ const ImageUpload = ({
       {(value.length > 0 || uploadingFiles.length > 0) && (
         <PreviewContainer>
           {/* Uploaded images */}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {value.map((image, index) => (
             <PreviewItem key={`uploaded-${index}`}>
               <PreviewImage
@@ -497,30 +497,30 @@ const ImageUpload = ({
 
           {/* Uploading files */}
           {uploadingFiles.map(file => (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <PreviewItem key={file.id}>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <PreviewImage src={file.preview} alt="Uploading..." />
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <PreviewOverlay show={file.status !== 'success'}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <StatusIcon status={file.status}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {file.status === 'uploading' && <Loader className="animate-spin" />}
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {file.status === 'success' && <Check />}
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {file.status === 'error' && <AlertCircle />}
                 </StatusIcon>
               </PreviewOverlay>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {file.status === 'uploading' && <UploadProgress progress={file.progress} />}
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {file.status !== 'uploading' && (
                 <RemoveButton
                   onClick={(e: any) => {
                     e.stopPropagation();
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     removeUploadingFile(file.id);
                   }}
                   title="Remove"

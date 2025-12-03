@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   CreditCard,
@@ -359,9 +359,9 @@ const Finance = () => {
     ];
 
     setTimeout(() => {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setCommissionData(mockCommissionData);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setWalletData(mockWalletData);
       setLoading(false);
     }, 1000);
@@ -369,22 +369,22 @@ const Finance = () => {
 
   const filteredCommissionData = commissionData.filter(
     item =>
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       item.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       item.partner.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredWalletData = walletData.filter(item =>
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     item.partner.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const totalCommission = commissionData.reduce((sum, item) => sum + item.commission, 0);
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const totalWalletBalance = walletData.reduce((sum, item) => sum + item.balance, 0);
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const totalPendingPayouts = walletData.reduce((sum, item) => sum + item.pendingAmount, 0);
 
   return (
@@ -539,26 +539,26 @@ const Finance = () => {
                       </TableRow>
                     ) : (
                       filteredCommissionData.map(item => (
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableRow key={item.id}>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <TableCell>{item.orderId}</TableCell>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <TableCell>{item.partner}</TableCell>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <TableCell>₹{item.amount.toLocaleString()}</TableCell>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <TableCell>₹{item.commission.toLocaleString()}</TableCell>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <TableCell>{item.rate}</TableCell>
                           <TableCell>
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             <StatusBadge status={item.status}>
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                             </StatusBadge>
                           </TableCell>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <TableCell>{item.date}</TableCell>
                           <TableCell>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -581,22 +581,22 @@ const Finance = () => {
                     </TableRow>
                   ) : (
                     filteredWalletData.map(item => (
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <TableRow key={item.id}>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>{item.partner}</TableCell>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>₹{item.balance.toLocaleString()}</TableCell>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>₹{item.pendingAmount.toLocaleString()}</TableCell>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>{item.lastPayout}</TableCell>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>₹{item.payoutAmount.toLocaleString()}</TableCell>
                         <TableCell>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <StatusBadge status={item.status}>
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                           </StatusBadge>
                         </TableCell>

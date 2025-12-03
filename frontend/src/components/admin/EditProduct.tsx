@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import {
@@ -427,10 +427,10 @@ function EditProduct() {
             value={formData.name}
             onChange={handleInputChange}
             placeholder="Enter product name"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             className={errors.name ? 'error' : ''}
           />
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
         </FormGroup>
 
@@ -440,7 +440,7 @@ function EditProduct() {
             name="category"
             value={formData.category}
             onChange={handleInputChange}
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             className={errors.category ? 'error' : ''}
           >
             <option value="">Select category</option>
@@ -450,7 +450,7 @@ function EditProduct() {
               </option>
             ))}
           </Select>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {errors.category && <ErrorMessage>{errors.category}</ErrorMessage>}
         </FormGroup>
 
@@ -462,10 +462,10 @@ function EditProduct() {
             value={formData.brand}
             onChange={handleInputChange}
             placeholder="Enter brand name"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             className={errors.brand ? 'error' : ''}
           />
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {errors.brand && <ErrorMessage>{errors.brand}</ErrorMessage>}
         </FormGroup>
 
@@ -508,10 +508,10 @@ function EditProduct() {
             value={formData.description}
             onChange={handleInputChange}
             placeholder="Describe the product features, condition, and any important details..."
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             className={errors.description ? 'error' : ''}
           />
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {errors.description && <ErrorMessage>{errors.description}</ErrorMessage>}
         </FormGroup>
 
@@ -580,10 +580,10 @@ function EditProduct() {
             placeholder="Enter selling price"
             min="0"
             step="0.01"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             className={errors.price ? 'error' : ''}
           />
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {errors.price && <ErrorMessage>{errors.price}</ErrorMessage>}
         </FormGroup>
 
@@ -616,7 +616,7 @@ function EditProduct() {
             name="condition"
             value={formData.condition}
             onChange={handleInputChange}
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             className={errors.condition ? 'error' : ''}
           >
             <option value="">Select condition</option>
@@ -626,7 +626,7 @@ function EditProduct() {
               </option>
             ))}
           </Select>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {errors.condition && <ErrorMessage>{errors.condition}</ErrorMessage>}
         </FormGroup>
       </FormGrid>
@@ -648,11 +648,11 @@ function EditProduct() {
             </h4>
             <ImagePreviewGrid>
               {existingImages.map(image => (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <ImagePreview key={image.id}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <img src={image.url} alt="Product" />
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <RemoveImageButton onClick={() => removeExistingImage(image.id)}>
                     <X size={12} />
                   </RemoveImageButton>
@@ -668,7 +668,7 @@ function EditProduct() {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           onClick={() => document.getElementById('image-upload').click()}
           style={{ marginTop: existingImages.length > 0 ? '1rem' : '0' }}
         >
@@ -698,11 +698,11 @@ function EditProduct() {
             </h4>
             <ImagePreviewGrid>
               {selectedImages.map(image => (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <ImagePreview key={image.id}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <img src={image.preview} alt="Preview" />
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <RemoveImageButton onClick={() => removeImage(image.id)}>
                     <X size={12} />
                   </RemoveImageButton>
@@ -791,7 +791,7 @@ function EditProduct() {
 
         if (product.images && product.images.length > 0) {
           setExistingImages(
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             product.images.map((url, index) => ({
               id: `existing-${index}`,
               url: url.trim(),
@@ -818,7 +818,7 @@ function EditProduct() {
     }));
 
     // Clear error when user starts typing
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -842,12 +842,12 @@ function EditProduct() {
     validFiles.forEach((file: any) => {
       const reader = new FileReader();
       reader.onload = e => {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setSelectedImages(prev => [
           ...prev,
           {
             file,
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             preview: e.target.result,
             id: Date.now() + Math.random(),
           },
@@ -875,30 +875,30 @@ function EditProduct() {
   };
 
   const removeImage = (imageId: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setSelectedImages(prev => prev.filter(img => img.id !== imageId));
   };
 
   const removeExistingImage = (imageId: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setExistingImages(prev => prev.filter(img => img.id !== imageId));
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (!formData.name.trim()) newErrors.name = 'Product name is required';
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (!formData.description.trim()) newErrors.description = 'Description is required';
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (!formData.category) newErrors.category = 'Category is required';
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (!formData.brand.trim()) newErrors.brand = 'Brand is required';
     if (!formData.price || parseFloat(formData.price) <= 0)
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.price = 'Valid price is required';
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (!formData.condition) newErrors.condition = 'Condition is required';
 
     setErrors(newErrors);
@@ -920,7 +920,7 @@ function EditProduct() {
       if (selectedImages.length > 0) {
         const imageFormData = new FormData();
         selectedImages.forEach(img => {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           imageFormData.append('images', img.file);
         });
 
@@ -931,7 +931,7 @@ function EditProduct() {
       }
 
       // Combine existing and new image URLs
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const allImageUrls = [...existingImages.map(img => img.url), ...newImageUrls];
 
       // Then update the product
@@ -958,7 +958,7 @@ function EditProduct() {
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setErrors({ submit: error.message || 'Failed to update product. Please try again.' });
     } finally {
       setSaving(false);
@@ -989,7 +989,7 @@ function EditProduct() {
       }
     } catch (error) {
       console.error('Error deleting product:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setErrors({ delete: error.message || 'Failed to delete product. Please try again.' });
     } finally {
       setDeleting(false);
@@ -1009,13 +1009,13 @@ function EditProduct() {
     );
   }
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   if (errors.fetch) {
     return (
       <Container>
         <LoadingContainer>
           <AlertCircle size={32} color="#ef4444" />
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <p>{errors.fetch}</p>
           <Button onClick={() => navigate('/admin/products')}>Back to Products</Button>
         </LoadingContainer>
@@ -1097,11 +1097,11 @@ function EditProduct() {
           </FormBody>
 
           <FormActions>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {(errors.submit || errors.delete) && (
               <ErrorMessage style={{ marginRight: 'auto' }}>
                 <AlertCircle size={16} style={{ marginRight: '0.5rem' }} />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.submit || errors.delete}
               </ErrorMessage>
             )}

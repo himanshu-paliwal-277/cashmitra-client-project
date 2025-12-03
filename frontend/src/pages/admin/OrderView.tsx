@@ -64,7 +64,7 @@ const OrderView = () => {
       setOrder(response);
       setNewStatus(response.status || 'pending');
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.message || 'Failed to fetch order details');
     } finally {
       setLoading(false);
@@ -72,7 +72,7 @@ const OrderView = () => {
   };
 
   const handleStatusUpdate = async () => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (!newStatus || newStatus === (order?.status || '')) return;
 
     try {
@@ -81,7 +81,7 @@ const OrderView = () => {
       await fetchOrderDetails();
       console.log('Order status updated successfully');
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.message || 'Failed to update order status');
     } finally {
       setUpdating(false);
@@ -117,7 +117,7 @@ const OrderView = () => {
       cancelled: 'bg-red-100 text-red-800',
       refunded: 'bg-orange-100 text-orange-800',
     };
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
@@ -172,7 +172,7 @@ const OrderView = () => {
     );
   }
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const user = order?.user;
 
   return (
@@ -188,7 +188,7 @@ const OrderView = () => {
         </button>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Order Details</h1>
         <span className="ml-auto px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-lg">
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           #{order?._id || 'N/A'}
         </span>
       </div>
@@ -198,72 +198,72 @@ const OrderView = () => {
         {/* Main Content - 2 columns */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Overview */}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Card>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <Package size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Order Overview</h2>
               </div>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Header>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Body>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-sm text-gray-600">Order Type:</span>
                 <span
                   className={cn(
                     'px-3 py-1 rounded-lg text-sm font-medium',
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     order?.orderType === 'buy'
                       ? 'bg-blue-100 text-blue-800'
                       : 'bg-yellow-100 text-yellow-800'
                   )}
                 >
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {order?.orderType?.charAt(0).toUpperCase() + order?.orderType?.slice(1) || 'N/A'}
                 </span>
               </div>
 
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {order?.progressPercentage !== undefined && (
                 <div>
                   <div className="flex justify-between items-center mb-2 text-sm text-gray-600">
                     <span>Order Progress</span>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <span className="font-medium">{order?.progressPercentage}%</span>
                   </div>
                   <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-300"
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       style={{ width: `${order?.progressPercentage}%` }}
                     />
                   </div>
                 </div>
               )}
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Body>
           </Card>
 
           {/* Product Information */}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Card>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <Package size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Product Information</h2>
               </div>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Header>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Body>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {order?.items && order.items.length > 0 && (
                 <>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {order.items.map((item: any, index: any) => {
                     const product = item.product;
                     return (
@@ -324,11 +324,11 @@ const OrderView = () => {
 
                           <div className="flex items-center gap-4">
                             <div className="text-2xl font-bold text-green-600">
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               {formatCurrency(order?.totalAmount / item.quantity)}
                             </div>
                             {product?.basePrice &&
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               product.basePrice > order?.totalAmount / item.quantity && (
                                 <>
                                   <div className="text-base text-gray-500 line-through">
@@ -336,7 +336,7 @@ const OrderView = () => {
                                   </div>
                                   <div className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm font-medium">
                                     {Math.round(
-                                      {/* @ts-expect-error */}
+                                      // @ts-expect-error
                                       ((product.basePrice - order?.totalAmount / item.quantity) /
                                         product.basePrice) *
                                         100
@@ -352,22 +352,22 @@ const OrderView = () => {
                   })}
                 </>
               )}
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Body>
           </Card>
 
           {/* Customer Information */}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Card>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <User size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Customer Information</h2>
               </div>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Header>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Body>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
@@ -400,29 +400,29 @@ const OrderView = () => {
                   <Calendar size={20} className="text-blue-600 mt-0.5" />
                   <div className="flex-1">
                     <div className="text-sm text-gray-600 mb-1">Order Date</div>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <div className="font-medium text-gray-900">{formatDate(order?.createdAt)}</div>
                   </div>
                 </div>
               </div>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Body>
           </Card>
 
           {/* Shipping Information */}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {order?.shippingDetails && (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
                 <div className="flex items-center gap-3">
                   <MapPin size={20} className="text-amber-600" />
                   <h2 className="text-xl font-semibold text-gray-900">Shipping Information</h2>
                 </div>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               </Card.Header>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <Card.Body>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg sm:col-span-2">
@@ -430,20 +430,20 @@ const OrderView = () => {
                     <div className="flex-1">
                       <div className="text-sm text-gray-600 mb-1">Delivery Address</div>
                       <div className="font-medium text-gray-900">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {order?.shippingDetails?.address ? (
                           <>
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {order?.shippingDetails?.address?.street}
                             <br />
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {order?.shippingDetails?.address?.city},{' '}
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {order?.shippingDetails?.address?.state}
                             <br />
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {order?.shippingDetails?.address?.pincode},{' '}
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {order?.shippingDetails?.address?.country}
                           </>
                         ) : (
@@ -458,7 +458,7 @@ const OrderView = () => {
                     <div className="flex-1">
                       <div className="text-sm text-gray-600 mb-1">Contact Phone</div>
                       <div className="font-medium text-gray-900">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {order?.shippingDetails?.contactPhone || user?.phone || 'N/A'}
                       </div>
                     </div>
@@ -469,27 +469,27 @@ const OrderView = () => {
                     <div className="flex-1">
                       <div className="text-sm text-gray-600 mb-1">Delivery Method</div>
                       <div className="font-medium text-gray-900">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {order?.shippingDetails?.deliveryMethod || 'Standard Delivery'}
                       </div>
                     </div>
                   </div>
 
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {order?.shippingDetails?.trackingId && (
                     <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg sm:col-span-2">
                       <Tag size={20} className="text-blue-600 mt-0.5" />
                       <div className="flex-1">
                         <div className="text-sm text-gray-600 mb-1">Tracking ID</div>
                         <div className="font-medium text-gray-900">
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {order?.shippingDetails?.trackingId}
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               </Card.Body>
             </Card>
           )}
@@ -498,30 +498,30 @@ const OrderView = () => {
         {/* Sidebar - 1 column */}
         <div className="space-y-6">
           {/* Order Status */}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Card>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <Shield size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Order Status</h2>
               </div>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Header>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Body>
               <div className="mb-6">
                 <div
                   className={cn(
                     'flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-sm',
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     getStatusColor(order?.status || 'pending')
                   )}
                 >
                   <CheckCircle size={16} />
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {order?.status
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
                     : 'Pending'}
                 </div>
@@ -544,29 +544,29 @@ const OrderView = () => {
 
               <button
                 onClick={handleStatusUpdate}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 disabled={updating || newStatus === (order?.status || '')}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
               >
                 <Save size={16} />
                 {updating ? 'Updating...' : 'Update Status'}
               </button>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Body>
           </Card>
 
           {/* Payment Information */}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Card>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <CreditCard size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Payment Information</h2>
               </div>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Header>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Body>
               <div className="space-y-4">
                 <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
@@ -574,7 +574,7 @@ const OrderView = () => {
                   <div className="flex-1">
                     <div className="text-sm text-gray-600 mb-1">Total Amount</div>
                     <div className="text-lg font-bold text-gray-900">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {formatCurrency(order?.totalAmount)}
                     </div>
                   </div>
@@ -585,7 +585,7 @@ const OrderView = () => {
                   <div className="flex-1">
                     <div className="text-sm text-gray-600 mb-1">Payment Method</div>
                     <div className="font-medium text-gray-900">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order?.paymentDetails?.method || 'N/A'}
                     </div>
                   </div>
@@ -596,54 +596,54 @@ const OrderView = () => {
                   <div className="flex-1">
                     <div className="text-sm text-gray-600 mb-1">Payment Status</div>
                     <div className="font-medium text-gray-900">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {order?.paymentDetails?.status || 'N/A'}
                     </div>
                   </div>
                 </div>
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {order?.commission && (
                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
                     <TrendingUp size={20} className="text-blue-600 mt-0.5" />
                     <div className="flex-1">
                       <div className="text-sm text-gray-600 mb-1">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         Commission ({(order?.commission?.rate * 100).toFixed(1)}%)
                       </div>
                       <div className="font-medium text-gray-900">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {formatCurrency(order?.commission?.amount)}
                       </div>
                     </div>
                   </div>
                 )}
               </div>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Body>
           </Card>
 
           {/* Order Timeline */}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Card>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <Clock size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Order Timeline</h2>
               </div>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Header>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <Card.Body>
               <div className="relative pl-8">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {order?.timeline && order.timeline.length > 0 ? (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   order.timeline.map((item: any, index: any) => (
                     <div key={index} className="relative pb-8 last:pb-0">
                       {/* Vertical Line */}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {index !== order.timeline.length - 1 && (
                         <div
                           className={cn(
@@ -675,13 +675,13 @@ const OrderView = () => {
                       </div>
                     </div>
                   ))
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ) : order?.statusHistory && order.statusHistory.length > 0 ? (
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   order.statusHistory.map((item: any, index: any) => (
                     <div key={index} className="relative pb-8 last:pb-0">
                       {/* Vertical Line */}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {index !== order.statusHistory.length - 1 && (
                         <div className="absolute left-[-1.5rem] top-8 w-0.5 h-full bg-green-500" />
                       )}
@@ -710,7 +710,7 @@ const OrderView = () => {
                   </div>
                 )}
               </div>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             </Card.Body>
           </Card>
         </div>

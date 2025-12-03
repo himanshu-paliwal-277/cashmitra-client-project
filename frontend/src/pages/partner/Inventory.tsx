@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   Search,
@@ -579,7 +579,7 @@ function Inventory() {
               <ActionsMenu>
                 <ActionsButton
                   onClick={() =>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     setActiveDropdown(activeDropdown === product.id ? null : product.id)
                   }
                 >

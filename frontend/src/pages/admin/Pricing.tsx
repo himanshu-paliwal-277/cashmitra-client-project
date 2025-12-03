@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   DollarSign,
@@ -339,9 +339,9 @@ const Pricing = () => {
     ];
 
     setTimeout(() => {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setPriceData(mockPriceData);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setAdjustments(mockAdjustments);
       setLoading(false);
     }, 1000);
@@ -349,14 +349,14 @@ const Pricing = () => {
 
   const filteredPriceData = priceData.filter(
     item =>
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       item.brand.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredAdjustments = adjustments.filter(item =>
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     item.product.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -402,16 +402,16 @@ const Pricing = () => {
           ) : activeTab === 'price-table' ? (
             <PricingGrid>
               {filteredPriceData.map(item => (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <PricingCard key={item.id}>
                   <ProductHeader>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <ProductName>{item.product}</ProductName>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <PriceChange positive={item.change > 0}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {item.change > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {Math.abs(item.change)}%
                     </PriceChange>
                   </ProductHeader>
@@ -419,28 +419,28 @@ const Pricing = () => {
                   <PriceDetails>
                     <PriceRow>
                       <ConditionLabel>Excellent</ConditionLabel>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <PriceValue>₹{item.prices.excellent.toLocaleString()}</PriceValue>
                     </PriceRow>
                     <PriceRow>
                       <ConditionLabel>Good</ConditionLabel>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <PriceValue>₹{item.prices.good.toLocaleString()}</PriceValue>
                     </PriceRow>
                     <PriceRow>
                       <ConditionLabel>Fair</ConditionLabel>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <PriceValue>₹{item.prices.fair.toLocaleString()}</PriceValue>
                     </PriceRow>
                     <PriceRow>
                       <ConditionLabel>Poor</ConditionLabel>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <PriceValue>₹{item.prices.poor.toLocaleString()}</PriceValue>
                     </PriceRow>
                   </PriceDetails>
 
                   <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1rem' }}>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     Last updated: {item.lastUpdated}
                   </div>
 
@@ -481,21 +481,21 @@ const Pricing = () => {
                     </TableRow>
                   ) : (
                     filteredAdjustments.map(adjustment => (
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <TableRow key={adjustment.id}>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>{adjustment.product}</TableCell>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>{adjustment.condition}</TableCell>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>₹{adjustment.oldPrice.toLocaleString()}</TableCell>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>₹{adjustment.newPrice.toLocaleString()}</TableCell>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>{adjustment.reason}</TableCell>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>{adjustment.adjustedBy}</TableCell>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <TableCell>{adjustment.adjustedAt}</TableCell>
                         <TableCell>
                           <div style={{ display: 'flex', gap: '0.5rem' }}>

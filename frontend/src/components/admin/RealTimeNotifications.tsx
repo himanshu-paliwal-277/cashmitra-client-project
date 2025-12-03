@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   Bell,
@@ -333,7 +333,7 @@ const RealTimeNotifications = ({
   // Close panel when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: any) => {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (panelRef.current && !panelRef.current.contains(event.target)) {
         setIsOpen(false);
       }
@@ -350,12 +350,12 @@ const RealTimeNotifications = ({
       if (latestNotification && !latestNotification.isRead) {
         // Create audio element for notification sound
         if (!audioRef.current) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           audioRef.current = new Audio(
             'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT'
           );
         }
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         audioRef.current.play().catch(() => {
           // Ignore audio play errors (browser restrictions)
         });
@@ -365,9 +365,9 @@ const RealTimeNotifications = ({
 
   // Show toast for new notifications
   useEffect(() => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const newNotifications = notifications.filter(n => !n.isRead).slice(0, 3);
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     newNotifications.forEach(notification => {
       showToast(notification);
     });
@@ -376,7 +376,7 @@ const RealTimeNotifications = ({
   const showToast = (notification: any) => {
     const toastId = Date.now() + Math.random();
     const notificationType =
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       NOTIFICATION_TYPES[notification.type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
 
     const toast = {
@@ -387,7 +387,7 @@ const RealTimeNotifications = ({
       icon: notificationType.icon,
     };
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setToasts(prev => [...prev, toast]);
 
     // Auto remove toast after 5 seconds
@@ -397,7 +397,7 @@ const RealTimeNotifications = ({
   };
 
   const removeToast = (toastId: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setToasts(prev => prev.filter(toast => toast.id !== toastId));
   };
 
@@ -429,20 +429,20 @@ const RealTimeNotifications = ({
   };
 
   const getNotificationIcon = (type: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const notificationType = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
     const IconComponent = notificationType.icon;
     return <IconComponent size={20} />;
   };
 
   const getNotificationColor = (type: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const notificationType = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
     return notificationType.color;
   };
 
   const getNotificationCategory = (type: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const notificationType = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
     return notificationType.category;
   };
@@ -450,7 +450,7 @@ const RealTimeNotifications = ({
   const formatTime = (timestamp: any) => {
     const now = new Date();
     const time = new Date(timestamp);
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const diffInMinutes = Math.floor((now - time) / (1000 * 60));
 
     if (diffInMinutes < 1) return 'Just now';
@@ -459,10 +459,10 @@ const RealTimeNotifications = ({
     return time.toLocaleDateString();
   };
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const filteredNotifications = notifications.filter(notification => {
     if (filter === 'all') return true;
     return getNotificationCategory(notification.type).toLowerCase() === filter;
@@ -533,7 +533,7 @@ const RealTimeNotifications = ({
               <EmptySubtext>You're all caught up!</EmptySubtext>
             </EmptyState>
           ) : (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             filteredNotifications.map(notification => (
               <NotificationItem
                 key={notification.id}
@@ -575,22 +575,22 @@ const RealTimeNotifications = ({
     {/* Toast Notifications */}
     <ToastContainer>
       {toasts.map(toast => {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         const IconComponent = toast.icon;
         return (
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <Toast key={toast.id} color={toast.color}>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <ToastIcon color={toast.color}>
               <IconComponent size={20} />
             </ToastIcon>
             <ToastContent>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <ToastTitle>{toast.title}</ToastTitle>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <ToastMessage>{toast.message}</ToastMessage>
             </ToastContent>
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <ToastClose onClick={() => removeToast(toast.id)}>
               <X size={16} />
             </ToastClose>

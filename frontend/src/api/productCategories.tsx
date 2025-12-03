@@ -52,7 +52,7 @@ export const productCategoriesAPI = {
       console.error('Error fetching categories:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to fetch categories',
       };
     }
@@ -70,7 +70,7 @@ export const productCategoriesAPI = {
       console.error('Error fetching category:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to fetch category',
       };
     }
@@ -81,23 +81,23 @@ export const productCategoriesAPI = {
     try {
       const response = await api.get(`/categories/${categoryId}/products`, {
         params: {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           page: params.page || 1,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           limit: params.limit || 20,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           sort: params.sort || 'createdAt',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           order: params.order || 'desc',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           search: params.search || '',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           minPrice: params.minPrice,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           maxPrice: params.maxPrice,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           condition: params.condition,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           brand: params.brand,
         },
       });
@@ -109,7 +109,7 @@ export const productCategoriesAPI = {
       console.error('Error fetching products by category:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to fetch products',
       };
     }
@@ -127,7 +127,7 @@ export const productCategoriesAPI = {
       console.error('Error fetching featured categories:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to fetch featured categories',
       };
     }
@@ -147,7 +147,7 @@ export const productCategoriesAPI = {
       console.error('Error searching categories:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to search categories',
       };
     }
@@ -165,7 +165,7 @@ export const productCategoriesAPI = {
       console.error('Error fetching category stats:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to fetch category statistics',
       };
     }
@@ -173,7 +173,7 @@ export const productCategoriesAPI = {
 
   // Subscribe to category updates (WebSocket)
   subscribeToCategoryUpdates: (categoryId: any, onUpdate: any, onError: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:3001';
     const ws = new WebSocket(`${wsUrl}/categories/${categoryId}/updates`);
 
@@ -216,7 +216,7 @@ export const productCategoriesAPI = {
       console.error('Error fetching real-time category data:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to fetch real-time data',
       };
     }
@@ -230,25 +230,25 @@ export const productsAPI = {
     try {
       const response = await api.get('/products', {
         params: {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           page: params.page || 1,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           limit: params.limit || 20,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           sort: params.sort || 'createdAt',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           order: params.order || 'desc',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           search: params.search || '',
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           category: params.category,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           minPrice: params.minPrice,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           maxPrice: params.maxPrice,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           condition: params.condition,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           brand: params.brand,
         },
       });
@@ -260,7 +260,7 @@ export const productsAPI = {
       console.error('Error fetching products:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to fetch products',
       };
     }
@@ -278,7 +278,7 @@ export const productsAPI = {
       console.error('Error fetching product:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to fetch product',
       };
     }
@@ -296,7 +296,7 @@ export const productsAPI = {
       console.error('Error fetching featured products:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to fetch featured products',
       };
     }
@@ -319,7 +319,7 @@ export const productsAPI = {
       console.error('Error searching products:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to search products',
       };
     }
@@ -340,7 +340,7 @@ export const cartAPI = {
       console.error('Error fetching cart:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to fetch cart',
       };
     }
@@ -361,7 +361,7 @@ export const cartAPI = {
       console.error('Error adding to cart:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to add item to cart',
       };
     }
@@ -381,7 +381,7 @@ export const cartAPI = {
       console.error('Error updating cart item:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to update cart item',
       };
     }
@@ -399,7 +399,7 @@ export const cartAPI = {
       console.error('Error removing from cart:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to remove item from cart',
       };
     }
@@ -417,7 +417,7 @@ export const cartAPI = {
       console.error('Error clearing cart:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to clear cart',
       };
     }
@@ -437,7 +437,7 @@ export const cartAPI = {
       console.error('Error syncing cart:', error);
       return {
         success: false,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error: error.response?.data?.message || 'Failed to sync cart',
       };
     }

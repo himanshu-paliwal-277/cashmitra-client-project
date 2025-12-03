@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import useAdminReturns from '../../hooks/useAdminReturns';
 import {
@@ -525,7 +525,7 @@ const Returns = () => {
 
   useEffect(() => {
     setReturns(hookReturns);
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setStats(hookStats);
     setLoading(hookLoading);
   }, [hookReturns, hookStats, hookLoading]);
@@ -533,13 +533,13 @@ const Returns = () => {
   const handleStatusUpdate = async (returnId: any, newStatus: any, notes = '') => {
     try {
       await updateReturnStatus(returnId, newStatus, notes);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (selectedReturn && selectedReturn._id === returnId) {
         // Refresh the selected return details
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         const updatedReturn = returns.find(r => r._id === returnId);
         if (updatedReturn) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           setSelectedReturn({ ...updatedReturn, status: newStatus });
         }
       }
@@ -606,25 +606,25 @@ const Returns = () => {
       cancelled: [],
     };
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     return statusFlow[currentStatus]?.includes(newStatus) || false;
   };
 
   const filteredReturns = returns.filter(returnItem => {
     const matchesSearch =
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       returnItem.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       returnItem.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       returnItem.product?.name?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const matchesStatus = !statusFilter || returnItem.status === statusFilter;
 
     const matchesDate =
       !dateFilter ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       new Date(returnItem.createdAt).toDateString() === new Date(dateFilter).toDateString();
 
     return matchesSearch && matchesStatus && matchesDate;
@@ -752,48 +752,48 @@ const Returns = () => {
             </div>
           ) : (
             filteredReturns.map(returnItem => (
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <ReturnRow key={returnItem._id}>
                 <OrderInfo>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <OrderId>#{returnItem.orderId}</OrderId>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <OrderDate>{new Date(returnItem.createdAt).toLocaleDateString()}</OrderDate>
                 </OrderInfo>
 
                 <CustomerInfo>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <CustomerName>{returnItem.customer?.name || 'N/A'}</CustomerName>
                   <CustomerContact>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {returnItem.customer?.phone || returnItem.customer?.email || 'N/A'}
                   </CustomerContact>
                 </CustomerInfo>
 
                 <ProductInfo>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <ProductName>{returnItem.product?.name || 'N/A'}</ProductName>
                   <ProductDetails>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {returnItem.product?.brand} • {returnItem.product?.model}
                   </ProductDetails>
                 </ProductInfo>
 
                 <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {returnItem.reason || 'Not specified'}
                 </div>
 
                 <div style={{ color: '#059669', fontSize: '0.875rem', fontWeight: '600' }}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   ₹{(returnItem.refundAmount || 0).toLocaleString()}
                 </div>
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <StatusBadge status={returnItem.status}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {getStatusIcon(returnItem.status)}
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {returnItem.status?.charAt(0)?.toUpperCase() + returnItem.status?.slice(1) ||
                     'Requested'}
                 </StatusBadge>
@@ -803,44 +803,44 @@ const Returns = () => {
                     <Eye size={14} />
                   </IconButton>
 
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {canUpdateStatus(returnItem.status, 'approved') && (
                     <IconButton
                       success
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       onClick={() => handleStatusUpdate(returnItem._id, 'approved')}
                     >
                       <CheckCircle size={14} />
                     </IconButton>
                   )}
 
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {canUpdateStatus(returnItem.status, 'rejected') && (
                     <IconButton
                       danger
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       onClick={() => handleStatusUpdate(returnItem._id, 'rejected')}
                     >
                       <XCircle size={14} />
                     </IconButton>
                   )}
 
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {canUpdateStatus(returnItem.status, 'picked_up') && (
                     <IconButton
                       warning
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       onClick={() => handleStatusUpdate(returnItem._id, 'picked_up')}
                     >
                       <Truck size={14} />
                     </IconButton>
                   )}
 
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {canUpdateStatus(returnItem.status, 'completed') && (
                     <IconButton
                       success
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       onClick={() => handleStatusUpdate(returnItem._id, 'completed')}
                     >
                       <CheckCircle size={14} />
@@ -857,7 +857,7 @@ const Returns = () => {
         <Modal>
           <ModalContent>
             <ModalHeader>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <ModalTitle>Return Details - #{selectedReturn.orderId}</ModalTitle>
               <CloseButton onClick={() => setShowDetailModal(false)}>
                 <X size={20} />
@@ -870,27 +870,27 @@ const Returns = () => {
                 <DetailItem>
                   <Package size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Order ID:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>#{selectedReturn.orderId}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Calendar size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Return Date:</DetailLabel>
                   <DetailValue>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {new Date(selectedReturn.createdAt).toLocaleDateString()}
                   </DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <DollarSign size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Refund Amount:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>₹{(selectedReturn.refundAmount || 0).toLocaleString()}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <MessageSquare size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Reason:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedReturn.reason || 'Not specified'}</DetailValue>
                 </DetailItem>
               </DetailGrid>
@@ -902,24 +902,24 @@ const Returns = () => {
                 <DetailItem>
                   <User size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Name:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedReturn.customer?.name || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Phone size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Phone:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedReturn.customer?.phone || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <DetailLabel>Email:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedReturn.customer?.email || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <MapPin size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Address:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedReturn.customer?.address || 'N/A'}</DetailValue>
                 </DetailItem>
               </DetailGrid>
@@ -931,22 +931,22 @@ const Returns = () => {
                 <DetailItem>
                   <Package size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Product:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedReturn.product?.name || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <DetailLabel>Brand:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedReturn.product?.brand || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <DetailLabel>Model:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedReturn.product?.model || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <DetailLabel>Condition:</DetailLabel>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <DetailValue>{selectedReturn.product?.condition || 'N/A'}</DetailValue>
                 </DetailItem>
               </DetailGrid>
@@ -960,18 +960,18 @@ const Returns = () => {
                   <TimelineContent>
                     <TimelineTitle>Return Requested</TimelineTitle>
                     <TimelineDate>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {new Date(selectedReturn.createdAt).toLocaleString()}
                     </TimelineDate>
                     <TimelineDescription>
                       Customer initiated return request for{' '}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {selectedReturn.reason || 'unspecified reason'}
                     </TimelineDescription>
                   </TimelineContent>
                 </TimelineItem>
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {selectedReturn.statusHistory?.map((history: any, index: any) => (
                   <TimelineItem key={index}>
                     <TimelineIcon color={getTimelineColor(history.status)} />
@@ -988,7 +988,7 @@ const Returns = () => {
               </TimelineContainer>
             </DetailSection>
 
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {selectedReturn.notes && (
               <DetailSection>
                 <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Additional Notes</h3>
@@ -1000,7 +1000,7 @@ const Returns = () => {
                     color: '#374151',
                   }}
                 >
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {selectedReturn.notes}
                 </div>
               </DetailSection>
@@ -1009,12 +1009,12 @@ const Returns = () => {
             <ActionSection>
               <h4 style={{ marginBottom: '1rem', color: '#374151' }}>Quick Actions</h4>
               <ActionButtons2>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {canUpdateStatus(selectedReturn.status, 'approved') && (
                   <Button
                     variant="success"
                     onClick={() => {
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       handleStatusUpdate(selectedReturn._id, 'approved');
                       setShowDetailModal(false);
                     }}
@@ -1024,12 +1024,12 @@ const Returns = () => {
                   </Button>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {canUpdateStatus(selectedReturn.status, 'picked_up') && (
                   <Button
                     variant="warning"
                     onClick={() => {
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       handleStatusUpdate(selectedReturn._id, 'picked_up');
                       setShowDetailModal(false);
                     }}
@@ -1039,12 +1039,12 @@ const Returns = () => {
                   </Button>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {canUpdateStatus(selectedReturn.status, 'inspecting') && (
                   <Button
                     variant="warning"
                     onClick={() => {
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       handleStatusUpdate(selectedReturn._id, 'inspecting');
                       setShowDetailModal(false);
                     }}
@@ -1054,12 +1054,12 @@ const Returns = () => {
                   </Button>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {canUpdateStatus(selectedReturn.status, 'completed') && (
                   <Button
                     variant="success"
                     onClick={() => {
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       handleStatusUpdate(selectedReturn._id, 'completed');
                       setShowDetailModal(false);
                     }}
@@ -1069,14 +1069,14 @@ const Returns = () => {
                   </Button>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {canUpdateStatus(selectedReturn.status, 'rejected') && (
                   <Button
                     variant="danger"
                     onClick={() => {
                       const reason = prompt('Please provide a reason for rejection:');
                       if (reason) {
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         handleStatusUpdate(selectedReturn._id, 'rejected', reason);
                         setShowDetailModal(false);
                       }
@@ -1087,12 +1087,12 @@ const Returns = () => {
                   </Button>
                 )}
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {canUpdateStatus(selectedReturn.status, 'cancelled') && (
                   <Button
                     variant="danger"
                     onClick={() => {
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       handleStatusUpdate(selectedReturn._id, 'cancelled');
                       setShowDetailModal(false);
                     }}

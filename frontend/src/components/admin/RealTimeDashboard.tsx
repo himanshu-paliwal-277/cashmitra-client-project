@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   TrendingUp,
@@ -398,14 +398,14 @@ const RealTimeDashboard = () => {
   // Real-time hooks
   const {
     orders,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     stats,
     loading: ordersLoading,
     error: ordersError,
     connected: ordersConnected,
     lastUpdated: ordersLastUpdated,
     refresh: refreshOrders,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     updateOrderStatus,
   } = useRealTimeOrders(orderTypeFilter, {
     pollingInterval: 5000,
@@ -421,10 +421,10 @@ const RealTimeDashboard = () => {
     analytics,
     loading: analyticsLoading,
     error: analyticsError,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     lastUpdated: analyticsLastUpdated,
     refresh: refreshAnalytics,
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   } = useRealTimeAnalytics({
     pollingInterval: 30000,
     dateRange: 'today',
@@ -433,14 +433,14 @@ const RealTimeDashboard = () => {
   // Filter orders based on search and status
   const filteredOrders = orders.filter(order => {
     const matchesSearch =
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       order.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       order.items?.[0]?.product?.brand?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
 
     return matchesSearch && matchesStatus;
@@ -448,28 +448,28 @@ const RealTimeDashboard = () => {
 
   // Generate recent activity
   const recentActivity = orders.slice(0, 10).map(order => ({
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     id: order._id,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     type: order.orderType,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     status: order.status,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     text: `${order.orderType === 'sell' ? 'Sell' : 'Buy'} order ${order._id.slice(-6)} ${order.status}`,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     time: new Date(order.updatedAt || order.createdAt).toLocaleTimeString(),
     color:
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       order.status === 'delivered'
         ? '#059669'
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         : order.status === 'cancelled'
           ? '#DC2626'
           : '#3B82F6',
   }));
 
   const handleRefresh = async () => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     await Promise.all([refreshOrders(), refreshAnalytics()]);
   };
 
@@ -566,7 +566,7 @@ const RealTimeDashboard = () => {
               <DollarSign size={20} />
             </StatIcon>
           </StatHeader>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <StatValue>{analytics ? formatCurrency(analytics.totalRevenue || 0) : '₹0'}</StatValue>
           <StatLabel>Today's Revenue</StatLabel>
           <StatChange positive={true}>
@@ -625,30 +625,30 @@ const RealTimeDashboard = () => {
             {!ordersLoading &&
               !ordersError &&
               filteredOrders.map(order => (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <OrderItem key={order._id}>
                   <OrderInfo>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <OrderId>#{order._id.slice(-8).toUpperCase()}</OrderId>
                     <OrderDetails>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <span>{order.orderType === 'sell' ? 'Sell' : 'Buy'} Order</span>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <span>{order.user?.name || 'Unknown User'}</span>
                       <span>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {order.items?.[0]?.product?.brand} {order.items?.[0]?.product?.model}
                       </span>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <span>{formatCurrency(order.totalAmount)}</span>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <span>{new Date(order.createdAt).toLocaleDateString()}</span>
                     </OrderDetails>
                   </OrderInfo>
 
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   <OrderStatus status={order.status}>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                   </OrderStatus>
 

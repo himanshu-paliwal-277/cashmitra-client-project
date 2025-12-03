@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import { adminService } from '../../services/adminService';
@@ -429,13 +429,13 @@ const BuyProducts = () => {
 
   const filteredProducts = products.filter(product => {
     const matchesSearch =
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       product.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const matchesCategory = !selectedCategory || product.categoryId === selectedCategory;
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const matchesStatus = !selectedStatus || product.status === selectedStatus;
 
     return matchesSearch && matchesCategory && matchesStatus;
@@ -446,9 +446,9 @@ const BuyProducts = () => {
     let bValue = b[sortBy];
 
     if (sortBy === 'price') {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       aValue = parseFloat(aValue) || 0;
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       bValue = parseFloat(bValue) || 0;
     }
 
@@ -462,7 +462,7 @@ const BuyProducts = () => {
   const renderProductCard = (product: any) => {
     // Get the first image from the images object
     const firstImageKey = Object.keys(product.images || {})[0];
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const productImage = product.images?.[firstImageKey];
 
     return (
@@ -478,9 +478,9 @@ const BuyProducts = () => {
                 objectFit: 'cover',
               }}
               onError={e => {
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 e.target.style.display = 'none';
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 e.target.nextSibling.style.display = 'flex';
               }}
             />
@@ -537,13 +537,13 @@ const BuyProducts = () => {
       <tbody>
         {sortedProducts.map(product => {
           // Get the first image from the images object
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           const firstImageKey = Object.keys(product.images || {})[0];
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           const productImage = product.images?.[firstImageKey];
 
           return (
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             <TableRow key={product._id}>
               <TableCell>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -562,7 +562,7 @@ const BuyProducts = () => {
                     {productImage ? (
                       <img
                         src={productImage.replace(/`/g, '').trim()}
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         alt={product.name}
                         style={{
                           width: '100%',
@@ -570,9 +570,9 @@ const BuyProducts = () => {
                           objectFit: 'cover',
                         }}
                         onError={e => {
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           e.target.style.display = 'none';
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           e.target.nextSibling.style.display = 'flex';
                         }}
                       />
@@ -590,25 +590,25 @@ const BuyProducts = () => {
                     </div>
                   </div>
                   <div>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <div style={{ fontWeight: '500' }}>{product.name}</div>
                     <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {product.description?.substring(0, 50)}...
                     </div>
                   </div>
                 </div>
               </TableCell>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <TableCell>{product.categoryId?.name || 'Uncategorized'}</TableCell>
               <TableCell style={{ fontWeight: '600', color: '#10b981' }}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 ₹{product.pricing?.discountedPrice || 'N/A'}
               </TableCell>
               <TableCell>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <ProductBadge status={product.isActive ? 'active' : 'inactive'}>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {product.isActive ? 'Active' : 'Inactive'}
                 </ProductBadge>
               </TableCell>
@@ -625,7 +625,7 @@ const BuyProducts = () => {
                   </ActionButtonSmall>
                   <ActionButtonSmall
                     style={{ flex: 'none', padding: '0.375rem' }}
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     onClick={() => handleDeleteProduct(product._id)}
                   >
                     <Trash2 size={14} />
@@ -696,9 +696,9 @@ const BuyProducts = () => {
           >
             <option value="">All Categories</option>
             {categories.map(category => (
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <option key={category.id} value={category.id}>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {category.name}
               </option>
             ))}

@@ -36,16 +36,16 @@ const PriceQuote = () => {
 
     // Process answers
     Object.values(data.answers || {}).forEach(ans => {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (ans.delta) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         const adjust = ans.delta.sign === '-' ? -1 : 1;
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         if (ans.delta.type === 'percent') {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           percentDelta += adjust * (ans.delta.value || 0);
         } else {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           absDelta += adjust * (ans.delta.value || 0);
         }
       }
@@ -79,7 +79,7 @@ const PriceQuote = () => {
     return adjustedPrice;
   };
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const offers = offerSessionData?.offers || [
     { id: 'amazon', brand: 'A', percent: 2, tcs: true },
     { id: 'flipkart', brand: 'F', percent: 3.5, tcs: true },
@@ -94,7 +94,7 @@ const PriceQuote = () => {
       const totalAmount = quotedPrice - processingFee;
 
       setPriceData({
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         quotedPrice,
         processingFee,
         pickupCharge,
@@ -115,7 +115,7 @@ const PriceQuote = () => {
     setIsLoadingOffers(true);
     try {
       const variantId = assessmentData.selectedVariant?.id || assessmentData.selectedVariant?._id;
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const userData = JSON.parse(localStorage.getItem('userData'));
 
       const offerData = {
@@ -156,7 +156,7 @@ const PriceQuote = () => {
         state: {
           assessmentData,
           product,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           sessionId: offerSessionData?.sessionId,
           priceData: {
             quotedPrice: calculatePrice(assessmentData),
@@ -221,12 +221,12 @@ const PriceQuote = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Product Image */}
                 <div className="w-full h-80 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center overflow-hidden">
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {productDetails.images?.[0] ? (
                     <img
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       src={productDetails.images[0]}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       alt={productDetails.name}
                       className="w-full h-full object-cover"
                     />
@@ -239,17 +239,17 @@ const PriceQuote = () => {
                 <div className="flex flex-col justify-between">
                   <div>
                     <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {productDetails.brand || 'Apple'} {productDetails.name}
                     </h2>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <p className="text-slate-600 mb-6">({productDetails.variant})</p>
 
                     {/* Price Display */}
                     <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 mb-6 border-2 border-green-300">
                       <p className="text-sm text-slate-600 mb-1">Your Device Value</p>
                       <p className="text-4xl font-bold text-green-600">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {formatPrice(priceData.quotedPrice)}
                       </p>
                     </div>
@@ -301,7 +301,7 @@ const PriceQuote = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-slate-600">Base Price</span>
                   <span className="font-semibold text-slate-900">
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {formatPrice(priceData.quotedPrice)}
                   </span>
                 </div>
@@ -320,7 +320,7 @@ const PriceQuote = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold text-slate-900">Total Amount</span>
                     <span className="text-2xl font-bold text-green-600">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {formatPrice(priceData.totalAmount)}
                     </span>
                   </div>
@@ -352,7 +352,7 @@ const PriceQuote = () => {
                 <div className="space-y-3">
                   {offers.map((offer: any) => {
                     const isSelected = selectedOffer === offer.id;
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     const bonusAmount = Math.round((priceData.quotedPrice * offer.percent) / 100);
 
                     return (

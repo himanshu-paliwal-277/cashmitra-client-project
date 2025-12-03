@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import {
   TrendingUp,
@@ -493,17 +493,17 @@ const ActionDescription = styled.p`
 function Dashboard() {
   const navigate = useNavigate();
   const {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     partner,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     logout,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     getAvailableMenuItems,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     hasMenuPermission,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     getBusinessLimits,
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     getAvailableFeatures,
   } = usePartnerAuth();
 

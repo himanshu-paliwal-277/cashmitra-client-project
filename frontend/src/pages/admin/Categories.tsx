@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import useAdminCategories from '../../hooks/useAdminCategories';
 import {
@@ -344,7 +344,7 @@ const Categories = () => {
     e.preventDefault();
     try {
       if (editingCategory) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         await editCategory(editingCategory._id, formData);
       } else {
         await addCategory(formData);
@@ -403,7 +403,7 @@ const Categories = () => {
   };
 
   const renderCategory = (category: any, level = 0) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const hasChildren = categories.some(cat => cat.parentCategory?._id === category._id);
     const isExpanded = expandedCategories.has(category._id);
     const children = buildCategoryTree(categories, category._id);
@@ -474,12 +474,12 @@ const Categories = () => {
   };
 
   const filteredCategories = categories.filter(category => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (!searchTerm) return !category.parentCategory; // Show only root categories when no search
     return (
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       category.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });

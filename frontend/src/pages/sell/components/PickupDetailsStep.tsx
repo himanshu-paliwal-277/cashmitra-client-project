@@ -52,7 +52,7 @@ const PickupDetailsStep = ({
             value={formData.address}
             onChange={e => setFormData({ ...formData, address: e.target.value })}
             placeholder="Enter complete address"
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             rows="3"
             className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />

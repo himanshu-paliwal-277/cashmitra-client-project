@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-{/* @ts-expect-error */}
+// @ts-expect-error
 const API_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
 
 const api = axios.create({

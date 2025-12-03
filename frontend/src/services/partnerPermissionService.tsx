@@ -6,15 +6,15 @@ class PartnerPermissionService {
     try {
       const params = new URLSearchParams();
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.search) params.append('search', filters.search);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.roleTemplate) params.append('roleTemplate', filters.roleTemplate);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.isActive !== undefined) params.append('isActive', filters.isActive);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.page) params.append('page', filters.page);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.limit) params.append('limit', filters.limit);
 
       const response = await api.get(`/partner-permissions/admin?${params}`);
@@ -184,15 +184,15 @@ class PartnerPermissionService {
     try {
       const params = new URLSearchParams();
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.startDate) params.append('startDate', filters.startDate);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.endDate) params.append('endDate', filters.endDate);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.action) params.append('action', filters.action);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.page) params.append('page', filters.page);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.limit) params.append('limit', filters.limit);
 
       const response = await api.get(`/partner-permissions/admin/${partnerId}/audit-log?${params}`);
@@ -208,11 +208,11 @@ class PartnerPermissionService {
     try {
       const params = new URLSearchParams();
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.search) params.append('search', filters.search);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.role) params.append('role', filters.role);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.status) params.append('status', filters.status);
       params.append('format', format);
 
@@ -357,13 +357,13 @@ class PartnerPermissionService {
     try {
       const params = new URLSearchParams();
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.priority) params.append('priority', filters.priority);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.dueDate) params.append('dueDate', filters.dueDate);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.page) params.append('page', filters.page);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (filters.limit) params.append('limit', filters.limit);
 
       const response = await api.get(`/admin/permission-reviews/pending?${params}`);

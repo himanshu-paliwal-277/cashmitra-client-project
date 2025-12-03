@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import {

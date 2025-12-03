@@ -21,7 +21,7 @@ const BuyProductsList = () => {
       setProducts(response.data || []);
     } catch (err) {
       console.error('Error fetching products:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Failed to load products');
     } finally {
       setLoading(false);
@@ -82,27 +82,27 @@ const BuyProductsList = () => {
         ) : (
           <div className="products-grid">
             {products.map(p => {
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const rating = p.rating?.average ?? 4.6;
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const mrp = p.pricing?.mrp ?? 0;
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               const discounted = p.pricing?.discountedPrice ?? mrp;
               const percent =
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 p.pricing?.discountPercent ??
                 (mrp > 0 ? Math.round(((mrp - discounted) / mrp) * 100) : 0);
               const discountAmount =
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 p.pricing?.discountAmount ?? (mrp - discounted > 0 ? mrp - discounted : 0);
               const goldPrice = Math.max(0, Math.round(discounted * 0.93)); // “with GOLD” line (tweak if you have real value)
 
               return (
                 <article
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   key={p._id}
                   className="product-card"
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   onClick={() => handleProductClick(p._id)}
                 >
                   {/* Assured chip (top-left) */}
@@ -118,9 +118,9 @@ const BuyProductsList = () => {
                   {/* Image + ₹X OFF */}
                   <div className="product-image-wrap">
                     <img
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       src={p.images.main || '/placeholder-phone.png'}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       alt={p.name}
                       className="product-image"
                       loading="lazy"
@@ -133,7 +133,7 @@ const BuyProductsList = () => {
                   {/* Name */}
                   <div className="content">
                     <h3 className="name">
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {p.name} {p.isRefurbished ? '- Refurbished' : ''}
                     </h3>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled, { keyframes, css } from 'styled-components';
 import useAdminModels from '../../hooks/useAdminModels';
 import useAdminBrands from '../../hooks/useAdminBrands';
@@ -562,55 +562,55 @@ const Models = () => {
 
     // Model name validation
     if (!formData.name.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.name = 'Model name is required';
     } else if (formData.name.trim().length < 2) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.name = 'Model name must be at least 2 characters';
     } else if (formData.name.trim().length > 100) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.name = 'Model name must be less than 100 characters';
     }
 
     // Brand validation
     if (!formData.brand) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.brand = 'Brand is required';
     }
 
     // Description validation
     if (formData.description && formData.description.length > 1000) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.description = 'Description must be less than 1000 characters';
     }
 
     // Release year validation
     const currentYear = new Date().getFullYear();
     if (!formData.releaseYear) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.releaseYear = 'Release year is required';
     } else if (formData.releaseYear < 1990 || formData.releaseYear > currentYear + 2) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.releaseYear = `Release year must be between 1990 and ${currentYear + 2}`;
     }
 
     // Variants validation
     if (!formData.variants || formData.variants.length === 0) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.variants = 'At least one variant is required';
     } else {
       formData.variants.forEach((variant, index) => {
         if (!variant.name?.trim()) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           newErrors[`variant_${index}_name`] = 'Variant name is required';
         }
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         if (!variant.price || variant.price <= 0) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           newErrors[`variant_${index}_price`] = 'Valid price is required';
         }
         if (variant.comparePrice && variant.comparePrice <= variant.price) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           newErrors[`variant_${index}_comparePrice`] = 'Compare price must be higher than price';
         }
       });
@@ -640,7 +640,7 @@ const Models = () => {
         model: formData.name.trim(),
         brand: formData.brand,
         description: formData.description?.trim() || '',
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         releaseYear: parseInt(formData.releaseYear),
         isActive: formData.isActive,
         variants: Array.isArray(formData.variants)
@@ -658,11 +658,11 @@ const Models = () => {
       };
 
       console.log('Sending model data:', modelData);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       console.log('Edit mode:', !!editingModel, 'Model ID:', editingModel?.model);
 
       if (editingModel) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         const result = await editModel(editingModel.model, modelData);
         console.log('Edit result:', result);
         if (!result.success) {
@@ -684,12 +684,12 @@ const Models = () => {
       console.error('Error saving model:', error);
 
       // Handle validation errors from backend
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (error.response?.data?.errors) {
         const backendErrors = {};
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         error.response.data.errors.forEach((err: any, index: any) => {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           backendErrors[`backend_error_${index}`] = err.message;
         });
         setErrors({
@@ -699,9 +699,9 @@ const Models = () => {
       } else {
         setErrors({
           submit:
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             error.response?.data?.message ||
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             error.message ||
             'Failed to save model. Please try again.',
         });
@@ -759,7 +759,7 @@ const Models = () => {
   const handleInputChange = (field: any, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear field error when user starts typing
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -767,13 +767,13 @@ const Models = () => {
 
   const handleVariantChange = (index: any, field: any, value: any) => {
     const updatedVariants = [...formData.variants];
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     updatedVariants[index] = { ...updatedVariants[index], [field]: value };
     setFormData(prev => ({ ...prev, variants: updatedVariants }));
 
     // Clear variant field error when user starts typing
     const errorKey = `variant_${index}_${field}`;
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[errorKey]) {
       setErrors(prev => ({ ...prev, [errorKey]: '' }));
     }
@@ -865,7 +865,7 @@ const Models = () => {
 
   const updateVariant = (index: any, field: any, value: any) => {
     const newVariants = [...formData.variants];
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     newVariants[index] = { ...newVariants[index], [field]: value };
     setFormData({ ...formData, variants: newVariants });
   };
@@ -875,16 +875,16 @@ const Models = () => {
     let filtered = models.filter(model => {
       const matchesSearch =
         searchTerm === '' ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         model.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         model.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         model.brand?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const matchesBrand = brandFilter === '' || model.brand === brandFilter;
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const matchesCategory = categoryFilter === '' || model.category === categoryFilter;
 
       return matchesSearch && matchesBrand && matchesCategory;
@@ -896,39 +896,39 @@ const Models = () => {
 
       switch (sortBy) {
         case 'name':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.model?.toLowerCase() || '';
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.model?.toLowerCase() || '';
           break;
         case 'brand':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.brand?.toLowerCase() || '';
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.brand?.toLowerCase() || '';
           break;
         case 'releaseYear':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.releaseYear || 0;
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.releaseYear || 0;
           break;
         case 'variants':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.variantCount || 0;
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.variantCount || 0;
           break;
         case 'status':
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.isActive ? 1 : 0;
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.isActive ? 1 : 0;
           break;
         default:
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           aValue = a.model?.toLowerCase() || '';
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           bValue = b.model?.toLowerCase() || '';
       }
 
@@ -944,14 +944,14 @@ const Models = () => {
 
   // Memoized available brands from models
   const availableBrands = React.useMemo(() => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const brandSet = new Set(models.map(model => model.brand).filter(Boolean));
     return Array.from(brandSet).sort();
   }, [models]);
 
   // Memoized available categories from models
   const availableCategories = React.useMemo(() => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const categorySet = new Set(models.map(model => model.category).filter(Boolean));
     return Array.from(categorySet).sort();
   }, [models]);
@@ -1049,17 +1049,17 @@ const Models = () => {
           </div>
         ) : (
           filteredAndSortedModels.map((model, index) => {
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             const isExpanded = expandedModels.has(model.model);
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             const hasVariants = model.variantCount > 0;
 
             return (
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <React.Fragment key={model.model || index}>
                 <ModelItem>
                   <ModelHeader>
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <ModelIcon onClick={() => hasVariants && toggleExpanded(model.model)}>
                       {hasVariants ? (
                         isExpanded ? (
@@ -1074,34 +1074,34 @@ const Models = () => {
 
                     <ModelInfo>
                       <ModelName>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {model.model}
                         <ModelSubtitle>
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {model.brand} • {model.category}
                         </ModelSubtitle>
                       </ModelName>
 
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <ModelDetail>{model.category || 'No Category'}</ModelDetail>
 
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <ModelDetail>{model.productCount || 0} Products</ModelDetail>
 
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <ModelDetail>{model.variantCount || 0} Variants</ModelDetail>
 
                       <StatusBadge active={true}>Active</StatusBadge>
 
                       <ActionButtons>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <IconButton success onClick={() => toggleExpanded(model.model)}>
                           <Eye size={14} />
                         </IconButton>
                         <IconButton primary onClick={() => handleEdit(model)}>
                           <Edit size={14} />
                         </IconButton>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         <IconButton danger onClick={() => handleDelete(model.model)}>
                           <Trash2 size={14} />
                         </IconButton>
@@ -1115,9 +1115,9 @@ const Models = () => {
                     <h4 style={{ margin: '0 0 1rem 0', color: '#374151' }}>Model Variants</h4>
                     <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
                       <p>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         This model has {model.variantCount} variant
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {model.variantCount !== 1 ? 's' : ''}.
                       </p>
                       <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>
@@ -1142,11 +1142,11 @@ const Models = () => {
               </CloseButton>
             </ModalHeader>
 
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {errors.submit && (
               <AlertMessage>
                 <AlertCircle size={16} />
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.submit}
               </AlertMessage>
             )}
@@ -1160,16 +1160,16 @@ const Models = () => {
                     value={formData.name}
                     onChange={(e: any) => handleInputChange('name', e.target.value)}
                     style={{
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       borderColor: errors.name ? '#dc2626' : '#d1d5db',
                     }}
                     required
                   />
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {errors.name && (
                     <ErrorMessage>
                       <AlertCircle size={12} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {errors.name}
                     </ErrorMessage>
                   )}
@@ -1184,16 +1184,16 @@ const Models = () => {
                     min="1990"
                     max={new Date().getFullYear() + 2}
                     style={{
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       borderColor: errors.releaseYear ? '#dc2626' : '#d1d5db',
                     }}
                     required
                   />
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {errors.releaseYear && (
                     <ErrorMessage>
                       <AlertCircle size={12} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {errors.releaseYear}
                     </ErrorMessage>
                   )}
@@ -1207,25 +1207,25 @@ const Models = () => {
                     value={formData.brand}
                     onChange={(e: any) => handleInputChange('brand', e.target.value)}
                     style={{
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       borderColor: errors.brand ? '#dc2626' : '#d1d5db',
                     }}
                     required
                   >
                     <option value="">Select Brand</option>
                     {brands.map(brand => (
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       <option key={brand.brand || brand._id} value={brand.brand || brand.name}>
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {brand.brand || brand.name}
                       </option>
                     ))}
                   </Select>
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {errors.brand && (
                     <ErrorMessage>
                       <AlertCircle size={12} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {errors.brand}
                     </ErrorMessage>
                   )}
@@ -1271,7 +1271,7 @@ const Models = () => {
                         key={key}
                         style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '0.25rem' }}
                       >
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         • {errors[key]}
                       </div>
                     ))}
@@ -1285,7 +1285,7 @@ const Models = () => {
                   onChange={(e: any) => handleInputChange('description', e.target.value)}
                   placeholder="Model description and specifications..."
                   style={{
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     borderColor: errors.description ? '#dc2626' : '#d1d5db',
                   }}
                 />
@@ -1297,11 +1297,11 @@ const Models = () => {
                     marginTop: '0.25rem',
                   }}
                 >
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {errors.description && (
                     <ErrorMessage>
                       <AlertCircle size={12} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {errors.description}
                     </ErrorMessage>
                   )}
@@ -1320,11 +1320,11 @@ const Models = () => {
                   </AddVariantButton>
                 </VariantFormHeader>
 
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {errors.variants && (
                   <ErrorMessage style={{ marginBottom: '1rem' }}>
                     <AlertCircle size={12} />
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     {errors.variants}
                   </ErrorMessage>
                 )}
@@ -1364,15 +1364,15 @@ const Models = () => {
                           onChange={(e: any) => handleVariantChange(index, 'name', e.target.value)}
                           placeholder="e.g., 128GB Space Gray"
                           style={{
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             borderColor: errors[`variant_${index}_name`] ? '#dc2626' : '#d1d5db',
                           }}
                         />
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {errors[`variant_${index}_name`] && (
                           <ErrorMessage>
                             <AlertCircle size={12} />
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {errors[`variant_${index}_name`]}
                           </ErrorMessage>
                         )}
@@ -1445,16 +1445,16 @@ const Models = () => {
                           min="0"
                           step="0.01"
                           style={{
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             borderColor: errors[`variant_${index}_price`] ? '#dc2626' : '#d1d5db',
                           }}
                           required
                         />
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {errors[`variant_${index}_price`] && (
                           <ErrorMessage>
                             <AlertCircle size={12} />
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {errors[`variant_${index}_price`]}
                           </ErrorMessage>
                         )}
@@ -1469,17 +1469,17 @@ const Models = () => {
                           min="0"
                           step="0.01"
                           style={{
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             borderColor: errors[`variant_${index}_comparePrice`]
                               ? '#dc2626'
                               : '#d1d5db',
                           }}
                         />
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {errors[`variant_${index}_comparePrice`] && (
                           <ErrorMessage>
                             <AlertCircle size={12} />
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             {errors[`variant_${index}_comparePrice`]}
                           </ErrorMessage>
                         )}

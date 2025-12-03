@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-{/* @ts-expect-error */}
+// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import {
@@ -431,10 +431,10 @@ const SellConfigurationManagement = () => {
       // Initialize with default values from CONFIG_SECTIONS
       const defaultConfig = {};
       Object.entries(CONFIG_SECTIONS).forEach(([sectionKey, section]) => {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         defaultConfig[sectionKey] = {};
         section.settings.forEach(setting => {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           defaultConfig[sectionKey][setting.key] = setting.defaultValue;
         });
       });
@@ -445,7 +445,7 @@ const SellConfigurationManagement = () => {
 
       setConfig(defaultConfig);
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Failed to load configuration');
       console.error('Error loading configuration:', err);
     } finally {
@@ -456,7 +456,7 @@ const SellConfigurationManagement = () => {
   const saveConfiguration = async () => {
     try {
       setSaving(true);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setSaveStatus('saving');
       setError(null);
 
@@ -466,16 +466,16 @@ const SellConfigurationManagement = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setSaveStatus('saved');
       setHasChanges(false);
 
       // Clear save status after 3 seconds
       setTimeout(() => setSaveStatus(null), 3000);
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setSaveStatus('error');
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Failed to save configuration');
       console.error('Error saving configuration:', err);
     } finally {
@@ -512,13 +512,13 @@ const SellConfigurationManagement = () => {
       const reader = new FileReader();
       reader.onload = e => {
         try {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           const importedConfig = JSON.parse(e.target.result);
           setConfig(importedConfig);
           setHasChanges(true);
           setSaveStatus(null);
         } catch (err) {
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           setError('Invalid configuration file');
         }
       };
@@ -530,7 +530,7 @@ const SellConfigurationManagement = () => {
     setConfig(prev => ({
       ...prev,
       [sectionKey]: {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ...prev[sectionKey],
         [settingKey]: value,
       },
@@ -540,7 +540,7 @@ const SellConfigurationManagement = () => {
   };
 
   const renderSettingInput = (sectionKey: any, setting: any) => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     const value = config[sectionKey]?.[setting.key] ?? setting.defaultValue;
 
     switch (setting.type) {
@@ -702,7 +702,7 @@ const SellConfigurationManagement = () => {
     );
   }
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const currentSection = CONFIG_SECTIONS[activeSection];
 
   return (
@@ -720,7 +720,7 @@ const SellConfigurationManagement = () => {
             style={{ display: 'none' }}
             id="import-config"
           />
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <ActionButton onClick={() => document.getElementById('import-config').click()}>
             <Upload size={16} />
             Import
@@ -887,7 +887,7 @@ const ActionButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     background: ${(props: any) => props.variant === 'primary' ? theme.colors.primaryHover : theme.colors.background};
     transform: translateY(-1px);
   }
@@ -1224,7 +1224,7 @@ const ArrayItemButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     background: ${(props: any) => props.variant === 'danger' ? theme.colors.errorHover : theme.colors.background};
     color: ${(props: any) => props.variant === 'danger' ? 'white' : theme.colors.text.primary};
   }

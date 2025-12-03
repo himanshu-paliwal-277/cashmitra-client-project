@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Prefer local API for development to test new endpoints
-{/* @ts-expect-error */}
+// @ts-expect-error
 const API_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
 
 const api = axios.create({
@@ -30,57 +30,57 @@ class ProductService {
       const queryParams = new URLSearchParams();
 
       // Add pagination
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.page) queryParams.append('page', params.page);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.limit) queryParams.append('limit', params.limit);
 
       // Add filters
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.category && params.category !== 'all')
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         queryParams.append('category', params.category);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.brand && params.brand !== 'all') queryParams.append('brand', params.brand);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.condition && params.condition !== 'all')
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         queryParams.append('condition', params.condition);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.search) queryParams.append('search', params.search);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.minPrice) queryParams.append('minPrice', params.minPrice);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice);
 
       // Map frontend sortBy values to backend values
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       let backendSortBy = params.sortBy;
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.sortBy === 'popularity') backendSortBy = 'popularity';
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       else if (params.sortBy === 'price-low') {
         backendSortBy = 'price';
         queryParams.append('sortOrder', 'asc');
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       } else if (params.sortBy === 'price-high') {
         backendSortBy = 'price';
         queryParams.append('sortOrder', 'desc');
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       } else if (params.sortBy === 'rating') backendSortBy = 'rating';
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       else if (params.sortBy === 'newest') backendSortBy = 'createdAt';
 
       if (backendSortBy) queryParams.append('sortBy', backendSortBy);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.sortOrder && !params.sortBy?.includes('price'))
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         queryParams.append('sortOrder', params.sortOrder);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.availability) queryParams.append('availability', params.availability);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.pincode) queryParams.append('pincode', params.pincode);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.featured) queryParams.append('featured', params.featured);
 
       const response = await api.get(`/products?${queryParams.toString()}`);
@@ -95,7 +95,7 @@ class ProductService {
       };
     } catch (error) {
       console.error('Error fetching products:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw new Error(error.response?.data?.message || 'Failed to fetch products');
     }
   }
@@ -106,7 +106,7 @@ class ProductService {
       const response = await api.get(`/products/${id}`);
       return response.data;
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -118,7 +118,7 @@ class ProductService {
       return response.data.data || [];
     } catch (error) {
       console.error('Error fetching categories:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw new Error(error.response?.data?.message || 'Failed to fetch categories');
     }
   }
@@ -130,7 +130,7 @@ class ProductService {
       return response.data.data || [];
     } catch (error) {
       console.error('Error fetching buy super categories:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw new Error(error.response?.data?.message || 'Failed to fetch buy super categories');
     }
   }
@@ -142,7 +142,7 @@ class ProductService {
       return response.data.data || [];
     } catch (error) {
       console.error('Error fetching sell super categories:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw new Error(error.response?.data?.message || 'Failed to fetch sell super categories');
     }
   }
@@ -154,7 +154,7 @@ class ProductService {
       return response.data.data || [];
     } catch (error) {
       console.error('Error fetching buy categories:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw new Error(error.response?.data?.message || 'Failed to fetch buy categories');
     }
   }
@@ -165,29 +165,29 @@ class ProductService {
       const queryParams = new URLSearchParams();
 
       // Add pagination
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.page) queryParams.append('page', params.page);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.limit) queryParams.append('limit', params.limit);
 
       // Add filters - support both categoryId and category name
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.categoryId) queryParams.append('categoryId', params.categoryId);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.category && params.category !== 'all')
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         queryParams.append('category', params.category);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.brand && params.brand !== 'all') queryParams.append('brand', params.brand);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.search) queryParams.append('search', params.search);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.isActive !== undefined) queryParams.append('isActive', params.isActive);
 
       // Add sorting
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.sortBy) queryParams.append('sortBy', params.sortBy);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
 
       const response = await api.get(`/buy-products?${queryParams.toString()}`);
@@ -202,7 +202,7 @@ class ProductService {
       };
     } catch (error) {
       console.error('Error fetching buy products:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw new Error(error.response?.data?.message || 'Failed to fetch buy products');
     }
   }
@@ -215,7 +215,7 @@ class ProductService {
       return response.data.data?.map((item: any) => item.brand) || [];
     } catch (error) {
       console.error('Error fetching brands:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw new Error(error.response?.data?.message || 'Failed to fetch brands');
     }
   }
@@ -228,7 +228,7 @@ class ProductService {
       return response.data.data || {};
     } catch (error) {
       console.error('Error fetching filters:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw new Error(error.response?.data?.message || 'Failed to fetch filters');
     }
   }
@@ -239,7 +239,7 @@ class ProductService {
       const response = await api.get(`/products/suggestions?q=${encodeURIComponent(query)}`);
       return response.data;
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -250,7 +250,7 @@ class ProductService {
       const response = await api.post('/products', productData);
       return response.data;
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -261,7 +261,7 @@ class ProductService {
       const response = await api.put(`/products/${id}`, productData);
       return response.data;
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -272,7 +272,7 @@ class ProductService {
       const response = await api.delete(`/products/${id}`);
       return response.data;
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }
@@ -287,7 +287,7 @@ class ProductService {
       });
       return response.data;
     } catch (error) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       throw error.response?.data || error;
     }
   }

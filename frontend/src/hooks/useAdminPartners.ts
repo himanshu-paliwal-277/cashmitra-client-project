@@ -13,7 +13,7 @@ export const useAdminPartners = () => {
   const [totalPartners, setTotalPartners] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { getAuthHeader } = useAdminAuth();
 
   const fetchPartners = useCallback(async (params = {}) => {
@@ -31,7 +31,7 @@ export const useAdminPartners = () => {
 
       return response;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch partners');
       throw err;
     } finally {
@@ -49,7 +49,7 @@ export const useAdminPartners = () => {
       // Handle the actual API response structure
       return response.data || response.partner || response;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to fetch partner');
       throw err;
     } finally {
@@ -63,14 +63,14 @@ export const useAdminPartners = () => {
     try {
       const response = await updatePartnerStatus(id, { isVerified });
       // Update the partner in the local state
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setPartners(prevPartners =>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         prevPartners.map(partner => (partner._id === id ? { ...partner, isVerified } : partner))
       );
       return response;
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError(err.response?.data?.message || 'Failed to update partner status');
       throw err;
     } finally {
@@ -91,7 +91,7 @@ export const useAdminPartners = () => {
         return { success: false, message: response.message };
       }
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const errorMessage = err.response?.data?.message || err.message || 'Failed to create partner';
       setError(errorMessage);
       return { success: false, message: errorMessage };
@@ -113,7 +113,7 @@ export const useAdminPartners = () => {
         return { success: false, message: response.message };
       }
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const errorMessage = err.response?.data?.message || err.message || 'Failed to update partner';
       setError(errorMessage);
       return { success: false, message: errorMessage };
@@ -135,7 +135,7 @@ export const useAdminPartners = () => {
         return { success: false, message: response.message };
       }
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const errorMessage = err.response?.data?.message || err.message || 'Failed to delete partner';
       setError(errorMessage);
       return { success: false, message: errorMessage };

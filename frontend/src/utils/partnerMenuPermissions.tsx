@@ -524,7 +524,7 @@ export const isMenuItemAccessible = (permissions: any, permissionName: any) => {
  * @returns {Object} Business limits
  */
 export const getBusinessLimits = (permissions: any, roleTemplate: any) => {
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const template = PARTNER_ROLE_TEMPLATES[roleTemplate];
   if (!template) return {};
 
@@ -538,7 +538,7 @@ export const getBusinessLimits = (permissions: any, roleTemplate: any) => {
  * @returns {Object} Available features
  */
 export const getAvailableFeatures = (permissions: any, roleTemplate: any) => {
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const template = PARTNER_ROLE_TEMPLATES[roleTemplate];
   if (!template) return {};
 
@@ -561,7 +561,7 @@ export const canPerformAction = (businessLimits: any, action: any, currentCount 
     requestPayout: businessLimits.maxPayoutAmount,
   };
 
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const limit = actionLimits[action];
   if (limit === undefined || limit === -1) return true; // No limit or unlimited
 

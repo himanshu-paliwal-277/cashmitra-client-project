@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Centralized API configuration reading from .env
 export const API_BASE_URL =
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
 
 // Create a shared axios instance

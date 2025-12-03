@@ -77,7 +77,7 @@ const SellMobileForm = () => {
   const getModelsByBrand = (brandName: any) => {
     if (!models || !brandName) return [];
     return models.filter(
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       model => model.brand && (model.brand.name === brandName || model.brand === brandName)
     );
   };
@@ -85,15 +85,15 @@ const SellMobileForm = () => {
   const getMobileBrands = () => {
     if (!brands || !categories) return [];
     const mobileCategory = categories.find(
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       cat => cat.name && cat.name.toLowerCase().includes('mobile')
     );
     if (!mobileCategory) return brands;
     return brands.filter(
       brand =>
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         brand.category &&
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         (brand.category._id === mobileCategory._id || brand.category === mobileCategory._id)
     );
   };
@@ -182,7 +182,7 @@ const SellMobileForm = () => {
         storage: formData.storage,
         color: formData.color,
         condition: formData.condition,
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         functionalChecks: formData.functionalChecks || [],
         accessories: {
           hasBox: formData.hasBox || false,
@@ -214,7 +214,7 @@ const SellMobileForm = () => {
       'OnePlus 12': 45000,
       'Pixel 8 Pro': 40000,
     };
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     let basePrice = basePrices[formData.model] || 25000;
     const condition = conditionOptions.find(c => c.id === formData.condition);
     if (condition) basePrice *= condition.priceMultiplier;
@@ -244,7 +244,7 @@ const SellMobileForm = () => {
           storage: formData.storage,
           color: formData.color,
           condition: formData.condition,
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           functionalChecks: formData.functionalChecks || [],
           accessories: {
             hasBox: formData.hasBox || false,
@@ -284,7 +284,7 @@ const SellMobileForm = () => {
       }
     } catch (error) {
       console.error('Error submitting sell order:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Network error. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);

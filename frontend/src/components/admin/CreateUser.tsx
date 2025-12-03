@@ -46,7 +46,7 @@ const CreateUser = () => {
       [name]: type === 'checkbox' ? checked : value,
     }));
     // Clear error when user starts typing
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -56,36 +56,36 @@ const CreateUser = () => {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.name = 'Name is required';
     }
 
     if (!formData.email.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.email = 'Email is invalid';
     }
 
     if (!formData.phone.trim()) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.phone = 'Phone number is required';
     } else if (!/^[0-9]{10}$/.test(formData.phone.replace(/\D/g, ''))) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.phone = 'Phone number must be 10 digits';
     }
 
     if (!formData.password) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.password = 'Password must be at least 6 characters';
     }
 
     if (formData.password !== formData.confirmPassword) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
@@ -113,7 +113,7 @@ const CreateUser = () => {
 
       // Add roleTemplate only if role is partner and a template is selected
       if (formData.role === 'partner' && formData.roleTemplate) {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         userData.roleTemplate = formData.roleTemplate;
       }
 
@@ -122,7 +122,7 @@ const CreateUser = () => {
       navigate('/admin/users');
     } catch (error) {
       console.error('Error creating user:', error);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       alert(error.message || 'Failed to create user. Please try again.');
     } finally {
       setLoading(false);
@@ -149,11 +149,11 @@ const CreateUser = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 className={errors.name ? 'error' : ''}
                 placeholder="Enter full name"
               />
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {errors.name && <span className="error-message">{errors.name}</span>}
             </div>
 
@@ -165,11 +165,11 @@ const CreateUser = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 className={errors.email ? 'error' : ''}
                 placeholder="Enter email address"
               />
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
           </div>
@@ -183,11 +183,11 @@ const CreateUser = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 className={errors.phone ? 'error' : ''}
                 placeholder="Enter phone number"
               />
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {errors.phone && <span className="error-message">{errors.phone}</span>}
             </div>
 
@@ -216,9 +216,9 @@ const CreateUser = () => {
                 >
                   <option value="">Select a role template (optional)</option>
                   {roleTemplates.map(template => (
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <option key={template._id || template.id} value={template._id || template.name}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {template.displayName} - {template.permissions?.length || 0} permissions
                     </option>
                   ))}
@@ -239,11 +239,11 @@ const CreateUser = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 className={errors.password ? 'error' : ''}
                 placeholder="Enter password"
               />
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {errors.password && <span className="error-message">{errors.password}</span>}
             </div>
 
@@ -255,13 +255,13 @@ const CreateUser = () => {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 className={errors.confirmPassword ? 'error' : ''}
                 placeholder="Confirm password"
               />
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {errors.confirmPassword && (
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <span className="error-message">{errors.confirmPassword}</span>
               )}
             </div>

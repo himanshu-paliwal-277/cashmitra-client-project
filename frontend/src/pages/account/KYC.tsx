@@ -124,7 +124,7 @@ const KYC = () => {
     setFormData(prev => ({
       ...prev,
       [section]: {
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         ...prev[section],
         [field]: value,
       },
@@ -307,7 +307,7 @@ const KYC = () => {
                 value={formData.contactInfo.pincode}
                 onChange={e => handleInputChange('contactInfo', 'pincode', e.target.value)}
                 placeholder="Enter PIN code"
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 maxLength="6"
                 className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
@@ -543,15 +543,15 @@ const KYC = () => {
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                 {(() => {
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   const CurrentStepIcon = steps[currentStep - 1].icon;
                   return <CurrentStepIcon className="w-6 h-6" />;
                 })()}
               </div>
               <div>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <h3 className="text-xl font-bold text-white">{steps[currentStep - 1].title}</h3>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <p className="text-blue-100 text-sm">{steps[currentStep - 1].description}</p>
               </div>
             </div>

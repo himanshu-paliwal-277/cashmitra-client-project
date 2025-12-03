@@ -63,7 +63,7 @@ const PhoneList = () => {
       }
     } catch (err) {
       console.error('Error fetching cell phones:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Failed to load cell phones. Please try again later.');
       // Try fallback approach
       await fetchFallbackPhones();
@@ -75,7 +75,7 @@ const PhoneList = () => {
   const fetchFallbackPhones = async () => {
     try {
       // Try to search for mobile products
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       const searchResponse = await productCategoriesAPI.searchProducts('mobile phone', {
         limit: 12,
       });
@@ -84,12 +84,12 @@ const PhoneList = () => {
         setPhones(searchResponse.data.data);
       } else {
         // Use static fallback data
-        {/* @ts-expect-error */}
+        // @ts-expect-error
         setPhones(getFallbackPhones());
       }
     } catch (err) {
       console.error('Fallback search failed:', err);
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setPhones(getFallbackPhones());
     }
   };
@@ -219,22 +219,22 @@ const PhoneList = () => {
 
       <div className="phones-grid">
         {phones.map(phone => (
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <div key={phone._id} className="phone-card" onClick={() => handleProductClick(phone._id)}>
             <div className="phone-image-container">
               <img
                 src={getProductImage(phone)}
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 alt={phone.name || 'Phone'}
                 className="phone-image"
                 onError={e => {
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   e.target.src = '/api/placeholder/280/200';
                 }}
               />
 
               {/* Status Badge */}
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {phone.isActive && <div className="status-badge available">Available</div>}
 
               {/* Action Buttons */}
@@ -264,15 +264,15 @@ const PhoneList = () => {
             </div>
 
             <div className="phone-info">
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <div className="phone-brand">{phone.brand || 'Unknown Brand'}</div>
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <h3 className="phone-name">{phone.name || 'Unknown Model'}</h3>
 
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               {phone.description && <p className="phone-description">{phone.description}</p>}
 
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               <div className="phone-category">{phone.categoryId?.name || 'Smartphone'}</div>
 
               <div className="phone-rating">
@@ -281,35 +281,35 @@ const PhoneList = () => {
                     <Star
                       key={index}
                       size={14}
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       className={index < Math.floor(phone.rating || 4.5) ? 'star filled' : 'star'}
                     />
                   ))}
                 </div>
                 <span className="rating-text">
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   {phone.rating || 4.5} ({phone.reviews || Math.floor(Math.random() * 200) + 50}{' '}
                   reviews)
                 </span>
               </div>
 
               <div className="phone-price">
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 <span className="current-price">{formatPrice(phone.pricing?.discountedPrice)}</span>
-                {/* @ts-expect-error */}
+                // @ts-expect-error
                 {phone.pricing?.originalPrice &&
-                  {/* @ts-expect-error */}
+                  // @ts-expect-error
                   phone.pricing.originalPrice > phone.pricing.discountedPrice && (
                     <>
                       <span className="original-price">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {formatPrice(phone.pricing.originalPrice)}
                       </span>
                       <span className="discount-badge">
                         {Math.round(
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           ((phone.pricing.originalPrice - phone.pricing.discountedPrice) /
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             phone.pricing.originalPrice) *
                             100
                         )}

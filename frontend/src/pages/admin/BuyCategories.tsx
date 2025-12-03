@@ -57,7 +57,7 @@ const BuyCategories = () => {
       const response = await adminService.getBuyCategories();
       setCategories(response.data || []);
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       setError('Failed to fetch categories');
       console.error('Error fetching categories:', err);
     } finally {
@@ -66,7 +66,7 @@ const BuyCategories = () => {
   };
 
   const showToast = (message: any, type = 'success') => {
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
@@ -117,7 +117,7 @@ const BuyCategories = () => {
       await fetchCategories();
       showToast('Category created successfully');
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       showToast(err.message || 'Failed to create category', 'error');
     } finally {
       setIsSubmitting(false);
@@ -176,7 +176,7 @@ const BuyCategories = () => {
       await fetchCategories();
       showToast('Category updated successfully');
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       showToast(err.message || 'Failed to update category', 'error');
     } finally {
       setIsSubmitting(false);
@@ -193,7 +193,7 @@ const BuyCategories = () => {
       await fetchCategories();
       showToast('Category deleted successfully');
     } catch (err) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       showToast(err.message || 'Failed to delete category', 'error');
     }
   };
@@ -206,7 +206,7 @@ const BuyCategories = () => {
   };
 
   const filteredCategories = categories.filter(category =>
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -293,28 +293,28 @@ const BuyCategories = () => {
                 <div className="space-y-3">
                   {filteredCategories.map(category => (
                     <div
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       key={category._id}
                       className={`group flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         editingCategory === category._id
                           ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300 shadow-md'
                           : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300 hover:shadow-md'
                       }`}
                     >
                       <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md">
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         {category.image ? (
                           <img
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             src={category.image}
-                            {/* @ts-expect-error */}
+                            // @ts-expect-error
                             alt={category.name}
                             className="w-full h-full object-cover"
                             onError={e => {
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               e.target.style.display = 'none';
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               e.target.parentElement.innerHTML =
                                 '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><line x1="3" y1="3" x2="21" y2="21"></line><path d="M9 9v6h6"></path><path d="M21 15V6a2 2 0 0 0-2-2H6"></path></svg>';
                             }}
@@ -326,19 +326,19 @@ const BuyCategories = () => {
 
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-gray-900 mb-1 truncate">
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {category.name}
                         </h3>
                         <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           {category.superCategory?.name && (
                             <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
                               <Grid size={12} />
-                              {/* @ts-expect-error */}
+                              // @ts-expect-error
                               {category.superCategory.name}
                             </span>
                           )}
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           <span>Created: {new Date(category.createdAt).toLocaleDateString()}</span>
                         </div>
                       </div>
@@ -352,7 +352,7 @@ const BuyCategories = () => {
                           <Edit size={18} />
                         </button>
                         <button
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           onClick={() => handleDelete(category._id)}
                           disabled={isSubmitting}
                           className="p-2 hover:bg-red-100 rounded-lg transition-colors duration-150 text-red-600 disabled:opacity-50"
@@ -414,9 +414,9 @@ const BuyCategories = () => {
                 >
                   <option value="">Select Super Category</option>
                   {superCategories.map(sc => (
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     <option key={sc._id} value={sc._id}>
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {sc.name}
                     </option>
                   ))}
@@ -434,7 +434,7 @@ const BuyCategories = () => {
                 </label>
                 {!imagePreview ? (
                   <div
-                    {/* @ts-expect-error */}
+                    // @ts-expect-error
                     onClick={() => document.getElementById('catImageInput').click()}
                     className="p-8 border-2 border-dashed border-gray-300 rounded-xl text-center cursor-pointer bg-gray-50 hover:bg-emerald-50 hover:border-emerald-500 transition-all duration-200"
                   >
@@ -449,13 +449,13 @@ const BuyCategories = () => {
                       accept="image/*"
                       className="hidden"
                       onChange={e => {
-                        {/* @ts-expect-error */}
+                        // @ts-expect-error
                         const file = e.target.files[0];
                         if (file) {
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           setImageFile(file);
                           const reader = new FileReader();
-                          {/* @ts-expect-error */}
+                          // @ts-expect-error
                           reader.onloadend = () => setImagePreview(reader.result);
                           reader.readAsDataURL(file);
                         }
@@ -478,7 +478,7 @@ const BuyCategories = () => {
                     </button>
                     <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 bg-black/60 text-white rounded-lg text-xs backdrop-blur-sm">
                       <ImageIcon size={14} />
-                      {/* @ts-expect-error */}
+                      // @ts-expect-error
                       {imageFile ? imageFile.name : 'Current image'}
                     </div>
                   </div>
@@ -519,15 +519,15 @@ const BuyCategories = () => {
       {toast && (
         <div
           className={`fixed top-6 right-6 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl z-50 animate-slideIn ${
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             toast.type === 'success'
               ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white'
               : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
           }`}
         >
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {toast.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           <span className="font-medium">{toast.message}</span>
         </div>
       )}

@@ -23,7 +23,7 @@ import {
 
 const PartnerLogin = () => {
   const navigate = useNavigate();
-  {/* @ts-expect-error */}
+  // @ts-expect-error
   const { login, loading, isAuthenticated } = usePartnerAuth();
 
   const [formData, setFormData] = useState({
@@ -48,7 +48,7 @@ const PartnerLogin = () => {
     }));
 
     // Clear error when user starts typing
-    {/* @ts-expect-error */}
+    // @ts-expect-error
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -61,18 +61,18 @@ const PartnerLogin = () => {
     const newErrors = {};
 
     if (!formData.email) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.email = 'Please enter a valid email address';
     }
 
     if (!formData.password) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
-      {/* @ts-expect-error */}
+      // @ts-expect-error
       newErrors.password = 'Password must be at least 6 characters';
     }
 
@@ -132,7 +132,7 @@ const PartnerLogin = () => {
         </LoginHeader>
 
         <LoginForm onSubmit={handleSubmit}>
-          {/* @ts-expect-error */}
+          // @ts-expect-error
           {errors.general && <ErrorMessage>{errors.general}</ErrorMessage>}
 
           <FormGroup>
@@ -144,11 +144,11 @@ const PartnerLogin = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email address"
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               hasError={!!errors.email}
               autoComplete="email"
             />
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
           </FormGroup>
 
@@ -161,11 +161,11 @@ const PartnerLogin = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="Enter your password"
-              {/* @ts-expect-error */}
+              // @ts-expect-error
               hasError={!!errors.password}
               autoComplete="current-password"
             />
-            {/* @ts-expect-error */}
+            // @ts-expect-error
             {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
           </FormGroup>
 
