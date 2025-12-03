@@ -1,0 +1,780 @@
+import { useState, useEffect } from 'react';
+import { cn } from '../../lib/utils';
+import useSellQuestions from '../../hooks/useSellQuestions';
+import QuestionModal from '../../components/admin/QuestionModal';
+import Card from '../../components/ui/Card';
+import {
+  HelpCircle,
+  Plus,
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  Eye,
+  TrendingUp,
+  Grid,
+  List,
+  SortAsc,
+  SortDesc,
+  Download,
+  Tag,
+  AlertCircle,
+  X,
+  ChevronUp,
+  ChevronDown,
+  RefreshCw,
+} from 'lucide-react';
+import adminService from '../../services/adminService';
+
+const SellQuestionsManagement = () => {
+  const {
+    questions,
+    loading,
+    error,
+    pagination,
+    fetchQuestions: getAllQuestions,
+    createQuestion,
+    updateQuestion,
+    deleteQuestion,
+    reorderQuestions,
+    clearError,
+  } = useSellQuestions();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [sortBy, setSortBy] = useState('order');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [viewMode, setViewMode] = useState('grid');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [categories, setCategories] = useState([]);
+
+  // Question types aligned with schema
+  const questionTypes = [
+    { id: 'radio', name: 'Radio Button' },
+    { id: 'checkbox', name: 'Checkbox' },
+    { id: 'select', name: 'Select Dropdown' },
+    { id: 'multiselect', name: 'Multi-Select' },
+    { id: 'slider', name: 'Slider' },
+    { id: 'toggle', name: 'Toggle' },
+  ];
+
+  // Fetch categories
+  const fetchCategories = async () => {
+    try {
+      const response = await adminService.getCategories();
+      setCategories(response.data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const deriveType = (q: any) => q.uiType || 'radio';
+  const deriveStatus = (q: any) => q && typeof q.isActive === 'boolean' ? (q.isActive ? 'active' : 'inactive') : 'inactive';
+  const getDisplayOptions = (q: any) => Array.isArray(q?.options) ? q.options : [];
+
+  const stats = [
+    {
+      label: 'Total Questions',
+      value: pagination.total || 0,
+      icon: HelpCircle,
+      color: 'bg-amber-500',
+    },
+    {
+      label: 'Active Questions',
+      value: questions.filter(q => deriveStatus(q) === 'active').length,
+      icon: TrendingUp,
+      color: 'bg-emerald-500',
+    },
+    {
+      label: 'Total Options',
+      value: questions.reduce((sum, q) => sum + getDisplayOptions(q).length, 0),
+      icon: Tag,
+      color: 'bg-blue-500',
+    },
+    {
+      label: 'Question Types',
+      value: new Set(questions.map(q => deriveType(q))).size,
+      icon: Grid,
+      color: 'bg-purple-500',
+    },
+  ];
+
+  useEffect(() => {
+    fetchCategories();
+    fetchQuestions();
+  }, [currentPage, sortBy, sortOrder]);
+
+  const fetchQuestions = async () => {
+    try {
+      const filters = {
+        search: searchTerm,
+        uiType: selectedType,
+        isActive: selectedStatus ? selectedStatus === 'active' : undefined,
+        categoryId: selectedCategory,
+        sortBy,
+        sortOrder,
+      };
+      await getAllQuestions(currentPage, 12, filters);
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    }
+  };
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+    fetchQuestions();
+  };
+
+  const handleAddQuestion = () => {
+    setSelectedQuestion(null);
+    setIsQuestionModalOpen(true);
+  };
+
+  const handleEditQuestion = (question: any) => {
+    setSelectedQuestion(question);
+    setIsQuestionModalOpen(true);
+  };
+
+  const handleSaveQuestion = async (questionData: any) => {
+    try {
+      if (selectedQuestion) {
+        {/* @ts-expect-error */}
+        await updateQuestion(selectedQuestion._id, questionData);
+      } else {
+        await createQuestion(questionData);
+      }
+      setIsQuestionModalOpen(false);
+      setSelectedQuestion(null);
+      fetchQuestions();
+    } catch (error) {
+      console.error('Error saving question:', error);
+      throw error;
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsQuestionModalOpen(false);
+    setSelectedQuestion(null);
+  };
+
+  const handleDeleteQuestion = async (questionId: any) => {
+    if (
+      window.confirm('Are you sure you want to delete this question? This action cannot be undone.')
+    ) {
+      try {
+        await deleteQuestion(questionId);
+        fetchQuestions();
+      } catch (error) {
+        console.error('Error deleting question:', error);
+      }
+    }
+  };
+
+  const handleSort = (field: any) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const handleReorder = async (questionId: any, direction: any) => {
+    try {
+      {/* @ts-expect-error */}
+      const currentIndex = questions.findIndex(q => q._id === questionId);
+      const newOrder =
+        {/* @ts-expect-error */}
+        direction === 'up' ? questions[currentIndex].order - 1 : questions[currentIndex].order + 1;
+
+      if (newOrder >= 1 && newOrder <= questions.length) {
+        const otherQuestion = questions.find(
+          q =>
+            {/* @ts-expect-error */}
+            q.order === newOrder &&
+            {/* @ts-expect-error */}
+            q.section === questions[currentIndex].section &&
+            {/* @ts-expect-error */}
+            (q.categoryId?._id || q.categoryId) ===
+              {/* @ts-expect-error */}
+              (questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId)
+        );
+        if (otherQuestion) {
+          await reorderQuestions({
+            categoryId:
+              {/* @ts-expect-error */}
+              questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId,
+            {/* @ts-expect-error */}
+            section: questions[currentIndex].section,
+            {/* @ts-expect-error */}
+            questionIds: [questionId, otherQuestion._id],
+          });
+        }
+        fetchQuestions();
+      }
+    } catch (error) {
+      console.error('Error reordering questions:', error);
+    }
+  };
+
+  const getTypeBadgeColor = (type: any) => {
+    const colors = {
+      radio: 'bg-green-100 text-green-800',
+      checkbox: 'bg-blue-100 text-blue-800',
+      select: 'bg-yellow-100 text-yellow-800',
+      multiselect: 'bg-purple-100 text-purple-800',
+      slider: 'bg-orange-100 text-orange-800',
+      toggle: 'bg-pink-100 text-pink-800',
+    };
+    {/* @ts-expect-error */}
+    return colors[type] || 'bg-gray-100 text-gray-800';
+  };
+
+  {/* @ts-expect-error */}
+  const renderQuestionCard = (question: any) => <Card key={question._id} hoverable className="flex flex-col h-full transition-all duration-200">
+    {/* @ts-expect-error */}
+    <Card.Header divider className="bg-gray-50">
+      <div className="flex justify-between items-start gap-4">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
+            {question.title}
+          </h3>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+            <span className="font-medium">Order: {question.order}</span>
+            <span>•</span>
+            <span className="truncate">
+              {question.categoryId?.name || question.categoryId || 'Unknown'}
+            </span>
+            <span>•</span>
+            <span>{getDisplayOptions(question).length} options</span>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 items-end">
+          <span
+            className={cn(
+              'px-2 py-1 rounded text-xs font-medium capitalize whitespace-nowrap',
+              getTypeBadgeColor(deriveType(question))
+            )}
+          >
+            {questionTypes.find(t => t.id === deriveType(question))?.name || deriveType(question)}
+          </span>
+          <div className="flex gap-1">
+            <button
+              onClick={() => handleReorder(question._id, 'up')}
+              disabled={question.order === 1}
+              className="p-1 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronUp size={14} />
+            </button>
+            <button
+              onClick={() => handleReorder(question._id, 'down')}
+              disabled={question.order === questions.length}
+              className="p-1 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronDown size={14} />
+            </button>
+          </div>
+        </div>
+      </div>
+    {/* @ts-expect-error */}
+    </Card.Header>
+
+    {/* @ts-expect-error */}
+    <Card.Body className="flex-1">
+      {question.description && (
+        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{question.description}</p>
+      )}
+
+      {getDisplayOptions(question).length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+            <Tag size={14} />
+            Options ({getDisplayOptions(question).length})
+          </div>
+          <div className="space-y-1">
+            {getDisplayOptions(question)
+              .slice(0, 3)
+              .map((option: any, index: any) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
+                >
+                  <span className="text-gray-700 truncate flex-1">{option.label}</span>
+                  <span className="text-gray-600 font-medium ml-2">
+                    {option.delta
+                      ? `${option.delta.sign}${option.delta.value}${option.delta.type === 'percent' ? '%' : ''}`
+                      : option.value}
+                  </span>
+                </div>
+              ))}
+            {getDisplayOptions(question).length > 3 && (
+              <div className="p-2 bg-gray-50 rounded text-sm text-gray-500 italic text-center">
+                +{getDisplayOptions(question).length - 3} more options...
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    {/* @ts-expect-error */}
+    </Card.Body>
+
+    {/* @ts-expect-error */}
+    <Card.Footer divider className="bg-gray-50">
+      <div className="flex gap-2">
+        <button
+          onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
+          className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+        >
+          <Eye size={14} />
+          View
+        </button>
+        <button
+          onClick={() => handleEditQuestion(question)}
+          className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+        >
+          <Edit size={14} />
+          Edit
+        </button>
+        <button
+          onClick={() => handleDeleteQuestion(question._id)}
+          className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-red-500 hover:text-red-600 transition-colors"
+        >
+          <Trash2 size={14} />
+          Delete
+        </button>
+      </div>
+    {/* @ts-expect-error */}
+    </Card.Footer>
+  </Card>;
+
+  const renderQuestionTable = () => (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-50">
+            <th
+              onClick={() => handleSort('order')}
+              className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                Order
+                {sortBy === 'order' &&
+                  (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+              </div>
+            </th>
+            <th
+              onClick={() => handleSort('title')}
+              className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                Question
+                {sortBy === 'title' &&
+                  (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+              </div>
+            </th>
+            <th
+              onClick={() => handleSort('uiType')}
+              className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                Type
+                {sortBy === 'uiType' &&
+                  (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+              </div>
+            </th>
+            <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700">
+              Category
+            </th>
+            <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700">
+              Options
+            </th>
+            <th
+              onClick={() => handleSort('isActive')}
+              className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                Status
+                {sortBy === 'isActive' &&
+                  (sortOrder === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />)}
+              </div>
+            </th>
+            <th className="text-left px-4 py-3 border-b border-gray-200 font-semibold text-gray-700">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {questions.map(question => (
+            {/* @ts-expect-error */}
+            <tr key={question._id} className="hover:bg-gray-50 transition-colors">
+              <td className="px-4 py-3 border-b border-gray-200">
+                <div className="flex items-center gap-2">
+                  {/* @ts-expect-error */}
+                  <span className="font-semibold text-gray-900">{question.order}</span>
+                  <div className="flex gap-1">
+                    <button
+                      {/* @ts-expect-error */}
+                      onClick={() => handleReorder(question._id, 'up')}
+                      {/* @ts-expect-error */}
+                      disabled={question.order === 1}
+                      className="p-0.5 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:text-amber-600 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronUp size={12} />
+                    </button>
+                    <button
+                      {/* @ts-expect-error */}
+                      onClick={() => handleReorder(question._id, 'down')}
+                      {/* @ts-expect-error */}
+                      disabled={question.order === questions.length}
+                      className="p-0.5 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:text-amber-600 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronDown size={12} />
+                    </button>
+                  </div>
+                </div>
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200">
+                {/* @ts-expect-error */}
+                <div className="font-semibold text-gray-900">{question.title}</div>
+                {/* @ts-expect-error */}
+                {question.description && (
+                  <div className="text-sm text-gray-600 mt-1 truncate max-w-md">
+                    {/* @ts-expect-error */}
+                    {question.description.substring(0, 60)}...
+                  </div>
+                )}
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200">
+                <span
+                  className={cn(
+                    'px-2 py-1 rounded text-xs font-medium capitalize',
+                    getTypeBadgeColor(deriveType(question))
+                  )}
+                >
+                  {questionTypes.find(t => t.id === deriveType(question))?.name ||
+                    deriveType(question)}
+                </span>
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+                {/* @ts-expect-error */}
+                {question.categoryId?.name || question.categoryId || 'Unknown'}
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+                {getDisplayOptions(question).length}
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200">
+                <span
+                  className={cn(
+                    'px-2 py-1 rounded text-xs font-medium capitalize',
+                    deriveStatus(question) === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  )}
+                >
+                  {deriveStatus(question)}
+                </span>
+              </td>
+              <td className="px-4 py-3 border-b border-gray-200">
+                <div className="flex gap-2">
+                  <button
+                    {/* @ts-expect-error */}
+                    onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
+                    className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+                    title="View"
+                  >
+                    <Eye size={14} />
+                  </button>
+                  <button
+                    onClick={() => handleEditQuestion(question)}
+                    className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+                    title="Edit"
+                  >
+                    <Edit size={14} />
+                  </button>
+                  <button
+                    {/* @ts-expect-error */}
+                    onClick={() => handleDeleteQuestion(question._id)}
+                    className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-red-500 hover:text-red-600 transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderPagination = () => {
+    const totalPages = pagination.totalPages || 1;
+    const pages = [];
+
+    for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+      pages.push(
+        <button
+          key={i}
+          className={cn(
+            'px-3 py-2 text-sm border rounded transition-colors',
+            currentPage === i
+              ? 'bg-amber-500 text-white border-amber-500'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-amber-500'
+          )}
+          onClick={() => setCurrentPage(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    return (
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-6 py-4 border-t border-gray-200">
+        <div className="text-sm text-gray-600">
+          Showing {(currentPage - 1) * pagination.limit + 1} to{' '}
+          {Math.min(currentPage * pagination.limit, pagination.total)} of {pagination.total}{' '}
+          questions
+        </div>
+        <div className="flex gap-2">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+            className="px-3 py-2 text-sm border border-gray-300 rounded bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Previous
+          </button>
+          {pages}
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+            className="px-3 py-2 text-sm border border-gray-300 rounded bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  if (loading && questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="flex flex-col items-center justify-center py-12 text-gray-600">
+          <RefreshCw size={32} className="animate-spin mb-4" />
+          <p className="text-lg">Loading questions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-amber-500 rounded-lg">
+            <HelpCircle size={32} className="text-white" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Sell Questions Management
+          </h1>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={fetchQuestions}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            Refresh
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 transition-all">
+            <Download size={16} />
+            Export
+          </button>
+          <button
+            onClick={handleAddQuestion}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-amber-500 text-white hover:bg-amber-600 shadow-md hover:shadow-lg transition-all"
+          >
+            <Plus size={16} />
+            Add Question
+          </button>
+        </div>
+      </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 flex items-center gap-3">
+          <AlertCircle size={20} />
+          <span className="flex-1">{error}</span>
+          <button
+            onClick={clearError}
+            className="text-red-800 hover:text-red-900 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+      )}
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+        {stats.map((stat, index) => (
+          {/* @ts-expect-error */}
+          <Card key={index} className="flex items-center gap-4 p-6">
+            <div className={cn('p-3 rounded-xl text-white', stat.color)}>
+              <stat.icon size={24} />
+            </div>
+            <div className="flex-1">
+              <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+              <div className="text-sm text-gray-600">{stat.label}</div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Filters Section */}
+      {/* @ts-expect-error */}
+      <Card className="mb-8 p-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search Input */}
+          <div className="flex-1 relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search questions by title or description..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+            />
+          </div>
+
+          {/* Type Filter */}
+          <select
+            value={selectedType}
+            onChange={e => setSelectedType(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+          >
+            <option value="">All Types</option>
+            {questionTypes.map(type => (
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Category Filter */}
+          <select
+            value={selectedCategory}
+            onChange={e => setSelectedCategory(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+          >
+            <option value="">All Categories</option>
+            {categories.map(category => (
+              {/* @ts-expect-error */}
+              <option key={category._id} value={category._id}>
+                {/* @ts-expect-error */}
+                {category.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Status Filter */}
+          <select
+            value={selectedStatus}
+            onChange={e => setSelectedStatus(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+          >
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+
+          {/* Filter Button */}
+          <button
+            onClick={handleSearch}
+            className="flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition-all whitespace-nowrap"
+          >
+            <Filter size={16} />
+            Filter
+          </button>
+
+          {/* View Toggle */}
+          <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={cn(
+                'p-2.5 transition-colors',
+                viewMode === 'grid'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-white text-gray-600 hover:bg-gray-50'
+              )}
+            >
+              <Grid size={16} />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'p-2.5 transition-colors border-l border-gray-300',
+                viewMode === 'list'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-white text-gray-600 hover:bg-gray-50'
+              )}
+            >
+              <List size={16} />
+            </button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Questions Section */}
+      {/* @ts-expect-error */}
+      <Card className="overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Questions ({pagination.total || 0})
+          </h2>
+        </div>
+
+        {questions.length === 0 ? (
+          <div className="text-center py-16 px-4">
+            <HelpCircle size={48} className="mx-auto mb-4 text-gray-400" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No questions found</h3>
+            <p className="text-sm text-gray-600">
+              Try adjusting your search criteria or add a new question
+            </p>
+          </div>
+        ) : (
+          <>
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6">
+                {questions.map(renderQuestionCard)}
+              </div>
+            ) : (
+              renderQuestionTable()
+            )}
+            {pagination.totalPages > 1 && renderPagination()}
+          </>
+        )}
+      </Card>
+
+      {/* Question Modal */}
+      <QuestionModal
+        isOpen={isQuestionModalOpen}
+        onClose={handleCloseModal}
+        question={selectedQuestion}
+        onSave={handleSaveQuestion}
+        loading={loading}
+        categories={categories}
+        selectedCategoryId={selectedCategory}
+      />
+    </div>
+  );
+};
+
+export default SellQuestionsManagement;
