@@ -25,9 +25,7 @@ const useAdminBrands = () => {
           inactive: response.data.filter((brand: any) => brand.status === 'inactive').length,
         });
       }
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message || 'Failed to fetch brands');
+    } catch (err) {      setError(err.message || 'Failed to fetch brands');
       console.error('Error fetching brands:', err);
     } finally {
       setLoading(false);
@@ -40,9 +38,7 @@ const useAdminBrands = () => {
     setError(null);
     try {
       const response = await adminService.createBrand(brandData);
-      if (response.success && response.data) {
-        // @ts-expect-error
-        setBrands(prev => [...prev, response.data]);
+      if (response.success && response.data) {        setBrands(prev => [...prev, response.data]);
         setStats(prev => ({
           ...prev,
           total: prev.total + 1,
@@ -51,12 +47,8 @@ const useAdminBrands = () => {
         return { success: true, data: response.data };
       }
       throw new Error('Failed to create brand');
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message || 'Failed to add brand');
-      console.error('Error adding brand:', err);
-      // @ts-expect-error
-      return { success: false, error: err.message };
+    } catch (err) {      setError(err.message || 'Failed to add brand');
+      console.error('Error adding brand:', err);      return { success: false, error: err.message };
     } finally {
       setLoading(false);
     }
@@ -78,25 +70,9 @@ const useAdminBrands = () => {
       const response = await adminService.updateBrand(brandId, updateData);
       console.log('editBrand response:', response);
 
-      if (response.success) {
-        // @ts-expect-error
-        setBrands(prev =>
-          prev.map(brand =>
-            // @ts-expect-error
-            brand.brand === brandId
-              ? {
-                  // @ts-expect-error
-                  ...brand,
-                  // @ts-expect-error
-                  brand: brandData.brand || brandData.newBrandName || brand.brand,
-                  // @ts-expect-error
-                  description: brandData.description || brand.description,
-                  // @ts-expect-error
-                  category: brandData.category || brand.category,
-                  // @ts-expect-error
-                  website: brandData.website || brand.website,
-                  // @ts-expect-error
-                  isActive: brandData.isActive !== undefined ? brandData.isActive : brand.isActive,
+      if (response.success) {        setBrands(prev =>
+          prev.map(brand =>            brand.brand === brandId
+              ? {                  ...brand,                  brand: brandData.brand || brandData.newBrandName || brand.brand,                  description: brandData.description || brand.description,                  category: brandData.category || brand.category,                  website: brandData.website || brand.website,                  isActive: brandData.isActive !== undefined ? brandData.isActive : brand.isActive,
                   updatedAt: new Date().toISOString(),
                 }
               : brand
@@ -105,9 +81,7 @@ const useAdminBrands = () => {
         return { success: true, data: response.data };
       }
       throw new Error(response.message || 'Failed to update brand');
-    } catch (err) {
-      // @ts-expect-error
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to update brand';
+    } catch (err) {      const errorMessage = err.response?.data?.message || err.message || 'Failed to update brand';
       setError(errorMessage);
       console.error('Error updating brand:', err);
       return { success: false, error: errorMessage };
@@ -123,27 +97,17 @@ const useAdminBrands = () => {
     try {
       const response = await adminService.deleteBrand(brandId);
       if (response.success) {
-        setBrands(prev => {
-          // @ts-expect-error
-          const updated = prev.filter(brand => brand.brand !== brandId);
+        setBrands(prev => {          const updated = prev.filter(brand => brand.brand !== brandId);
           setStats({
-            total: updated.length,
-            // @ts-expect-error
-            active: updated.filter(brand => brand.status !== 'inactive').length,
-            // @ts-expect-error
-            inactive: updated.filter(brand => brand.status === 'inactive').length,
+            total: updated.length,            active: updated.filter(brand => brand.status !== 'inactive').length,            inactive: updated.filter(brand => brand.status === 'inactive').length,
           });
           return updated;
         });
         return { success: true };
       }
       throw new Error('Failed to delete brand');
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || err.message || 'Failed to remove brand');
-      console.error('Error removing brand:', err);
-      // @ts-expect-error
-      return { success: false, error: err.response?.data?.message || err.message };
+    } catch (err) {      setError(err.response?.data?.message || err.message || 'Failed to remove brand');
+      console.error('Error removing brand:', err);      return { success: false, error: err.response?.data?.message || err.message };
     } finally {
       setLoading(false);
     }

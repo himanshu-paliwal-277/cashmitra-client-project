@@ -35,17 +35,12 @@ const CategorySelection = () => {
       setProductsLoading(true);
       setProductsError(null);
 
-      const matchingCategory = apiCategories.find(
-        // @ts-expect-error
-        cat => cat.name.toLowerCase() === categoryNameParam.toLowerCase()
+      const matchingCategory = apiCategories.find(        cat => cat.name.toLowerCase() === categoryNameParam.toLowerCase()
       );
 
       if (!matchingCategory) {
         throw new Error(`Category "${categoryNameParam}" not found`);
-      }
-
-      // @ts-expect-error
-      setCategoryName(matchingCategory.name);
+      }      setCategoryName(matchingCategory.name);
 
       const response = await sellService.getSellProductsByCategory(categoryNameParam, {
         page,
@@ -53,9 +48,7 @@ const CategorySelection = () => {
       });
 
       if (response && response.data && response.data.products) {
-        if (append) {
-          // @ts-expect-error
-          setProducts(prev => [...prev, ...response.data.products]);
+        if (append) {          setProducts(prev => [...prev, ...response.data.products]);
         } else {
           setProducts(response.data.products);
         }
@@ -72,9 +65,7 @@ const CategorySelection = () => {
         setHasMoreProducts(false);
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
-      // @ts-expect-error
-      setProductsError(error.message || 'Failed to fetch products');
+      console.error('Error fetching products:', error);      setProductsError(error.message || 'Failed to fetch products');
       if (!append) {
         setProducts([]);
       }
@@ -239,21 +230,13 @@ const CategorySelection = () => {
             {/* Products Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
               {products.map(product => (
-                <div
-                  // @ts-expect-error
-                  key={product.id}
+                <div                  key={product.id}
                   onClick={() => handleProductClick(product)}
                   className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 border-slate-100 hover:border-blue-400 group overflow-hidden"
                 >
                   {/* Product Image */}
-                  <div className="relative h-56 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center overflow-hidden">
-                    // @ts-expect-error
-                    {product.images && product.images.length > 0 ? (
-                      <img
-                        // @ts-expect-error
-                        src={product.images[0]}
-                        // @ts-expect-error
-                        alt={product.name}
+                  <div className="relative h-56 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center overflow-hidden">                    {product.images && product.images.length > 0 ? (
+                      <img                        src={product.images[0]}                        alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (
@@ -265,38 +248,25 @@ const CategorySelection = () => {
 
                   {/* Product Info */}
                   <div className="p-5">
-                    <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                      // @ts-expect-error
-                      {product.name}
-                    </h3>
-
-                    // @ts-expect-error
-                    {product.categoryId?.name && (
-                      // @ts-expect-error
-                      <p className="text-sm text-slate-600 mb-3">{product.categoryId.name}</p>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">                      {product.name}
+                    </h3>                    {product.categoryId?.name && (                      <p className="text-sm text-slate-600 mb-3">{product.categoryId.name}</p>
                     )}
 
                     {/* Stats */}
                     <div className="flex items-center justify-between mb-4 text-sm">
                       <div className="flex items-center gap-1 text-amber-600">
                         <Star className="w-4 h-4 fill-current" />
-                        <span className="font-semibold">
-                          // @ts-expect-error
-                          {product.rating ? product.rating.toFixed(1) : 'N/A'}
+                        <span className="font-semibold">                          {product.rating ? product.rating.toFixed(1) : 'N/A'}
                         </span>
                       </div>
                       <div className="flex items-center gap-1 text-slate-600">
-                        <Package className="w-4 h-4" />
-                        // @ts-expect-error
-                        <span>{product.variants?.length || 0} variants</span>
+                        <Package className="w-4 h-4" />                        <span>{product.variants?.length || 0} variants</span>
                       </div>
                     </div>
 
                     {/* Price */}
                     <div className="flex items-center gap-1 text-2xl font-bold text-green-600 mb-4">
-                      <IndianRupee className="w-5 h-5" />
-                      // @ts-expect-error
-                      <span>{product.basePrice ? `${product.basePrice}+` : 'Get Quote'}</span>
+                      <IndianRupee className="w-5 h-5" />                      <span>{product.basePrice ? `${product.basePrice}+` : 'Get Quote'}</span>
                     </div>
 
                     {/* Button */}

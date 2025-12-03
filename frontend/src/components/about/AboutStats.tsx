@@ -63,7 +63,6 @@ const AboutStats = () => {
         glow: 'shadow-info-500/50',
       },
     };
-    // @ts-expect-error
     return colorMap[color];
   };
 

@@ -5,9 +5,7 @@
  * @version 1.0.0
  */
 
-import React, { useState, useEffect } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';import styled from 'styled-components';
 import { theme } from '../../theme';
 import {
   Settings,
@@ -430,12 +428,8 @@ const SellConfigurationManagement = () => {
 
       // Initialize with default values from CONFIG_SECTIONS
       const defaultConfig = {};
-      Object.entries(CONFIG_SECTIONS).forEach(([sectionKey, section]) => {
-        // @ts-expect-error
-        defaultConfig[sectionKey] = {};
-        section.settings.forEach(setting => {
-          // @ts-expect-error
-          defaultConfig[sectionKey][setting.key] = setting.defaultValue;
+      Object.entries(CONFIG_SECTIONS).forEach(([sectionKey, section]) => {        defaultConfig[sectionKey] = {};
+        section.settings.forEach(setting => {          defaultConfig[sectionKey][setting.key] = setting.defaultValue;
         });
       });
 
@@ -444,9 +438,7 @@ const SellConfigurationManagement = () => {
       // setConfig({ ...defaultConfig, ...response.data });
 
       setConfig(defaultConfig);
-    } catch (err) {
-      // @ts-expect-error
-      setError('Failed to load configuration');
+    } catch (err) {      setError('Failed to load configuration');
       console.error('Error loading configuration:', err);
     } finally {
       setLoading(false);
@@ -455,28 +447,19 @@ const SellConfigurationManagement = () => {
 
   const saveConfiguration = async () => {
     try {
-      setSaving(true);
-      // @ts-expect-error
-      setSaveStatus('saving');
+      setSaving(true);      setSaveStatus('saving');
       setError(null);
 
       // In a real app, you would save to API
       // await api.put('/admin/sell/configuration', config);
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // @ts-expect-error
-      setSaveStatus('saved');
+      await new Promise(resolve => setTimeout(resolve, 1000));      setSaveStatus('saved');
       setHasChanges(false);
 
       // Clear save status after 3 seconds
       setTimeout(() => setSaveStatus(null), 3000);
-    } catch (err) {
-      // @ts-expect-error
-      setSaveStatus('error');
-      // @ts-expect-error
-      setError('Failed to save configuration');
+    } catch (err) {      setSaveStatus('error');      setError('Failed to save configuration');
       console.error('Error saving configuration:', err);
     } finally {
       setSaving(false);
@@ -511,15 +494,11 @@ const SellConfigurationManagement = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = e => {
-        try {
-          // @ts-expect-error
-          const importedConfig = JSON.parse(e.target.result);
+        try {          const importedConfig = JSON.parse(e.target.result);
           setConfig(importedConfig);
           setHasChanges(true);
           setSaveStatus(null);
-        } catch (err) {
-          // @ts-expect-error
-          setError('Invalid configuration file');
+        } catch (err) {          setError('Invalid configuration file');
         }
       };
       reader.readAsText(file);
@@ -529,9 +508,7 @@ const SellConfigurationManagement = () => {
   const updateSetting = (sectionKey: any, settingKey: any, value: any) => {
     setConfig(prev => ({
       ...prev,
-      [sectionKey]: {
-        // @ts-expect-error
-        ...prev[sectionKey],
+      [sectionKey]: {        ...prev[sectionKey],
         [settingKey]: value,
       },
     }));
@@ -539,9 +516,7 @@ const SellConfigurationManagement = () => {
     setSaveStatus(null);
   };
 
-  const renderSettingInput = (sectionKey: any, setting: any) => {
-    // @ts-expect-error
-    const value = config[sectionKey]?.[setting.key] ?? setting.defaultValue;
+  const renderSettingInput = (sectionKey: any, setting: any) => {    const value = config[sectionKey]?.[setting.key] ?? setting.defaultValue;
 
     switch (setting.type) {
       case 'text':
@@ -700,10 +675,7 @@ const SellConfigurationManagement = () => {
         </LoadingSpinner>
       </Container>
     );
-  }
-
-  // @ts-expect-error
-  const currentSection = CONFIG_SECTIONS[activeSection];
+  }  const currentSection = CONFIG_SECTIONS[activeSection];
 
   return (
     <Container>
@@ -719,9 +691,7 @@ const SellConfigurationManagement = () => {
             onChange={importConfiguration}
             style={{ display: 'none' }}
             id="import-config"
-          />
-          // @ts-expect-error
-          <ActionButton onClick={() => document.getElementById('import-config').click()}>
+          />          <ActionButton onClick={() => document.getElementById('import-config').click()}>
             <Upload size={16} />
             Import
           </ActionButton>
@@ -886,9 +856,7 @@ const ActionButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {
-    // @ts-expect-error
-    background: ${(props: any) => props.variant === 'primary' ? theme.colors.primaryHover : theme.colors.background};
+  &:hover {    background: ${(props: any) => props.variant === 'primary' ? theme.colors.primaryHover : theme.colors.background};
     transform: translateY(-1px);
   }
 
@@ -1223,9 +1191,7 @@ const ArrayItemButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {
-    // @ts-expect-error
-    background: ${(props: any) => props.variant === 'danger' ? theme.colors.errorHover : theme.colors.background};
+  &:hover {    background: ${(props: any) => props.variant === 'danger' ? theme.colors.errorHover : theme.colors.background};
     color: ${(props: any) => props.variant === 'danger' ? 'white' : theme.colors.text.primary};
   }
 `;

@@ -133,9 +133,7 @@ const Wallet = () => {
             <Activity className="w-8 h-8 text-red-600" />
           </div>
           <h3 className="text-xl font-bold text-slate-900 mb-2">Error Loading Wallet</h3>
-          <p className="text-slate-600 mb-6">{error}</p>
-          // @ts-expect-error
-          <Button variant="primary" onClick={() => window.location.reload()}>
+          <p className="text-slate-600 mb-6">{error}</p>          <Button variant="primary" onClick={() => window.location.reload()}>
             Retry
           </Button>
         </div>

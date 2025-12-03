@@ -6,7 +6,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-// @ts-expect-error
 import styled from 'styled-components';
 import { adminService } from '../../services/adminService';
 import cloudinaryService from '../../services/cloudinaryService';
@@ -234,8 +233,9 @@ const Button = styled.button`
   gap: 0.5rem;
   transition: all 0.2s;
 
-  ${(props: any) => props.variant === 'primary'
-  ? `
+  ${(props: any) =>
+    props.variant === 'primary'
+      ? `
 background: #f59e0b;
 color: white;
 border: none;
@@ -249,7 +249,7 @@ border: none;
   cursor: not-allowed;
 }
 `
-  : `
+      : `
 background: white;
 color: #374151;
 border: 1px solid #d1d5db;
@@ -376,13 +376,7 @@ const TagChip = styled.div`
   }
 `;
 
-const ProductModal = ({
-  isOpen,
-  onClose,
-  product = null,
-  onSave,
-  loading = false
-}: any) => {
+const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false }: any) => {
   const [formData, setFormData] = useState({
     name: '',
     categoryId: '',
@@ -475,8 +469,9 @@ const ProductModal = ({
       const uploadResult = await cloudinaryService.uploadMultipleImages(files);
       if (uploadResult.success && uploadResult.successful && uploadResult.successful.length > 0) {
         // Extract URLs from the successful uploads
-        const imageUrls = uploadResult.successful.map((img: any) => img.url.trim().replace(/["`]/g, ''));
-        // @ts-expect-error
+        const imageUrls = uploadResult.successful.map((img: any) =>
+          img.url.trim().replace(/["`]/g, '')
+        );
         setFormData(prev => ({
           ...prev,
           images: [...prev.images, ...imageUrls],
@@ -495,7 +490,6 @@ const ProductModal = ({
         );
       }
     } catch (error) {
-      // @ts-expect-error
       setError('Failed to upload images: ' + error.message);
     } finally {
       setImageUploading(false);
@@ -511,9 +505,7 @@ const ProductModal = ({
 
   // Tags handling
   const addTag = () => {
-    // @ts-expect-error
     if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-      // @ts-expect-error
       setFormData(prev => ({
         ...prev,
         tags: [...prev.tags, tagInput.trim()],
@@ -537,7 +529,6 @@ const ProductModal = ({
   };
 
   const addVariant = () => {
-    // @ts-expect-error
     setFormData(prev => ({
       ...prev,
       variants: [
@@ -557,17 +548,14 @@ const ProductModal = ({
   const removeVariant = (variantId: any) => {
     setFormData(prev => ({
       ...prev,
-      // @ts-expect-error
       variants: prev.variants.filter(v => (v._id || v.tempId) !== variantId),
     }));
   };
 
   const updateVariant = (variantId: any, field: any, value: any) => {
-    // @ts-expect-error
     setFormData(prev => ({
       ...prev,
       variants: prev.variants.map(v =>
-        // @ts-expect-error
         (v._id || v.tempId) === variantId ? { ...v, [field]: value } : v
       ),
     }));
@@ -595,12 +583,10 @@ const ProductModal = ({
 
     // Validate variants
     for (const variant of formData.variants) {
-      // @ts-expect-error
       if (!variant.label.trim()) {
         setError('All variants must have a label');
         return;
       }
-      // @ts-expect-error
       if (!variant.basePrice || isNaN(variant.basePrice) || parseFloat(variant.basePrice) < 0) {
         setError('All variants must have a valid base price');
         return;
@@ -614,17 +600,12 @@ const ProductModal = ({
         slug, // Ensure slug is always present
         variants: formData.variants.map(variant => {
           const cleanedVariant = {
-            // @ts-expect-error
             label: variant.label,
-            // @ts-expect-error
             basePrice: parseFloat(variant.basePrice),
-            // @ts-expect-error
             isActive: variant.isActive,
           };
           // Only include _id if it exists and is a valid ObjectId (for updates)
-          // @ts-expect-error
           if (variant._id && variant._id.length === 24) {
-            // @ts-expect-error
             cleanedVariant._id = variant._id;
           }
           return cleanedVariant;
@@ -634,7 +615,6 @@ const ProductModal = ({
       await onSave(cleanedData);
       onClose();
     } catch (err) {
-      // @ts-expect-error
       setError(err.message || 'Failed to save product');
     }
   };
@@ -695,9 +675,7 @@ const ProductModal = ({
                     {categoriesLoading ? 'Loading categories...' : 'Select category'}
                   </option>
                   {categories.map(category => (
-                    // @ts-expect-error
                     <option key={category._id} value={category._id}>
-                      // @ts-expect-error
                       {category.name}
                     </option>
                   ))}
@@ -722,7 +700,6 @@ const ProductModal = ({
               <ImageUploadContainer>
                 <ImageUploadButton
                   type="button"
-                  // @ts-expect-error
                   onClick={() => document.getElementById('image-upload').click()}
                 >
                   <Upload size={16} />
@@ -801,13 +778,11 @@ const ProductModal = ({
               </div>
 
               {formData.variants.map((variant, index) => (
-                // @ts-expect-error
                 <VariantCard key={variant._id || variant.tempId}>
                   <VariantHeader>
                     <span style={{ fontWeight: '600', color: '#374151' }}>Variant {index + 1}</span>
                     <RemoveVariantButton
                       type="button"
-                      // @ts-expect-error
                       onClick={() => removeVariant(variant._id || variant.tempId)}
                     >
                       <Trash2 size={12} />
@@ -820,10 +795,9 @@ const ProductModal = ({
                       <Label>Label *</Label>
                       <Input
                         type="text"
-                        // @ts-expect-error
                         value={variant.label}
-                        // @ts-expect-error
-                        onChange={(e: any) => updateVariant(variant._id || variant.tempId, 'label', e.target.value)
+                        onChange={(e: any) =>
+                          updateVariant(variant._id || variant.tempId, 'label', e.target.value)
                         }
                         placeholder="e.g., 128GB Black, 256GB White"
                         required
@@ -834,10 +808,9 @@ const ProductModal = ({
                       <Label>Base Price *</Label>
                       <Input
                         type="number"
-                        // @ts-expect-error
                         value={variant.basePrice}
-                        // @ts-expect-error
-                        onChange={(e: any) => updateVariant(variant._id || variant.tempId, 'basePrice', e.target.value)
+                        onChange={(e: any) =>
+                          updateVariant(variant._id || variant.tempId, 'basePrice', e.target.value)
                         }
                         placeholder="Variant base price"
                         min="0"
@@ -849,19 +822,16 @@ const ProductModal = ({
                     <FormGroup>
                       <Label>Active</Label>
                       <Select
-                        // @ts-expect-error
                         value={variant.isActive}
-                        onChange={(e: any) => updateVariant(
-                          // @ts-expect-error
-                          variant._id || variant.tempId,
-                          'isActive',
-                          e.target.value === 'true'
-                        )
+                        onChange={(e: any) =>
+                          updateVariant(
+                            variant._id || variant.tempId,
+                            'isActive',
+                            e.target.value === 'true'
+                          )
                         }
                       >
-                        // @ts-expect-error
                         <option value={true}>Active</option>
-                        // @ts-expect-error
                         <option value={false}>Inactive</option>
                       </Select>
                     </FormGroup>

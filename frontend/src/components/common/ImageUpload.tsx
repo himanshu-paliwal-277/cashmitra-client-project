@@ -1,5 +1,4 @@
 import React, { useState, useRef, useCallback } from 'react';
-// @ts-expect-error
 import styled from 'styled-components';
 import { Upload, X, Image as ImageIcon, Loader, AlertCircle, Check } from 'lucide-react';
 import cloudinaryService from '../../services/cloudinaryService';
@@ -20,21 +19,21 @@ const UploadLabel = styled.label`
 
 const DropZone = styled.div`
   border: 2px dashed
-    ${(props: any) => props.isDragOver
-  ? theme.colors.primary.main
-  : props.hasError
-    ? theme.colors.error.main
-    // @ts-expect-error
-    : theme.colors.border.light};
+    ${(props: any) =>
+      props.isDragOver
+        ? theme.colors.primary.main
+        : props.hasError
+          ? theme.colors.error.main
+          : theme.colors.border.light};
   border-radius: 8px;
   padding: 2rem;
   text-align: center;
-  background-color: ${(props: any) => props.isDragOver
-  ? `${theme.colors.primary.main}10`
-  : props.hasError
-    ? `${theme.colors.error.main}10`
-    // @ts-expect-error
-    : theme.colors.background.light};
+  background-color: ${(props: any) =>
+    props.isDragOver
+      ? `${theme.colors.primary.main}10`
+      : props.hasError
+        ? `${theme.colors.error.main}10`
+        : theme.colors.background.light};
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -53,12 +52,13 @@ const UploadIcon = styled.div`
   svg {
     width: 3rem;
     height: 3rem;
-    color: ${(props: any) => props.hasError ? theme.colors.error.main : theme.colors.text.secondary};
+    color: ${(props: any) =>
+      props.hasError ? theme.colors.error.main : theme.colors.text.secondary};
   }
 `;
 
 const UploadText = styled.div`
-  color: ${(props: any) => props.hasError ? theme.colors.error.main : theme.colors.text.primary};
+  color: ${(props: any) => (props.hasError ? theme.colors.error.main : theme.colors.text.primary)};
   font-weight: 500;
   margin-bottom: 0.5rem;
 `;
@@ -83,9 +83,7 @@ const PreviewItem = styled.div`
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  // @ts-expect-error
   background-color: ${theme.colors.background.light};
-  // @ts-expect-error
   border: 1px solid ${theme.colors.border.light};
 `;
 
@@ -106,7 +104,7 @@ const PreviewOverlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: ${(props: any) => props.show ? 1 : 0};
+  opacity: ${(props: any) => (props.show ? 1 : 0)};
   transition: opacity 0.3s ease;
 `;
 
@@ -166,13 +164,14 @@ const StatusIcon = styled.div`
   svg {
     width: 24px;
     height: 24px;
-    color: ${(props: any) => props.status === 'uploading'
-  ? theme.colors.primary.main
-  : props.status === 'success'
-    ? theme.colors.success.main
-    : props.status === 'error'
-      ? theme.colors.error.main
-      : theme.colors.text.secondary};
+    color: ${(props: any) =>
+      props.status === 'uploading'
+        ? theme.colors.primary.main
+        : props.status === 'success'
+          ? theme.colors.success.main
+          : props.status === 'error'
+            ? theme.colors.error.main
+            : theme.colors.text.secondary};
   }
 `;
 
@@ -203,7 +202,7 @@ const ImageUpload = ({
   folder = 'products',
   label = 'Product Images',
   required = false,
-  disabled = false
+  disabled = false,
 }: any) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState([]);
@@ -253,7 +252,6 @@ const ImageUpload = ({
       setErrors([]);
 
       // Create upload tracking objects
-      // @ts-expect-error
       const uploadTrackingFiles = validFiles.map((file, index) => ({
         id: `${Date.now()}_${index}`,
         file,
@@ -261,8 +259,6 @@ const ImageUpload = ({
         progress: 0,
         preview: URL.createObjectURL(file),
       }));
-
-      // @ts-expect-error
       setUploadingFiles(prev => [...prev, ...uploadTrackingFiles]);
 
       try {
@@ -274,8 +270,6 @@ const ImageUpload = ({
             source: 'product_management',
           },
         };
-
-        // @ts-expect-error
         const uploadPromises = uploadTrackingFiles.map(async trackingFile => {
           try {
             const result = await cloudinaryService.uploadImage(trackingFile.file, {
@@ -284,12 +278,9 @@ const ImageUpload = ({
             });
 
             // Update tracking file status
-            // @ts-expect-error
             setUploadingFiles(prev =>
               prev.map(f =>
-                // @ts-expect-error
                 f.id === trackingFile.id
-                  // @ts-expect-error
                   ? { ...f, status: result.success ? 'success' : 'error', progress: 100, result }
                   : f
               )
@@ -297,17 +288,13 @@ const ImageUpload = ({
 
             return result;
           } catch (error) {
-            // @ts-expect-error
             setUploadingFiles(prev =>
               prev.map(f =>
-                // @ts-expect-error
                 f.id === trackingFile.id
-                  // @ts-expect-error
                   ? { ...f, status: 'error', progress: 100, error: error.message }
                   : f
               )
             );
-            // @ts-expect-error
             return { success: false, error: error.message };
           }
         });
@@ -317,7 +304,6 @@ const ImageUpload = ({
         const failedUploads = results.filter(r => !r.success);
 
         if (failedUploads.length > 0) {
-          // @ts-expect-error
           setErrors(failedUploads.map(f => f.error || 'Upload failed'));
         }
 
@@ -329,18 +315,15 @@ const ImageUpload = ({
         // Clean up tracking files after a delay
         setTimeout(() => {
           setUploadingFiles(prev =>
-            // @ts-expect-error
             prev.filter(f => !uploadTrackingFiles.some(tf => tf.id === f.id))
           );
         }, 2000);
       } catch (error) {
         console.error('Upload error:', error);
-        // @ts-expect-error
         setErrors(['Failed to upload images. Please try again.']);
 
         // Clean up failed uploads
         setUploadingFiles(prev =>
-          // @ts-expect-error
           prev.filter(f => !uploadTrackingFiles.some(tf => tf.id === f.id))
         );
       }
@@ -387,7 +370,6 @@ const ImageUpload = ({
 
   const handleClick = useCallback(() => {
     if (!disabled && fileInputRef.current) {
-      // @ts-expect-error
       fileInputRef.current.click();
     }
   }, [disabled]);
@@ -404,7 +386,6 @@ const ImageUpload = ({
 
   const removeImage = useCallback(
     (index: any) => {
-      // @ts-expect-error
       const newImages = value.filter((_, i) => i !== index);
       onChange(newImages);
     },
@@ -412,7 +393,6 @@ const ImageUpload = ({
   );
 
   const removeUploadingFile = useCallback((id: any) => {
-    // @ts-expect-error
     setUploadingFiles(prev => prev.filter(f => f.id !== id));
   }, []);
 
@@ -444,7 +424,6 @@ const ImageUpload = ({
           <UploadSubtext>
             {multiple ? `Up to ${maxFiles} files` : 'Single file'} • Max{' '}
             {(maxFileSize / 1024 / 1024).toFixed(0)}MB each •
-            // @ts-expect-error
             {allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}
           </UploadSubtext>
 
@@ -473,7 +452,6 @@ const ImageUpload = ({
       {(value.length > 0 || uploadingFiles.length > 0) && (
         <PreviewContainer>
           {/* Uploaded images */}
-          // @ts-expect-error
           {value.map((image, index) => (
             <PreviewItem key={`uploaded-${index}`}>
               <PreviewImage
@@ -497,30 +475,20 @@ const ImageUpload = ({
 
           {/* Uploading files */}
           {uploadingFiles.map(file => (
-            // @ts-expect-error
             <PreviewItem key={file.id}>
-              // @ts-expect-error
               <PreviewImage src={file.preview} alt="Uploading..." />
-              // @ts-expect-error
               <PreviewOverlay show={file.status !== 'success'}>
-                // @ts-expect-error
                 <StatusIcon status={file.status}>
-                  // @ts-expect-error
                   {file.status === 'uploading' && <Loader className="animate-spin" />}
-                  // @ts-expect-error
                   {file.status === 'success' && <Check />}
-                  // @ts-expect-error
                   {file.status === 'error' && <AlertCircle />}
                 </StatusIcon>
               </PreviewOverlay>
-              // @ts-expect-error
               {file.status === 'uploading' && <UploadProgress progress={file.progress} />}
-              // @ts-expect-error
               {file.status !== 'uploading' && (
                 <RemoveButton
                   onClick={(e: any) => {
                     e.stopPropagation();
-                    // @ts-expect-error
                     removeUploadingFile(file.id);
                   }}
                   title="Remove"

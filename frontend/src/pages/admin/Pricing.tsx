@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';import styled from 'styled-components';
 import {
   DollarSign,
   Plus,
@@ -338,26 +336,16 @@ const Pricing = () => {
       },
     ];
 
-    setTimeout(() => {
-      // @ts-expect-error
-      setPriceData(mockPriceData);
-      // @ts-expect-error
-      setAdjustments(mockAdjustments);
+    setTimeout(() => {      setPriceData(mockPriceData);      setAdjustments(mockAdjustments);
       setLoading(false);
     }, 1000);
   }, []);
 
   const filteredPriceData = priceData.filter(
-    item =>
-      // @ts-expect-error
-      item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      item.brand.toLowerCase().includes(searchTerm.toLowerCase())
+    item =>      item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||      item.brand.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredAdjustments = adjustments.filter(item =>
-    // @ts-expect-error
-    item.product.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredAdjustments = adjustments.filter(item =>    item.product.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -401,47 +389,27 @@ const Pricing = () => {
             <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
           ) : activeTab === 'price-table' ? (
             <PricingGrid>
-              {filteredPriceData.map(item => (
-                // @ts-expect-error
-                <PricingCard key={item.id}>
-                  <ProductHeader>
-                    // @ts-expect-error
-                    <ProductName>{item.product}</ProductName>
-                    // @ts-expect-error
-                    <PriceChange positive={item.change > 0}>
-                      // @ts-expect-error
-                      {item.change > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                      // @ts-expect-error
-                      {Math.abs(item.change)}%
+              {filteredPriceData.map(item => (                <PricingCard key={item.id}>
+                  <ProductHeader>                    <ProductName>{item.product}</ProductName>                    <PriceChange positive={item.change > 0}>                      {item.change > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}                      {Math.abs(item.change)}%
                     </PriceChange>
                   </ProductHeader>
 
                   <PriceDetails>
                     <PriceRow>
-                      <ConditionLabel>Excellent</ConditionLabel>
-                      // @ts-expect-error
-                      <PriceValue>₹{item.prices.excellent.toLocaleString()}</PriceValue>
+                      <ConditionLabel>Excellent</ConditionLabel>                      <PriceValue>₹{item.prices.excellent.toLocaleString()}</PriceValue>
                     </PriceRow>
                     <PriceRow>
-                      <ConditionLabel>Good</ConditionLabel>
-                      // @ts-expect-error
-                      <PriceValue>₹{item.prices.good.toLocaleString()}</PriceValue>
+                      <ConditionLabel>Good</ConditionLabel>                      <PriceValue>₹{item.prices.good.toLocaleString()}</PriceValue>
                     </PriceRow>
                     <PriceRow>
-                      <ConditionLabel>Fair</ConditionLabel>
-                      // @ts-expect-error
-                      <PriceValue>₹{item.prices.fair.toLocaleString()}</PriceValue>
+                      <ConditionLabel>Fair</ConditionLabel>                      <PriceValue>₹{item.prices.fair.toLocaleString()}</PriceValue>
                     </PriceRow>
                     <PriceRow>
-                      <ConditionLabel>Poor</ConditionLabel>
-                      // @ts-expect-error
-                      <PriceValue>₹{item.prices.poor.toLocaleString()}</PriceValue>
+                      <ConditionLabel>Poor</ConditionLabel>                      <PriceValue>₹{item.prices.poor.toLocaleString()}</PriceValue>
                     </PriceRow>
                   </PriceDetails>
 
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1rem' }}>
-                    // @ts-expect-error
-                    Last updated: {item.lastUpdated}
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1rem' }}>                    Last updated: {item.lastUpdated}
                   </div>
 
                   <ActionButtons>
@@ -480,23 +448,7 @@ const Pricing = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredAdjustments.map(adjustment => (
-                      // @ts-expect-error
-                      <TableRow key={adjustment.id}>
-                        // @ts-expect-error
-                        <TableCell>{adjustment.product}</TableCell>
-                        // @ts-expect-error
-                        <TableCell>{adjustment.condition}</TableCell>
-                        // @ts-expect-error
-                        <TableCell>₹{adjustment.oldPrice.toLocaleString()}</TableCell>
-                        // @ts-expect-error
-                        <TableCell>₹{adjustment.newPrice.toLocaleString()}</TableCell>
-                        // @ts-expect-error
-                        <TableCell>{adjustment.reason}</TableCell>
-                        // @ts-expect-error
-                        <TableCell>{adjustment.adjustedBy}</TableCell>
-                        // @ts-expect-error
-                        <TableCell>{adjustment.adjustedAt}</TableCell>
+                    filteredAdjustments.map(adjustment => (                      <TableRow key={adjustment.id}>                        <TableCell>{adjustment.product}</TableCell>                        <TableCell>{adjustment.condition}</TableCell>                        <TableCell>₹{adjustment.oldPrice.toLocaleString()}</TableCell>                        <TableCell>₹{adjustment.newPrice.toLocaleString()}</TableCell>                        <TableCell>{adjustment.reason}</TableCell>                        <TableCell>{adjustment.adjustedBy}</TableCell>                        <TableCell>{adjustment.adjustedAt}</TableCell>
                         <TableCell>
                           <div style={{ display: 'flex', gap: '0.5rem' }}>
                             <IconButton style={{ padding: '0.25rem' }}>

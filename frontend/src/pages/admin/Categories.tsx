@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';import styled from 'styled-components';
 import useAdminCategories from '../../hooks/useAdminCategories';
 import {
   FolderTree,
@@ -343,9 +341,7 @@ const Categories = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      if (editingCategory) {
-        // @ts-expect-error
-        await editCategory(editingCategory._id, formData);
+      if (editingCategory) {        await editCategory(editingCategory._id, formData);
       } else {
         await addCategory(formData);
       }
@@ -402,9 +398,7 @@ const Categories = () => {
       .sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
   };
 
-  const renderCategory = (category: any, level = 0) => {
-    // @ts-expect-error
-    const hasChildren = categories.some(cat => cat.parentCategory?._id === category._id);
+  const renderCategory = (category: any, level = 0) => {    const hasChildren = categories.some(cat => cat.parentCategory?._id === category._id);
     const isExpanded = expandedCategories.has(category._id);
     const children = buildCategoryTree(categories, category._id);
 
@@ -473,14 +467,8 @@ const Categories = () => {
     );
   };
 
-  const filteredCategories = categories.filter(category => {
-    // @ts-expect-error
-    if (!searchTerm) return !category.parentCategory; // Show only root categories when no search
-    return (
-      // @ts-expect-error
-      category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      category.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCategories = categories.filter(category => {    if (!searchTerm) return !category.parentCategory; // Show only root categories when no search
+    return (      category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||      category.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
 

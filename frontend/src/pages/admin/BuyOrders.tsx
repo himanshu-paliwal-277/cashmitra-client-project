@@ -100,9 +100,7 @@ const BuyOrders = () => {
       },
     ];
 
-    setTimeout(() => {
-      // @ts-expect-error
-      setOrders(mockData);
+    setTimeout(() => {      setOrders(mockData);
       setLoading(false);
     }, 1000);
   }, []);
@@ -115,16 +113,7 @@ const BuyOrders = () => {
   ];
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch =
-      // @ts-expect-error
-      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      order.product.toLowerCase().includes(searchTerm.toLowerCase());
-
-    // @ts-expect-error
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+    const matchesSearch =      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||      order.product.toLowerCase().includes(searchTerm.toLowerCase());    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -153,9 +142,7 @@ const BuyOrders = () => {
       shipped: 'bg-indigo-100 text-indigo-800',
       delivered: 'bg-green-100 text-green-800',
       cancelled: 'bg-red-100 text-red-800',
-    };
-    // @ts-expect-error
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    };    return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
   if (loading) {
@@ -181,9 +168,7 @@ const BuyOrders = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        {stats.map((stat, index) => (
-          // @ts-expect-error
-          <Card
+        {stats.map((stat, index) => (          <Card
             key={index}
             className="p-6 border-l-4"
             style={{ borderLeftColor: stat.color.replace('bg-', '#').replace('500', '') }}
@@ -199,9 +184,7 @@ const BuyOrders = () => {
         ))}
       </div>
 
-      {/* Filters Section */}
-      // @ts-expect-error
-      <Card className="mb-6 p-6">
+      {/* Filters Section */}      <Card className="mb-6 p-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -247,33 +230,17 @@ const BuyOrders = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {filteredOrders.map(order => (
-            // @ts-expect-error
-            <Card key={order.id} hoverable>
-              // @ts-expect-error
-              <Card.Body>
+          {filteredOrders.map(order => (            <Card key={order.id} hoverable>              <Card.Body>
                 {/* Order Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                  <div className="flex-1">
-                    // @ts-expect-error
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{order.id}</h3>
-                    // @ts-expect-error
-                    <p className="text-sm text-gray-600 mb-1">{order.customerName}</p>
-                    // @ts-expect-error
-                    <p className="text-xs text-gray-500">{order.orderDate}</p>
+                  <div className="flex-1">                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{order.id}</h3>                    <p className="text-sm text-gray-600 mb-1">{order.customerName}</p>                    <p className="text-xs text-gray-500">{order.orderDate}</p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    // @ts-expect-error
-                    {getStatusIcon(order.status)}
+                  <div className="flex items-center gap-2">                    {getStatusIcon(order.status)}
                     <span
                       className={cn(
-                        'px-3 py-1 rounded-full text-xs font-semibold capitalize',
-                        // @ts-expect-error
-                        getStatusColor(order.status)
+                        'px-3 py-1 rounded-full text-xs font-semibold capitalize',                        getStatusColor(order.status)
                       )}
-                    >
-                      // @ts-expect-error
-                      {order.status}
+                    >                      {order.status}
                     </span>
                   </div>
                 </div>
@@ -283,49 +250,37 @@ const BuyOrders = () => {
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                       Product
-                    </div>
-                    // @ts-expect-error
-                    <div className="text-sm font-semibold text-gray-900">{order.product}</div>
+                    </div>                    <div className="text-sm font-semibold text-gray-900">{order.product}</div>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                       Condition
-                    </div>
-                    // @ts-expect-error
-                    <div className="text-sm font-semibold text-gray-900">{order.condition}</div>
+                    </div>                    <div className="text-sm font-semibold text-gray-900">{order.condition}</div>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                       Price
                     </div>
-                    <div className="text-sm font-semibold text-gray-900">
-                      // @ts-expect-error
-                      ₹{order.price.toLocaleString()}
+                    <div className="text-sm font-semibold text-gray-900">                      ₹{order.price.toLocaleString()}
                     </div>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                       Payment Method
-                    </div>
-                    // @ts-expect-error
-                    <div className="text-sm font-semibold text-gray-900">{order.paymentMethod}</div>
+                    </div>                    <div className="text-sm font-semibold text-gray-900">{order.paymentMethod}</div>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                       Delivery Address
                     </div>
-                    <div className="text-sm font-semibold text-gray-900">
-                      // @ts-expect-error
-                      {order.deliveryAddress}
+                    <div className="text-sm font-semibold text-gray-900">                      {order.deliveryAddress}
                     </div>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                       Est. Delivery
                     </div>
-                    <div className="text-sm font-semibold text-gray-900">
-                      // @ts-expect-error
-                      {order.estimatedDelivery}
+                    <div className="text-sm font-semibold text-gray-900">                      {order.estimatedDelivery}
                     </div>
                   </div>
                 </div>
@@ -344,9 +299,7 @@ const BuyOrders = () => {
                     <Truck size={16} />
                     Track Order
                   </button>
-                </div>
-              // @ts-expect-error
-              </Card.Body>
+                </div>              </Card.Body>
             </Card>
           ))}
         </div>

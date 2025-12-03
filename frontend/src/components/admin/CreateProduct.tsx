@@ -4,7 +4,6 @@ import { adminService } from '../../services/adminService';
 import useAdminCategories from '../../hooks/useAdminCategories';
 import useAdminBrands from '../../hooks/useAdminBrands';
 import useAdminModels from '../../hooks/useAdminModels';
-// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import {
@@ -112,8 +111,10 @@ const Tab = styled.button`
   background: none;
   border: none;
   font-weight: ${theme.typography.fontWeight.medium};
-  color: ${(props: any) => props.active ? theme.colors.primary.main : theme.colors.text.secondary};
-  border-bottom: 2px solid ${(props: any) => props.active ? theme.colors.primary.main : 'transparent'};
+  color: ${(props: any) =>
+    props.active ? theme.colors.primary.main : theme.colors.text.secondary};
+  border-bottom: 2px solid
+    ${(props: any) => (props.active ? theme.colors.primary.main : 'transparent')};
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -324,10 +325,13 @@ const Button = styled.button`
   align-items: center;
   gap: ${theme.spacing[2]};
   padding: ${theme.spacing[3]} ${theme.spacing[6]};
-  background-color: ${(props: any) => props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
-  color: ${(props: any) => props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
+  background-color: ${(props: any) =>
+    props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
+  color: ${(props: any) =>
+    props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
   border: 1px solid
-    ${(props: any) => props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
+    ${(props: any) =>
+      props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
@@ -335,7 +339,8 @@ const Button = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: ${(props: any) => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background-color: ${(props: any) =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -351,10 +356,13 @@ const Alert = styled.div`
   padding: ${theme.spacing[4]};
   border-radius: ${theme.borderRadius.md};
   margin-bottom: ${theme.spacing[4]};
-  background-color: ${(props: any) => props.type === 'error' ? theme.colors.error[50] : theme.colors.success[50]};
+  background-color: ${(props: any) =>
+    props.type === 'error' ? theme.colors.error[50] : theme.colors.success[50]};
   border: 1px solid
-    ${(props: any) => props.type === 'error' ? theme.colors.error[200] : theme.colors.success[200]};
-  color: ${(props: any) => props.type === 'error' ? theme.colors.error[700] : theme.colors.success[700]};
+    ${(props: any) =>
+      props.type === 'error' ? theme.colors.error[200] : theme.colors.success[200]};
+  color: ${(props: any) =>
+    props.type === 'error' ? theme.colors.error[700] : theme.colors.success[700]};
 `;
 
 const CreateProduct = () => {
@@ -485,7 +493,6 @@ const CreateProduct = () => {
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          // @ts-expect-error
           ...prev[parent],
           [child]: value,
         },
@@ -504,7 +511,6 @@ const CreateProduct = () => {
           const categoryName = value.toLowerCase();
 
           const categoryBrands = brands.filter(
-            // @ts-expect-error
             brand => brand.categories && brand.categories.includes(categoryName)
           );
           setFilteredBrands(categoryBrands);
@@ -519,7 +525,6 @@ const CreateProduct = () => {
           console.log('value: ', value);
           console.log('models: ', models);
           const categoryModals = models.filter(
-            // @ts-expect-error
             model => model.brand.toLowerCase() === value.toLowerCase()
           );
 
@@ -537,12 +542,9 @@ const CreateProduct = () => {
     setFormData(prev => ({
       ...prev,
       [parent]: {
-        // @ts-expect-error
         ...prev[parent],
         [child]: checked
-          // @ts-expect-error
           ? [...(prev[parent][child] || []), value]
-          // @ts-expect-error
           : (prev[parent][child] || []).filter((item: any) => item !== value),
       },
     }));
@@ -562,7 +564,6 @@ const CreateProduct = () => {
       const imageUrls = images
         .map(img => {
           if (typeof img === 'string') return img;
-          // @ts-expect-error
           return img.url || img.file || '';
         })
         .filter(url => url); // Remove empty strings
@@ -590,18 +591,13 @@ const CreateProduct = () => {
         conditionFactors: formData.conditionFactors,
         specifications: {
           ...formData.specifications,
-          // @ts-expect-error
           ram: formData.variant.ram.trim() || formData.specifications?.ram,
-          // @ts-expect-error
           storage: formData.variant.storage.trim() || formData.specifications?.storage,
         },
         images: imageUrls,
         description: formData.description || '',
-        // @ts-expect-error
         shortDescription: formData.shortDescription || '',
-        // @ts-expect-error
         sku: formData.sku || '',
-        // @ts-expect-error
         barcode: formData.barcode || '',
         isActive: formData.isActive,
       };
@@ -613,7 +609,6 @@ const CreateProduct = () => {
         navigate('/admin/products');
       }, 2000);
     } catch (error) {
-      // @ts-expect-error
       setMessage({ type: 'error', text: error.message || 'Failed to create product' });
     } finally {
       setLoading(false);
@@ -661,9 +656,7 @@ const CreateProduct = () => {
           >
             <option value="">Select Category</option>
             {categories.map(category => (
-              // @ts-expect-error
               <option key={category._id} value={category.name}>
-                // @ts-expect-error
                 {category.name}
               </option>
             ))}
@@ -679,9 +672,7 @@ const CreateProduct = () => {
           >
             <option value="">Select Brand</option>
             {filteredBrands.map(brand => (
-              // @ts-expect-error
               <option key={brand._id} value={brand._id}>
-                // @ts-expect-error
                 {brand.name || brand.brand}
               </option>
             ))}
@@ -697,9 +688,7 @@ const CreateProduct = () => {
           >
             <option value="">Select Series</option>
             {filteredModels.map(model => (
-              // @ts-expect-error
               <option key={model._id || model.id || model.model} value={model.model || model.value}>
-                // @ts-expect-error
                 {model.model || model.model}
               </option>
             ))}
@@ -760,7 +749,6 @@ const CreateProduct = () => {
         <FormGroup>
           <Label>Short Description</Label>
           <TextArea
-            // @ts-expect-error
             value={formData.shortDescription}
             onChange={(e: any) => handleInputChange('shortDescription', e.target.value)}
             placeholder="Brief product description (max 160 characters)"
@@ -782,7 +770,6 @@ const CreateProduct = () => {
           <Label>SKU</Label>
           <Input
             type="text"
-            // @ts-expect-error
             value={formData.sku}
             onChange={(e: any) => handleInputChange('sku', e.target.value)}
             placeholder="Stock Keeping Unit"
@@ -793,7 +780,6 @@ const CreateProduct = () => {
           <Label>Barcode</Label>
           <Input
             type="text"
-            // @ts-expect-error
             value={formData.barcode}
             onChange={(e: any) => handleInputChange('barcode', e.target.value)}
             placeholder="Product barcode"
@@ -815,7 +801,6 @@ const CreateProduct = () => {
           <Label>Screen Size</Label>
           <Input
             type="text"
-            // @ts-expect-error
             value={formData.specifications.screenSize}
             onChange={(e: any) => handleInputChange('specifications.screenSize', e.target.value)}
             placeholder="e.g., 6.1 inches, 13.3 inches"
@@ -827,7 +812,9 @@ const CreateProduct = () => {
           <Input
             type="text"
             value={formData.specifications.screenResolution}
-            onChange={(e: any) => handleInputChange('specifications.screenResolution', e.target.value)}
+            onChange={(e: any) =>
+              handleInputChange('specifications.screenResolution', e.target.value)
+            }
             placeholder="e.g., 1920x1080, 2560x1600"
           />
         </FormGroup>
@@ -874,7 +861,6 @@ const CreateProduct = () => {
           <Label>Processor</Label>
           <Input
             type="text"
-            // @ts-expect-error
             value={formData.specifications.processor}
             onChange={(e: any) => handleInputChange('specifications.processor', e.target.value)}
             placeholder="e.g., A17 Pro, Intel Core i7"
@@ -884,9 +870,10 @@ const CreateProduct = () => {
         <FormGroup>
           <Label>Processor Brand</Label>
           <Select
-            // @ts-expect-error
             value={formData.specifications.processorBrand}
-            onChange={(e: any) => handleInputChange('specifications.processorBrand', e.target.value)}
+            onChange={(e: any) =>
+              handleInputChange('specifications.processorBrand', e.target.value)
+            }
           >
             <option value="">Select Brand</option>
             <option value="Apple">Apple</option>
@@ -901,7 +888,6 @@ const CreateProduct = () => {
         <FormGroup>
           <Label>RAM</Label>
           <Select
-            // @ts-expect-error
             value={formData.specifications.ram}
             onChange={(e: any) => handleInputChange('specifications.ram', e.target.value)}
           >
@@ -919,7 +905,6 @@ const CreateProduct = () => {
         <FormGroup>
           <Label>Storage</Label>
           <Select
-            // @ts-expect-error
             value={formData.specifications.storage}
             onChange={(e: any) => handleInputChange('specifications.storage', e.target.value)}
           >
@@ -936,7 +921,6 @@ const CreateProduct = () => {
         <FormGroup>
           <Label>Storage Type</Label>
           <Select
-            // @ts-expect-error
             value={formData.specifications.storageType}
             onChange={(e: any) => handleInputChange('specifications.storageType', e.target.value)}
           >
@@ -952,7 +936,6 @@ const CreateProduct = () => {
           <Label>Graphics Card</Label>
           <Input
             type="text"
-            // @ts-expect-error
             value={formData.specifications.graphicsCard}
             onChange={(e: any) => handleInputChange('specifications.graphicsCard', e.target.value)}
             placeholder="e.g., Integrated, RTX 4060"
@@ -1031,7 +1014,9 @@ const CreateProduct = () => {
           <Input
             type="text"
             value={formData.specifications.batteryCapacity}
-            onChange={(e: any) => handleInputChange('specifications.batteryCapacity', e.target.value)}
+            onChange={(e: any) =>
+              handleInputChange('specifications.batteryCapacity', e.target.value)
+            }
             placeholder="e.g., 4000mAh, 58.2Wh"
           />
         </FormGroup>
@@ -1060,9 +1045,10 @@ const CreateProduct = () => {
           <Label>Power Consumption</Label>
           <Input
             type="text"
-            // @ts-expect-error
             value={formData.specifications.powerConsumption}
-            onChange={(e: any) => handleInputChange('specifications.powerConsumption', e.target.value)}
+            onChange={(e: any) =>
+              handleInputChange('specifications.powerConsumption', e.target.value)
+            }
             placeholder="e.g., 45W, 100W"
           />
         </FormGroup>
@@ -1103,7 +1089,9 @@ const CreateProduct = () => {
           <Input
             type="text"
             value={formData.specifications.videoRecording}
-            onChange={(e: any) => handleInputChange('specifications.videoRecording', e.target.value)}
+            onChange={(e: any) =>
+              handleInputChange('specifications.videoRecording', e.target.value)
+            }
             placeholder="e.g., 4K at 60fps"
           />
         </FormGroup>
@@ -1161,7 +1149,9 @@ const CreateProduct = () => {
             <Checkbox
               type="checkbox"
               checked={formData.specifications.fingerprint}
-              onChange={(e: any) => handleInputChange('specifications.fingerprint', e.target.checked)}
+              onChange={(e: any) =>
+                handleInputChange('specifications.fingerprint', e.target.checked)
+              }
             />
             Fingerprint Scanner
           </CheckboxItem>
@@ -1170,7 +1160,9 @@ const CreateProduct = () => {
             <Checkbox
               type="checkbox"
               checked={formData.specifications.faceUnlock}
-              onChange={(e: any) => handleInputChange('specifications.faceUnlock', e.target.checked)}
+              onChange={(e: any) =>
+                handleInputChange('specifications.faceUnlock', e.target.checked)
+              }
             />
             Face Unlock
           </CheckboxItem>
@@ -1179,7 +1171,9 @@ const CreateProduct = () => {
             <Checkbox
               type="checkbox"
               checked={formData.specifications.wirelessCharging}
-              onChange={(e: any) => handleInputChange('specifications.wirelessCharging', e.target.checked)}
+              onChange={(e: any) =>
+                handleInputChange('specifications.wirelessCharging', e.target.checked)
+              }
             />
             Wireless Charging
           </CheckboxItem>
@@ -1188,7 +1182,9 @@ const CreateProduct = () => {
             <Checkbox
               type="checkbox"
               checked={formData.specifications.fastCharging}
-              onChange={(e: any) => handleInputChange('specifications.fastCharging', e.target.checked)}
+              onChange={(e: any) =>
+                handleInputChange('specifications.fastCharging', e.target.checked)
+              }
             />
             Fast Charging
           </CheckboxItem>
@@ -1216,7 +1212,9 @@ const CreateProduct = () => {
           <Label>Water Resistance</Label>
           <Select
             value={formData.specifications.waterResistance}
-            onChange={(e: any) => handleInputChange('specifications.waterResistance', e.target.value)}
+            onChange={(e: any) =>
+              handleInputChange('specifications.waterResistance', e.target.value)
+            }
           >
             <option value="">Select Rating</option>
             <option value="IP68">IP68</option>
@@ -1278,7 +1276,6 @@ const CreateProduct = () => {
           <Label>Color</Label>
           <Input
             type="text"
-            // @ts-expect-error
             value={formData.specifications.color}
             onChange={(e: any) => handleInputChange('specifications.color', e.target.value)}
             placeholder="e.g., Space Black, Silver"

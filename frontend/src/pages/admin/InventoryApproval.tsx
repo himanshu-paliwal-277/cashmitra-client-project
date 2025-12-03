@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';import styled from 'styled-components';
 import useAdminInventoryApproval from '../../hooks/useAdminInventoryApproval';
 import {
   Package,
@@ -520,9 +518,7 @@ const InventoryApproval = () => {
   const handleItemAction = async () => {
     if (!selectedItem || !actionType) return;
 
-    try {
-      // @ts-expect-error
-      await updateInventoryStatus(selectedItem._id, actionType, actionNotes);
+    try {      await updateInventoryStatus(selectedItem._id, actionType, actionNotes);
 
       setShowActionModal(false);
       setSelectedItem(null);
@@ -565,20 +561,7 @@ const InventoryApproval = () => {
   };
 
   const filteredInventory = inventory.filter(item => {
-    const matchesSearch =
-      // @ts-expect-error
-      item.deviceName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      item.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      item.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      item.partner?.businessName?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    // @ts-expect-error
-    const matchesStatus = !statusFilter || item.status === statusFilter;
-    // @ts-expect-error
-    const matchesCategory = !categoryFilter || item.category === categoryFilter;
+    const matchesSearch =      item.deviceName?.toLowerCase().includes(searchTerm.toLowerCase()) ||      item.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||      item.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||      item.partner?.businessName?.toLowerCase().includes(searchTerm.toLowerCase());    const matchesStatus = !statusFilter || item.status === statusFilter;    const matchesCategory = !categoryFilter || item.category === categoryFilter;
 
     return matchesSearch && matchesStatus && matchesCategory;
   });
@@ -703,67 +686,35 @@ const InventoryApproval = () => {
           </EmptyState>
         ) : (
           <InventoryList>
-            {filteredInventory.map(item => (
-              // @ts-expect-error
-              <InventoryItem key={item._id}>
-                // @ts-expect-error
-                <ItemHeader onClick={() => toggleItemExpansion(item._id)}>
+            {filteredInventory.map(item => (              <InventoryItem key={item._id}>                <ItemHeader onClick={() => toggleItemExpansion(item._id)}>
                   <ItemInfo>
-                    <DeviceImage
-                      // @ts-expect-error
-                      src={item.images?.[0] || '/api/placeholder/60/60'}
-                      // @ts-expect-error
-                      alt={item.deviceName}
+                    <DeviceImage                      src={item.images?.[0] || '/api/placeholder/60/60'}                      alt={item.deviceName}
                       onError={(e: any) => {
                         e.target.src = '/api/placeholder/60/60';
                       }}
                     />
-                    <DeviceDetails>
-                      // @ts-expect-error
-                      <DeviceName>{item.deviceName || 'Unknown Device'}</DeviceName>
-                      <DeviceSpecs>
-                        // @ts-expect-error
-                        {item.brand} {item.model} • {item.storage} • {item.condition}
+                    <DeviceDetails>                      <DeviceName>{item.deviceName || 'Unknown Device'}</DeviceName>
+                      <DeviceSpecs>                        {item.brand} {item.model} • {item.storage} • {item.condition}
                       </DeviceSpecs>
                       <PartnerInfo>
-                        <User size={14} />
-                        // @ts-expect-error
-                        {item.partner?.businessName || 'Unknown Partner'}
-                        <MapPin size={14} style={{ marginLeft: '0.5rem' }} />
-                        // @ts-expect-error
-                        {item.partner?.city || 'Unknown Location'}
+                        <User size={14} />                        {item.partner?.businessName || 'Unknown Partner'}
+                        <MapPin size={14} style={{ marginLeft: '0.5rem' }} />                        {item.partner?.city || 'Unknown Location'}
                       </PartnerInfo>
                     </DeviceDetails>
                   </ItemInfo>
 
-                  <PriceInfo>
-                    // @ts-expect-error
-                    <Price>₹{(item.proposedPrice || 0).toLocaleString()}</Price>
+                  <PriceInfo>                    <Price>₹{(item.proposedPrice || 0).toLocaleString()}</Price>
                     <PriceLabel>Proposed Price</PriceLabel>
-                  </PriceInfo>
-
-                  // @ts-expect-error
-                  <StatusBadge status={item.status}>
-                    // @ts-expect-error
-                    {getStatusIcon(item.status)}
-                    // @ts-expect-error
-                    {item.status?.replace('_', ' ')?.charAt(0)?.toUpperCase() +
-                      // @ts-expect-error
-                      item.status?.replace('_', ' ')?.slice(1) || 'Pending'}
+                  </PriceInfo>                  <StatusBadge status={item.status}>                    {getStatusIcon(item.status)}                    {item.status?.replace('_', ' ')?.charAt(0)?.toUpperCase() +                      item.status?.replace('_', ' ')?.slice(1) || 'Pending'}
                   </StatusBadge>
 
-                  <ExpandButton>
-                    // @ts-expect-error
-                    {expandedItems.has(item._id) ? (
+                  <ExpandButton>                    {expandedItems.has(item._id) ? (
                       <ChevronUp size={20} />
                     ) : (
                       <ChevronDown size={20} />
                     )}
                   </ExpandButton>
-                </ItemHeader>
-
-                // @ts-expect-error
-                {expandedItems.has(item._id) && (
+                </ItemHeader>                {expandedItems.has(item._id) && (
                   <ItemDetails>
                     <DetailsGrid>
                       <DetailSection>
@@ -773,44 +724,28 @@ const InventoryApproval = () => {
                         </SectionTitle>
                         <SpecsList>
                           <SpecItem>
-                            <SpecLabel>Brand:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.brand || 'N/A'}</SpecValue>
+                            <SpecLabel>Brand:</SpecLabel>                            <SpecValue>{item.brand || 'N/A'}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Model:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.model || 'N/A'}</SpecValue>
+                            <SpecLabel>Model:</SpecLabel>                            <SpecValue>{item.model || 'N/A'}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Storage:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.storage || 'N/A'}</SpecValue>
+                            <SpecLabel>Storage:</SpecLabel>                            <SpecValue>{item.storage || 'N/A'}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>RAM:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.ram || 'N/A'}</SpecValue>
+                            <SpecLabel>RAM:</SpecLabel>                            <SpecValue>{item.ram || 'N/A'}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Color:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.color || 'N/A'}</SpecValue>
+                            <SpecLabel>Color:</SpecLabel>                            <SpecValue>{item.color || 'N/A'}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Condition:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.condition || 'N/A'}</SpecValue>
+                            <SpecLabel>Condition:</SpecLabel>                            <SpecValue>{item.condition || 'N/A'}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Battery Health:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.batteryHealth || 'N/A'}%</SpecValue>
+                            <SpecLabel>Battery Health:</SpecLabel>                            <SpecValue>{item.batteryHealth || 'N/A'}%</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>IMEI:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.imei || 'N/A'}</SpecValue>
+                            <SpecLabel>IMEI:</SpecLabel>                            <SpecValue>{item.imei || 'N/A'}</SpecValue>
                           </SpecItem>
                         </SpecsList>
                       </DetailSection>
@@ -822,51 +757,32 @@ const InventoryApproval = () => {
                         </SectionTitle>
                         <SpecsList>
                           <SpecItem>
-                            <SpecLabel>Proposed Price:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>₹{(item.proposedPrice || 0).toLocaleString()}</SpecValue>
+                            <SpecLabel>Proposed Price:</SpecLabel>                            <SpecValue>₹{(item.proposedPrice || 0).toLocaleString()}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Market Price:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>₹{(item.marketPrice || 0).toLocaleString()}</SpecValue>
+                            <SpecLabel>Market Price:</SpecLabel>                            <SpecValue>₹{(item.marketPrice || 0).toLocaleString()}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Submitted:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{new Date(item.createdAt).toLocaleDateString()}</SpecValue>
+                            <SpecLabel>Submitted:</SpecLabel>                            <SpecValue>{new Date(item.createdAt).toLocaleDateString()}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Quantity:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.quantity || 1}</SpecValue>
+                            <SpecLabel>Quantity:</SpecLabel>                            <SpecValue>{item.quantity || 1}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Category:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.category || 'N/A'}</SpecValue>
+                            <SpecLabel>Category:</SpecLabel>                            <SpecValue>{item.category || 'N/A'}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Warranty:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.warranty || 'No'}</SpecValue>
+                            <SpecLabel>Warranty:</SpecLabel>                            <SpecValue>{item.warranty || 'No'}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Box Available:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.hasBox ? 'Yes' : 'No'}</SpecValue>
+                            <SpecLabel>Box Available:</SpecLabel>                            <SpecValue>{item.hasBox ? 'Yes' : 'No'}</SpecValue>
                           </SpecItem>
                           <SpecItem>
-                            <SpecLabel>Accessories:</SpecLabel>
-                            // @ts-expect-error
-                            <SpecValue>{item.hasAccessories ? 'Yes' : 'No'}</SpecValue>
+                            <SpecLabel>Accessories:</SpecLabel>                            <SpecValue>{item.hasAccessories ? 'Yes' : 'No'}</SpecValue>
                           </SpecItem>
                         </SpecsList>
                       </DetailSection>
-                    </DetailsGrid>
-
-                    // @ts-expect-error
-                    {item.description && (
+                    </DetailsGrid>                    {item.description && (
                       <DetailSection style={{ marginBottom: '1.5rem' }}>
                         <SectionTitle>
                           <FileText size={16} />
@@ -879,24 +795,15 @@ const InventoryApproval = () => {
                             borderRadius: '0.375rem',
                             color: '#374151',
                           }}
-                        >
-                          // @ts-expect-error
-                          {item.description}
+                        >                          {item.description}
                         </div>
                       </DetailSection>
-                    )}
-
-                    // @ts-expect-error
-                    {item.images && item.images.length > 0 && (
+                    )}                    {item.images && item.images.length > 0 && (
                       <DetailSection style={{ marginBottom: '1.5rem' }}>
                         <SectionTitle>
-                          <ImageIcon size={16} />
-                          // @ts-expect-error
-                          Device Images ({item.images.length})
+                          <ImageIcon size={16} />                          Device Images ({item.images.length})
                         </SectionTitle>
-                        <ImageGallery>
-                          // @ts-expect-error
-                          {item.images.map((image: any, index: any) => (
+                        <ImageGallery>                          {item.images.map((image: any, index: any) => (
                             <GalleryImage
                               key={index}
                               src={image}
@@ -908,10 +815,7 @@ const InventoryApproval = () => {
                           ))}
                         </ImageGallery>
                       </DetailSection>
-                    )}
-
-                    // @ts-expect-error
-                    {item.notes && (
+                    )}                    {item.notes && (
                       <DetailSection style={{ marginBottom: '1.5rem' }}>
                         <SectionTitle>
                           <MessageSquare size={16} />
@@ -924,16 +828,12 @@ const InventoryApproval = () => {
                             borderRadius: '0.375rem',
                             color: '#374151',
                           }}
-                        >
-                          // @ts-expect-error
-                          {item.notes}
+                        >                          {item.notes}
                         </div>
                       </DetailSection>
                     )}
 
-                    <ActionButtons>
-                      // @ts-expect-error
-                      {item.status === 'pending' && (
+                    <ActionButtons>                      {item.status === 'pending' && (
                         <>
                           <ActionBtn review onClick={() => openActionModal(item, 'under_review')}>
                             <Eye size={16} />
@@ -948,10 +848,7 @@ const InventoryApproval = () => {
                             Reject
                           </ActionBtn>
                         </>
-                      )}
-
-                      // @ts-expect-error
-                      {item.status === 'under_review' && (
+                      )}                      {item.status === 'under_review' && (
                         <>
                           <ActionBtn approve onClick={() => openActionModal(item, 'approved')}>
                             <Check size={16} />
@@ -962,10 +859,7 @@ const InventoryApproval = () => {
                             Reject
                           </ActionBtn>
                         </>
-                      )}
-
-                      // @ts-expect-error
-                      {(item.status === 'approved' || item.status === 'rejected') && (
+                      )}                      {(item.status === 'approved' || item.status === 'rejected') && (
                         <ActionBtn onClick={() => openActionModal(item, 'pending')}>
                           <RefreshCw size={16} />
                           Reset to Pending
@@ -1006,14 +900,8 @@ const InventoryApproval = () => {
                   borderRadius: '0.5rem',
                   marginBottom: '1rem',
                 }}
-              >
-                // @ts-expect-error
-                <strong>{selectedItem.deviceName}</strong>
-                <br />
-                // @ts-expect-error
-                {selectedItem.brand} {selectedItem.model} • ₹
-                // @ts-expect-error
-                {(selectedItem.proposedPrice || 0).toLocaleString()}
+              >                <strong>{selectedItem.deviceName}</strong>
+                <br />                {selectedItem.brand} {selectedItem.model} • ₹                {(selectedItem.proposedPrice || 0).toLocaleString()}
               </div>
 
               <label

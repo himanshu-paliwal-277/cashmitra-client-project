@@ -1,4 +1,3 @@
-// @ts-expect-error
 import { createGlobalStyle } from 'styled-components';
 import { theme } from '../theme';
 

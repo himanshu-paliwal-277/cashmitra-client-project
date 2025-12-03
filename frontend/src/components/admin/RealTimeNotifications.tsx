@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-// @ts-expect-error
 import styled from 'styled-components';
 import {
   Bell,
@@ -69,7 +68,7 @@ const NotificationPanel = styled.div`
   z-index: 1000;
   margin-top: 0.5rem;
   overflow: hidden;
-  display: ${(props: any) => props.isOpen ? 'block' : 'none'};
+  display: ${(props: any) => (props.isOpen ? 'block' : 'none')};
 
   @media (max-width: 480px) {
     width: 320px;
@@ -125,7 +124,7 @@ const NotificationItem = styled.div`
   gap: 1rem;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid ${(props: any) => props.theme.colors.border};
-  background: ${(props: any) => props.isRead ? 'transparent' : props.theme.colors.blue[50]};
+  background: ${(props: any) => (props.isRead ? 'transparent' : props.theme.colors.blue[50])};
   cursor: pointer;
   transition: all 0.2s;
 
@@ -322,7 +321,7 @@ const RealTimeNotifications = ({
   onNotificationDelete,
   onMarkAllRead,
   soundEnabled = true,
-  onSoundToggle
+  onSoundToggle,
 }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
@@ -333,7 +332,6 @@ const RealTimeNotifications = ({
   // Close panel when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: any) => {
-      // @ts-expect-error
       if (panelRef.current && !panelRef.current.contains(event.target)) {
         setIsOpen(false);
       }
@@ -350,12 +348,10 @@ const RealTimeNotifications = ({
       if (latestNotification && !latestNotification.isRead) {
         // Create audio element for notification sound
         if (!audioRef.current) {
-          // @ts-expect-error
           audioRef.current = new Audio(
             'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT'
           );
         }
-        // @ts-expect-error
         audioRef.current.play().catch(() => {
           // Ignore audio play errors (browser restrictions)
         });
@@ -365,9 +361,7 @@ const RealTimeNotifications = ({
 
   // Show toast for new notifications
   useEffect(() => {
-    // @ts-expect-error
     const newNotifications = notifications.filter(n => !n.isRead).slice(0, 3);
-    // @ts-expect-error
     newNotifications.forEach(notification => {
       showToast(notification);
     });
@@ -376,7 +370,6 @@ const RealTimeNotifications = ({
   const showToast = (notification: any) => {
     const toastId = Date.now() + Math.random();
     const notificationType =
-      // @ts-expect-error
       NOTIFICATION_TYPES[notification.type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
 
     const toast = {
@@ -386,8 +379,6 @@ const RealTimeNotifications = ({
       color: notificationType.color,
       icon: notificationType.icon,
     };
-
-    // @ts-expect-error
     setToasts(prev => [...prev, toast]);
 
     // Auto remove toast after 5 seconds
@@ -397,7 +388,6 @@ const RealTimeNotifications = ({
   };
 
   const removeToast = (toastId: any) => {
-    // @ts-expect-error
     setToasts(prev => prev.filter(toast => toast.id !== toastId));
   };
 
@@ -429,20 +419,17 @@ const RealTimeNotifications = ({
   };
 
   const getNotificationIcon = (type: any) => {
-    // @ts-expect-error
     const notificationType = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
     const IconComponent = notificationType.icon;
     return <IconComponent size={20} />;
   };
 
   const getNotificationColor = (type: any) => {
-    // @ts-expect-error
     const notificationType = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
     return notificationType.color;
   };
 
   const getNotificationCategory = (type: any) => {
-    // @ts-expect-error
     const notificationType = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.SYSTEM_UPDATE;
     return notificationType.category;
   };
@@ -450,7 +437,6 @@ const RealTimeNotifications = ({
   const formatTime = (timestamp: any) => {
     const now = new Date();
     const time = new Date(timestamp);
-    // @ts-expect-error
     const diffInMinutes = Math.floor((now - time) / (1000 * 60));
 
     if (diffInMinutes < 1) return 'Just now';
@@ -458,11 +444,7 @@ const RealTimeNotifications = ({
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
     return time.toLocaleDateString();
   };
-
-  // @ts-expect-error
   const unreadCount = notifications.filter(n => !n.isRead).length;
-
-  // @ts-expect-error
   const filteredNotifications = notifications.filter(notification => {
     if (filter === 'all') return true;
     return getNotificationCategory(notification.type).toLowerCase() === filter;
@@ -470,135 +452,130 @@ const RealTimeNotifications = ({
 
   const categories = ['all', 'orders', 'payments', 'users', 'inventory', 'system', 'analytics'];
 
-  return <>
-    <NotificationContainer ref={panelRef}>
-      <NotificationButton onClick={() => setIsOpen(!isOpen)}>
-        <Bell size={20} />
-        {unreadCount > 0 && (
-          <NotificationBadge>{unreadCount > 99 ? '99+' : unreadCount}</NotificationBadge>
-        )}
-      </NotificationButton>
-
-      <NotificationPanel isOpen={isOpen}>
-        <NotificationHeader>
-          <NotificationTitle>Notifications</NotificationTitle>
-          <NotificationActions>
-            <ActionButton
-              onClick={onSoundToggle}
-              title={soundEnabled ? 'Disable sound' : 'Enable sound'}
-            >
-              {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-            </ActionButton>
-            <ActionButton onClick={onMarkAllRead} title="Mark all as read">
-              <Check size={16} />
-            </ActionButton>
-            <ActionButton onClick={() => setIsOpen(false)} title="Close">
-              <X size={16} />
-            </ActionButton>
-          </NotificationActions>
-        </NotificationHeader>
-
-        {/* Filter Tabs */}
-        <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #E5E7EB' }}>
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            {categories.map(category => (
-              <button
-                key={category}
-                onClick={() => setFilter(category)}
-                style={{
-                  padding: '0.25rem 0.75rem',
-                  border: 'none',
-                  borderRadius: '1rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  background: filter === category ? '#3B82F6' : '#F3F4F6',
-                  color: filter === category ? 'white' : '#6B7280',
-                  transition: 'all 0.2s',
-                }}
-              >
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <NotificationList>
-          {filteredNotifications.length === 0 ? (
-            <EmptyState>
-              <EmptyIcon>
-                <Bell size={24} />
-              </EmptyIcon>
-              <EmptyText>No notifications</EmptyText>
-              <EmptySubtext>You're all caught up!</EmptySubtext>
-            </EmptyState>
-          ) : (
-            // @ts-expect-error
-            filteredNotifications.map(notification => (
-              <NotificationItem
-                key={notification.id}
-                isRead={notification.isRead}
-                onClick={() => onNotificationRead(notification.id)}
-              >
-                <NotificationIcon color={getNotificationColor(notification.type)}>
-                  {getNotificationIcon(notification.type)}
-                </NotificationIcon>
-
-                <NotificationContent>
-                  <NotificationText>{notification.message}</NotificationText>
-                  <NotificationMeta>
-                    <NotificationTime>{formatTime(notification.timestamp)}</NotificationTime>
-                    <NotificationCategory>
-                      {getNotificationCategory(notification.type)}
-                    </NotificationCategory>
-                  </NotificationMeta>
-                </NotificationContent>
-
-                <NotificationActions2>
-                  <QuickAction
-                    onClick={(e: any) => {
-                      e.stopPropagation();
-                      onNotificationDelete(notification.id);
-                    }}
-                    title="Delete notification"
-                  >
-                    <X size={14} />
-                  </QuickAction>
-                </NotificationActions2>
-              </NotificationItem>
-            ))
+  return (
+    <>
+      <NotificationContainer ref={panelRef}>
+        <NotificationButton onClick={() => setIsOpen(!isOpen)}>
+          <Bell size={20} />
+          {unreadCount > 0 && (
+            <NotificationBadge>{unreadCount > 99 ? '99+' : unreadCount}</NotificationBadge>
           )}
-        </NotificationList>
-      </NotificationPanel>
-    </NotificationContainer>
+        </NotificationButton>
 
-    {/* Toast Notifications */}
-    <ToastContainer>
-      {toasts.map(toast => {
-        // @ts-expect-error
-        const IconComponent = toast.icon;
-        return (
-          // @ts-expect-error
-          <Toast key={toast.id} color={toast.color}>
-            // @ts-expect-error
-            <ToastIcon color={toast.color}>
-              <IconComponent size={20} />
-            </ToastIcon>
-            <ToastContent>
-              // @ts-expect-error
-              <ToastTitle>{toast.title}</ToastTitle>
-              // @ts-expect-error
-              <ToastMessage>{toast.message}</ToastMessage>
-            </ToastContent>
-            // @ts-expect-error
-            <ToastClose onClick={() => removeToast(toast.id)}>
-              <X size={16} />
-            </ToastClose>
-          </Toast>
-        );
-      })}
-    </ToastContainer>
-  </>;
+        <NotificationPanel isOpen={isOpen}>
+          <NotificationHeader>
+            <NotificationTitle>Notifications</NotificationTitle>
+            <NotificationActions>
+              <ActionButton
+                onClick={onSoundToggle}
+                title={soundEnabled ? 'Disable sound' : 'Enable sound'}
+              >
+                {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+              </ActionButton>
+              <ActionButton onClick={onMarkAllRead} title="Mark all as read">
+                <Check size={16} />
+              </ActionButton>
+              <ActionButton onClick={() => setIsOpen(false)} title="Close">
+                <X size={16} />
+              </ActionButton>
+            </NotificationActions>
+          </NotificationHeader>
+
+          {/* Filter Tabs */}
+          <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #E5E7EB' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {categories.map(category => (
+                <button
+                  key={category}
+                  onClick={() => setFilter(category)}
+                  style={{
+                    padding: '0.25rem 0.75rem',
+                    border: 'none',
+                    borderRadius: '1rem',
+                    fontSize: '0.75rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    background: filter === category ? '#3B82F6' : '#F3F4F6',
+                    color: filter === category ? 'white' : '#6B7280',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <NotificationList>
+            {filteredNotifications.length === 0 ? (
+              <EmptyState>
+                <EmptyIcon>
+                  <Bell size={24} />
+                </EmptyIcon>
+                <EmptyText>No notifications</EmptyText>
+                <EmptySubtext>You're all caught up!</EmptySubtext>
+              </EmptyState>
+            ) : (
+              filteredNotifications.map(notification => (
+                <NotificationItem
+                  key={notification.id}
+                  isRead={notification.isRead}
+                  onClick={() => onNotificationRead(notification.id)}
+                >
+                  <NotificationIcon color={getNotificationColor(notification.type)}>
+                    {getNotificationIcon(notification.type)}
+                  </NotificationIcon>
+
+                  <NotificationContent>
+                    <NotificationText>{notification.message}</NotificationText>
+                    <NotificationMeta>
+                      <NotificationTime>{formatTime(notification.timestamp)}</NotificationTime>
+                      <NotificationCategory>
+                        {getNotificationCategory(notification.type)}
+                      </NotificationCategory>
+                    </NotificationMeta>
+                  </NotificationContent>
+
+                  <NotificationActions2>
+                    <QuickAction
+                      onClick={(e: any) => {
+                        e.stopPropagation();
+                        onNotificationDelete(notification.id);
+                      }}
+                      title="Delete notification"
+                    >
+                      <X size={14} />
+                    </QuickAction>
+                  </NotificationActions2>
+                </NotificationItem>
+              ))
+            )}
+          </NotificationList>
+        </NotificationPanel>
+      </NotificationContainer>
+
+      {/* Toast Notifications */}
+      <ToastContainer>
+        {toasts.map(toast => {
+          const IconComponent = toast.icon;
+          return (
+            <Toast key={toast.id} color={toast.color}>
+              <ToastIcon color={toast.color}>
+                <IconComponent size={20} />
+              </ToastIcon>
+              <ToastContent>
+                <ToastTitle>{toast.title}</ToastTitle>
+                <ToastMessage>{toast.message}</ToastMessage>
+              </ToastContent>
+              <ToastClose onClick={() => removeToast(toast.id)}>
+                <X size={16} />
+              </ToastClose>
+            </Toast>
+          );
+        })}
+      </ToastContainer>
+    </>
+  );
 };
 
 export default RealTimeNotifications;

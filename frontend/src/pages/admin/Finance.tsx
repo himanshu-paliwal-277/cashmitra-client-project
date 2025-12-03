@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';import styled from 'styled-components';
 import {
   CreditCard,
   DollarSign,
@@ -358,34 +356,17 @@ const Finance = () => {
       },
     ];
 
-    setTimeout(() => {
-      // @ts-expect-error
-      setCommissionData(mockCommissionData);
-      // @ts-expect-error
-      setWalletData(mockWalletData);
+    setTimeout(() => {      setCommissionData(mockCommissionData);      setWalletData(mockWalletData);
       setLoading(false);
     }, 1000);
   }, []);
 
   const filteredCommissionData = commissionData.filter(
-    item =>
-      // @ts-expect-error
-      item.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      item.partner.toLowerCase().includes(searchTerm.toLowerCase())
+    item =>      item.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||      item.partner.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredWalletData = walletData.filter(item =>
-    // @ts-expect-error
-    item.partner.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // @ts-expect-error
-  const totalCommission = commissionData.reduce((sum, item) => sum + item.commission, 0);
-  // @ts-expect-error
-  const totalWalletBalance = walletData.reduce((sum, item) => sum + item.balance, 0);
-  // @ts-expect-error
-  const totalPendingPayouts = walletData.reduce((sum, item) => sum + item.pendingAmount, 0);
+  const filteredWalletData = walletData.filter(item =>    item.partner.toLowerCase().includes(searchTerm.toLowerCase())
+  );  const totalCommission = commissionData.reduce((sum, item) => sum + item.commission, 0);  const totalWalletBalance = walletData.reduce((sum, item) => sum + item.balance, 0);  const totalPendingPayouts = walletData.reduce((sum, item) => sum + item.pendingAmount, 0);
 
   return (
     <Container>
@@ -538,28 +519,10 @@ const Finance = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredCommissionData.map(item => (
-                        // @ts-expect-error
-                        <TableRow key={item.id}>
-                          // @ts-expect-error
-                          <TableCell>{item.orderId}</TableCell>
-                          // @ts-expect-error
-                          <TableCell>{item.partner}</TableCell>
-                          // @ts-expect-error
-                          <TableCell>₹{item.amount.toLocaleString()}</TableCell>
-                          // @ts-expect-error
-                          <TableCell>₹{item.commission.toLocaleString()}</TableCell>
-                          // @ts-expect-error
-                          <TableCell>{item.rate}</TableCell>
-                          <TableCell>
-                            // @ts-expect-error
-                            <StatusBadge status={item.status}>
-                              // @ts-expect-error
-                              {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                      filteredCommissionData.map(item => (                        <TableRow key={item.id}>                          <TableCell>{item.orderId}</TableCell>                          <TableCell>{item.partner}</TableCell>                          <TableCell>₹{item.amount.toLocaleString()}</TableCell>                          <TableCell>₹{item.commission.toLocaleString()}</TableCell>                          <TableCell>{item.rate}</TableCell>
+                          <TableCell>                            <StatusBadge status={item.status}>                              {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                             </StatusBadge>
-                          </TableCell>
-                          // @ts-expect-error
-                          <TableCell>{item.date}</TableCell>
+                          </TableCell>                          <TableCell>{item.date}</TableCell>
                           <TableCell>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                               <IconButton>
@@ -580,24 +543,8 @@ const Finance = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredWalletData.map(item => (
-                      // @ts-expect-error
-                      <TableRow key={item.id}>
-                        // @ts-expect-error
-                        <TableCell>{item.partner}</TableCell>
-                        // @ts-expect-error
-                        <TableCell>₹{item.balance.toLocaleString()}</TableCell>
-                        // @ts-expect-error
-                        <TableCell>₹{item.pendingAmount.toLocaleString()}</TableCell>
-                        // @ts-expect-error
-                        <TableCell>{item.lastPayout}</TableCell>
-                        // @ts-expect-error
-                        <TableCell>₹{item.payoutAmount.toLocaleString()}</TableCell>
-                        <TableCell>
-                          // @ts-expect-error
-                          <StatusBadge status={item.status}>
-                            // @ts-expect-error
-                            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                    filteredWalletData.map(item => (                      <TableRow key={item.id}>                        <TableCell>{item.partner}</TableCell>                        <TableCell>₹{item.balance.toLocaleString()}</TableCell>                        <TableCell>₹{item.pendingAmount.toLocaleString()}</TableCell>                        <TableCell>{item.lastPayout}</TableCell>                        <TableCell>₹{item.payoutAmount.toLocaleString()}</TableCell>
+                        <TableCell>                          <StatusBadge status={item.status}>                            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                           </StatusBadge>
                         </TableCell>
                         <TableCell>

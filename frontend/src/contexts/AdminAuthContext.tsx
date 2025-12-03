@@ -2,9 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginAdmin, getAdminProfile } from '../services/adminService';
 
-// Create the context
-// @ts-expect-error
-const AdminAuthContext = createContext();
+// Create the contextconst AdminAuthContext = createContext();
 
 // Custom hook to use the admin auth context
 export const useAdminAuth = () => {
@@ -68,9 +66,7 @@ export const AdminAuthProvider = ({
       navigate('/admin/dashboard');
 
       return data;
-    } catch (error) {
-      // @ts-expect-error
-      setError(error.response?.data?.message || 'Login failed');
+    } catch (error) {      setError(error.response?.data?.message || 'Login failed');
       throw error;
     } finally {
       setIsLoading(false);
@@ -104,9 +100,7 @@ export const AdminAuthProvider = ({
       setAdminUser(profileData.admin);
       return profileData.admin;
     } catch (error) {
-      console.error('Error refreshing profile:', error);
-      // @ts-expect-error
-      if (error.response?.status === 401) {
+      console.error('Error refreshing profile:', error);      if (error.response?.status === 401) {
         logout();
       }
       throw error;

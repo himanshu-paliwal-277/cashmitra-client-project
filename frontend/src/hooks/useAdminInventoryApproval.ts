@@ -47,9 +47,7 @@ const useAdminInventoryApproval = () => {
         rejected: rejectedItems,
         underReview: underReviewItems,
       });
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message || 'Failed to fetch inventory');
+    } catch (err) {      setError(err.message || 'Failed to fetch inventory');
       console.error('Error fetching inventory:', err);
     } finally {
       setLoading(false);
@@ -79,12 +77,8 @@ const useAdminInventoryApproval = () => {
         // Refresh the data
         await fetchInventory();
         return { success: true };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to update inventory status');
-        console.error('Error updating inventory status:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to update inventory status');
+        console.error('Error updating inventory status:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -138,12 +132,8 @@ const useAdminInventoryApproval = () => {
         // Refresh the data
         await fetchInventory();
         return { success: true };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to delete inventory item');
-        console.error('Error deleting inventory item:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to delete inventory item');
+        console.error('Error deleting inventory item:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -153,9 +143,7 @@ const useAdminInventoryApproval = () => {
 
   // Get inventory item by ID
   const getInventoryItemById = useCallback(
-    (itemId: any) => {
-      // @ts-expect-error
-      return inventory.find(item => item._id === itemId);
+    (itemId: any) => {      return inventory.find(item => item._id === itemId);
     },
     [inventory]
   );

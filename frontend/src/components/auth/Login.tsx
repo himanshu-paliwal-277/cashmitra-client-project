@@ -12,8 +12,6 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-
-  // @ts-expect-error
   const { login, loading, error, clearError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,18 +22,14 @@ const Login = () => {
     const errors = {};
 
     if (!formData.email) {
-      // @ts-expect-error
       errors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      // @ts-expect-error
       errors.email = 'Please enter a valid email address';
     }
 
     if (!formData.password) {
-      // @ts-expect-error
       errors.password = 'Password is required';
     } else if (formData.password.length < 6) {
-      // @ts-expect-error
       errors.password = 'Password must be at least 6 characters';
     }
 
@@ -47,7 +41,6 @@ const Login = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
 
     // Clear validation error for this field
-    // @ts-expect-error
     if (validationErrors[name]) {
       setValidationErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -103,13 +96,11 @@ const Login = () => {
           {/* Input Group */}
           <div className="flex flex-col gap-4">
             <Input
-              // @ts-expect-error
               type="email"
               name="email"
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
-              // @ts-expect-error
               error={validationErrors.email}
               leftIcon={<Mail size={20} />}
               autoComplete="email"
@@ -118,13 +109,11 @@ const Login = () => {
 
             <div className="relative">
               <Input
-                // @ts-expect-error
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={handleChange}
-                // @ts-expect-error
                 error={validationErrors.password}
                 leftIcon={<Lock size={20} />}
                 autoComplete="current-password"
@@ -150,7 +139,6 @@ const Login = () => {
           </Link>
 
           {/* Submit Button */}
-          // @ts-expect-error
           <Button
             type="submit"
             variant="primary"

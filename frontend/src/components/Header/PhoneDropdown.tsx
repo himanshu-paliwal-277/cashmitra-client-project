@@ -3,11 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { productCategoriesAPI } from '../../api/productCategories';
 import './PhoneDropdown.css';
 
-const PhoneDropdown = ({
-  isVisible = true,
-  onClose,
-  onLinkClick = () => {}
-}: any) => {
+const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: any) => {
   const navigate = useNavigate();
   const [phones, setPhones] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,10 +26,11 @@ const PhoneDropdown = ({
 
         // Find mobile/phone category
         const mobileCategory = categoryList.find(
-          (cat: any) => cat.name &&
-          (cat.name.toLowerCase().includes('mobile') ||
-            cat.name.toLowerCase().includes('phone') ||
-            cat.name.toLowerCase().includes('smartphone'))
+          (cat: any) =>
+            cat.name &&
+            (cat.name.toLowerCase().includes('mobile') ||
+              cat.name.toLowerCase().includes('phone') ||
+              cat.name.toLowerCase().includes('smartphone'))
         );
 
         if (mobileCategory) {
@@ -64,7 +61,6 @@ const PhoneDropdown = ({
       }
     } catch (err) {
       console.error('Error fetching phones:', err);
-      // @ts-expect-error
       setError('Failed to load phones');
       await fetchFallbackPhones();
     } finally {
@@ -75,7 +71,6 @@ const PhoneDropdown = ({
   const fetchFallbackPhones = async () => {
     try {
       // Try to search for mobile products
-      // @ts-expect-error
       const searchResponse = await productCategoriesAPI.searchProducts('mobile phone', {
         limit: 8,
       });
@@ -84,12 +79,10 @@ const PhoneDropdown = ({
         setPhones(searchResponse.data.data);
       } else {
         // Use static fallback data
-        // @ts-expect-error
         setPhones(getFallbackPhones());
       }
     } catch (err) {
       console.error('Fallback search failed:', err);
-      // @ts-expect-error
       setPhones(getFallbackPhones());
     }
   };
@@ -181,31 +174,23 @@ const PhoneDropdown = ({
           <div className="phone-dropdown-grid">
             {phones.slice(0, 8).map(phone => (
               <div
-                // @ts-expect-error
                 key={phone._id}
                 className="phone-dropdown-item"
                 onClick={() => handlePhoneClick(phone)}
               >
                 <div className="phone-item-image">
                   <img
-                    // @ts-expect-error
                     src={phone.image || phone.images?.[0] || '/placeholder-phone.jpg'}
-                    // @ts-expect-error
                     alt={phone.name}
                   />
                 </div>
                 <div className="phone-item-info">
-                  // @ts-expect-error
                   <h4 className="phone-item-name">{phone.name}</h4>
-                  // @ts-expect-error
                   <p className="phone-item-brand">{phone.brand}</p>
                   <div className="phone-item-price">
-                    // @ts-expect-error
                     {formatPrice(phone.price || phone.pricing?.discountedPrice)}
                   </div>
-                  // @ts-expect-error
                   {phone.condition && (
-                    // @ts-expect-error
                     <span className="phone-item-condition">{phone.condition}</span>
                   )}
                 </div>

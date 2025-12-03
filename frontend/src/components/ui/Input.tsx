@@ -4,25 +4,7 @@ import { cn } from '../../lib/utils';
 
 const Input = React.forwardRef(
   (
-    {
-      // @ts-expect-error
-      className,
-      // @ts-expect-error
-      type,
-      // @ts-expect-error
-      error,
-      // @ts-expect-error
-      label,
-      // @ts-expect-error
-      leftIcon,
-      // @ts-expect-error
-      rightIcon,
-      // @ts-expect-error
-      helperText,
-      // @ts-expect-error
-      required,
-      // @ts-expect-error
-      id,
+    {      className,      type,      error,      label,      leftIcon,      rightIcon,      helperText,      required,      id,
       ...props
     },
     ref
@@ -61,9 +43,7 @@ const Input = React.forwardRef(
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               className
-            )}
-            // @ts-expect-error
-            ref={ref}
+            )}            ref={ref}
             aria-invalid={hasError}
             aria-describedby={error ? `${inputId}-error` : undefined}
             {...props}

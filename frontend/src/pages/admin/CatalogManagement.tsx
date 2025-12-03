@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminCatalog } from '../../hooks/useAdminCatalog';
-import { useAdminAuth } from '../../contexts/AdminAuthContext';
-// @ts-expect-error
-import styled from 'styled-components';
+import { useAdminAuth } from '../../contexts/AdminAuthContext';import styled from 'styled-components';
 import {
   Package,
   Plus,
@@ -513,9 +511,7 @@ function CatalogManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
-  // @ts-expect-error
-  const { adminUser } = useAdminAuth();
+  const [sortBy, setSortBy] = useState('name');  const { adminUser } = useAdminAuth();
   const {
     products: catalogProducts,
     categories,
@@ -532,30 +528,22 @@ function CatalogManagement() {
   const stats = productStats
     ? [
         {
-          label: 'Total Products',
-          // @ts-expect-error
-          value: productStats.totalProducts?.toLocaleString() || '0',
+          label: 'Total Products',          value: productStats.totalProducts?.toLocaleString() || '0',
           icon: <Package size={20} />,
           color: '#3B82F6',
         },
         {
-          label: 'Active Products',
-          // @ts-expect-error
-          value: productStats.activeProducts?.toLocaleString() || '0',
+          label: 'Active Products',          value: productStats.activeProducts?.toLocaleString() || '0',
           icon: <CheckCircle size={20} />,
           color: '#10B981',
         },
         {
-          label: 'Inactive Products',
-          // @ts-expect-error
-          value: productStats.pendingProducts?.toLocaleString() || '0',
+          label: 'Inactive Products',          value: productStats.pendingProducts?.toLocaleString() || '0',
           icon: <Clock size={20} />,
           color: '#F59E0B',
         },
         {
-          label: 'Categories',
-          // @ts-expect-error
-          value: productStats.categoriesCount?.toLocaleString() || '0',
+          label: 'Categories',          value: productStats.categoriesCount?.toLocaleString() || '0',
           icon: <Layers size={20} />,
           color: '#8B5CF6',
         },
@@ -590,37 +578,7 @@ function CatalogManagement() {
   // Use products from hook - format to match API structure
   const products =
     catalogProducts?.length > 0
-      ? catalogProducts.map(product => ({
-          // @ts-expect-error
-          id: product._id,
-          // @ts-expect-error
-          name: `${product.brand} ${product.model}`,
-          // @ts-expect-error
-          category: product.category,
-          // @ts-expect-error
-          brand: product.brand,
-          // @ts-expect-error
-          model: product.model,
-          // @ts-expect-error
-          series: product.series,
-          // @ts-expect-error
-          price: product.basePrice ? `₹${product.basePrice.toLocaleString()}` : '₹0',
-          // @ts-expect-error
-          basePrice: product.basePrice,
-          // @ts-expect-error
-          variant: product.variant,
-          // @ts-expect-error
-          status: product.isActive ? 'active' : 'inactive',
-          // @ts-expect-error
-          images: product.images || [],
-          // @ts-expect-error
-          specifications: product.specifications,
-          // @ts-expect-error
-          createdAt: product.createdAt,
-          // @ts-expect-error
-          updatedAt: product.updatedAt,
-          // @ts-expect-error
-          createdBy: product.createdBy,
+      ? catalogProducts.map(product => ({          id: product._id,          name: `${product.brand} ${product.model}`,          category: product.category,          brand: product.brand,          model: product.model,          series: product.series,          price: product.basePrice ? `₹${product.basePrice.toLocaleString()}` : '₹0',          basePrice: product.basePrice,          variant: product.variant,          status: product.isActive ? 'active' : 'inactive',          images: product.images || [],          specifications: product.specifications,          createdAt: product.createdAt,          updatedAt: product.updatedAt,          createdBy: product.createdBy,
         }))
       : [];
 
@@ -740,13 +698,7 @@ function CatalogManagement() {
             <Select value={categoryFilter} onChange={(e: any) => setCategoryFilter(e.target.value)}>
               <option value="all">All Categories</option>
               {categories && categories.length > 0 ? (
-                categories.map(category => (
-                  // @ts-expect-error
-                  <option key={category.name || category} value={category.name || category}>
-                    // @ts-expect-error
-                    {(category.name || category).charAt(0).toUpperCase() +
-                      // @ts-expect-error
-                      (category.name || category).slice(1)}
+                categories.map(category => (                  <option key={category.name || category} value={category.name || category}>                    {(category.name || category).charAt(0).toUpperCase() +                      (category.name || category).slice(1)}
                   </option>
                 ))
               ) : (
@@ -824,9 +776,7 @@ function CatalogManagement() {
             <EmptyIcon>
               <AlertCircle size={40} />
             </EmptyIcon>
-            <h4>Error loading products</h4>
-            // @ts-expect-error
-            <p>{error.message || 'Something went wrong. Please try again.'}</p>
+            <h4>Error loading products</h4>            <p>{error.message || 'Something went wrong. Please try again.'}</p>
             <Button variant="outline" onClick={handleRefresh} style={{ marginTop: '1rem' }}>
               Try Again
             </Button>

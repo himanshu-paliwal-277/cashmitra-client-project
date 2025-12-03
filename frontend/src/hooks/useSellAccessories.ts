@@ -40,9 +40,7 @@ const useSellAccessories = () => {
       // Handle different response structures
       const responseData = response.data;
       if (Array.isArray(responseData)) {
-        // If response.data is directly an array
-        // @ts-expect-error
-        setAccessories(responseData);
+        // If response.data is directly an array        setAccessories(responseData);
         setPagination({
           page: 1,
           limit: responseData.length,
@@ -77,9 +75,7 @@ const useSellAccessories = () => {
           totalPages: 0,
         });
       }
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch accessories');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch accessories');
     } finally {
       setLoading(false);
     }
@@ -97,9 +93,7 @@ const useSellAccessories = () => {
         },
       });
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch accessory');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch accessory');
       throw err;
     } finally {
       setLoading(false);
@@ -123,9 +117,7 @@ const useSellAccessories = () => {
         // Refresh accessories list
         await fetchAccessories();
         return response.data;
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to create accessory');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to create accessory');
         throw err;
       } finally {
         setLoading(false);
@@ -151,9 +143,7 @@ const useSellAccessories = () => {
         // Refresh accessories list
         await fetchAccessories();
         return response.data;
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to update accessory');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to update accessory');
         throw err;
       } finally {
         setLoading(false);
@@ -177,9 +167,7 @@ const useSellAccessories = () => {
 
         // Refresh accessories list
         await fetchAccessories();
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to delete accessory');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to delete accessory');
         throw err;
       } finally {
         setLoading(false);
@@ -205,9 +193,7 @@ const useSellAccessories = () => {
         // Refresh accessories list
         await fetchAccessories();
         return response.data;
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to create accessories');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to create accessories');
         throw err;
       } finally {
         setLoading(false);
@@ -233,9 +219,7 @@ const useSellAccessories = () => {
         // Refresh accessories list
         await fetchAccessories();
         return response.data;
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to reorder accessories');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to reorder accessories');
         throw err;
       } finally {
         setLoading(false);
@@ -264,9 +248,7 @@ const useSellAccessories = () => {
         // Refresh accessories list
         await fetchAccessories();
         return response.data;
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to toggle accessory status');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to toggle accessory status');
         throw err;
       } finally {
         setLoading(false);
@@ -282,9 +264,7 @@ const useSellAccessories = () => {
     try {
       const response = await api.get(`/sell-accessories/public/${productId}`);
       return response.data.accessories || [];
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch accessories');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch accessories');
       throw err;
     } finally {
       setLoading(false);
@@ -297,9 +277,7 @@ const useSellAccessories = () => {
     try {
       const response = await api.get(`/sell-accessories/public/accessory/${accessoryId}`);
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch accessory');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch accessory');
       throw err;
     } finally {
       setLoading(false);

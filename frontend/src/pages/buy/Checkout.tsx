@@ -26,11 +26,7 @@ const Checkout = ({
   onBack,
   onOrderComplete
 }: any) => {
-  const navigate = useNavigate();
-  // @ts-expect-error
-  const { user, setOrderData } = useAuth();
-  // @ts-expect-error
-  const { cartItems, getCartTotal, clearCart } = useCart();
+  const navigate = useNavigate();  const { user, setOrderData } = useAuth();  const { cartItems, getCartTotal, clearCart } = useCart();
   const { addresses = [], loading: addressLoading, addAddress } = useUserAddresses();
 
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -55,11 +51,7 @@ const Checkout = ({
   });
 
   useEffect(() => {
-    if (addresses.length > 0 && !selectedAddress) {
-      // @ts-expect-error
-      const def = addresses.find(a => a.isDefault) || addresses[0];
-      // @ts-expect-error
-      setSelectedAddress(def._id || def.id);
+    if (addresses.length > 0 && !selectedAddress) {      const def = addresses.find(a => a.isDefault) || addresses[0];      setSelectedAddress(def._id || def.id);
     }
   }, [addresses, selectedAddress]);
 
@@ -143,17 +135,12 @@ const Checkout = ({
 
   const handlePlaceOrder = async () => {
     try {
-      setOrderLoading(true);
-
-      // @ts-expect-error
-      const selectedAddressObj = addresses.find(a => (a._id || a.id) === selectedAddress);
+      setOrderLoading(true);      const selectedAddressObj = addresses.find(a => (a._id || a.id) === selectedAddress);
       if (!selectedAddressObj) throw new Error('Please select a delivery address');
 
       let processedCartItems = cartItems;
       if (!Array.isArray(cartItems) && typeof cartItems === 'object' && cartItems !== null) {
-        const keys = Object.keys(cartItems);
-        // @ts-expect-error
-        const numeric = keys.every(k => !isNaN(k));
+        const keys = Object.keys(cartItems);        const numeric = keys.every(k => !isNaN(k));
         if (numeric && keys.length) processedCartItems = Object.values(cartItems);
       }
       if (!Array.isArray(processedCartItems) || processedCartItems.length === 0) {
@@ -169,17 +156,7 @@ const Checkout = ({
 
       const orderData = {
         items,
-        shippingAddress: {
-          // @ts-expect-error
-          street: selectedAddressObj.street,
-          // @ts-expect-error
-          city: selectedAddressObj.city,
-          // @ts-expect-error
-          state: selectedAddressObj.state,
-          // @ts-expect-error
-          pincode: selectedAddressObj.pincode,
-          // @ts-expect-error
-          phone: formatPhoneForValidation(selectedAddressObj.phone),
+        shippingAddress: {          street: selectedAddressObj.street,          city: selectedAddressObj.city,          state: selectedAddressObj.state,          pincode: selectedAddressObj.pincode,          phone: formatPhoneForValidation(selectedAddressObj.phone),
         },
         paymentMethod: selectedPayment,
       };
@@ -193,18 +170,14 @@ const Checkout = ({
         if (onOrderComplete) onOrderComplete(response.data.data.order);
       }
     } catch (err) {
-      console.error('Error placing order:', err);
-      // @ts-expect-error
-      alert(err.message || 'Failed to place order. Please try again.');
+      console.error('Error placing order:', err);      alert(err.message || 'Failed to place order. Please try again.');
     } finally {
       setOrderLoading(false);
     }
   };
 
   const sortedCart = useMemo(() => {
-    const arr = Array.isArray(cartItems) ? cartItems : [];
-    // @ts-expect-error
-    return [...arr].sort((a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
+    const arr = Array.isArray(cartItems) ? cartItems : [];    return [...arr].sort((a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
   }, [cartItems]);
 
   return (
@@ -239,9 +212,7 @@ const Checkout = ({
                 <div className="co-empty muted">Loading addresses…</div>
               ) : addresses.length > 0 ? (
                 <div className="addr-list">
-                  {addresses.map(address => {
-                    // @ts-expect-error
-                    const id = address._id || address.id;
+                  {addresses.map(address => {                    const id = address._id || address.id;
                     const isActive = selectedAddress === id;
                     return (
                       <button
@@ -250,23 +221,13 @@ const Checkout = ({
                         onClick={() => setSelectedAddress(id)}
                       >
                         {isActive && <CheckCircle size={20} className="addr-check" />}
-                        <div className="addr-name">
-                          // @ts-expect-error
-                          {address.fullName} • {address.addressType}
+                        <div className="addr-name">                          {address.fullName} • {address.addressType}
                         </div>
                         <div className="addr-lines">
-                          <div>
-                            // @ts-expect-error
-                            {address.street}
-                            // @ts-expect-error
-                            {address.addressLine2 ? `, ${address.addressLine2}` : ''}
+                          <div>                            {address.street}                            {address.addressLine2 ? `, ${address.addressLine2}` : ''}
                           </div>
-                          <div>
-                            // @ts-expect-error
-                            {address.city}, {address.state} — {address.pincode}
-                          </div>
-                          // @ts-expect-error
-                          <div className="addr-phone">{address.phone}</div>
+                          <div>                            {address.city}, {address.state} — {address.pincode}
+                          </div>                          <div className="addr-phone">{address.phone}</div>
                         </div>
                       </button>
                     );

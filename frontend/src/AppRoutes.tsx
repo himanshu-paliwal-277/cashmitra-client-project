@@ -105,10 +105,7 @@ import AdminLayout from './components/admin/AdminLayout';
 import AgentLogin from './pages/agent/AgentLogin';
 import AgentDashboard from './pages/agent/AgentDashboard';
 
-const AppRoutes = ({
-  sellFlowData,
-  updateSellFlowData
-}: any) => {
+const AppRoutes = ({ sellFlowData, updateSellFlowData }: any) => {
   return (
     <Routes>
       {/* ==================== PUBLIC ROUTES ==================== */}
@@ -140,7 +137,6 @@ const AppRoutes = ({
         path="/sell"
         element={
           <CategorySelection
-            // @ts-expect-error
             onContinue={(category: any) => {
               updateSellFlowData('category', category);
               window.location.href = '/sell/brand';
@@ -152,7 +148,6 @@ const AppRoutes = ({
         path="/sell/brand"
         element={
           <BrandSelection
-            // @ts-expect-error
             category={sellFlowData.category}
             onContinue={(brand: any) => {
               updateSellFlowData('brand', brand);
@@ -166,7 +161,6 @@ const AppRoutes = ({
         path="/sell/model"
         element={
           <SellModelSelection
-            // @ts-expect-error
             category={sellFlowData.category}
             brand={sellFlowData.brand}
             onContinue={(model: any, variant: any) => {
@@ -182,7 +176,6 @@ const AppRoutes = ({
         path="/sell/evaluation"
         element={
           <SellDeviceEvaluation
-            // @ts-expect-error
             brand={sellFlowData.brand}
             model={sellFlowData.model}
             onContinue={(evaluationAnswers: any) => {
@@ -197,7 +190,6 @@ const AppRoutes = ({
         path="/sell/defects"
         element={
           <SellScreenDefects
-            // @ts-expect-error
             brand={sellFlowData.brand}
             model={sellFlowData.model}
             onContinue={(defects: any) => {
@@ -212,7 +204,6 @@ const AppRoutes = ({
         path="/sell/accessories/:id?"
         element={
           <SellAccessories
-            // @ts-expect-error
             brand={sellFlowData.brand}
             model={sellFlowData.model}
             onContinue={(accessories: any) => {
@@ -227,7 +218,6 @@ const AppRoutes = ({
         path="/sell/condition"
         element={
           <ConditionQuestionnaire
-            // @ts-expect-error
             brand={sellFlowData.brand}
             model={sellFlowData.model}
             onContinue={(answers: any) => {
@@ -242,7 +232,6 @@ const AppRoutes = ({
         path="/sell/quote"
         element={
           <PriceQuote
-            // @ts-expect-error
             brand={sellFlowData.brand}
             model={sellFlowData.model}
             conditionAnswers={sellFlowData.conditionAnswers}
@@ -255,7 +244,6 @@ const AppRoutes = ({
         path="/sell/pickup"
         element={
           <PickupBooking
-            // @ts-expect-error
             brand={sellFlowData.brand}
             model={sellFlowData.model}
             priceQuote={sellFlowData.priceQuote}
@@ -271,7 +259,6 @@ const AppRoutes = ({
         path="/sell/booking"
         element={
           <PickupBooking
-            // @ts-expect-error
             brand={sellFlowData.brand}
             model={sellFlowData.model}
             priceQuote={sellFlowData.priceQuote}
@@ -287,7 +274,6 @@ const AppRoutes = ({
         path="/sell/confirmation"
         element={
           <BookingConfirmation
-            // @ts-expect-error
             bookingData={sellFlowData.bookingData}
             brand={sellFlowData.brand}
             model={sellFlowData.model}
@@ -301,7 +287,6 @@ const AppRoutes = ({
         path="/sell/mobile"
         element={
           <SellMobileForm
-            // @ts-expect-error
             onContinue={(brand: any) => {
               updateSellFlowData('category', 'mobile');
               updateSellFlowData('brand', brand);

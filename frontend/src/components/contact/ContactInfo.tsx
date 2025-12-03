@@ -101,7 +101,6 @@ const ContactInfo = () => {
             title="Office Location"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14030.834434445278!2d77.02664!3d28.4595!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d22fe277d0001%3A0x0!2zMjjCsDI3JzM0LjIiTiA3N8KwMDEnMzUuOSJF!5e0!3m2!1sen!2sin!4v1234567890"
             className="absolute inset-0 w-full h-full border-0 opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-            // @ts-expect-error
             allowFullScreen=""
             loading="lazy"
           ></iframe>

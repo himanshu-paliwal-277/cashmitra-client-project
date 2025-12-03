@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import useAdminPartners from '../../hooks/useAdminPartners';
 import adminService from '../../services/adminService';
@@ -498,17 +496,13 @@ const Partners = () => {
   });
 
   const {
-    partners: hookPartners,
-    // @ts-expect-error
-    stats: hookStats,
+    partners: hookPartners,    stats: hookStats,
     loading: hookLoading,
     error: hookError,
     fetchPartners,
     addPartner,
     editPartner,
-    removePartner,
-    // @ts-expect-error
-    updatePartnerStatus,
+    removePartner,    updatePartnerStatus,
   } = useAdminPartners();
 
   // Fetch partners on component mount
@@ -547,9 +541,7 @@ const Partners = () => {
     console.log('sdf');
     e.preventDefault();
     try {
-      if (editingPartner) {
-        // @ts-expect-error
-        await editPartner(editingPartner._id, formData);
+      if (editingPartner) {        await editPartner(editingPartner._id, formData);
       } else {
         await addPartner(formData);
       }
@@ -581,9 +573,7 @@ const Partners = () => {
   };
 
   const handleEdit = (partner: any) => {
-    setEditingPartner(partner);
-    // @ts-expect-error
-    setFormData({
+    setEditingPartner(partner);    setFormData({
       userId: partner.user?._id || '',
       shopName: partner.shopName || '',
       shopAddress: {
@@ -614,9 +604,7 @@ const Partners = () => {
     setShowDetailModal(true);
   };
 
-  const resetForm = () => {
-    // @ts-expect-error
-    setFormData({
+  const resetForm = () => {    setFormData({
       userId: '',
       shopName: '',
       shopAddress: {
@@ -655,20 +643,7 @@ const Partners = () => {
   };
 
   const filteredPartners = partners.filter(partner => {
-    const matchesSearch =
-      // @ts-expect-error
-      partner.shopName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      partner.shopEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      partner.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      partner.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      partner.gstNumber?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    // @ts-expect-error
-    const matchesStatus = !statusFilter || partner.verificationStatus === statusFilter;
+    const matchesSearch =      partner.shopName?.toLowerCase().includes(searchTerm.toLowerCase()) ||      partner.shopEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||      partner.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||      partner.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||      partner.gstNumber?.toLowerCase().includes(searchTerm.toLowerCase());    const matchesStatus = !statusFilter || partner.verificationStatus === statusFilter;
     const matchesType = !typeFilter; // No business type in partner model, so ignore this filter for now
 
     return matchesSearch && matchesStatus && matchesType;
@@ -790,23 +765,13 @@ const Partners = () => {
               </p>
             </div>
           ) : (
-            filteredPartners.map(partner => (
-              // @ts-expect-error
-              <PartnerRow key={partner._id}>
+            filteredPartners.map(partner => (              <PartnerRow key={partner._id}>
                 <PartnerInfo>
-                  <PartnerAvatar>
-                    // @ts-expect-error
-                    {partner.shopName?.charAt(0)?.toUpperCase() ||
-                      // @ts-expect-error
-                      partner.user?.name?.charAt(0)?.toUpperCase() ||
+                  <PartnerAvatar>                    {partner.shopName?.charAt(0)?.toUpperCase() ||                      partner.user?.name?.charAt(0)?.toUpperCase() ||
                       'P'}
                   </PartnerAvatar>
-                  <PartnerDetails>
-                    // @ts-expect-error
-                    <PartnerName>{partner.shopName || 'No Shop Name'}</PartnerName>
-                    <PartnerEmail>
-                      // @ts-expect-error
-                      {partner.user?.name} ({partner.user?.email})
+                  <PartnerDetails>                    <PartnerName>{partner.shopName || 'No Shop Name'}</PartnerName>
+                    <PartnerEmail>                      {partner.user?.name} ({partner.user?.email})
                     </PartnerEmail>
                   </PartnerDetails>
                 </PartnerInfo>
@@ -817,16 +782,7 @@ const Partners = () => {
 
                 <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>0</div>
 
-                <div style={{ color: '#059669', fontSize: '0.875rem', fontWeight: '600' }}>₹0</div>
-
-                // @ts-expect-error
-                <StatusBadge status={partner.verificationStatus}>
-                  // @ts-expect-error
-                  {getStatusIcon(partner.verificationStatus)}
-                  // @ts-expect-error
-                  {partner.verificationStatus?.charAt(0)?.toUpperCase() +
-                    // @ts-expect-error
-                    partner.verificationStatus?.slice(1) || 'Pending'}
+                <div style={{ color: '#059669', fontSize: '0.875rem', fontWeight: '600' }}>₹0</div>                <StatusBadge status={partner.verificationStatus}>                  {getStatusIcon(partner.verificationStatus)}                  {partner.verificationStatus?.charAt(0)?.toUpperCase() +                    partner.verificationStatus?.slice(1) || 'Pending'}
                 </StatusBadge>
 
                 <ActionButtons>
@@ -840,33 +796,19 @@ const Partners = () => {
                     style={{ background: '#8b5cf6' }}
                     onClick={() =>
                       navigate('/admin/partner-permissions', {
-                        state: {
-                          // @ts-expect-error
-                          partnerId: partner._id,
-                          // @ts-expect-error
-                          partnerName: partner.user?.name || 'Partner',
+                        state: {                          partnerId: partner._id,                          partnerName: partner.user?.name || 'Partner',
                         },
                       })
                     }
                   >
                     <Settings size={14} />
-                  </IconButton>
-                  // @ts-expect-error
-                  {partner.verificationStatus === 'pending' && (
-                    // @ts-expect-error
-                    <IconButton success onClick={() => handleStatusChange(partner._id, 'approved')}>
+                  </IconButton>                  {partner.verificationStatus === 'pending' && (                    <IconButton success onClick={() => handleStatusChange(partner._id, 'approved')}>
                       <CheckCircle size={14} />
                     </IconButton>
-                  )}
-                  // @ts-expect-error
-                  {partner.verificationStatus === 'approved' && (
-                    // @ts-expect-error
-                    <IconButton warning onClick={() => handleStatusChange(partner._id, 'rejected')}>
+                  )}                  {partner.verificationStatus === 'approved' && (                    <IconButton warning onClick={() => handleStatusChange(partner._id, 'rejected')}>
                       <XCircle size={14} />
                     </IconButton>
-                  )}
-                  // @ts-expect-error
-                  <IconButton danger onClick={() => handleDelete(partner._id)}>
+                  )}                  <IconButton danger onClick={() => handleDelete(partner._id)}>
                     <Trash2 size={14} />
                   </IconButton>
                 </ActionButtons>
@@ -906,11 +848,7 @@ const Partners = () => {
                       required
                     >
                       <option value="">Select a user</option>
-                      {users.map(user => (
-                        // @ts-expect-error
-                        <option key={user._id} value={user._id}>
-                          // @ts-expect-error
-                          {user.name} ({user.email})
+                      {users.map(user => (                        <option key={user._id} value={user._id}>                          {user.name} ({user.email})
                         </option>
                       ))}
                     </Select>
@@ -1163,32 +1101,22 @@ const Partners = () => {
               <DetailGrid>
                 <DetailItem>
                   <Users size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Name:</DetailLabel>
-                  // @ts-expect-error
-                  <DetailValue>{selectedPartner.user?.name || 'N/A'}</DetailValue>
+                  <DetailLabel>Name:</DetailLabel>                  <DetailValue>{selectedPartner.user?.name || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Mail size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Email:</DetailLabel>
-                  // @ts-expect-error
-                  <DetailValue>{selectedPartner.user?.email || 'N/A'}</DetailValue>
+                  <DetailLabel>Email:</DetailLabel>                  <DetailValue>{selectedPartner.user?.email || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Phone size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Phone:</DetailLabel>
-                  <DetailValue>
-                    // @ts-expect-error
-                    {selectedPartner.user?.phone || selectedPartner.shopPhone || 'N/A'}
+                  <DetailValue>                    {selectedPartner.user?.phone || selectedPartner.shopPhone || 'N/A'}
                   </DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Calendar size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Joined:</DetailLabel>
-                  <DetailValue>
-                    // @ts-expect-error
-                    {selectedPartner.createdAt
-                      // @ts-expect-error
-                      ? new Date(selectedPartner.createdAt).toLocaleDateString()
+                  <DetailValue>                    {selectedPartner.createdAt                      ? new Date(selectedPartner.createdAt).toLocaleDateString()
                       : 'N/A'}
                   </DetailValue>
                 </DetailItem>
@@ -1200,49 +1128,22 @@ const Partners = () => {
               <DetailGrid>
                 <DetailItem>
                   <Building size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Business Name:</DetailLabel>
-                  // @ts-expect-error
-                  <DetailValue>{selectedPartner.shopName || 'N/A'}</DetailValue>
+                  <DetailLabel>Business Name:</DetailLabel>                  <DetailValue>{selectedPartner.shopName || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
-                  <DetailLabel>Business Type:</DetailLabel>
-                  // @ts-expect-error
-                  <DetailValue>{selectedPartner.businessType || 'Individual'}</DetailValue>
+                  <DetailLabel>Business Type:</DetailLabel>                  <DetailValue>{selectedPartner.businessType || 'Individual'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
-                  <DetailLabel>GST Number:</DetailLabel>
-                  // @ts-expect-error
-                  <DetailValue>{selectedPartner.gstNumber || 'N/A'}</DetailValue>
+                  <DetailLabel>GST Number:</DetailLabel>                  <DetailValue>{selectedPartner.gstNumber || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
-                  <DetailLabel>PAN Number:</DetailLabel>
-                  // @ts-expect-error
-                  <DetailValue>{selectedPartner.panNumber || 'N/A'}</DetailValue>
+                  <DetailLabel>PAN Number:</DetailLabel>                  <DetailValue>{selectedPartner.panNumber || 'N/A'}</DetailValue>
                 </DetailItem>
-              </DetailGrid>
-
-              // @ts-expect-error
-              {(selectedPartner.shopAddress?.street ||
-                // @ts-expect-error
-                selectedPartner.shopAddress?.city ||
-                // @ts-expect-error
-                selectedPartner.shopAddress?.state ||
-                // @ts-expect-error
-                selectedPartner.shopAddress?.pincode) && (
+              </DetailGrid>              {(selectedPartner.shopAddress?.street ||                selectedPartner.shopAddress?.city ||                selectedPartner.shopAddress?.state ||                selectedPartner.shopAddress?.pincode) && (
                 <DetailItem style={{ gridColumn: '1 / -1' }}>
                   <MapPin size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Address:</DetailLabel>
-                  <DetailValue>
-                    // @ts-expect-error
-                    {selectedPartner.shopAddress?.street && `${selectedPartner.shopAddress.street}`}
-                    // @ts-expect-error
-                    {selectedPartner.shopAddress?.city && `, ${selectedPartner.shopAddress.city}`}
-                    // @ts-expect-error
-                    {selectedPartner.shopAddress?.state && `, ${selectedPartner.shopAddress.state}`}
-                    // @ts-expect-error
-                    {selectedPartner.shopAddress?.pincode &&
-                      // @ts-expect-error
-                      ` - ${selectedPartner.shopAddress.pincode}`}
+                  <DetailValue>                    {selectedPartner.shopAddress?.street && `${selectedPartner.shopAddress.street}`}                    {selectedPartner.shopAddress?.city && `, ${selectedPartner.shopAddress.city}`}                    {selectedPartner.shopAddress?.state && `, ${selectedPartner.shopAddress.state}`}                    {selectedPartner.shopAddress?.pincode &&                      ` - ${selectedPartner.shopAddress.pincode}`}
                   </DetailValue>
                 </DetailItem>
               )}
@@ -1253,43 +1154,24 @@ const Partners = () => {
               <DetailGrid>
                 <DetailItem>
                   <TrendingUp size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Total Orders:</DetailLabel>
-                  // @ts-expect-error
-                  <DetailValue>{selectedPartner.totalOrders || 0}</DetailValue>
+                  <DetailLabel>Total Orders:</DetailLabel>                  <DetailValue>{selectedPartner.totalOrders || 0}</DetailValue>
                 </DetailItem>
                 <DetailItem>
-                  <DetailLabel>Total Revenue:</DetailLabel>
-                  // @ts-expect-error
-                  <DetailValue>₹{(selectedPartner.totalRevenue || 0).toLocaleString()}</DetailValue>
+                  <DetailLabel>Total Revenue:</DetailLabel>                  <DetailValue>₹{(selectedPartner.totalRevenue || 0).toLocaleString()}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Star size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Commission Rate:</DetailLabel>
-                  <DetailValue>
-                    // @ts-expect-error
-                    {selectedPartner.commissionRate
-                      // @ts-expect-error
-                      ? `${selectedPartner.commissionRate}%`
+                  <DetailValue>                    {selectedPartner.commissionRate                      ? `${selectedPartner.commissionRate}%`
                       : 'Not set'}
                   </DetailValue>
                 </DetailItem>
                 <DetailItem>
-                  <DetailLabel>Status:</DetailLabel>
-                  // @ts-expect-error
-                  <StatusBadge status={selectedPartner.verificationStatus}>
-                    // @ts-expect-error
-                    {getStatusIcon(selectedPartner.verificationStatus)}
-                    // @ts-expect-error
-                    {selectedPartner.verificationStatus?.charAt(0)?.toUpperCase() +
-                      // @ts-expect-error
-                      selectedPartner.verificationStatus?.slice(1) || 'Pending'}
+                  <DetailLabel>Status:</DetailLabel>                  <StatusBadge status={selectedPartner.verificationStatus}>                    {getStatusIcon(selectedPartner.verificationStatus)}                    {selectedPartner.verificationStatus?.charAt(0)?.toUpperCase() +                      selectedPartner.verificationStatus?.slice(1) || 'Pending'}
                   </StatusBadge>
                 </DetailItem>
               </DetailGrid>
-            </DetailSection>
-
-            // @ts-expect-error
-            {selectedPartner.notes && (
+            </DetailSection>            {selectedPartner.notes && (
               <DetailSection>
                 <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Notes</h3>
                 <div
@@ -1299,9 +1181,7 @@ const Partners = () => {
                     borderRadius: '0.5rem',
                     color: '#374151',
                   }}
-                >
-                  // @ts-expect-error
-                  {selectedPartner.notes}
+                >                  {selectedPartner.notes}
                 </div>
               </DetailSection>
             )}

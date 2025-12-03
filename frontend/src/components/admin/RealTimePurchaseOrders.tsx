@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-// @ts-expect-error
 import styled from 'styled-components';
 import {
   Search,
@@ -103,14 +102,16 @@ const FilterButton = styled.button`
   padding: 0.75rem 1rem;
   border: 1px solid ${(props: any) => props.theme.colors.border};
   border-radius: 0.5rem;
-  background: ${(props: any) => props.active ? props.theme.colors.primary : props.theme.colors.white};
-  color: ${(props: any) => props.active ? 'white' : props.theme.colors.text};
+  background: ${(props: any) =>
+    props.active ? props.theme.colors.primary : props.theme.colors.white};
+  color: ${(props: any) => (props.active ? 'white' : props.theme.colors.text)};
   cursor: pointer;
   font-size: 0.875rem;
   transition: all 0.2s;
 
   &:hover {
-    background: ${(props: any) => props.active ? props.theme.colors.primary : props.theme.colors.gray[50]};
+    background: ${(props: any) =>
+      props.active ? props.theme.colors.primary : props.theme.colors.gray[50]};
   }
 `;
 
@@ -138,7 +139,7 @@ const ActionButton = styled.button`
 `;
 
 const FiltersPanel = styled.div`
-  display: ${(props: any) => props.isOpen ? 'block' : 'none'};
+  display: ${(props: any) => (props.isOpen ? 'block' : 'none')};
   background: ${(props: any) => props.theme.colors.white};
   border: 1px solid ${(props: any) => props.theme.colors.border};
   border-radius: 0.75rem;
@@ -530,7 +531,6 @@ const RealTimePurchaseOrders = () => {
   });
 
   // Real-time orders hook
-  // @ts-expect-error
   const { orders, stats, loading, error, connected, lastUpdated, refresh, updateOrderStatus } =
     useRealTimeOrders('buy', {
       pollingInterval: 5000,
@@ -545,46 +545,34 @@ const RealTimePurchaseOrders = () => {
       // Search filter
       const searchMatch =
         !searchTerm ||
-        // @ts-expect-error
         order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // @ts-expect-error
         order.partner?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // @ts-expect-error
         order.partner?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // @ts-expect-error
         order.items?.[0]?.product?.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // @ts-expect-error
         order.items?.[0]?.product?.model?.toLowerCase().includes(searchTerm.toLowerCase());
 
       // Status filter
-      // @ts-expect-error
       const statusMatch = filters.status === 'all' || order.status === filters.status;
 
       // Date filter
-      // @ts-expect-error
       const orderDate = new Date(order.createdAt);
       const dateFromMatch = !filters.dateFrom || orderDate >= new Date(filters.dateFrom);
       const dateToMatch = !filters.dateTo || orderDate <= new Date(filters.dateTo);
 
       // Amount filter
       const amountMatch =
-        // @ts-expect-error
         (!filters.minAmount || order.totalAmount >= parseFloat(filters.minAmount)) &&
-        // @ts-expect-error
         (!filters.maxAmount || order.totalAmount <= parseFloat(filters.maxAmount));
 
       // Partner filter
       const partnerMatch =
         !filters.partner ||
-        // @ts-expect-error
         order.partner?.name?.toLowerCase().includes(filters.partner.toLowerCase());
 
       // Product filter
       const productMatch =
         !filters.product ||
-        // @ts-expect-error
         order.items?.[0]?.product?.brand?.toLowerCase().includes(filters.product.toLowerCase()) ||
-        // @ts-expect-error
         order.items?.[0]?.product?.model?.toLowerCase().includes(filters.product.toLowerCase());
 
       return (
@@ -604,27 +592,19 @@ const RealTimePurchaseOrders = () => {
 
       switch (sortField) {
         case 'createdAt':
-          // @ts-expect-error
           aValue = new Date(a.createdAt);
-          // @ts-expect-error
           bValue = new Date(b.createdAt);
           break;
         case 'totalAmount':
-          // @ts-expect-error
           aValue = a.totalAmount || 0;
-          // @ts-expect-error
           bValue = b.totalAmount || 0;
           break;
         case 'status':
-          // @ts-expect-error
           aValue = a.status;
-          // @ts-expect-error
           bValue = b.status;
           break;
         case 'partner':
-          // @ts-expect-error
           aValue = a.partner?.name || '';
-          // @ts-expect-error
           bValue = b.partner?.name || '';
           break;
         default:
@@ -905,12 +885,9 @@ const RealTimePurchaseOrders = () => {
 
           {!loading &&
             paginatedOrders.map(order => (
-              // @ts-expect-error
               <OrderRow key={order._id}>
                 <OrderCell>
-                  // @ts-expect-error
                   <OrderId>#{order._id.slice(-8).toUpperCase()}</OrderId>
-                  // @ts-expect-error
                   <OrderMeta>{formatDate(order.createdAt)}</OrderMeta>
                 </OrderCell>
 
@@ -918,12 +895,10 @@ const RealTimePurchaseOrders = () => {
                   <PartnerInfo>
                     <PartnerName>
                       <Store size={14} />
-                      // @ts-expect-error
                       {order.partner?.name || 'Unknown Partner'}
                     </PartnerName>
                     <PartnerContact>
                       <Mail size={12} />
-                      // @ts-expect-error
                       {order.partner?.email || 'No email'}
                     </PartnerContact>
                   </PartnerInfo>
@@ -932,34 +907,25 @@ const RealTimePurchaseOrders = () => {
                 <OrderCell className="hide-mobile">
                   <ProductInfo>
                     <ProductName>
-                      // @ts-expect-error
                       {order.items?.[0]?.product?.brand} {order.items?.[0]?.product?.model}
                     </ProductName>
                     <ProductDetails>
-                      // @ts-expect-error
                       Condition: {order.items?.[0]?.condition || 'N/A'}
-                      // @ts-expect-error
                       {order.items?.length > 1 && ` +${order.items.length - 1} more`}
                     </ProductDetails>
                   </ProductInfo>
                 </OrderCell>
 
                 <OrderCell>
-                  // @ts-expect-error
                   <Amount>{formatCurrency(order.totalAmount)}</Amount>
                 </OrderCell>
 
                 <OrderCell>
-                  // @ts-expect-error
                   <OrderStatus status={order.status}>
-                    // @ts-expect-error
                     {getStatusIcon(order.status)}
-                    // @ts-expect-error
                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                   </OrderStatus>
                 </OrderCell>
-
-                // @ts-expect-error
                 <OrderCell className="hide-mobile">{formatDate(order.createdAt)}</OrderCell>
 
                 <OrderCell>

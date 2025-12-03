@@ -50,9 +50,7 @@ const useAdminPartnerList = () => {
         totalOrders,
         totalRevenue,
       });
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message || 'Failed to fetch partners');
+    } catch (err) {      setError(err.message || 'Failed to fetch partners');
       console.error('Error fetching partners:', err);
     } finally {
       setLoading(false);
@@ -82,12 +80,8 @@ const useAdminPartnerList = () => {
         // Refresh the data
         await fetchPartners();
         return { success: true };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to update partner status');
-        console.error('Error updating partner status:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to update partner status');
+        console.error('Error updating partner status:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -118,12 +112,8 @@ const useAdminPartnerList = () => {
         // Refresh the data
         await fetchPartners();
         return { success: true };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to create partner');
-        console.error('Error creating partner:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to create partner');
+        console.error('Error creating partner:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -154,12 +144,8 @@ const useAdminPartnerList = () => {
         // Refresh the data
         await fetchPartners();
         return { success: true };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to update partner');
-        console.error('Error updating partner:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to update partner');
+        console.error('Error updating partner:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -189,12 +175,8 @@ const useAdminPartnerList = () => {
         // Refresh the data
         await fetchPartners();
         return { success: true };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to delete partner');
-        console.error('Error deleting partner:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to delete partner');
+        console.error('Error deleting partner:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -204,9 +186,7 @@ const useAdminPartnerList = () => {
 
   // Get partner by ID
   const getPartnerById = useCallback(
-    (partnerId: any) => {
-      // @ts-expect-error
-      return partners.find(partner => partner._id === partnerId);
+    (partnerId: any) => {      return partners.find(partner => partner._id === partnerId);
     },
     [partners]
   );

@@ -137,27 +137,21 @@ const PickupBooking = () => {
   const handleContinue = async () => {
     if (currentStep === 1) {
       // Validate address
-      if (!formData.pincode || !formData.flatNo || !formData.locality) {
-        // @ts-expect-error
-        setSubmitError('Please fill all required address fields');
+      if (!formData.pincode || !formData.flatNo || !formData.locality) {        setSubmitError('Please fill all required address fields');
         return;
       }
       setCurrentStep(2);
       setSubmitError(null);
     } else if (currentStep === 2) {
       // Validate pickup
-      if (!formData.selectedDate || !formData.selectedTime) {
-        // @ts-expect-error
-        setSubmitError('Please select pickup date and time');
+      if (!formData.selectedDate || !formData.selectedTime) {        setSubmitError('Please select pickup date and time');
         return;
       }
       setCurrentStep(3);
       setSubmitError(null);
     } else if (currentStep === 3) {
       // Validate payment
-      if (!formData.paymentType) {
-        // @ts-expect-error
-        setSubmitError('Please select a payment method');
+      if (!formData.paymentType) {        setSubmitError('Please select a payment method');
         return;
       }
 
@@ -217,15 +211,11 @@ const PickupBooking = () => {
           sessionId: sessionId || location.state?.sessionId,
           orderNumber: `ORD${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`,
           pickup: {
-            address: {
-              // @ts-expect-error
-              fullName: userData?.name || formData.fullName || 'User',
+            address: {              fullName: userData?.name || formData.fullName || 'User',
               phone: formData.alternateNumber || userData?.phone || '1234567890',
               street:
                 `${formData.flatNo}, ${formData.locality}${formData.landmark ? `, Near ${formData.landmark}` : ''}`.trim(),
-              city: formData.city,
-              // @ts-expect-error
-              state: formData.state || 'Delhi',
+              city: formData.city,              state: formData.state || 'Delhi',
               pincode: formData.pincode,
             },
             slot: {
@@ -260,9 +250,7 @@ const PickupBooking = () => {
         // Navigate to confirmation page
         navigate('/sell/confirmation', { state: { bookingData, orderData } });
       } catch (error) {
-        console.error('Error creating sell order:', error);
-        // @ts-expect-error
-        setSubmitError(error.message || 'Failed to create booking. Please try again.');
+        console.error('Error creating sell order:', error);        setSubmitError(error.message || 'Failed to create booking. Please try again.');
       } finally {
         setIsSubmitting(false);
       }

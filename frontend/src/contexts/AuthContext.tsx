@@ -1,8 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { API_BASE_URL } from '../config/api';
-
-// @ts-expect-error
-const AuthContext = createContext();
+import { API_BASE_URL } from '../config/api';const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -61,11 +58,7 @@ export const AuthProvider = ({
 
       setUser(data);
       return { success: true, user: data };
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message);
-      // @ts-expect-error
-      return { success: false, error: err.message };
+    } catch (err) {      setError(err.message);      return { success: false, error: err.message };
     } finally {
       setLoading(false);
     }
@@ -96,11 +89,7 @@ export const AuthProvider = ({
 
       setUser(data);
       return { success: true, user: data };
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message);
-      // @ts-expect-error
-      return { success: false, error: err.message };
+    } catch (err) {      setError(err.message);      return { success: false, error: err.message };
     } finally {
       setLoading(false);
     }
@@ -113,9 +102,7 @@ export const AuthProvider = ({
     setError(null);
   };
 
-  const updateUser = (updatedUserData: any) => {
-    // @ts-expect-error
-    const updatedUser = { ...user, ...updatedUserData };
+  const updateUser = (updatedUserData: any) => {    const updatedUser = { ...user, ...updatedUserData };
     setUser(updatedUser);
     localStorage.setItem('userData', JSON.stringify(updatedUser));
   };

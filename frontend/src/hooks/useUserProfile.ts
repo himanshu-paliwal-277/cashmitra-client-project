@@ -14,9 +14,7 @@ const useUserProfile = () => {
       const response = await api.get('/user/profile');
       setProfile(response.data);
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch profile');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch profile');
       throw err;
     } finally {
       setLoading(false);
@@ -31,9 +29,7 @@ const useUserProfile = () => {
       const response = await api.put('/user/profile', profileData);
       setProfile(response.data);
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to update profile');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to update profile');
       throw err;
     } finally {
       setLoading(false);
@@ -52,14 +48,9 @@ const useUserProfile = () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-      });
-
-      // @ts-expect-error
-      setProfile(prev => ({ ...prev, profilePicture: response.data.profilePicture }));
+      });      setProfile(prev => ({ ...prev, profilePicture: response.data.profilePicture }));
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to update profile picture');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to update profile picture');
       throw err;
     } finally {
       setLoading(false);
@@ -73,9 +64,7 @@ const useUserProfile = () => {
     try {
       const response = await api.put('/user/profile/password', passwordData);
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to change password');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to change password');
       throw err;
     } finally {
       setLoading(false);

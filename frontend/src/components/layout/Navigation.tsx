@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import Button from '../ui/Button';
@@ -210,8 +209,8 @@ const IconButton = styled.button`
 
 const CartButton = styled(IconButton)`
   &::after {
-    content: '${(props: any) => props.$itemCount > 0 ? props.$itemCount : ''}';
-    display: ${(props: any) => props.$itemCount > 0 ? 'flex' : 'none'};
+    content: '${(props: any) => (props.$itemCount > 0 ? props.$itemCount : '')}';
+    display: ${(props: any) => (props.$itemCount > 0 ? 'flex' : 'none')};
     position: absolute;
     top: 4px;
     right: 4px;
@@ -255,9 +254,9 @@ const DropdownMenu = styled.div`
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   min-width: 220px;
   z-index: ${theme.zIndex.dropdown};
-  opacity: ${(props: any) => props.$isOpen ? 1 : 0};
-  visibility: ${(props: any) => props.$isOpen ? 'visible' : 'hidden'};
-  transform: ${(props: any) => props.$isOpen ? 'translateY(0)' : 'translateY(-8px)'};
+  opacity: ${(props: any) => (props.$isOpen ? 1 : 0)};
+  visibility: ${(props: any) => (props.$isOpen ? 'visible' : 'hidden')};
+  transform: ${(props: any) => (props.$isOpen ? 'translateY(0)' : 'translateY(-8px)')};
   transition: all 0.2s ease;
   overflow: hidden;
 `;
@@ -364,7 +363,7 @@ const NavDropdownWrapper = styled.div`
   left: 0;
   z-index: ${theme.zIndex.dropdown};
   padding-top: 8px;
-  display: ${(props: any) => props.$isOpen ? 'block' : 'none'};
+  display: ${(props: any) => (props.$isOpen ? 'block' : 'none')};
 `;
 
 // Mobile Menu
@@ -385,7 +384,7 @@ const MobileMenuContainer = styled.div`
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   z-index: 999;
   padding: 1rem;
-  display: ${(props: any) => props.$isOpen ? 'block' : 'none'};
+  display: ${(props: any) => (props.$isOpen ? 'block' : 'none')};
   max-height: calc(100vh - 60px); // Adjust based on TopBar height
   overflow-y: auto;
 `;
@@ -449,7 +448,7 @@ const MobileCollapsibleTrigger = styled.div`
 
   svg {
     transition: transform 0.2s ease;
-    transform: ${(props: any) => props.$isOpen ? 'rotate(180deg)' : 'rotate(0)'};
+    transform: ${(props: any) => (props.$isOpen ? 'rotate(180deg)' : 'rotate(0)')};
   }
 `;
 
@@ -467,10 +466,7 @@ const MobileActions = styled.div`
   gap: 4px;
 `;
 
-const MobileCollapsibleNavItem = ({
-  item,
-  onLinkClick
-}: any) => {
+const MobileCollapsibleNavItem = ({ item, onLinkClick }: any) => {
   const [isOpen, setIsOpen] = useState(false);
 
   if (!item.hasDropdown) {
@@ -499,12 +495,7 @@ const MobileCollapsibleNavItem = ({
 };
 
 // Main Navigation Component
-const Navigation = ({
-  isAuthenticated,
-  onLogin,
-  onLogout,
-  currentPath = '/'
-}: any) => {
+const Navigation = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }: any) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -528,7 +519,6 @@ const Navigation = ({
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: any) => {
-      // @ts-expect-error
       if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
         setIsProfileDropdownOpen(false);
       }
@@ -548,7 +538,6 @@ const Navigation = ({
     const timer = setTimeout(() => {
       setOpenNavDropdown(null);
     }, 200);
-    // @ts-expect-error
     setNavDropdownTimer(timer);
   };
 

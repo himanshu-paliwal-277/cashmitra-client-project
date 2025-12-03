@@ -1,12 +1,8 @@
 // Image upload service using backend proxy
-// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-// @ts-expect-error
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
+// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
 
 class CloudinaryService {
-  constructor() {
-    // @ts-expect-error
-    this.baseUrl = `${API_BASE_URL}/upload`;
+  constructor() {    this.baseUrl = `${API_BASE_URL}/upload`;
   }
 
   /**
@@ -35,10 +31,7 @@ class CloudinaryService {
       formData.append('image', file);
 
       // Get auth token from localStorage
-      const token = localStorage.getItem('adminToken');
-
-      // @ts-expect-error
-      const response = await fetch(`${this.baseUrl}/image`, {
+      const token = localStorage.getItem('adminToken');      const response = await fetch(`${this.baseUrl}/image`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -74,9 +67,7 @@ class CloudinaryService {
     } catch (error) {
       console.error('Cloudinary upload error:', error);
       return {
-        success: false,
-        // @ts-expect-error
-        error: error.message || 'Failed to upload image',
+        success: false,        error: error.message || 'Failed to upload image',
       };
     }
   }
@@ -90,16 +81,11 @@ class CloudinaryService {
   async uploadMultipleImages(files: any, options = {}) {
     try {
       const formData = new FormData();
-      Array.from(files).forEach(file => {
-        // @ts-expect-error
-        formData.append('images', file);
+      Array.from(files).forEach(file => {        formData.append('images', file);
       });
 
       // Get auth token from localStorage
-      const token = localStorage.getItem('adminToken');
-
-      // @ts-expect-error
-      const response = await fetch(`${this.baseUrl}/images`, {
+      const token = localStorage.getItem('adminToken');      const response = await fetch(`${this.baseUrl}/images`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -131,13 +117,9 @@ class CloudinaryService {
     } catch (error) {
       console.error('Multiple upload error:', error);
       return {
-        success: false,
-        // @ts-expect-error
-        error: error.message || 'Failed to upload images',
+        success: false,        error: error.message || 'Failed to upload images',
         results: [],
-        successful: [],
-        // @ts-expect-error
-        failed: [error.message],
+        successful: [],        failed: [error.message],
         totalUploaded: 0,
         totalFailed: Array.from(files).length,
       };
@@ -158,15 +140,8 @@ class CloudinaryService {
       });
 
       const formData = new FormData();
-      formData.append('public_id', publicId);
-      // @ts-expect-error
-      formData.append('timestamp', timestamp);
-      // @ts-expect-error
-      formData.append('api_key', this.apiKey);
-      formData.append('signature', signature);
-
-      // @ts-expect-error
-      const response = await fetch(`${this.baseUrl}/image/destroy`, {
+      formData.append('public_id', publicId);      formData.append('timestamp', timestamp);      formData.append('api_key', this.apiKey);
+      formData.append('signature', signature);      const response = await fetch(`${this.baseUrl}/image/destroy`, {
         method: 'POST',
         body: formData,
       });
@@ -180,9 +155,7 @@ class CloudinaryService {
     } catch (error) {
       console.error('Cloudinary delete error:', error);
       return {
-        success: false,
-        // @ts-expect-error
-        error: error.message || 'Failed to delete image',
+        success: false,        error: error.message || 'Failed to delete image',
       };
     }
   }
@@ -193,28 +166,9 @@ class CloudinaryService {
    * @param {Object} transformations - Transformation parameters
    * @returns {string} Transformed image URL
    */
-  getTransformedUrl(publicId: any, transformations = {}) {
-    // @ts-expect-error
-    const baseUrl = `https://res.cloudinary.com/${this.cloudName}/image/upload`;
+  getTransformedUrl(publicId: any, transformations = {}) {    const baseUrl = `https://res.cloudinary.com/${this.cloudName}/image/upload`;
 
-    const transformParams = [];
-
-    // @ts-expect-error
-    if (transformations.width) transformParams.push(`w_${transformations.width}`);
-    // @ts-expect-error
-    if (transformations.height) transformParams.push(`h_${transformations.height}`);
-    // @ts-expect-error
-    if (transformations.crop) transformParams.push(`c_${transformations.crop}`);
-    // @ts-expect-error
-    if (transformations.quality) transformParams.push(`q_${transformations.quality}`);
-    // @ts-expect-error
-    if (transformations.format) transformParams.push(`f_${transformations.format}`);
-    // @ts-expect-error
-    if (transformations.gravity) transformParams.push(`g_${transformations.gravity}`);
-    // @ts-expect-error
-    if (transformations.radius) transformParams.push(`r_${transformations.radius}`);
-    // @ts-expect-error
-    if (transformations.effect) transformParams.push(`e_${transformations.effect}`);
+    const transformParams = [];    if (transformations.width) transformParams.push(`w_${transformations.width}`);    if (transformations.height) transformParams.push(`h_${transformations.height}`);    if (transformations.crop) transformParams.push(`c_${transformations.crop}`);    if (transformations.quality) transformParams.push(`q_${transformations.quality}`);    if (transformations.format) transformParams.push(`f_${transformations.format}`);    if (transformations.gravity) transformParams.push(`g_${transformations.gravity}`);    if (transformations.radius) transformParams.push(`r_${transformations.radius}`);    if (transformations.effect) transformParams.push(`e_${transformations.effect}`);
 
     const transformString = transformParams.length > 0 ? `${transformParams.join(',')}/` : '';
 
@@ -261,19 +215,7 @@ class CloudinaryService {
    * @returns {Object} Validation result
    */
   validateImage(file: any, options = {}) {
-    const {
-      // @ts-expect-error
-      maxSize = 10 * 1024 * 1024, // 10MB default
-      // @ts-expect-error
-      allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
-      // @ts-expect-error
-      minWidth = 100,
-      // @ts-expect-error
-      minHeight = 100,
-      // @ts-expect-error
-      maxWidth = 5000,
-      // @ts-expect-error
-      maxHeight = 5000,
+    const {      maxSize = 10 * 1024 * 1024, // 10MB default      allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],      minWidth = 100,      minHeight = 100,      maxWidth = 5000,      maxHeight = 5000,
     } = options;
 
     const errors = [];
@@ -316,37 +258,13 @@ class CloudinaryService {
    * @returns {Object} Widget configuration
    */
   getUploadWidgetConfig(options = {}) {
-    return {
-      // @ts-expect-error
-      cloudName: this.cloudName,
-      // @ts-expect-error
-      uploadPreset: this.uploadPreset,
-      sources: ['local', 'url', 'camera'],
-      // @ts-expect-error
-      multiple: options.multiple || false,
-      // @ts-expect-error
-      maxFiles: options.maxFiles || 10,
-      // @ts-expect-error
-      maxFileSize: options.maxFileSize || 10000000, // 10MB
-      // @ts-expect-error
-      maxImageWidth: options.maxImageWidth || 2000,
-      // @ts-expect-error
-      maxImageHeight: options.maxImageHeight || 2000,
-      // @ts-expect-error
-      cropping: options.cropping || false,
-      // @ts-expect-error
-      croppingAspectRatio: options.croppingAspectRatio || null,
-      // @ts-expect-error
-      folder: options.folder || 'products',
-      // @ts-expect-error
-      tags: options.tags || ['product'],
+    return {      cloudName: this.cloudName,      uploadPreset: this.uploadPreset,
+      sources: ['local', 'url', 'camera'],      multiple: options.multiple || false,      maxFiles: options.maxFiles || 10,      maxFileSize: options.maxFileSize || 10000000, // 10MB      maxImageWidth: options.maxImageWidth || 2000,      maxImageHeight: options.maxImageHeight || 2000,      cropping: options.cropping || false,      croppingAspectRatio: options.croppingAspectRatio || null,      folder: options.folder || 'products',      tags: options.tags || ['product'],
       resourceType: 'image',
       clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
       theme: 'minimal',
       showAdvancedOptions: false,
-      showInsecurePreview: false,
-      // @ts-expect-error
-      showUploadMoreButton: options.multiple || false,
+      showInsecurePreview: false,      showUploadMoreButton: options.multiple || false,
       styles: {
         palette: {
           window: '#FFFFFF',

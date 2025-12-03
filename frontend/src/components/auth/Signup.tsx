@@ -16,8 +16,6 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [passwordStrength, setPasswordStrength] = useState(0);
-
-  // @ts-expect-error
   const { signup, loading, error, clearError } = useAuth();
   const navigate = useNavigate();
 
@@ -80,39 +78,30 @@ const Signup = () => {
     const errors = {};
 
     if (!formData.name.trim()) {
-      // @ts-expect-error
       errors.name = 'Name is required';
     }
 
     if (!formData.email) {
-      // @ts-expect-error
       errors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      // @ts-expect-error
       errors.email = 'Please enter a valid email address';
     }
 
     if (!formData.phone) {
-      // @ts-expect-error
       errors.phone = 'Phone number is required';
     } else if (!/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
-      // @ts-expect-error
       errors.phone = 'Please enter a valid phone number';
     }
 
     if (!formData.password) {
-      // @ts-expect-error
       errors.password = 'Password is required';
     } else if (formData.password.length < 8) {
-      // @ts-expect-error
       errors.password = 'Password must be at least 8 characters';
     } else if (passwordStrength < 3) {
-      // @ts-expect-error
       errors.password = 'Password is too weak. Please use a stronger password';
     }
 
     if (!formData.agreeToTerms) {
-      // @ts-expect-error
       errors.agreeToTerms = 'You must agree to the terms and conditions';
     }
 
@@ -131,7 +120,6 @@ const Signup = () => {
     }
 
     // Clear validation error for this field
-    // @ts-expect-error
     if (validationErrors[name]) {
       setValidationErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -196,13 +184,11 @@ const Signup = () => {
           {/* Input Group */}
           <div className="flex flex-col gap-4">
             <Input
-              // @ts-expect-error
               type="text"
               name="name"
               placeholder="Full name"
               value={formData.name}
               onChange={handleChange}
-              // @ts-expect-error
               error={validationErrors.name}
               leftIcon={<User size={20} />}
               autoComplete="name"
@@ -210,13 +196,11 @@ const Signup = () => {
             />
 
             <Input
-              // @ts-expect-error
               type="email"
               name="email"
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
-              // @ts-expect-error
               error={validationErrors.email}
               leftIcon={<Mail size={20} />}
               autoComplete="email"
@@ -224,13 +208,11 @@ const Signup = () => {
             />
 
             <Input
-              // @ts-expect-error
               type="tel"
               name="phone"
               placeholder="Enter your phone number"
               value={formData.phone}
               onChange={handleChange}
-              // @ts-expect-error
               error={validationErrors.phone}
               leftIcon={<Phone size={20} />}
               autoComplete="tel"
@@ -239,13 +221,11 @@ const Signup = () => {
 
             <div className="relative">
               <Input
-                // @ts-expect-error
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={handleChange}
-                // @ts-expect-error
                 error={validationErrors.password}
                 leftIcon={<Lock size={20} />}
                 autoComplete="new-password"
@@ -296,16 +276,13 @@ const Signup = () => {
               <Link to="/privacy" className="text-blue-500 no-underline hover:underline">
                 Privacy Policy
               </Link>
-              // @ts-expect-error
               {validationErrors.agreeToTerms && (
-                // @ts-expect-error
                 <div className="text-red-500 mt-1">{validationErrors.agreeToTerms}</div>
               )}
             </label>
           </div>
 
           {/* Submit Button */}
-          // @ts-expect-error
           <Button
             type="submit"
             variant="primary"

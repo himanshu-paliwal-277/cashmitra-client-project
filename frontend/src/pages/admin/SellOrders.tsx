@@ -91,9 +91,7 @@ const SellOrders = () => {
   const fetchAgents = async () => {
     try {
       setLoadingAgents(true);
-      try {
-        // @ts-expect-error
-        const agentProfilesResponse = await adminService.getAllAgents({ limit: 100 });
+      try {        const agentProfilesResponse = await adminService.getAllAgents({ limit: 100 });
         const agentProfiles = agentProfilesResponse.data || agentProfilesResponse.agents || [];
 
         if (agentProfiles.length > 0) {
@@ -113,9 +111,7 @@ const SellOrders = () => {
           setLoadingAgents(false);
           return;
         }
-      } catch (err) {
-        // @ts-expect-error
-        console.log('Could not fetch agent profiles, trying users endpoint:', err.message);
+      } catch (err) {        console.log('Could not fetch agent profiles, trying users endpoint:', err.message);
       }
 
       const usersResponse = await adminService.getAllUsers({ limit: 100 });
@@ -146,10 +142,7 @@ const SellOrders = () => {
             ...agent,
             type: 'pickup_agent'
           })),
-        ];
-
-        // @ts-expect-error
-        setAgents(combinedAgents);
+        ];        setAgents(combinedAgents);
       } else {
         const formattedAgents = agents.map((agent: any) => ({
           ...agent,
@@ -168,9 +161,7 @@ const SellOrders = () => {
           agentCode: 'AGT25110001',
           type: 'agent',
         },
-      ];
-      // @ts-expect-error
-      setAgents(mockAgents);
+      ];      setAgents(mockAgents);
     } finally {
       setLoadingAgents(false);
     }
@@ -224,9 +215,7 @@ const SellOrders = () => {
       picked: Truck,
       paid: CheckCircle,
       cancelled: XCircle,
-    };
-    // @ts-expect-error
-    return icons[s] || Package;
+    };    return icons[s] || Package;
   };
 
   const getStatusBadge = (status: any) => {
@@ -236,9 +225,7 @@ const SellOrders = () => {
       picked: 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white',
       paid: 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white',
       cancelled: 'bg-gradient-to-r from-red-500 to-rose-600 text-white',
-    };
-    // @ts-expect-error
-    return styles[status] || styles.draft;
+    };    return styles[status] || styles.draft;
   };
 
   const viewOrderDetails = (order: any) => {
@@ -418,28 +405,18 @@ const SellOrders = () => {
             {orders.map(order => {
               const productName = getProductName(order);
               const customerName = getCustomerName(order);
-              const reduction = calculatePriceReduction(order);
-              // @ts-expect-error
-              const StatusIcon = getStatusIcon(order.status);
+              const reduction = calculatePriceReduction(order);              const StatusIcon = getStatusIcon(order.status);
 
               return (
-                <div
-                  // @ts-expect-error
-                  key={order._id}
+                <div                  key={order._id}
                   className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 >
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        // @ts-expect-error
-                        <h3 className="text-xl font-bold text-gray-900">{order.orderNumber}</h3>
-                        <span
-                          // @ts-expect-error
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(order.status)}`}
+                      <div className="flex items-center gap-3 mb-2">                        <h3 className="text-xl font-bold text-gray-900">{order.orderNumber}</h3>
+                        <span                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(order.status)}`}
                         >
-                          <StatusIcon size={14} />
-                          // @ts-expect-error
-                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                          <StatusIcon size={14} />                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-600 mb-1">
@@ -447,9 +424,7 @@ const SellOrders = () => {
                         <span className="font-medium">{customerName}</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-500 text-sm">
-                        <Calendar size={14} />
-                        // @ts-expect-error
-                        <span>{formatDate(order.createdAt)}</span>
+                        <Calendar size={14} />                        <span>{formatDate(order.createdAt)}</span>
                       </div>
                     </div>
                   </div>
@@ -466,9 +441,7 @@ const SellOrders = () => {
                       <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                         Quoted Price
                       </div>
-                      <div className="font-bold text-blue-600">
-                        // @ts-expect-error
-                        {formatCurrency(order.quoteAmount)}
+                      <div className="font-bold text-blue-600">                        {formatCurrency(order.quoteAmount)}
                       </div>
                     </div>
 
@@ -476,12 +449,8 @@ const SellOrders = () => {
                       <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                         Final Price
                       </div>
-                      <div className="font-bold text-emerald-600">
-                        // @ts-expect-error
-                        {order.status === 'cancelled'
-                          ? 'N/A'
-                          // @ts-expect-error
-                          : formatCurrency(order.actualAmount || order.quoteAmount)}
+                      <div className="font-bold text-emerald-600">                        {order.status === 'cancelled'
+                          ? 'N/A'                          : formatCurrency(order.actualAmount || order.quoteAmount)}
                       </div>
                     </div>
 
@@ -502,45 +471,29 @@ const SellOrders = () => {
                         Pickup Location
                       </div>
                       <div className="font-semibold text-gray-900 flex items-center gap-1">
-                        <MapPin size={14} />
-                        // @ts-expect-error
-                        {order.pickup?.address?.city}, {order.pickup?.address?.state}
+                        <MapPin size={14} />                        {order.pickup?.address?.city}, {order.pickup?.address?.state}
                       </div>
                     </div>
 
                     <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 sm:col-span-2 lg:col-span-1">
                       <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                         Assigned Agent
-                      </div>
-                      // @ts-expect-error
-                      {order.assignedTo ? (
-                        <div className="font-semibold text-emerald-600">
-                          // @ts-expect-error
-                          {order.assignedTo.name}
-                          // @ts-expect-error
-                          {order.assignedTo.phone && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              // @ts-expect-error
-                              {order.assignedTo.phone}
+                      </div>                      {order.assignedTo ? (
+                        <div className="font-semibold text-emerald-600">                          {order.assignedTo.name}                          {order.assignedTo.phone && (
+                            <div className="text-xs text-gray-500 mt-1">                              {order.assignedTo.phone}
                             </div>
                           )}
                         </div>
                       ) : (
                         <select
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"
-                          // @ts-expect-error
-                          onChange={e => handleAssignOrder(order._id, e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm"                          onChange={e => handleAssignOrder(order._id, e.target.value)}
                           defaultValue=""
                           disabled={loadingAgents}
                         >
                           <option value="">
                             {loadingAgents ? 'Loading agents...' : 'Assign Agent'}
                           </option>
-                          {agents.map(a => (
-                            // @ts-expect-error
-                            <option key={a._id} value={a._id}>
-                              // @ts-expect-error
-                              {a.name} {a.phone && `(${a.phone})`}
+                          {agents.map(a => (                            <option key={a._id} value={a._id}>                              {a.name} {a.phone && `(${a.phone})`}
                             </option>
                           ))}
                         </select>
@@ -607,9 +560,7 @@ const SellOrders = () => {
             <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200 flex items-center justify-between z-10">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  <Sparkles className="text-blue-600" size={24} />
-                  // @ts-expect-error
-                  Order Details: {selectedOrder.orderNumber}
+                  <Sparkles className="text-blue-600" size={24} />                  Order Details: {selectedOrder.orderNumber}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">Complete order information</p>
               </div>
@@ -632,9 +583,7 @@ const SellOrders = () => {
                       <User size={16} />
                       <span className="text-xs uppercase tracking-wide">Name</span>
                     </div>
-                    <div className="font-semibold text-gray-900">
-                      // @ts-expect-error
-                      {selectedOrder.pickup?.address?.fullName || 'N/A'}
+                    <div className="font-semibold text-gray-900">                      {selectedOrder.pickup?.address?.fullName || 'N/A'}
                     </div>
                   </div>
                   <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4">
@@ -642,9 +591,7 @@ const SellOrders = () => {
                       <Phone size={16} />
                       <span className="text-xs uppercase tracking-wide">Phone</span>
                     </div>
-                    <div className="font-semibold text-gray-900">
-                      // @ts-expect-error
-                      {selectedOrder.pickup?.address?.phone || 'N/A'}
+                    <div className="font-semibold text-gray-900">                      {selectedOrder.pickup?.address?.phone || 'N/A'}
                     </div>
                   </div>
                   <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 md:col-span-2">
@@ -652,9 +599,7 @@ const SellOrders = () => {
                       <Mail size={16} />
                       <span className="text-xs uppercase tracking-wide">Email</span>
                     </div>
-                    <div className="font-semibold text-gray-900">
-                      // @ts-expect-error
-                      {selectedOrder.userId?.email || 'N/A'}
+                    <div className="font-semibold text-gray-900">                      {selectedOrder.userId?.email || 'N/A'}
                     </div>
                   </div>
                 </div>
@@ -679,41 +624,27 @@ const SellOrders = () => {
                       <AlertCircle size={16} />
                       <span className="text-xs uppercase tracking-wide">Status</span>
                     </div>
-                    <span
-                      // @ts-expect-error
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(selectedOrder.status)}`}
-                    >
-                      // @ts-expect-error
-                      {selectedOrder.status.toUpperCase()}
+                    <span                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(selectedOrder.status)}`}
+                    >                      {selectedOrder.status.toUpperCase()}
                     </span>
                   </div>
                   <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 md:col-span-2">
                     <div className="flex items-center gap-2 text-gray-600 mb-2">
                       <User size={16} />
                       <span className="text-xs uppercase tracking-wide">Assigned Agent</span>
-                    </div>
-                    // @ts-expect-error
-                    {selectedOrder.assignedTo ? (
-                      <div className="font-semibold text-emerald-600">
-                        // @ts-expect-error
-                        {selectedOrder.assignedTo.name} ({selectedOrder.assignedTo.phone})
+                    </div>                    {selectedOrder.assignedTo ? (
+                      <div className="font-semibold text-emerald-600">                        {selectedOrder.assignedTo.name} ({selectedOrder.assignedTo.phone})
                       </div>
                     ) : (
                       <select
                         className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                        onChange={e => {
-                          // @ts-expect-error
-                          handleAssignOrder(selectedOrder._id, e.target.value);
+                        onChange={e => {                          handleAssignOrder(selectedOrder._id, e.target.value);
                           setShowDetailsModal(false);
                         }}
                         disabled={loadingAgents}
                       >
                         <option>{loadingAgents ? 'Loading agents...' : 'Assign Agent'}</option>
-                        {agents.map(a => (
-                          // @ts-expect-error
-                          <option key={a._id} value={a._id}>
-                            // @ts-expect-error
-                            {a.name} {a.phone && `(${a.phone})`}
+                        {agents.map(a => (                          <option key={a._id} value={a._id}>                            {a.name} {a.phone && `(${a.phone})`}
                           </option>
                         ))}
                       </select>
@@ -728,39 +659,25 @@ const SellOrders = () => {
                 </h3>
                 <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 space-y-3">
                   <div className="flex justify-between items-center pb-3 border-b border-gray-200">
-                    <span className="text-gray-600">Initial Quote</span>
-                    // @ts-expect-error
-                    <strong className="text-lg">{formatCurrency(selectedOrder.quoteAmount)}</strong>
-                  </div>
-                  // @ts-expect-error
-                  {selectedOrder.actualAmount &&
-                    // @ts-expect-error
-                    selectedOrder.actualAmount !== selectedOrder.quoteAmount && (
+                    <span className="text-gray-600">Initial Quote</span>                    <strong className="text-lg">{formatCurrency(selectedOrder.quoteAmount)}</strong>
+                  </div>                  {selectedOrder.actualAmount &&                    selectedOrder.actualAmount !== selectedOrder.quoteAmount && (
                       <>
                         <div className="flex justify-between items-center bg-red-50 rounded-lg p-3">
                           <span className="text-red-600 font-medium">Price Reduction</span>
                           <span className="text-red-600 font-bold">
-                            -
-                            // @ts-expect-error
-                            {formatCurrency(selectedOrder.quoteAmount - selectedOrder.actualAmount)}
+                            -                            {formatCurrency(selectedOrder.quoteAmount - selectedOrder.actualAmount)}
                           </span>
                         </div>
                         <div className="flex justify-between items-center bg-blue-50 rounded-lg p-3">
                           <strong className="text-gray-900">Final Amount</strong>
-                          <strong className="text-xl text-blue-600">
-                            // @ts-expect-error
-                            {formatCurrency(selectedOrder.actualAmount)}
+                          <strong className="text-xl text-blue-600">                            {formatCurrency(selectedOrder.actualAmount)}
                           </strong>
                         </div>
                       </>
-                    )}
-                  // @ts-expect-error
-                  {!selectedOrder.actualAmount && (
+                    )}                  {!selectedOrder.actualAmount && (
                     <div className="flex justify-between items-center bg-blue-50 rounded-lg p-3">
                       <strong className="text-gray-900">Final Amount</strong>
-                      <strong className="text-xl text-blue-600">
-                        // @ts-expect-error
-                        {formatCurrency(selectedOrder.quoteAmount)}
+                      <strong className="text-xl text-blue-600">                        {formatCurrency(selectedOrder.quoteAmount)}
                       </strong>
                     </div>
                   )}
@@ -772,41 +689,20 @@ const SellOrders = () => {
                   Pickup Address
                 </h3>
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-l-4 border-blue-500">
-                  <p className="font-bold text-gray-900 mb-2">
-                    // @ts-expect-error
-                    {selectedOrder.pickup?.address?.fullName}
-                  </p>
-                  // @ts-expect-error
-                  <p className="text-gray-700">{selectedOrder.pickup?.address?.phone}</p>
-                  // @ts-expect-error
-                  <p className="text-gray-700">{selectedOrder.pickup?.address?.street}</p>
-                  <p className="text-gray-700">
-                    // @ts-expect-error
-                    {selectedOrder.pickup?.address?.city}, {selectedOrder.pickup?.address?.state} -{' '}
-                    // @ts-expect-error
-                    {selectedOrder.pickup?.address?.pincode}
-                  </p>
-                  // @ts-expect-error
-                  {selectedOrder.pickup?.slot?.date && (
-                    <p className="mt-3 pt-3 border-t border-blue-200">
-                      // @ts-expect-error
-                      <strong>Pickup Slot:</strong> {formatDate(selectedOrder.pickup.slot.date)}{' '}
-                      // @ts-expect-error
-                      {selectedOrder.pickup.slot.window}
+                  <p className="font-bold text-gray-900 mb-2">                    {selectedOrder.pickup?.address?.fullName}
+                  </p>                  <p className="text-gray-700">{selectedOrder.pickup?.address?.phone}</p>                  <p className="text-gray-700">{selectedOrder.pickup?.address?.street}</p>
+                  <p className="text-gray-700">                    {selectedOrder.pickup?.address?.city}, {selectedOrder.pickup?.address?.state} -{' '}                    {selectedOrder.pickup?.address?.pincode}
+                  </p>                  {selectedOrder.pickup?.slot?.date && (
+                    <p className="mt-3 pt-3 border-t border-blue-200">                      <strong>Pickup Slot:</strong> {formatDate(selectedOrder.pickup.slot.date)}{' '}                      {selectedOrder.pickup.slot.window}
                     </p>
                   )}
                 </div>
-              </section>
-
-              // @ts-expect-error
-              {selectedOrder.notes && (
+              </section>              {selectedOrder.notes && (
                 <section>
                   <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-gray-200">
                     Notes
                   </h3>
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-900">
-                    // @ts-expect-error
-                    {selectedOrder.notes}
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-900">                    {selectedOrder.notes}
                   </div>
                 </section>
               )}

@@ -36,9 +36,7 @@ const UserOrderDetails = () => {
         setLoading(true);
         const orderData = await getOrderById(orderId);
         setOrder(orderData);
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to fetch order details');
+      } catch (err) {        setError(err.message || 'Failed to fetch order details');
       } finally {
         setLoading(false);
       }
@@ -98,9 +96,7 @@ const UserOrderDetails = () => {
       completed: 100,
       cancelled: 0,
       refunded: 0,
-    };
-    // @ts-expect-error
-    return statusMap[status] || 0;
+    };    return statusMap[status] || 0;
   };
 
   if (loading) {
@@ -146,12 +142,7 @@ const UserOrderDetails = () => {
         </div>
       </div>
     );
-  }
-
-  // @ts-expect-error
-  const product = order?.items?.[0]?.product;
-  // @ts-expect-error
-  const progressPercentage = getProgressPercentage(order?.status);
+  }  const product = order?.items?.[0]?.product;  const progressPercentage = getProgressPercentage(order?.status);
 
   return (
     <div className="user-order-container">
@@ -161,27 +152,17 @@ const UserOrderDetails = () => {
           <ArrowLeft size={20} />
           Back to Orders
         </button>
-        <h1 className="title">Order Details</h1>
-        // @ts-expect-error
-        <span className="order-id">#{order?._id?.slice(-8) || 'N/A'}</span>
+        <h1 className="title">Order Details</h1>        <span className="order-id">#{order?._id?.slice(-8) || 'N/A'}</span>
       </div>
 
       {/* Order Status Banner */}
       <div className="status-banner">
-        <div className="status-info">
-          // @ts-expect-error
-          <div className={`status-badge status-${order?.status}`}>
-            // @ts-expect-error
-            {getStatusIcon(order?.status)}
-            <span>
-              // @ts-expect-error
-              {order?.status?.charAt(0).toUpperCase() + order?.status?.slice(1) || 'Pending'}
+        <div className="status-info">          <div className={`status-badge status-${order?.status}`}>            {getStatusIcon(order?.status)}
+            <span>              {order?.status?.charAt(0).toUpperCase() + order?.status?.slice(1) || 'Pending'}
             </span>
           </div>
           <div className="order-date">
-            <Calendar size={16} />
-            // @ts-expect-error
-            <span>Ordered on {formatDate(order?.createdAt)}</span>
+            <Calendar size={16} />            <span>Ordered on {formatDate(order?.createdAt)}</span>
           </div>
         </div>
         <div className="progress-section">
@@ -204,12 +185,8 @@ const UserOrderDetails = () => {
               <Package size={20} />
               <h2 className="card-title">Product Information</h2>
             </div>
-            <div className="card-content">
-              // @ts-expect-error
-              {order?.items && order.items.length > 0 && (
-                <>
-                  // @ts-expect-error
-                  {order.items.map((item: any, index: any) => {
+            <div className="card-content">              {order?.items && order.items.length > 0 && (
+                <>                  {order.items.map((item: any, index: any) => {
                     const product = item.product;
                     return (
                       <div key={item._id || index} className="product-section">
@@ -262,21 +239,15 @@ const UserOrderDetails = () => {
                           </div>
 
                           <div className="price-section">
-                            <div className="price">
-                              // @ts-expect-error
-                              {formatCurrency(order?.totalAmount / item.quantity)}
+                            <div className="price">                              {formatCurrency(order?.totalAmount / item.quantity)}
                             </div>
-                            {product?.basePrice &&
-                              // @ts-expect-error
-                              product.basePrice > order?.totalAmount / item.quantity && (
+                            {product?.basePrice &&                              product.basePrice > order?.totalAmount / item.quantity && (
                                 <>
                                   <div className="original-price">
                                     {formatCurrency(product.basePrice)}
                                   </div>
                                   <div className="discount">
-                                    {Math.round(
-                                      // @ts-expect-error
-                                      ((product.basePrice - order?.totalAmount / item.quantity) /
+                                    {Math.round(                                      ((product.basePrice - order?.totalAmount / item.quantity) /
                                         product.basePrice) *
                                         100
                                     )}
@@ -294,9 +265,7 @@ const UserOrderDetails = () => {
             </div>
           </div>
 
-          {/* Shipping Details */}
-          // @ts-expect-error
-          {order?.shippingDetails && (
+          {/* Shipping Details */}          {order?.shippingDetails && (
             <div className="card">
               <div className="card-header">
                 <Truck size={20} />
@@ -310,59 +279,33 @@ const UserOrderDetails = () => {
                     </div>
                     <div className="info-content">
                       <div className="info-label">Delivery Address</div>
-                      <div className="info-value">
-                        // @ts-expect-error
-                        {order.shippingDetails.address?.street && (
-                          // @ts-expect-error
-                          <div>{order.shippingDetails.address.street}</div>
-                        )}
-                        // @ts-expect-error
-                        {order.shippingDetails.address?.city &&
-                          // @ts-expect-error
-                          order.shippingDetails.address?.state && (
-                            <div>
-                              // @ts-expect-error
-                              {order.shippingDetails.address.city},{' '}
-                              // @ts-expect-error
-                              {order.shippingDetails.address.state}
+                      <div className="info-value">                        {order.shippingDetails.address?.street && (                          <div>{order.shippingDetails.address.street}</div>
+                        )}                        {order.shippingDetails.address?.city &&                          order.shippingDetails.address?.state && (
+                            <div>                              {order.shippingDetails.address.city},{' '}                              {order.shippingDetails.address.state}
                             </div>
-                          )}
-                        // @ts-expect-error
-                        {order.shippingDetails.address?.zipCode && (
-                          // @ts-expect-error
-                          <div>{order.shippingDetails.address.zipCode}</div>
+                          )}                        {order.shippingDetails.address?.zipCode && (                          <div>{order.shippingDetails.address.zipCode}</div>
                         )}
                       </div>
                     </div>
-                  </div>
-
-                  // @ts-expect-error
-                  {order?.shippingDetails?.trackingId && (
+                  </div>                  {order?.shippingDetails?.trackingId && (
                     <div className="info-item">
                       <div className="info-icon">
                         <Package size={20} />
                       </div>
                       <div className="info-content">
                         <div className="info-label">Tracking ID</div>
-                        <div className="info-value tracking-id">
-                          // @ts-expect-error
-                          {order.shippingDetails.trackingId}
+                        <div className="info-value tracking-id">                          {order.shippingDetails.trackingId}
                         </div>
                       </div>
                     </div>
-                  )}
-
-                  // @ts-expect-error
-                  {order?.shippingDetails?.estimatedDelivery && (
+                  )}                  {order?.shippingDetails?.estimatedDelivery && (
                     <div className="info-item">
                       <div className="info-icon">
                         <Calendar size={20} />
                       </div>
                       <div className="info-content">
                         <div className="info-label">Estimated Delivery</div>
-                        <div className="info-value">
-                          // @ts-expect-error
-                          {formatDate(order.shippingDetails.estimatedDelivery)}
+                        <div className="info-value">                          {formatDate(order.shippingDetails.estimatedDelivery)}
                         </div>
                       </div>
                     </div>
@@ -372,18 +315,14 @@ const UserOrderDetails = () => {
             </div>
           )}
 
-          {/* Order Timeline */}
-          // @ts-expect-error
-          {order?.timeline && order.timeline.length > 0 && (
+          {/* Order Timeline */}          {order?.timeline && order.timeline.length > 0 && (
             <div className="card">
               <div className="card-header">
                 <Clock size={20} />
                 <h2 className="card-title">Order Timeline</h2>
               </div>
               <div className="card-content">
-                <div className="timeline">
-                  // @ts-expect-error
-                  {order.timeline.map((item: any, index: any) => (
+                <div className="timeline">                  {order.timeline.map((item: any, index: any) => (
                     <div key={index} className="timeline-item">
                       <div className={`timeline-icon timeline-${item.status}`}>
                         {getStatusIcon(item.status)}
@@ -414,33 +353,22 @@ const UserOrderDetails = () => {
             <div className="card-content">
               <div className="payment-details">
                 <div className="payment-row">
-                  <span>Subtotal</span>
-                  // @ts-expect-error
-                  <span>{formatCurrency(order?.totalAmount * 0.9 || 0)}</span>
+                  <span>Subtotal</span>                  <span>{formatCurrency(order?.totalAmount * 0.9 || 0)}</span>
                 </div>
                 <div className="payment-row">
-                  <span>Taxes & Fees</span>
-                  // @ts-expect-error
-                  <span>{formatCurrency(order?.totalAmount * 0.1 || 0)}</span>
+                  <span>Taxes & Fees</span>                  <span>{formatCurrency(order?.totalAmount * 0.1 || 0)}</span>
                 </div>
                 <div className="payment-row total">
-                  <span>Total Amount</span>
-                  // @ts-expect-error
-                  <span>{formatCurrency(order?.totalAmount || 0)}</span>
+                  <span>Total Amount</span>                  <span>{formatCurrency(order?.totalAmount || 0)}</span>
                 </div>
-              </div>
-
-              // @ts-expect-error
-              {order?.paymentDetails && (
+              </div>              {order?.paymentDetails && (
                 <div className="payment-method">
                   <div className="info-item">
                     <div className="info-icon">
                       <CreditCard size={20} />
                     </div>
                     <div className="info-content">
-                      <div className="info-label">Payment Method</div>
-                      // @ts-expect-error
-                      <div className="info-value">{order.paymentDetails.method || 'N/A'}</div>
+                      <div className="info-label">Payment Method</div>                      <div className="info-value">{order.paymentDetails.method || 'N/A'}</div>
                     </div>
                   </div>
                   <div className="info-item">
@@ -448,11 +376,7 @@ const UserOrderDetails = () => {
                       <Shield size={20} />
                     </div>
                     <div className="info-content">
-                      <div className="info-label">Payment Status</div>
-                      // @ts-expect-error
-                      <div className={`payment-status status-${order.paymentDetails.status}`}>
-                        // @ts-expect-error
-                        {order.paymentDetails.status || 'Pending'}
+                      <div className="info-label">Payment Status</div>                      <div className={`payment-status status-${order.paymentDetails.status}`}>                        {order.paymentDetails.status || 'Pending'}
                       </div>
                     </div>
                   </div>
@@ -461,9 +385,7 @@ const UserOrderDetails = () => {
             </div>
           </div>
 
-          {/* Commission Details (if applicable) */}
-          // @ts-expect-error
-          {order?.commission && (
+          {/* Commission Details (if applicable) */}          {order?.commission && (
             <div className="card">
               <div className="card-header">
                 <Star size={20} />
@@ -472,15 +394,11 @@ const UserOrderDetails = () => {
               <div className="card-content">
                 <div className="commission-details">
                   <div className="commission-item">
-                    <span>Cashback Rate</span>
-                    // @ts-expect-error
-                    <span className="commission-rate">{order.commission.rate || 0}%</span>
+                    <span>Cashback Rate</span>                    <span className="commission-rate">{order.commission.rate || 0}%</span>
                   </div>
                   <div className="commission-item">
                     <span>Cashback Amount</span>
-                    <span className="commission-amount">
-                      // @ts-expect-error
-                      {formatCurrency(order.commission.amount || 0)}
+                    <span className="commission-amount">                      {formatCurrency(order.commission.amount || 0)}
                     </span>
                   </div>
                 </div>

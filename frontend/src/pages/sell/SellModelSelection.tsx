@@ -87,25 +87,13 @@ const SellModelSelection = () => {
   }
 
   // Get variants from API data or fallback to default
-  const variants =
-    // @ts-expect-error
-    product.productDetails?.memoryStorage?.phoneVariants?.length > 0
-      // @ts-expect-error
-      ? product.productDetails.memoryStorage.phoneVariants
+  const variants =    product.productDetails?.memoryStorage?.phoneVariants?.length > 0      ? product.productDetails.memoryStorage.phoneVariants
       : ['16 GB', '32 GB', '64 GB', '128 GB'];
 
   // Get product image
-  const productImage =
-    // @ts-expect-error
-    product.images && product.images['0'] ? product.images['0'].replace(/["`]/g, '') : null;
+  const productImage =    product.images && product.images['0'] ? product.images['0'].replace(/["`]/g, '') : null;
 
-  // Dynamic breadcrumb and title
-  // @ts-expect-error
-  const brandName = product.brand || 'Brand';
-  // @ts-expect-error
-  const productName = product.name || 'Product';
-  // @ts-expect-error
-  const basePrice = product.pricing?.discountedPrice || product.basePrice || '2,160';
+  // Dynamic breadcrumb and title  const brandName = product.brand || 'Brand';  const productName = product.name || 'Product';  const basePrice = product.pricing?.discountedPrice || product.basePrice || '2,160';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -251,67 +239,47 @@ const SellModelSelection = () => {
               <div className="space-y-4">
                 <h5 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
                   Device Details
-                </h5>
-
-                // @ts-expect-error
-                {product.productDetails?.display?.size && (
+                </h5>                {product.productDetails?.display?.size && (
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Monitor className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-600">Display</p>
-                      <p className="text-sm font-semibold text-slate-900">
-                        // @ts-expect-error
-                        {product.productDetails.display.size}
+                      <p className="text-sm font-semibold text-slate-900">                        {product.productDetails.display.size}
                       </p>
                     </div>
                   </div>
-                )}
-
-                // @ts-expect-error
-                {product.productDetails?.battery?.capacity && (
+                )}                {product.productDetails?.battery?.capacity && (
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Battery className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-600">Battery</p>
-                      <p className="text-sm font-semibold text-slate-900">
-                        // @ts-expect-error
-                        {product.productDetails.battery.capacity}
+                      <p className="text-sm font-semibold text-slate-900">                        {product.productDetails.battery.capacity}
                       </p>
                     </div>
                   </div>
-                )}
-
-                // @ts-expect-error
-                {product.productDetails?.design?.weight && (
+                )}                {product.productDetails?.design?.weight && (
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <CheckCircle className="w-5 h-5 text-purple-600" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-600">Weight</p>
-                      <p className="text-sm font-semibold text-slate-900">
-                        // @ts-expect-error
-                        {product.productDetails.design.weight}
+                      <p className="text-sm font-semibold text-slate-900">                        {product.productDetails.design.weight}
                       </p>
                     </div>
                   </div>
-                )}
-
-                // @ts-expect-error
-                {product.availability && (
+                )}                {product.availability && (
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                     <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Package className="w-5 h-5 text-amber-600" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-600">Availability</p>
-                      <p className="text-sm font-semibold text-slate-900">
-                        // @ts-expect-error
-                        {product.availability.inStock ? 'In Stock' : 'Out of Stock'}
+                      <p className="text-sm font-semibold text-slate-900">                        {product.availability.inStock ? 'In Stock' : 'Out of Stock'}
                       </p>
                     </div>
                   </div>

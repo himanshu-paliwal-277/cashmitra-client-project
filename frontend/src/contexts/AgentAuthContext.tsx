@@ -1,12 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
-
-// @ts-expect-error
-const AgentAuthContext = createContext();
-
-// @ts-expect-error
-const API_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
+import { toast } from 'react-hot-toast';const AgentAuthContext = createContext();const API_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
 
 export const AgentAuthProvider = ({
   children
@@ -65,16 +59,12 @@ export const AgentAuthProvider = ({
       localStorage.setItem('agentToken', token);
       localStorage.setItem('agentUser', JSON.stringify(agentData));
 
-      // Update state
-      // @ts-expect-error
-      setAgent(agentData);
+      // Update state      setAgent(agentData);
       setIsAuthenticated(true);
 
       toast.success('Login successful!');
       return true;
-    } catch (error) {
-      // @ts-expect-error
-      const message = error.response?.data?.message || 'Login failed';
+    } catch (error) {      const message = error.response?.data?.message || 'Login failed';
       toast.error(message);
       throw error;
     } finally {

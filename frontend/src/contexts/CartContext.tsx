@@ -1,9 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { API_BASE_URL } from '../config/api';
-
-// @ts-expect-error
-const CartContext = createContext();
+import { API_BASE_URL } from '../config/api';const CartContext = createContext();
 
 export const useCart = () => {
   const context = useContext(CartContext);
@@ -18,9 +15,7 @@ export const CartProvider = ({
 }: any) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  // @ts-expect-error
-  const { user, getAuthToken } = useAuth();
+  const [error, setError] = useState(null);  const { user, getAuthToken } = useAuth();
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -188,22 +183,13 @@ export const CartProvider = ({
     console.log('product: ', product);
     try {
       setLoading(true);
-      setError(null);
-
-      // @ts-expect-error
-      const existingItemIndex = cartItems.findIndex(item => item.productId === product._id);
+      setError(null);      const existingItemIndex = cartItems.findIndex(item => item.productId === product._id);
 
       let updatedCart;
       if (existingItemIndex >= 0) {
         // Update existing item and move to front
-        const updatedItem = {
-          // @ts-expect-error
-          ...cartItems[existingItemIndex],
-          // @ts-expect-error
-          quantity: cartItems[existingItemIndex].quantity + quantity,
-          inventoryId:
-            // @ts-expect-error
-            cartItems[existingItemIndex].inventoryId || cartItems[existingItemIndex].productId, // Ensure inventoryId exists
+        const updatedItem = {          ...cartItems[existingItemIndex],          quantity: cartItems[existingItemIndex].quantity + quantity,
+          inventoryId:            cartItems[existingItemIndex].inventoryId || cartItems[existingItemIndex].productId, // Ensure inventoryId exists
           addedAt: new Date().toISOString(), // Update timestamp
         };
         const otherItems = cartItems.filter((_, index) => index !== existingItemIndex);
@@ -223,10 +209,7 @@ export const CartProvider = ({
           addedAt: new Date().toISOString(), // Add timestamp for ordering
         };
         updatedCart = [cartItem, ...cartItems]; // Add to beginning for most recent first
-      }
-
-      // @ts-expect-error
-      setCartItems(updatedCart);
+      }      setCartItems(updatedCart);
 
       // Update server if user is logged in
       if (user) {
@@ -234,11 +217,7 @@ export const CartProvider = ({
       }
 
       return { success: true };
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message);
-      // @ts-expect-error
-      return { success: false, error: err.message };
+    } catch (err) {      setError(err.message);      return { success: false, error: err.message };
     } finally {
       setLoading(false);
     }
@@ -249,24 +228,18 @@ export const CartProvider = ({
       setLoading(true);
       setError(null);
 
-      // Find the item to get its inventoryId
-      // @ts-expect-error
-      const itemToRemove = cartItems.find(item => item.productId === productId);
+      // Find the item to get its inventoryId      const itemToRemove = cartItems.find(item => item.productId === productId);
       if (!itemToRemove) {
         throw new Error('Item not found in cart');
       }
 
-      // Update local state first
-      // @ts-expect-error
-      const updatedCart = cartItems.filter(item => item.productId !== productId);
+      // Update local state first      const updatedCart = cartItems.filter(item => item.productId !== productId);
       setCartItems(updatedCart);
 
       // Update server if user is logged in
       if (user) {
         const token = getAuthToken();
-        if (token) {
-          // @ts-expect-error
-          const inventoryId = itemToRemove.inventoryId || itemToRemove.productId;
+        if (token) {          const inventoryId = itemToRemove.inventoryId || itemToRemove.productId;
           const response = await fetch(`${API_BASE_URL}/buy/cart/${inventoryId}`, {
             method: 'DELETE',
             headers: {
@@ -282,9 +255,7 @@ export const CartProvider = ({
         }
       }
     } catch (err) {
-      console.error('Error removing from cart:', err);
-      // @ts-expect-error
-      setError(err.message);
+      console.error('Error removing from cart:', err);      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -300,31 +271,20 @@ export const CartProvider = ({
         return;
       }
 
-      // Find the item to get its inventoryId
-      // @ts-expect-error
-      const itemToUpdate = cartItems.find(item => item.productId === productId);
+      // Find the item to get its inventoryId      const itemToUpdate = cartItems.find(item => item.productId === productId);
       if (!itemToUpdate) {
         throw new Error('Item not found in cart');
       }
 
       // Update local state first
-      const updatedCart = cartItems.map(item =>
-        // @ts-expect-error
-        item.productId === productId
-          // @ts-expect-error
-          ? { ...item, quantity, inventoryId: item.inventoryId || item.productId }
+      const updatedCart = cartItems.map(item =>        item.productId === productId          ? { ...item, quantity, inventoryId: item.inventoryId || item.productId }
           : item
-      );
-
-      // @ts-expect-error
-      setCartItems(updatedCart);
+      );      setCartItems(updatedCart);
 
       // Update server if user is logged in
       if (user) {
         const token = getAuthToken();
-        if (token) {
-          // @ts-expect-error
-          const inventoryId = itemToUpdate.inventoryId || itemToUpdate.productId;
+        if (token) {          const inventoryId = itemToUpdate.inventoryId || itemToUpdate.productId;
           const response = await fetch(`${API_BASE_URL}/buy/cart/${inventoryId}`, {
             method: 'PUT',
             headers: {
@@ -342,9 +302,7 @@ export const CartProvider = ({
         }
       }
     } catch (err) {
-      console.error('Error updating quantity:', err);
-      // @ts-expect-error
-      setError(err.message);
+      console.error('Error updating quantity:', err);      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -365,9 +323,7 @@ export const CartProvider = ({
           // Since there's no dedicated clear endpoint, we'll remove each item individually
           const itemsToRemove = [...cartItems]; // Create a copy to avoid state mutation issues
 
-          for (const item of itemsToRemove) {
-            // @ts-expect-error
-            const inventoryId = item.inventoryId || item.productId;
+          for (const item of itemsToRemove) {            const inventoryId = item.inventoryId || item.productId;
             try {
               const response = await fetch(`${API_BASE_URL}/buy/cart/${inventoryId}`, {
                 method: 'DELETE',
@@ -386,22 +342,16 @@ export const CartProvider = ({
         }
       }
     } catch (err) {
-      console.error('Error clearing cart:', err);
-      // @ts-expect-error
-      setError(err.message);
+      console.error('Error clearing cart:', err);      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const getCartTotal = () => {
-    // @ts-expect-error
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const getCartTotal = () => {    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const getCartItemsCount = () => {
-    // @ts-expect-error
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  const getCartItemsCount = () => {    return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
   const clearError = () => {

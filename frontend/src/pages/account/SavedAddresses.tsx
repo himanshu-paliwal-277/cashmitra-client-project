@@ -17,9 +17,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import useUserAddresses from '../../hooks/useUserAddresses';
 import './SavedAddresses.css';
 
-const SavedAddresses = () => {
-  // @ts-expect-error
-  const { user } = useAuth();
+const SavedAddresses = () => {  const { user } = useAuth();
   const {
     addresses,
     loading,
@@ -110,9 +108,7 @@ const SavedAddresses = () => {
   const saveAddress = async () => {
     try {
       setSaving(true);
-      if (editingAddress) {
-        // @ts-expect-error
-        await updateAddress(editingAddress._id || editingAddress.id, formData);
+      if (editingAddress) {        await updateAddress(editingAddress._id || editingAddress.id, formData);
       } else {
         await addAddress(formData);
       }
@@ -166,9 +162,7 @@ const SavedAddresses = () => {
           <div>
             <h1 className="addr-title">Saved Addresses</h1>
             <p className="addr-subtitle">Manage your delivery addresses</p>
-          </div>
-          // @ts-expect-error
-          <Button variant="primary" onClick={handleAddAddress}>
+          </div>          <Button variant="primary" onClick={handleAddAddress}>
             <Plus size={18} />
             <span>Add New Address</span>
           </Button>
@@ -182,22 +176,12 @@ const SavedAddresses = () => {
           </div>
         ) : addresses?.length > 0 ? (
           <div className="addr-grid">
-            {addresses.map(address => {
-              // @ts-expect-error
-              const id = address._id || address.id;
-              // @ts-expect-error
-              const type = address.addressType || address.type || 'home';
-              return (
-                // @ts-expect-error
-                <Card key={id} className={`addr-card ${address.isDefault ? 'is-default' : ''}`}>
-                  // @ts-expect-error
-                  {address.isDefault && <span className="addr-badge">Default</span>}
+            {addresses.map(address => {              const id = address._id || address.id;              const type = address.addressType || address.type || 'home';
+              return (                <Card key={id} className={`addr-card ${address.isDefault ? 'is-default' : ''}`}>                  {address.isDefault && <span className="addr-badge">Default</span>}
 
                   <div className="addr-card-head">
                     <div className="addr-type">
-                      {getAddressTypeIcon(type)}
-                      // @ts-expect-error
-                      <span>{address.title || getAddressTypeLabel(type)}</span>
+                      {getAddressTypeIcon(type)}                      <span>{address.title || getAddressTypeLabel(type)}</span>
                     </div>
                     <div className="addr-actions">
                       <button
@@ -217,30 +201,16 @@ const SavedAddresses = () => {
                     </div>
                   </div>
 
-                  <div className="addr-content">
-                    // @ts-expect-error
-                    <h3 className="addr-name">{address.fullName || address.name}</h3>
-                    // @ts-expect-error
-                    <p className="addr-line">{address.street || address.addressLine1}</p>
-                    // @ts-expect-error
-                    {address.addressLine2 && <p className="addr-line">{address.addressLine2}</p>}
-                    <p className="addr-line">
-                      // @ts-expect-error
-                      {address.city}, {address.state} — {address.pincode}
+                  <div className="addr-content">                    <h3 className="addr-name">{address.fullName || address.name}</h3>                    <p className="addr-line">{address.street || address.addressLine1}</p>                    {address.addressLine2 && <p className="addr-line">{address.addressLine2}</p>}
+                    <p className="addr-line">                      {address.city}, {address.state} — {address.pincode}
                     </p>
 
                     <div className="addr-contact">
                       <div className="addr-contact-item">
-                        <Phone size={14} />
-                        // @ts-expect-error
-                        <span>{address.phone}</span>
-                      </div>
-                      // @ts-expect-error
-                      {address.email && (
+                        <Phone size={14} />                        <span>{address.phone}</span>
+                      </div>                      {address.email && (
                         <div className="addr-contact-item">
-                          <Mail size={14} />
-                          // @ts-expect-error
-                          <span>{address.email}</span>
+                          <Mail size={14} />                          <span>{address.email}</span>
                         </div>
                       )}
                     </div>
@@ -249,9 +219,7 @@ const SavedAddresses = () => {
               );
             })}
           </div>
-        ) : (
-          // @ts-expect-error
-          <Card>
+        ) : (          <Card>
             <div className="addr-empty">
               <div className="addr-empty-icon">
                 <MapPin size={38} />
@@ -259,9 +227,7 @@ const SavedAddresses = () => {
               <h3 className="addr-empty-title">No Saved Addresses</h3>
               <p className="addr-empty-desc">
                 Add your delivery addresses to make checkout faster and easier.
-              </p>
-              // @ts-expect-error
-              <Button variant="primary" size="lg" onClick={handleAddAddress}>
+              </p>              <Button variant="primary" size="lg" onClick={handleAddAddress}>
                 <Plus size={18} /> <span>Add Your First Address</span>
               </Button>
             </div>
@@ -486,13 +452,9 @@ const SavedAddresses = () => {
                 <label htmlFor="isDefault">Set as default address for faster checkout</label>
               </div>
 
-              <footer className="addr-form-actions">
-                // @ts-expect-error
-                <Button type="button" variant="ghost" onClick={closeModal} disabled={saving}>
+              <footer className="addr-form-actions">                <Button type="button" variant="ghost" onClick={closeModal} disabled={saving}>
                   Cancel
-                </Button>
-                // @ts-expect-error
-                <Button type="submit" variant="primary" disabled={saving}>
+                </Button>                <Button type="submit" variant="primary" disabled={saving}>
                   {saving ? (
                     <>
                       <RefreshCw size={16} className="spin" />

@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-// @ts-expect-error
-import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';import styled from 'styled-components';
 import { theme } from '../../theme';
 import { adminService } from '../../services/adminService';
 import ProductModal from '../../components/ProductModal';
@@ -428,15 +426,7 @@ const BuyProducts = () => {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch =
-      // @ts-expect-error
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      product.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    // @ts-expect-error
-    const matchesCategory = !selectedCategory || product.categoryId === selectedCategory;
-    // @ts-expect-error
-    const matchesStatus = !selectedStatus || product.status === selectedStatus;
+    const matchesSearch =      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||      product.description?.toLowerCase().includes(searchTerm.toLowerCase());    const matchesCategory = !selectedCategory || product.categoryId === selectedCategory;    const matchesStatus = !selectedStatus || product.status === selectedStatus;
 
     return matchesSearch && matchesCategory && matchesStatus;
   });
@@ -445,11 +435,7 @@ const BuyProducts = () => {
     let aValue = a[sortBy];
     let bValue = b[sortBy];
 
-    if (sortBy === 'price') {
-      // @ts-expect-error
-      aValue = parseFloat(aValue) || 0;
-      // @ts-expect-error
-      bValue = parseFloat(bValue) || 0;
+    if (sortBy === 'price') {      aValue = parseFloat(aValue) || 0;      bValue = parseFloat(bValue) || 0;
     }
 
     if (sortOrder === 'asc') {
@@ -461,9 +447,7 @@ const BuyProducts = () => {
 
   const renderProductCard = (product: any) => {
     // Get the first image from the images object
-    const firstImageKey = Object.keys(product.images || {})[0];
-    // @ts-expect-error
-    const productImage = product.images?.[firstImageKey];
+    const firstImageKey = Object.keys(product.images || {})[0];    const productImage = product.images?.[firstImageKey];
 
     return (
       <ProductCard key={product._id}>
@@ -477,11 +461,7 @@ const BuyProducts = () => {
                 height: '100%',
                 objectFit: 'cover',
               }}
-              onError={e => {
-                // @ts-expect-error
-                e.target.style.display = 'none';
-                // @ts-expect-error
-                e.target.nextSibling.style.display = 'flex';
+              onError={e => {                e.target.style.display = 'none';                e.target.nextSibling.style.display = 'flex';
               }}
             />
           ) : null}
@@ -536,15 +516,9 @@ const BuyProducts = () => {
       </thead>
       <tbody>
         {sortedProducts.map(product => {
-          // Get the first image from the images object
-          // @ts-expect-error
-          const firstImageKey = Object.keys(product.images || {})[0];
-          // @ts-expect-error
-          const productImage = product.images?.[firstImageKey];
+          // Get the first image from the images object          const firstImageKey = Object.keys(product.images || {})[0];          const productImage = product.images?.[firstImageKey];
 
-          return (
-            // @ts-expect-error
-            <TableRow key={product._id}>
+          return (            <TableRow key={product._id}>
               <TableCell>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div
@@ -561,19 +535,13 @@ const BuyProducts = () => {
                   >
                     {productImage ? (
                       <img
-                        src={productImage.replace(/`/g, '').trim()}
-                        // @ts-expect-error
-                        alt={product.name}
+                        src={productImage.replace(/`/g, '').trim()}                        alt={product.name}
                         style={{
                           width: '100%',
                           height: '100%',
                           objectFit: 'cover',
                         }}
-                        onError={e => {
-                          // @ts-expect-error
-                          e.target.style.display = 'none';
-                          // @ts-expect-error
-                          e.target.nextSibling.style.display = 'flex';
+                        onError={e => {                          e.target.style.display = 'none';                          e.target.nextSibling.style.display = 'flex';
                         }}
                       />
                     ) : null}
@@ -589,27 +557,15 @@ const BuyProducts = () => {
                       <Package size={20} />
                     </div>
                   </div>
-                  <div>
-                    // @ts-expect-error
-                    <div style={{ fontWeight: '500' }}>{product.name}</div>
-                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                      // @ts-expect-error
-                      {product.description?.substring(0, 50)}...
+                  <div>                    <div style={{ fontWeight: '500' }}>{product.name}</div>
+                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>                      {product.description?.substring(0, 50)}...
                     </div>
                   </div>
                 </div>
+              </TableCell>              <TableCell>{product.categoryId?.name || 'Uncategorized'}</TableCell>
+              <TableCell style={{ fontWeight: '600', color: '#10b981' }}>                ₹{product.pricing?.discountedPrice || 'N/A'}
               </TableCell>
-              // @ts-expect-error
-              <TableCell>{product.categoryId?.name || 'Uncategorized'}</TableCell>
-              <TableCell style={{ fontWeight: '600', color: '#10b981' }}>
-                // @ts-expect-error
-                ₹{product.pricing?.discountedPrice || 'N/A'}
-              </TableCell>
-              <TableCell>
-                // @ts-expect-error
-                <ProductBadge status={product.isActive ? 'active' : 'inactive'}>
-                  // @ts-expect-error
-                  {product.isActive ? 'Active' : 'Inactive'}
+              <TableCell>                <ProductBadge status={product.isActive ? 'active' : 'inactive'}>                  {product.isActive ? 'Active' : 'Inactive'}
                 </ProductBadge>
               </TableCell>
               <TableCell>
@@ -624,9 +580,7 @@ const BuyProducts = () => {
                     <Edit size={14} />
                   </ActionButtonSmall>
                   <ActionButtonSmall
-                    style={{ flex: 'none', padding: '0.375rem' }}
-                    // @ts-expect-error
-                    onClick={() => handleDeleteProduct(product._id)}
+                    style={{ flex: 'none', padding: '0.375rem' }}                    onClick={() => handleDeleteProduct(product._id)}
                   >
                     <Trash2 size={14} />
                   </ActionButtonSmall>
@@ -695,11 +649,7 @@ const BuyProducts = () => {
             onChange={(e: any) => setSelectedCategory(e.target.value)}
           >
             <option value="">All Categories</option>
-            {categories.map(category => (
-              // @ts-expect-error
-              <option key={category.id} value={category.id}>
-                // @ts-expect-error
-                {category.name}
+            {categories.map(category => (              <option key={category.id} value={category.id}>                {category.name}
               </option>
             ))}
           </FilterSelect>

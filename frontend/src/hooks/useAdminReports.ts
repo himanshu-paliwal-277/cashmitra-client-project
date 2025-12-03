@@ -14,9 +14,7 @@ export const useAdminReports = () => {
       const response = await getSalesReport(params);
       setSalesData(response.data);
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch sales report');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch sales report');
       throw err;
     } finally {
       setLoading(false);
@@ -30,9 +28,7 @@ export const useAdminReports = () => {
       const response = await getInventoryReport(params);
       setInventoryData(response.data);
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch inventory report');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch inventory report');
       throw err;
     } finally {
       setLoading(false);

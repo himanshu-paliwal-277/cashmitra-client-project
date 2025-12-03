@@ -6,7 +6,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-// @ts-expect-error
 import styled from 'styled-components';
 import { X, Save, Plus, Trash2, AlertCircle, HelpCircle, CheckCircle, Circle } from 'lucide-react';
 
@@ -210,8 +209,8 @@ const RemoveOptionButton = styled.button`
 `;
 
 const CorrectToggle = styled.button`
-  background: ${(props: any) => props.isCorrect ? '#10b981' : '#e5e7eb'};
-  color: ${(props: any) => props.isCorrect ? 'white' : '#6b7280'};
+  background: ${(props: any) => (props.isCorrect ? '#10b981' : '#e5e7eb')};
+  color: ${(props: any) => (props.isCorrect ? 'white' : '#6b7280')};
   border: none;
   padding: 0.5rem;
   border-radius: 0.375rem;
@@ -223,7 +222,7 @@ const CorrectToggle = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: ${(props: any) => props.isCorrect ? '#059669' : '#d1d5db'};
+    background: ${(props: any) => (props.isCorrect ? '#059669' : '#d1d5db')};
   }
 `;
 
@@ -258,8 +257,9 @@ const Button = styled.button`
   gap: 0.5rem;
   transition: all 0.2s;
 
-  ${(props: any) => props.variant === 'primary'
-  ? `
+  ${(props: any) =>
+    props.variant === 'primary'
+      ? `
 background: #f59e0b;
 color: white;
 border: none;
@@ -273,7 +273,7 @@ border: none;
   cursor: not-allowed;
 }
 `
-  : `
+      : `
 background: white;
 color: #374151;
 border: 1px solid #d1d5db;
@@ -309,7 +309,7 @@ const QuestionModal = ({
   onSave,
   loading = false,
   categories = [],
-  selectedCategoryId = null
+  selectedCategoryId = null,
 }: any) => {
   const [formData, setFormData] = useState({
     categoryId: '',
@@ -350,7 +350,7 @@ const QuestionModal = ({
             // Use tempId instead of id
             tempId: opt._id || Date.now(),
 
-            showIf: opt.showIf || { questionKey: '', value: '' }
+            showIf: opt.showIf || { questionKey: '', value: '' },
           })) || [],
         isActive: question.isActive !== false,
       });
@@ -382,7 +382,6 @@ const QuestionModal = ({
   };
 
   const addOption = () => {
-    // @ts-expect-error
     setFormData(prev => ({
       ...prev,
       options: [
@@ -406,31 +405,24 @@ const QuestionModal = ({
   const removeOption = (tempId: any) => {
     setFormData(prev => ({
       ...prev,
-      // @ts-expect-error
       options: prev.options.filter(o => o.tempId !== tempId),
     }));
   };
 
   const updateOption = (tempId: any, field: any, value: any) => {
-    // @ts-expect-error
     setFormData(prev => ({
       ...prev,
-      // @ts-expect-error
       options: prev.options.map(o => (o.tempId === tempId ? { ...o, [field]: value } : o)),
     }));
   };
 
   const updateOptionDelta = (tempId: any, deltaField: any, value: any) => {
-    // @ts-expect-error
     setFormData(prev => ({
       ...prev,
       options: prev.options.map(o =>
-        // @ts-expect-error
         o.tempId === tempId
           ? {
-              // @ts-expect-error
               ...o,
-              // @ts-expect-error
               delta: { ...o.delta, [deltaField]: value },
             }
           : o
@@ -468,19 +460,16 @@ const QuestionModal = ({
         setError('At least 2 options are required for choice questions');
         return;
       }
-      // @ts-expect-error
       if (formData.options.some(o => !o.label.trim())) {
         setError('All options must have a label');
         return;
       }
-      // @ts-expect-error
       if (formData.options.some(o => !o.key.trim())) {
         setError('All options must have a key');
         return;
       }
       if (
         formData.options.some(
-          // @ts-expect-error
           o => o.showIf && (o.showIf.questionKey === undefined || o.showIf.value === undefined)
         )
       ) {
@@ -492,7 +481,6 @@ const QuestionModal = ({
     // Prepare data for backend, excluding tempId
     const submitData = {
       ...formData,
-      // @ts-expect-error
       options: formData.options.map(({ tempId, ...opt }) => opt), // Exclude tempId from options
     };
 
@@ -500,7 +488,6 @@ const QuestionModal = ({
       await onSave(submitData);
       onClose();
     } catch (err) {
-      // @ts-expect-error
       setError(err.message || 'Failed to save question');
     }
   };
@@ -537,7 +524,6 @@ const QuestionModal = ({
                 required
               >
                 <option value="">Select category</option>
-                // @ts-expect-error
                 {categories.map(category => (
                   <option key={category._id} value={category._id}>
                     {category.name}
@@ -627,9 +613,7 @@ const QuestionModal = ({
                   value={formData.required}
                   onChange={(e: any) => handleInputChange('required', e.target.value === 'true')}
                 >
-                  // @ts-expect-error
                   <option value={true}>Yes</option>
-                  // @ts-expect-error
                   <option value={false}>No</option>
                 </Select>
               </FormGroup>
@@ -640,9 +624,7 @@ const QuestionModal = ({
                   value={formData.multiSelect}
                   onChange={(e: any) => handleInputChange('multiSelect', e.target.value === 'true')}
                 >
-                  // @ts-expect-error
                   <option value={false}>No</option>
-                  // @ts-expect-error
                   <option value={true}>Yes</option>
                 </Select>
               </FormGroup>
@@ -654,14 +636,16 @@ const QuestionModal = ({
                 <Input
                   type="text"
                   value={formData.showIf.questionKey}
-                  onChange={(e: any) => handleInputChange('showIf', { ...formData.showIf, questionKey: e.target.value })
+                  onChange={(e: any) =>
+                    handleInputChange('showIf', { ...formData.showIf, questionKey: e.target.value })
                   }
                   placeholder="Question key"
                 />
                 <Input
                   type="text"
                   value={formData.showIf.value}
-                  onChange={(e: any) => handleInputChange('showIf', { ...formData.showIf, value: e.target.value })
+                  onChange={(e: any) =>
+                    handleInputChange('showIf', { ...formData.showIf, value: e.target.value })
                   }
                   placeholder="Expected value"
                 />
@@ -691,13 +675,11 @@ const QuestionModal = ({
                 </div>
 
                 {formData.options.map((option, index) => (
-                  // @ts-expect-error
                   <OptionCard key={option.tempId}>
                     <OptionHeader>
                       <span style={{ fontWeight: '600', color: '#374151' }}>
                         Option {index + 1}
                       </span>
-                      // @ts-expect-error
                       <RemoveOptionButton type="button" onClick={() => removeOption(option.tempId)}>
                         <Trash2 size={12} />
                         Remove
@@ -716,9 +698,7 @@ const QuestionModal = ({
                         <Label>Option Key</Label>
                         <Input
                           type="text"
-                          // @ts-expect-error
                           value={option.key}
-                          // @ts-expect-error
                           onChange={(e: any) => updateOption(option.tempId, 'key', e.target.value)}
                           placeholder="excellent"
                         />
@@ -728,10 +708,10 @@ const QuestionModal = ({
                         <Label>Option Value</Label>
                         <Input
                           type="text"
-                          // @ts-expect-error
                           value={option.value}
-                          // @ts-expect-error
-                          onChange={(e: any) => updateOption(option.tempId, 'value', e.target.value)}
+                          onChange={(e: any) =>
+                            updateOption(option.tempId, 'value', e.target.value)
+                          }
                           placeholder="excellent"
                         />
                       </FormGroup>
@@ -741,9 +721,7 @@ const QuestionModal = ({
                       <Label>Option Label</Label>
                       <Input
                         type="text"
-                        // @ts-expect-error
                         value={option.label}
-                        // @ts-expect-error
                         onChange={(e: any) => updateOption(option.tempId, 'label', e.target.value)}
                         placeholder="Excellent - No scratches or damage"
                       />
@@ -768,20 +746,20 @@ const QuestionModal = ({
                         }}
                       >
                         <Select
-                          // @ts-expect-error
                           value={option.delta?.type || 'percent'}
-                          // @ts-expect-error
-                          onChange={(e: any) => updateOptionDelta(option.tempId, 'type', e.target.value)}
+                          onChange={(e: any) =>
+                            updateOptionDelta(option.tempId, 'type', e.target.value)
+                          }
                         >
                           <option value="percent">Percentage</option>
                           <option value="abs">Absolute</option>
                         </Select>
 
                         <Select
-                          // @ts-expect-error
                           value={option.delta?.sign || '+'}
-                          // @ts-expect-error
-                          onChange={(e: any) => updateOptionDelta(option.tempId, 'sign', e.target.value)}
+                          onChange={(e: any) =>
+                            updateOptionDelta(option.tempId, 'sign', e.target.value)
+                          }
                         >
                           <option value="+">+ (Add)</option>
                           <option value="-">- (Subtract)</option>
@@ -789,14 +767,13 @@ const QuestionModal = ({
 
                         <Input
                           type="number"
-                          // @ts-expect-error
                           value={option.delta?.value || 0}
-                          onChange={(e: any) => updateOptionDelta(
-                            // @ts-expect-error
-                            option.tempId,
-                            'value',
-                            parseFloat(e.target.value) || 0
-                          )
+                          onChange={(e: any) =>
+                            updateOptionDelta(
+                              option.tempId,
+                              'value',
+                              parseFloat(e.target.value) || 0
+                            )
                           }
                           placeholder="0"
                           min="0"

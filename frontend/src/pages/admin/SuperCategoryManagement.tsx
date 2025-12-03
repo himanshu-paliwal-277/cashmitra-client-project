@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect, useCallback } from 'react';import styled from 'styled-components';
 import { Plus, Edit2, Trash2, Image as ImageIcon, Search } from 'lucide-react';
 import { API_BASE_URL } from '../../config/api';
 import SuperCategoryForm from './SuperCategoryForm';
@@ -52,9 +50,7 @@ const SuperCategoryManagement = () => {
         setError(errorMessage);
       }
     } catch (err) {
-      console.error('Error fetching super categories:', err);
-      // @ts-expect-error
-      setError('Error fetching super categories: ' + (err.message || 'Unknown error'));
+      console.error('Error fetching super categories:', err);      setError('Error fetching super categories: ' + (err.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }
@@ -90,9 +86,7 @@ const SuperCategoryManagement = () => {
       } else {
         alert(data.message || 'Failed to delete super category');
       }
-    } catch (err) {
-      // @ts-expect-error
-      alert('Error deleting super category: ' + err.message);
+    } catch (err) {      alert('Error deleting super category: ' + err.message);
     }
   };
 
@@ -185,44 +179,26 @@ const SuperCategoryManagement = () => {
         </EmptyMessage>
       ) : (
         <Grid>
-          {superCategories.map(category => (
-            // @ts-expect-error
-            <Card key={category._id}>
-              <CardImage>
-                // @ts-expect-error
-                {category.image ? (
-                  // @ts-expect-error
-                  <img src={category.image} alt={category.name} />
+          {superCategories.map(category => (            <Card key={category._id}>
+              <CardImage>                {category.image ? (                  <img src={category.image} alt={category.name} />
                 ) : (
                   <PlaceholderImage>
                     <ImageIcon size={48} />
                   </PlaceholderImage>
-                )}
-                // @ts-expect-error
-                <StatusBadge active={category.isActive}>
-                  // @ts-expect-error
-                  {category.isActive ? 'Active' : 'Inactive'}
+                )}                <StatusBadge active={category.isActive}>                  {category.isActive ? 'Active' : 'Inactive'}
                 </StatusBadge>
               </CardImage>
 
-              <CardContent>
-                // @ts-expect-error
-                <CategoryName>{category.name}</CategoryName>
-                <CategoryDescription>
-                  // @ts-expect-error
-                  {category.description || 'No description'}
+              <CardContent>                <CategoryName>{category.name}</CategoryName>
+                <CategoryDescription>                  {category.description || 'No description'}
                 </CategoryDescription>
 
                 <CategoryStats>
                   <Stat>
-                    <StatLabel>Categories:</StatLabel>
-                    // @ts-expect-error
-                    <StatValue>{category.categories?.length || 0}</StatValue>
+                    <StatLabel>Categories:</StatLabel>                    <StatValue>{category.categories?.length || 0}</StatValue>
                   </Stat>
                   <Stat>
-                    <StatLabel>Order:</StatLabel>
-                    // @ts-expect-error
-                    <StatValue>{category.sortOrder || 0}</StatValue>
+                    <StatLabel>Order:</StatLabel>                    <StatValue>{category.sortOrder || 0}</StatValue>
                   </Stat>
                 </CategoryStats>
               </CardContent>
@@ -231,9 +207,7 @@ const SuperCategoryManagement = () => {
                 <ActionButton onClick={() => handleEdit(category)} variant="edit">
                   <Edit2 size={18} />
                   Edit
-                </ActionButton>
-                // @ts-expect-error
-                <ActionButton onClick={() => handleDelete(category._id)} variant="delete">
+                </ActionButton>                <ActionButton onClick={() => handleDelete(category._id)} variant="delete">
                   <Trash2 size={18} />
                   Delete
                 </ActionButton>

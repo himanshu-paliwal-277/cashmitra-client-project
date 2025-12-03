@@ -7,7 +7,6 @@ import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
  * Redirects to login page if user is not authenticated
  */
 const PartnerProtectedRoute = () => {
-  // @ts-expect-error
   const { isAuthenticated, isLoading } = usePartnerAuth();
 
   // Show loading state while checking authentication

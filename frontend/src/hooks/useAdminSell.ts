@@ -47,9 +47,7 @@ const useAdminSell = () => {
         approved: approvedOrders,
         avgQuote: Math.round(avgQuote),
       });
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message || 'Failed to fetch sell orders');
+    } catch (err) {      setError(err.message || 'Failed to fetch sell orders');
       console.error('Error fetching sell orders:', err);
     } finally {
       setLoading(false);
@@ -79,12 +77,8 @@ const useAdminSell = () => {
         // Refresh the data
         await fetchSellOrders();
         return { success: true };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to update order status');
-        console.error('Error updating order status:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to update order status');
+        console.error('Error updating order status:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -115,12 +109,8 @@ const useAdminSell = () => {
         // Refresh the data
         await fetchSellOrders();
         return { success: true };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to create sell order');
-        console.error('Error creating sell order:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to create sell order');
+        console.error('Error creating sell order:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -150,12 +140,8 @@ const useAdminSell = () => {
         // Refresh the data
         await fetchSellOrders();
         return { success: true };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to delete sell order');
-        console.error('Error deleting sell order:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to delete sell order');
+        console.error('Error deleting sell order:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }

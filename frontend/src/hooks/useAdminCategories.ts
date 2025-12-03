@@ -18,17 +18,13 @@ export const useAdminCategories = () => {
 
       // Set category stats
       const data = response.data || response;
-      setCategoryStats({
-        // @ts-expect-error
-        totalCategories: data.length || 0,
+      setCategoryStats({        totalCategories: data.length || 0,
         parentCategories: data.filter((cat: any) => !cat.parentId)?.length || 0,
         subCategories: data.filter((cat: any) => cat.parentId)?.length || 0,
       });
 
       return response;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch categories');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch categories');
       throw err;
     } finally {
       setLoading(false);
@@ -44,9 +40,7 @@ export const useAdminCategories = () => {
         // Refresh categories list after adding
         await fetchCategories();
         return response;
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to add category');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to add category');
         throw err;
       } finally {
         setLoading(false);
@@ -60,18 +54,12 @@ export const useAdminCategories = () => {
     setError(null);
     try {
       const response = await adminService.updateCategory(id, categoryData);
-      // Update the category in the local state
-      // @ts-expect-error
-      setCategories(prevCategories =>
-        prevCategories.map(category =>
-          // @ts-expect-error
-          category.id === id ? { ...category, ...categoryData } : category
+      // Update the category in the local state      setCategories(prevCategories =>
+        prevCategories.map(category =>          category.id === id ? { ...category, ...categoryData } : category
         )
       );
       return response;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to update category');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to update category');
       throw err;
     } finally {
       setLoading(false);
@@ -83,13 +71,9 @@ export const useAdminCategories = () => {
     setError(null);
     try {
       const response = await adminService.deleteCategory(id);
-      // Remove the category from the local state
-      // @ts-expect-error
-      setCategories(prevCategories => prevCategories.filter(category => category.id !== id));
+      // Remove the category from the local state      setCategories(prevCategories => prevCategories.filter(category => category.id !== id));
       return response;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to delete category');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to delete category');
       throw err;
     } finally {
       setLoading(false);

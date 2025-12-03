@@ -17,9 +17,7 @@ const useUserOrders = () => {
       setOrders(response.data.orders || []);
       console.log('response.data.orders: ', response.data.orders);
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch orders');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch orders');
       throw err;
     } finally {
       setLoading(false);
@@ -33,9 +31,7 @@ const useUserOrders = () => {
     try {
       const response = await api.get(`/user/orders/${orderId}`);
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch order details');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch order details');
       throw err;
     } finally {
       setLoading(false);
@@ -47,21 +43,13 @@ const useUserOrders = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.put(`/user/orders/${orderId}/cancel`, { reason });
-      // @ts-expect-error
-      setOrders(prev =>
-        prev.map(order =>
-          // @ts-expect-error
-          order.id === orderId
-            // @ts-expect-error
-            ? { ...order, status: 'cancelled', cancellationReason: reason }
+      const response = await api.put(`/user/orders/${orderId}/cancel`, { reason });      setOrders(prev =>
+        prev.map(order =>          order.id === orderId            ? { ...order, status: 'cancelled', cancellationReason: reason }
             : order
         )
       );
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to cancel order');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to cancel order');
       throw err;
     } finally {
       setLoading(false);
@@ -73,16 +61,10 @@ const useUserOrders = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.post(`/user/orders/${orderId}/return`, returnData);
-      // @ts-expect-error
-      setOrders(prev =>
-        // @ts-expect-error
-        prev.map(order => (order.id === orderId ? { ...order, returnStatus: 'requested' } : order))
+      const response = await api.post(`/user/orders/${orderId}/return`, returnData);      setOrders(prev =>        prev.map(order => (order.id === orderId ? { ...order, returnStatus: 'requested' } : order))
       );
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to request return');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to request return');
       throw err;
     } finally {
       setLoading(false);
@@ -96,9 +78,7 @@ const useUserOrders = () => {
     try {
       const response = await api.get(`/user/orders/${orderId}/tracking`);
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to track order');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to track order');
       throw err;
     } finally {
       setLoading(false);
@@ -125,9 +105,7 @@ const useUserOrders = () => {
       window.URL.revokeObjectURL(url);
 
       return true;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to download invoice');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to download invoice');
       throw err;
     } finally {
       setLoading(false);

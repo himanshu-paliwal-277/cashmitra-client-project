@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState } from 'react';import styled from 'styled-components';
 import {
   Search,
   Filter,
@@ -578,9 +576,7 @@ function Inventory() {
 
               <ActionsMenu>
                 <ActionsButton
-                  onClick={() =>
-                    // @ts-expect-error
-                    setActiveDropdown(activeDropdown === product.id ? null : product.id)
+                  onClick={() =>                    setActiveDropdown(activeDropdown === product.id ? null : product.id)
                   }
                 >
                   <MoreVertical size={16} />

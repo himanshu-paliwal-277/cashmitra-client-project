@@ -46,9 +46,7 @@ const useSellProducts = () => {
         total: response.data.data?.length || 0,
         totalPages: 1,
       });
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch products');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch products');
     } finally {
       setLoading(false);
     }
@@ -66,9 +64,7 @@ const useSellProducts = () => {
         },
       });
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch product');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch product');
       throw err;
     } finally {
       setLoading(false);
@@ -92,9 +88,7 @@ const useSellProducts = () => {
         // Refresh products list
         await fetchProducts();
         return response.data;
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to create product');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to create product');
         throw err;
       } finally {
         setLoading(false);
@@ -120,9 +114,7 @@ const useSellProducts = () => {
         // Refresh products list
         await fetchProducts();
         return response.data;
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to update product');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to update product');
         throw err;
       } finally {
         setLoading(false);
@@ -146,9 +138,7 @@ const useSellProducts = () => {
 
         // Refresh products list
         await fetchProducts();
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to delete product');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to delete product');
         throw err;
       } finally {
         setLoading(false);
@@ -170,9 +160,7 @@ const useSellProducts = () => {
       });
       setVariants(response.data.variants || []);
       return response.data.variants || [];
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch variants');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch variants');
       throw err;
     } finally {
       setLoading(false);
@@ -196,9 +184,7 @@ const useSellProducts = () => {
         // Refresh variants list
         await fetchVariants(productId);
         return response.data;
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to create variant');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to create variant');
         throw err;
       } finally {
         setLoading(false);
@@ -228,9 +214,7 @@ const useSellProducts = () => {
         // Refresh variants list
         await fetchVariants(productId);
         return response.data;
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to update variant');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to update variant');
         throw err;
       } finally {
         setLoading(false);
@@ -254,9 +238,7 @@ const useSellProducts = () => {
 
         // Refresh variants list
         await fetchVariants(productId);
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.response?.data?.message || 'Failed to delete variant');
+      } catch (err) {        setError(err.response?.data?.message || 'Failed to delete variant');
         throw err;
       } finally {
         setLoading(false);
@@ -273,9 +255,7 @@ const useSellProducts = () => {
       const queryParams = new URLSearchParams(filters);
       const response = await api.get(`/sell-products/public?${queryParams}`);
       return response.data.products || [];
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch products');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch products');
       throw err;
     } finally {
       setLoading(false);
@@ -288,9 +268,7 @@ const useSellProducts = () => {
     try {
       const response = await api.get(`/sell-products/public/${productId}`);
       return response.data;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch product');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch product');
       throw err;
     } finally {
       setLoading(false);

@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -863,15 +861,8 @@ const EditBuyProduct = () => {
         const newData = { ...prev };
         let current = newData;
 
-        for (let i = 0; i < keys.length - 1; i++) {
-          // @ts-expect-error
-          if (!current[keys[i]]) current[keys[i]] = {};
-          // @ts-expect-error
-          current = current[keys[i]];
-        }
-
-        // @ts-expect-error
-        current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
+        for (let i = 0; i < keys.length - 1; i++) {          if (!current[keys[i]]) current[keys[i]] = {};          current = current[keys[i]];
+        }        current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
         return newData;
       });
     } else {
@@ -881,9 +872,7 @@ const EditBuyProduct = () => {
       }));
     }
 
-    // Clear error for this field
-    // @ts-expect-error
-    if (errors[name]) {
+    // Clear error for this field    if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
@@ -894,19 +883,9 @@ const EditBuyProduct = () => {
       const newData = { ...prev };
       let current = newData;
 
-      for (let i = 0; i < keys.length - 1; i++) {
-        // @ts-expect-error
-        current = current[keys[i]];
-      }
-
-      // @ts-expect-error
-      if (!Array.isArray(current[keys[keys.length - 1]])) {
-        // @ts-expect-error
-        current[keys[keys.length - 1]] = [];
-      }
-
-      // @ts-expect-error
-      current[keys[keys.length - 1]].push(newItem);
+      for (let i = 0; i < keys.length - 1; i++) {        current = current[keys[i]];
+      }      if (!Array.isArray(current[keys[keys.length - 1]])) {        current[keys[keys.length - 1]] = [];
+      }      current[keys[keys.length - 1]].push(newItem);
       return newData;
     });
   };
@@ -917,13 +896,8 @@ const EditBuyProduct = () => {
       const newData = { ...prev };
       let current = newData;
 
-      for (let i = 0; i < keys.length - 1; i++) {
-        // @ts-expect-error
-        current = current[keys[i]];
-      }
-
-      // @ts-expect-error
-      current[keys[keys.length - 1]].splice(index, 1);
+      for (let i = 0; i < keys.length - 1; i++) {        current = current[keys[i]];
+      }      current[keys[keys.length - 1]].splice(index, 1);
       return newData;
     });
   };
@@ -934,13 +908,8 @@ const EditBuyProduct = () => {
       const newData = { ...prev };
       let current = newData;
 
-      for (let i = 0; i < keys.length - 1; i++) {
-        // @ts-expect-error
-        current = current[keys[i]];
-      }
-
-      // @ts-expect-error
-      current[keys[keys.length - 1]][index] = value;
+      for (let i = 0; i < keys.length - 1; i++) {        current = current[keys[i]];
+      }      current[keys[keys.length - 1]][index] = value;
       return newData;
     });
   };
@@ -961,12 +930,7 @@ const EditBuyProduct = () => {
           ],
         })
       );
-      const uploadResults = await Promise.all(uploadPromises);
-
-      // @ts-expect-error
-      const newImages = uploadResults.map(result => result.secure_url);
-      // @ts-expect-error
-      setFormData(prev => ({
+      const uploadResults = await Promise.all(uploadPromises);      const newImages = uploadResults.map(result => result.secure_url);      setFormData(prev => ({
         ...prev,
         images: [...prev.images, ...newImages],
       }));
@@ -991,64 +955,42 @@ const EditBuyProduct = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Required fields validation
-    // @ts-expect-error
-    if (!formData.categoryId) newErrors.categoryId = 'Category is required';
-    // @ts-expect-error
-    if (!formData.name.trim()) newErrors.name = 'Product name is required';
-    // @ts-expect-error
-    if (!formData.brand.trim()) newErrors.brand = 'Brand is required';
-    // @ts-expect-error
-    if (!formData.description.trim()) newErrors.description = 'Description is required';
+    // Required fields validation    if (!formData.categoryId) newErrors.categoryId = 'Category is required';    if (!formData.name.trim()) newErrors.name = 'Product name is required';    if (!formData.brand.trim()) newErrors.brand = 'Brand is required';    if (!formData.description.trim()) newErrors.description = 'Description is required';
 
     // Pricing validation
-    if (!formData.pricing.originalPrice || parseFloat(formData.pricing.originalPrice) <= 0) {
-      // @ts-expect-error
-      newErrors['pricing.originalPrice'] = 'Valid original price is required';
+    if (!formData.pricing.originalPrice || parseFloat(formData.pricing.originalPrice) <= 0) {      newErrors['pricing.originalPrice'] = 'Valid original price is required';
     }
 
     if (
       formData.pricing.discountedPrice &&
       parseFloat(formData.pricing.discountedPrice) >= parseFloat(formData.pricing.originalPrice)
-    ) {
-      // @ts-expect-error
-      newErrors['pricing.discountedPrice'] = 'Discounted price must be less than original price';
+    ) {      newErrors['pricing.discountedPrice'] = 'Discounted price must be less than original price';
     }
 
     if (
       formData.pricing?.discount?.value &&
       (parseFloat(formData.pricing.discount.value) < 0 ||
         parseFloat(formData.pricing.discount.value) > 100)
-    ) {
-      // @ts-expect-error
-      newErrors['pricing.discount.value'] = 'Discount value must be between 0 and 100';
+    ) {      newErrors['pricing.discount.value'] = 'Discount value must be between 0 and 100';
     }
 
     // Availability validation
     if (
       formData.availability.inStock &&
       (!formData.availability.quantity || parseInt(formData.availability.quantity) <= 0)
-    ) {
-      // @ts-expect-error
-      newErrors['availability.quantity'] = 'Quantity is required when product is in stock';
+    ) {      newErrors['availability.quantity'] = 'Quantity is required when product is in stock';
     }
 
     // Images validation
-    if (formData.images.length === 0) {
-      // @ts-expect-error
-      newErrors.images = 'At least one product image is required';
+    if (formData.images.length === 0) {      newErrors.images = 'At least one product image is required';
     }
 
     // Top specs validation - at least one spec required
-    if (formData.topSpecs.length === 0) {
-      // @ts-expect-error
-      newErrors.topSpecs = 'At least one top specification is required';
+    if (formData.topSpecs.length === 0) {      newErrors.topSpecs = 'At least one top specification is required';
     }
 
     // Condition options validation - at least one condition required
-    if (formData.conditionOptions.length === 0) {
-      // @ts-expect-error
-      newErrors.conditionOptions = 'At least one condition option is required';
+    if (formData.conditionOptions.length === 0) {      newErrors.conditionOptions = 'At least one condition option is required';
     }
 
     setErrors(newErrors);
@@ -1069,45 +1011,27 @@ const EditBuyProduct = () => {
         ...formData,
         // Convert object-like arrays to proper arrays and handle images properly
         images: Array.isArray(formData.images)
-          ? formData.images
-              // @ts-expect-error
-              .filter(img => img && (typeof img === 'string' ? img : img.url))
-              // @ts-expect-error
-              .map(img => (typeof img === 'string' ? img : img.url))
-          : Object.values(formData.images || {})
-              // @ts-expect-error
-              .filter(img => img && (typeof img === 'string' ? img : img.url))
-              // @ts-expect-error
-              .map(img => (typeof img === 'string' ? img : img.url)),
+          ? formData.images              .filter(img => img && (typeof img === 'string' ? img : img.url))              .map(img => (typeof img === 'string' ? img : img.url))
+          : Object.values(formData.images || {})              .filter(img => img && (typeof img === 'string' ? img : img.url))              .map(img => (typeof img === 'string' ? img : img.url)),
         conditionOptions: Array.isArray(formData.conditionOptions)
           ? formData.conditionOptions.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.conditionOptions || {}).filter(
-              // @ts-expect-error
-              item => item && Object.keys(item).length > 0
+          : Object.values(formData.conditionOptions || {}).filter(              item => item && Object.keys(item).length > 0
             ),
         variants: Array.isArray(formData.variants)
           ? formData.variants.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.variants || {}).filter(
-              // @ts-expect-error
-              item => item && Object.keys(item).length > 0
+          : Object.values(formData.variants || {}).filter(              item => item && Object.keys(item).length > 0
             ),
         addOns: Array.isArray(formData.addOns)
           ? formData.addOns.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.addOns || {}).filter(
-              // @ts-expect-error
-              item => item && Object.keys(item).length > 0
+          : Object.values(formData.addOns || {}).filter(              item => item && Object.keys(item).length > 0
             ),
         offers: Array.isArray(formData.offers)
           ? formData.offers.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.offers || {}).filter(
-              // @ts-expect-error
-              item => item && Object.keys(item).length > 0
+          : Object.values(formData.offers || {}).filter(              item => item && Object.keys(item).length > 0
             ),
         relatedProducts: Array.isArray(formData.relatedProducts)
           ? formData.relatedProducts.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.relatedProducts || {}).filter(
-              // @ts-expect-error
-              item => item && Object.keys(item).length > 0
+          : Object.values(formData.relatedProducts || {}).filter(              item => item && Object.keys(item).length > 0
             ),
         topSpecs: Array.isArray(formData.topSpecs)
           ? formData.topSpecs
@@ -1117,22 +1041,16 @@ const EditBuyProduct = () => {
           : Object.values(formData.badges || {}),
         reviews: Array.isArray(formData.reviews)
           ? formData.reviews.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.reviews || {}).filter(
-              // @ts-expect-error
-              item => item && Object.keys(item).length > 0
+          : Object.values(formData.reviews || {}).filter(              item => item && Object.keys(item).length > 0
             ),
         paymentOptions: {
           ...formData.paymentOptions,
           emiPlans: Array.isArray(formData.paymentOptions?.emiPlans)
             ? formData.paymentOptions.emiPlans.filter(item => item && Object.keys(item).length > 0)
-            : Object.values(formData.paymentOptions?.emiPlans || {}).filter(
-                // @ts-expect-error
-                item => item && Object.keys(item).length > 0
+            : Object.values(formData.paymentOptions?.emiPlans || {}).filter(                item => item && Object.keys(item).length > 0
               ),
           methods: Array.isArray(formData.paymentOptions?.methods)
-            ? formData.paymentOptions.methods.filter(
-                // @ts-expect-error
-                item => item && typeof item === 'string' && item.trim() !== ''
+            ? formData.paymentOptions.methods.filter(                item => item && typeof item === 'string' && item.trim() !== ''
               )
             : Object.values(formData.paymentOptions?.methods || {}).filter(
                 item => item && typeof item === 'string' && item.trim() !== ''
@@ -1160,13 +1078,7 @@ const EditBuyProduct = () => {
           quantity: parseInt(formData.availability.quantity) || 0,
         },
         // Ensure rating values are numbers
-        rating: {
-          // @ts-expect-error
-          ...formData.rating,
-          // @ts-expect-error
-          average: parseFloat(formData.rating.average) || 0,
-          // @ts-expect-error
-          count: parseInt(formData.rating.count) || 0,
+        rating: {          ...formData.rating,          average: parseFloat(formData.rating.average) || 0,          count: parseInt(formData.rating.count) || 0,
         },
         // Fix nested arrays in productDetails - matching AddBuyProduct exactly
         productDetails: {
@@ -1196,18 +1108,8 @@ const EditBuyProduct = () => {
                   ? formData.productDetails.rearCamera.features
                   : Object.values(formData.productDetails.rearCamera.features || {}),
               }
-            : undefined,
-          // @ts-expect-error
-          frontCamera: formData.productDetails.frontCamera
-            ? {
-                // @ts-expect-error
-                ...formData.productDetails.frontCamera,
-                // @ts-expect-error
-                features: Array.isArray(formData.productDetails.frontCamera?.features)
-                  // @ts-expect-error
-                  ? formData.productDetails.frontCamera.features
-                  // @ts-expect-error
-                  : Object.values(formData.productDetails.frontCamera?.features || {}),
+            : undefined,          frontCamera: formData.productDetails.frontCamera
+            ? {                ...formData.productDetails.frontCamera,                features: Array.isArray(formData.productDetails.frontCamera?.features)                  ? formData.productDetails.frontCamera.features                  : Object.values(formData.productDetails.frontCamera?.features || {}),
               }
             : undefined,
           display: formData.productDetails.display
@@ -1217,9 +1119,7 @@ const EditBuyProduct = () => {
                   ? formData.productDetails.display.features.filter(
                       item => item && Object.keys(item).length > 0
                     )
-                  : Object.values(formData.productDetails.display.features || {}).filter(
-                      // @ts-expect-error
-                      item => item && Object.keys(item).length > 0
+                  : Object.values(formData.productDetails.display.features || {}).filter(                      item => item && Object.keys(item).length > 0
                     ),
               }
             : undefined,
@@ -1230,9 +1130,7 @@ const EditBuyProduct = () => {
                   ? formData.productDetails.design.colors.filter(
                       item => item && Object.keys(item).length > 0
                     )
-                  : Object.values(formData.productDetails.design.colors || {}).filter(
-                      // @ts-expect-error
-                      item => item && Object.keys(item).length > 0
+                  : Object.values(formData.productDetails.design.colors || {}).filter(                      item => item && Object.keys(item).length > 0
                     ),
               }
             : undefined,
@@ -1253,9 +1151,7 @@ const EditBuyProduct = () => {
                   ? formData.productDetails.memoryStorage.phoneVariants.filter(
                       item => item && Object.keys(item).length > 0
                     )
-                  : Object.values(formData.productDetails.memoryStorage.phoneVariants || {}).filter(
-                      // @ts-expect-error
-                      item => item && Object.keys(item).length > 0
+                  : Object.values(formData.productDetails.memoryStorage.phoneVariants || {}).filter(                      item => item && Object.keys(item).length > 0
                     ),
               }
             : undefined,
@@ -1270,15 +1166,11 @@ const EditBuyProduct = () => {
           sensors: formData.productDetails.sensors
             ? Array.isArray(formData.productDetails.sensors)
               ? formData.productDetails.sensors.filter(item => item && Object.keys(item).length > 0)
-              : Object.values(formData.productDetails.sensors || {}).filter(
-                  // @ts-expect-error
-                  item => item && Object.keys(item).length > 0
+              : Object.values(formData.productDetails.sensors || {}).filter(                  item => item && Object.keys(item).length > 0
                 )
             : undefined,
         },
-        // Ensure sortOrder is a number
-        // @ts-expect-error
-        sortOrder: parseInt(formData.sortOrder) || 0,
+        // Ensure sortOrder is a number        sortOrder: parseInt(formData.sortOrder) || 0,
       };
 
       await adminService.updateBuyProduct(id, productData);
@@ -1287,9 +1179,7 @@ const EditBuyProduct = () => {
         navigate('/admin/products');
       }, 2000);
     } catch (error) {
-      console.error('Error updating product:', error);
-      // @ts-expect-error
-      setErrors({ submit: error.response?.data?.message || 'Failed to update product' });
+      console.error('Error updating product:', error);      setErrors({ submit: error.response?.data?.message || 'Failed to update product' });
     } finally {
       setLoading(false);
     }
@@ -1331,20 +1221,12 @@ const EditBuyProduct = () => {
                   required
                 >
                   <option value="">Select Category</option>
-                  {categories.map(category => (
-                    // @ts-expect-error
-                    <option key={category._id} value={category._id}>
-                      // @ts-expect-error
-                      {category.name}
+                  {categories.map(category => (                    <option key={category._id} value={category._id}>                      {category.name}
                     </option>
                   ))}
-                </Select>
-                // @ts-expect-error
-                {errors.categoryId && (
+                </Select>                {errors.categoryId && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />
-                    // @ts-expect-error
-                    {errors.categoryId}
+                    <AlertCircle size={16} />                    {errors.categoryId}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1358,13 +1240,9 @@ const EditBuyProduct = () => {
                   onChange={handleInputChange}
                   placeholder="Enter product name"
                   required
-                />
-                // @ts-expect-error
-                {errors.name && (
+                />                {errors.name && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />
-                    // @ts-expect-error
-                    {errors.name}
+                    <AlertCircle size={16} />                    {errors.name}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1378,33 +1256,23 @@ const EditBuyProduct = () => {
                   onChange={handleInputChange}
                   placeholder="Enter brand name"
                   required
-                />
-                // @ts-expect-error
-                {errors.brand && (
+                />                {errors.brand && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />
-                    // @ts-expect-error
-                    {errors.brand}
+                    <AlertCircle size={16} />                    {errors.brand}
                   </ErrorMessage>
                 )}
               </FormGroup>
 
               <FormGroup>
                 <Label>Status</Label>
-                <Select name="isActive" value={formData.isActive} onChange={handleInputChange}>
-                  // @ts-expect-error
-                  <option value={true}>Active</option>
-                  // @ts-expect-error
-                  <option value={false}>Inactive</option>
+                <Select name="isActive" value={formData.isActive} onChange={handleInputChange}>                  <option value={true}>Active</option>                  <option value={false}>Inactive</option>
                 </Select>
               </FormGroup>
             </FormGrid>
 
             {/* Images Section */}
             <FormGroup style={{ marginTop: '1.5rem' }}>
-              <Label>Product Images</Label>
-              // @ts-expect-error
-              <ImageUploadContainer onClick={() => document.getElementById('imageUpload').click()}>
+              <Label>Product Images</Label>              <ImageUploadContainer onClick={() => document.getElementById('imageUpload').click()}>
                 <Upload size={24} style={{ margin: '0 auto 0.5rem' }} />
                 <p>Click to upload images or drag and drop</p>
                 <p style={{ fontSize: '0.75rem', color: '#6b7280' }}>PNG, JPG, GIF up to 10MB</p>
@@ -1429,13 +1297,9 @@ const EditBuyProduct = () => {
                     </ImageItem>
                   ))}
                 </ImagePreview>
-              )}
-              // @ts-expect-error
-              {errors.images && (
+              )}              {errors.images && (
                 <ErrorMessage>
-                  <AlertCircle size={16} />
-                  // @ts-expect-error
-                  {errors.images}
+                  <AlertCircle size={16} />                  {errors.images}
                 </ErrorMessage>
               )}
             </FormGroup>
@@ -1454,17 +1318,11 @@ const EditBuyProduct = () => {
                   onChange={handleInputChange}
                   placeholder="Enter original price"
                   required
-                  style={{
-                    // @ts-expect-error
-                    borderColor: errors['pricing.originalPrice'] ? '#dc2626' : '#d1d5db',
+                  style={{                    borderColor: errors['pricing.originalPrice'] ? '#dc2626' : '#d1d5db',
                   }}
-                />
-                // @ts-expect-error
-                {errors['pricing.originalPrice'] && (
+                />                {errors['pricing.originalPrice'] && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />
-                    // @ts-expect-error
-                    {errors['pricing.originalPrice']}
+                    <AlertCircle size={16} />                    {errors['pricing.originalPrice']}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1477,17 +1335,11 @@ const EditBuyProduct = () => {
                   value={formData.pricing.discountedPrice}
                   onChange={handleInputChange}
                   placeholder="Enter discounted price"
-                  style={{
-                    // @ts-expect-error
-                    borderColor: errors['pricing.discountedPrice'] ? '#dc2626' : '#d1d5db',
+                  style={{                    borderColor: errors['pricing.discountedPrice'] ? '#dc2626' : '#d1d5db',
                   }}
-                />
-                // @ts-expect-error
-                {errors['pricing.discountedPrice'] && (
+                />                {errors['pricing.discountedPrice'] && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />
-                    // @ts-expect-error
-                    {errors['pricing.discountedPrice']}
+                    <AlertCircle size={16} />                    {errors['pricing.discountedPrice']}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1512,17 +1364,11 @@ const EditBuyProduct = () => {
                   value={formData.pricing?.discount?.value || ''}
                   onChange={handleInputChange}
                   placeholder="Enter discount value"
-                  style={{
-                    // @ts-expect-error
-                    borderColor: errors['pricing.discount.value'] ? '#dc2626' : '#d1d5db',
+                  style={{                    borderColor: errors['pricing.discount.value'] ? '#dc2626' : '#d1d5db',
                   }}
-                />
-                // @ts-expect-error
-                {errors['pricing.discount.value'] && (
+                />                {errors['pricing.discount.value'] && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />
-                    // @ts-expect-error
-                    {errors['pricing.discount.value']}
+                    <AlertCircle size={16} />                    {errors['pricing.discount.value']}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1537,9 +1383,7 @@ const EditBuyProduct = () => {
                 <Label>Product Conditions</Label>
                 <AddButton
                   type="button"
-                  onClick={() => {
-                    // @ts-expect-error
-                    setFormData(prev => ({
+                  onClick={() => {                    setFormData(prev => ({
                       ...prev,
                       conditionOptions: [
                         ...prev.conditionOptions,
@@ -1566,13 +1410,9 @@ const EditBuyProduct = () => {
                   <FormGrid>
                     <FormGroup>
                       <Label>Condition</Label>
-                      <Select
-                        // @ts-expect-error
-                        value={option.condition}
+                      <Select                        value={option.condition}
                         onChange={(e: any) => {
-                          const newOptions = [...formData.conditionOptions];
-                          // @ts-expect-error
-                          newOptions[index] = { ...option, condition: e.target.value };
+                          const newOptions = [...formData.conditionOptions];                          newOptions[index] = { ...option, condition: e.target.value };
                           setFormData(prev => ({ ...prev, conditionOptions: newOptions }));
                         }}
                       >
@@ -1589,13 +1429,9 @@ const EditBuyProduct = () => {
                     <FormGroup>
                       <Label>Price</Label>
                       <Input
-                        type="number"
-                        // @ts-expect-error
-                        value={option.price}
+                        type="number"                        value={option.price}
                         onChange={(e: any) => {
-                          const newOptions = [...formData.conditionOptions];
-                          // @ts-expect-error
-                          newOptions[index] = { ...option, price: e.target.value };
+                          const newOptions = [...formData.conditionOptions];                          newOptions[index] = { ...option, price: e.target.value };
                           setFormData(prev => ({ ...prev, conditionOptions: newOptions }));
                         }}
                         placeholder="0.00"
@@ -1606,13 +1442,9 @@ const EditBuyProduct = () => {
 
                   <FormGroup>
                     <Label>Description</Label>
-                    <TextArea
-                      // @ts-expect-error
-                      value={option.description}
+                    <TextArea                      value={option.description}
                       onChange={(e: any) => {
-                        const newOptions = [...formData.conditionOptions];
-                        // @ts-expect-error
-                        newOptions[index] = { ...option, description: e.target.value };
+                        const newOptions = [...formData.conditionOptions];                        newOptions[index] = { ...option, description: e.target.value };
                         setFormData(prev => ({ ...prev, conditionOptions: newOptions }));
                       }}
                       placeholder="Describe the condition details"
@@ -1634,9 +1466,7 @@ const EditBuyProduct = () => {
                   </RemoveButton>
                 </div>
               ))}
-            </DynamicFieldContainer>
-            // @ts-expect-error
-            {errors.conditionOptions && <ErrorMessage>{errors.conditionOptions}</ErrorMessage>}
+            </DynamicFieldContainer>            {errors.conditionOptions && <ErrorMessage>{errors.conditionOptions}</ErrorMessage>}
           </FormSection>
 
           {/* Availability */}
@@ -1664,17 +1494,11 @@ const EditBuyProduct = () => {
                   value={formData.availability.quantity}
                   onChange={handleInputChange}
                   placeholder="0"
-                  style={{
-                    // @ts-expect-error
-                    borderColor: errors['availability.quantity'] ? '#dc2626' : '#d1d5db',
+                  style={{                    borderColor: errors['availability.quantity'] ? '#dc2626' : '#d1d5db',
                   }}
-                />
-                // @ts-expect-error
-                {errors['availability.quantity'] && (
+                />                {errors['availability.quantity'] && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />
-                    // @ts-expect-error
-                    {errors['availability.quantity']}
+                    <AlertCircle size={16} />                    {errors['availability.quantity']}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1792,13 +1616,9 @@ const EditBuyProduct = () => {
                   </div>
                 </FormGroup>
               ))}
-            </DynamicFieldContainer>
-            // @ts-expect-error
-            {errors.topSpecs && (
+            </DynamicFieldContainer>            {errors.topSpecs && (
               <ErrorMessage>
-                <AlertCircle size={16} />
-                // @ts-expect-error
-                {errors.topSpecs}
+                <AlertCircle size={16} />                {errors.topSpecs}
               </ErrorMessage>
             )}
           </FormSection>
@@ -2317,9 +2137,7 @@ const EditBuyProduct = () => {
                 <h3>Variants</h3>
                 <AddButton
                   type="button"
-                  onClick={() =>
-                    // @ts-expect-error
-                    handleArrayAdd('variants', { name: '', price: '', stock: '', sku: '' })
+                  onClick={() =>                    handleArrayAdd('variants', { name: '', price: '', stock: '', sku: '' })
                   }
                 >
                   <Plus size={16} />
@@ -2340,22 +2158,14 @@ const EditBuyProduct = () => {
                     <FormGroup>
                       <Label>Variant Name</Label>
                       <Input
-                        type="text"
-                        // @ts-expect-error
-                        value={variant.name || ''}
-                        // @ts-expect-error
-                        onChange={(e: any) => handleArrayUpdate('variants', index, 'name', e.target.value)}
+                        type="text"                        value={variant.name || ''}                        onChange={(e: any) => handleArrayUpdate('variants', index, 'name', e.target.value)}
                         placeholder="e.g., 128GB, Red Color"
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>Price</Label>
                       <Input
-                        type="number"
-                        // @ts-expect-error
-                        value={variant.price || ''}
-                        // @ts-expect-error
-                        onChange={(e: any) => handleArrayUpdate('variants', index, 'price', e.target.value)
+                        type="number"                        value={variant.price || ''}                        onChange={(e: any) => handleArrayUpdate('variants', index, 'price', e.target.value)
                         }
                         placeholder="0.00"
                         step="0.01"
@@ -2364,11 +2174,7 @@ const EditBuyProduct = () => {
                     <FormGroup>
                       <Label>Stock</Label>
                       <Input
-                        type="number"
-                        // @ts-expect-error
-                        value={variant.stock || ''}
-                        // @ts-expect-error
-                        onChange={(e: any) => handleArrayUpdate('variants', index, 'stock', e.target.value)
+                        type="number"                        value={variant.stock || ''}                        onChange={(e: any) => handleArrayUpdate('variants', index, 'stock', e.target.value)
                         }
                         placeholder="0"
                       />
@@ -2376,11 +2182,7 @@ const EditBuyProduct = () => {
                     <FormGroup>
                       <Label>SKU</Label>
                       <Input
-                        type="text"
-                        // @ts-expect-error
-                        value={variant.sku || ''}
-                        // @ts-expect-error
-                        onChange={(e: any) => handleArrayUpdate('variants', index, 'sku', e.target.value)}
+                        type="text"                        value={variant.sku || ''}                        onChange={(e: any) => handleArrayUpdate('variants', index, 'sku', e.target.value)}
                         placeholder="Unique SKU"
                       />
                     </FormGroup>
@@ -2407,9 +2209,7 @@ const EditBuyProduct = () => {
               <DynamicFieldHeader>
                 <h3>Add-ons</h3>
                 <AddButton
-                  type="button"
-                  // @ts-expect-error
-                  onClick={() => handleArrayAdd('addOns', { name: '', price: '', description: '' })}
+                  type="button"                  onClick={() => handleArrayAdd('addOns', { name: '', price: '', description: '' })}
                 >
                   <Plus size={16} />
                   Add Add-on
@@ -2429,22 +2229,14 @@ const EditBuyProduct = () => {
                     <FormGroup>
                       <Label>Add-on Name</Label>
                       <Input
-                        type="text"
-                        // @ts-expect-error
-                        value={addon.name || ''}
-                        // @ts-expect-error
-                        onChange={(e: any) => handleArrayUpdate('addOns', index, 'name', e.target.value)}
+                        type="text"                        value={addon.name || ''}                        onChange={(e: any) => handleArrayUpdate('addOns', index, 'name', e.target.value)}
                         placeholder="e.g., Screen Protector, Case"
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>Price</Label>
                       <Input
-                        type="number"
-                        // @ts-expect-error
-                        value={addon.price || ''}
-                        // @ts-expect-error
-                        onChange={(e: any) => handleArrayUpdate('addOns', index, 'price', e.target.value)}
+                        type="number"                        value={addon.price || ''}                        onChange={(e: any) => handleArrayUpdate('addOns', index, 'price', e.target.value)}
                         placeholder="0.00"
                         step="0.01"
                       />
@@ -2452,11 +2244,7 @@ const EditBuyProduct = () => {
                   </FormGrid>
                   <FormGroup>
                     <Label>Description</Label>
-                    <TextArea
-                      // @ts-expect-error
-                      value={addon.description || ''}
-                      // @ts-expect-error
-                      onChange={(e: any) => handleArrayUpdate('addOns', index, 'description', e.target.value)
+                    <TextArea                      value={addon.description || ''}                      onChange={(e: any) => handleArrayUpdate('addOns', index, 'description', e.target.value)
                       }
                       placeholder="Describe the add-on"
                       rows={2}
@@ -2485,9 +2273,7 @@ const EditBuyProduct = () => {
                 <h3>Offers</h3>
                 <AddButton
                   type="button"
-                  onClick={() =>
-                    // @ts-expect-error
-                    handleArrayAdd('offers', {
+                  onClick={() =>                    handleArrayAdd('offers', {
                       title: '',
                       description: '',
                       discount: '',
@@ -2513,22 +2299,14 @@ const EditBuyProduct = () => {
                     <FormGroup>
                       <Label>Offer Title</Label>
                       <Input
-                        type="text"
-                        // @ts-expect-error
-                        value={offer.title || ''}
-                        // @ts-expect-error
-                        onChange={(e: any) => handleArrayUpdate('offers', index, 'title', e.target.value)}
+                        type="text"                        value={offer.title || ''}                        onChange={(e: any) => handleArrayUpdate('offers', index, 'title', e.target.value)}
                         placeholder="e.g., Early Bird Discount"
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>Discount (%)</Label>
                       <Input
-                        type="number"
-                        // @ts-expect-error
-                        value={offer.discount || ''}
-                        // @ts-expect-error
-                        onChange={(e: any) => handleArrayUpdate('offers', index, 'discount', e.target.value)
+                        type="number"                        value={offer.discount || ''}                        onChange={(e: any) => handleArrayUpdate('offers', index, 'discount', e.target.value)
                         }
                         placeholder="10"
                         min="0"
@@ -2538,22 +2316,14 @@ const EditBuyProduct = () => {
                     <FormGroup>
                       <Label>Valid Until</Label>
                       <Input
-                        type="date"
-                        // @ts-expect-error
-                        value={offer.validUntil || ''}
-                        // @ts-expect-error
-                        onChange={(e: any) => handleArrayUpdate('offers', index, 'validUntil', e.target.value)
+                        type="date"                        value={offer.validUntil || ''}                        onChange={(e: any) => handleArrayUpdate('offers', index, 'validUntil', e.target.value)
                         }
                       />
                     </FormGroup>
                   </FormGrid>
                   <FormGroup>
                     <Label>Description</Label>
-                    <TextArea
-                      // @ts-expect-error
-                      value={offer.description || ''}
-                      // @ts-expect-error
-                      onChange={(e: any) => handleArrayUpdate('offers', index, 'description', e.target.value)
+                    <TextArea                      value={offer.description || ''}                      onChange={(e: any) => handleArrayUpdate('offers', index, 'description', e.target.value)
                       }
                       placeholder="Describe the offer details"
                       rows={2}
@@ -2583,13 +2353,9 @@ const EditBuyProduct = () => {
                 placeholder="Enter product description"
                 rows={6}
                 required
-              />
-              // @ts-expect-error
-              {errors.description && (
+              />              {errors.description && (
                 <ErrorMessage>
-                  <AlertCircle size={16} />
-                  // @ts-expect-error
-                  {errors.description}
+                  <AlertCircle size={16} />                  {errors.description}
                 </ErrorMessage>
               )}
             </FormGroup>
@@ -2612,15 +2378,10 @@ const EditBuyProduct = () => {
               <CheckCircle size={16} />
               {success}
             </SuccessMessage>
-          )}
-
-          // @ts-expect-error
-          {errors.submit && (
+          )}          {errors.submit && (
             <div style={{ padding: '1rem 2rem' }}>
               <ErrorMessage>
-                <AlertCircle size={16} />
-                // @ts-expect-error
-                {errors.submit}
+                <AlertCircle size={16} />                {errors.submit}
               </ErrorMessage>
             </div>
           )}

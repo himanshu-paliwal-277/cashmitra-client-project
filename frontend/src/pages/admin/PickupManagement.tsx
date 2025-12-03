@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';import styled from 'styled-components';
 import {
   Calendar,
   Clock,
@@ -420,9 +418,7 @@ const PickupForm = ({
       const [parent, child] = field.split('.');
       setFormData(prev => ({
         ...prev,
-        [parent]: {
-          // @ts-expect-error
-          ...prev[parent],
+        [parent]: {          ...prev[parent],
           [child]: value,
         },
       }));
@@ -540,9 +536,7 @@ const PickupForm = ({
 
     // Validate required address fields
     const requiredAddressFields = ['street', 'city', 'state', 'pincode'];
-    const missingFields = requiredAddressFields.filter(
-      // @ts-expect-error
-      field => !formData.address[field] || formData.address[field].trim() === ''
+    const missingFields = requiredAddressFields.filter(      field => !formData.address[field] || formData.address[field].trim() === ''
     );
 
     if (missingFields.length > 0) {
@@ -612,9 +606,7 @@ const PickupForm = ({
       // Nested customer structure for backend processing
       customer: {
         name: formData.customer.name.trim(),
-        phone: formData.customer.phone.trim(),
-        // @ts-expect-error
-        email: formData.customer.email || '',
+        phone: formData.customer.phone.trim(),        email: formData.customer.email || '',
       },
 
       // Nested address structure with zipCode (not pincode) - ensure all fields are populated
@@ -622,9 +614,7 @@ const PickupForm = ({
         street: formData.address.street.trim(),
         city: formData.address.city.trim(),
         state: formData.address.state.trim(),
-        zipCode: formData.address.pincode.trim(), // backend expects zipCode, not pincode
-        // @ts-expect-error
-        landmark: formData.address.landmark || '',
+        zipCode: formData.address.pincode.trim(), // backend expects zipCode, not pincode        landmark: formData.address.landmark || '',
       },
 
       // Include product information if selected
@@ -884,20 +874,12 @@ const PickupManagement = () => {
   const fetchProducts = async () => {
     try {
       setLoadingProducts(true);
-      const response = await productService.getProducts({ limit: 100 });
-      // @ts-expect-error
-      const productsData = response.data || response.products || response || [];
+      const response = await productService.getProducts({ limit: 100 });      const productsData = response.data || response.products || response || [];
       setProducts(productsData);
     } catch (error) {
       console.error('Error fetching products:', error);
       // Fallback to mock data if API fails
-      setProducts([
-        // @ts-expect-error
-        { _id: '1', name: 'iPhone 13', brand: 'Apple', model: 'A2482' },
-        // @ts-expect-error
-        { _id: '2', name: 'Samsung Galaxy S21', brand: 'Samsung', model: 'SM-G991B' },
-        // @ts-expect-error
-        { _id: '3', name: 'MacBook Pro', brand: 'Apple', model: 'MBP16' },
+      setProducts([        { _id: '1', name: 'iPhone 13', brand: 'Apple', model: 'A2482' },        { _id: '2', name: 'Samsung Galaxy S21', brand: 'Samsung', model: 'SM-G991B' },        { _id: '3', name: 'MacBook Pro', brand: 'Apple', model: 'MBP16' },
       ]);
     } finally {
       setLoadingProducts(false);
@@ -917,13 +899,9 @@ const PickupManagement = () => {
 
       if (response) {
         setOrders(response.orders);
-      } else if (response && Array.isArray(response)) {
-        // @ts-expect-error
-        setOrders(response);
+      } else if (response && Array.isArray(response)) {        setOrders(response);
       } else {
-        // Fallback to existing getAllOrders if new endpoint not available
-        // @ts-expect-error
-        const fallbackResponse = await adminService.getAllOrders();
+        // Fallback to existing getAllOrders if new endpoint not available        const fallbackResponse = await adminService.getAllOrders();
         setOrders(fallbackResponse.data || []);
       }
     } catch (error) {
@@ -978,9 +956,7 @@ const PickupManagement = () => {
                   pincode: '110001',
                 },
               },
-            ];
-      // @ts-expect-error
-      setOrders(mockData);
+            ];      setOrders(mockData);
     } finally {
       setLoadingOrders(false);
     }
@@ -1007,47 +983,15 @@ const PickupManagement = () => {
       setPickups(pickupsArray);
       setTotalPages(pickupData.totalPages || pickupData.pages || 1);
     } catch (error) {
-      console.error('Error fetching pickups:', error);
-      // @ts-expect-error
-      setError('Failed to fetch pickups. Please try again.');
+      console.error('Error fetching pickups:', error);      setError('Failed to fetch pickups. Please try again.');
 
       // Fallback to mock data if API fails
       setPickups([
-        {
-          // @ts-expect-error
-          _id: '1',
-          // @ts-expect-error
-          orderNumber: 'ORD001',
-          customer: {
-            // @ts-expect-error
-            name: 'John Doe',
-            // @ts-expect-error
-            phone: '+91 9876543210',
+        {          _id: '1',          orderNumber: 'ORD001',
+          customer: {            name: 'John Doe',            phone: '+91 9876543210',
           },
-          address: {
-            // @ts-expect-error
-            street: '123 Main St',
-            // @ts-expect-error
-            city: 'Mumbai',
-            // @ts-expect-error
-            state: 'Maharashtra',
-            // @ts-expect-error
-            pincode: '400001',
-          },
-          // @ts-expect-error
-          scheduledDate: '2024-01-25',
-          // @ts-expect-error
-          timeSlot: 'morning',
-          // @ts-expect-error
-          status: 'scheduled',
-          // @ts-expect-error
-          assignedTo: null,
-          // @ts-expect-error
-          items: ['iPhone 14 Pro'],
-          // @ts-expect-error
-          priority: 'normal',
-          // @ts-expect-error
-          createdAt: '2024-01-20T10:00:00Z',
+          address: {            street: '123 Main St',            city: 'Mumbai',            state: 'Maharashtra',            pincode: '400001',
+          },          scheduledDate: '2024-01-25',          timeSlot: 'morning',          status: 'scheduled',          assignedTo: null,          items: ['iPhone 14 Pro'],          priority: 'normal',          createdAt: '2024-01-20T10:00:00Z',
         },
       ]);
     } finally {
@@ -1110,9 +1054,7 @@ const PickupManagement = () => {
           })),
         ];
 
-        console.log('Combined agents:', combinedAgents);
-        // @ts-expect-error
-        setAgents(combinedAgents);
+        console.log('Combined agents:', combinedAgents);        setAgents(combinedAgents);
       } else {
         const formattedAgents = agents.map((agent: any) => ({
           ...agent,
@@ -1122,9 +1064,7 @@ const PickupManagement = () => {
         setAgents(formattedAgents);
       }
     } catch (error) {
-      console.error('Error fetching agents:', error);
-      // @ts-expect-error
-      console.error('Error details:', error.response?.data || error.message);
+      console.error('Error fetching agents:', error);      console.error('Error details:', error.response?.data || error.message);
 
       // Fallback to mock agents
       const mockAgents = [
@@ -1132,9 +1072,7 @@ const PickupManagement = () => {
         { _id: '2', name: 'Agent B', email: 'agent.b@example.com', type: 'pickup_agent' },
         { _id: '3', name: 'Driver C', email: 'driver.c@example.com', type: 'driver' },
       ];
-      console.log('Using mock agents:', mockAgents);
-      // @ts-expect-error
-      setAgents(mockAgents);
+      console.log('Using mock agents:', mockAgents);      setAgents(mockAgents);
     } finally {
       setLoadingAgents(false);
       console.log('Finished fetching agents');
@@ -1142,27 +1080,11 @@ const PickupManagement = () => {
   };
 
   const stats = {
-    total: pickups.length,
-    // @ts-expect-error
-    scheduled: pickups.filter(p => p.status === 'scheduled').length,
-    // @ts-expect-error
-    confirmed: pickups.filter(p => p.status === 'confirmed').length,
-    // @ts-expect-error
-    in_transit: pickups.filter(p => p.status === 'in_transit').length,
-    // @ts-expect-error
-    completed: pickups.filter(p => p.status === 'completed').length,
+    total: pickups.length,    scheduled: pickups.filter(p => p.status === 'scheduled').length,    confirmed: pickups.filter(p => p.status === 'confirmed').length,    in_transit: pickups.filter(p => p.status === 'in_transit').length,    completed: pickups.filter(p => p.status === 'completed').length,
   };
 
   const filteredPickups = pickups.filter(pickup => {
-    const matchesSearch =
-      // @ts-expect-error
-      pickup.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      pickup.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      pickup.customer?.phone?.includes(searchTerm);
-    // @ts-expect-error
-    const matchesStatus = statusFilter === 'all' || pickup.status === statusFilter;
+    const matchesSearch =      pickup.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||      pickup.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||      pickup.customer?.phone?.includes(searchTerm);    const matchesStatus = statusFilter === 'all' || pickup.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -1173,9 +1095,7 @@ const PickupManagement = () => {
       setShowModal(false);
       fetchPickups(); // Refresh the list
     } catch (error) {
-      console.error('Error creating pickup:', error);
-      // @ts-expect-error
-      setError('Failed to create pickup. Please try again.');
+      console.error('Error creating pickup:', error);      setError('Failed to create pickup. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -1183,16 +1103,12 @@ const PickupManagement = () => {
 
   const handleEditPickup = async (pickupData: any) => {
     try {
-      setLoading(true);
-      // @ts-expect-error
-      await pickupService.updatePickup(selectedPickup._id, pickupData);
+      setLoading(true);      await pickupService.updatePickup(selectedPickup._id, pickupData);
       setShowModal(false);
       setSelectedPickup(null);
       fetchPickups(); // Refresh the list
     } catch (error) {
-      console.error('Error updating pickup:', error);
-      // @ts-expect-error
-      setError('Failed to update pickup. Please try again.');
+      console.error('Error updating pickup:', error);      setError('Failed to update pickup. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -1200,14 +1116,10 @@ const PickupManagement = () => {
 
   const handleAssignPickup = async (pickupId: any, agentId: any) => {
     try {
-      setLoading(true);
-      // @ts-expect-error
-      await pickupService.assignPickup(pickupId, agentId);
+      setLoading(true);      await pickupService.assignPickup(pickupId, agentId);
       fetchPickups(); // Refresh the list
     } catch (error) {
-      console.error('Error assigning pickup:', error);
-      // @ts-expect-error
-      setError('Failed to assign pickup. Please try again.');
+      console.error('Error assigning pickup:', error);      setError('Failed to assign pickup. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -1219,9 +1131,7 @@ const PickupManagement = () => {
       await pickupService.updatePickupStatus(pickupId, newStatus);
       fetchPickups(); // Refresh the list
     } catch (error) {
-      console.error('Error updating status:', error);
-      // @ts-expect-error
-      setError('Failed to update status. Please try again.');
+      console.error('Error updating status:', error);      setError('Failed to update status. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -1322,62 +1232,36 @@ const PickupManagement = () => {
           <div>Actions</div>
         </TableHeader>
 
-        {filteredPickups.map(pickup => (
-          // @ts-expect-error
-          <TableRow key={pickup._id}>
-            <div>
-              // @ts-expect-error
-              <div style={{ fontWeight: '500' }}>{pickup.orderNumber}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                // @ts-expect-error
-                {pickup.items?.join(', ') || 'No items listed'}
+        {filteredPickups.map(pickup => (          <TableRow key={pickup._id}>
+            <div>              <div style={{ fontWeight: '500' }}>{pickup.orderNumber}</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>                {pickup.items?.join(', ') || 'No items listed'}
+              </div>
+            </div>
+            <div>              <div style={{ fontWeight: '500' }}>{pickup.customer?.name || 'N/A'}</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>                {pickup.customer?.phone || 'N/A'}
               </div>
             </div>
             <div>
-              // @ts-expect-error
-              <div style={{ fontWeight: '500' }}>{pickup.customer?.name || 'N/A'}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                // @ts-expect-error
-                {pickup.customer?.phone || 'N/A'}
+              <div style={{ fontSize: '12px' }}>                {pickup.address?.street || ''} {pickup.address?.city || ''}
+              </div>
+              <div style={{ fontSize: '11px', color: '#666' }}>                {pickup.address?.state || ''} {pickup.address?.pincode || ''}
               </div>
             </div>
-            <div>
-              <div style={{ fontSize: '12px' }}>
-                // @ts-expect-error
-                {pickup.address?.street || ''} {pickup.address?.city || ''}
-              </div>
-              <div style={{ fontSize: '11px', color: '#666' }}>
-                // @ts-expect-error
-                {pickup.address?.state || ''} {pickup.address?.pincode || ''}
+            <div>              <div style={{ fontWeight: '500' }}>{formatDate(pickup.scheduledDate)}</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>                {formatTimeSlot(pickup.timeSlot)}
               </div>
             </div>
-            <div>
-              // @ts-expect-error
-              <div style={{ fontWeight: '500' }}>{formatDate(pickup.scheduledDate)}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                // @ts-expect-error
-                {formatTimeSlot(pickup.timeSlot)}
-              </div>
-            </div>
-            <div>
-              // @ts-expect-error
-              {pickup.assignedTo ? (
+            <div>              {pickup.assignedTo ? (
                 <div>
-                  <div style={{ fontWeight: '500' }}>
-                    // @ts-expect-error
-                    {pickup.assignedTo.name || pickup.assignedTo}
+                  <div style={{ fontWeight: '500' }}>                    {pickup.assignedTo.name || pickup.assignedTo}
                   </div>
-                  <div style={{ fontSize: '12px', color: '#666' }}>
-                    // @ts-expect-error
-                    {pickup.assignedTo.phone || ''}
+                  <div style={{ fontSize: '12px', color: '#666' }}>                    {pickup.assignedTo.phone || ''}
                   </div>
                 </div>
               ) : (
                 <select
                   onChange={e => {
-                    if (e.target.value) {
-                      // @ts-expect-error
-                      handleAssignPickup(pickup._id, e.target.value);
+                    if (e.target.value) {                      handleAssignPickup(pickup._id, e.target.value);
                     }
                   }}
                   defaultValue=""
@@ -1389,21 +1273,13 @@ const PickupManagement = () => {
                   }}
                 >
                   <option value="">Assign Agent</option>
-                  {agents.map(agent => (
-                    // @ts-expect-error
-                    <option key={agent._id} value={agent._id}>
-                      // @ts-expect-error
-                      {agent.name} ({agent.type})
+                  {agents.map(agent => (                    <option key={agent._id} value={agent._id}>                      {agent.name} ({agent.type})
                     </option>
                   ))}
                 </select>
               )}
             </div>
-            <div>
-              // @ts-expect-error
-              <StatusBadge status={pickup.status}>
-                // @ts-expect-error
-                {pickup.status.replace('_', ' ').toUpperCase()}
+            <div>              <StatusBadge status={pickup.status}>                {pickup.status.replace('_', ' ').toUpperCase()}
               </StatusBadge>
             </div>
             <Actions>
@@ -1418,12 +1294,8 @@ const PickupManagement = () => {
                 }}
               >
                 <Edit size={16} />
-              </ActionButton>
-              // @ts-expect-error
-              {pickup.status === 'pending' && (
-                <ActionButton
-                  // @ts-expect-error
-                  onClick={() => handleStatusUpdate(pickup._id, 'assigned')}
+              </ActionButton>              {pickup.status === 'pending' && (
+                <ActionButton                  onClick={() => handleStatusUpdate(pickup._id, 'assigned')}
                   style={{ color: '#28a745' }}
                 >
                   <CheckCircle size={16} />
@@ -1451,54 +1323,32 @@ const PickupManagement = () => {
             {modalType === 'view' && selectedPickup && (
               <div>
                 <FormGroup>
-                  <Label>Order Number</Label>
-                  // @ts-expect-error
-                  <div>{selectedPickup.orderNumber}</div>
+                  <Label>Order Number</Label>                  <div>{selectedPickup.orderNumber}</div>
                 </FormGroup>
                 <FormGroup>
                   <Label>Customer</Label>
-                  <div>
-                    // @ts-expect-error
-                    {selectedPickup.customer?.name || 'N/A'} -{' '}
-                    // @ts-expect-error
-                    {selectedPickup.customer?.phone || 'N/A'}
+                  <div>                    {selectedPickup.customer?.name || 'N/A'} -{' '}                    {selectedPickup.customer?.phone || 'N/A'}
                   </div>
                 </FormGroup>
                 <FormGroup>
                   <Label>Address</Label>
-                  <div>
-                    // @ts-expect-error
-                    {selectedPickup.address?.street || ''} {selectedPickup.address?.city || ''}
-                    <br />
-                    // @ts-expect-error
-                    {selectedPickup.address?.state || ''} {selectedPickup.address?.pincode || ''}
+                  <div>                    {selectedPickup.address?.street || ''} {selectedPickup.address?.city || ''}
+                    <br />                    {selectedPickup.address?.state || ''} {selectedPickup.address?.pincode || ''}
                   </div>
                 </FormGroup>
                 <FormGroup>
                   <Label>Scheduled Date & Time</Label>
-                  <div>
-                    // @ts-expect-error
-                    {formatDate(selectedPickup.scheduledDate)} -{' '}
-                    // @ts-expect-error
-                    {formatTimeSlot(selectedPickup.timeSlot)}
+                  <div>                    {formatDate(selectedPickup.scheduledDate)} -{' '}                    {formatTimeSlot(selectedPickup.timeSlot)}
                   </div>
                 </FormGroup>
                 <FormGroup>
-                  <Label>Items</Label>
-                  // @ts-expect-error
-                  <div>{selectedPickup.items?.join(', ') || 'No items listed'}</div>
+                  <Label>Items</Label>                  <div>{selectedPickup.items?.join(', ') || 'No items listed'}</div>
                 </FormGroup>
                 <FormGroup>
-                  <Label>Assigned Agent</Label>
-                  // @ts-expect-error
-                  <div>{selectedPickup.assignedTo?.name || 'Not assigned'}</div>
+                  <Label>Assigned Agent</Label>                  <div>{selectedPickup.assignedTo?.name || 'Not assigned'}</div>
                 </FormGroup>
                 <FormGroup>
-                  <Label>Status</Label>
-                  // @ts-expect-error
-                  <StatusBadge status={selectedPickup.status}>
-                    // @ts-expect-error
-                    {selectedPickup.status.replace('_', ' ').toUpperCase()}
+                  <Label>Status</Label>                  <StatusBadge status={selectedPickup.status}>                    {selectedPickup.status.replace('_', ' ').toUpperCase()}
                   </StatusBadge>
                 </FormGroup>
               </div>

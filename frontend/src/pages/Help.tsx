@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState } from 'react';import styled from 'styled-components';
 import { theme } from '../theme';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -76,9 +74,7 @@ const SearchInput = styled.input`
     border-color: ${theme.colors.primary.main};
   }
 
-  &::placeholder {
-    // @ts-expect-error
-    color: ${theme.colors.text.tertiary};
+  &::placeholder {    color: ${theme.colors.text.tertiary};
   }
 `;
 
@@ -86,9 +82,7 @@ const SearchIcon = styled(Search)`
   position: absolute;
   left: ${theme.spacing[4]};
   top: 50%;
-  transform: translateY(-50%);
-  // @ts-expect-error
-  color: ${theme.colors.text.tertiary};
+  transform: translateY(-50%);  color: ${theme.colors.text.tertiary};
 `;
 
 const HelpSections = styled.div`
@@ -300,9 +294,7 @@ const Help = () => {
                     }}
                   >
                     {option.available}
-                  </ContactDescription>
-                  // @ts-expect-error
-                  <Button variant="primary" fullWidth>
+                  </ContactDescription>                  <Button variant="primary" fullWidth>
                     {option.action}
                   </Button>
                 </ContactCard>

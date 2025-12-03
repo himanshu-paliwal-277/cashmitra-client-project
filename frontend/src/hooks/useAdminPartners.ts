@@ -12,9 +12,7 @@ export const useAdminPartners = () => {
   const [error, setError] = useState(null);
   const [totalPartners, setTotalPartners] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  // @ts-expect-error
-  const { getAuthHeader } = useAdminAuth();
+  const [totalPages, setTotalPages] = useState(1);  const { getAuthHeader } = useAdminAuth();
 
   const fetchPartners = useCallback(async (params = {}) => {
     setLoading(true);
@@ -30,9 +28,7 @@ export const useAdminPartners = () => {
       setTotalPages(response.totalPages || 1);
 
       return response;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch partners');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch partners');
       throw err;
     } finally {
       setLoading(false);
@@ -48,9 +44,7 @@ export const useAdminPartners = () => {
 
       // Handle the actual API response structure
       return response.data || response.partner || response;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to fetch partner');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch partner');
       throw err;
     } finally {
       setLoading(false);
@@ -62,16 +56,10 @@ export const useAdminPartners = () => {
     setError(null);
     try {
       const response = await updatePartnerStatus(id, { isVerified });
-      // Update the partner in the local state
-      // @ts-expect-error
-      setPartners(prevPartners =>
-        // @ts-expect-error
-        prevPartners.map(partner => (partner._id === id ? { ...partner, isVerified } : partner))
+      // Update the partner in the local state      setPartners(prevPartners =>        prevPartners.map(partner => (partner._id === id ? { ...partner, isVerified } : partner))
       );
       return response;
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Failed to update partner status');
+    } catch (err) {      setError(err.response?.data?.message || 'Failed to update partner status');
       throw err;
     } finally {
       setLoading(false);
@@ -90,9 +78,7 @@ export const useAdminPartners = () => {
         setError(response.message || 'Failed to create partner');
         return { success: false, message: response.message };
       }
-    } catch (err) {
-      // @ts-expect-error
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to create partner';
+    } catch (err) {      const errorMessage = err.response?.data?.message || err.message || 'Failed to create partner';
       setError(errorMessage);
       return { success: false, message: errorMessage };
     } finally {
@@ -112,9 +98,7 @@ export const useAdminPartners = () => {
         setError(response.message || 'Failed to update partner');
         return { success: false, message: response.message };
       }
-    } catch (err) {
-      // @ts-expect-error
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to update partner';
+    } catch (err) {      const errorMessage = err.response?.data?.message || err.message || 'Failed to update partner';
       setError(errorMessage);
       return { success: false, message: errorMessage };
     } finally {
@@ -134,9 +118,7 @@ export const useAdminPartners = () => {
         setError(response.message || 'Failed to delete partner');
         return { success: false, message: response.message };
       }
-    } catch (err) {
-      // @ts-expect-error
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete partner';
+    } catch (err) {      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete partner';
       setError(errorMessage);
       return { success: false, message: errorMessage };
     } finally {

@@ -38,17 +38,13 @@ const SellScreenDefects = () => {
       buttons: '🔘',
       charging: '🔌',
       default: '🔧',
-    };
-    // @ts-expect-error
-    return categoryIcons[category] || categoryIcons.default;
+    };    return categoryIcons[category] || categoryIcons.default;
   };
 
   // Fetch defects from API
   useEffect(() => {
     const fetchDefects = async () => {
-      if (!product?.data?.categoryId) {
-        // @ts-expect-error
-        setError('Product category not found');
+      if (!product?.data?.categoryId) {        setError('Product category not found');
         setLoading(false);
         return;
       }
@@ -64,23 +60,9 @@ const SellScreenDefects = () => {
           defects = response.defects;
           if (response.grouped && typeof response.grouped === 'object') {
             groupedDefectsFromAPI = response.grouped;
-          }
-        // @ts-expect-error
-        } else if (response && response.success && response.data) {
-          // @ts-expect-error
-          if (response.data.defects && Array.isArray(response.data.defects)) {
-            // @ts-expect-error
-            defects = response.data.defects;
-            // @ts-expect-error
-            if (response.data.grouped && typeof response.data.grouped === 'object') {
-              // @ts-expect-error
-              groupedDefectsFromAPI = response.data.grouped;
+          }        } else if (response && response.success && response.data) {          if (response.data.defects && Array.isArray(response.data.defects)) {            defects = response.data.defects;            if (response.data.grouped && typeof response.data.grouped === 'object') {              groupedDefectsFromAPI = response.data.grouped;
             }
-          }
-        // @ts-expect-error
-        } else if (response && response.data && Array.isArray(response.data)) {
-          // @ts-expect-error
-          defects = response.data;
+          }        } else if (response && response.data && Array.isArray(response.data)) {          defects = response.data;
         } else if (response && Array.isArray(response)) {
           defects = response;
         }
@@ -96,10 +78,7 @@ const SellScreenDefects = () => {
             delta: defect.delta,
             order: defect.order || 0,
           }));
-        }
-
-        // @ts-expect-error
-        transformedDefects.sort((a, b) => {
+        }        transformedDefects.sort((a, b) => {
           if (a.category !== b.category) {
             return a.category.localeCompare(b.category);
           }
@@ -109,9 +88,7 @@ const SellScreenDefects = () => {
         let finalGroupedDefects = {};
 
         if (Object.keys(groupedDefectsFromAPI).length > 0) {
-          finalGroupedDefects = Object.keys(groupedDefectsFromAPI).reduce((acc, category) => {
-            // @ts-expect-error
-            acc[category] = groupedDefectsFromAPI[category].map((defect: any) => ({
+          finalGroupedDefects = Object.keys(groupedDefectsFromAPI).reduce((acc, category) => {            acc[category] = groupedDefectsFromAPI[category].map((defect: any) => ({
               id: defect._id || defect.key || defect.id,
               label: defect.title || defect.label || defect.name,
               icon: defect.icon || getCategoryIcon(defect.category),
@@ -121,9 +98,7 @@ const SellScreenDefects = () => {
             }));
             return acc;
           }, {});
-        } else {
-          // @ts-expect-error
-          finalGroupedDefects = transformedDefects.reduce((acc, defect) => {
+        } else {          finalGroupedDefects = transformedDefects.reduce((acc, defect) => {
             if (!acc[defect.category]) {
               acc[defect.category] = [];
             }
@@ -135,15 +110,10 @@ const SellScreenDefects = () => {
         const defectOptionsWithNoDefects = [
           { id: 'no-defects', label: 'No Defects', icon: '✓', category: 'none', order: -1 },
           ...transformedDefects,
-        ];
-
-        // @ts-expect-error
-        setDefectOptions(defectOptionsWithNoDefects);
+        ];        setDefectOptions(defectOptionsWithNoDefects);
         setGroupedDefects(finalGroupedDefects);
       } catch (err) {
-        console.error('Error fetching defects:', err);
-        // @ts-expect-error
-        setError('Failed to load defects');
+        console.error('Error fetching defects:', err);        setError('Failed to load defects');
 
         const fallbackDefects = [
           { id: 'no-defects', label: 'No Defects', icon: '✓' },
@@ -154,9 +124,7 @@ const SellScreenDefects = () => {
           { id: 'body-damage', label: 'Body Damage', icon: '🔨' },
           { id: 'water-damage', label: 'Water Damage', icon: '💧' },
           { id: 'button-issues', label: 'Button Issues', icon: '🔘' },
-        ];
-        // @ts-expect-error
-        setDefectOptions(fallbackDefects);
+        ];        setDefectOptions(fallbackDefects);
       } finally {
         setLoading(false);
       }
@@ -166,71 +134,25 @@ const SellScreenDefects = () => {
   }, [product?._id]);
 
   const handleDefectToggle = (defectId: any) => {
-    if (defectId === 'no-defects') {
-      // @ts-expect-error
-      setSelectedDefects(['no-defects']);
+    if (defectId === 'no-defects') {      setSelectedDefects(['no-defects']);
       setSelectedDefectsDetails([
-        {
-          // @ts-expect-error
-          id: 'no-defects',
-          // @ts-expect-error
-          label: 'No Defects',
-          // @ts-expect-error
-          icon: '✓',
-          // @ts-expect-error
-          category: 'none',
-          // @ts-expect-error
-          delta: 0,
-          // @ts-expect-error
-          questionText: 'Screen/Body Condition',
-          // @ts-expect-error
-          answerText: 'No Defects',
-          // @ts-expect-error
-          questionType: 'defect_selection',
-          // @ts-expect-error
-          section: 'screen_defects',
+        {          id: 'no-defects',          label: 'No Defects',          icon: '✓',          category: 'none',          delta: 0,          questionText: 'Screen/Body Condition',          answerText: 'No Defects',          questionType: 'defect_selection',          section: 'screen_defects',
         },
       ]);
-    } else {
-      // @ts-expect-error
-      setSelectedDefects(prev => {
-        const filtered = prev.filter(id => id !== 'no-defects');
-        // @ts-expect-error
-        if (filtered.includes(defectId)) {
+    } else {      setSelectedDefects(prev => {
+        const filtered = prev.filter(id => id !== 'no-defects');        if (filtered.includes(defectId)) {
           const newSelected = filtered.filter(id => id !== defectId);
-          setSelectedDefectsDetails(prevDetails =>
-            // @ts-expect-error
-            prevDetails.filter(defect => defect.id !== defectId)
+          setSelectedDefectsDetails(prevDetails =>            prevDetails.filter(defect => defect.id !== defectId)
           );
           return newSelected;
         } else {
-          const defectToAdd =
-            // @ts-expect-error
-            defectOptions.find(d => d.id === defectId) ||
+          const defectToAdd =            defectOptions.find(d => d.id === defectId) ||
             Object.values(groupedDefects)
-              .flat()
-              // @ts-expect-error
-              .find(d => d.id === defectId);
+              .flat()              .find(d => d.id === defectId);
 
-          if (defectToAdd) {
-            // @ts-expect-error
-            setSelectedDefectsDetails(prevDetails => [
-              // @ts-expect-error
-              ...prevDetails.filter(d => d.id !== 'no-defects'),
-              {
-                // @ts-expect-error
-                id: defectToAdd.id,
-                // @ts-expect-error
-                label: defectToAdd.label,
-                // @ts-expect-error
-                icon: defectToAdd.icon,
-                // @ts-expect-error
-                category: defectToAdd.category,
-                // @ts-expect-error
-                delta: defectToAdd.delta || 0,
-                questionText: 'Screen/Body Condition',
-                // @ts-expect-error
-                answerText: defectToAdd.label,
+          if (defectToAdd) {            setSelectedDefectsDetails(prevDetails => [              ...prevDetails.filter(d => d.id !== 'no-defects'),
+              {                id: defectToAdd.id,                label: defectToAdd.label,                icon: defectToAdd.icon,                category: defectToAdd.category,                delta: defectToAdd.delta || 0,
+                questionText: 'Screen/Body Condition',                answerText: defectToAdd.label,
                 questionType: 'defect_selection',
                 section: 'screen_defects',
               },
@@ -378,24 +300,18 @@ const SellScreenDefects = () => {
                 {/* No Defects Option */}
                 <div
                   onClick={() => handleDefectToggle('no-defects')}
-                  className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
-                    // @ts-expect-error
-                    selectedDefects.includes('no-defects')
+                  className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${                    selectedDefects.includes('no-defects')
                       ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-500 shadow-lg'
                       : 'bg-white border-slate-200 hover:border-blue-400 hover:bg-blue-50'
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${
-                        // @ts-expect-error
-                        selectedDefects.includes('no-defects')
+                      className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${                        selectedDefects.includes('no-defects')
                           ? 'bg-green-500 text-white'
                           : 'bg-slate-100'
                       }`}
-                    >
-                      // @ts-expect-error
-                      {selectedDefects.includes('no-defects') ? (
+                    >                      {selectedDefects.includes('no-defects') ? (
                         <CheckCircle className="w-8 h-8" />
                       ) : (
                         '✓'
@@ -403,9 +319,7 @@ const SellScreenDefects = () => {
                     </div>
                     <div className="flex-1">
                       <h3
-                        className={`text-lg font-bold ${
-                          // @ts-expect-error
-                          selectedDefects.includes('no-defects')
+                        className={`text-lg font-bold ${                          selectedDefects.includes('no-defects')
                             ? 'text-green-700'
                             : 'text-slate-900'
                         }`}
@@ -423,11 +337,7 @@ const SellScreenDefects = () => {
                     <h3 className="text-lg font-bold text-slate-900 mb-4 capitalize border-b-2 border-slate-200 pb-2">
                       {category}
                     </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                      // @ts-expect-error
-                      {categoryDefects.map((defect: any) => {
-                        // @ts-expect-error
-                        const isSelected = selectedDefects.includes(defect.id);
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">                      {categoryDefects.map((defect: any) => {                        const isSelected = selectedDefects.includes(defect.id);
                         return (
                           <div
                             key={defect.id}
@@ -526,25 +436,15 @@ const SellScreenDefects = () => {
                           no: 'Not Working',
                         };
                         return (
-                          <p key={questionId} className="text-xs text-slate-600">
-                            // @ts-expect-error
-                            {questionLabels[questionId] || questionId}:{' '}
-                            // @ts-expect-error
-                            {answerLabels[answer] || answer}
+                          <p key={questionId} className="text-xs text-slate-600">                            {questionLabels[questionId] || questionId}:{' '}                            {answerLabels[answer] || answer}
                           </p>
                         );
                       } else if (
                         answer &&
-                        typeof answer === 'object' &&
-                        // @ts-expect-error
-                        answer.questionText &&
-                        // @ts-expect-error
-                        answer.answerText
+                        typeof answer === 'object' &&                        answer.questionText &&                        answer.answerText
                       ) {
                         return (
-                          <p key={questionId} className="text-xs text-slate-600">
-                            // @ts-expect-error
-                            {String(answer.questionText)}: {String(answer.answerText)}
+                          <p key={questionId} className="text-xs text-slate-600">                            {String(answer.questionText)}: {String(answer.answerText)}
                           </p>
                         );
                       }
@@ -556,24 +456,14 @@ const SellScreenDefects = () => {
                 {/* Screen Defects */}
                 {selectedDefects.length > 0 && (
                   <div className="bg-slate-50 rounded-lg p-3">
-                    <p className="text-xs font-semibold text-slate-700 mb-2">Screen Condition</p>
-                    // @ts-expect-error
-                    {selectedDefects.includes('no-defects') ? (
+                    <p className="text-xs font-semibold text-slate-700 mb-2">Screen Condition</p>                    {selectedDefects.includes('no-defects') ? (
                       <p className="text-xs text-green-600 font-semibold">✓ No Defects</p>
                     ) : (
                       <div>
                         <p className="text-xs text-slate-600 mb-1">
                           {selectedDefects.length} defect(s) selected
                         </p>
-                        {selectedDefectsDetails.map(defect => (
-                          // @ts-expect-error
-                          <p key={defect.id} className="text-xs text-slate-600">
-                            // @ts-expect-error
-                            • {defect.label}
-                            // @ts-expect-error
-                            {defect.delta !== 0 &&
-                              // @ts-expect-error
-                              ` (${defect.delta > 0 ? '+' : ''}₹${defect.delta})`}
+                        {selectedDefectsDetails.map(defect => (                          <p key={defect.id} className="text-xs text-slate-600">                            • {defect.label}                            {defect.delta !== 0 &&                              ` (${defect.delta > 0 ? '+' : ''}₹${defect.delta})`}
                           </p>
                         ))}
                       </div>

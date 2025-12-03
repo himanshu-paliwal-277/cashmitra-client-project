@@ -39,9 +39,7 @@ const SellAccessories = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!product?.data?.categoryId) {
-      // @ts-expect-error
-      setError('Product category not found');
+    if (!product?.data?.categoryId) {      setError('Product category not found');
       setLoading(false);
       return;
     }
@@ -56,22 +54,14 @@ const SellAccessories = () => {
       const accessoriesData = await sellService.getCustomerAccessories(product.data.categoryId._id);
       setAccessories(accessoriesData || []);
     } catch (err) {
-      console.error('Error fetching accessories:', err);
-      // @ts-expect-error
-      setError('Failed to load accessories. Please try again.');
+      console.error('Error fetching accessories:', err);      setError('Failed to load accessories. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAccessoryToggle = (accessory: any) => {
-    // @ts-expect-error
-    setSelectedAccessories(prev => {
-      // @ts-expect-error
-      const isSelected = prev.some(a => a._id === accessory._id);
-      if (isSelected) {
-        // @ts-expect-error
-        return prev.filter(a => a._id !== accessory._id);
+  const handleAccessoryToggle = (accessory: any) => {    setSelectedAccessories(prev => {      const isSelected = prev.some(a => a._id === accessory._id);
+      if (isSelected) {        return prev.filter(a => a._id !== accessory._id);
       } else {
         return [...prev, accessory];
       }
@@ -122,9 +112,7 @@ const SellAccessories = () => {
     product.images && product.images['0'] ? product.images['0'].replace(/["`]/g, '') : null;
 
   // Calculate total accessory value
-  const totalAccessoryValue = selectedAccessories.reduce(
-    // @ts-expect-error
-    (sum, acc) => sum + (acc.delta?.value || 0),
+  const totalAccessoryValue = selectedAccessories.reduce(    (sum, acc) => sum + (acc.delta?.value || 0),
     0
   );
 
@@ -221,13 +209,9 @@ const SellAccessories = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                  {accessories.map(accessory => {
-                    // @ts-expect-error
-                    const isSelected = selectedAccessories.some(a => a._id === accessory._id);
+                  {accessories.map(accessory => {                    const isSelected = selectedAccessories.some(a => a._id === accessory._id);
                     return (
-                      <div
-                        // @ts-expect-error
-                        key={accessory._id}
+                      <div                        key={accessory._id}
                         onClick={() => handleAccessoryToggle(accessory)}
                         className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
                           isSelected
@@ -251,14 +235,10 @@ const SellAccessories = () => {
                             className={`text-lg font-bold mb-2 ${
                               isSelected ? 'text-green-700' : 'text-slate-900'
                             }`}
-                          >
-                            // @ts-expect-error
-                            {accessory.title}
+                          >                            {accessory.title}
                           </h3>
                           <div className="flex items-center gap-1 text-green-600 font-semibold">
-                            <Plus className="w-4 h-4" />
-                            // @ts-expect-error
-                            <span>₹{accessory.delta?.value || 0}</span>
+                            <Plus className="w-4 h-4" />                            <span>₹{accessory.delta?.value || 0}</span>
                           </div>
                         </div>
                       </div>
@@ -372,14 +352,8 @@ const SellAccessories = () => {
                     <p className="text-xs font-semibold text-slate-700 mb-2">
                       Selected Accessories
                     </p>
-                    {selectedAccessories.map(accessory => (
-                      // @ts-expect-error
-                      <div key={accessory._id} className="flex items-center justify-between mb-1">
-                        // @ts-expect-error
-                        <p className="text-xs text-slate-600">• {accessory.title}</p>
-                        <p className="text-xs text-green-600 font-semibold">
-                          // @ts-expect-error
-                          +₹{accessory.delta?.value || 0}
+                    {selectedAccessories.map(accessory => (                      <div key={accessory._id} className="flex items-center justify-between mb-1">                        <p className="text-xs text-slate-600">• {accessory.title}</p>
+                        <p className="text-xs text-green-600 font-semibold">                          +₹{accessory.delta?.value || 0}
                         </p>
                       </div>
                     ))}

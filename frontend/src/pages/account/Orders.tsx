@@ -59,9 +59,7 @@ const statusLabel = (status: any) => {
   }
 };
 
-const Orders = () => {
-  // @ts-expect-error
-  const { user } = useAuth();
+const Orders = () => {  const { user } = useAuth();
   const {
     orders = [],
     loading,
@@ -93,13 +91,7 @@ const Orders = () => {
     };
 
     return orders.filter(o => {
-      const txt = [
-        // @ts-expect-error
-        o?._id,
-        // @ts-expect-error
-        o?.orderType,
-        // @ts-expect-error
-        ...(o?.items || []).flatMap((it: any) => [
+      const txt = [        o?._id,        o?.orderType,        ...(o?.items || []).flatMap((it: any) => [
           it?.product?.name,
           it?.product?.brand,
           it?.product?.model,
@@ -110,11 +102,7 @@ const Orders = () => {
         .toLowerCase();
 
       const matchSearch = !s || txt.includes(s);
-      const matchStatus =
-        // @ts-expect-error
-        statusFilter === 'all' || (o?.status || '').toLowerCase() === statusFilter;
-      // @ts-expect-error
-      const matchTime = timeOk(o?.createdAt);
+      const matchStatus =        statusFilter === 'all' || (o?.status || '').toLowerCase() === statusFilter;      const matchTime = timeOk(o?.createdAt);
       return matchSearch && matchStatus && matchTime;
     });
   }, [orders, searchTerm, statusFilter, timeFilter]);
@@ -218,48 +206,24 @@ const Orders = () => {
           </div>
         ) : (
           <div className="orders-list">
-            {filtered.map(order => {
-              // @ts-expect-error
-              const created = order?.createdAt
-                // @ts-expect-error
-                ? new Date(order.createdAt).toLocaleDateString('en-IN', {
+            {filtered.map(order => {              const created = order?.createdAt                ? new Date(order.createdAt).toLocaleDateString('en-IN', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
                   })
-                : '—';
-              // @ts-expect-error
-              const status = (order?.status || 'unknown').toLowerCase();
-              // @ts-expect-error
-              const payMethod = order?.paymentDetails?.method || '—';
-              // @ts-expect-error
-              const payStatus = (order?.paymentDetails?.status || '—').toLowerCase();
-              // @ts-expect-error
-              const address = order?.shippingDetails?.address || {};
-              const commissionRate =
-                // @ts-expect-error
-                order?.commission?.rate != null ? Number(order.commission.rate) : null;
-              const commissionAmt =
-                // @ts-expect-error
-                order?.commission?.amount != null ? Number(order.commission.amount) : null;
+                : '—';              const status = (order?.status || 'unknown').toLowerCase();              const payMethod = order?.paymentDetails?.method || '—';              const payStatus = (order?.paymentDetails?.status || '—').toLowerCase();              const address = order?.shippingDetails?.address || {};
+              const commissionRate =                order?.commission?.rate != null ? Number(order.commission.rate) : null;
+              const commissionAmt =                order?.commission?.amount != null ? Number(order.commission.amount) : null;
 
-              return (
-                // @ts-expect-error
-                <div key={order._id} className="order-card simple">
+              return (                <div key={order._id} className="order-card simple">
                   {/* Top row */}
                   <div className="order-top">
-                    <div className="order-top-left">
-                      // @ts-expect-error
-                      <h3 className="order-id">#{order._id}</h3>
+                    <div className="order-top-left">                      <h3 className="order-id">#{order._id}</h3>
                       <div className="order-chips">
                         <span className="chip">
                           <Calendar size={14} /> {created}
-                        </span>
-                        // @ts-expect-error
-                        {order.orderType && (
-                          <span className="chip outline">
-                            // @ts-expect-error
-                            {(order.orderType || '').toUpperCase()}
+                        </span>                        {order.orderType && (
+                          <span className="chip outline">                            {(order.orderType || '').toUpperCase()}
                           </span>
                         )}
                         <span className={`chip status badge-${status}`}>
@@ -270,9 +234,7 @@ const Orders = () => {
 
                     <div className="order-total">
                       <div className="total-label">Total</div>
-                      <div className="total-value">
-                        // @ts-expect-error
-                        ₹{Number(order.totalAmount || 0).toLocaleString()}
+                      <div className="total-value">                        ₹{Number(order.totalAmount || 0).toLocaleString()}
                       </div>
                     </div>
                   </div>
@@ -284,9 +246,7 @@ const Orders = () => {
                       <div className="block-title">
                         <Package size={16} /> Items
                       </div>
-                      <div className="items-compact">
-                        // @ts-expect-error
-                        {(order.items || []).map((it: any, idx: any) => (
+                      <div className="items-compact">                        {(order.items || []).map((it: any, idx: any) => (
                           <div className="item-compact" key={idx}>
                             <div className="item-compact-img">
                               <img
@@ -320,9 +280,7 @@ const Orders = () => {
                         <span className="k">Status</span>
                         <span
                           className={`v pill ${payStatus === 'paid' ? 'ok' : payStatus === 'pending' ? 'warn' : ''}`}
-                        >
-                          // @ts-expect-error
-                          {order?.paymentDetails?.status || '—'}
+                        >                          {order?.paymentDetails?.status || '—'}
                         </span>
                       </div>
                     </div>
@@ -364,21 +322,15 @@ const Orders = () => {
                   </div>
 
                   {/* Actions (kept minimal) */}
-                  <div className="order-actions simple">
-                    // @ts-expect-error
-                    <Link to={`/account/orders/${order._id}`} className="btn ghost">
+                  <div className="order-actions simple">                    <Link to={`/account/orders/${order._id}`} className="btn ghost">
                       <Eye size={16} />
                       <span>View Order</span>
-                    </Link>
-                    // @ts-expect-error
-                    <button className="btn ghost" onClick={() => downloadInvoice(order._id)}>
+                    </Link>                    <button className="btn ghost" onClick={() => downloadInvoice(order._id)}>
                       <Download size={16} />
                       <span>Invoice</span>
                     </button>
 
-                    {status === 'shipped' && (
-                      // @ts-expect-error
-                      <button className="btn primary" onClick={() => trackOrder(order._id)}>
+                    {status === 'shipped' && (                      <button className="btn primary" onClick={() => trackOrder(order._id)}>
                         <Truck size={16} />
                         <span>Track</span>
                       </button>
@@ -386,17 +338,13 @@ const Orders = () => {
 
                     {(status === 'pending' ||
                       status === 'processing' ||
-                      status === 'confirmed') && (
-                      // @ts-expect-error
-                      <button className="btn danger" onClick={() => cancelOrder(order._id)}>
+                      status === 'confirmed') && (                      <button className="btn danger" onClick={() => cancelOrder(order._id)}>
                         <X size={16} />
                         <span>Cancel</span>
                       </button>
                     )}
 
-                    {status === 'delivered' && (
-                      // @ts-expect-error
-                      <button className="btn" onClick={() => requestReturn(order._id)}>
+                    {status === 'delivered' && (                      <button className="btn" onClick={() => requestReturn(order._id)}>
                         <RefreshCw size={16} />
                         <span>Return / Reorder</span>
                       </button>

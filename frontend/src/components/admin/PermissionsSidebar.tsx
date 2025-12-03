@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// @ts-expect-error
 import styled from 'styled-components';
 import {
   X,
@@ -40,7 +39,7 @@ const SidebarContainer = styled.div`
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-left: 1px solid #e2e8f0;
   box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
-  transform: translateX(${(props: any) => props.$isOpen ? '0' : '100%'});
+  transform: translateX(${(props: any) => (props.$isOpen ? '0' : '100%')});
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   display: flex;
@@ -207,10 +206,10 @@ const RoleTemplateGrid = styled.div`
 
 const RoleTemplateButton = styled.button`
   padding: 0.5rem;
-  border: 1px solid ${(props: any) => props.$isActive ? '#3b82f6' : '#e2e8f0'};
+  border: 1px solid ${(props: any) => (props.$isActive ? '#3b82f6' : '#e2e8f0')};
   border-radius: 0.5rem;
-  background: ${(props: any) => props.$isActive ? '#eff6ff' : 'white'};
-  color: ${(props: any) => props.$isActive ? '#3b82f6' : '#64748b'};
+  background: ${(props: any) => (props.$isActive ? '#eff6ff' : 'white')};
+  color: ${(props: any) => (props.$isActive ? '#3b82f6' : '#64748b')};
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
@@ -270,11 +269,11 @@ const CategoryTitle = styled.div`
 const CategoryToggle = styled.div`
   color: #64748b;
   transition: transform 0.2s;
-  transform: rotate(${(props: any) => props.$isExpanded ? '90deg' : '0deg'});
+  transform: rotate(${(props: any) => (props.$isExpanded ? '90deg' : '0deg')});
 `;
 
 const PermissionsList = styled.div`
-  display: ${(props: any) => props.$isExpanded ? 'block' : 'none'};
+  display: ${(props: any) => (props.$isExpanded ? 'block' : 'none')};
 `;
 
 const PermissionItem = styled.div`
@@ -314,7 +313,7 @@ const PermissionToggle = styled.button`
   height: 1.25rem;
   border-radius: 0.625rem;
   border: none;
-  background: ${(props: any) => props.$isEnabled ? '#10b981' : '#e5e7eb'};
+  background: ${(props: any) => (props.$isEnabled ? '#10b981' : '#e5e7eb')};
   position: relative;
   cursor: pointer;
   transition: all 0.2s;
@@ -328,7 +327,7 @@ const PermissionToggle = styled.button`
     content: '';
     position: absolute;
     top: 0.125rem;
-    left: ${(props: any) => props.$isEnabled ? '1.375rem' : '0.125rem'};
+    left: ${(props: any) => (props.$isEnabled ? '1.375rem' : '0.125rem')};
     width: 1rem;
     height: 1rem;
     background: white;
@@ -349,10 +348,10 @@ const ActionButtons = styled.div`
 const ActionButton = styled.button`
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 1px solid ${(props: any) => props.$variant === 'primary' ? '#3b82f6' : '#e2e8f0'};
+  border: 1px solid ${(props: any) => (props.$variant === 'primary' ? '#3b82f6' : '#e2e8f0')};
   border-radius: 0.5rem;
-  background: ${(props: any) => props.$variant === 'primary' ? '#3b82f6' : 'white'};
-  color: ${(props: any) => props.$variant === 'primary' ? 'white' : '#374151'};
+  background: ${(props: any) => (props.$variant === 'primary' ? '#3b82f6' : 'white')};
+  color: ${(props: any) => (props.$variant === 'primary' ? 'white' : '#374151')};
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -363,7 +362,7 @@ const ActionButton = styled.button`
   gap: 0.5rem;
 
   &:hover {
-    background: ${(props: any) => props.$variant === 'primary' ? '#2563eb' : '#f8fafc'};
+    background: ${(props: any) => (props.$variant === 'primary' ? '#2563eb' : '#f8fafc')};
     transform: translateY(-1px);
   }
 
@@ -409,12 +408,7 @@ const StatusIndicator = styled.div`
   margin-bottom: 1rem;
 `;
 
-const PermissionsSidebar = ({
-  isOpen,
-  onClose,
-  selectedPartner,
-  onPermissionsUpdate
-}: any) => {
+const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpdate }: any) => {
   const [loading, setLoading] = useState(false);
   const [permissions, setPermissions] = useState({});
   const [originalPermissions, setOriginalPermissions] = useState({});
@@ -430,7 +424,6 @@ const PermissionsSidebar = ({
 
     try {
       setLoading(true);
-      // @ts-expect-error
       setStatus({ type: 'loading', message: 'Loading permissions...' });
 
       const response = await partnerPermissionService.getPartnerPermissions(selectedPartner.id);
@@ -441,17 +434,14 @@ const PermissionsSidebar = ({
       setOriginalPermissions(permissionsData);
       setRoleTemplate(roleData);
       setHasChanges(false);
-      // @ts-expect-error
       setStatus({ type: 'success', message: 'Permissions loaded successfully' });
 
       // Auto-expand first category
       if (PARTNER_MENU_ITEMS.length > 0) {
-        // @ts-expect-error
         setExpandedCategories({ [PARTNER_MENU_ITEMS[0].section]: true });
       }
     } catch (error) {
       console.error('Error loading permissions:', error);
-      // @ts-expect-error
       setStatus({ type: 'error', message: 'Failed to load permissions' });
       toast.error('Failed to load partner permissions');
     } finally {
@@ -478,9 +468,7 @@ const PermissionsSidebar = ({
     setPermissions(prev => ({
       ...prev,
       [permissionKey]: {
-        // @ts-expect-error
         ...prev[permissionKey],
-        // @ts-expect-error
         granted: !prev[permissionKey]?.granted,
       },
     }));
@@ -492,7 +480,6 @@ const PermissionsSidebar = ({
 
     try {
       setLoading(true);
-      // @ts-expect-error
       setStatus({ type: 'loading', message: 'Applying role template...' });
 
       await partnerPermissionService.applyRoleTemplate(selectedPartner.id, templateKey);
@@ -501,10 +488,8 @@ const PermissionsSidebar = ({
       await loadPermissions();
 
       setRoleTemplate(templateKey);
-      // @ts-expect-error
       setStatus({ type: 'success', message: 'Role template applied successfully' });
       toast.success(
-        // @ts-expect-error
         `Role template "${PARTNER_ROLE_TEMPLATES[templateKey]?.label}" applied successfully`
       );
 
@@ -514,7 +499,6 @@ const PermissionsSidebar = ({
       }
     } catch (error) {
       console.error('Error applying role template:', error);
-      // @ts-expect-error
       setStatus({ type: 'error', message: 'Failed to apply role template' });
       toast.error('Failed to apply role template');
     } finally {
@@ -528,7 +512,6 @@ const PermissionsSidebar = ({
 
     try {
       setLoading(true);
-      // @ts-expect-error
       setStatus({ type: 'loading', message: 'Saving permissions...' });
 
       await partnerPermissionService.updatePartnerPermissions(selectedPartner.id, {
@@ -538,7 +521,6 @@ const PermissionsSidebar = ({
 
       setOriginalPermissions(permissions);
       setHasChanges(false);
-      // @ts-expect-error
       setStatus({ type: 'success', message: 'Permissions saved successfully' });
       toast.success('Partner permissions updated successfully');
 
@@ -548,7 +530,6 @@ const PermissionsSidebar = ({
       }
     } catch (error) {
       console.error('Error saving permissions:', error);
-      // @ts-expect-error
       setStatus({ type: 'error', message: 'Failed to save permissions' });
       toast.error('Failed to save permissions');
     } finally {
@@ -567,7 +548,6 @@ const PermissionsSidebar = ({
   const toggleCategory = (categoryName: any) => {
     setExpandedCategories(prev => ({
       ...prev,
-      // @ts-expect-error
       [categoryName]: !prev[categoryName],
     }));
   };
@@ -594,7 +574,6 @@ const PermissionsSidebar = ({
       'Support & Communication': HelpCircle,
       Settings: Settings,
     };
-    // @ts-expect-error
     return iconMap[sectionName] || Settings;
   };
 
@@ -623,7 +602,6 @@ const PermissionsSidebar = ({
           <PartnerDetails>
             <PartnerName>{selectedPartner.shopName || selectedPartner.name}</PartnerName>
             <PartnerRole>
-              // @ts-expect-error
               {PARTNER_ROLE_TEMPLATES[roleTemplate]?.label || 'Basic Partner'}
             </PartnerRole>
           </PartnerDetails>
@@ -631,15 +609,10 @@ const PermissionsSidebar = ({
 
         {/* Status Indicator */}
         {status && (
-          // @ts-expect-error
           <StatusIndicator $status={status.type}>
-            // @ts-expect-error
             {status.type === 'loading' && <RefreshCw size={14} className="animate-spin" />}
-            // @ts-expect-error
             {status.type === 'success' && <CheckCircle size={14} />}
-            // @ts-expect-error
             {status.type === 'error' && <AlertCircle size={14} />}
-            // @ts-expect-error
             {status.message}
           </StatusIndicator>
         )}
@@ -681,7 +654,6 @@ const PermissionsSidebar = ({
         <PermissionsSection>
           {filteredMenuItems.map(section => {
             const IconComponent = getCategoryIcon(section.section);
-            // @ts-expect-error
             const isExpanded = expandedCategories[section.section];
 
             return (
@@ -698,7 +670,6 @@ const PermissionsSidebar = ({
 
                 <PermissionsList $isExpanded={isExpanded}>
                   {section.items.map(item => {
-                    // @ts-expect-error
                     const permissionData = permissions[item.requiredPermission];
                     const isEnabled = permissionData?.granted || false;
 

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import { adminService } from '../../services/adminService';
@@ -96,10 +95,13 @@ const Button = styled.button`
   align-items: center;
   gap: ${theme.spacing[2]};
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  background-color: ${(props: any) => props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
-  color: ${(props: any) => props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
+  background-color: ${(props: any) =>
+    props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
+  color: ${(props: any) =>
+    props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
   border: 1px solid
-    ${(props: any) => props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
+    ${(props: any) =>
+      props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
@@ -107,7 +109,8 @@ const Button = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: ${(props: any) => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background-color: ${(props: any) =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -175,8 +178,9 @@ const CategoryIcon = styled.div`
   width: 32px;
   height: 32px;
   border-radius: ${theme.borderRadius.md};
-  background-color: ${(props: any) => props.isParent ? theme.colors.primary[100] : theme.colors.grey[100]};
-  color: ${(props: any) => props.isParent ? theme.colors.primary.main : theme.colors.grey[600]};
+  background-color: ${(props: any) =>
+    props.isParent ? theme.colors.primary[100] : theme.colors.grey[100]};
+  color: ${(props: any) => (props.isParent ? theme.colors.primary.main : theme.colors.grey[600])};
   margin-right: ${theme.spacing[3]};
 `;
 
@@ -371,7 +375,6 @@ const CategoryManagement = () => {
   const handleSaveCategory = async () => {
     try {
       if (editingCategory) {
-        // @ts-expect-error
         await adminService.updateCategory(editingCategory.id, formData);
       } else {
         await adminService.createCategory(formData);
@@ -408,24 +411,19 @@ const CategoryManagement = () => {
     if (!searchTerm) return categories;
     return categories.filter(
       category =>
-        // @ts-expect-error
         category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        // @ts-expect-error
         category.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 
   const renderCategoryIcon = (iconName: any) => {
-    // @ts-expect-error
     const IconComponent = categoryIcons[iconName] || Package;
     return <IconComponent size={16} />;
   };
 
   const renderCategory = (category: any, level = 0) => {
-    // @ts-expect-error
     const hasChildren = categories.some(cat => cat.parentId === category.id);
     const isExpanded = expandedCategories.has(category.id);
-    // @ts-expect-error
     const children = categories.filter(cat => cat.parentId === category.id);
 
     return (
@@ -462,8 +460,6 @@ const CategoryManagement = () => {
       </div>
     );
   };
-
-  // @ts-expect-error
   const mainCategories = getFilteredCategories().filter(cat => !cat.parentId);
 
   return (
@@ -562,12 +558,9 @@ const CategoryManagement = () => {
               >
                 <option value="">None (Main Category)</option>
                 {categories
-                  // @ts-expect-error
                   .filter(cat => !cat.parentId && cat.id !== editingCategory?.id)
                   .map(category => (
-                    // @ts-expect-error
                     <option key={category.id} value={category.id}>
-                      // @ts-expect-error
                       {category.name}
                     </option>
                   ))}

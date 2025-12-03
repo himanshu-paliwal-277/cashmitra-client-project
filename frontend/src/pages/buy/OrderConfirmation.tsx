@@ -31,9 +31,7 @@ const OrderConfirmation = ({
   onGoHome
 }: any) => {
   const location = useLocation();
-  const navigate = useNavigate();
-  // @ts-expect-error
-  const { currentOrder, clearOrderData } = useAuth();
+  const navigate = useNavigate();  const { currentOrder, clearOrderData } = useAuth();
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Get order data from context first, then navigation state or props
@@ -219,9 +217,7 @@ const OrderConfirmation = ({
                       <img
                         src={item.product?.images?.[0] || '/api/placeholder/100/100'}
                         alt={item.product?.name || 'Product'}
-                        onError={e => {
-                          // @ts-expect-error
-                          e.target.src = '/api/placeholder/100/100';
+                        onError={e => {                          e.target.src = '/api/placeholder/100/100';
                         }}
                       />
                     </div>
@@ -340,9 +336,7 @@ const OrderConfirmation = ({
                 <div className="actions-list">
                   {quickActions.map((action, index) => {
                     const IconComponent = action.icon;
-                    return (
-                      // @ts-expect-error
-                      <Button
+                    return (                      <Button
                         key={index}
                         variant={action.variant}
                         size="sm"
@@ -434,9 +428,7 @@ const OrderConfirmation = ({
                     </div>
                   </div>
                 </div>
-                <div className="support-actions">
-                  // @ts-expect-error
-                  <Button variant="primary" size="sm" className="action-button">
+                <div className="support-actions">                  <Button variant="primary" size="sm" className="action-button">
                     <MessageCircle size={16} />
                     Chat Support
                   </Button>
@@ -445,15 +437,11 @@ const OrderConfirmation = ({
             </div>
           </div>
 
-          <div className="navigation-actions">
-            // @ts-expect-error
-            <Button variant="primary" size="lg" onClick={handleContinueShopping}>
+          <div className="navigation-actions">            <Button variant="primary" size="lg" onClick={handleContinueShopping}>
               <ShoppingBag size={20} />
               Continue Shopping
               <ArrowRight size={20} />
-            </Button>
-            // @ts-expect-error
-            <Button variant="ghost" size="lg" onClick={handleGoHome}>
+            </Button>            <Button variant="ghost" size="lg" onClick={handleGoHome}>
               <Home size={20} />
               Go to Home
             </Button>

@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';import styled from 'styled-components';
 import { theme } from '../../theme';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
@@ -237,25 +235,7 @@ const SellMobile = ({
   // Filter brands for mobile category
   const mobileBrands = brands.filter(brand => {
     // Check if brand has mobile category or if it's associated with mobile products
-    return (
-      // @ts-expect-error
-      brand.categoryName === 'Mobile' ||
-      // @ts-expect-error
-      brand.categoryName === 'Mobile Phones' ||
-      // @ts-expect-error
-      brand.name === 'Apple' ||
-      // @ts-expect-error
-      brand.name === 'Samsung' ||
-      // @ts-expect-error
-      brand.name === 'OnePlus' ||
-      // @ts-expect-error
-      brand.name === 'Google' ||
-      // @ts-expect-error
-      brand.name === 'Xiaomi' ||
-      // @ts-expect-error
-      brand.name === 'Oppo' ||
-      // @ts-expect-error
-      brand.name === 'Vivo'
+    return (      brand.categoryName === 'Mobile' ||      brand.categoryName === 'Mobile Phones' ||      brand.name === 'Apple' ||      brand.name === 'Samsung' ||      brand.name === 'OnePlus' ||      brand.name === 'Google' ||      brand.name === 'Xiaomi' ||      brand.name === 'Oppo' ||      brand.name === 'Vivo'
     );
   });
 
@@ -345,17 +325,9 @@ const SellMobile = ({
 
         <BrandGrid>
           {mobileBrands.map(brand => (
-            <BrandCard
-              // @ts-expect-error
-              key={brand._id || brand.id}
-              // @ts-expect-error
-              className={selectedBrand?.name === brand.name ? 'selected' : ''}
+            <BrandCard              key={brand._id || brand.id}              className={selectedBrand?.name === brand.name ? 'selected' : ''}
               onClick={() => handleBrandSelect(brand)}
-            >
-              // @ts-expect-error
-              <BrandLogo>{brand.name?.charAt(0).toUpperCase()}</BrandLogo>
-              // @ts-expect-error
-              <BrandName>{brand.name}</BrandName>
+            >              <BrandLogo>{brand.name?.charAt(0).toUpperCase()}</BrandLogo>              <BrandName>{brand.name}</BrandName>
             </BrandCard>
           ))}
         </BrandGrid>

@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-// @ts-expect-error
-import styled from 'styled-components';
+import { useLocation, useNavigate } from 'react-router-dom';import styled from 'styled-components';
 import { theme } from '../../theme';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
@@ -286,17 +284,9 @@ const ModelSelection = ({
   // Set selected category and brand based on URL params
   useEffect(() => {
     if (categories && categoryId) {
-      console.log('categories: ', categories);
-      // @ts-expect-error
-      const category = categories.find(cat => cat.name === categoryId);
-      // @ts-expect-error
-      setSelectedCategory(category);
+      console.log('categories: ', categories);      const category = categories.find(cat => cat.name === categoryId);      setSelectedCategory(category);
     }
-    if (brands && brandId) {
-      // @ts-expect-error
-      const brand = brands.find(br => br.brand === brandId);
-      // @ts-expect-error
-      setSelectedBrand(brand);
+    if (brands && brandId) {      const brand = brands.find(br => br.brand === brandId);      setSelectedBrand(brand);
     }
   }, [categories, brands, categoryId, brandId]);
 
@@ -306,15 +296,11 @@ const ModelSelection = ({
     // console.log('selectedBrand: ', selectedBrand);
     // console.log('selectedCategory: ', selectedCategory);
     if (models && selectedCategory && selectedBrand) {
-      let filtered = models.filter(
-        // @ts-expect-error
-        model => model.category === selectedCategory.name && model.brand === selectedBrand.brand
+      let filtered = models.filter(        model => model.category === selectedCategory.name && model.brand === selectedBrand.brand
       );
 
       if (searchQuery) {
-        filtered = filtered.filter(model =>
-          // @ts-expect-error
-          model.model.toLowerCase().includes(searchQuery.toLowerCase())
+        filtered = filtered.filter(model =>          model.model.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
 
@@ -324,13 +310,8 @@ const ModelSelection = ({
 
   // Filter models based on search query
   console.log('filteredModels: ', filteredModels);
-  const currentModels = filteredModels.filter(model =>
-    // @ts-expect-error
-    model.brand.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // @ts-expect-error
-  const popularModels = currentModels.filter(model => model.popular);
+  const currentModels = filteredModels.filter(model =>    model.brand.toLowerCase().includes(searchQuery.toLowerCase())
+  );  const popularModels = currentModels.filter(model => model.popular);
   const allModels = currentModels;
 
   const handleModelClick = (model: any) => {
@@ -342,9 +323,7 @@ const ModelSelection = ({
       onModelSelect(selectedModel);
     }
     // Navigate to condition questionnaire
-    navigate(
-      // @ts-expect-error
-      `/sell/condition?category=${categoryId}&brand=${brandId}&model=${selectedModel.model}`
+    navigate(      `/sell/condition?category=${categoryId}&brand=${brandId}&model=${selectedModel.model}`
     );
   };
 
@@ -387,9 +366,7 @@ const ModelSelection = ({
       <PageContainer>
         <Container>
           <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <p style={{ color: theme.colors.error.main }}>Error loading models: {error}</p>
-            // @ts-expect-error
-            <Button onClick={() => window.location.reload()}>Retry</Button>
+            <p style={{ color: theme.colors.error.main }}>Error loading models: {error}</p>            <Button onClick={() => window.location.reload()}>Retry</Button>
           </div>
         </Container>
       </PageContainer>
@@ -398,9 +375,7 @@ const ModelSelection = ({
 
   const renderModelCard = (model: any) => <ModelCard
     key={model._id}
-    onClick={() => handleModelClick(model)}
-    // @ts-expect-error
-    className={selectedModel?._id === model._id ? 'selected' : ''}
+    onClick={() => handleModelClick(model)}    className={selectedModel?._id === model._id ? 'selected' : ''}
     style={{ position: 'relative' }}
   >
     {model.popular && (
@@ -408,10 +383,7 @@ const ModelSelection = ({
         <Star size={12} fill="currentColor" />
         Popular
       </PopularBadge>
-    )}
-
-    // @ts-expect-error
-    <Card.Body>
+    )}    <Card.Body>
       <ModelHeader>
         <ModelName>{model.model}</ModelName>
         <ModelYear>
@@ -444,9 +416,7 @@ const ModelSelection = ({
         <PriceValue>
           {formatPrice(model.minPrice || 0)} - {formatPrice(model.maxPrice || 0)}
         </PriceValue>
-      </PriceRange>
-    // @ts-expect-error
-    </Card.Body>
+      </PriceRange>    </Card.Body>
   </ModelCard>;
 
   return (
@@ -461,26 +431,16 @@ const ModelSelection = ({
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
           <BreadcrumbLink href="/sell">Sell Device</BreadcrumbLink>
           <BreadcrumbSeparator>/</BreadcrumbSeparator>
-          <BreadcrumbLink href={`/sell/brand?category=${categoryId}`}>
-            // @ts-expect-error
-            {selectedCategory?.name || 'Category'}
+          <BreadcrumbLink href={`/sell/brand?category=${categoryId}`}>            {selectedCategory?.name || 'Category'}
           </BreadcrumbLink>
-          <BreadcrumbSeparator>/</BreadcrumbSeparator>
-          // @ts-expect-error
-          <span>{selectedBrand?.name}</span>
+          <BreadcrumbSeparator>/</BreadcrumbSeparator>          <span>{selectedBrand?.name}</span>
         </Breadcrumb>
 
         {/* Page Header */}
         <PageHeader>
-          <BrandInfo>
-            // @ts-expect-error
-            <BrandLogo bgColor={selectedBrand?.bgColor} textColor={selectedBrand?.textColor}>
-              // @ts-expect-error
-              {selectedBrand?.logo}
+          <BrandInfo>            <BrandLogo bgColor={selectedBrand?.bgColor} textColor={selectedBrand?.textColor}>              {selectedBrand?.logo}
             </BrandLogo>
-            <div>
-              // @ts-expect-error
-              <PageTitle>Select your {selectedBrand?.name} model</PageTitle>
+            <div>              <PageTitle>Select your {selectedBrand?.name} model</PageTitle>
             </div>
           </BrandInfo>
           <PageSubtitle>Choose the exact model to get the most accurate price quote</PageSubtitle>
@@ -488,9 +448,7 @@ const ModelSelection = ({
 
         {/* Search */}
         <SearchSection>
-          <Input
-            // @ts-expect-error
-            placeholder={`Search ${selectedBrand?.name} models...`}
+          <Input            placeholder={`Search ${selectedBrand?.name} models...`}
             leftIcon={<Search size={20} />}
             value={searchQuery}
             onChange={(e: any) => setSearchQuery(e.target.value)}
@@ -509,17 +467,11 @@ const ModelSelection = ({
         <div style={{ marginBottom: theme.spacing[8] }}>
           <SectionTitle>
             {searchQuery
-              ? `Search Results (${allModels.length})`
-              // @ts-expect-error
-              : `📱 All ${selectedBrand?.name} Models`}
+              ? `Search Results (${allModels.length})`              : `📱 All ${selectedBrand?.name} Models`}
           </SectionTitle>
           <ModelGrid>{allModels.map(renderModelCard)}</ModelGrid>
 
-          {allModels.length === 0 && (
-            // @ts-expect-error
-            <Card>
-              // @ts-expect-error
-              <Card.Body>
+          {allModels.length === 0 && (            <Card>              <Card.Body>
                 <div style={{ textAlign: 'center', padding: theme.spacing[8] }}>
                   <p>No models found matching "{searchQuery}"</p>
                   <p
@@ -530,9 +482,7 @@ const ModelSelection = ({
                   >
                     Try a different search term or contact support if your model is not listed.
                   </p>
-                </div>
-              // @ts-expect-error
-              </Card.Body>
+                </div>              </Card.Body>
             </Card>
           )}
         </div>
@@ -548,9 +498,7 @@ const ModelSelection = ({
             rightIcon={<ArrowRight size={20} />}
             disabled={!selectedModel}
             onClick={handleNext}
-          >
-            // @ts-expect-error
-            Continue with {selectedModel?.name || 'Selected Model'}
+          >            Continue with {selectedModel?.name || 'Selected Model'}
           </NextButton>
         </NavigationButtons>
       </Container>

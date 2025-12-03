@@ -76,25 +76,17 @@ const SellMobileForm = () => {
 
   const getModelsByBrand = (brandName: any) => {
     if (!models || !brandName) return [];
-    return models.filter(
-      // @ts-expect-error
-      model => model.brand && (model.brand.name === brandName || model.brand === brandName)
+    return models.filter(      model => model.brand && (model.brand.name === brandName || model.brand === brandName)
     );
   };
 
   const getMobileBrands = () => {
     if (!brands || !categories) return [];
-    const mobileCategory = categories.find(
-      // @ts-expect-error
-      cat => cat.name && cat.name.toLowerCase().includes('mobile')
+    const mobileCategory = categories.find(      cat => cat.name && cat.name.toLowerCase().includes('mobile')
     );
     if (!mobileCategory) return brands;
     return brands.filter(
-      brand =>
-        // @ts-expect-error
-        brand.category &&
-        // @ts-expect-error
-        (brand.category._id === mobileCategory._id || brand.category === mobileCategory._id)
+      brand =>        brand.category &&        (brand.category._id === mobileCategory._id || brand.category === mobileCategory._id)
     );
   };
 
@@ -181,9 +173,7 @@ const SellMobileForm = () => {
         model: formData.model,
         storage: formData.storage,
         color: formData.color,
-        condition: formData.condition,
-        // @ts-expect-error
-        functionalChecks: formData.functionalChecks || [],
+        condition: formData.condition,        functionalChecks: formData.functionalChecks || [],
         accessories: {
           hasBox: formData.hasBox || false,
           hasBill: formData.hasBill || false,
@@ -213,9 +203,7 @@ const SellMobileForm = () => {
       'Galaxy S24 Ultra': 70000,
       'OnePlus 12': 45000,
       'Pixel 8 Pro': 40000,
-    };
-    // @ts-expect-error
-    let basePrice = basePrices[formData.model] || 25000;
+    };    let basePrice = basePrices[formData.model] || 25000;
     const condition = conditionOptions.find(c => c.id === formData.condition);
     if (condition) basePrice *= condition.priceMultiplier;
     if (formData.hasBox) basePrice += 1000;
@@ -243,9 +231,7 @@ const SellMobileForm = () => {
           model: formData.model,
           storage: formData.storage,
           color: formData.color,
-          condition: formData.condition,
-          // @ts-expect-error
-          functionalChecks: formData.functionalChecks || [],
+          condition: formData.condition,          functionalChecks: formData.functionalChecks || [],
           accessories: {
             hasBox: formData.hasBox || false,
             hasBill: formData.hasBill || false,
@@ -283,9 +269,7 @@ const SellMobileForm = () => {
         setError(response.message || 'Failed to create sell order. Please try again.');
       }
     } catch (error) {
-      console.error('Error submitting sell order:', error);
-      // @ts-expect-error
-      setError('Network error. Please check your connection and try again.');
+      console.error('Error submitting sell order:', error);      setError('Network error. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }

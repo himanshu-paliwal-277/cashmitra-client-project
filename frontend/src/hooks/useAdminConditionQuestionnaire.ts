@@ -25,9 +25,7 @@ const useAdminConditionQuestionnaire = () => {
   const fetchQuestionnaires = useCallback(async (page = 1, limit = 10) => {
     setLoading(true);
     setError(null);
-    try {
-      // @ts-expect-error
-      const data = await adminService.getConditionQuestionnaires({ page, limit });
+    try {      const data = await adminService.getConditionQuestionnaires({ page, limit });
       // Backend returns data in { success, data: { questionnaires, stats, pagination } } format
       const questionnaireList = data.data?.questionnaires || [];
       const backendStats = data.data?.stats || {};
@@ -53,9 +51,7 @@ const useAdminConditionQuestionnaire = () => {
         avgCompletionTime: backendStats.avgCompletionTime || 0,
         categoriesCount: backendStats.categoriesCount || 0,
       });
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message || 'Failed to fetch questionnaires');
+    } catch (err) {      setError(err.message || 'Failed to fetch questionnaires');
       console.error('Error fetching questionnaires:', err);
     } finally {
       setLoading(false);
@@ -75,12 +71,8 @@ const useAdminConditionQuestionnaire = () => {
         // Refresh the data
         await fetchQuestionnaires();
         return { success: true };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to update questionnaire status');
-        console.error('Error updating questionnaire status:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to update questionnaire status');
+        console.error('Error updating questionnaire status:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -99,12 +91,8 @@ const useAdminConditionQuestionnaire = () => {
         // Refresh the data
         await fetchQuestionnaires();
         return { success: true, data: result.data };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to create questionnaire');
-        console.error('Error creating questionnaire:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to create questionnaire');
+        console.error('Error creating questionnaire:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -126,12 +114,8 @@ const useAdminConditionQuestionnaire = () => {
         // Refresh the data
         await fetchQuestionnaires();
         return { success: true, data: result.data };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to update questionnaire');
-        console.error('Error updating questionnaire:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to update questionnaire');
+        console.error('Error updating questionnaire:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -153,12 +137,8 @@ const useAdminConditionQuestionnaire = () => {
         // Refresh the data
         await fetchQuestionnaires();
         return { success: true, message: result.message };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to delete questionnaire');
-        console.error('Error deleting questionnaire:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to delete questionnaire');
+        console.error('Error deleting questionnaire:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -187,12 +167,8 @@ const useAdminConditionQuestionnaire = () => {
         // Refresh the data
         await fetchQuestionnaires();
         return { success: true, data: result.data };
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to duplicate questionnaire');
-        console.error('Error duplicating questionnaire:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to duplicate questionnaire');
+        console.error('Error duplicating questionnaire:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -207,9 +183,7 @@ const useAdminConditionQuestionnaire = () => {
 
   // Get questionnaire by ID (from local state)
   const getQuestionnaireById = useCallback(
-    (questionnaireId: any) => {
-      // @ts-expect-error
-      return questionnaires.find(questionnaire => questionnaire._id === questionnaireId);
+    (questionnaireId: any) => {      return questionnaires.find(questionnaire => questionnaire._id === questionnaireId);
     },
     [questionnaires]
   );
@@ -218,17 +192,11 @@ const useAdminConditionQuestionnaire = () => {
   const fetchQuestionnaireById = useCallback(async (questionnaireId: any) => {
     setLoading(true);
     setError(null);
-    try {
-      // @ts-expect-error
-      const result = await adminService.getConditionQuestionnaireById(questionnaireId);
+    try {      const result = await adminService.getConditionQuestionnaireById(questionnaireId);
 
       return { success: true, data: result.data };
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message || 'Failed to fetch questionnaire');
-      console.error('Error fetching questionnaire by ID:', err);
-      // @ts-expect-error
-      return { success: false, error: err.message };
+    } catch (err) {      setError(err.message || 'Failed to fetch questionnaire');
+      console.error('Error fetching questionnaire by ID:', err);      return { success: false, error: err.message };
     } finally {
       setLoading(false);
     }

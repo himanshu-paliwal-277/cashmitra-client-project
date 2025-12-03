@@ -117,7 +117,6 @@ const AboutHero = () => {
 
                   {/* Hover Glow Effect */}
                   <div
-                    // @ts-expect-error
                     className={`absolute inset-0 bg-gradient-to-br from-${stat.color}-100 to-transparent rounded-2xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 -z-10`}
                   ></div>
                 </div>

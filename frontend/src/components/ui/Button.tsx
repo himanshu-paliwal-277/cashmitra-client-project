@@ -1,6 +1,4 @@
-import React from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React from 'react';import styled from 'styled-components';
 import { theme } from '../../theme';
 
 const StyledButton = styled.button`
@@ -191,27 +189,7 @@ pointer-events: none;
 
 const Button = React.forwardRef(
   (
-    {
-      // @ts-expect-error
-      children,
-      // @ts-expect-error
-      variant = 'default',
-      // @ts-expect-error
-      size = 'md',
-      // @ts-expect-error
-      loading = false,
-      // @ts-expect-error
-      disabled = false,
-      // @ts-expect-error
-      fullWidth = false,
-      // @ts-expect-error
-      rounded = false,
-      // @ts-expect-error
-      leftIcon,
-      // @ts-expect-error
-      rightIcon,
-      // @ts-expect-error
-      as = 'button',
+    {      children,      variant = 'default',      size = 'md',      loading = false,      disabled = false,      fullWidth = false,      rounded = false,      leftIcon,      rightIcon,      as = 'button',
       ...props
     },
     ref

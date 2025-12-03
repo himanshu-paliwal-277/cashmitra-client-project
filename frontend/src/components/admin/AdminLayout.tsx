@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-// @ts-expect-error
 import styled from 'styled-components';
 import {
   Menu,
@@ -56,7 +55,7 @@ const Sidebar = styled.aside`
   left: 0;
   height: 100vh;
   z-index: 1000;
-  transform: translateX(${(props: any) => props.$isOpen ? '0' : '-100%'});
+  transform: translateX(${(props: any) => (props.$isOpen ? '0' : '-100%')});
   transition: transform 0.3s ease;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 
@@ -184,19 +183,19 @@ const NavItem = styled(Link)`
   align-items: center;
   padding: 0.875rem 1.5rem;
   margin: 0.25rem 1rem;
-  color: ${(props: any) => props.$active ? '#3b82f6' : '#374151'};
+  color: ${(props: any) => (props.$active ? '#3b82f6' : '#374151')};
   text-decoration: none;
-  font-weight: ${(props: any) => props.$active ? '600' : '500'};
+  font-weight: ${(props: any) => (props.$active ? '600' : '500')};
   font-size: 0.875rem;
-  background-color: ${(props: any) => props.$active ? '#eff6ff' : 'transparent'};
+  background-color: ${(props: any) => (props.$active ? '#eff6ff' : 'transparent')};
   border-radius: 0.5rem;
-  border-left: ${(props: any) => props.$active ? '3px solid #3b82f6' : '3px solid transparent'};
+  border-left: ${(props: any) => (props.$active ? '3px solid #3b82f6' : '3px solid transparent')};
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 
   &:hover {
-    background-color: ${(props: any) => props.$active ? '#eff6ff' : '#f8fafc'};
-    color: ${(props: any) => props.$active ? '#3b82f6' : '#1f2937'};
+    background-color: ${(props: any) => (props.$active ? '#eff6ff' : '#f8fafc')};
+    color: ${(props: any) => (props.$active ? '#3b82f6' : '#1f2937')};
     transform: translateX(2px);
   }
 
@@ -274,7 +273,7 @@ const Overlay = styled.div`
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
-  display: ${(props: any) => props.$isOpen ? 'block' : 'none'};
+  display: ${(props: any) => (props.$isOpen ? 'block' : 'none')};
 
   @media (min-width: 1024px) {
     display: none;
@@ -284,7 +283,6 @@ const Overlay = styled.div`
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  // @ts-expect-error
   const { adminUser, logout } = useAdminAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 

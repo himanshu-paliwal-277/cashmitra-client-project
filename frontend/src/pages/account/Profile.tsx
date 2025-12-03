@@ -21,9 +21,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import useUserProfile from '../../hooks/useUserProfile';
 import './Profile.css';
 
-const Profile = () => {
-  // @ts-expect-error
-  const { user } = useAuth();
+const Profile = () => {  const { user } = useAuth();
   const { profile: profileData, loading, error, updateProfile } = useUserProfile();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -39,24 +37,10 @@ const Profile = () => {
   // hydrate edit data when we receive profile
   useEffect(() => {
     if (profileData) {
-      setEditData({
-        // @ts-expect-error
-        name: profileData.name || '',
-        // @ts-expect-error
-        email: profileData.email || '',
-        // @ts-expect-error
-        phone: profileData.phone || '',
-        // @ts-expect-error
-        dateOfBirth: profileData.dateOfBirth || '',
-        address:
-          // @ts-expect-error
-          profileData.address && typeof profileData.address === 'object'
-            // @ts-expect-error
-            ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
+      setEditData({        name: profileData.name || '',        email: profileData.email || '',        phone: profileData.phone || '',        dateOfBirth: profileData.dateOfBirth || '',
+        address:          profileData.address && typeof profileData.address === 'object'            ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                 .replace(/^,\s*|,\s*,/g, ',')
-                .replace(/^,\s*|,\s*$/g, '')
-            // @ts-expect-error
-            : profileData.address || '',
+                .replace(/^,\s*|,\s*$/g, '')            : profileData.address || '',
       });
     }
   }, [profileData]);
@@ -64,24 +48,10 @@ const Profile = () => {
   const handleEdit = () => {
     if (profileData) {
       setEditData(prev => ({
-        ...prev,
-        // @ts-expect-error
-        name: profileData.name || '',
-        // @ts-expect-error
-        email: profileData.email || '',
-        // @ts-expect-error
-        phone: profileData.phone || '',
-        // @ts-expect-error
-        dateOfBirth: profileData.dateOfBirth || '',
-        address:
-          // @ts-expect-error
-          profileData.address && typeof profileData.address === 'object'
-            // @ts-expect-error
-            ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
+        ...prev,        name: profileData.name || '',        email: profileData.email || '',        phone: profileData.phone || '',        dateOfBirth: profileData.dateOfBirth || '',
+        address:          profileData.address && typeof profileData.address === 'object'            ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                 .replace(/^,\s*|,\s*,/g, ',')
-                .replace(/^,\s*|,\s*$/g, '')
-            // @ts-expect-error
-            : profileData.address || '',
+                .replace(/^,\s*|,\s*$/g, '')            : profileData.address || '',
       }));
     }
     setIsEditing(true);
@@ -102,24 +72,10 @@ const Profile = () => {
 
   const handleCancel = () => {
     if (profileData) {
-      setEditData({
-        // @ts-expect-error
-        name: profileData.name || '',
-        // @ts-expect-error
-        email: profileData.email || '',
-        // @ts-expect-error
-        phone: profileData.phone || '',
-        // @ts-expect-error
-        dateOfBirth: profileData.dateOfBirth || '',
-        address:
-          // @ts-expect-error
-          profileData.address && typeof profileData.address === 'object'
-            // @ts-expect-error
-            ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
+      setEditData({        name: profileData.name || '',        email: profileData.email || '',        phone: profileData.phone || '',        dateOfBirth: profileData.dateOfBirth || '',
+        address:          profileData.address && typeof profileData.address === 'object'            ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                 .replace(/^,\s*|,\s*,/g, ',')
-                .replace(/^,\s*|,\s*$/g, '')
-            // @ts-expect-error
-            : profileData.address || '',
+                .replace(/^,\s*|,\s*$/g, '')            : profileData.address || '',
       });
     }
     setIsEditing(false);
@@ -164,11 +120,7 @@ const Profile = () => {
   ];
 
   const initials = loading
-    ? 'L'
-    // @ts-expect-error
-    : profileData?.name
-      // @ts-expect-error
-      ? profileData.name
+    ? 'L'    : profileData?.name      ? profileData.name
           .split(' ')
           .map((n: any) => n[0])
           .join('')
@@ -197,13 +149,9 @@ const Profile = () => {
                 </button>
               </div>
 
-              <h2 className="prof-username">
-                // @ts-expect-error
-                {loading ? 'Loading...' : profileData?.name || 'User Name'}
+              <h2 className="prof-username">                {loading ? 'Loading...' : profileData?.name || 'User Name'}
               </h2>
-              <div className="prof-email">
-                // @ts-expect-error
-                {loading ? 'Loading...' : profileData?.email || 'user@example.com'}
+              <div className="prof-email">                {loading ? 'Loading...' : profileData?.email || 'user@example.com'}
               </div>
 
               <div className="prof-status" role="status" aria-live="polite">
@@ -272,9 +220,7 @@ const Profile = () => {
                       disabled={saving}
                     />
                   ) : (
-                    <div className="prof-value">
-                      // @ts-expect-error
-                      {loading ? 'Loading...' : profileData?.name || 'Not provided'}
+                    <div className="prof-value">                      {loading ? 'Loading...' : profileData?.name || 'Not provided'}
                     </div>
                   )}
                 </div>
@@ -295,9 +241,7 @@ const Profile = () => {
                       title="Email is verified and cannot be changed here"
                     />
                   ) : (
-                    <div className="prof-value">
-                      // @ts-expect-error
-                      {loading ? 'Loading...' : profileData?.email || 'Not provided'}
+                    <div className="prof-value">                      {loading ? 'Loading...' : profileData?.email || 'Not provided'}
                       <Shield size={14} className="prof-value-ok" />
                     </div>
                   )}
@@ -317,9 +261,7 @@ const Profile = () => {
                       disabled={saving}
                     />
                   ) : (
-                    <div className="prof-value">
-                      // @ts-expect-error
-                      {loading ? 'Loading...' : profileData?.phone || 'Not provided'}
+                    <div className="prof-value">                      {loading ? 'Loading...' : profileData?.phone || 'Not provided'}
                     </div>
                   )}
                 </div>
@@ -340,11 +282,7 @@ const Profile = () => {
                   ) : (
                     <div className="prof-value">
                       {loading
-                        ? 'Loading...'
-                        // @ts-expect-error
-                        : profileData?.dateOfBirth
-                          // @ts-expect-error
-                          ? new Date(profileData.dateOfBirth).toLocaleDateString('en-IN', {
+                        ? 'Loading...'                        : profileData?.dateOfBirth                          ? new Date(profileData.dateOfBirth).toLocaleDateString('en-IN', {
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric',
@@ -370,29 +308,19 @@ const Profile = () => {
                   ) : (
                     <div className="prof-value">
                       {loading
-                        ? 'Loading...'
-                        // @ts-expect-error
-                        : profileData?.address && typeof profileData.address === 'object'
-                          // @ts-expect-error
-                          ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
+                        ? 'Loading...'                        : profileData?.address && typeof profileData.address === 'object'                          ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
                               .replace(/^,\s*|,\s*,/g, ',')
-                              .replace(/^,\s*|,\s*$/g, '') || 'Not provided'
-                          // @ts-expect-error
-                          : profileData?.address || 'Not provided'}
+                              .replace(/^,\s*|,\s*$/g, '') || 'Not provided'                          : profileData?.address || 'Not provided'}
                     </div>
                   )}
                 </div>
               </div>
 
               {isEditing && (
-                <div className="prof-actions">
-                  // @ts-expect-error
-                  <Button variant="ghost" size="md" onClick={handleCancel} disabled={saving}>
+                <div className="prof-actions">                  <Button variant="ghost" size="md" onClick={handleCancel} disabled={saving}>
                     <X size={16} />
                     Cancel
-                  </Button>
-                  // @ts-expect-error
-                  <Button variant="primary" size="md" onClick={handleSave} disabled={saving}>
+                  </Button>                  <Button variant="primary" size="md" onClick={handleSave} disabled={saving}>
                     <Save size={16} />
                     {saving ? 'Saving...' : 'Save Changes'}
                   </Button>

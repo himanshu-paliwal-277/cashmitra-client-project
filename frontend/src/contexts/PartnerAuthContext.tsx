@@ -9,10 +9,7 @@ import {
   getBusinessLimits,
   getAvailableFeatures,
   canPerformAction,
-} from '../utils/partnerMenuPermissions';
-
-// @ts-expect-error
-const PartnerAuthContext = createContext();
+} from '../utils/partnerMenuPermissions';const PartnerAuthContext = createContext();
 
 export const usePartnerAuth = () => {
   const context = useContext(PartnerAuthContext);
@@ -167,9 +164,7 @@ export const PartnerAuthProvider = ({
   };
 
   // Check if partner has specific feature enabled
-  const hasFeature = (featureName: any) => {
-    // @ts-expect-error
-    return availableFeatures[featureName] || false;
+  const hasFeature = (featureName: any) => {    return availableFeatures[featureName] || false;
   };
 
   // Get partner's role information
@@ -197,9 +192,7 @@ export const PartnerAuthProvider = ({
 
       const data = await response.json();
 
-      if (response.ok) {
-        // @ts-expect-error
-        const updatedPartner = { ...partner, ...data.partner };
+      if (response.ok) {        const updatedPartner = { ...partner, ...data.partner };
         setPartner(updatedPartner);
         localStorage.setItem('partnerData', JSON.stringify(updatedPartner));
         toast.success('Profile updated successfully');
@@ -216,11 +209,7 @@ export const PartnerAuthProvider = ({
   };
 
   // Refresh permissions (useful after admin updates)
-  const refreshPermissions = async () => {
-    // @ts-expect-error
-    if (partner?._id) {
-      // @ts-expect-error
-      await fetchPartnerPermissions(partner._id);
+  const refreshPermissions = async () => {    if (partner?._id) {      await fetchPartnerPermissions(partner._id);
     }
   };
 
@@ -231,15 +220,7 @@ export const PartnerAuthProvider = ({
 
   // Get partner's verification status
   const getVerificationStatus = () => {
-    return {
-      // @ts-expect-error
-      isVerified: partner?.isVerified || false,
-      // @ts-expect-error
-      kycStatus: partner?.kycStatus || 'pending',
-      // @ts-expect-error
-      documentsStatus: partner?.documentsStatus || 'pending',
-      // @ts-expect-error
-      profileComplete: partner?.profileComplete || false,
+    return {      isVerified: partner?.isVerified || false,      kycStatus: partner?.kycStatus || 'pending',      documentsStatus: partner?.documentsStatus || 'pending',      profileComplete: partner?.profileComplete || false,
     };
   };
 
@@ -271,13 +252,9 @@ export const PartnerAuthProvider = ({
     getMenuItems,
     refreshPermissions,
 
-    // Menu and feature methods (from utils)
-    // @ts-expect-error
-    getAvailableMenuItems: () => getAvailableMenuItems(permissions, roleTemplate),
+    // Menu and feature methods (from utils)    getAvailableMenuItems: () => getAvailableMenuItems(permissions, roleTemplate),
     getBusinessLimits: () => getBusinessLimits(permissions, roleTemplate),
-    getAvailableFeatures: () => getAvailableFeatures(permissions, roleTemplate),
-    // @ts-expect-error
-    hasMenuPermission: (menuId: any) => hasMenuPermission(permissions, roleTemplate, menuId),
+    getAvailableFeatures: () => getAvailableFeatures(permissions, roleTemplate),    hasMenuPermission: (menuId: any) => hasMenuPermission(permissions, roleTemplate, menuId),
 
     // Business logic methods
     canPerformBusinessAction,

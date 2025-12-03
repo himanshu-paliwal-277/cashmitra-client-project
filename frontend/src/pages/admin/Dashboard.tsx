@@ -36,9 +36,7 @@ import {
   Clock,
 } from 'lucide-react';
 
-function AdminDashboard() {
-  // @ts-expect-error
-  const { admin, logout } = useAdminAuth();
+function AdminDashboard() {  const { admin, logout } = useAdminAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [analytics, setAnalytics] = useState(null);
   const [partners, setPartners] = useState([]);
@@ -256,30 +254,22 @@ function AdminDashboard() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                       {[
                         {
-                          icon: Users,
-                          // @ts-expect-error
-                          value: analytics?.overview?.totalUsers || 1245,
+                          icon: Users,                          value: analytics?.overview?.totalUsers || 1245,
                           label: 'Total Users',
                           gradient: 'from-blue-500 to-purple-500',
                         },
                         {
-                          icon: Store,
-                          // @ts-expect-error
-                          value: analytics?.overview?.totalPartners || 156,
+                          icon: Store,                          value: analytics?.overview?.totalPartners || 156,
                           label: 'Active Partners',
                           gradient: 'from-green-500 to-emerald-500',
                         },
                         {
-                          icon: ShoppingBag,
-                          // @ts-expect-error
-                          value: analytics?.overview?.totalOrders || 2890,
+                          icon: ShoppingBag,                          value: analytics?.overview?.totalOrders || 2890,
                           label: 'Orders Today',
                           gradient: 'from-amber-500 to-orange-500',
                         },
                         {
-                          icon: DollarSign,
-                          // @ts-expect-error
-                          value: `₹${analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}`,
+                          icon: DollarSign,                          value: `₹${analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}`,
                           label: 'Revenue',
                           gradient: 'from-purple-500 to-pink-500',
                         },
@@ -305,65 +295,49 @@ function AdminDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   {[
                     {
-                      icon: Users,
-                      // @ts-expect-error
-                      value: analytics?.overview?.totalUsers || 1245,
+                      icon: Users,                      value: analytics?.overview?.totalUsers || 1245,
                       label: 'Total Users',
                       trend: '+12%',
                       color: '#667eea',
                     },
                     {
-                      icon: Store,
-                      // @ts-expect-error
-                      value: analytics?.overview?.totalPartners || 156,
+                      icon: Store,                      value: analytics?.overview?.totalPartners || 156,
                       label: 'Verified Partners',
                       trend: '+8%',
                       color: '#10B981',
                     },
                     {
-                      icon: ShoppingBag,
-                      // @ts-expect-error
-                      value: analytics?.overview?.totalOrders || 2890,
+                      icon: ShoppingBag,                      value: analytics?.overview?.totalOrders || 2890,
                       label: 'Total Orders',
                       trend: '+24%',
                       color: '#F59E0B',
                     },
                     {
-                      icon: DollarSign,
-                      // @ts-expect-error
-                      value: `₹${analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}`,
+                      icon: DollarSign,                      value: `₹${analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}`,
                       label: 'Total Revenue',
                       trend: '+18%',
                       color: '#8B5CF6',
                     },
                     {
-                      icon: HelpCircle,
-                      // @ts-expect-error
-                      value: analytics?.questionnaires?.total || 450,
+                      icon: HelpCircle,                      value: analytics?.questionnaires?.total || 450,
                       label: 'Questionnaires',
                       trend: '+15%',
                       color: '#EF4444',
                     },
                     {
-                      icon: Smartphone,
-                      // @ts-expect-error
-                      value: analytics?.devices?.mobile || 890,
+                      icon: Smartphone,                      value: analytics?.devices?.mobile || 890,
                       label: 'Mobile Devices',
                       trend: 'Popular',
                       color: '#06B6D4',
                     },
                     {
-                      icon: Activity,
-                      // @ts-expect-error
-                      value: analytics?.activity?.activeToday || 234,
+                      icon: Activity,                      value: analytics?.activity?.activeToday || 234,
                       label: 'Active Today',
                       trend: '+5%',
                       color: '#84CC16',
                     },
                     {
-                      icon: Target,
-                      // @ts-expect-error
-                      value: `${analytics?.performance?.conversionRate || '3.2'}%`,
+                      icon: Target,                      value: `${analytics?.performance?.conversionRate || '3.2'}%`,
                       label: 'Conversion Rate',
                       trend: '+0.4%',
                       color: '#F97316',
@@ -444,48 +418,28 @@ function AdminDashboard() {
                       </thead>
                       <tbody>
                         {orders.slice(0, 5).map((order, index) => (
-                          <tr
-                            // @ts-expect-error
-                            key={order._id || index}
+                          <tr                            key={order._id || index}
                             className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
                           >
-                            <td className="py-4 px-4 font-medium text-slate-900">
-                              // @ts-expect-error
-                              #{order._id?.slice(-6) || `ORD${String(index + 1).padStart(3, '0')}`}
+                            <td className="py-4 px-4 font-medium text-slate-900">                              #{order._id?.slice(-6) || `ORD${String(index + 1).padStart(3, '0')}`}
                             </td>
-                            <td className="py-4 px-4 text-slate-700">
-                              // @ts-expect-error
-                              {order.user?.name || `Customer ${index + 1}`}
+                            <td className="py-4 px-4 text-slate-700">                              {order.user?.name || `Customer ${index + 1}`}
                             </td>
-                            <td className="py-4 px-4 text-slate-700">
-                              // @ts-expect-error
-                              {order.orderType || 'Sell'}
+                            <td className="py-4 px-4 text-slate-700">                              {order.orderType || 'Sell'}
                             </td>
-                            <td className="py-4 px-4 font-semibold text-slate-900">
-                              // @ts-expect-error
-                              ₹{order.totalAmount || Math.floor(Math.random() * 50000 + 10000)}
+                            <td className="py-4 px-4 font-semibold text-slate-900">                              ₹{order.totalAmount || Math.floor(Math.random() * 50000 + 10000)}
                             </td>
                             <td className="py-4 px-4">
                               <span
-                                className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                  // @ts-expect-error
-                                  order.status === 'completed'
-                                    ? 'bg-green-100 text-green-700'
-                                    // @ts-expect-error
-                                    : order.status === 'pending'
+                                className={`px-3 py-1 rounded-full text-xs font-semibold ${                                  order.status === 'completed'
+                                    ? 'bg-green-100 text-green-700'                                    : order.status === 'pending'
                                       ? 'bg-amber-100 text-amber-700'
                                       : 'bg-red-100 text-red-700'
                                 }`}
-                              >
-                                // @ts-expect-error
-                                {order.status || 'pending'}
+                              >                                {order.status || 'pending'}
                               </span>
                             </td>
-                            <td className="py-4 px-4 text-slate-600">
-                              // @ts-expect-error
-                              {order.createdAt
-                                // @ts-expect-error
-                                ? new Date(order.createdAt).toLocaleDateString()
+                            <td className="py-4 px-4 text-slate-600">                              {order.createdAt                                ? new Date(order.createdAt).toLocaleDateString()
                                 : new Date().toLocaleDateString()}
                             </td>
                           </tr>

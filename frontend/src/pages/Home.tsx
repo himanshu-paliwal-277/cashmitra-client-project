@@ -192,18 +192,14 @@ const Home = () => {
           </p>
 
           {/* Hero Actions */}
-          <div className="flex gap-4 justify-center flex-wrap mb-12">
-            // @ts-expect-error
-            <Button
+          <div className="flex gap-4 justify-center flex-wrap mb-12">            <Button
               variant="primary"
               size="lg"
               rightIcon={<ArrowRight size={20} />}
               onClick={() => navigate('/sell-device')}
             >
               Start Selling
-            </Button>
-            // @ts-expect-error
-            <Button variant="secondary" size="lg" onClick={() => navigate('/buy')}>
+            </Button>            <Button variant="secondary" size="lg" onClick={() => navigate('/buy')}>
               Browse Devices
             </Button>
           </div>
@@ -275,11 +271,7 @@ const Home = () => {
 
           {/* Testimonial Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-            {testimonials.map(testimonial => (
-              // @ts-expect-error
-              <Card key={testimonial.id} className="relative">
-                // @ts-expect-error
-                <Card.Body>
+            {testimonials.map(testimonial => (              <Card key={testimonial.id} className="relative">                <Card.Body>
                   {/* Star Rating */}
                   <div className="flex gap-1 mb-3 text-yellow-500">
                     {[...Array(testimonial.rating)].map((_, i) => (
@@ -301,9 +293,7 @@ const Home = () => {
                       </h4>
                       <p className="text-sm text-gray-500 m-0">{testimonial.location}</p>
                     </div>
-                  </div>
-                // @ts-expect-error
-                </Card.Body>
+                  </div>                </Card.Body>
               </Card>
             ))}
           </div>

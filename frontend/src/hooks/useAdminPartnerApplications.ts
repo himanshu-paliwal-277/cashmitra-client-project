@@ -51,9 +51,7 @@ const useAdminPartnerApplications = () => {
           underReview: statusCounts.underReview || 0,
         });
       }
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.message || 'Failed to fetch partner applications');
+    } catch (err) {      setError(err.message || 'Failed to fetch partner applications');
       console.error('Error fetching partner applications:', err);
     } finally {
       setLoading(false);
@@ -71,30 +69,16 @@ const useAdminPartnerApplications = () => {
           status,
           notes
         );
-        if (response.success) {
-          // @ts-expect-error
-          setApplications(prev =>
-            prev.map(app =>
-              // @ts-expect-error
-              app.id === applicationId
-                // @ts-expect-error
-                ? { ...app, status, notes, updatedAt: new Date().toISOString() }
+        if (response.success) {          setApplications(prev =>
+            prev.map(app =>              app.id === applicationId                ? { ...app, status, notes, updatedAt: new Date().toISOString() }
                 : app
             )
           );
 
           // Update stats
-          setStats(prev => {
-            // @ts-expect-error
-            const oldApp = applications.find(app => app.id === applicationId);
-            // @ts-expect-error
-            if (oldApp && oldApp.status !== status) {
+          setStats(prev => {            const oldApp = applications.find(app => app.id === applicationId);            if (oldApp && oldApp.status !== status) {
               return {
-                ...prev,
-                // @ts-expect-error
-                [oldApp.status]: Math.max(0, prev[oldApp.status] - 1),
-                // @ts-expect-error
-                [status]: prev[status] + 1,
+                ...prev,                [oldApp.status]: Math.max(0, prev[oldApp.status] - 1),                [status]: prev[status] + 1,
               };
             }
             return prev;
@@ -103,12 +87,8 @@ const useAdminPartnerApplications = () => {
           return { success: true, message: response.message };
         }
         throw new Error('Failed to update application status');
-      } catch (err) {
-        // @ts-expect-error
-        setError(err.message || 'Failed to update application status');
-        console.error('Error updating application status:', err);
-        // @ts-expect-error
-        return { success: false, error: err.message };
+      } catch (err) {        setError(err.message || 'Failed to update application status');
+        console.error('Error updating application status:', err);        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -169,9 +149,7 @@ const useAdminPartnerApplications = () => {
 
   // Get application by ID
   const getApplicationById = useCallback(
-    (applicationId: any) => {
-      // @ts-expect-error
-      return applications.find(app => app.id === applicationId);
+    (applicationId: any) => {      return applications.find(app => app.id === applicationId);
     },
     [applications]
   );
@@ -182,13 +160,7 @@ const useAdminPartnerApplications = () => {
       if (!searchTerm) return applications;
 
       return applications.filter(
-        app =>
-          // @ts-expect-error
-          app.shopName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          // @ts-expect-error
-          app.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          // @ts-expect-error
-          app.email.toLowerCase().includes(searchTerm.toLowerCase())
+        app =>          app.shopName.toLowerCase().includes(searchTerm.toLowerCase()) ||          app.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||          app.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
     },
     [applications]

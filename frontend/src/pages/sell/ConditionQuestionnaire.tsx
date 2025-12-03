@@ -32,9 +32,7 @@ const ConditionQuestionnaire = () => {
   const model = searchParams.get('model');
 
   useEffect(() => {
-    if (!category || !brand || !model) {
-      // @ts-expect-error
-      setError('Missing required parameters. Please select a device first.');
+    if (!category || !brand || !model) {      setError('Missing required parameters. Please select a device first.');
       setLoading(false);
       return;
     }
@@ -45,22 +43,16 @@ const ConditionQuestionnaire = () => {
   const fetchCategories = async () => {
     try {
       const response = await sellService.getCategories();
-      const categoryData = response.data?.find(
-        // @ts-expect-error
-        (cat: any) => cat.name.toLowerCase() === category.toLowerCase()
+      const categoryData = response.data?.find(        (cat: any) => cat.name.toLowerCase() === category.toLowerCase()
       );
 
       if (categoryData) {
         await fetchConditionQuestions(categoryData._id);
-      } else {
-        // @ts-expect-error
-        setError(`Category "${category}" not found`);
+      } else {        setError(`Category "${category}" not found`);
         setLoading(false);
       }
     } catch (err) {
-      console.error('Error fetching categories:', err);
-      // @ts-expect-error
-      setError('Failed to load categories. Please try again.');
+      console.error('Error fetching categories:', err);      setError('Failed to load categories. Please try again.');
       setLoading(false);
     }
   };
@@ -92,14 +84,10 @@ const ConditionQuestionnaire = () => {
         });
 
         setQuestions(flatQuestions);
-      } else {
-        // @ts-expect-error
-        setQuestions(defaultQuestions);
+      } else {        setQuestions(defaultQuestions);
       }
     } catch (err) {
-      console.error('Error fetching condition questions:', err);
-      // @ts-expect-error
-      setQuestions(defaultQuestions);
+      console.error('Error fetching condition questions:', err);      setQuestions(defaultQuestions);
     } finally {
       setLoading(false);
     }
@@ -271,9 +259,7 @@ const ConditionQuestionnaire = () => {
         `/sell/quote?assessmentId=${data.assessmentId}&category=${category}&brand=${brand}&model=${model}`
       );
     } catch (err) {
-      console.error('Error submitting assessment:', err);
-      // @ts-expect-error
-      setError('Failed to submit assessment. Please try again.');
+      console.error('Error submitting assessment:', err);      setError('Failed to submit assessment. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -289,9 +275,7 @@ const ConditionQuestionnaire = () => {
     return (answeredCount / currentQuestions.length) * 100;
   };
 
-  const currentQuestions = questions.length > 0 ? questions : defaultQuestions;
-  // @ts-expect-error
-  const isComplete = currentQuestions.every(q => answers[q.id]);
+  const currentQuestions = questions.length > 0 ? questions : defaultQuestions;  const isComplete = currentQuestions.every(q => answers[q.id]);
 
   if (loading) {
     return (
@@ -331,18 +315,10 @@ const ConditionQuestionnaire = () => {
 
           {/* Device Info */}
           <div className="flex items-center justify-center gap-4 mb-6 p-4 bg-white/10 backdrop-blur-sm rounded-xl">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl font-bold text-white">
-              // @ts-expect-error
-              {productDetails?.brand?.charAt(0)?.toUpperCase() || brand?.charAt(0)?.toUpperCase()}
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl font-bold text-white">              {productDetails?.brand?.charAt(0)?.toUpperCase() || brand?.charAt(0)?.toUpperCase()}
             </div>
-            <div className="text-left">
-              // @ts-expect-error
-              <h3 className="text-lg font-bold">{productDetails?.model || model}</h3>
-              <p className="text-sm text-white">
-                // @ts-expect-error
-                {productDetails?.brand || brand} • {productDetails?.category || category}
-                // @ts-expect-error
-                {productDetails?.variant?.storage && ` • ${productDetails.variant.storage}`}
+            <div className="text-left">              <h3 className="text-lg font-bold">{productDetails?.model || model}</h3>
+              <p className="text-sm text-white">                {productDetails?.brand || brand} • {productDetails?.category || category}                {productDetails?.variant?.storage && ` • ${productDetails.variant.storage}`}
               </p>
             </div>
           </div>
@@ -390,9 +366,7 @@ const ConditionQuestionnaire = () => {
 
         {/* Questions */}
         <div className="space-y-6">
-          {currentQuestions.map((question, index) => {
-            // @ts-expect-error
-            const isAnswered = answers[question.id];
+          {currentQuestions.map((question, index) => {            const isAnswered = answers[question.id];
             return (
               <div
                 key={question.id}
@@ -429,9 +403,7 @@ const ConditionQuestionnaire = () => {
                 {/* Options Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {question.options.map(option => {
-                    const OptionIcon = option.icon;
-                    // @ts-expect-error
-                    const isSelected = answers[question.id] === option.id;
+                    const OptionIcon = option.icon;                    const isSelected = answers[question.id] === option.id;
 
                     let colorClasses = '';
                     if (isSelected) {

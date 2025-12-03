@@ -173,25 +173,13 @@ const SellSessionsManagement = () => {
   ];
 
   useEffect(() => {
-    setTimeout(() => {
-      // @ts-expect-error
-      setSessions(mockSessions);
+    setTimeout(() => {      setSessions(mockSessions);
       setLoading(false);
     }, 1000);
   }, []);
 
   const filteredSessions = sessions.filter(session => {
-    const matchesSearch =
-      // @ts-expect-error
-      session.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      session.deviceModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      session.id.toLowerCase().includes(searchTerm.toLowerCase());
-    // @ts-expect-error
-    const matchesStatus = statusFilter === 'all' || session.status === statusFilter;
-    // @ts-expect-error
-    const matchesDevice = deviceFilter === 'all' || session.deviceType === deviceFilter;
+    const matchesSearch =      session.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||      session.deviceModel.toLowerCase().includes(searchTerm.toLowerCase()) ||      session.id.toLowerCase().includes(searchTerm.toLowerCase());    const matchesStatus = statusFilter === 'all' || session.status === statusFilter;    const matchesDevice = deviceFilter === 'all' || session.deviceType === deviceFilter;
     return matchesSearch && matchesStatus && matchesDevice;
   });
 
@@ -205,13 +193,7 @@ const SellSessionsManagement = () => {
   }, [searchTerm, statusFilter, deviceFilter, dateFilter]);
 
   const stats = {
-    totalSessions: sessions.length,
-    // @ts-expect-error
-    activeSessions: sessions.filter(s => s.status === 'active').length,
-    // @ts-expect-error
-    completedSessions: sessions.filter(s => s.status === 'completed').length,
-    // @ts-expect-error
-    expiredSessions: sessions.filter(s => s.status === 'expired').length,
+    totalSessions: sessions.length,    activeSessions: sessions.filter(s => s.status === 'active').length,    completedSessions: sessions.filter(s => s.status === 'completed').length,    expiredSessions: sessions.filter(s => s.status === 'expired').length,
   };
 
   const getStatusIcon = (status: any) => {
@@ -235,9 +217,7 @@ const SellSessionsManagement = () => {
       completed: 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white',
       expired: 'bg-gradient-to-r from-red-500 to-rose-600 text-white',
       pending: 'bg-gradient-to-r from-amber-500 to-orange-600 text-white',
-    };
-    // @ts-expect-error
-    return styles[status] || styles.pending;
+    };    return styles[status] || styles.pending;
   };
 
   const handleCreateSession = async () => {
@@ -558,28 +538,18 @@ const SellSessionsManagement = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {paginatedSessions.map(session => (
-                  <tr
-                    // @ts-expect-error
-                    key={session.id}
+                  <tr                    key={session.id}
                     className="hover:bg-blue-50/50 transition-colors duration-150"
                   >
-                    <td className="px-6 py-4">
-                      // @ts-expect-error
-                      <div className="font-semibold text-gray-900">{session.id}</div>
+                    <td className="px-6 py-4">                      <div className="font-semibold text-gray-900">{session.id}</div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
-                          // @ts-expect-error
-                          {session.userName.charAt(0)}
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">                          {session.userName.charAt(0)}
                         </div>
-                        <div>
-                          // @ts-expect-error
-                          <div className="font-semibold text-gray-900">{session.userName}</div>
+                        <div>                          <div className="font-semibold text-gray-900">{session.userName}</div>
                           <div className="text-sm text-gray-500 flex items-center gap-1">
-                            <Phone size={12} />
-                            // @ts-expect-error
-                            {session.userPhone}
+                            <Phone size={12} />                            {session.userPhone}
                           </div>
                         </div>
                       </div>
@@ -590,30 +560,20 @@ const SellSessionsManagement = () => {
                           <Package size={20} className="text-gray-600" />
                         </div>
                         <div>
-                          <div className="font-semibold text-gray-900">
-                            // @ts-expect-error
-                            {session.deviceBrand} {session.deviceModel}
+                          <div className="font-semibold text-gray-900">                            {session.deviceBrand} {session.deviceModel}
                           </div>
-                          <div className="text-sm text-gray-500">
-                            // @ts-expect-error
-                            {session.deviceType} • {session.deviceCondition}
+                          <div className="text-sm text-gray-500">                            {session.deviceType} • {session.deviceCondition}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                        // @ts-expect-error
-                        <DollarSign size={16} />₹{session.offerPrice.toLocaleString()}
+                      <div className="flex items-center gap-1 text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">                        <DollarSign size={16} />₹{session.offerPrice.toLocaleString()}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 text-lg font-bold text-gray-900">
-                        // @ts-expect-error
-                        {session.finalPrice > 0 ? (
-                          <>
-                            // @ts-expect-error
-                            <DollarSign size={16} />₹{session.finalPrice.toLocaleString()}
+                      <div className="flex items-center gap-1 text-lg font-bold text-gray-900">                        {session.finalPrice > 0 ? (
+                          <>                            <DollarSign size={16} />₹{session.finalPrice.toLocaleString()}
                           </>
                         ) : (
                           <span className="text-gray-400">-</span>
@@ -621,27 +581,17 @@ const SellSessionsManagement = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span
-                        // @ts-expect-error
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(session.status)}`}
-                      >
-                        // @ts-expect-error
-                        {getStatusIcon(session.status)}
-                        // @ts-expect-error
-                        {session.status}
+                      <span                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(session.status)}`}
+                      >                        {getStatusIcon(session.status)}                        {session.status}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <Calendar size={14} />
-                        // @ts-expect-error
-                        {session.sessionDuration}
+                        <Calendar size={14} />                        {session.sessionDuration}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-600">
-                        // @ts-expect-error
-                        {new Date(session.expiresAt).toLocaleDateString()}
+                      <div className="text-sm text-gray-600">                        {new Date(session.expiresAt).toLocaleDateString()}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -779,11 +729,7 @@ const SellSessionsManagement = () => {
                     <option value="">
                       {productsLoading ? 'Loading products...' : 'Select Product'}
                     </option>
-                    {products.map(product => (
-                      // @ts-expect-error
-                      <option key={product._id} value={product._id}>
-                        // @ts-expect-error
-                        {product.name}
+                    {products.map(product => (                      <option key={product._id} value={product._id}>                        {product.name}
                       </option>
                     ))}
                   </select>
@@ -807,11 +753,7 @@ const SellSessionsManagement = () => {
                           ? 'No variants available'
                           : 'Select Variant'}
                     </option>
-                    {variants.map(variant => (
-                      // @ts-expect-error
-                      <option key={variant._id} value={variant._id}>
-                        // @ts-expect-error
-                        {variant.label} - ₹{variant.basePrice}
+                    {variants.map(variant => (                      <option key={variant._id} value={variant._id}>                        {variant.label} - ₹{variant.basePrice}
                       </option>
                     ))}
                   </select>
@@ -834,9 +776,7 @@ const SellSessionsManagement = () => {
                       handleCreateFormChange('answers', e.target.value);
                     }
                   }}
-                  placeholder='{"condition": "excellent", "accessories": ["charger", "box"]}'
-                  // @ts-expect-error
-                  rows="4"
+                  placeholder='{"condition": "excellent", "accessories": ["charger", "box"]}'                  rows="4"
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 font-mono text-sm"
                 />
                 <p className="text-xs text-gray-500">Enter answers as JSON object (optional)</p>
@@ -846,16 +786,12 @@ const SellSessionsManagement = () => {
                 <label className="block text-sm font-semibold text-gray-700">Defects</label>
                 <div className="border border-gray-200 rounded-xl p-4 bg-gray-50 hover:bg-white transition-all duration-200 min-h-[80px]">
                   <div className="flex flex-wrap gap-2 mb-3">
-                    {createFormData.defects.map(defectId => {
-                      // @ts-expect-error
-                      const defect = defects.find(d => d._id === defectId);
+                    {createFormData.defects.map(defectId => {                      const defect = defects.find(d => d._id === defectId);
                       return (
                         <div
                           key={defectId}
                           className="inline-flex items-center gap-2 bg-gradient-to-r from-red-500 to-rose-600 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-md"
-                        >
-                          // @ts-expect-error
-                          {defect ? defect.title : defectId}
+                        >                          {defect ? defect.title : defectId}
                           <button
                             type="button"
                             onClick={() => {
@@ -874,9 +810,7 @@ const SellSessionsManagement = () => {
                   </div>
                   <select
                     value=""
-                    onChange={e => {
-                      // @ts-expect-error
-                      if (e.target.value && !createFormData.defects.includes(e.target.value)) {
+                    onChange={e => {                      if (e.target.value && !createFormData.defects.includes(e.target.value)) {
                         const updatedDefects = [...createFormData.defects, e.target.value];
                         handleCreateFormChange('defects', updatedDefects);
                       }
@@ -888,18 +822,8 @@ const SellSessionsManagement = () => {
                     <option value="">
                       {defectsLoading ? 'Loading defects...' : 'Select defects to add'}
                     </option>
-                    {defects
-                      // @ts-expect-error
-                      .filter(defect => !createFormData.defects.includes(defect._id))
-                      .map(defect => (
-                        // @ts-expect-error
-                        <option key={defect._id} value={defect._id}>
-                          // @ts-expect-error
-                          {defect.title}{' '}
-                          // @ts-expect-error
-                          {defect.delta &&
-                            // @ts-expect-error
-                            `(${defect.delta.sign}${defect.delta.value}${defect.delta.type === 'abs' ? '₹' : '%'})`}
+                    {defects                      .filter(defect => !createFormData.defects.includes(defect._id))
+                      .map(defect => (                        <option key={defect._id} value={defect._id}>                          {defect.title}{' '}                          {defect.delta &&                            `(${defect.delta.sign}${defect.delta.value}${defect.delta.type === 'abs' ? '₹' : '%'})`}
                         </option>
                       ))}
                   </select>
@@ -913,16 +837,12 @@ const SellSessionsManagement = () => {
                 <label className="block text-sm font-semibold text-gray-700">Accessories</label>
                 <div className="border border-gray-200 rounded-xl p-4 bg-gray-50 hover:bg-white transition-all duration-200 min-h-[80px]">
                   <div className="flex flex-wrap gap-2 mb-3">
-                    {createFormData.accessories.map(accessoryId => {
-                      // @ts-expect-error
-                      const accessory = accessories.find(a => a._id === accessoryId);
+                    {createFormData.accessories.map(accessoryId => {                      const accessory = accessories.find(a => a._id === accessoryId);
                       return (
                         <div
                           key={accessoryId}
                           className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-md"
-                        >
-                          // @ts-expect-error
-                          {accessory ? accessory.title : accessoryId}
+                        >                          {accessory ? accessory.title : accessoryId}
                           <button
                             type="button"
                             onClick={() => {
@@ -941,9 +861,7 @@ const SellSessionsManagement = () => {
                   </div>
                   <select
                     value=""
-                    onChange={e => {
-                      // @ts-expect-error
-                      if (e.target.value && !createFormData.accessories.includes(e.target.value)) {
+                    onChange={e => {                      if (e.target.value && !createFormData.accessories.includes(e.target.value)) {
                         const updatedAccessories = [...createFormData.accessories, e.target.value];
                         handleCreateFormChange('accessories', updatedAccessories);
                       }
@@ -955,18 +873,8 @@ const SellSessionsManagement = () => {
                     <option value="">
                       {accessoriesLoading ? 'Loading accessories...' : 'Select accessories to add'}
                     </option>
-                    {accessories
-                      // @ts-expect-error
-                      .filter(accessory => !createFormData.accessories.includes(accessory._id))
-                      .map(accessory => (
-                        // @ts-expect-error
-                        <option key={accessory._id} value={accessory._id}>
-                          // @ts-expect-error
-                          {accessory.title}{' '}
-                          // @ts-expect-error
-                          {accessory.delta &&
-                            // @ts-expect-error
-                            `(${accessory.delta.sign}${accessory.delta.value}${accessory.delta.type === 'abs' ? '₹' : '%'})`}
+                    {accessories                      .filter(accessory => !createFormData.accessories.includes(accessory._id))
+                      .map(accessory => (                        <option key={accessory._id} value={accessory._id}>                          {accessory.title}{' '}                          {accessory.delta &&                            `(${accessory.delta.sign}${accessory.delta.value}${accessory.delta.type === 'abs' ? '₹' : '%'})`}
                         </option>
                       ))}
                   </select>

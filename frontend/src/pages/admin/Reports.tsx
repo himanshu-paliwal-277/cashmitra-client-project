@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAdminReports } from '../../hooks/useAdminReports';
-import { useAdminAuth } from '../../contexts/AdminAuthContext';
-// @ts-expect-error
-import styled from 'styled-components';
+import { useAdminAuth } from '../../contexts/AdminAuthContext';import styled from 'styled-components';
 import {
   BarChart3,
   TrendingUp,
@@ -271,10 +269,7 @@ function Reports() {
   const [reportType, setReportType] = useState('overview');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  // @ts-expect-error
-  const { adminUser } = useAdminAuth();
+  const [isRefreshing, setIsRefreshing] = useState(false);  const { adminUser } = useAdminAuth();
   const { salesData, inventoryData, loading, error, fetchSalesReport, fetchInventoryReport } =
     useAdminReports();
 
@@ -318,51 +313,25 @@ function Reports() {
     loadReports();
   }, [dateRange, reportType, startDate, endDate, loadReports]);
 
-  // Use real data if available, otherwise fallback to mock data
-  // @ts-expect-error
-  const stats = salesData?.stats
+  // Use real data if available, otherwise fallback to mock data  const stats = salesData?.stats
     ? [
         {
-          label: 'Total Revenue',
-          // @ts-expect-error
-          value: `₹${(salesData.stats.totalRevenue || 0).toLocaleString()}`,
-          // @ts-expect-error
-          change: `${salesData.stats.revenueChange || 0}%`,
-          // @ts-expect-error
-          positive: (salesData.stats.revenueChange || 0) >= 0,
+          label: 'Total Revenue',          value: `₹${(salesData.stats.totalRevenue || 0).toLocaleString()}`,          change: `${salesData.stats.revenueChange || 0}%`,          positive: (salesData.stats.revenueChange || 0) >= 0,
           icon: <DollarSign size={20} />,
           color: '#10B981',
         },
         {
-          label: 'Total Orders',
-          // @ts-expect-error
-          value: (salesData.stats.totalOrders || 0).toLocaleString(),
-          // @ts-expect-error
-          change: `${salesData.stats.ordersChange || 0}%`,
-          // @ts-expect-error
-          positive: (salesData.stats.ordersChange || 0) >= 0,
+          label: 'Total Orders',          value: (salesData.stats.totalOrders || 0).toLocaleString(),          change: `${salesData.stats.ordersChange || 0}%`,          positive: (salesData.stats.ordersChange || 0) >= 0,
           icon: <ShoppingCart size={20} />,
           color: '#3B82F6',
         },
         {
-          label: 'Active Users',
-          // @ts-expect-error
-          value: (salesData.stats.activeUsers || 0).toLocaleString(),
-          // @ts-expect-error
-          change: `${salesData.stats.usersChange || 0}%`,
-          // @ts-expect-error
-          positive: (salesData.stats.usersChange || 0) >= 0,
+          label: 'Active Users',          value: (salesData.stats.activeUsers || 0).toLocaleString(),          change: `${salesData.stats.usersChange || 0}%`,          positive: (salesData.stats.usersChange || 0) >= 0,
           icon: <Users size={20} />,
           color: '#8B5CF6',
         },
         {
-          label: 'Products Sold',
-          // @ts-expect-error
-          value: (salesData.stats.productsSold || 0).toLocaleString(),
-          // @ts-expect-error
-          change: `${salesData.stats.productsChange || 0}%`,
-          // @ts-expect-error
-          positive: (salesData.stats.productsChange || 0) >= 0,
+          label: 'Products Sold',          value: (salesData.stats.productsSold || 0).toLocaleString(),          change: `${salesData.stats.productsChange || 0}%`,          positive: (salesData.stats.productsChange || 0) >= 0,
           icon: <Package size={20} />,
           color: '#F59E0B',
         },
@@ -402,11 +371,7 @@ function Reports() {
         },
       ];
 
-  // Use real data if available, otherwise fallback to mock data
-  // @ts-expect-error
-  const topProducts = salesData?.topProducts
-    // @ts-expect-error
-    ? salesData.topProducts.map((product: any) => ({
+  // Use real data if available, otherwise fallback to mock data  const topProducts = salesData?.topProducts    ? salesData.topProducts.map((product: any) => ({
     name: product.name,
     sales: product.sales,
     revenue: `₹${(product.revenue || 0).toLocaleString()}`
@@ -419,11 +384,7 @@ function Reports() {
         { name: 'Sony WH-1000XM5', sales: 1123, revenue: '₹3.4L' },
       ];
 
-  // Use real data if available, otherwise fallback to mock data
-  // @ts-expect-error
-  const topPartners = salesData?.topPartners
-    // @ts-expect-error
-    ? salesData.topPartners.map((partner: any) => ({
+  // Use real data if available, otherwise fallback to mock data  const topPartners = salesData?.topPartners    ? salesData.topPartners.map((partner: any) => ({
     name: partner.name,
     orders: partner.orders,
     revenue: `₹${(partner.revenue || 0).toLocaleString()}`

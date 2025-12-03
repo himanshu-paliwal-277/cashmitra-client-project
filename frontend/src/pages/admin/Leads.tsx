@@ -100,9 +100,7 @@ const Leads = () => {
       },
     ];
 
-    setTimeout(() => {
-      // @ts-expect-error
-      setLeads(mockData);
+    setTimeout(() => {      setLeads(mockData);
       setLoading(false);
     }, 1000);
   }, []);
@@ -115,16 +113,7 @@ const Leads = () => {
   ];
 
   const filteredLeads = leads.filter(lead => {
-    const matchesSearch =
-      // @ts-expect-error
-      lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      lead.interest.toLowerCase().includes(searchTerm.toLowerCase());
-
-    // @ts-expect-error
-    const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
+    const matchesSearch =      lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||      lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||      lead.interest.toLowerCase().includes(searchTerm.toLowerCase());    const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -142,9 +131,7 @@ const Leads = () => {
       qualified: 'bg-teal-100 text-teal-800',
       converted: 'bg-green-100 text-green-800',
       lost: 'bg-red-100 text-red-800',
-    };
-    // @ts-expect-error
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    };    return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
   if (loading) {
@@ -176,9 +163,7 @@ const Leads = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        {stats.map((stat, index) => (
-          // @ts-expect-error
-          <Card
+        {stats.map((stat, index) => (          <Card
             key={index}
             className="p-6 border-l-4"
             style={{ borderLeftColor: stat.color.replace('bg-', '#') }}
@@ -194,9 +179,7 @@ const Leads = () => {
         ))}
       </div>
 
-      {/* Filters Section */}
-      // @ts-expect-error
-      <Card className="mb-6 p-6">
+      {/* Filters Section */}      <Card className="mb-6 p-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -242,63 +225,41 @@ const Leads = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredLeads.map(lead => (
-            // @ts-expect-error
-            <Card key={lead.id} hoverable className="flex flex-col">
-              // @ts-expect-error
-              <Card.Body className="flex-1">
+          {filteredLeads.map(lead => (            <Card key={lead.id} hoverable className="flex flex-col">              <Card.Body className="flex-1">
                 {/* Lead Header */}
                 <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    // @ts-expect-error
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{lead.name}</h3>
+                  <div className="flex-1">                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{lead.name}</h3>
                     <span
                       className={cn(
-                        'inline-block px-3 py-1 rounded-full text-xs font-semibold capitalize',
-                        // @ts-expect-error
-                        getStatusColor(lead.status)
+                        'inline-block px-3 py-1 rounded-full text-xs font-semibold capitalize',                        getStatusColor(lead.status)
                       )}
-                    >
-                      // @ts-expect-error
-                      {lead.status}
+                    >                      {lead.status}
                     </span>
                   </div>
                   <div
                     className={cn(
-                      'px-3 py-1 rounded-full text-white text-xs font-bold',
-                      // @ts-expect-error
-                      getScoreColor(lead.score)
+                      'px-3 py-1 rounded-full text-white text-xs font-bold',                      getScoreColor(lead.score)
                     )}
-                  >
-                    // @ts-expect-error
-                    {lead.score}
+                  >                    {lead.score}
                   </div>
                 </div>
 
                 {/* Lead Info */}
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Mail size={14} className="text-amber-600 flex-shrink-0" />
-                    // @ts-expect-error
-                    <span className="truncate">{lead.email}</span>
+                    <Mail size={14} className="text-amber-600 flex-shrink-0" />                    <span className="truncate">{lead.email}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Phone size={14} className="text-amber-600 flex-shrink-0" />
-                    // @ts-expect-error
-                    <span>{lead.phone}</span>
+                    <Phone size={14} className="text-amber-600 flex-shrink-0" />                    <span>{lead.phone}</span>
                   </div>
                   <div className="flex items-start gap-2 text-sm text-gray-600">
-                    <span className="font-medium flex-shrink-0">Source:</span>
-                    // @ts-expect-error
-                    <span>{lead.source}</span>
+                    <span className="font-medium flex-shrink-0">Source:</span>                    <span>{lead.source}</span>
                   </div>
                 </div>
 
                 {/* Lead Interest */}
                 <div className="bg-gray-50 p-3 rounded-lg mb-4">
-                  <div className="text-xs font-medium text-gray-700 mb-1">Interest</div>
-                  // @ts-expect-error
-                  <div className="text-sm text-gray-900">{lead.interest}</div>
+                  <div className="text-xs font-medium text-gray-700 mb-1">Interest</div>                  <div className="text-sm text-gray-900">{lead.interest}</div>
                 </div>
 
                 {/* Action Buttons */}
@@ -319,9 +280,7 @@ const Leads = () => {
                     <MessageSquare size={14} />
                     Note
                   </button>
-                </div>
-              // @ts-expect-error
-              </Card.Body>
+                </div>              </Card.Body>
             </Card>
           ))}
         </div>

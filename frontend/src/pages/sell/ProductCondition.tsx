@@ -58,40 +58,26 @@ const ProductCondition = () => {
         setQuestions(allQuestions);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      // @ts-expect-error
-      setError('Failed to load product information. Please try again.');
+      console.error('Error fetching data:', error);      setError('Failed to load product information. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAnswerChange = (questionId: any, value: any) => {
-    // @ts-expect-error
-    const question = questions.find(q => q._id === questionId);
-    // @ts-expect-error
-    const selectedOption = question?.options?.find((opt: any) => opt.value === value);
+  const handleAnswerChange = (questionId: any, value: any) => {    const question = questions.find(q => q._id === questionId);    const selectedOption = question?.options?.find((opt: any) => opt.value === value);
 
     setAnswers(prev => ({
       ...prev,
       [questionId]: {
-        questionId: questionId,
-        // @ts-expect-error
-        questionText: question?.title || question?.question || '',
-        // @ts-expect-error
-        questionType: question?.type || '',
+        questionId: questionId,        questionText: question?.title || question?.question || '',        questionType: question?.type || '',
         answerValue: value,
         answerText: selectedOption?.label || value,
-        delta: selectedOption?.delta || { type: 'percentage', value: 0 },
-        // @ts-expect-error
-        section: question?.section || '',
+        delta: selectedOption?.delta || { type: 'percentage', value: 0 },        section: question?.section || '',
       },
     }));
   };
 
-  const handleContinue = () => {
-    // @ts-expect-error
-    const selectedVariant = product?.data.variants?.find((v: any) => v._id === variantId);
+  const handleContinue = () => {    const selectedVariant = product?.data.variants?.find((v: any) => v._id === variantId);
 
     navigate('/sell/defects', {
       state: {
@@ -104,16 +90,11 @@ const ProductCondition = () => {
     });
   };
 
-  const isFormComplete = () => {
-    // @ts-expect-error
-    const requiredQuestions = questions.filter(question => question.required);
+  const isFormComplete = () => {    const requiredQuestions = questions.filter(question => question.required);
 
     if (requiredQuestions.length === 0) {
       return questions.length > 0 && Object.keys(answers).length > 0;
-    }
-
-    // @ts-expect-error
-    return requiredQuestions.every(question => answers[question._id]?.answerValue);
+    }    return requiredQuestions.every(question => answers[question._id]?.answerValue);
   };
 
   if (loading) {
@@ -145,10 +126,7 @@ const ProductCondition = () => {
         </div>
       </div>
     );
-  }
-
-  // @ts-expect-error
-  const selectedVariant = product?.data.variants?.find((v: any) => v._id === variantId);
+  }  const selectedVariant = product?.data.variants?.find((v: any) => v._id === variantId);
   const answeredCount = Object.keys(answers).length;
   const totalQuestions = questions.length;
   const progress = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
@@ -231,9 +209,7 @@ const ProductCondition = () => {
         {/* Questions */}
         <div className="space-y-6 mb-8">
           {questions.map((question, index) => (
-            <div
-              // @ts-expect-error
-              key={question._id}
+            <div              key={question._id}
               className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-slate-200"
             >
               <div className="flex items-start gap-4 mb-6">
@@ -241,35 +217,19 @@ const ProductCondition = () => {
                   {index + 1}
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1">
-                    // @ts-expect-error
-                    {question.title}
-                    // @ts-expect-error
-                    {question.required && <span className="text-red-500 ml-1">*</span>}
-                  </h3>
-                  // @ts-expect-error
-                  {question.description && (
-                    // @ts-expect-error
-                    <p className="text-sm text-slate-600">{question.description}</p>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1">                    {question.title}                    {question.required && <span className="text-red-500 ml-1">*</span>}
+                  </h3>                  {question.description && (                    <p className="text-sm text-slate-600">{question.description}</p>
                   )}
-                </div>
-                // @ts-expect-error
-                {question.helpText && (
+                </div>                {question.helpText && (
                   <button
-                    className="text-slate-400 hover:text-slate-600 transition-colors"
-                    // @ts-expect-error
-                    title={question.helpText}
+                    className="text-slate-400 hover:text-slate-600 transition-colors"                    title={question.helpText}
                   >
                     <HelpCircle className="w-5 h-5" />
                   </button>
                 )}
               </div>
 
-              <div className="space-y-3">
-                // @ts-expect-error
-                {question.activeOptions?.map((option: any) => {
-                  // @ts-expect-error
-                  const isSelected = answers[question._id]?.answerValue === option.value;
+              <div className="space-y-3">                {question.activeOptions?.map((option: any) => {                  const isSelected = answers[question._id]?.answerValue === option.value;
                   return (
                     <label
                       key={option.value}
@@ -280,13 +240,9 @@ const ProductCondition = () => {
                       }`}
                     >
                       <input
-                        type="radio"
-                        // @ts-expect-error
-                        name={question._id}
+                        type="radio"                        name={question._id}
                         value={option.value}
-                        checked={isSelected}
-                        // @ts-expect-error
-                        onChange={() => handleAnswerChange(question._id, option.value)}
+                        checked={isSelected}                        onChange={() => handleAnswerChange(question._id, option.value)}
                         className="w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500"
                       />
                       <span

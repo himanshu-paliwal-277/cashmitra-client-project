@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
-// @ts-expect-error
 import styled from 'styled-components';
 import { theme } from '../../theme';
 import {
@@ -204,8 +203,8 @@ const ViewToggle = styled.div`
 
 const ViewButton = styled.button`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  background: ${(props: any) => props.active ? theme.colors.primary.main : theme.colors.white};
-  color: ${(props: any) => props.active ? theme.colors.white : theme.colors.text.secondary};
+  background: ${(props: any) => (props.active ? theme.colors.primary.main : theme.colors.white)};
+  color: ${(props: any) => (props.active ? theme.colors.white : theme.colors.text.secondary)};
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -214,7 +213,8 @@ const ViewButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background: ${(props: any) => props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${(props: any) =>
+      props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 `;
 
@@ -335,7 +335,6 @@ const ProductContent = styled.div`
 `;
 
 const ProductName = styled.h3`
-  // @ts-expect-error
   font-size: ${theme.typography.fontSize.md};
   font-weight: ${theme.typography.fontWeight.semibold};
   color: ${theme.colors.text.primary};
@@ -435,8 +434,9 @@ const ProductStatus = styled.div`
   font-size: ${theme.typography.fontSize.xs};
   font-weight: ${theme.typography.fontWeight.medium};
   text-transform: uppercase;
-  background: ${(props: any) => props.isActive ? theme.colors.success[100] : theme.colors.grey[100]};
-  color: ${(props: any) => props.isActive ? theme.colors.success[700] : theme.colors.grey[700]};
+  background: ${(props: any) =>
+    props.isActive ? theme.colors.success[100] : theme.colors.grey[100]};
+  color: ${(props: any) => (props.isActive ? theme.colors.success[700] : theme.colors.grey[700])};
   margin-bottom: ${theme.spacing[2]};
 `;
 
@@ -523,10 +523,13 @@ const Button = styled.button`
   align-items: center;
   gap: ${theme.spacing[2]};
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  background-color: ${(props: any) => props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
-  color: ${(props: any) => props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
+  background-color: ${(props: any) =>
+    props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
+  color: ${(props: any) =>
+    props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
   border: 1px solid
-    ${(props: any) => props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
+    ${(props: any) =>
+      props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.typography.fontSize.sm};
   font-weight: ${theme.typography.fontWeight.medium};
@@ -534,7 +537,8 @@ const Button = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: ${(props: any) => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background-color: ${(props: any) =>
+      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -593,10 +597,13 @@ const Alert = styled.div`
   padding: ${theme.spacing[4]};
   border-radius: ${theme.borderRadius.md};
   margin-bottom: ${theme.spacing[4]};
-  background-color: ${(props: any) => props.type === 'error' ? theme.colors.error[50] : theme.colors.success[50]};
+  background-color: ${(props: any) =>
+    props.type === 'error' ? theme.colors.error[50] : theme.colors.success[50]};
   border: 1px solid
-    ${(props: any) => props.type === 'error' ? theme.colors.error[200] : theme.colors.success[200]};
-  color: ${(props: any) => props.type === 'error' ? theme.colors.error[700] : theme.colors.success[700]};
+    ${(props: any) =>
+      props.type === 'error' ? theme.colors.error[200] : theme.colors.success[200]};
+  color: ${(props: any) =>
+    props.type === 'error' ? theme.colors.error[700] : theme.colors.success[700]};
 `;
 
 const ProductList = () => {
@@ -630,7 +637,6 @@ const ProductList = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      // @ts-expect-error
       const response = await adminService.getCatalog(filters);
       console.log('response: ', response);
       setProducts(response.products || []);
@@ -639,7 +645,8 @@ const ProductList = () => {
       const total = response.products?.length || 0;
       const active = response.products?.filter((p: any) => p.status === 'active').length || 0;
       const outOfStock = response.products?.filter((p: any) => p.stock <= 0).length || 0;
-      const totalValue = response.products?.reduce((sum: any, p: any) => sum + p.price * p.stock, 0) || 0;
+      const totalValue =
+        response.products?.reduce((sum: any, p: any) => sum + p.price * p.stock, 0) || 0;
 
       setStats({ total, active, outOfStock, totalValue });
     } catch (error) {
@@ -673,7 +680,6 @@ const ProductList = () => {
       setMessage({ type: 'success', text: 'Product deleted successfully' });
       fetchProducts();
     } catch (error) {
-      // @ts-expect-error
       setMessage({ type: 'error', text: error.message || 'Failed to delete product' });
     }
   };
@@ -685,7 +691,6 @@ const ProductList = () => {
       setMessage({ type: 'success', text: 'Product status updated successfully' });
       fetchProducts();
     } catch (error) {
-      // @ts-expect-error
       setMessage({ type: 'error', text: error.message || 'Failed to update product status' });
     }
   };
@@ -730,13 +735,9 @@ const ProductList = () => {
 
   const filteredProducts = products.filter(product => {
     const matchesSearch =
-      // @ts-expect-error
       product?.name?.toLowerCase().includes(filters.search.toLowerCase()) ||
-      // @ts-expect-error
       product?.brand?.toLowerCase().includes(filters.search.toLowerCase());
-    // @ts-expect-error
     const matchesCategory = !filters.category || product.category === filters.category;
-    // @ts-expect-error
     const matchesStatus = !filters.status || product.status === filters.status;
 
     return matchesSearch && matchesCategory && matchesStatus;
@@ -749,9 +750,7 @@ const ProductList = () => {
     let bValue = b[sortBy];
 
     if (sortBy === 'price') {
-      // @ts-expect-error
       aValue = parseFloat(aValue);
-      // @ts-expect-error
       bValue = parseFloat(bValue);
     }
 
@@ -859,9 +858,7 @@ const ProductList = () => {
             >
               <option value="">All Categories</option>
               {categories.map(category => (
-                // @ts-expect-error
                 <option key={category.id} value={category.id}>
-                  // @ts-expect-error
                   {category.name}
                 </option>
               ))}
@@ -947,15 +944,11 @@ const ProductList = () => {
             {sortedProducts.map(product => {
               const badgeType = getBadgeType(product);
               return (
-                // @ts-expect-error
                 <ProductCard key={product._id || product.id}>
                   <ProductImage>
-                    // @ts-expect-error
                     {product.images && product.images.length > 0 ? (
                       <img
-                        // @ts-expect-error
                         src={product.images[0]}
-                        // @ts-expect-error
                         alt={`${product.brand} ${product.series} ${product.model}`}
                       />
                     ) : (
@@ -967,83 +960,61 @@ const ProductList = () => {
                   </ProductImage>
 
                   <ProductContent>
-                    // @ts-expect-error
                     <ProductStatus isActive={product.isActive}>
-                      // @ts-expect-error
                       {product.isActive ? 'Active' : 'Inactive'}
                     </ProductStatus>
-
-                    // @ts-expect-error
                     <ProductBrand>{product.brand}</ProductBrand>
                     <ProductName>
-                      // @ts-expect-error
                       {product.series} {product.model}
                     </ProductName>
 
                     <ProductPrice>
-                      // @ts-expect-error
                       <CurrentPrice>{formatPrice(product.basePrice)}</CurrentPrice>
                     </ProductPrice>
-
-                    // @ts-expect-error
                     {product.variant && (
                       <ProductVariant>
                         <VariantTitle>Variant Details</VariantTitle>
                         <VariantInfo>
-                          // @ts-expect-error
                           {product.variant.ram && (
                             <VariantItem>
                               <span>RAM:</span>
-                              // @ts-expect-error
                               <span>{product.variant.ram}</span>
                             </VariantItem>
                           )}
-                          // @ts-expect-error
                           {product.variant.storage && (
                             <VariantItem>
                               <span>Storage:</span>
-                              // @ts-expect-error
                               <span>{product.variant.storage}</span>
                             </VariantItem>
                           )}
-                          // @ts-expect-error
                           {product.variant.processor && (
                             <VariantItem>
                               <span>CPU:</span>
-                              // @ts-expect-error
                               <span>{product.variant.processor}</span>
                             </VariantItem>
                           )}
-                          // @ts-expect-error
                           {product.variant.screenSize && (
                             <VariantItem>
                               <span>Screen:</span>
-                              // @ts-expect-error
                               <span>{product.variant.screenSize}</span>
                             </VariantItem>
                           )}
-                          // @ts-expect-error
                           {product.variant.color && (
                             <VariantItem>
                               <span>Color:</span>
-                              // @ts-expect-error
                               <span>{product.variant.color}</span>
                             </VariantItem>
                           )}
                         </VariantInfo>
                       </ProductVariant>
                     )}
-
-                    // @ts-expect-error
                     {product.specifications && (
                       <ProductSpecs>
                         <SpecsTitle>Key Specifications</SpecsTitle>
                         <SpecsList>
-                          // @ts-expect-error
                           {Object.entries(product.specifications)
                             .slice(0, 3)
                             .map(([key, value]) => (
-                              // @ts-expect-error
                               <div key={key}>
                                 <strong>{key}:</strong> {value}
                               </div>
@@ -1053,15 +1024,12 @@ const ProductList = () => {
                     )}
 
                     <ProductMeta>
-                      // @ts-expect-error
                       <span>Category: {product.category}</span>
-                      // @ts-expect-error
                       <span>Created: {formatDate(product.createdAt)}</span>
                     </ProductMeta>
 
                     <ProductActions>
                       <ActionButton
-                        // @ts-expect-error
                         onClick={() => navigate(`/admin/products/${product._id || product.id}`)}
                       >
                         <Eye size={14} />
@@ -1069,7 +1037,6 @@ const ProductList = () => {
                       </ActionButton>
                       <ActionButton
                         onClick={() =>
-                          // @ts-expect-error
                           navigate(`/admin/products/${product._id || product.id}/edit`)
                         }
                       >
@@ -1078,7 +1045,6 @@ const ProductList = () => {
                       </ActionButton>
                       <ActionButton
                         variant="danger"
-                        // @ts-expect-error
                         onClick={() => handleDeleteProduct(product._id || product.id)}
                       >
                         <Trash2 size={14} />

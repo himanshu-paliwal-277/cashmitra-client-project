@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAgentAuth } from '../../contexts/AgentAuthContext';
-import { Mail, Lock, LogIn, Loader } from 'lucide-react';
-// @ts-expect-error
-import styled from 'styled-components';
+import { Mail, Lock, LogIn, Loader } from 'lucide-react';import styled from 'styled-components';
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -141,10 +139,7 @@ const AgentLogin = () => {
     password: '',
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  // @ts-expect-error
-  const { login } = useAgentAuth();
+  const [error, setError] = useState('');  const { login } = useAgentAuth();
   const navigate = useNavigate();
 
   const handleChange = (e: any) => {
@@ -169,9 +164,7 @@ const AgentLogin = () => {
     try {
       await login(formData.email, formData.password);
       navigate('/agent/dashboard');
-    } catch (err) {
-      // @ts-expect-error
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } catch (err) {      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }

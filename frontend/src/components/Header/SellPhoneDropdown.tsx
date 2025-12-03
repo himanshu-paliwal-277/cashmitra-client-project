@@ -4,11 +4,7 @@ import { adminService } from '../../services/adminService';
 import './SellPhoneDropdown.css';
 import useAdminCategories from '../../hooks/useAdminCategories';
 
-const SellPhoneDropdown = ({
-  isVisible = true,
-  onClose,
-  onLinkClick = () => {}
-}: any) => {
+const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: any) => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -81,12 +77,10 @@ const SellPhoneDropdown = ({
 
         <div className="sell-categories-grid">
           {categories.map(category => {
-            // @ts-expect-error
             const imageUrl = category.image || getCategoryImage(category.name);
 
             return (
               <div
-                // @ts-expect-error
                 key={category.id}
                 className="sell-category-item"
                 onClick={() => handleCategoryClick(category)}
@@ -94,25 +88,19 @@ const SellPhoneDropdown = ({
                 <div className="category-image">
                   <img
                     src={imageUrl}
-                    // @ts-expect-error
                     alt={category.name}
                     onError={e => {
-                      // @ts-expect-error
                       e.target.style.display = 'none';
-                      // @ts-expect-error
                       e.target.nextSibling.style.display = 'flex';
                     }}
                   />
                   <div className="category-icon-fallback" style={{ display: 'none' }}>
-                    // @ts-expect-error
                     {getCategoryIcon(category.icon || category.name)}
                   </div>
                 </div>
                 <div className="category-info">
-                  // @ts-expect-error
                   <h4 className="category-name">{category.name}</h4>
                   <p className="category-description">
-                    // @ts-expect-error
                     {category.description || `Sell your ${category.name.toLowerCase()}`}
                   </p>
                 </div>
@@ -147,8 +135,6 @@ const getCategoryImage = (categoryName: any) => {
       'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=200&h=200&fit=crop',
     default: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
   };
-
-  // @ts-expect-error
   return imageMap[categoryName] || imageMap['default'];
 };
 
@@ -170,8 +156,6 @@ const getCategoryIcon = (iconName: any) => {
     Package: '📦',
     Monitor: '🖥️',
   };
-
-  // @ts-expect-error
   return iconMap[iconName] || '📦';
 };
 

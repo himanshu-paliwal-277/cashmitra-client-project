@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect, useCallback } from 'react';import styled from 'styled-components';
 import { Plus, Edit2, Trash2, Image as ImageIcon, Search } from 'lucide-react';
 import { API_BASE_URL } from '../../config/api';
 import SuperCategoryForm from './SuperCategoryForm';
@@ -51,9 +49,7 @@ const SellSuperCategoryManagement = () => {
         setError(errorMessage);
       }
     } catch (err) {
-      console.error('Error fetching super categories:', err);
-      // @ts-expect-error
-      setError('Error fetching super categories: ' + (err.message || 'Unknown error'));
+      console.error('Error fetching super categories:', err);      setError('Error fetching super categories: ' + (err.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }
@@ -89,9 +85,7 @@ const SellSuperCategoryManagement = () => {
       } else {
         alert(data.message || 'Failed to delete super category');
       }
-    } catch (err) {
-      // @ts-expect-error
-      alert('Error deleting super category: ' + err.message);
+    } catch (err) {      alert('Error deleting super category: ' + err.message);
     }
   };
 
@@ -116,11 +110,7 @@ const SellSuperCategoryManagement = () => {
   };
 
   const filteredCategories = superCategories.filter(category => {
-    const matchesSearch =
-      // @ts-expect-error
-      category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
-      category.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =      category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||      category.description?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
@@ -174,43 +164,23 @@ const SellSuperCategoryManagement = () => {
         </EmptyMessage>
       ) : (
         <Grid>
-          {filteredCategories.map(category => (
-            // @ts-expect-error
-            <Card key={category._id}>
-              <CardImage>
-                // @ts-expect-error
-                {category.image ? (
-                  // @ts-expect-error
-                  <img src={category.image} alt={category.name} />
+          {filteredCategories.map(category => (            <Card key={category._id}>
+              <CardImage>                {category.image ? (                  <img src={category.image} alt={category.name} />
                 ) : (
                   <ImageIcon size={48} color="#cbd5e0" />
                 )}
               </CardImage>
               <CardContent>
-                <CardHeader>
-                  // @ts-expect-error
-                  <CategoryName>{category.name}</CategoryName>
-                  // @ts-expect-error
-                  <StatusBadge isActive={category.isActive}>
-                    // @ts-expect-error
-                    {category.isActive ? 'Active' : 'Inactive'}
+                <CardHeader>                  <CategoryName>{category.name}</CategoryName>                  <StatusBadge isActive={category.isActive}>                    {category.isActive ? 'Active' : 'Inactive'}
                   </StatusBadge>
-                </CardHeader>
-                // @ts-expect-error
-                <CardDescription>{category.description || 'No description'}</CardDescription>
+                </CardHeader>                <CardDescription>{category.description || 'No description'}</CardDescription>
                 <CardFooter>
-                  <CardMeta>
-                    // @ts-expect-error
-                    <MetaItem>Sort: {category.sortOrder || 0}</MetaItem>
-                    // @ts-expect-error
-                    <MetaItem>{new Date(category.createdAt).toLocaleDateString()}</MetaItem>
+                  <CardMeta>                    <MetaItem>Sort: {category.sortOrder || 0}</MetaItem>                    <MetaItem>{new Date(category.createdAt).toLocaleDateString()}</MetaItem>
                   </CardMeta>
                   <CardActions>
                     <ActionButton onClick={() => handleEdit(category)}>
                       <Edit2 size={16} />
-                    </ActionButton>
-                    // @ts-expect-error
-                    <ActionButton danger onClick={() => handleDelete(category._id)}>
+                    </ActionButton>                    <ActionButton danger onClick={() => handleDelete(category._id)}>
                       <Trash2 size={16} />
                     </ActionButton>
                   </CardActions>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// @ts-expect-error
 import styled from 'styled-components';
 import { adminService } from '../services/adminService';
 import { X, Upload, Star, Plus, Trash2, Save, AlertCircle, Image as ImageIcon } from 'lucide-react';
@@ -213,7 +212,7 @@ const RatingSection = styled.div`
 const StarButton = styled.button`
   background: none;
   border: none;
-  color: ${(props: any) => props.filled ? '#fbbf24' : '#d1d5db'};
+  color: ${(props: any) => (props.filled ? '#fbbf24' : '#d1d5db')};
   cursor: pointer;
   padding: 0.25rem;
   transition: all 0.2s;
@@ -283,12 +282,7 @@ const Button = styled.button`
   }
 `;
 
-const ProductModal = ({
-  isOpen,
-  onClose,
-  product,
-  onSave
-}: any) => {
+const ProductModal = ({ isOpen, onClose, product, onSave }: any) => {
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
@@ -366,7 +360,6 @@ const ProductModal = ({
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          // @ts-expect-error
           ...prev[parent],
           [child]: value,
         },
@@ -379,7 +372,6 @@ const ProductModal = ({
     }
 
     // Clear error when user starts typing
-    // @ts-expect-error
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -402,8 +394,6 @@ const ProductModal = ({
         }
       }
     }
-
-    // @ts-expect-error
     setFormData(prev => ({
       ...prev,
       images: [...prev.images, ...uploadedImages],
@@ -443,23 +433,19 @@ const ProductModal = ({
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      // @ts-expect-error
       newErrors.name = 'Product name is required';
     }
 
     if (!formData.brand.trim()) {
-      // @ts-expect-error
       newErrors.brand = 'Brand is required';
     }
 
     if (!formData.categoryId) {
-      // @ts-expect-error
       newErrors.categoryId = 'Category is required';
     }
 
     if (formData.pricing.mrp && formData.pricing.discountedPrice) {
       if (parseFloat(formData.pricing.discountedPrice) >= parseFloat(formData.pricing.mrp)) {
-        // @ts-expect-error
         newErrors['pricing.discountedPrice'] = 'Discounted price must be less than MRP';
       }
     }
@@ -482,7 +468,6 @@ const ProductModal = ({
       if (processedData.pricing.mrp && processedData.pricing.discountedPrice) {
         const mrp = parseFloat(processedData.pricing.mrp);
         const discounted = parseFloat(processedData.pricing.discountedPrice);
-        // @ts-expect-error
         processedData.pricing.discountPercent = Math.round(((mrp - discounted) / mrp) * 100);
       }
 
@@ -525,11 +510,9 @@ const ProductModal = ({
                   onChange={(e: any) => handleInputChange('name', e.target.value)}
                   placeholder="Enter product name"
                 />
-                // @ts-expect-error
                 {errors.name && (
                   <ErrorMessage>
                     <AlertCircle size={14} />
-                    // @ts-expect-error
                     {errors.name}
                   </ErrorMessage>
                 )}
@@ -543,11 +526,9 @@ const ProductModal = ({
                   onChange={(e: any) => handleInputChange('brand', e.target.value)}
                   placeholder="Enter brand name"
                 />
-                // @ts-expect-error
                 {errors.brand && (
                   <ErrorMessage>
                     <AlertCircle size={14} />
-                    // @ts-expect-error
                     {errors.brand}
                   </ErrorMessage>
                 )}
@@ -561,18 +542,14 @@ const ProductModal = ({
                 >
                   <option value="">Select a category</option>
                   {categories.map(category => (
-                    // @ts-expect-error
                     <option key={category._id} value={category._id}>
-                      // @ts-expect-error
                       {category.name}
                     </option>
                   ))}
                 </Select>
-                // @ts-expect-error
                 {errors.categoryId && (
                   <ErrorMessage>
                     <AlertCircle size={14} />
-                    // @ts-expect-error
                     {errors.categoryId}
                   </ErrorMessage>
                 )}
@@ -607,16 +584,16 @@ const ProductModal = ({
                 <Input
                   type="number"
                   value={formData.pricing.discountedPrice}
-                  onChange={(e: any) => handleInputChange('pricing.discountedPrice', e.target.value)}
+                  onChange={(e: any) =>
+                    handleInputChange('pricing.discountedPrice', e.target.value)
+                  }
                   placeholder="Enter discounted price"
                   min="0"
                   step="0.01"
                 />
-                // @ts-expect-error
                 {errors['pricing.discountedPrice'] && (
                   <ErrorMessage>
                     <AlertCircle size={14} />
-                    // @ts-expect-error
                     {errors['pricing.discountedPrice']}
                   </ErrorMessage>
                 )}
@@ -626,7 +603,8 @@ const ProductModal = ({
                 <Label>Stock Status</Label>
                 <Select
                   value={formData.availability.inStock}
-                  onChange={(e: any) => handleInputChange('availability.inStock', e.target.value === 'true')
+                  onChange={(e: any) =>
+                    handleInputChange('availability.inStock', e.target.value === 'true')
                   }
                 >
                   <option value="true">In Stock</option>
@@ -675,7 +653,6 @@ const ProductModal = ({
                     setDragOver(true);
                   }}
                   onDragLeave={() => setDragOver(false)}
-                  // @ts-expect-error
                   onClick={() => document.getElementById('image-upload').click()}
                 >
                   <ImageIcon size={48} color="#6b7280" />
@@ -709,12 +686,9 @@ const ProductModal = ({
                 )}
               </FormGroup>
             </FormGrid>
-
-            // @ts-expect-error
             {errors.submit && (
               <ErrorMessage style={{ marginTop: '1rem' }}>
                 <AlertCircle size={16} />
-                // @ts-expect-error
                 {errors.submit}
               </ErrorMessage>
             )}

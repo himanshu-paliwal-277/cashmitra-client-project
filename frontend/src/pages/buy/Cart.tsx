@@ -32,29 +32,9 @@ import './cart.css';
 const Cart = ({
   onBack
 }: any) => {
-  const navigate = useNavigate();
-  // @ts-expect-error
-  const { user, setOrderData } = useAuth();
+  const navigate = useNavigate();  const { user, setOrderData } = useAuth();
 
-  const {
-    // @ts-expect-error
-    cartItems,
-    // @ts-expect-error
-    loading,
-    // @ts-expect-error
-    error,
-    // @ts-expect-error
-    updateQuantity,
-    // @ts-expect-error
-    removeFromCart,
-    // @ts-expect-error
-    clearCart,
-    // @ts-expect-error
-    getCartTotal,
-    // @ts-expect-error
-    getCartItemsCount,
-    // @ts-expect-error
-    syncCartWithServer: syncWithServer,
+  const {    cartItems,    loading,    error,    updateQuantity,    removeFromCart,    clearCart,    getCartTotal,    getCartItemsCount,    syncCartWithServer: syncWithServer,
   } = useCart();
 
   // ------- Promo (unchanged UI) -------
@@ -71,11 +51,7 @@ const Cart = ({
   const closeAddressModal = () => setShowAddressForm(false);
 
   useEffect(() => {
-    if (addresses.length > 0 && !selectedAddress) {
-      // @ts-expect-error
-      const def = addresses.find(a => a.isDefault) || addresses[0];
-      // @ts-expect-error
-      setSelectedAddress(def._id || def.id);
+    if (addresses.length > 0 && !selectedAddress) {      const def = addresses.find(a => a.isDefault) || addresses[0];      setSelectedAddress(def._id || def.id);
     }
   }, [addresses, selectedAddress]);
 
@@ -126,18 +102,14 @@ const Cart = ({
     try {
       setLocalError(null);
       await updateQuantity(id, q);
-    } catch {
-      // @ts-expect-error
-      setLocalError('Failed to update quantity. Please try again.');
+    } catch {      setLocalError('Failed to update quantity. Please try again.');
     }
   };
   const handleRemoveItem = async (id: any) => {
     try {
       setLocalError(null);
       await removeFromCart(id);
-    } catch {
-      // @ts-expect-error
-      setLocalError('Failed to remove item. Please try again.');
+    } catch {      setLocalError('Failed to remove item. Please try again.');
     }
   };
   const moveToWishlist = (id: any) => handleRemoveItem(id);
@@ -148,13 +120,9 @@ const Cart = ({
     setLocalError(null);
     try {
       await new Promise(r => setTimeout(r, 900));
-      if (promoCode.toLowerCase() === 'save10') {
-        // @ts-expect-error
-        setAppliedPromo({ code: 'SAVE10', discount: 10 });
+      if (promoCode.toLowerCase() === 'save10') {        setAppliedPromo({ code: 'SAVE10', discount: 10 });
         setPromoCode('');
-      } else {
-        // @ts-expect-error
-        setLocalError('Invalid promo code. Please try again.');
+      } else {        setLocalError('Invalid promo code. Please try again.');
       }
     } finally {
       setIsApplyingPromo(false);
@@ -168,9 +136,7 @@ const Cart = ({
     (sum: any, item: any) => sum + (item.originalPrice || item.price) * item.quantity,
     0
   );
-  const savings = Math.max(originalTotal - subtotal, 0);
-  // @ts-expect-error
-  const promoDiscount = appliedPromo ? Math.round((subtotal * appliedPromo.discount) / 100) : 0;
+  const savings = Math.max(originalTotal - subtotal, 0);  const promoDiscount = appliedPromo ? Math.round((subtotal * appliedPromo.discount) / 100) : 0;
   const shipping = subtotal > 50000 ? 0 : 500;
   const total = subtotal - promoDiscount + shipping;
 
@@ -190,26 +156,19 @@ const Cart = ({
   };
 
   const sortedCart = useMemo(() => {
-    const arr = Array.isArray(cartItems) ? cartItems : [];
-    // @ts-expect-error
-    return [...arr].sort((a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
+    const arr = Array.isArray(cartItems) ? cartItems : [];    return [...arr].sort((a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
   }, [cartItems]);
 
   const [placing, setPlacing] = useState(false);
   const handlePlaceOrder = async () => {
     try {
-      setPlacing(true);
-
-      // @ts-expect-error
-      const selectedAddr = addresses.find(a => (a._id || a.id) === selectedAddress);
+      setPlacing(true);      const selectedAddr = addresses.find(a => (a._id || a.id) === selectedAddress);
       if (!selectedAddr) throw new Error('Please select a delivery address');
 
       // Robust cart extraction (same safety as in Checkout)
       let processed = cartItems;
       if (!Array.isArray(cartItems) && cartItems && typeof cartItems === 'object') {
-        const keys = Object.keys(cartItems);
-        // @ts-expect-error
-        if (keys.length && keys.every(k => !isNaN(k))) {
+        const keys = Object.keys(cartItems);        if (keys.length && keys.every(k => !isNaN(k))) {
           processed = Object.values(cartItems);
         }
       }
@@ -226,17 +185,7 @@ const Cart = ({
 
       const orderData = {
         items,
-        shippingAddress: {
-          // @ts-expect-error
-          street: selectedAddr.street,
-          // @ts-expect-error
-          city: selectedAddr.city,
-          // @ts-expect-error
-          state: selectedAddr.state,
-          // @ts-expect-error
-          pincode: selectedAddr.pincode,
-          // @ts-expect-error
-          phone: formatPhone(selectedAddr.phone),
+        shippingAddress: {          street: selectedAddr.street,          city: selectedAddr.city,          state: selectedAddr.state,          pincode: selectedAddr.pincode,          phone: formatPhone(selectedAddr.phone),
         },
         paymentMethod: 'card', // or capture choice later on Checkout
       };
@@ -250,9 +199,7 @@ const Cart = ({
           state: { orderData: resp.data.data.order },
         });
       }
-    } catch (e) {
-      // @ts-expect-error
-      alert(e.message || 'Failed to place order. Please try again.');
+    } catch (e) {      alert(e.message || 'Failed to place order. Please try again.');
     } finally {
       setPlacing(false);
     }
@@ -282,9 +229,7 @@ const Cart = ({
                 <ShoppingBag size={38} />
               </div>
               <h2>Your cart is empty</h2>
-              <p>Looks like you haven’t added any items yet.</p>
-              // @ts-expect-error
-              <Button variant="primary" size="lg" onClick={onBack}>
+              <p>Looks like you haven’t added any items yet.</p>              <Button variant="primary" size="lg" onClick={onBack}>
                 Start Shopping
               </Button>
             </div>
@@ -294,9 +239,7 @@ const Cart = ({
     );
   }
 
-  // ------- Main UI -------
-  // @ts-expect-error
-  const activeAddress = addresses.find(a => (a._id || a.id) === selectedAddress);
+  // ------- Main UI -------  const activeAddress = addresses.find(a => (a._id || a.id) === selectedAddress);
 
   return (
     <div className="cart-page">
@@ -332,26 +275,14 @@ const Cart = ({
               <div className="addr-strip__text">
                 <div className="addr-strip__title">
                   Delivers to{' '}
-                  <b>
-                    // @ts-expect-error
-                    {activeAddress?.addressType
-                      // @ts-expect-error
-                      ? activeAddress.addressType[0].toUpperCase() +
-                        // @ts-expect-error
-                        activeAddress.addressType.slice(1)
+                  <b>                    {activeAddress?.addressType                      ? activeAddress.addressType[0].toUpperCase() +                        activeAddress.addressType.slice(1)
                       : 'Address'}
                   </b>
                 </div>
                 <div className="addr-strip__line">
                   {addressLoading
                     ? 'Loading address…'
-                    : activeAddress
-                      // @ts-expect-error
-                      ? `${activeAddress.street}${
-                          // @ts-expect-error
-                          activeAddress.addressLine2 ? `, ${activeAddress.addressLine2}` : ''
-                        // @ts-expect-error
-                        }, ${activeAddress.city}, ${activeAddress.state}, ${activeAddress.pincode}`
+                    : activeAddress                      ? `${activeAddress.street}${                          activeAddress.addressLine2 ? `, ${activeAddress.addressLine2}` : ''                        }, ${activeAddress.city}, ${activeAddress.state}, ${activeAddress.pincode}`
                       : 'No address selected'}
                 </div>
               </div>
@@ -369,9 +300,7 @@ const Cart = ({
             <div className="cart-items">
               {sortedCart.map(item => {
                 const id = item.inventoryId || item.productId || item.id;
-                return (
-                  // @ts-expect-error
-                  <Card className="item-card" key={id}>
+                return (                  <Card className="item-card" key={id}>
                     {item.unavailable && (
                       <div className="item-unavailable">
                         <span className="dot" />
@@ -505,18 +434,14 @@ const Cart = ({
               })}
             </div>
 
-            {/* RIGHT: summary */}
-            // @ts-expect-error
-            <Card className="summary">
+            {/* RIGHT: summary */}            <Card className="summary">
               <h2 className="summary__title">Price Summary</h2>
 
               <div className="coupon">
                 {appliedPromo ? (
                   <div className="coupon__applied">
                     <div className="left">
-                      <Tag size={14} />
-                      // @ts-expect-error
-                      <span>{appliedPromo.code}</span>
+                      <Tag size={14} />                      <span>{appliedPromo.code}</span>
                     </div>
                     <button
                       className="coupon__remove"
@@ -528,16 +453,12 @@ const Cart = ({
                   </div>
                 ) : (
                   <div className="coupon__input">
-                    <Input
-                      // @ts-expect-error
-                      type="text"
+                    <Input                      type="text"
                       placeholder="Enter coupon"
                       value={promoCode}
                       onChange={(e: any) => setPromoCode(e.target.value)}
                       size="sm"
-                    />
-                    // @ts-expect-error
-                    <Button
+                    />                    <Button
                       variant="ghost"
                       size="sm"
                       onClick={applyPromoCode}
@@ -562,9 +483,7 @@ const Cart = ({
                 </div>
 
                 {appliedPromo && (
-                  <div className="row">
-                    // @ts-expect-error
-                    <span>Coupon ({appliedPromo.code})</span>
+                  <div className="row">                    <span>Coupon ({appliedPromo.code})</span>
                     <span className="green">-₹{promoDiscount.toLocaleString()}</span>
                   </div>
                 )}
@@ -582,10 +501,7 @@ const Cart = ({
 
               <div className="saved-pill">
                 You’ve saved <b>₹{(savings + promoDiscount).toLocaleString()}</b>
-              </div>
-
-              // @ts-expect-error
-              <Button
+              </div>              <Button
                 variant="primary"
                 size="lg"
                 fullWidth

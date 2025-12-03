@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-// Prefer local API for development to test new endpoints
-// @ts-expect-error
-const API_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
+// Prefer local API for development to test new endpointsconst API_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -29,59 +27,17 @@ class ProductService {
     try {
       const queryParams = new URLSearchParams();
 
-      // Add pagination
-      // @ts-expect-error
-      if (params.page) queryParams.append('page', params.page);
-      // @ts-expect-error
-      if (params.limit) queryParams.append('limit', params.limit);
+      // Add pagination      if (params.page) queryParams.append('page', params.page);      if (params.limit) queryParams.append('limit', params.limit);
 
-      // Add filters
-      // @ts-expect-error
-      if (params.category && params.category !== 'all')
-        // @ts-expect-error
-        queryParams.append('category', params.category);
-      // @ts-expect-error
-      if (params.brand && params.brand !== 'all') queryParams.append('brand', params.brand);
-      // @ts-expect-error
-      if (params.condition && params.condition !== 'all')
-        // @ts-expect-error
-        queryParams.append('condition', params.condition);
-      // @ts-expect-error
-      if (params.search) queryParams.append('search', params.search);
-      // @ts-expect-error
-      if (params.minPrice) queryParams.append('minPrice', params.minPrice);
-      // @ts-expect-error
-      if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice);
+      // Add filters      if (params.category && params.category !== 'all')        queryParams.append('category', params.category);      if (params.brand && params.brand !== 'all') queryParams.append('brand', params.brand);      if (params.condition && params.condition !== 'all')        queryParams.append('condition', params.condition);      if (params.search) queryParams.append('search', params.search);      if (params.minPrice) queryParams.append('minPrice', params.minPrice);      if (params.maxPrice) queryParams.append('maxPrice', params.maxPrice);
 
-      // Map frontend sortBy values to backend values
-      // @ts-expect-error
-      let backendSortBy = params.sortBy;
-      // @ts-expect-error
-      if (params.sortBy === 'popularity') backendSortBy = 'popularity';
-      // @ts-expect-error
-      else if (params.sortBy === 'price-low') {
+      // Map frontend sortBy values to backend values      let backendSortBy = params.sortBy;      if (params.sortBy === 'popularity') backendSortBy = 'popularity';      else if (params.sortBy === 'price-low') {
         backendSortBy = 'price';
-        queryParams.append('sortOrder', 'asc');
-      // @ts-expect-error
-      } else if (params.sortBy === 'price-high') {
+        queryParams.append('sortOrder', 'asc');      } else if (params.sortBy === 'price-high') {
         backendSortBy = 'price';
-        queryParams.append('sortOrder', 'desc');
-      // @ts-expect-error
-      } else if (params.sortBy === 'rating') backendSortBy = 'rating';
-      // @ts-expect-error
-      else if (params.sortBy === 'newest') backendSortBy = 'createdAt';
+        queryParams.append('sortOrder', 'desc');      } else if (params.sortBy === 'rating') backendSortBy = 'rating';      else if (params.sortBy === 'newest') backendSortBy = 'createdAt';
 
-      if (backendSortBy) queryParams.append('sortBy', backendSortBy);
-      // @ts-expect-error
-      if (params.sortOrder && !params.sortBy?.includes('price'))
-        // @ts-expect-error
-        queryParams.append('sortOrder', params.sortOrder);
-      // @ts-expect-error
-      if (params.availability) queryParams.append('availability', params.availability);
-      // @ts-expect-error
-      if (params.pincode) queryParams.append('pincode', params.pincode);
-      // @ts-expect-error
-      if (params.featured) queryParams.append('featured', params.featured);
+      if (backendSortBy) queryParams.append('sortBy', backendSortBy);      if (params.sortOrder && !params.sortBy?.includes('price'))        queryParams.append('sortOrder', params.sortOrder);      if (params.availability) queryParams.append('availability', params.availability);      if (params.pincode) queryParams.append('pincode', params.pincode);      if (params.featured) queryParams.append('featured', params.featured);
 
       const response = await api.get(`/products?${queryParams.toString()}`);
       return {
@@ -94,9 +50,7 @@ class ProductService {
         },
       };
     } catch (error) {
-      console.error('Error fetching products:', error);
-      // @ts-expect-error
-      throw new Error(error.response?.data?.message || 'Failed to fetch products');
+      console.error('Error fetching products:', error);      throw new Error(error.response?.data?.message || 'Failed to fetch products');
     }
   }
 
@@ -105,9 +59,7 @@ class ProductService {
     try {
       const response = await api.get(`/products/${id}`);
       return response.data;
-    } catch (error) {
-      // @ts-expect-error
-      throw error.response?.data || error;
+    } catch (error) {      throw error.response?.data || error;
     }
   }
 
@@ -117,9 +69,7 @@ class ProductService {
       const response = await api.get('/products/categories');
       return response.data.data || [];
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      // @ts-expect-error
-      throw new Error(error.response?.data?.message || 'Failed to fetch categories');
+      console.error('Error fetching categories:', error);      throw new Error(error.response?.data?.message || 'Failed to fetch categories');
     }
   }
 
@@ -129,9 +79,7 @@ class ProductService {
       const response = await api.get('/buy-super-categories/public');
       return response.data.data || [];
     } catch (error) {
-      console.error('Error fetching buy super categories:', error);
-      // @ts-expect-error
-      throw new Error(error.response?.data?.message || 'Failed to fetch buy super categories');
+      console.error('Error fetching buy super categories:', error);      throw new Error(error.response?.data?.message || 'Failed to fetch buy super categories');
     }
   }
 
@@ -141,9 +89,7 @@ class ProductService {
       const response = await api.get('/sell-super-categories/public');
       return response.data.data || [];
     } catch (error) {
-      console.error('Error fetching sell super categories:', error);
-      // @ts-expect-error
-      throw new Error(error.response?.data?.message || 'Failed to fetch sell super categories');
+      console.error('Error fetching sell super categories:', error);      throw new Error(error.response?.data?.message || 'Failed to fetch sell super categories');
     }
   }
 
@@ -153,9 +99,7 @@ class ProductService {
       const response = await api.get('/buy-categories');
       return response.data.data || [];
     } catch (error) {
-      console.error('Error fetching buy categories:', error);
-      // @ts-expect-error
-      throw new Error(error.response?.data?.message || 'Failed to fetch buy categories');
+      console.error('Error fetching buy categories:', error);      throw new Error(error.response?.data?.message || 'Failed to fetch buy categories');
     }
   }
 
@@ -164,31 +108,11 @@ class ProductService {
     try {
       const queryParams = new URLSearchParams();
 
-      // Add pagination
-      // @ts-expect-error
-      if (params.page) queryParams.append('page', params.page);
-      // @ts-expect-error
-      if (params.limit) queryParams.append('limit', params.limit);
+      // Add pagination      if (params.page) queryParams.append('page', params.page);      if (params.limit) queryParams.append('limit', params.limit);
 
-      // Add filters - support both categoryId and category name
-      // @ts-expect-error
-      if (params.categoryId) queryParams.append('categoryId', params.categoryId);
-      // @ts-expect-error
-      if (params.category && params.category !== 'all')
-        // @ts-expect-error
-        queryParams.append('category', params.category);
-      // @ts-expect-error
-      if (params.brand && params.brand !== 'all') queryParams.append('brand', params.brand);
-      // @ts-expect-error
-      if (params.search) queryParams.append('search', params.search);
-      // @ts-expect-error
-      if (params.isActive !== undefined) queryParams.append('isActive', params.isActive);
+      // Add filters - support both categoryId and category name      if (params.categoryId) queryParams.append('categoryId', params.categoryId);      if (params.category && params.category !== 'all')        queryParams.append('category', params.category);      if (params.brand && params.brand !== 'all') queryParams.append('brand', params.brand);      if (params.search) queryParams.append('search', params.search);      if (params.isActive !== undefined) queryParams.append('isActive', params.isActive);
 
-      // Add sorting
-      // @ts-expect-error
-      if (params.sortBy) queryParams.append('sortBy', params.sortBy);
-      // @ts-expect-error
-      if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+      // Add sorting      if (params.sortBy) queryParams.append('sortBy', params.sortBy);      if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
 
       const response = await api.get(`/buy-products?${queryParams.toString()}`);
       return {
@@ -201,9 +125,7 @@ class ProductService {
         },
       };
     } catch (error) {
-      console.error('Error fetching buy products:', error);
-      // @ts-expect-error
-      throw new Error(error.response?.data?.message || 'Failed to fetch buy products');
+      console.error('Error fetching buy products:', error);      throw new Error(error.response?.data?.message || 'Failed to fetch buy products');
     }
   }
 
@@ -214,9 +136,7 @@ class ProductService {
       const response = await api.get(`/products/brands${params}`);
       return response.data.data?.map((item: any) => item.brand) || [];
     } catch (error) {
-      console.error('Error fetching brands:', error);
-      // @ts-expect-error
-      throw new Error(error.response?.data?.message || 'Failed to fetch brands');
+      console.error('Error fetching brands:', error);      throw new Error(error.response?.data?.message || 'Failed to fetch brands');
     }
   }
 
@@ -227,9 +147,7 @@ class ProductService {
       const response = await api.get(`/products/filters${params}`);
       return response.data.data || {};
     } catch (error) {
-      console.error('Error fetching filters:', error);
-      // @ts-expect-error
-      throw new Error(error.response?.data?.message || 'Failed to fetch filters');
+      console.error('Error fetching filters:', error);      throw new Error(error.response?.data?.message || 'Failed to fetch filters');
     }
   }
 
@@ -238,9 +156,7 @@ class ProductService {
     try {
       const response = await api.get(`/products/suggestions?q=${encodeURIComponent(query)}`);
       return response.data;
-    } catch (error) {
-      // @ts-expect-error
-      throw error.response?.data || error;
+    } catch (error) {      throw error.response?.data || error;
     }
   }
 
@@ -249,9 +165,7 @@ class ProductService {
     try {
       const response = await api.post('/products', productData);
       return response.data;
-    } catch (error) {
-      // @ts-expect-error
-      throw error.response?.data || error;
+    } catch (error) {      throw error.response?.data || error;
     }
   }
 
@@ -260,9 +174,7 @@ class ProductService {
     try {
       const response = await api.put(`/products/${id}`, productData);
       return response.data;
-    } catch (error) {
-      // @ts-expect-error
-      throw error.response?.data || error;
+    } catch (error) {      throw error.response?.data || error;
     }
   }
 
@@ -271,9 +183,7 @@ class ProductService {
     try {
       const response = await api.delete(`/products/${id}`);
       return response.data;
-    } catch (error) {
-      // @ts-expect-error
-      throw error.response?.data || error;
+    } catch (error) {      throw error.response?.data || error;
     }
   }
 
@@ -286,9 +196,7 @@ class ProductService {
         },
       });
       return response.data;
-    } catch (error) {
-      // @ts-expect-error
-      throw error.response?.data || error;
+    } catch (error) {      throw error.response?.data || error;
     }
   }
 }

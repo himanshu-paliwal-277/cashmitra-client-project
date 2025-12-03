@@ -1,18 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run dev:*)",
-      "Bash(npm install:*)",
-      "Bash(dir:*)",
-      "Bash(npm run lint)",
-      "Bash(npx eslint:*)",
-      "Bash(test:*)",
-      "Bash(npm run lint:*)",
-      "Bash(npx ts-migrate:*)",
-      "Bash(npx ts-migrate-full:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(node:*)"
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

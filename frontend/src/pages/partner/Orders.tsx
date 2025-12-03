@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState } from 'react';import styled from 'styled-components';
 import {
   Search,
   Filter,

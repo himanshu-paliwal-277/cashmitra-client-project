@@ -10,9 +10,7 @@ const OPENAI_API_KEY =
   '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';
 
 class GSMArenaService {
-  constructor() {
-    // @ts-expect-error
-    this.openaiClient = axios.create({
+  constructor() {    this.openaiClient = axios.create({
       baseURL: 'https://api.openai.com/v1',
       headers: {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
@@ -33,10 +31,7 @@ class GSMArenaService {
         throw new Error('Product name must be at least 2 characters long');
       }
 
-      const prompt = this.buildSearchPrompt(productName);
-
-      // @ts-expect-error
-      const response = await this.openaiClient.post('/chat/completions', {
+      const prompt = this.buildSearchPrompt(productName);      const response = await this.openaiClient.post('/chat/completions', {
         model: 'gpt-4o', // Updated to more recent model for better accuracy
         messages: [
           {
@@ -90,9 +85,7 @@ class GSMArenaService {
 
       return this.formatProductData(productData);
     } catch (error) {
-      console.error('GSMArena search error:', error);
-      // @ts-expect-error
-      const status = error.response?.status;
+      console.error('GSMArena search error:', error);      const status = error.response?.status;
       if (status === 401) {
         throw new Error('API authentication failed. Check your API key.');
       } else if (status === 429) {
@@ -100,9 +93,7 @@ class GSMArenaService {
       } else if (status === 402) {
         throw new Error('API quota exceeded. Contact support.');
       } else if (status >= 500) {
-        throw new Error('API service unavailable. Try again later.');
-      // @ts-expect-error
-      } else if (error.code === 'ETIMEDOUT') {
+        throw new Error('API service unavailable. Try again later.');      } else if (error.code === 'ETIMEDOUT') {
         throw new Error('Request timed out. Try again.');
       } else {
         throw error; // Re-throw for user-friendly messages
@@ -383,10 +374,7 @@ Important: Return only valid JSON. Fill based on known data for the product. If 
    */
   async getProductSuggestions(query: any) {
     try {
-      if (!query || query.trim().length < 2) return [];
-
-      // @ts-expect-error
-      const response = await this.openaiClient.post('/chat/completions', {
+      if (!query || query.trim().length < 2) return [];      const response = await this.openaiClient.post('/chat/completions', {
         model: 'gpt-3.5-turbo',
         messages: [
           {

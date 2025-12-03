@@ -129,7 +129,6 @@ const AboutFeatures = () => {
               <div
                 key={index}
                 className="group relative cursor-pointer"
-                // @ts-expect-error
                 onMouseEnter={() => setActiveFeature(index)}
                 onMouseLeave={() => setActiveFeature(null)}
               >

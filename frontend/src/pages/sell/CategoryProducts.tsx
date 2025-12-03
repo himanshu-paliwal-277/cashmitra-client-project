@@ -44,17 +44,11 @@ const CategoryProducts = () => {
         setTotalPages(totalPages);
 
         // Extract unique brands from products
-        const uniqueBrands = [...new Set(products.map((product: any) => product.brand).filter(Boolean))];
-        // @ts-expect-error
-        setBrands(uniqueBrands);
-      } else {
-        // @ts-expect-error
-        setError('Failed to fetch products');
+        const uniqueBrands = [...new Set(products.map((product: any) => product.brand).filter(Boolean))];        setBrands(uniqueBrands);
+      } else {        setError('Failed to fetch products');
       }
     } catch (err) {
-      console.error('Error fetching products:', err);
-      // @ts-expect-error
-      setError('Failed to load products. Please try again.');
+      console.error('Error fetching products:', err);      setError('Failed to load products. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -74,9 +68,7 @@ const CategoryProducts = () => {
     );
 
     // Navigate to the sell model page with category, brand, and product ID parameters
-    navigate(
-      // @ts-expect-error
-      `/sell/model?category=${encodeURIComponent(category)}&brand=${encodeURIComponent(product.brand || '')}&productId=${encodeURIComponent(product._id)}`
+    navigate(      `/sell/model?category=${encodeURIComponent(category)}&brand=${encodeURIComponent(product.brand || '')}&productId=${encodeURIComponent(product._id)}`
     );
   };
 
@@ -143,9 +135,7 @@ const CategoryProducts = () => {
         {/* Page Header */}
         <div className="page-header">
           <h1 className="page-title">Sell Your {formatCategoryName(category)}</h1>
-          <p className="page-subtitle">
-            // @ts-expect-error
-            Get the best price for your {category.toLowerCase()}. Choose your device below to get
+          <p className="page-subtitle">            Get the best price for your {category.toLowerCase()}. Choose your device below to get
             started.
           </p>
         </div>
@@ -154,9 +144,7 @@ const CategoryProducts = () => {
         <div className="filters-section">
           <div className="search-filter">
             <input
-              type="text"
-              // @ts-expect-error
-              placeholder={`Search ${category.toLowerCase()} models...`}
+              type="text"              placeholder={`Search ${category.toLowerCase()} models...`}
               value={searchTerm}
               onChange={handleSearchChange}
               className="search-input"
@@ -182,48 +170,24 @@ const CategoryProducts = () => {
           <>
             <div className="products-grid">
               {products.map(product => (
-                <div
-                  // @ts-expect-error
-                  key={product._id}
+                <div                  key={product._id}
                   className="product-card"
                   onClick={() => handleProductClick(product)}
                 >
                   <div className="product-image-container">
                     <img
-                      src={
-                        // @ts-expect-error
-                        product.images && product.images['0']
-                          // @ts-expect-error
-                          ? product.images['0']
-                          // @ts-expect-error
-                          : product.image || '/placeholder-product.jpg'
-                      }
-                      // @ts-expect-error
-                      alt={product.name}
+                      src={                        product.images && product.images['0']                          ? product.images['0']                          : product.image || '/placeholder-product.jpg'
+                      }                      alt={product.name}
                       className="product-image"
-                      onError={e => {
-                        // @ts-expect-error
-                        e.target.src = '/placeholder-product.jpg';
+                      onError={e => {                        e.target.src = '/placeholder-product.jpg';
                       }}
                     />
                   </div>
-                  <div className="product-info">
-                    // @ts-expect-error
-                    <h3 className="product-name">{product.name}</h3>
-                    // @ts-expect-error
-                    {product.brand && <p className="product-brand">{product.brand}</p>}
-                    // @ts-expect-error
-                    {product.pricing?.discountedPrice && (
-                      <p className="product-price">
-                        // @ts-expect-error
-                        Starting from ₹{product.pricing.discountedPrice.toLocaleString()}
+                  <div className="product-info">                    <h3 className="product-name">{product.name}</h3>                    {product.brand && <p className="product-brand">{product.brand}</p>}                    {product.pricing?.discountedPrice && (
+                      <p className="product-price">                        Starting from ₹{product.pricing.discountedPrice.toLocaleString()}
                       </p>
-                    )}
-                    // @ts-expect-error
-                    {!product.pricing?.discountedPrice && product.basePrice && (
-                      <p className="product-price">
-                        // @ts-expect-error
-                        Starting from ₹{product.basePrice.toLocaleString()}
+                    )}                    {!product.pricing?.discountedPrice && product.basePrice && (
+                      <p className="product-price">                        Starting from ₹{product.basePrice.toLocaleString()}
                       </p>
                     )}
                   </div>
@@ -272,9 +236,7 @@ const CategoryProducts = () => {
             <h3>No products found</h3>
             <p>
               {searchTerm || selectedBrand
-                ? 'Try adjusting your search or filter criteria.'
-                // @ts-expect-error
-                : `No ${category.toLowerCase()} products are currently available.`}
+                ? 'Try adjusting your search or filter criteria.'                : `No ${category.toLowerCase()} products are currently available.`}
             </p>
           </div>
         )}

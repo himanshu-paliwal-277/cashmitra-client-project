@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// @ts-expect-error
 import styled from 'styled-components';
 import {
   TrendingUp,
@@ -54,8 +53,8 @@ const ConnectionStatus = styled.div`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  background: ${(props: any) => props.connected ? '#D1FAE5' : '#FEE2E2'};
-  color: ${(props: any) => props.connected ? '#065F46' : '#991B1B'};
+  background: ${(props: any) => (props.connected ? '#D1FAE5' : '#FEE2E2')};
+  color: ${(props: any) => (props.connected ? '#065F46' : '#991B1B')};
 `;
 
 const Controls = styled.div`
@@ -140,7 +139,7 @@ const StatChange = styled.div`
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: ${(props: any) => props.positive ? '#059669' : '#DC2626'};
+  color: ${(props: any) => (props.positive ? '#059669' : '#DC2626')};
 `;
 
 const ContentGrid = styled.div`
@@ -398,14 +397,12 @@ const RealTimeDashboard = () => {
   // Real-time hooks
   const {
     orders,
-    // @ts-expect-error
     stats,
     loading: ordersLoading,
     error: ordersError,
     connected: ordersConnected,
     lastUpdated: ordersLastUpdated,
     refresh: refreshOrders,
-    // @ts-expect-error
     updateOrderStatus,
   } = useRealTimeOrders(orderTypeFilter, {
     pollingInterval: 5000,
@@ -421,10 +418,8 @@ const RealTimeDashboard = () => {
     analytics,
     loading: analyticsLoading,
     error: analyticsError,
-    // @ts-expect-error
     lastUpdated: analyticsLastUpdated,
     refresh: refreshAnalytics,
-  // @ts-expect-error
   } = useRealTimeAnalytics({
     pollingInterval: 30000,
     dateRange: 'today',
@@ -433,14 +428,9 @@ const RealTimeDashboard = () => {
   // Filter orders based on search and status
   const filteredOrders = orders.filter(order => {
     const matchesSearch =
-      // @ts-expect-error
       order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
       order.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      // @ts-expect-error
       order.items?.[0]?.product?.brand?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    // @ts-expect-error
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
 
     return matchesSearch && matchesStatus;
@@ -448,28 +438,20 @@ const RealTimeDashboard = () => {
 
   // Generate recent activity
   const recentActivity = orders.slice(0, 10).map(order => ({
-    // @ts-expect-error
     id: order._id,
-    // @ts-expect-error
     type: order.orderType,
-    // @ts-expect-error
     status: order.status,
-    // @ts-expect-error
     text: `${order.orderType === 'sell' ? 'Sell' : 'Buy'} order ${order._id.slice(-6)} ${order.status}`,
-    // @ts-expect-error
     time: new Date(order.updatedAt || order.createdAt).toLocaleTimeString(),
     color:
-      // @ts-expect-error
       order.status === 'delivered'
         ? '#059669'
-        // @ts-expect-error
         : order.status === 'cancelled'
           ? '#DC2626'
           : '#3B82F6',
   }));
 
   const handleRefresh = async () => {
-    // @ts-expect-error
     await Promise.all([refreshOrders(), refreshAnalytics()]);
   };
 
@@ -566,7 +548,6 @@ const RealTimeDashboard = () => {
               <DollarSign size={20} />
             </StatIcon>
           </StatHeader>
-          // @ts-expect-error
           <StatValue>{analytics ? formatCurrency(analytics.totalRevenue || 0) : '₹0'}</StatValue>
           <StatLabel>Today's Revenue</StatLabel>
           <StatChange positive={true}>
@@ -597,7 +578,10 @@ const RealTimeDashboard = () => {
                 <option value="sell">Sell Orders</option>
                 <option value="buy">Buy Orders</option>
               </FilterSelect>
-              <FilterSelect value={statusFilter} onChange={(e: any) => setStatusFilter(e.target.value)}>
+              <FilterSelect
+                value={statusFilter}
+                onChange={(e: any) => setStatusFilter(e.target.value)}
+              >
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
                 <option value="processing">Processing</option>
@@ -625,30 +609,20 @@ const RealTimeDashboard = () => {
             {!ordersLoading &&
               !ordersError &&
               filteredOrders.map(order => (
-                // @ts-expect-error
                 <OrderItem key={order._id}>
                   <OrderInfo>
-                    // @ts-expect-error
                     <OrderId>#{order._id.slice(-8).toUpperCase()}</OrderId>
                     <OrderDetails>
-                      // @ts-expect-error
                       <span>{order.orderType === 'sell' ? 'Sell' : 'Buy'} Order</span>
-                      // @ts-expect-error
                       <span>{order.user?.name || 'Unknown User'}</span>
                       <span>
-                        // @ts-expect-error
                         {order.items?.[0]?.product?.brand} {order.items?.[0]?.product?.model}
                       </span>
-                      // @ts-expect-error
                       <span>{formatCurrency(order.totalAmount)}</span>
-                      // @ts-expect-error
                       <span>{new Date(order.createdAt).toLocaleDateString()}</span>
                     </OrderDetails>
                   </OrderInfo>
-
-                  // @ts-expect-error
                   <OrderStatus status={order.status}>
-                    // @ts-expect-error
                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                   </OrderStatus>
 

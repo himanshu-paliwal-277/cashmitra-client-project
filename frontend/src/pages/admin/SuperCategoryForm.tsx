@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-// @ts-expect-error
-import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';import styled from 'styled-components';
 import { Upload, X, Save, Image as ImageIcon } from 'lucide-react';
 import { API_BASE_URL } from '../../config/api';
 
@@ -43,9 +41,7 @@ const SuperCategoryForm = ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    // Clear error for this field
-    // @ts-expect-error
-    if (errors[name]) {
+    // Clear error for this field    if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
@@ -70,9 +66,7 @@ const SuperCategoryForm = ({
 
       // Create preview
       const reader = new FileReader();
-      reader.onloadend = () => {
-        // @ts-expect-error
-        setImagePreview(reader.result);
+      reader.onloadend = () => {        setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -98,23 +92,15 @@ const SuperCategoryForm = ({
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      // @ts-expect-error
-      newErrors.name = 'Name is required';
-    } else if (formData.name.length > 50) {
-      // @ts-expect-error
-      newErrors.name = 'Name must be 50 characters or less';
+    if (!formData.name.trim()) {      newErrors.name = 'Name is required';
+    } else if (formData.name.length > 50) {      newErrors.name = 'Name must be 50 characters or less';
     }
 
-    if (formData.description && formData.description.length > 200) {
-      // @ts-expect-error
-      newErrors.description = 'Description must be 200 characters or less';
+    if (formData.description && formData.description.length > 200) {      newErrors.description = 'Description must be 200 characters or less';
     }
 
     // Image is required only when creating new category
-    if (!category && !imageFile && !imagePreview) {
-      // @ts-expect-error
-      newErrors.image = 'Image is required';
+    if (!category && !imageFile && !imagePreview) {      newErrors.image = 'Image is required';
     }
 
     setErrors(newErrors);
@@ -161,9 +147,7 @@ const SuperCategoryForm = ({
       if (imageFile) {
         try {
           imageUrl = await uploadImageToCloudinary(imageFile);
-        } catch (uploadError) {
-          // @ts-expect-error
-          setErrors({ submit: 'Failed to upload image: ' + uploadError.message });
+        } catch (uploadError) {          setErrors({ submit: 'Failed to upload image: ' + uploadError.message });
           setLoading(false);
           return;
         }
@@ -211,9 +195,7 @@ const SuperCategoryForm = ({
         setErrors({ submit: data.message || 'Failed to save super category' });
       }
     } catch (err) {
-      console.error('Error saving super category:', err);
-      // @ts-expect-error
-      setErrors({ submit: 'Error saving super category: ' + err.message });
+      console.error('Error saving super category:', err);      setErrors({ submit: 'Error saving super category: ' + err.message });
     } finally {
       setLoading(false);
     }
@@ -235,12 +217,8 @@ const SuperCategoryForm = ({
               value={formData.name}
               onChange={handleChange}
               placeholder="e.g., Mobile, Laptop, Watch"
-              maxLength={50}
-              // @ts-expect-error
-              hasError={errors.name}
-            />
-            // @ts-expect-error
-            {errors.name && <ErrorText>{errors.name}</ErrorText>}
+              maxLength={50}              hasError={errors.name}
+            />            {errors.name && <ErrorText>{errors.name}</ErrorText>}
             <CharCount>{formData.name.length}/50</CharCount>
           </FormGroup>
 
@@ -252,12 +230,8 @@ const SuperCategoryForm = ({
               onChange={handleChange}
               placeholder="Brief description of the super category"
               rows={4}
-              maxLength={200}
-              // @ts-expect-error
-              hasError={errors.description}
-            />
-            // @ts-expect-error
-            {errors.description && <ErrorText>{errors.description}</ErrorText>}
+              maxLength={200}              hasError={errors.description}
+            />            {errors.description && <ErrorText>{errors.description}</ErrorText>}
             <CharCount>{formData.description.length}/200</CharCount>
           </FormGroup>
 
@@ -302,9 +276,7 @@ const SuperCategoryForm = ({
                 <X size={20} />
               </RemoveImageButton>
             </ImagePreview>
-          ) : (
-            // @ts-expect-error
-            <DropZone onDrop={handleDrop} onDragOver={handleDragOver} hasError={errors.image}>
+          ) : (            <DropZone onDrop={handleDrop} onDragOver={handleDragOver} hasError={errors.image}>
               <ImageIcon size={48} />
               <DropText>Drag and drop an image here</DropText>
               <DropSubText>or</DropSubText>
@@ -320,14 +292,8 @@ const SuperCategoryForm = ({
               />
               <DropHint>PNG, JPG, GIF up to 5MB</DropHint>
             </DropZone>
-          )}
-
-          // @ts-expect-error
-          {errors.image && <ErrorText>{errors.image}</ErrorText>}
-        </FormSection>
-
-        // @ts-expect-error
-        {errors.submit && <SubmitError>{errors.submit}</SubmitError>}
+          )}          {errors.image && <ErrorText>{errors.image}</ErrorText>}
+        </FormSection>        {errors.submit && <SubmitError>{errors.submit}</SubmitError>}
 
         <FormActions>
           <CancelButton type="button" onClick={onClose} disabled={loading}>
