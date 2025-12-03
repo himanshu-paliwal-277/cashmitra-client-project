@@ -1,11 +1,8 @@
 import { useState, Suspense } from 'react';
-import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
 import GlobalStyles from './styles/GlobalStyles';
-import Navigation from './components/layout/Navigation';
-import Footer from './components/layout/Footer';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { AdminAuthProvider } from './contexts/AdminAuthContext';
@@ -19,22 +16,9 @@ import AppRoutes from './AppRoutes';
 
 /**
  * AppContent component
- *
- * This component MUST be separate from App because:
- * - It uses React Router hooks (useLocation, useNavigate, useAuth)
- * - These hooks can ONLY be used inside components that are children of <Router>
- * - The <Router> is defined in the App component below
- * - Without this separation, you'll get: "useLocation() may be used only in the context of a <Router> component"
+ * Manages sell flow state and renders routes with Suspense
  */
 function AppContent() {
-  const location = useLocation(); // ⚠️ Must be inside <Router>
-  const navigate = useNavigate(); // ⚠️ Must be inside <Router>
-  const { user, logout } = useAuth(); // ⚠️ Must be inside <AuthProvider>
-
-  const isAdminRoute = location.pathname.startsWith('/admin');
-  const isPartnerRoute = location.pathname.startsWith('/partner');
-  const isAgentRoute = location.pathname.startsWith('/agent');
-
   const [sellFlowData, setSellFlowData] = useState({
     category: null,
     brand: null,
@@ -44,36 +28,14 @@ function AppContent() {
     bookingData: null,
   });
 
-  const handleLogin = () => {
-    navigate('/login');
-  };
-
   const updateSellFlowData = (key: any, value: any) => {
-    setSellFlowData(prev => ({ ...prev, [key]: value }));
+    setSellFlowData((prev) => ({ ...prev, [key]: value }));
   };
-
-  // Don't show Navigation and Footer on admin, partner, or agent routes
-  const showNavAndFooter = !isAdminRoute && !isPartnerRoute && !isAgentRoute;
 
   return (
-    <div className="App">
-      {showNavAndFooter && (
-        <Navigation
-          isAuthenticated={!!user}
-          onLogin={handleLogin}
-          onLogout={logout}
-          currentPath={location.pathname}
-        />
-      )}
-
-      <main>
-        <Suspense fallback={<FullScreenLoader text="Loading..." />}>
-          <AppRoutes sellFlowData={sellFlowData} updateSellFlowData={updateSellFlowData} />
-        </Suspense>
-      </main>
-
-      {showNavAndFooter && <Footer />}
-    </div>
+    <Suspense fallback={<FullScreenLoader text="Loading..." />}>
+      <AppRoutes sellFlowData={sellFlowData} updateSellFlowData={updateSellFlowData} />
+    </Suspense>
   );
 }
 
