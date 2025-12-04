@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import {
   CreditCard,
   DollarSign,
@@ -120,7 +122,7 @@ const StatChange = styled.div`
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: ${(props: any) => props.positive ? '#10b981' : '#ef4444'};
+  color: ${(props: any) => (props.positive ? '#10b981' : '#ef4444')};
   margin-top: 0.5rem;
 `;
 
@@ -140,11 +142,11 @@ const TabsList = styled.div`
 const Tab = styled.button`
   flex: 1;
   padding: 1rem 1.5rem;
-  background: ${(props: any) => props.active ? '#f9fafb' : 'white'};
+  background: ${(props: any) => (props.active ? '#f9fafb' : 'white')};
   border: none;
-  border-bottom: 2px solid ${(props: any) => props.active ? '#10b981' : 'transparent'};
-  font-weight: ${(props: any) => props.active ? '600' : '500'};
-  color: ${(props: any) => props.active ? '#10b981' : '#6b7280'};
+  border-bottom: 2px solid ${(props: any) => (props.active ? '#10b981' : 'transparent')};
+  font-weight: ${(props: any) => (props.active ? '600' : '500')};
+  color: ${(props: any) => (props.active ? '#10b981' : '#6b7280')};
   cursor: pointer;
   transition: all 0.2s;
 
@@ -356,17 +358,25 @@ const Finance = () => {
       },
     ];
 
-    setTimeout(() => {      setCommissionData(mockCommissionData);      setWalletData(mockWalletData);
+    setTimeout(() => {
+      setCommissionData(mockCommissionData);
+      setWalletData(mockWalletData);
       setLoading(false);
     }, 1000);
   }, []);
 
   const filteredCommissionData = commissionData.filter(
-    item =>      item.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||      item.partner.toLowerCase().includes(searchTerm.toLowerCase())
+    item =>
+      item.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.partner.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredWalletData = walletData.filter(item =>    item.partner.toLowerCase().includes(searchTerm.toLowerCase())
-  );  const totalCommission = commissionData.reduce((sum, item) => sum + item.commission, 0);  const totalWalletBalance = walletData.reduce((sum, item) => sum + item.balance, 0);  const totalPendingPayouts = walletData.reduce((sum, item) => sum + item.pendingAmount, 0);
+  const filteredWalletData = walletData.filter(item =>
+    item.partner.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const totalCommission = commissionData.reduce((sum, item) => sum + item.commission, 0);
+  const totalWalletBalance = walletData.reduce((sum, item) => sum + item.balance, 0);
+  const totalPendingPayouts = walletData.reduce((sum, item) => sum + item.pendingAmount, 0);
 
   return (
     <Container>
@@ -480,7 +490,7 @@ const Finance = () => {
           </FilterSection>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
+            <LoadingSpinner size="lg" text="Loading financial data..." />
           ) : (
             <TableContainer>
               <Table>
@@ -519,10 +529,19 @@ const Finance = () => {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredCommissionData.map(item => (                        <TableRow key={item.id}>                          <TableCell>{item.orderId}</TableCell>                          <TableCell>{item.partner}</TableCell>                          <TableCell>₹{item.amount.toLocaleString()}</TableCell>                          <TableCell>₹{item.commission.toLocaleString()}</TableCell>                          <TableCell>{item.rate}</TableCell>
-                          <TableCell>                            <StatusBadge status={item.status}>                              {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                      filteredCommissionData.map(item => (
+                        <TableRow key={item.id}>
+                          <TableCell>{item.orderId}</TableCell>
+                          <TableCell>{item.partner}</TableCell>
+                          <TableCell>₹{item.amount.toLocaleString()}</TableCell>
+                          <TableCell>₹{item.commission.toLocaleString()}</TableCell>
+                          <TableCell>{item.rate}</TableCell>
+                          <TableCell>
+                            <StatusBadge status={item.status}>
+                              {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                             </StatusBadge>
-                          </TableCell>                          <TableCell>{item.date}</TableCell>
+                          </TableCell>
+                          <TableCell>{item.date}</TableCell>
                           <TableCell>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                               <IconButton>
@@ -543,8 +562,16 @@ const Finance = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredWalletData.map(item => (                      <TableRow key={item.id}>                        <TableCell>{item.partner}</TableCell>                        <TableCell>₹{item.balance.toLocaleString()}</TableCell>                        <TableCell>₹{item.pendingAmount.toLocaleString()}</TableCell>                        <TableCell>{item.lastPayout}</TableCell>                        <TableCell>₹{item.payoutAmount.toLocaleString()}</TableCell>
-                        <TableCell>                          <StatusBadge status={item.status}>                            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                    filteredWalletData.map(item => (
+                      <TableRow key={item.id}>
+                        <TableCell>{item.partner}</TableCell>
+                        <TableCell>₹{item.balance.toLocaleString()}</TableCell>
+                        <TableCell>₹{item.pendingAmount.toLocaleString()}</TableCell>
+                        <TableCell>{item.lastPayout}</TableCell>
+                        <TableCell>₹{item.payoutAmount.toLocaleString()}</TableCell>
+                        <TableCell>
+                          <StatusBadge status={item.status}>
+                            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                           </StatusBadge>
                         </TableCell>
                         <TableCell>

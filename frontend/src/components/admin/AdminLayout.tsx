@@ -40,7 +40,7 @@ const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, adminUser } = useAdminAuth() as any;
-  const [sidebarOpen, setSidebarOpen] = useState(true); // Default open on desktop
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Default collapsed
 
   // Permissions sidebar hook
   const {
