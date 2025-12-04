@@ -79,7 +79,8 @@ const Marketplace = () => {
     const fetchCategories = async () => {
       try {
         const categoriesData = await getBuyCategories();
-        const allCategory = { _id: 'all', name: 'All', slug: 'all' };        setCategories([allCategory, ...(categoriesData || [])]);
+        const allCategory = { _id: 'all', name: 'All', slug: 'all' };
+        setCategories([allCategory, ...(categoriesData || [])]);
       } catch (err) {
         console.error('Error fetching categories:', err);
       }
@@ -115,16 +116,20 @@ const Marketplace = () => {
           limit: 20,
         };
 
-        if (selectedCategory && selectedCategory !== 'all') {          params.category = selectedCategory;
+        if (selectedCategory && selectedCategory !== 'all') {
+          params.category = selectedCategory;
         }
 
-        if (searchQuery.trim()) {          params.search = searchQuery.trim();
+        if (searchQuery.trim()) {
+          params.search = searchQuery.trim();
         }
 
-        if (filters.brand !== 'all') {          params.brand = filters.brand;
+        if (filters.brand !== 'all') {
+          params.brand = filters.brand;
         }
 
-        if (sortBy !== 'popularity') {          params.sortBy = sortBy;
+        if (sortBy !== 'popularity') {
+          params.sortBy = sortBy;
         }
 
         const response = await getBuyProducts(params);
@@ -134,7 +139,8 @@ const Marketplace = () => {
           total: response.pagination?.total || 0,
         });
       } catch (err) {
-        console.error('Error fetching buy products:', err);        setError('Failed to load products. Please try again.');
+        console.error('Error fetching buy products:', err);
+        setError('Failed to load products. Please try again.');
       } finally {
         setIsLoading(false);
       }
@@ -304,8 +310,8 @@ const Marketplace = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-16 px-4">
-        <div className="max-w-7xl mx-auto text-center">
+      <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-16 ">
+        <div className="main-container text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 text-white">
             Buy Refurbished Devices
           </h1>
@@ -329,7 +335,7 @@ const Marketplace = () => {
 
       {/* Features Bar */}
       <div className="bg-white border-b border-slate-200 py-6">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="main-container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: <Award className="w-6 h-6" />, text: 'Quality Certified', color: 'blue' },
@@ -359,24 +365,31 @@ const Marketplace = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="main-container py-12">
         {/* Categories */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-slate-900 mb-6">Shop by Category</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {categories.map(category => {              const IconComponent = getCategoryIcon(category.name);
-              const isActive =                selectedCategory === category.name ||                (selectedCategory === 'all' && category._id === 'all');
+            {categories.map(category => {
+              const IconComponent = getCategoryIcon(category.name);
+              const isActive =
+                selectedCategory === category.name ||
+                (selectedCategory === 'all' && category._id === 'all');
 
               return (
-                <button                  key={category._id}
+                <button
+                  key={category._id}
                   onClick={() => handleCategoryClick(category)}
                   className={`p-6 rounded-2xl border-2 transition-all hover:scale-105 ${
                     isActive
                       ? 'border-blue-500 bg-blue-50 shadow-lg'
                       : 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-md'
                   }`}
-                >                  {category.image ? (
-                    <img                      src={category.image}                      alt={category.name}
+                >
+                  {category.image ? (
+                    <img
+                      src={category.image}
+                      alt={category.name}
                       className="w-12 h-12 mx-auto mb-3 object-contain"
                     />
                   ) : (
@@ -390,7 +403,8 @@ const Marketplace = () => {
                     className={`text-sm font-bold text-center ${
                       isActive ? 'text-blue-600' : 'text-slate-900'
                     }`}
-                  >                    {category.name}
+                  >
+                    {category.name}
                   </h4>
                 </button>
               );
@@ -470,7 +484,8 @@ const Marketplace = () => {
         {/* Products */}
         {error ? (
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-slate-200">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">              <AlertCircle className="w-8 h-8 text-red-600" />
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="w-8 h-8 text-red-600" />
             </div>
             <h3 className="text-2xl font-bold text-slate-900 mb-2">Error Loading Products</h3>
             <p className="text-slate-600 mb-6">{error}</p>

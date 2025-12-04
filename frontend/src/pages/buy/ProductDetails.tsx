@@ -44,7 +44,8 @@ const ICON_SIZE = 18;
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();  const { addToCart } = useCart();
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -82,7 +83,8 @@ const ProductDetails = () => {
         if (data.conditionOptions?.length) setSelectedCondition(data.conditionOptions[0]);
         if (data.storageOptions?.length) setSelectedStorage(data.storageOptions[0]);
         if (data.colorOptions?.length) setSelectedColor(data.colorOptions[0]);
-      } catch (e) {        setError(e.message || 'Failed to load product details. Please try again.');
+      } catch (e) {
+        setError(e.message || 'Failed to load product details. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -93,14 +95,22 @@ const ProductDetails = () => {
   const scrollRail = (dir = 1) => {
     const el = railRef.current;
     if (!el) return;
-    const step = 88; // thumbnail + gap    el.scrollBy({ top: step * dir, behavior: 'smooth' });
+    const step = 88; // thumbnail + gap
+    el.scrollBy({ top: step * dir, behavior: 'smooth' });
   };
 
   const addItem = (goCheckout = false) => {
     if (!product) return;
     addToCart(
-      {        _id: product._id,        name: product.name,        price: selectedVariant?.price || product.price,        images: [product.images?.[0] || '/placeholder-phone.jpg'],        brand: product.brand || 'Unknown Brand',        model: product.model || 'Unknown Model',
-        condition: selectedCondition,        inventoryId: product.inventoryId || product._id,
+      {
+        _id: product._id,
+        name: product.name,
+        price: selectedVariant?.price || product.price,
+        images: [product.images?.[0] || '/placeholder-phone.jpg'],
+        brand: product.brand || 'Unknown Brand',
+        model: product.model || 'Unknown Model',
+        condition: selectedCondition,
+        inventoryId: product.inventoryId || product._id,
         variant: selectedVariant,
         storage: selectedStorage,
         color: selectedColor,
@@ -160,7 +170,9 @@ const ProductDetails = () => {
         </div>
       </div>
     );
-  }  const priceNow = product.pricing?.discountedPrice || selectedVariant?.price || product.price || 0;  const mrp = product.pricing?.mrp || product.originalPrice || null;
+  }
+  const priceNow = product.pricing?.discountedPrice || selectedVariant?.price || product.price || 0;
+  const mrp = product.pricing?.mrp || product.originalPrice || null;
   const discountPct = mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
 
   return (
@@ -175,11 +187,14 @@ const ProductDetails = () => {
           Buy
         </button>
         <ChevronRight size={14} />
-        <button          onClick={() => navigate(`/buy/category/${product?.categoryId?.name || 'Category'}`)}
+        <button
+          onClick={() => navigate(`/buy/category/${product?.categoryId?.name || 'Category'}`)}
           className="link"
-        >          {product?.categoryId?.name || 'Category'}
+        >
+          {product?.categoryId?.name || 'Category'}
         </button>
-        <ChevronRight size={14} />        <span className="muted">{product.name}</span>
+        <ChevronRight size={14} />
+        <span className="muted">{product.name}</span>
       </nav>
 
       {/* Top area */}
@@ -193,9 +208,15 @@ const ProductDetails = () => {
             <div className="rail-list" ref={railRef}>
               {(() => {
                 // Handle images as object with main, gallery, thumbnail properties
-                const imageArray = [];                if (product.images) {                  if (product.images.main) imageArray.push(product.images.main.trim());                  if (product.images.gallery) imageArray.push(product.images.gallery.trim());
-                  if (                    product.images.thumbnail &&                    product.images.thumbnail !== product.images.gallery
-                  ) {                    imageArray.push(product.images.thumbnail.trim());
+                const imageArray = [];
+                if (product.images) {
+                  if (product.images.main) imageArray.push(product.images.main.trim());
+                  if (product.images.gallery) imageArray.push(product.images.gallery.trim());
+                  if (
+                    product.images.thumbnail &&
+                    product.images.thumbnail !== product.images.gallery
+                  ) {
+                    imageArray.push(product.images.thumbnail.trim());
                   }
                 }
                 // Fallback to placeholder if no images
@@ -206,7 +227,8 @@ const ProductDetails = () => {
                     key={i}
                     className={`rail-thumb ${i === selectedImageIndex ? 'active' : ''}`}
                     onClick={() => setSelectedImageIndex(i)}
-                  >                    <img src={img} alt={`${product.name} ${i + 1}`} />
+                  >
+                    <img src={img} alt={`${product.name} ${i + 1}`} />
                   </button>
                 ));
               })()}
@@ -220,15 +242,22 @@ const ProductDetails = () => {
             <img
               src={(() => {
                 // Handle images as object with main, gallery, thumbnail properties
-                const imageArray = [];                if (product.images) {                  if (product.images.main) imageArray.push(product.images.main.trim());                  if (product.images.gallery) imageArray.push(product.images.gallery.trim());
-                  if (                    product.images.thumbnail &&                    product.images.thumbnail !== product.images.gallery
-                  ) {                    imageArray.push(product.images.thumbnail.trim());
+                const imageArray = [];
+                if (product.images) {
+                  if (product.images.main) imageArray.push(product.images.main.trim());
+                  if (product.images.gallery) imageArray.push(product.images.gallery.trim());
+                  if (
+                    product.images.thumbnail &&
+                    product.images.thumbnail !== product.images.gallery
+                  ) {
+                    imageArray.push(product.images.thumbnail.trim());
                   }
                 }
                 // Fallback to placeholder if no images
                 const finalImages = imageArray.length > 0 ? imageArray : ['/placeholder-phone.jpg'];
                 return finalImages[selectedImageIndex] || '/placeholder-phone.jpg';
-              })()}              alt={product.name}
+              })()}
+              alt={product.name}
             />
             <div className="pd__assured">
               <Shield size={14} />
@@ -240,17 +269,23 @@ const ProductDetails = () => {
         {/* Info */}
         <div className="pd__info">
           <div className="pd__title-row">
-            <div className="pd__chips">              {product.isRefurbished && <span className="chip chip-green">Refurbished</span>}
+            <div className="pd__chips">
+              {product.isRefurbished && <span className="chip chip-green">Refurbished</span>}
               <span className="chip">32-Point QC</span>
               <span className="chip">15-Day Refund</span>
               <span className="chip">12-Month Warranty</span>
             </div>
-            <h1 className="pd__title">              {product.name} <span className="muted">– Refurbished</span>
+            <h1 className="pd__title">
+              {product.name} <span className="muted">– Refurbished</span>
             </h1>
-            <div className="pd__rating">              <div className="stars">{renderStars(Math.round(product.averageRating || 5))}</div>              <span className="pd__rating-val">{product.averageRating || '5.0'}</span>
-              <span className="dot" />              <span className="muted">{product.totalReviews || 4} reviews</span>
+            <div className="pd__rating">
+              <div className="stars">{renderStars(Math.round(product.averageRating || 5))}</div>
+              <span className="pd__rating-val">{product.averageRating || '5.0'}</span>
               <span className="dot" />
-              <span className="muted">                {product.trustMetrics?.devicesSold || product.soldCount || '500+'} sold
+              <span className="muted">{product.totalReviews || 4} reviews</span>
+              <span className="dot" />
+              <span className="muted">
+                {product.trustMetrics?.devicesSold || product.soldCount || '500+'} sold
               </span>
             </div>
           </div>
@@ -262,7 +297,8 @@ const ProductDetails = () => {
               <div className="now">₹{priceNow.toLocaleString()}</div>
               {mrp ? <div className="mrp">₹{mrp.toLocaleString()}</div> : null}
             </div>
-            <div className="pd__price-right">              {product.paymentOptions?.emiAvailable && (
+            <div className="pd__price-right">
+              {product.paymentOptions?.emiAvailable && (
                 <div className="irow">
                   <CreditCard size={ICON_SIZE} />
                   <span>EMI from ₹{Math.round(priceNow / 12).toLocaleString()}/mo</span>
@@ -317,10 +353,13 @@ const ProductDetails = () => {
             )}
           </div>
 
-          {/* Condition / Storage / Color */}          {product.conditionOptions?.length ? (
+          {/* Condition / Storage / Color */}
+          {product.conditionOptions?.length ? (
             <div className="pd__picker">
               <h4>Condition</h4>
-              <div className="pill-row">                {product.conditionOptions.map((c: any, i: any) => {                  const active = selectedCondition?.label === c.label;
+              <div className="pill-row">
+                {product.conditionOptions.map((c: any, i: any) => {
+                  const active = selectedCondition?.label === c.label;
                   return (
                     <button
                       key={c._id || i}
@@ -334,10 +373,13 @@ const ProductDetails = () => {
                 })}
               </div>
             </div>
-          ) : null}          {product.storageOptions?.length ? (
+          ) : null}
+          {product.storageOptions?.length ? (
             <div className="pd__picker">
               <h4>Storage</h4>
-              <div className="pill-row">                {product.storageOptions.map((s: any, i: any) => {                  const active = selectedStorage?.size === s.size;
+              <div className="pill-row">
+                {product.storageOptions.map((s: any, i: any) => {
+                  const active = selectedStorage?.size === s.size;
                   return (
                     <button
                       key={i}
@@ -353,10 +395,13 @@ const ProductDetails = () => {
                 })}
               </div>
             </div>
-          ) : null}          {product.colorOptions?.length ? (
+          ) : null}
+          {product.colorOptions?.length ? (
             <div className="pd__picker">
               <h4>Color</h4>
-              <div className="color-row">                {product.colorOptions.map((c: any, i: any) => {                  const active = selectedColor?.name === c.name;
+              <div className="color-row">
+                {product.colorOptions.map((c: any, i: any) => {
+                  const active = selectedColor?.name === c.name;
                   return (
                     <button
                       key={i}
@@ -408,9 +453,11 @@ const ProductDetails = () => {
             <div className="row irow">
               <Truck size={ICON_SIZE} />
               <div>
-                <div className="bold">                  {product.availability?.inStock ? 'Free Delivery' : 'Out of Stock'}
+                <div className="bold">
+                  {product.availability?.inStock ? 'Free Delivery' : 'Out of Stock'}
                 </div>
-                <div className="muted">                  {product.availability?.estimatedDelivery || 'Delivered in 2-3 business days'}
+                <div className="muted">
+                  {product.availability?.estimatedDelivery || 'Delivered in 2-3 business days'}
                 </div>
               </div>
             </div>
@@ -458,7 +505,8 @@ const ProductDetails = () => {
           <button
             className={activeTab === 'reviews' ? 'active' : ''}
             onClick={() => setActiveTab('reviews')}
-          >            <Star size={16} /> Reviews ({product.totalReviews || 4})
+          >
+            <Star size={16} /> Reviews ({product.totalReviews || 4})
           </button>
           <button
             className={activeTab === 'warranty' ? 'active' : ''}
@@ -488,32 +536,41 @@ const ProductDetails = () => {
               <SpecTile
                 icon={<Monitor size={ICON_SIZE} />}
                 label="Screen Size"
-                value={                  product.productDetails?.display?.size ||                  product.topSpecs?.screenSize ||
+                value={
+                  product.productDetails?.display?.size ||
+                  product.topSpecs?.screenSize ||
                   '6.7 inches'
                 }
               />
               <SpecTile
                 icon={<Cpu size={ICON_SIZE} />}
                 label="Chipset"
-                value={                  product.productDetails?.performance?.chipset ||                  product.topSpecs?.chipset ||
+                value={
+                  product.productDetails?.performance?.chipset ||
+                  product.topSpecs?.chipset ||
                   'Google Tensor G3'
                 }
               />
               <SpecTile
                 icon={<HardDrive size={ICON_SIZE} />}
-                label="Pixel Density"                value={product.topSpecs?.pixelDensity || '490 ppi'}
+                label="Pixel Density"
+                value={product.topSpecs?.pixelDensity || '490 ppi'}
               />
               <SpecTile
                 icon={<Smartphone size={ICON_SIZE} />}
                 label="Network"
-                value={                  product.productDetails?.networkConnectivity?.networkSupport ||                  product.topSpecs?.networkSupport ||
+                value={
+                  product.productDetails?.networkConnectivity?.networkSupport ||
+                  product.topSpecs?.networkSupport ||
                   '5G'
                 }
               />
               <SpecTile
                 icon={<Smartphone size={ICON_SIZE} />}
                 label="SIM Slots"
-                value={                  product.productDetails?.networkConnectivity?.simSlots ||                  product.topSpecs?.simSlots ||
+                value={
+                  product.productDetails?.networkConnectivity?.simSlots ||
+                  product.topSpecs?.simSlots ||
                   'Dual SIM, GSM+GSM'
                 }
               />
@@ -525,7 +582,12 @@ const ProductDetails = () => {
               icon={<Monitor size={ICON_SIZE} />}
               open={openKey === 'display'}
               onToggle={() => setOpenKey(openKey === 'display' ? '' : 'display')}
-              rows={[                ['Screen Size', product.productDetails?.display?.size || '6.7 inches'],                ['Type', product.productDetails?.display?.technology || 'LTPO OLED'],                ['Resolution', product.productDetails?.display?.resolution || '2992 × 1344'],                ['Refresh Rate', product.productDetails?.display?.refreshRate || '120Hz'],                ['Peak Brightness', product.topSpecs?.pixelDensity || '2400 nits peak'],
+              rows={[
+                ['Screen Size', product.productDetails?.display?.size || '6.7 inches'],
+                ['Type', product.productDetails?.display?.technology || 'LTPO OLED'],
+                ['Resolution', product.productDetails?.display?.resolution || '2992 × 1344'],
+                ['Refresh Rate', product.productDetails?.display?.refreshRate || '120Hz'],
+                ['Peak Brightness', product.topSpecs?.pixelDensity || '2400 nits peak'],
               ]}
             />
             <Acc
@@ -533,7 +595,13 @@ const ProductDetails = () => {
               icon={<Cpu size={ICON_SIZE} />}
               open={openKey === 'performance'}
               onToggle={() => setOpenKey(openKey === 'performance' ? '' : 'performance')}
-              rows={[                ['Chipset', product.productDetails?.performance?.chipset || 'Google Tensor G3'],                ['GPU', product.productDetails?.performance?.gpu || 'Immortalis-G715s MC10'],                ['OS', product.productDetails?.performance?.os || 'Android 14'],                ['Architecture', product.productDetails?.performance?.architecture || 'ARM64'],                ['RAM Type', product.productDetails?.memoryStorage?.ramType || 'LPDDR5X'],                ['Storage Type', product.productDetails?.memoryStorage?.romType || 'UFS 3.1'],
+              rows={[
+                ['Chipset', product.productDetails?.performance?.chipset || 'Google Tensor G3'],
+                ['GPU', product.productDetails?.performance?.gpu || 'Immortalis-G715s MC10'],
+                ['OS', product.productDetails?.performance?.os || 'Android 14'],
+                ['Architecture', product.productDetails?.performance?.architecture || 'ARM64'],
+                ['RAM Type', product.productDetails?.memoryStorage?.ramType || 'LPDDR5X'],
+                ['Storage Type', product.productDetails?.memoryStorage?.romType || 'UFS 3.1'],
               ]}
             />
             <Acc
@@ -543,12 +611,16 @@ const ProductDetails = () => {
               onToggle={() => setOpenKey(openKey === 'camera' ? '' : 'camera')}
               rows={[
                 [
-                  'Rear Setup',                  product.productDetails?.rearCamera?.setup || '50MP OIS + 48MP + 48MP',
-                ],                ['Front', product.productDetails?.frontCamera?.resolution || '10.5MP'],
+                  'Rear Setup',
+                  product.productDetails?.rearCamera?.setup || '50MP OIS + 48MP + 48MP',
+                ],
+                ['Front', product.productDetails?.frontCamera?.resolution || '10.5MP'],
                 [
-                  'Video',                  product.productDetails?.rearCamera?.videoRecording?.join(', ') ||
+                  'Video',
+                  product.productDetails?.rearCamera?.videoRecording?.join(', ') ||
                     '4K60, 1080p240',
-                ],                ['Flash', product.productDetails?.rearCamera?.flash || 'LED'],
+                ],
+                ['Flash', product.productDetails?.rearCamera?.flash || 'LED'],
               ]}
             />
             <Acc
@@ -556,7 +628,10 @@ const ProductDetails = () => {
               icon={<Battery size={ICON_SIZE} />}
               open={openKey === 'battery'}
               onToggle={() => setOpenKey(openKey === 'battery' ? '' : 'battery')}
-              rows={[                ['Capacity', product.productDetails?.battery?.capacity || '5000 mAh'],                ['Fast Charging', product.productDetails?.battery?.fastCharging || '30W'],                ['Wireless', product.productDetails?.battery?.wirelessCharging || '23W'],
+              rows={[
+                ['Capacity', product.productDetails?.battery?.capacity || '5000 mAh'],
+                ['Fast Charging', product.productDetails?.battery?.fastCharging || '30W'],
+                ['Wireless', product.productDetails?.battery?.wirelessCharging || '23W'],
               ]}
             />
             <Acc
@@ -566,11 +641,17 @@ const ProductDetails = () => {
               onToggle={() => setOpenKey(openKey === 'connectivity' ? '' : 'connectivity')}
               rows={[
                 [
-                  'Network',                  product.productDetails?.networkConnectivity?.networkSupport || '5G / 4G',
-                ],                ['Wi-Fi', product.productDetails?.networkConnectivity?.wifi || 'Wi-Fi 6E'],                ['Bluetooth', product.productDetails?.networkConnectivity?.bluetooth || '5.3'],                ['NFC', product.productDetails?.networkConnectivity?.nfc ? 'Yes' : 'No'],
+                  'Network',
+                  product.productDetails?.networkConnectivity?.networkSupport || '5G / 4G',
+                ],
+                ['Wi-Fi', product.productDetails?.networkConnectivity?.wifi || 'Wi-Fi 6E'],
+                ['Bluetooth', product.productDetails?.networkConnectivity?.bluetooth || '5.3'],
+                ['NFC', product.productDetails?.networkConnectivity?.nfc ? 'Yes' : 'No'],
                 [
-                  'GPS',                  product.productDetails?.networkConnectivity?.gps || 'GPS, GLONASS, Galileo',
-                ],                ['SIM Slots', product.productDetails?.networkConnectivity?.simSlots || 'Dual SIM'],
+                  'GPS',
+                  product.productDetails?.networkConnectivity?.gps || 'GPS, GLONASS, Galileo',
+                ],
+                ['SIM Slots', product.productDetails?.networkConnectivity?.simSlots || 'Dual SIM'],
               ]}
             />
             <Acc
@@ -578,17 +659,21 @@ const ProductDetails = () => {
               icon={<Smartphone size={ICON_SIZE} />}
               open={openKey === 'design'}
               onToggle={() => setOpenKey(openKey === 'design' ? '' : 'design')}
-              rows={[                ['Weight', product.productDetails?.design?.weight || '210 g'],
+              rows={[
+                ['Weight', product.productDetails?.design?.weight || '210 g'],
                 [
-                  'Build',                  product.productDetails?.design?.build || 'Aluminum, Gorilla Glass Victus 2',
+                  'Build',
+                  product.productDetails?.design?.build || 'Aluminum, Gorilla Glass Victus 2',
                 ],
                 [
-                  'Colors',                  (product.productDetails?.design?.colors || ['Obsidian', 'Porcelain', 'Bay']).join(
+                  'Colors',
+                  (product.productDetails?.design?.colors || ['Obsidian', 'Porcelain', 'Bay']).join(
                     ', '
                   ),
                 ],
                 [
-                  'Fingerprint',                  product.productDetails?.sensorsMisc?.fingerprintScanner ? 'Yes' : 'No',
+                  'Fingerprint',
+                  product.productDetails?.sensorsMisc?.fingerprintScanner ? 'Yes' : 'No',
                 ],
               ]}
             />
@@ -598,8 +683,10 @@ const ProductDetails = () => {
         {activeTab === 'reviews' && (
           <div className="pd__reviews">
             <div className="summary">
-              <div className="score">                <div className="big">{product.averageRating || '5.0'}</div>
-                <div className="stars big">                  {renderStars(Math.round(product.averageRating || 5))}
+              <div className="score">
+                <div className="big">{product.averageRating || '5.0'}</div>
+                <div className="stars big">
+                  {renderStars(Math.round(product.averageRating || 5))}
                 </div>
                 <div className="muted">out of 5</div>
               </div>
@@ -732,9 +819,11 @@ const ProductDetails = () => {
         )}
       </section>
 
-      {/* Description */}      {product.description && (
+      {/* Description */}
+      {product.description && (
         <section className="pd__desc card">
-          <h3>About this product</h3>          <p>{product.description}</p>
+          <h3>About this product</h3>
+          <p>{product.description}</p>
         </section>
       )}
     </div>
@@ -742,11 +831,7 @@ const ProductDetails = () => {
 };
 
 /* Helper subcomponents (UI only) */
-const SpecTile = ({
-  icon,
-  label,
-  value
-}: any) => (
+const SpecTile = ({ icon, label, value }: any) => (
   <div className="ts">
     <div className="ico">{icon}</div>
     <div className="txt">
@@ -756,13 +841,7 @@ const SpecTile = ({
   </div>
 );
 
-const Acc = ({
-  label,
-  icon,
-  open,
-  onToggle,
-  rows
-}: any) => (
+const Acc = ({ label, icon, open, onToggle, rows }: any) => (
   <div className="acc">
     <button className="acc__head" onClick={onToggle}>
       <div className="irow">
@@ -772,7 +851,8 @@ const Acc = ({
       {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
     </button>
     {open && (
-      <div className="kv-table">        {rows.map(([k, v], i: any) => (
+      <div className="kv-table">
+        {rows.map(([k, v], i: any) => (
           <div className="kv-row" key={i}>
             <div className="k">{k}</div>
             <div className="v">{v}</div>
@@ -783,11 +863,7 @@ const Acc = ({
   </div>
 );
 
-const Offer = ({
-  icon,
-  title,
-  desc
-}: any) => (
+const Offer = ({ icon, title, desc }: any) => (
   <div className="offer">
     <div className="ico">{icon}</div>
     <div className="txt">
@@ -797,12 +873,7 @@ const Offer = ({
   </div>
 );
 
-const FaqItem = ({
-  q,
-  a,
-  open,
-  onToggle
-}: any) => (
+const FaqItem = ({ q, a, open, onToggle }: any) => (
   <div className="acc">
     <button className="acc__head" onClick={onToggle}>
       <span>{q}</span>

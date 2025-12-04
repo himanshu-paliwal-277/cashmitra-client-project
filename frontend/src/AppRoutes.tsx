@@ -46,8 +46,8 @@ const Checkout = lazy(() => import('./pages/buy/Checkout'));
 const OrderConfirmation = lazy(() => import('./pages/buy/OrderConfirmation'));
 
 // Account Pages (Lazy)
-const Profile = lazy(() => import('./pages/account/Profile'));
-const Orders = lazy(() => import('./pages/account/Orders'));
+const MyProfile = lazy(() => import('./pages/account/MyProfile'));
+const MyOrders = lazy(() => import('./pages/account/MyOrders'));
 const UserOrderDetails = lazy(() => import('./components/UserOrderDetails'));
 const Wallet = lazy(() => import('./pages/account/Wallet'));
 const KYC = lazy(() => import('./pages/account/KYC'));
@@ -237,8 +237,8 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
         <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
 
         {/* Account Pages */}
-        <Route path="/account/profile" element={<Profile />} />
-        <Route path="/account/orders" element={<Orders />} />
+        <Route path="/account/profile" element={<MyProfile />} />
+        <Route path="/account/orders" element={<MyOrders />} />
         <Route path="/account/orders/:orderId" element={<UserOrderDetails />} />
         <Route path="/account/wallet" element={<Wallet />} />
         <Route path="/account/kyc" element={<KYC />} />

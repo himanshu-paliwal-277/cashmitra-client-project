@@ -12,7 +12,7 @@ const AboutMission = () => {
         ></div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="main-container relative z-10">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full border border-primary-100 mb-4">
@@ -31,7 +31,7 @@ const AboutMission = () => {
         </div>
 
         {/* Mission & Vision Cards - Enhanced */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-16 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 mb-16 w-full">
           {/* Mission Card */}
           <div className="group relative">
             {/* Outer Glow */}
@@ -153,7 +153,7 @@ const AboutMission = () => {
         </div>
 
         {/* Core Values - Premium Grid */}
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full mx-auto">
           <div className="text-center mb-12">
             <h3 className="text-2xl md:text-3xl font-bold text-grey-900 mb-3">Our Core Values</h3>
             <p className="text-grey-600">The principles that guide everything we do</p>

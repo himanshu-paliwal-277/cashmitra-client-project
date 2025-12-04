@@ -40,8 +40,8 @@ const Contact = () => {
 
         {/* Form & Info Section */}
         <section className="py-16 md:py-24 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-7xl mx-auto">
+          <div className="main-container">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
               {/* Contact Form */}
               <div>
                 <ContactForm />

@@ -44,7 +44,7 @@ const AboutHero = () => {
         <div className="absolute bottom-1/4 right-1/3 w-5 h-5 bg-info-400 rounded-full animate-float animation-delay-2000"></div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="main-container relative z-10">
         <div className="max-w-5xl mx-auto text-center">
           {/* Animated Badge */}
           <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-primary-100 mb-8 hover:scale-105 transition-transform duration-300 cursor-pointer group">

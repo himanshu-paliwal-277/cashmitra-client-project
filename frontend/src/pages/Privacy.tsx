@@ -38,20 +38,16 @@ const Privacy = () => {
         <PrivacyHero />
 
         {/* Main Content */}
-        <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-              <div className="grid lg:grid-cols-12 gap-8">
-                {/* Table of Contents - Sidebar */}
-                <div className="lg:col-span-4">
-                  <PrivacyTableOfContents />
-                </div>
+        <section className="py-12 md:py-16 main-container">
+          <div className="grid lg:grid-cols-12 gap-8">
+            {/* Table of Contents - Sidebar */}
+            <div className="lg:col-span-4">
+              <PrivacyTableOfContents />
+            </div>
 
-                {/* Privacy Content - Main */}
-                <div className="lg:col-span-8">
-                  <PrivacyContent />
-                </div>
-              </div>
+            {/* Privacy Content - Main */}
+            <div className="lg:col-span-8">
+              <PrivacyContent />
             </div>
           </div>
         </section>

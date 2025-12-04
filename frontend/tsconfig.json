@@ -22,8 +22,17 @@
     "allowJs": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+
+    /* 👇 Required for shadcn UI */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
+
+  /* 👇 Include only frontend src */
   "include": ["src"],
+
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -101,7 +101,7 @@ const AboutFeatures = () => {
         <div className="absolute top-1/4 right-0 w-96 h-96 bg-gradient-to-br from-primary-200 to-accent-200 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="main-container relative z-10">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full border border-primary-100 mb-4 hover:scale-105 transition-transform duration-300">
@@ -120,7 +120,7 @@ const AboutFeatures = () => {
         </div>
 
         {/* Features Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-12 ">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             const isActive = activeFeature === index;

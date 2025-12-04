@@ -216,13 +216,13 @@ const Header = () => {
                 }`}
               >
                 <button
-                  onClick={() => handleLinkClick('/profile')}
+                  onClick={() => handleLinkClick('/account/profile')}
                   className="w-full flex items-center gap-3 px-4 py-3 border-none bg-transparent text-gray-800 text-sm font-medium text-left cursor-pointer transition-colors hover:bg-gray-50"
                 >
                   <Settings size={18} /> My Profile
                 </button>
                 <button
-                  onClick={() => handleLinkClick('/orders')}
+                  onClick={() => handleLinkClick('/account/orders')}
                   className="w-full flex items-center gap-3 px-4 py-3 border-none bg-transparent text-gray-800 text-sm font-medium text-left cursor-pointer transition-colors hover:bg-gray-50"
                 >
                   <Package size={18} /> My Orders

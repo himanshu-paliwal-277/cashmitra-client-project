@@ -326,11 +326,11 @@ class SellService {
   }
 
   // Get sell products by category
-  async getSellProductsByCategory(categoryName: any, params = {}) {
+  async getSellProductsByCategory(categoryName, params = {}) {
     try {
       const queryString = new URLSearchParams(params).toString();
-      const response = await api.get(`/sell-products/category/${categoryName}?${queryString}`);
-      return response.data;
+      const res = await api.get(`/sell-products/category/${categoryName}?${queryString}`);
+      return res.data; // return final data only
     } catch (error) {
       console.error('Error fetching sell products by category:', error);
       throw error;
@@ -370,12 +370,13 @@ class SellService {
 
         // Return grouped structure by section
         return {
-          defects: defects.flatMap((section: any) => section.defects.map((defect: any) => ({
-            ...defect,
+          defects: defects.flatMap((section: any) =>
+            section.defects.map((defect: any) => ({
+              ...defect,
 
-            // Map title to name for UI compatibility
-            name: defect.title || defect.name
-          }))
+              // Map title to name for UI compatibility
+              name: defect.title || defect.name,
+            }))
           ),
           grouped: defects.reduce((acc: any, section: any) => {
             acc[section._id] = section.defects;
@@ -472,4 +473,5 @@ export default sellService;
 export { SellService };
 
 // Export individual methods for direct import
-export const createSellOfferSession = (offerData: any) => sellService.createSellOfferSession(offerData);
+export const createSellOfferSession = (offerData: any) =>
+  sellService.createSellOfferSession(offerData);

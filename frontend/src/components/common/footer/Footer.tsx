@@ -18,13 +18,11 @@ const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-4 mt-auto main-container">
       {/* ===== GRID ===== */}
-      <div className="grid grid-cols-1 gap-8 mb-12 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
         {/* Company Info */}
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2 text-2xl font-bold mb-4">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">
-              C
-            </div>
+          <div className="flex items-center gap-2 text-2xl font-bold">
+            <img src="/main-logo.png" alt="Cashmitra Logo" className="h-8 w-auto lg:h-10" />
             <span>Cashmitra</span>
           </div>
 
@@ -94,22 +92,22 @@ const Footer = () => {
                 Sell Laptop
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 className="text-gray-300 text-sm hover:text-primary-light"
                 to="/sell/price-calculator"
               >
                 Price Calculator
               </Link>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <Link
                 className="text-gray-300 text-sm hover:text-primary-light"
                 to="/sell/how-it-works"
               >
                 How It Works
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
 
@@ -141,19 +139,19 @@ const Footer = () => {
                 Buy Laptop
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 className="text-gray-300 text-sm hover:text-primary-light"
                 to="/buy/refurbished"
               >
                 Refurbished Devices
               </Link>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <Link className="text-gray-300 text-sm hover:text-primary-light" to="/buy/warranty">
                 Warranty Info
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
 
@@ -171,21 +169,21 @@ const Footer = () => {
                 Contact Us
               </Link>
             </li>
-            <li>
-              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/orders">
+            {/* <li>
+              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/account/orders">
                 Track Order
               </Link>
-            </li>
+            </li> */}
             <li>
-              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/returns">
+              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/returns-refund">
                 Returns & Refunds
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link className="text-gray-300 text-sm hover:text-primary-light" to="/faq">
                 FAQ
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
 
@@ -198,26 +196,26 @@ const Footer = () => {
                 About Us
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link className="text-gray-300 text-sm hover:text-primary-light" to="/careers">
                 Careers
               </Link>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <Link className="text-gray-300 text-sm hover:text-primary-light" to="/partner">
                 Partner With Us
               </Link>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <Link className="text-gray-300 text-sm hover:text-primary-light" to="/press">
                 Press
               </Link>
-            </li>
-            <li>
+            </li> */}
+            {/* <li>
               <Link className="text-gray-300 text-sm hover:text-primary-light" to="/blog">
                 Blog
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>
@@ -249,12 +247,12 @@ const Footer = () => {
           <Link className="text-gray-400 text-sm hover:text-primary-light" to="/terms">
             Terms of Service
           </Link>
-          <Link className="text-gray-400 text-sm hover:text-primary-light" to="/cookies">
+          {/* <Link className="text-gray-400 text-sm hover:text-primary-light" to="/cookies">
             Cookie Policy
-          </Link>
-          <Link className="text-gray-400 text-sm hover:text-primary-light" to="/security">
+          </Link> */}
+          {/* <Link className="text-gray-400 text-sm hover:text-primary-light" to="/security">
             Security
-          </Link>
+          </Link> */}
         </div>
       </div>
     </footer>

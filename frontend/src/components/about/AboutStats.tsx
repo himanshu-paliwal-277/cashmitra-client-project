@@ -74,7 +74,7 @@ const AboutStats = () => {
         <div className="absolute bottom-10 right-10 w-64 h-64 bg-accent-200 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="main-container relative z-10">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full border border-primary-100 mb-4">
