@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';import styled, { keyframes } from 'styled-components';
+import React, { useState, useEffect } from 'react';
 import useAdminBrands from '../../hooks/useAdminBrands';
 import adminService from '../../services/adminService';
+import Card from '../../components/ui/Card';
 import {
   Tag,
   Plus,
@@ -14,455 +15,39 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 
-// Keyframes for loading spinner
-const spin = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
-
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-  }
-`;
-
-const FilterSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  min-width: 250px;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const FilterSelect = styled.select`
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  min-width: 150px;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-  }
-`;
-
-const BrandsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const BrandCard = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const BrandLogo = styled.div`
-  width: 80px;
-  height: 80px;
-  background: #f3f4f6;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-`;
-
-const BrandInfo = styled.div`
-  text-align: center;
-  margin-bottom: 1rem;
-`;
-
-const BrandName = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 0.5rem 0;
-`;
-
-const BrandDescription = styled.p`
-  color: #6b7280;
-  font-size: 0.875rem;
-  margin: 0;
-  line-height: 1.4;
-`;
-
-const CategoriesContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  justify-content: center;
-`;
-
-const CategoryTag = styled.span`
-  background: #e0f2fe;
-  color: #0277bd;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: capitalize;
-`;
-
-const BrandStats = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: #f9fafb;
-  border-radius: 0.5rem;
-`;
-
-const StatItem = styled.div`
-  text-align: center;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1f2937;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-  margin-top: 0.25rem;
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: ${(props: any) => props.active ? '#dcfce7' : '#fee2e2'};
-  color: ${(props: any) => props.active ? '#166534' : '#dc2626'};
-  display: inline-block;
-  margin-bottom: 1rem;
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-`;
-
-const IconButton = styled.button`
-  background: ${(props: any) => props.primary ? '#3b82f6' : props.danger ? '#ef4444' : '#6b7280'};
-  color: white;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  transition: all 0.2s;
-
-  &:hover {
-    opacity: 0.9;
-    transform: scale(1.05);
-  }
-`;
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  padding: 2rem;
-  max-width: 500px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-
-  &:hover {
-    background: #f3f4f6;
-  }
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-`;
-
-const Label = styled.label`
-  display: block;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.5rem;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  min-height: 100px;
-  resize: vertical;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-  }
-`;
-
-const FileInput = styled.input`
-  display: none;
-`;
-
-const FileInputLabel = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  border: 2px dashed #d1d5db;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #6b7280;
-
-  &:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
-  }
-`;
-
-const LogoPreview = styled.div`
-  width: 100px;
-  height: 100px;
-  background: #f3f4f6;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 1rem auto;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-`;
-
-const ModalActions = styled.div`
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 2rem;
-`;
-
-const Button = styled.button`
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  ${(props: any) => props.variant === 'primary'
-  ? `
-background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-color: white;
-
-&:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+interface Brand {
+  _id: string;
+  brand: string;
+  category: string;
+  description?: string;
+  website?: string;
+  isActive: boolean;
+  logo?: string;
+  categories?: string[];
+  productCount?: number;
+  modelCount?: number;
 }
-`
-  : `
-background: #f3f4f6;
-color: #374151;
 
-&:hover:not(:disabled) {
-  background: #e5e7eb;
+interface FormData {
+  name: string;
+  category: string;
+  description: string;
+  website: string;
+  isActive: boolean;
+  logo: File | null;
 }
-`}
 
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
+interface FormErrors {
+  name?: string;
+  category?: string;
+  description?: string;
+  website?: string;
+  submit?: string;
+}
 
-const ErrorMessage = styled.div`
-  color: #dc2626;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-
-const SuccessMessage = styled.div`
-  color: #059669;
-  font-size: 0.875rem;
-  padding: 0.75rem;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  border-radius: 0.375rem;
-  margin-bottom: 1rem;
-`;
-
-const AlertMessage = styled.div`
-  color: #dc2626;
-  font-size: 0.875rem;
-  padding: 0.75rem;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 0.375rem;
-  margin-bottom: 1rem;
-`;
-
-const Brands = () => {
-  const [brands, setBrands] = useState([]);
-  const [categories, setCategories] = useState([]);
+const Brands: React.FC = () => {
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -471,12 +56,12 @@ const Brands = () => {
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
   const [showModal, setShowModal] = useState(false);
-  const [editingBrand, setEditingBrand] = useState(null);
+  const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [logoPreview, setLogoPreview] = useState('');
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     category: '',
     description: '',
@@ -508,7 +93,9 @@ const Brands = () => {
         const response = await adminService.getCategories();
         if (response.data && Array.isArray(response.data)) {
           // Extract category names for brand category dropdown
-          const categoryNames = response.data.filter((cat: any) => cat.isActive).map((cat: any) => cat.name);
+          const categoryNames = response.data
+            .filter((cat: { isActive: boolean }) => cat.isActive)
+            .map((cat: { name: string }) => cat.name);
 
           setCategories(
             categoryNames.length > 0 ? categoryNames : ['Mobile Phones', 'Tablets', 'Laptops']
@@ -516,7 +103,8 @@ const Brands = () => {
         }
       } catch (error) {
         console.error('Failed to fetch categories:', error);
-        // Fallback to hardcoded categories if API fails        setCategories(['Mobile Phones', 'Tablets', 'Laptops']);
+        // Fallback to hardcoded categories if API fails
+        setCategories(['Mobile Phones', 'Tablets', 'Laptops']);
       } finally {
         setCategoriesLoading(false);
       }
@@ -526,26 +114,31 @@ const Brands = () => {
   }, []);
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: FormErrors = {};
 
-    if (!formData.name.trim()) {      newErrors.name = 'Brand name is required';
-    } else if (formData.name.length < 2) {      newErrors.name = 'Brand name must be at least 2 characters';
+    if (!formData.name.trim()) {
+      newErrors.name = 'Brand name is required';
+    } else if (formData.name.length < 2) {
+      newErrors.name = 'Brand name must be at least 2 characters';
     }
 
-    if (!formData.category) {      newErrors.category = 'Category is required';
+    if (!formData.category) {
+      newErrors.category = 'Category is required';
     }
 
-    if (formData.website && !isValidUrl(formData.website)) {      newErrors.website = 'Please enter a valid URL';
+    if (formData.website && !isValidUrl(formData.website)) {
+      newErrors.website = 'Please enter a valid URL';
     }
 
-    if (formData.description && formData.description.length > 500) {      newErrors.description = 'Description must be less than 500 characters';
+    if (formData.description && formData.description.length > 500) {
+      newErrors.description = 'Description must be less than 500 characters';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const isValidUrl = (string: any) => {
+  const isValidUrl = (string: string) => {
     try {
       new URL(string);
       return true;
@@ -554,7 +147,7 @@ const Brands = () => {
     }
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -566,7 +159,7 @@ const Brands = () => {
 
     try {
       // Prepare data as regular object, not FormData
-      const submitData = {
+      const submitData: Record<string, unknown> = {
         brand: formData.name.trim(), // This will be used as newBrandName
         category: formData.category,
         description: formData.description?.trim() || '',
@@ -575,7 +168,9 @@ const Brands = () => {
       };
 
       if (editingBrand) {
-        // For editing, we need to pass the current brand name for URL and new name in data        submitData.currentBrandName = editingBrand.brand;        await editBrand(editingBrand.brand, submitData);
+        // For editing, we need to pass the current brand name for URL and new name in data
+        submitData.currentBrandName = editingBrand.brand;
+        await editBrand(editingBrand.brand, submitData);
       } else {
         await addBrand(submitData);
       }
@@ -584,13 +179,17 @@ const Brands = () => {
       setEditingBrand(null);
       resetForm();
     } catch (error) {
-      console.error('Error saving brand:', error);      setErrors({ submit: error.message || 'Failed to save brand. Please try again.' });
+      console.error('Error saving brand:', error);
+      setErrors({
+        submit:
+          (error as { message?: string }).message || 'Failed to save brand. Please try again.',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleDelete = async (brandId: any) => {
+  const handleDelete = async (brandId: string) => {
     if (window.confirm('Are you sure you want to delete this brand?')) {
       try {
         await removeBrand(brandId);
@@ -600,7 +199,7 @@ const Brands = () => {
     }
   };
 
-  const handleEdit = (brand: any) => {
+  const handleEdit = (brand: Brand) => {
     setEditingBrand(brand);
     setFormData({
       name: brand.brand || '',
@@ -614,11 +213,12 @@ const Brands = () => {
     setShowModal(true);
   };
 
-  const handleLogoChange = (e: any) => {
-    const file = e.target.files[0];
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       setFormData({ ...formData, logo: file });
-      const reader = new FileReader();      reader.onload = e => setLogoPreview(e.target.result);
+      const reader = new FileReader();
+      reader.onload = (e) => setLogoPreview(e.target?.result as string);
       reader.readAsDataURL(file);
     }
   };
@@ -637,125 +237,180 @@ const Brands = () => {
     setIsSubmitting(false);
   };
 
-  const handleInputChange = (field: any, value: any) => {
+  const handleInputChange = (field: keyof FormData, value: string | boolean) => {
     setFormData({ ...formData, [field]: value });
-    // Clear error when user starts typing    if (errors[field]) {
+    // Clear error when user starts typing
+    if (errors[field as keyof FormErrors]) {
       setErrors({ ...errors, [field]: '' });
     }
   };
 
   const filteredAndSortedBrands = React.useMemo(() => {
-    let filtered = brands.filter(brand => {
-      const matchesSearch =        brand.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||        brand.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    let filtered = brands.filter((brand) => {
+      const matchesSearch =
+        brand.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        brand.description?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus =
-        !statusFilter ||        (statusFilter === 'active' && brand.isActive !== false) ||        (statusFilter === 'inactive' && brand.isActive === false);      const matchesCategory = !categoryFilter || brand.category === categoryFilter;
+        !statusFilter ||
+        (statusFilter === 'active' && brand.isActive !== false) ||
+        (statusFilter === 'inactive' && brand.isActive === false);
+
+      const matchesCategory = !categoryFilter || brand.category === categoryFilter;
 
       return matchesSearch && matchesStatus && matchesCategory;
     });
 
     // Sort the filtered results
     filtered.sort((a, b) => {
-      let aValue, bValue;
+      let aValue: string | number, bValue: string | number;
 
       switch (sortBy) {
-        case 'name':          aValue = a.brand?.toLowerCase() || '';          bValue = b.brand?.toLowerCase() || '';
+        case 'name':
+          aValue = a.brand?.toLowerCase() || '';
+          bValue = b.brand?.toLowerCase() || '';
           break;
-        case 'category':          aValue = a.category?.toLowerCase() || '';          bValue = b.category?.toLowerCase() || '';
+        case 'category':
+          aValue = a.category?.toLowerCase() || '';
+          bValue = b.category?.toLowerCase() || '';
           break;
-        case 'products':          aValue = a.productCount || 0;          bValue = b.productCount || 0;
+        case 'products':
+          aValue = a.productCount || 0;
+          bValue = b.productCount || 0;
           break;
-        case 'models':          aValue = a.modelCount || 0;          bValue = b.modelCount || 0;
+        case 'models':
+          aValue = a.modelCount || 0;
+          bValue = b.modelCount || 0;
           break;
-        case 'status':          aValue = a.isActive !== false ? 1 : 0;          bValue = b.isActive !== false ? 1 : 0;
+        case 'status':
+          aValue = a.isActive !== false ? 1 : 0;
+          bValue = b.isActive !== false ? 1 : 0;
           break;
-        default:          aValue = a.brand?.toLowerCase() || '';          bValue = b.brand?.toLowerCase() || '';
+        default:
+          aValue = a.brand?.toLowerCase() || '';
+          bValue = b.brand?.toLowerCase() || '';
       }
 
       if (typeof aValue === 'string') {
-        return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        return sortOrder === 'asc' ? aValue.localeCompare(bValue as string) : (bValue as string).localeCompare(aValue);
       } else {
-        return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+        return sortOrder === 'asc' ? aValue - (bValue as number) : (bValue as number) - aValue;
       }
     });
 
     return filtered;
   }, [brands, searchTerm, statusFilter, categoryFilter, sortBy, sortOrder]);
 
-  const availableCategories = React.useMemo(() => {    const categories = [...new Set(brands.map(brand => brand.category).filter(Boolean))];
+  const availableCategories = React.useMemo(() => {
+    const categories = [...new Set(brands.map((brand) => brand.category).filter(Boolean))];
     return categories.sort();
   }, [brands]);
 
   if (loading) {
     return (
-      <Container>
-        <div style={{ textAlign: 'center', padding: '4rem' }}>
-          <Tag size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
-          <p>Loading brands...</p>
+      <div className="p-8 bg-slate-50 min-h-screen">
+        <div className="text-center py-16">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading brands...</p>
         </div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <Title>
-          <Tag size={32} />
+    <div className="p-4 sm:p-6 lg:p-8 bg-slate-50 min-h-screen">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-3">
+          <Tag className="w-8 h-8" />
           Brands Management
-        </Title>
-        <ActionButton
+        </h1>
+        <button
           onClick={() => {
             resetForm();
             setShowModal(true);
           }}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold rounded-lg hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/40 transition-all duration-200"
         >
-          <Plus size={20} />
+          <Plus className="w-5 h-5" />
           Add Brand
-        </ActionButton>
-      </Header>
+        </button>
+      </div>
 
-      <FilterSection>
-        <SearchInput
-          type="text"
-          placeholder="Search brands by name or description..."
-          value={searchTerm}
-          onChange={(e: any) => setSearchTerm(e.target.value)}
-        />
+      {/* Filter Section */}
+      <Card className="mb-8">
+        <div className="p-4 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Search Input */}
+            <div className="sm:col-span-2 lg:col-span-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search brands..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
 
-        <FilterSelect value={statusFilter} onChange={(e: any) => setStatusFilter(e.target.value)}>
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </FilterSelect>
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            >
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
 
-        <FilterSelect value={categoryFilter} onChange={(e: any) => setCategoryFilter(e.target.value)}>
-          <option value="">All Categories</option>
-          {availableCategories.map(category => (
-            <option key={category} value={category}>
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </option>
-          ))}
-        </FilterSelect>
+            {/* Category Filter */}
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            >
+              <option value="">All Categories</option>
+              {availableCategories.map((category) => (
+                <option key={category} value={category}>
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </option>
+              ))}
+            </select>
 
-        <FilterSelect value={sortBy} onChange={(e: any) => setSortBy(e.target.value)}>
-          <option value="name">Sort by Name</option>
-          <option value="category">Sort by Category</option>
-          <option value="products">Sort by Products</option>
-          <option value="models">Sort by Models</option>
-          <option value="status">Sort by Status</option>
-        </FilterSelect>
+            {/* Sort By */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            >
+              <option value="name">Sort by Name</option>
+              <option value="category">Sort by Category</option>
+              <option value="products">Sort by Products</option>
+              <option value="models">Sort by Models</option>
+              <option value="status">Sort by Status</option>
+            </select>
 
-        <FilterSelect value={sortOrder} onChange={(e: any) => setSortOrder(e.target.value)}>
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
-        </FilterSelect>
-      </FilterSection>
+            {/* Sort Order */}
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            >
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+          </div>
+        </div>
+      </Card>
 
+      {/* Brands Grid */}
       {filteredAndSortedBrands.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '4rem' }}>
-          <Tag size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
-          <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+        <div className="text-center py-16">
+          <Tag className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-600 text-lg mb-4">
             {searchTerm || statusFilter || categoryFilter
               ? 'No brands match your filters'
               : 'No brands found'}
@@ -767,206 +422,303 @@ const Brands = () => {
                 setStatusFilter('');
                 setCategoryFilter('');
               }}
-              style={{
-                marginTop: '1rem',
-                padding: '0.5rem 1rem',
-                background: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.375rem',
-                cursor: 'pointer',
-              }}
+              className="px-6 py-2.5 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors"
             >
               Clear Filters
             </button>
           )}
         </div>
       ) : (
-        <BrandsGrid>
-          {filteredAndSortedBrands.map(brand => (            <BrandCard key={brand._id}>
-              <BrandLogo>                {brand.logo ? (                  <img src={brand.logo} alt={brand.brand} />
-                ) : (
-                  <Tag size={32} style={{ color: '#9ca3af' }} />
-                )}
-              </BrandLogo>
-
-              <BrandInfo>                <BrandName>{brand.brand}</BrandName>
-                <BrandDescription>                  {brand.description || 'No description available'}
-                </BrandDescription>
-                <CategoriesContainer>                  {brand.categories &&                    brand.categories.map((category: any, index: any) => (
-                      <CategoryTag key={index}>{category}</CategoryTag>
-                    ))}
-                </CategoriesContainer>
-              </BrandInfo>              <StatusBadge active={brand.isActive !== false}>                {brand.isActive !== false ? 'Active' : 'Inactive'}
-              </StatusBadge>
-
-              <BrandStats>
-                <StatItem>                  <StatValue>{brand.productCount || 0}</StatValue>
-                  <StatLabel>Products</StatLabel>
-                </StatItem>
-                <StatItem>                  <StatValue>{brand.modelCount || 0}</StatValue>
-                  <StatLabel>Models</StatLabel>
-                </StatItem>
-              </BrandStats>              {brand.website && (
-                <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                  <a                    href={brand.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: '#3b82f6', fontSize: '0.875rem', textDecoration: 'none' }}
-                  >
-                    Visit Website
-                  </a>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          {filteredAndSortedBrands.map((brand) => (
+            <Card
+              key={brand._id}
+              className="group hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+            >
+              <div className="p-6">
+                {/* Brand Logo */}
+                <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                  {brand.logo ? (
+                    <img src={brand.logo} alt={brand.brand} className="w-full h-full object-contain" />
+                  ) : (
+                    <Tag className="w-8 h-8 text-gray-400" />
+                  )}
                 </div>
-              )}
 
-              <ActionButtons>
-                <IconButton primary onClick={() => handleEdit(brand)}>
-                  <Edit size={16} />
-                  Edit
-                </IconButton>                <IconButton danger onClick={() => handleDelete(brand.brand)}>
-                  <Trash2 size={16} />
-                  Delete
-                </IconButton>
-              </ActionButtons>
-            </BrandCard>
+                {/* Brand Info */}
+                <div className="text-center mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{brand.brand}</h3>
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                    {brand.description || 'No description available'}
+                  </p>
+
+                  {/* Categories */}
+                  {brand.categories && brand.categories.length > 0 && (
+                    <div className="flex flex-wrap gap-2 justify-center mb-3">
+                      {brand.categories.map((category, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-sky-100 text-sky-700 text-xs font-medium rounded capitalize"
+                        >
+                          {category}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Status Badge */}
+                <div className="flex justify-center mb-4">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      brand.isActive !== false
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {brand.isActive !== false ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+
+                {/* Brand Stats */}
+                <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg mb-4">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-gray-900">{brand.productCount || 0}</div>
+                    <div className="text-xs text-gray-600 mt-1">Products</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-gray-900">{brand.modelCount || 0}</div>
+                    <div className="text-xs text-gray-600 mt-1">Models</div>
+                  </div>
+                </div>
+
+                {/* Website Link */}
+                {brand.website && (
+                  <div className="text-center mb-4">
+                    <a
+                      href={brand.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+                    >
+                      Visit Website
+                    </a>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(brand)}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 hover:scale-105 transition-all duration-200"
+                  >
+                    <Edit className="w-4 h-4" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(brand.brand)}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 hover:scale-105 transition-all duration-200"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </Card>
           ))}
-        </BrandsGrid>
+        </div>
       )}
 
+      {/* Modal */}
       {showModal && (
-        <Modal>
-          <ModalContent>
-            <ModalHeader>
-              <ModalTitle>{editingBrand ? 'Edit Brand' : 'Add New Brand'}</ModalTitle>
-              <CloseButton
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {editingBrand ? 'Edit Brand' : 'Add New Brand'}
+              </h2>
+              <button
                 onClick={() => {
                   setShowModal(false);
                   setEditingBrand(null);
                 }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <X size={20} />
-              </CloseButton>
-            </ModalHeader>
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
 
-            <form onSubmit={handleSubmit}>              {errors.submit && <AlertMessage>{errors.submit}</AlertMessage>}
+            {/* Modal Body */}
+            <form onSubmit={handleSubmit} className="p-6">
+              {errors.submit && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                  {errors.submit}
+                </div>
+              )}
 
-              <FormGroup>
-                <Label>Brand Name *</Label>
-                <Input
+              {/* Brand Name */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Brand Name <span className="text-red-500">*</span>
+                </label>
+                <input
                   type="text"
                   value={formData.name}
-                  onChange={(e: any) => handleInputChange('name', e.target.value)}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
                   required
-                  style={{                    borderColor: errors.name ? '#dc2626' : '#d1d5db',
-                  }}
-                />                {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
-              </FormGroup>
+                  className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                    errors.name ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter brand name"
+                />
+                {errors.name && <p className="mt-2 text-xs text-red-600">{errors.name}</p>}
+              </div>
 
-              <FormGroup>
-                <Label>Category *</Label>
-                <Select
+              {/* Category */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Category <span className="text-red-500">*</span>
+                </label>
+                <select
                   value={formData.category}
-                  onChange={(e: any) => handleInputChange('category', e.target.value)}
+                  onChange={(e) => handleInputChange('category', e.target.value)}
                   required
-                  style={{                    borderColor: errors.category ? '#dc2626' : '#d1d5db',
-                  }}
+                  className={`w-full px-4 py-3 border rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                    errors.category ? 'border-red-500' : 'border-gray-300'
+                  }`}
                 >
                   <option value="">Select Category</option>
                   {categoriesLoading ? (
                     <option disabled>Loading categories...</option>
                   ) : (
-                    categories.map(category => (
-                      <option key={category} value={category}>                        {category?.charAt(0)?.toUpperCase() + category?.slice(1)}
+                    categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category?.charAt(0)?.toUpperCase() + category?.slice(1)}
                       </option>
                     ))
                   )}
-                </Select>                {errors.category && <ErrorMessage>{errors.category}</ErrorMessage>}
-              </FormGroup>
+                </select>
+                {errors.category && <p className="mt-2 text-xs text-red-600">{errors.category}</p>}
+              </div>
 
-              <FormGroup>
-                <Label>Description</Label>
-                <TextArea
+              {/* Description */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
                   value={formData.description}
-                  onChange={(e: any) => handleInputChange('description', e.target.value)}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="Brand description..."
-                  style={{                    borderColor: errors.description ? '#dc2626' : '#d1d5db',
-                  }}
-                />                {errors.description && <ErrorMessage>{errors.description}</ErrorMessage>}
-                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
+                  rows={4}
+                  className={`w-full px-4 py-3 border rounded-lg text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                    errors.description ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.description && (
+                  <p className="mt-2 text-xs text-red-600">{errors.description}</p>
+                )}
+                <div className="mt-2 text-xs text-gray-500">
                   {formData.description.length}/500 characters
                 </div>
-              </FormGroup>
+              </div>
 
-              <FormGroup>
-                <Label>Website URL</Label>
-                <Input
+              {/* Website URL */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Website URL
+                </label>
+                <input
                   type="url"
                   value={formData.website}
-                  onChange={(e: any) => handleInputChange('website', e.target.value)}
+                  onChange={(e) => handleInputChange('website', e.target.value)}
                   placeholder="https://example.com"
-                  style={{                    borderColor: errors.website ? '#dc2626' : '#d1d5db',
-                  }}
-                />                {errors.website && <ErrorMessage>{errors.website}</ErrorMessage>}
-              </FormGroup>
+                  className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                    errors.website ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.website && <p className="mt-2 text-xs text-red-600">{errors.website}</p>}
+              </div>
 
-              <FormGroup>
-                <Label>Brand Logo</Label>
-                <FileInput
+              {/* Brand Logo */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Brand Logo
+                </label>
+                <input
                   id="logo-upload"
                   type="file"
                   accept="image/*"
                   onChange={handleLogoChange}
+                  className="hidden"
                 />
-                <FileInputLabel htmlFor="logo-upload">
-                  <Upload size={16} />
-                  {formData.logo ? 'Change Logo' : 'Upload Logo'}
-                </FileInputLabel>
+                <label
+                  htmlFor="logo-upload"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-all"
+                >
+                  <Upload className="w-5 h-5" />
+                  <span className="text-sm font-medium">
+                    {formData.logo ? 'Change Logo' : 'Upload Logo'}
+                  </span>
+                </label>
 
                 {logoPreview && (
-                  <LogoPreview>
-                    <img src={logoPreview} alt="Logo preview" />
-                  </LogoPreview>
+                  <div className="mt-4 w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center mx-auto overflow-hidden">
+                    <img src={logoPreview} alt="Logo preview" className="w-full h-full object-contain" />
+                  </div>
                 )}
-              </FormGroup>
+              </div>
 
-              <FormGroup>
-                <Label>Status</Label>
-                <Select
-                  value={formData.isActive}
-                  onChange={(e: any) => setFormData({ ...formData, isActive: e.target.value === 'true' })}
+              {/* Status */}
+              <div className="mb-8">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                <select
+                  value={String(formData.isActive)}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'true' })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 >
                   <option value="true">Active</option>
                   <option value="false">Inactive</option>
-                </Select>
-              </FormGroup>
+                </select>
+              </div>
 
-              <ModalActions>
-                <Button
+              {/* Modal Actions */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-end pt-6 border-t border-gray-200">
+                <button
                   type="button"
                   onClick={() => {
                     setShowModal(false);
                     setEditingBrand(null);
                   }}
                   disabled={isSubmitting}
+                  className="w-full sm:w-auto px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
-                </Button>
-                <Button type="submit" variant="primary" disabled={isSubmitting}>
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold rounded-lg hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                >
                   {isSubmitting ? (
-                    <>{editingBrand ? 'Updating...' : 'Adding...'}</>
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      {editingBrand ? 'Updating...' : 'Adding...'}
+                    </>
                   ) : (
                     <>
-                      <Save size={16} />
+                      <Save className="w-5 h-5" />
                       {editingBrand ? 'Update Brand' : 'Create Brand'}
                     </>
                   )}
-                </Button>
-              </ModalActions>
+                </button>
+              </div>
             </form>
-          </ModalContent>
-        </Modal>
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

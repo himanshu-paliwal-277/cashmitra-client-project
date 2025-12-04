@@ -2,7 +2,6 @@ import { useState, Suspense } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
-import GlobalStyles from './styles/GlobalStyles';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { AdminAuthProvider } from './contexts/AdminAuthContext';
@@ -29,7 +28,7 @@ function AppContent() {
   });
 
   const updateSellFlowData = (key: any, value: any) => {
-    setSellFlowData((prev) => ({ ...prev, [key]: value }));
+    setSellFlowData(prev => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -55,7 +54,6 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider theme={theme}>
-        <GlobalStyles />
         <Router>
           <AuthProvider>
             <CartProvider>

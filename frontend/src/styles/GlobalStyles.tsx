@@ -216,10 +216,6 @@ export const GlobalStyles = createGlobalStyle`
     text-align: right;
   }
 
-  .hidden {
-    display: none;
-  }
-
   .sr-only {
     position: absolute;
     width: 1px;

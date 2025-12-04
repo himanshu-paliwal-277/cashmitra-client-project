@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAdminReports } from '../../hooks/useAdminReports';
-import { useAdminAuth } from '../../contexts/AdminAuthContext';import styled from 'styled-components';
+import { useAdminAuth } from '../../contexts/AdminAuthContext';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 import {
   BarChart3,
   TrendingUp,
   TrendingDown,
   Download,
-  Calendar,
   Filter,
   DollarSign,
   Users,
@@ -16,260 +17,66 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
-const ReportsContainer = styled.div`
-  min-height: 100vh;
-  background: ${(props: any) => props.theme.colors.background};
-  padding: 2rem;
-`;
+// Type definitions
+interface Stat {
+  label: string;
+  value: string;
+  change: string;
+  positive: boolean;
+  icon: React.ReactNode;
+  color: string;
+}
 
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
+interface Product {
+  name: string;
+  sales: number;
+  revenue: string;
+}
 
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme.colors.text};
-`;
+interface Partner {
+  name: string;
+  orders: number;
+  revenue: string;
+}
 
-const HeaderActions = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-`;
+interface SalesStats {
+  totalRevenue?: number;
+  revenueChange?: number;
+  totalOrders?: number;
+  ordersChange?: number;
+  activeUsers?: number;
+  usersChange?: number;
+  productsSold?: number;
+  productsChange?: number;
+}
 
-const Button = styled.button`
-  background: ${(props: any) => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${(props: any) => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
-  border: 1px solid ${(props: any) => props.theme.colors.primary};
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+interface SalesData {
+  stats?: SalesStats;
+  topProducts?: Array<{
+    name: string;
+    sales: number;
+    revenue?: number;
+  }>;
+  topPartners?: Array<{
+    name: string;
+    orders: number;
+    revenue?: number;
+  }>;
+}
 
-  &:hover {
-    background: ${(props: any) => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
-    color: white;
-  }
-`;
-
-const FiltersCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const FiltersGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  align-items: end;
-`;
-
-const FilterGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-  color: ${(props: any) => props.theme.colors.text};
-  font-size: 0.875rem;
-`;
-
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 6px;
-  font-size: 0.875rem;
-  background: white;
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => props.theme.colors.primary};
-  }
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 6px;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => props.theme.colors.primary};
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-`;
-
-const StatHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-`;
-
-const StatIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: ${(props: any) => props.color || props.theme.colors.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const StatInfo = styled.div`
-  text-align: right;
-`;
-
-const StatValue = styled.h3`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme.colors.text};
-  margin-bottom: 0.25rem;
-`;
-
-const StatLabel = styled.p`
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  font-size: 0.875rem;
-  margin: 0;
-`;
-
-const StatChange = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  color: ${(props: any) => props.positive ? '#10B981' : '#EF4444'};
-  margin-top: 0.5rem;
-`;
-
-const ChartsGrid = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const ChartCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-`;
-
-const ChartHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-`;
-
-const ChartTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const ChartPlaceholder = styled.div`
-  height: 300px;
-  background: ${(props: any) => props.theme.colors.background};
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  border: 2px dashed ${(props: any) => props.theme.colors.border};
-`;
-
-const TableCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-`;
-
-const TableHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid ${(props: any) => props.theme.colors.border};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const TableTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHead = styled.thead`
-  background: ${(props: any) => props.theme.colors.background};
-`;
-
-const TableRow = styled.tr`
-  border-bottom: 1px solid ${(props: any) => props.theme.colors.border};
-
-  &:hover {
-    background: ${(props: any) => props.theme.colors.background};
-  }
-`;
-
-const TableHeaderCell = styled.th`
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-  font-size: 0.875rem;
-`;
-
-const TableCell = styled.td`
-  padding: 1rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  font-size: 0.875rem;
-`;
+interface ReportParams {
+  dateRange: string;
+  startDate?: string;
+  endDate?: string;
+}
 
 function Reports() {
   const [dateRange, setDateRange] = useState('last_30_days');
   const [reportType, setReportType] = useState('overview');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [isRefreshing, setIsRefreshing] = useState(false);  const { adminUser } = useAdminAuth();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { adminUser } = useAdminAuth();
   const { salesData, inventoryData, loading, error, fetchSalesReport, fetchInventoryReport } =
     useAdminReports();
 
@@ -290,7 +97,7 @@ function Reports() {
 
   // Load reports based on filters
   const loadReports = useCallback(async () => {
-    const params = {
+    const params: ReportParams = {
       dateRange,
       ...(dateRange === 'custom' && { startDate, endDate }),
     };
@@ -313,25 +120,38 @@ function Reports() {
     loadReports();
   }, [dateRange, reportType, startDate, endDate, loadReports]);
 
-  // Use real data if available, otherwise fallback to mock data  const stats = salesData?.stats
+  // Use real data if available, otherwise fallback to mock data
+  const stats: Stat[] = (salesData as SalesData)?.stats
     ? [
         {
-          label: 'Total Revenue',          value: `₹${(salesData.stats.totalRevenue || 0).toLocaleString()}`,          change: `${salesData.stats.revenueChange || 0}%`,          positive: (salesData.stats.revenueChange || 0) >= 0,
+          label: 'Total Revenue',
+          value: `₹${((salesData as SalesData).stats?.totalRevenue || 0).toLocaleString()}`,
+          change: `${(salesData as SalesData).stats?.revenueChange || 0}%`,
+          positive: ((salesData as SalesData).stats?.revenueChange || 0) >= 0,
           icon: <DollarSign size={20} />,
           color: '#10B981',
         },
         {
-          label: 'Total Orders',          value: (salesData.stats.totalOrders || 0).toLocaleString(),          change: `${salesData.stats.ordersChange || 0}%`,          positive: (salesData.stats.ordersChange || 0) >= 0,
+          label: 'Total Orders',
+          value: ((salesData as SalesData).stats?.totalOrders || 0).toLocaleString(),
+          change: `${(salesData as SalesData).stats?.ordersChange || 0}%`,
+          positive: ((salesData as SalesData).stats?.ordersChange || 0) >= 0,
           icon: <ShoppingCart size={20} />,
           color: '#3B82F6',
         },
         {
-          label: 'Active Users',          value: (salesData.stats.activeUsers || 0).toLocaleString(),          change: `${salesData.stats.usersChange || 0}%`,          positive: (salesData.stats.usersChange || 0) >= 0,
+          label: 'Active Users',
+          value: ((salesData as SalesData).stats?.activeUsers || 0).toLocaleString(),
+          change: `${(salesData as SalesData).stats?.usersChange || 0}%`,
+          positive: ((salesData as SalesData).stats?.usersChange || 0) >= 0,
           icon: <Users size={20} />,
           color: '#8B5CF6',
         },
         {
-          label: 'Products Sold',          value: (salesData.stats.productsSold || 0).toLocaleString(),          change: `${salesData.stats.productsChange || 0}%`,          positive: (salesData.stats.productsChange || 0) >= 0,
+          label: 'Products Sold',
+          value: ((salesData as SalesData).stats?.productsSold || 0).toLocaleString(),
+          change: `${(salesData as SalesData).stats?.productsChange || 0}%`,
+          positive: ((salesData as SalesData).stats?.productsChange || 0) >= 0,
           icon: <Package size={20} />,
           color: '#F59E0B',
         },
@@ -371,11 +191,13 @@ function Reports() {
         },
       ];
 
-  // Use real data if available, otherwise fallback to mock data  const topProducts = salesData?.topProducts    ? salesData.topProducts.map((product: any) => ({
-    name: product.name,
-    sales: product.sales,
-    revenue: `₹${(product.revenue || 0).toLocaleString()}`
-  }))
+  // Use real data if available, otherwise fallback to mock data
+  const topProducts: Product[] = (salesData as SalesData)?.topProducts
+    ? (salesData as SalesData).topProducts!.map((product) => ({
+        name: product.name,
+        sales: product.sales,
+        revenue: `₹${(product.revenue || 0).toLocaleString()}`,
+      }))
     : [
         { name: 'iPhone 13 Pro Max', sales: 1247, revenue: '₹11.2L' },
         { name: 'Samsung Galaxy S23', sales: 892, revenue: '₹8.9L' },
@@ -384,11 +206,13 @@ function Reports() {
         { name: 'Sony WH-1000XM5', sales: 1123, revenue: '₹3.4L' },
       ];
 
-  // Use real data if available, otherwise fallback to mock data  const topPartners = salesData?.topPartners    ? salesData.topPartners.map((partner: any) => ({
-    name: partner.name,
-    orders: partner.orders,
-    revenue: `₹${(partner.revenue || 0).toLocaleString()}`
-  }))
+  // Use real data if available, otherwise fallback to mock data
+  const topPartners: Partner[] = (salesData as SalesData)?.topPartners
+    ? (salesData as SalesData).topPartners!.map((partner) => ({
+        name: partner.name,
+        orders: partner.orders,
+        revenue: `₹${(partner.revenue || 0).toLocaleString()}`,
+      }))
     : [
         { name: 'TechMart Electronics', orders: 2156, revenue: '₹25.6L' },
         { name: 'Mobile Hub', orders: 1847, revenue: '₹18.9L' },
@@ -398,199 +222,282 @@ function Reports() {
       ];
 
   return (
-    <ReportsContainer>
-      <Header>
-        <Title>Reports & Analytics</Title>
-        <HeaderActions>
-          <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing || loading}>
-            {isRefreshing ? (
-              <>
-                <RefreshCw size={20} className="animate-spin" />
-                Refreshing...
-              </>
-            ) : (
-              <>
-                <RefreshCw size={20} />
-                Refresh
-              </>
-            )}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 lg:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
+          Reports & Analytics
+        </h1>
+        <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={handleRefresh}
+            disabled={isRefreshing || loading}
+            leftIcon={<RefreshCw size={20} className={isRefreshing ? 'animate-spin' : ''} />}
+            className="flex-1 sm:flex-initial"
+          >
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
-          <Button>
-            <Download size={20} />
+          <Button
+            variant="primary"
+            size="md"
+            leftIcon={<Download size={20} />}
+            className="flex-1 sm:flex-initial"
+          >
             Export Report
           </Button>
-        </HeaderActions>
-      </Header>
+        </div>
+      </div>
 
-      <FiltersCard>
-        <FiltersGrid>
-          <FilterGroup>
-            <Label>Report Type</Label>
-            <Select value={reportType} onChange={(e: any) => setReportType(e.target.value)}>
-              <option value="overview">Overview</option>
-              <option value="sales">Sales Report</option>
-              <option value="partners">Partner Performance</option>
-              <option value="products">Product Analytics</option>
-              <option value="users">User Analytics</option>
-            </Select>
-          </FilterGroup>
+      {/* Filters Card */}
+      <Card className="mb-6 lg:mb-8 border-slate-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card.Content className="p-4 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Report Type</label>
+              <select
+                value={reportType}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setReportType(e.target.value)}
+                className="px-3 py-2.5 border border-slate-300 rounded-lg text-sm bg-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
+              >
+                <option value="overview">Overview</option>
+                <option value="sales">Sales Report</option>
+                <option value="partners">Partner Performance</option>
+                <option value="products">Product Analytics</option>
+                <option value="users">User Analytics</option>
+              </select>
+            </div>
 
-          <FilterGroup>
-            <Label>Date Range</Label>
-            <Select value={dateRange} onChange={(e: any) => setDateRange(e.target.value)}>
-              <option value="today">Today</option>
-              <option value="yesterday">Yesterday</option>
-              <option value="last_7_days">Last 7 Days</option>
-              <option value="last_30_days">Last 30 Days</option>
-              <option value="last_90_days">Last 90 Days</option>
-              <option value="custom">Custom Range</option>
-            </Select>
-          </FilterGroup>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Date Range</label>
+              <select
+                value={dateRange}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDateRange(e.target.value)}
+                className="px-3 py-2.5 border border-slate-300 rounded-lg text-sm bg-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
+              >
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="last_7_days">Last 7 Days</option>
+                <option value="last_30_days">Last 30 Days</option>
+                <option value="last_90_days">Last 90 Days</option>
+                <option value="custom">Custom Range</option>
+              </select>
+            </div>
 
-          {dateRange === 'custom' && (
-            <>
-              <FilterGroup>
-                <Label>Start Date</Label>
-                <Input type="date" value={startDate} onChange={(e: any) => setStartDate(e.target.value)} />
-              </FilterGroup>
+            {dateRange === 'custom' && (
+              <>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Start Date</label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartDate(e.target.value)}
+                    className="px-3 py-2.5 border border-slate-300 rounded-lg text-sm hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  />
+                </div>
 
-              <FilterGroup>
-                <Label>End Date</Label>
-                <Input type="date" value={endDate} onChange={(e: any) => setEndDate(e.target.value)} />
-              </FilterGroup>
-            </>
-          )}
-        </FiltersGrid>
-      </FiltersCard>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">End Date</label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndDate(e.target.value)}
+                    className="px-3 py-2.5 border border-slate-300 rounded-lg text-sm hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </Card.Content>
+      </Card>
 
       {loading && !isRefreshing ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
-          <div style={{ textAlign: 'center' }}>
+        <div className="flex justify-center items-center py-20">
+          <div className="text-center">
             <RefreshCw
               size={48}
-              className="animate-spin"
-              style={{ marginBottom: '1rem', opacity: 0.5 }}
+              className="animate-spin mb-4 mx-auto text-blue-600 opacity-50"
             />
-            <p>Loading reports data...</p>
+            <p className="text-slate-600 text-lg">Loading reports data...</p>
           </div>
         </div>
       ) : error ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ color: '#EF4444', marginBottom: '1rem' }}>{error}</p>
-            <Button onClick={handleRefresh}>Try Again</Button>
+        <div className="flex justify-center items-center py-20">
+          <div className="text-center">
+            <p className="text-red-600 font-semibold mb-4 text-lg">{error}</p>
+            <Button variant="primary" onClick={handleRefresh}>
+              Try Again
+            </Button>
           </div>
         </div>
       ) : (
         <>
-          <StatsGrid>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
             {stats.map((stat, index) => (
-              <StatCard key={index}>
-                <StatHeader>
-                  <StatIcon color={stat.color}>{stat.icon}</StatIcon>
-                  <StatInfo>
-                    <StatValue>{stat.value}</StatValue>
-                    <StatLabel>{stat.label}</StatLabel>
-                    <StatChange positive={stat.positive}>
-                      {stat.positive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                      {stat.change}
-                    </StatChange>
-                  </StatInfo>
-                </StatHeader>
-              </StatCard>
+              <Card
+                key={index}
+                className="border-slate-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group"
+              >
+                <Card.Content className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300"
+                      style={{
+                        background: `linear-gradient(135deg, ${stat.color} 0%, ${stat.color}dd 100%)`,
+                      }}
+                    >
+                      {stat.icon}
+                    </div>
+                    <div className="text-right">
+                      <h3 className="text-2xl lg:text-3xl font-bold text-slate-900 mb-1">
+                        {stat.value}
+                      </h3>
+                      <p className="text-sm text-slate-600 font-medium">{stat.label}</p>
+                      <div
+                        className={`flex items-center justify-end gap-1 text-xs font-semibold mt-2 ${
+                          stat.positive ? 'text-green-600' : 'text-red-600'
+                        }`}
+                      >
+                        {stat.positive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                        {stat.change}
+                      </div>
+                    </div>
+                  </div>
+                </Card.Content>
+              </Card>
             ))}
-          </StatsGrid>
+          </div>
 
-          <ChartsGrid>
-            <ChartCard>
-              <ChartHeader>
-                <ChartTitle>Revenue Trend</ChartTitle>
-                <Button variant="outline" style={{ padding: '0.5rem' }}>
-                  <Eye size={16} />
-                </Button>
-              </ChartHeader>
-              <ChartPlaceholder>
-                <div style={{ textAlign: 'center' }}>
-                  <BarChart3 size={48} />
-                  <p>Revenue chart would be displayed here</p>
+          {/* Charts Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
+            <Card className="lg:col-span-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
+              <Card.Content className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-slate-900">Revenue Trend</h3>
+                  <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                    <Eye size={20} />
+                  </button>
                 </div>
-              </ChartPlaceholder>
-            </ChartCard>
-
-            <ChartCard>
-              <ChartHeader>
-                <ChartTitle>Order Distribution</ChartTitle>
-                <Button variant="outline" style={{ padding: '0.5rem' }}>
-                  <Eye size={16} />
-                </Button>
-              </ChartHeader>
-              <ChartPlaceholder>
-                <div style={{ textAlign: 'center' }}>
-                  <BarChart3 size={48} />
-                  <p>Order distribution chart would be displayed here</p>
+                <div className="h-64 sm:h-80 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-slate-300 text-slate-500">
+                  <BarChart3 size={56} className="mb-3 text-blue-400" />
+                  <p className="text-center px-4">Revenue chart would be displayed here</p>
                 </div>
-              </ChartPlaceholder>
-            </ChartCard>
-          </ChartsGrid>
+              </Card.Content>
+            </Card>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-            <TableCard>
-              <TableHeader>
-                <TableTitle>Top Selling Products</TableTitle>
-                <Button variant="outline" style={{ padding: '0.5rem' }}>
-                  <Eye size={16} />
-                </Button>
-              </TableHeader>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeaderCell>Product</TableHeaderCell>
-                    <TableHeaderCell>Sales</TableHeaderCell>
-                    <TableHeaderCell>Revenue</TableHeaderCell>
-                  </TableRow>
-                </TableHead>
-                <tbody>
-                  {topProducts.map((product: any, index: any) => (
-                    <TableRow key={index}>
-                      <TableCell>{product.name}</TableCell>
-                      <TableCell>{product.sales}</TableCell>
-                      <TableCell>{product.revenue}</TableCell>
-                    </TableRow>
-                  ))}
-                </tbody>
-              </Table>
-            </TableCard>
+            <Card className="border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
+              <Card.Content className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-slate-900">Order Distribution</h3>
+                  <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                    <Eye size={20} />
+                  </button>
+                </div>
+                <div className="h-64 sm:h-80 bg-gradient-to-br from-slate-50 to-indigo-50 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-slate-300 text-slate-500">
+                  <BarChart3 size={56} className="mb-3 text-indigo-400" />
+                  <p className="text-center px-4">Order distribution chart would be displayed here</p>
+                </div>
+              </Card.Content>
+            </Card>
+          </div>
 
-            <TableCard>
-              <TableHeader>
-                <TableTitle>Top Performing Partners</TableTitle>
-                <Button variant="outline" style={{ padding: '0.5rem' }}>
-                  <Eye size={16} />
-                </Button>
-              </TableHeader>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeaderCell>Partner</TableHeaderCell>
-                    <TableHeaderCell>Orders</TableHeaderCell>
-                    <TableHeaderCell>Revenue</TableHeaderCell>
-                  </TableRow>
-                </TableHead>
-                <tbody>
-                  {topPartners.map((partner: any, index: any) => (
-                    <TableRow key={index}>
-                      <TableCell>{partner.name}</TableCell>
-                      <TableCell>{partner.orders}</TableCell>
-                      <TableCell>{partner.revenue}</TableCell>
-                    </TableRow>
-                  ))}
-                </tbody>
-              </Table>
-            </TableCard>
+          {/* Tables Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+            {/* Top Products Table */}
+            <Card className="border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="p-4 sm:p-6 border-b border-slate-200 flex justify-between items-center">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900">Top Selling Products</h3>
+                <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                  <Eye size={20} />
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gradient-to-r from-slate-50 to-blue-50">
+                    <tr>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-bold text-slate-700">
+                        Product
+                      </th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-bold text-slate-700">
+                        Sales
+                      </th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-bold text-slate-700">
+                        Revenue
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topProducts.map((product, index) => (
+                      <tr
+                        key={index}
+                        className="border-b border-slate-100 hover:bg-blue-50 transition-colors duration-200"
+                      >
+                        <td className="px-4 sm:px-6 py-4 text-sm text-slate-700 font-medium">
+                          {product.name}
+                        </td>
+                        <td className="px-4 sm:px-6 py-4 text-sm text-slate-600">
+                          {product.sales.toLocaleString()}
+                        </td>
+                        <td className="px-4 sm:px-6 py-4 text-sm text-slate-600 font-semibold">
+                          {product.revenue}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+
+            {/* Top Partners Table */}
+            <Card className="border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="p-4 sm:p-6 border-b border-slate-200 flex justify-between items-center">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900">Top Performing Partners</h3>
+                <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                  <Eye size={20} />
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gradient-to-r from-slate-50 to-green-50">
+                    <tr>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-bold text-slate-700">
+                        Partner
+                      </th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-bold text-slate-700">
+                        Orders
+                      </th>
+                      <th className="px-4 sm:px-6 py-4 text-left text-sm font-bold text-slate-700">
+                        Revenue
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topPartners.map((partner, index) => (
+                      <tr
+                        key={index}
+                        className="border-b border-slate-100 hover:bg-green-50 transition-colors duration-200"
+                      >
+                        <td className="px-4 sm:px-6 py-4 text-sm text-slate-700 font-medium">
+                          {partner.name}
+                        </td>
+                        <td className="px-4 sm:px-6 py-4 text-sm text-slate-600">
+                          {partner.orders.toLocaleString()}
+                        </td>
+                        <td className="px-4 sm:px-6 py-4 text-sm text-slate-600 font-semibold">
+                          {partner.revenue}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
           </div>
         </>
       )}
-    </ReportsContainer>
+    </div>
   );
 }
 

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import {
   Menu,
   X,
@@ -10,15 +9,12 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  ChevronDown,
   FolderTree,
   ShoppingCart,
   TrendingUp,
   FileText,
   ShoppingBag,
   RotateCcw,
-  Tag,
-  Smartphone,
   HelpCircle,
   UserCheck,
   ClipboardList,
@@ -33,258 +29,18 @@ import {
   AlertTriangle,
   Clock,
   Truck,
+  Bell,
+  Store,
 } from 'lucide-react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import PermissionsSidebar from './PermissionsSidebar';
 import usePermissionsSidebar from '../../hooks/usePermissionsSidebar';
 
-const LayoutContainer = styled.div`
-  display: flex;
-  height: 100vh;
-  background-color: #f8fafc;
-`;
-
-const Sidebar = styled.aside`
-  width: 280px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-right: 1px solid #e2e8f0;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  z-index: 1000;
-  transform: translateX(${(props: any) => (props.$isOpen ? '0' : '-100%')});
-  transition: transform 0.3s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-  @media (min-width: 1024px) {
-    position: static;
-    transform: translateX(0);
-  }
-`;
-
-const SidebarHeader = styled.div`
-  padding: 1.5rem 1.5rem 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-  }
-`;
-
-const Logo = styled.h1`
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: #3b82f6;
-  margin: 0;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.025em;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:hover {
-    background-color: #f1f5f9;
-    color: #374151;
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-
-  @media (min-width: 1024px) {
-    display: none;
-  }
-`;
-
-const SidebarNav = styled.nav`
-  flex: 1;
-  padding: 1.5rem 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #e2e8f0 transparent;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
-    border-radius: 2px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: #cbd5e1;
-  }
-`;
-
-const NavSection = styled.div`
-  margin-bottom: 2rem;
-
-  &:last-child {
-    margin-bottom: 1rem;
-  }
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 1rem 0;
-  padding: 0 1.5rem;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -0.5rem;
-    left: 1.5rem;
-    right: 1.5rem;
-    height: 1px;
-    background: linear-gradient(to right, #e2e8f0, transparent);
-  }
-`;
-
-const NavItem = styled(Link)`
-  display: flex;
-  align-items: center;
-  padding: 0.875rem 1.5rem;
-  margin: 0.25rem 1rem;
-  color: ${(props: any) => (props.$active ? '#3b82f6' : '#374151')};
-  text-decoration: none;
-  font-weight: ${(props: any) => (props.$active ? '600' : '500')};
-  font-size: 0.875rem;
-  background-color: ${(props: any) => (props.$active ? '#eff6ff' : 'transparent')};
-  border-radius: 0.5rem;
-  border-left: ${(props: any) => (props.$active ? '3px solid #3b82f6' : '3px solid transparent')};
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-
-  &:hover {
-    background-color: ${(props: any) => (props.$active ? '#eff6ff' : '#f8fafc')};
-    color: ${(props: any) => (props.$active ? '#3b82f6' : '#1f2937')};
-    transform: translateX(2px);
-  }
-
-  &:active {
-    transform: translateX(1px);
-  }
-`;
-
-const NavIcon = styled.span`
-  margin-right: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-`;
-
-const MobileMenuButton = styled.button`
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid #e2e8f0;
-  color: #374151;
-  cursor: pointer;
-  padding: 0.75rem;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow:
-    0 1px 3px 0 rgba(0, 0, 0, 0.1),
-    0 1px 2px 0 rgba(0, 0, 0, 0.06);
-
-  &:hover {
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    color: #1f2937;
-    transform: translateY(-1px);
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  @media (min-width: 1024px) {
-    display: none;
-  }
-`;
-
-const MainContent = styled.main`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  ${'' /* margin-left: 280px; */}
-  padding: 2rem;
-  background-color: #fafbfc;
-  min-height: 100vh;
-  overflow-y: auto;
-
-  @media (max-width: 1023px) {
-    margin-left: 0;
-    padding: 1.5rem 1rem;
-  }
-`;
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  display: ${(props: any) => (props.$isOpen ? 'block' : 'none')};
-
-  @media (min-width: 1024px) {
-    display: none;
-  }
-`;
-
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { adminUser, logout } = useAdminAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { logout, adminUser } = useAdminAuth() as any;
+  const [sidebarOpen, setSidebarOpen] = useState(true); // Default open on desktop
 
   // Permissions sidebar hook
   const {
@@ -301,243 +57,404 @@ const AdminLayout = () => {
   };
 
   return (
-    <LayoutContainer>
-      <Overlay $isOpen={sidebarOpen} onClick={() => setSidebarOpen(false)} />
-
-      {/* Sidebar */}
-      <Sidebar $isOpen={sidebarOpen}>
-        <SidebarHeader>
-          <Logo>Cashmitra Admin</Logo>
-          <CloseButton onClick={() => setSidebarOpen(false)}>
-            <X size={20} />
-          </CloseButton>
-        </SidebarHeader>
-
-        <SidebarNav>
-          <NavSection>
-            <SectionTitle>Main</SectionTitle>
-            <NavItem
-              to="/admin/dashboard"
-              $active={location.pathname === '/admin/dashboard'}
-              onClick={() => setSidebarOpen(false)}
+    <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
+      {/* Header */}
+      <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm shrink-0">
+        <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex justify-between items-center gap-2 sm:gap-4">
+          {/* Left Section */}
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0">
+            {/* Sidebar Toggle Button */}
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 sm:p-2.5 rounded-lg border border-slate-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-all shrink-0"
+              aria-label="Toggle menu"
             >
-              <NavIcon>
-                <LayoutDashboard size={18} />
-              </NavIcon>
-              Dashboard
-            </NavItem>
-          </NavSection>
+              <Menu size={20} className="sm:w-5 sm:h-5" />
+            </button>
 
-          <NavSection>
-            <SectionTitle>Buy Product List</SectionTitle>
-            <NavItem
-              to="/admin/buy-super-categories"
-              $active={location.pathname === '/admin/buy-super-categories'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <FolderTree size={18} />
-              </NavIcon>
-              Super Categories
-            </NavItem>
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <img src="/main-logo.png" alt="logo" className="w-8 h-8" />
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">CASHMITRA</h1>
+              <span className="hidden xs:inline-block px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-blue-600 bg-blue-100 rounded border border-blue-200 shrink-0">
+                ADMIN
+              </span>
+            </div>
+          </div>
 
-            <NavItem
-              to="/admin/buy-categories"
-              $active={location.pathname === '/admin/buy-categories'}
-              onClick={() => setSidebarOpen(false)}
+          {/* Right Section */}
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
+            {/* Notification Bell */}
+            <button
+              className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg transition-colors relative"
+              aria-label="Notifications"
             >
-              <NavIcon>
-                <FolderTree size={18} />
-              </NavIcon>
-              Categories
-            </NavItem>
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
+              <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full" />
+            </button>
 
-            <NavItem
-              to="/admin/buy-products"
-              $active={location.pathname === '/admin/buy-products'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Package size={18} />
-              </NavIcon>
-              Products
-            </NavItem>
-          </NavSection>
+            {/* Admin Profile */}
+            <div className="hidden sm:flex items-center gap-2 md:gap-3 px-2 md:px-3 py-1.5 md:py-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+              <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold text-xs md:text-sm shrink-0">
+                {adminUser?.name?.charAt(0) || 'A'}
+              </div>
+              <div className="hidden md:block text-left min-w-0">
+                <div className="text-sm font-semibold text-slate-900 truncate">
+                  {adminUser?.name || 'Admin'}
+                </div>
+                <div className="text-xs text-slate-600">Administrator</div>
+              </div>
+            </div>
 
-          <NavSection>
-            <SectionTitle>Sales & Orders</SectionTitle>
-            <NavItem
-              to="/admin/sell"
-              $active={location.pathname === '/admin/sell'}
-              onClick={() => setSidebarOpen(false)}
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              title="Logout"
             >
-              <NavIcon>
-                <TrendingUp size={18} />
-              </NavIcon>
-              Sell
-            </NavItem>
+              <LogOut className="w-4 h-4 sm:w-4 sm:h-4" />
+              <span className="hidden md:inline text-sm font-medium">Logout</span>
+            </button>
+          </div>
+        </div>
+      </header>
 
-            <NavItem
-              to="/admin/leads"
-              $active={location.pathname === '/admin/leads'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <FileText size={18} />
-              </NavIcon>
-              Leads
-            </NavItem>
+      {/* Content Area with Sidebar */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <aside
+          className={`bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ease-out overflow-hidden ${
+            sidebarOpen
+              ? 'w-64 sm:w-72 lg:w-80 fixed lg:relative translate-x-0 z-[1000] shadow-xl lg:shadow-none h-full'
+              : 'w-0 lg:w-0 fixed lg:relative -translate-x-full lg:translate-x-0 z-[1000] h-full border-0'
+          }`}
+        >
+          {/* Sidebar Navigation */}
+          <nav className="flex-1 py-6 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-400 [&::-webkit-scrollbar-thumb]:transition-colors">
+            {/* Main Section */}
+            <div className="mb-8 last:mb-4">
+              <h3 className="text-[0.6875rem] font-bold text-slate-500 uppercase tracking-[0.08em] mb-4 px-6">
+                Main
+              </h3>
+              <Link
+                to="/admin/dashboard"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/dashboard'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-500 shadow-sm'
+                    : 'text-gray-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:translate-x-1 hover:border-l-blue-300'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span
+                  className={`mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 ${
+                    location.pathname === '/admin/dashboard' ? '' : 'group-hover:scale-110'
+                  }`}
+                >
+                  <LayoutDashboard size={18} />
+                </span>
+                Dashboard
+              </Link>
+            </div>
 
-            <NavItem
-              to="/admin/sell-orders"
-              $active={location.pathname === '/admin/sell-orders'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <ShoppingCart size={18} />
-              </NavIcon>
-              Sell Orders
-            </NavItem>
+            {/* Buy Product List Section */}
+            <div className="mb-8 last:mb-4">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-4 sm:px-6">
+                Buy Product List
+              </h3>
+              <Link
+                to="/admin/buy-super-categories"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/buy-super-categories'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span
+                  className={`mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 ${
+                    location.pathname === '/admin/buy-super-categories'
+                      ? ''
+                      : 'group-hover:scale-110'
+                  }`}
+                >
+                  <FolderTree size={18} />
+                </span>
+                Super Categories
+              </Link>
 
-            <NavItem
-              to="/admin/buy"
-              $active={location.pathname === '/admin/buy'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <ShoppingBag size={18} />
-              </NavIcon>
-              Buy
-            </NavItem>
+              <Link
+                to="/admin/buy-categories"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/buy-categories'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <FolderTree size={18} />
+                </span>
+                Categories
+              </Link>
 
-            <NavItem
-              to="/admin/buy-orders"
-              $active={location.pathname === '/admin/buy-orders'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <ShoppingBag size={18} />
-              </NavIcon>
-              Buy Orders
-            </NavItem>
+              <Link
+                to="/admin/buy-products"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/buy-products'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Package size={18} />
+                </span>
+                Products
+              </Link>
+            </div>
 
-            <NavItem
-              to="/admin/pickup-management"
-              $active={location.pathname === '/admin/pickup-management'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Truck size={18} />
-              </NavIcon>
-              Pickup Management
-            </NavItem>
+            {/* Sales & Orders Section */}
+            <div className="mb-8 last:mb-4">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-4 sm:px-6">
+                Sales & Orders
+              </h3>
+              <Link
+                to="/admin/sell"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/sell'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <TrendingUp size={18} />
+                </span>
+                Sell
+              </Link>
 
-            <NavItem
-              to="/admin/returns"
-              $active={location.pathname === '/admin/returns'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <RotateCcw size={18} />
-              </NavIcon>
-              Returns
-            </NavItem>
-          </NavSection>
+              <Link
+                to="/admin/leads"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/leads'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <FileText size={18} />
+                </span>
+                Leads
+              </Link>
 
-          <NavSection>
-            <SectionTitle>Sell Product List</SectionTitle>
-            <NavItem
-              to="/admin/sell-super-categories"
-              $active={location.pathname === '/admin/sell-super-categories'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <FolderTree size={18} />
-              </NavIcon>
-              Super Categories
-            </NavItem>
+              <Link
+                to="/admin/sell-orders"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/sell-orders'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <ShoppingCart size={18} />
+                </span>
+                Sell Orders
+              </Link>
 
-            <NavItem
-              to="/admin/sell-categories"
-              $active={location.pathname === '/admin/sell-categories'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <FolderTree size={18} />
-              </NavIcon>
-              Categories
-            </NavItem>
+              <Link
+                to="/admin/buy"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/buy'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <ShoppingBag size={18} />
+                </span>
+                Buy
+              </Link>
 
-            <NavItem
-              to="/admin/sell-products"
-              $active={location.pathname === '/admin/sell-products'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Package size={18} />
-              </NavIcon>
-              Products
-            </NavItem>
-          </NavSection>
+              <Link
+                to="/admin/buy-orders"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/buy-orders'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <ShoppingBag size={18} />
+                </span>
+                Buy Orders
+              </Link>
 
-          <NavSection>
-            <SectionTitle>Sell Management</SectionTitle>
-            <NavItem
-              to="/admin/sell-questions-management"
-              $active={location.pathname === '/admin/sell-questions-management'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <HelpCircle size={18} />
-              </NavIcon>
-              Questions Management
-            </NavItem>
+              <Link
+                to="/admin/pickup-management"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/pickup-management'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Truck size={18} />
+                </span>
+                Pickup Management
+              </Link>
 
-            <NavItem
-              to="/admin/sell-defects-management"
-              $active={location.pathname === '/admin/sell-defects-management'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <AlertTriangle size={18} />
-              </NavIcon>
-              Defects Management
-            </NavItem>
+              <Link
+                to="/admin/returns"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/returns'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <RotateCcw size={18} />
+                </span>
+                Returns
+              </Link>
+            </div>
 
-            <NavItem
-              to="/admin/sell-accessories-management"
-              $active={location.pathname === '/admin/sell-accessories-management'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Package size={18} />
-              </NavIcon>
-              Accessories Management
-            </NavItem>
+            {/* Sell Product List Section */}
+            <div className="mb-8 last:mb-4">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-4 sm:px-6">
+                Sell Product List
+              </h3>
+              <Link
+                to="/admin/sell-super-categories"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/sell-super-categories'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <FolderTree size={18} />
+                </span>
+                Super Categories
+              </Link>
 
-            <NavItem
-              to="/admin/sell-sessions-management"
-              $active={location.pathname === '/admin/sell-sessions-management'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Clock size={18} />
-              </NavIcon>
-              Sessions Management
-            </NavItem>
+              <Link
+                to="/admin/sell-categories"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/sell-categories'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <FolderTree size={18} />
+                </span>
+                Categories
+              </Link>
 
-            <NavItem
-              to="/admin/sell-configuration-management"
-              $active={location.pathname === '/admin/sell-configuration-management'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Settings size={18} />
-              </NavIcon>
-              Configuration Management
-            </NavItem>
-          </NavSection>
-          {/* 
+              <Link
+                to="/admin/sell-products"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/sell-products'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Package size={18} />
+                </span>
+                Products
+              </Link>
+            </div>
+
+            {/* Sell Management Section */}
+            <div className="mb-8 last:mb-4">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-4 sm:px-6">
+                Sell Management
+              </h3>
+              <Link
+                to="/admin/sell-questions-management"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/sell-questions-management'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <HelpCircle size={18} />
+                </span>
+                Questions Management
+              </Link>
+
+              <Link
+                to="/admin/sell-defects-management"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/sell-defects-management'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <AlertTriangle size={18} />
+                </span>
+                Defects Management
+              </Link>
+
+              <Link
+                to="/admin/sell-sccessories-management"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/sell-accessories-management'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Package size={18} />
+                </span>
+                Accessories Management
+              </Link>
+
+              <Link
+                to="/admin/sell-sessions-management"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/sell-sessions-management'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Clock size={18} />
+                </span>
+                Sessions Management
+              </Link>
+
+              <Link
+                to="/admin/sell-configuration-management"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/sell-configuration-management'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Settings size={18} />
+                </span>
+                Configuration Management
+              </Link>
+            </div>
+            {/* 
           <NavSection>
             <SectionTitle>Catalog & Products</SectionTitle>
             <NavItem 
@@ -595,212 +512,275 @@ const AdminLayout = () => {
             </NavItem>
           </NavSection> */}
 
-          <NavSection>
-            <SectionTitle>Partners & Users</SectionTitle>
-            <NavItem
-              to="/admin/partners"
-              $active={location.pathname === '/admin/partners'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Users size={18} />
-              </NavIcon>
-              Partners
-            </NavItem>
+            {/* Partners & Users Section */}
+            <div className="mb-8 last:mb-4">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-4 sm:px-6">
+                Partners & Users
+              </h3>
+              <Link
+                to="/admin/partners"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/partners'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Users size={18} />
+                </span>
+                Partners
+              </Link>
 
-            <NavItem
-              to="/admin/partner-applications"
-              $active={location.pathname === '/admin/partner-applications'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <UserCheck size={18} />
-              </NavIcon>
-              Partner Applications (KYC)
-            </NavItem>
+              <Link
+                to="/admin/partner-applications"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/partner-applications'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <UserCheck size={18} />
+                </span>
+                Partner Applications (KYC)
+              </Link>
 
-            <NavItem
-              to="/admin/partner-list"
-              $active={location.pathname === '/admin/partner-list'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <ClipboardList size={18} />
-              </NavIcon>
-              Partner List
-            </NavItem>
+              <Link
+                to="/admin/partner-list"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/partner-list'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <ClipboardList size={18} />
+                </span>
+                Partner List
+              </Link>
 
-            <NavItem
-              to="/admin/partner-permissions"
-              $active={location.pathname === '/admin/partner-permissions'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Settings size={18} />
-              </NavIcon>
-              Partner Permissions
-            </NavItem>
+              <Link
+                to="/admin/partner-permissions"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/partner-permissions'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Settings size={18} />
+                </span>
+                Partner Permissions
+              </Link>
 
-            <NavItem
-              to="/admin/users"
-              $active={location.pathname.includes('/admin/users')}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Users size={18} />
-              </NavIcon>
-              User Management
-            </NavItem>
+              <Link
+                to="/admin/users"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname.includes('/admin/users')
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Users size={18} />
+                </span>
+                User Management
+              </Link>
 
-            <NavItem
-              to="/admin/inventory-approval"
-              $active={location.pathname === '/admin/inventory-approval'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <CheckSquare size={18} />
-              </NavIcon>
-              Inventory Approval
-            </NavItem>
-          </NavSection>
+              <Link
+                to="/admin/inventory-approval"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/inventory-approval'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <CheckSquare size={18} />
+                </span>
+                Inventory Approval
+              </Link>
+            </div>
 
-          <NavSection>
-            <SectionTitle>Pricing & Finance</SectionTitle>
-            <NavItem
-              to="/admin/pricing"
-              $active={location.pathname === '/admin/pricing'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <DollarSign size={18} />
-              </NavIcon>
-              Pricing
-            </NavItem>
+            {/* Pricing & Finance Section */}
+            <div className="mb-8 last:mb-4">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-4 sm:px-6">
+                Pricing & Finance
+              </h3>
+              <Link
+                to="/admin/pricing"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/pricing'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <DollarSign size={18} />
+                </span>
+                Pricing
+              </Link>
 
-            <NavItem
-              to="/admin/price-table"
-              $active={location.pathname === '/admin/price-table'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Table size={18} />
-              </NavIcon>
-              Price Table
-            </NavItem>
+              <Link
+                to="/admin/price-table"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/price-table'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Table size={18} />
+                </span>
+                Price Table
+              </Link>
 
-            <NavItem
-              to="/admin/condition-adjustments"
-              $active={location.pathname === '/admin/condition-adjustments'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Sliders size={18} />
-              </NavIcon>
-              Condition Adjustments
-            </NavItem>
+              <Link
+                to="/admin/condition-adjustments"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/condition-adjustments'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Sliders size={18} />
+                </span>
+                Condition Adjustments
+              </Link>
 
-            <NavItem
-              to="/admin/promotions"
-              $active={location.pathname === '/admin/promotions'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Gift size={18} />
-              </NavIcon>
-              Promotions/Coupons
-            </NavItem>
+              <Link
+                to="/admin/promotions"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/promotions'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Gift size={18} />
+                </span>
+                Promotions/Coupons
+              </Link>
 
-            <NavItem
-              to="/admin/finance"
-              $active={location.pathname === '/admin/finance'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Calculator size={18} />
-              </NavIcon>
-              Finance
-            </NavItem>
+              <Link
+                to="/admin/finance"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/finance'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Calculator size={18} />
+                </span>
+                Finance
+              </Link>
 
-            <NavItem
-              to="/admin/commission-rules"
-              $active={location.pathname === '/admin/commission-rules'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <CreditCard size={18} />
-              </NavIcon>
-              Commission Rules
-            </NavItem>
+              <Link
+                to="/admin/commission-rules"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/commission-rules'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <CreditCard size={18} />
+                </span>
+                Commission Rules
+              </Link>
 
-            <NavItem
-              to="/admin/wallet-payouts"
-              $active={location.pathname === '/admin/wallet-payouts'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Wallet size={18} />
-              </NavIcon>
-              Wallet & Payouts
-            </NavItem>
-          </NavSection>
+              <Link
+                to="/admin/wallet-payouts"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/wallet-payouts'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Wallet size={18} />
+                </span>
+                Wallet & Payouts
+              </Link>
+            </div>
 
-          <NavSection>
-            <SectionTitle>Analytics & Reports</SectionTitle>
-            <NavItem
-              to="/admin/reports"
-              $active={location.pathname === '/admin/reports'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <BarChart3 size={18} />
-              </NavIcon>
-              Reports
-            </NavItem>
-          </NavSection>
+            {/* Analytics & Reports Section */}
+            <div className="mb-8 last:mb-4">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-4 sm:px-6">
+                Analytics & Reports
+              </h3>
+              <Link
+                to="/admin/reports"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/reports'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <BarChart3 size={18} />
+                </span>
+                Reports
+              </Link>
+            </div>
 
-          <NavSection>
-            <SectionTitle>System</SectionTitle>
-            <NavItem
-              to="/admin/settings"
-              $active={location.pathname === '/admin/settings'}
-              onClick={() => setSidebarOpen(false)}
-            >
-              <NavIcon>
-                <Settings size={18} />
-              </NavIcon>
-              Settings
-            </NavItem>
+            {/* System Section */}
+            <div className="mb-8 last:mb-4">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-4 sm:px-6">
+                System
+              </h3>
+              <Link
+                to="/admin/settings"
+                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
+                  location.pathname === '/admin/settings'
+                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
+                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
+                } active:translate-x-0.5`}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <Settings size={18} />
+                </span>
+                Settings
+              </Link>
 
-            <NavItem
-              as="button"
-              onClick={handleLogout}
-              style={{
-                width: '100%',
-                border: 'none',
-                background: 'none',
-                textAlign: 'left',
-                cursor: 'pointer',
-                color: '#dc2626',
-              }}
-            >
-              <NavIcon>
-                <LogOut size={18} />
-              </NavIcon>
-              Logout
-            </NavItem>
-          </NavSection>
-        </SidebarNav>
-      </Sidebar>
+              <button
+                onClick={handleLogout}
+                className="flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group w-full border-none bg-transparent text-left cursor-pointer text-red-600 font-medium border-l-transparent hover:bg-gradient-to-r hover:from-red-50/50 hover:to-pink-50/30 hover:text-red-700 hover:translate-x-1 hover:border-l-red-300/50 hover:shadow-sm active:translate-x-0.5"
+              >
+                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  <LogOut size={18} />
+                </span>
+                Logout
+              </button>
+            </div>
+          </nav>
+        </aside>
 
-      {/* Main Content */}
-      <MainContent>
-        <MobileMenuButton onClick={() => setSidebarOpen(true)}>
-          <Menu size={24} />
-        </MobileMenuButton>
-
-        {/* Page Content */}
-        <Outlet context={{ openPermissionsSidebar }} />
-      </MainContent>
+        {/* Main Content */}
+        <main className="flex-1 flex flex-col overflow-hidden bg-slate-50">
+          {/* Page Content */}
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 lg:p-8">
+            <Outlet context={{ openPermissionsSidebar }} />
+          </div>
+        </main>
+      </div>
 
       {/* Permissions Sidebar */}
       <PermissionsSidebar
@@ -809,7 +789,7 @@ const AdminLayout = () => {
         selectedPartner={selectedPartner}
         onPermissionsUpdate={handlePermissionsUpdate}
       />
-    </LayoutContainer>
+    </div>
   );
 };
 
