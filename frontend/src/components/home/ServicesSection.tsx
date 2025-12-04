@@ -1,4 +1,5 @@
 import React from 'react';
+import ServiceCard from './ServiceCard';
 
 const ServicesSection = () => {
   const ourServices = [
@@ -144,17 +145,7 @@ const ServicesSection = () => {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 justify-items-center">
             {ourServices.map(service => (
-              <div
-                key={service.id}
-                className="flex flex-col items-center text-center p-4 bg-white rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer w-full"
-              >
-                <img
-                  src={service.image}
-                  alt={service.alt}
-                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover mb-3"
-                />
-                <p className="text-sm font-medium text-gray-700">{service.title}</p>
-              </div>
+              <ServiceCard key={service.id} service={service} />
             ))}
           </div>
         </div>
@@ -167,17 +158,7 @@ const ServicesSection = () => {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 justify-items-center">
             {sellServices.map(service => (
-              <div
-                key={service.id}
-                className="flex flex-col items-center text-center p-4 bg-white rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer w-full"
-              >
-                <img
-                  src={service.image}
-                  alt={service.alt}
-                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover mb-3"
-                />
-                <p className="text-sm font-medium text-gray-700">{service.title}</p>
-              </div>
+              <ServiceCard key={service.id} service={service} />
             ))}
           </div>
         </div>

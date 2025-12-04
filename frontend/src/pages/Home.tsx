@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import HomeBanner from '../components/home/HomeBanner';
 import BuyProductsList from '../components/home/BuyProductsList/BuyProductsList';
+import HowItWorks from '../components/home/HowItWorks';
+import Testimonial from '../components/home/Testimonial';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -54,57 +56,6 @@ const Home = () => {
   //     buyPath: '/buy?category=laptop',
   //   },
   // ];
-
-  const steps = [
-    {
-      number: 1,
-      title: 'Select Device',
-      description: 'Choose your device category, brand, and model from our extensive catalog',
-    },
-    {
-      number: 2,
-      title: 'Get Quote',
-      description:
-        'Answer a few questions about your device condition to get an instant price quote',
-    },
-    {
-      number: 3,
-      title: 'Schedule Pickup',
-      description: 'Book a free pickup slot at your convenience from verified local partners',
-    },
-    {
-      number: 4,
-      title: 'Get Paid',
-      description: 'Receive instant payment once your device is verified at the partner shop',
-    },
-  ];
-
-  const testimonials = [
-    {
-      id: 1,
-      text: 'Sold my iPhone 12 in just 2 hours! The process was so smooth and the price was better than other platforms.',
-      author: 'Priya Sharma',
-      location: 'Mumbai',
-      rating: 5,
-      avatar: 'PS',
-    },
-    {
-      id: 2,
-      text: 'Great experience selling my MacBook. The pickup was on time and payment was instant. Highly recommended!',
-      author: 'Rahul Kumar',
-      location: 'Delhi',
-      rating: 5,
-      avatar: 'RK',
-    },
-    {
-      id: 3,
-      text: 'Trustworthy platform with verified partners. Got the exact quoted price for my Samsung Galaxy.',
-      author: 'Anita Patel',
-      location: 'Bangalore',
-      rating: 5,
-      avatar: 'AP',
-    },
-  ];
 
   // Fetch real-time catalog products
   // const {
@@ -179,78 +130,10 @@ const Home = () => {
       <BuyProductsList />
 
       {/* How It Works */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-semibold text-center mb-4 text-gray-900">How it works</h2>
-          <p className="text-lg text-gray-600 text-center mb-12 max-w-[600px] mx-auto">
-            Simple 4-step process to sell your device safely and get paid instantly
-          </p>
-
-          {/* Steps Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
-            {steps.map((step, index) => (
-              <div key={step.number} className="text-center relative">
-                {/* Connector line */}
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-10 -right-4 w-8 h-0.5 bg-blue-500" />
-                )}
-
-                {/* Step Number */}
-                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                  {step.number}
-                </div>
-
-                <h3 className="text-lg font-semibold mb-2 text-gray-900">{step.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HowItWorks />
 
       {/* Testimonials */}
-      <section className="py-20 bg-white">
-        <div className="max-w-[1350px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-semibold text-center mb-4 text-gray-900">
-            What our customers say
-          </h2>
-          <p className="text-lg text-gray-600 text-center mb-12 max-w-[600px] mx-auto">
-            Join thousands of satisfied customers who have sold their devices through Cashmitra
-          </p>
-
-          {/* Testimonial Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-            {testimonials.map(testimonial => (
-              <Card key={testimonial.id} className="relative">
-                <Card.Body>
-                  {/* Star Rating */}
-                  <div className="flex gap-1 mb-3 text-yellow-500">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} size={16} fill="currentColor" />
-                    ))}
-                  </div>
-
-                  {/* Testimonial Text */}
-                  <p className="italic mb-4 leading-relaxed text-gray-700">"{testimonial.text}"</p>
-
-                  {/* Author */}
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                      {testimonial.avatar}
-                    </div>
-                    <div>
-                      <h4 className="text-base font-medium text-gray-900 m-0">
-                        {testimonial.author}
-                      </h4>
-                      <p className="text-sm text-gray-500 m-0">{testimonial.location}</p>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <Testimonial />
     </>
   );
 };

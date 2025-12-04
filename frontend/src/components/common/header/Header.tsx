@@ -1,10 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-// import { theme } from '../../theme';
-// import Button from '../ui/Button';
-// import PhoneDropdown from '../Header/PhoneDropdown';
-// import SellPhoneDropdown from '../Header/SellPhoneDropdown';
 import {
   Menu,
   X,
@@ -25,6 +21,7 @@ import theme from '../../../theme';
 import Button from '../../ui/Button';
 import SellPhoneDropdown from './SellPhoneDropdown';
 import PhoneDropdown from './PhoneDropdown';
+import { useAuth } from '../../../contexts/AuthContext';
 
 // Main Header Container
 const NavContainer = styled.nav`
@@ -499,8 +496,17 @@ const MobileCollapsibleNavItem = ({ item, onLinkClick }: any) => {
 };
 
 // Main Header Component
-const Header = ({ isAuthenticated, onLogin, onLogout, currentPath = '/' }: any) => {
+const Header = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const isAuthenticated = !!user;
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [openNavDropdown, setOpenNavDropdown] = useState(null);
