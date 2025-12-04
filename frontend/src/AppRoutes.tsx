@@ -129,79 +129,69 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
 
       {/* Admin Routes (No Main Layout - Has AdminLayout) */}
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route
-        path="/admin/*"
-        element={
-          <AdminProtectedRoute>
-            <AdminLayout />
-          </AdminProtectedRoute>
-        }
-      >
-        <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="sell" element={<Sell />} />
-        <Route path="sell-super-categories" element={<SellSuperCategoryManagement />} />
-        <Route path="sell-categories" element={<SellCategories />} />
-        <Route path="sell-products" element={<SellProducts />} />
-        <Route path="sell-questions" element={<SellQuestionsManagement />} />
-        <Route path="sell-defects" element={<SellDefectsManagement />} />
-        <Route path="sell-accessories" element={<SellAccessoriesManagement />} />
-        <Route path="sell-sessions" element={<SellSessionsManagement />} />
-        <Route path="sell-configuration" element={<SellConfigurationManagement />} />
-        <Route path="sell-orders" element={<SellOrders />} />
-        <Route path="sell-orders-management" element={<SellOrdersManagement />} />
-        <Route path="leads" element={<Leads />} />
-        <Route path="buy" element={<Buy />} />
-        <Route path="buy/order/:orderId" element={<OrderView />} />
-        <Route path="buy-super-categories" element={<SuperCategoryManagement />} />
-        <Route path="buy-categories" element={<BuyCategories />} />
-        <Route path="buy-products" element={<BuyProducts />} />
-        <Route path="buy-products/add" element={<AddBuyProduct />} />
-        <Route path="buy-products/edit/:id" element={<EditBuyProduct />} />
-        <Route path="buy-orders" element={<BuyOrders />} />
-        <Route path="pickup-management" element={<PickupManagement />} />
-        <Route path="returns" element={<Returns />} />
-        <Route path="catalog" element={<CatalogManagement />} />
-        <Route path="products" element={<Products />} />
-        <Route path="categories" element={<Categories />} />
-        <Route path="brands" element={<Brands />} />
-        <Route path="models" element={<Models />} />
-        <Route path="condition-questionnaire" element={<AdminConditionQuestionnaire />} />
-        <Route path="products/create" element={<CreateProduct />} />
-        <Route path="products/:id" element={<ProductDetail />} />
-        <Route path="products/:productId/edit" element={<EditProduct />} />
-        <Route path="partners" element={<Partners />} />
-        <Route path="partner-applications" element={<PartnerApplications />} />
-        <Route path="partner-list" element={<PartnerList />} />
-        <Route path="partner-permissions" element={<PartnerPermissions />} />
-        <Route path="inventory-approval" element={<InventoryApproval />} />
-        <Route path="users" element={<UserManagement />} />
-        <Route path="users/create" element={<CreateUser />} />
-        <Route path="users/edit/:userId" element={<EditUser />} />
-        <Route path="pricing" element={<Pricing />} />
-        <Route path="price-table" element={<Pricing />} />
-        <Route path="condition-adjustments" element={<Pricing />} />
-        <Route path="promotions" element={<Pricing />} />
-        <Route path="finance" element={<Finance />} />
-        <Route path="commission-rules" element={<Finance />} />
-        <Route path="wallet-payouts" element={<Finance />} />
-        <Route path="reports" element={<Reports />} />
+      <Route path="/admin" element={<AdminProtectedRoute />}>
+        <Route element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="sell" element={<Sell />} />
+          <Route path="sell-super-categories" element={<SellSuperCategoryManagement />} />
+          <Route path="sell-categories" element={<SellCategories />} />
+          <Route path="sell-products" element={<SellProducts />} />
+          <Route path="sell-questions" element={<SellQuestionsManagement />} />
+          <Route path="sell-defects" element={<SellDefectsManagement />} />
+          <Route path="sell-accessories" element={<SellAccessoriesManagement />} />
+          <Route path="sell-sessions" element={<SellSessionsManagement />} />
+          <Route path="sell-configuration" element={<SellConfigurationManagement />} />
+          <Route path="sell-orders" element={<SellOrders />} />
+          <Route path="sell-orders-management" element={<SellOrdersManagement />} />
+          <Route path="leads" element={<Leads />} />
+          <Route path="buy" element={<Buy />} />
+          <Route path="buy/order/:orderId" element={<OrderView />} />
+          <Route path="buy-super-categories" element={<SuperCategoryManagement />} />
+          <Route path="buy-categories" element={<BuyCategories />} />
+          <Route path="buy-products" element={<BuyProducts />} />
+          <Route path="buy-products/add" element={<AddBuyProduct />} />
+          <Route path="buy-products/edit/:id" element={<EditBuyProduct />} />
+          <Route path="buy-orders" element={<BuyOrders />} />
+          <Route path="pickup-management" element={<PickupManagement />} />
+          <Route path="returns" element={<Returns />} />
+          <Route path="catalog" element={<CatalogManagement />} />
+          <Route path="products" element={<Products />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="brands" element={<Brands />} />
+          <Route path="models" element={<Models />} />
+          <Route path="condition-questionnaire" element={<AdminConditionQuestionnaire />} />
+          <Route path="products/create" element={<CreateProduct />} />
+          <Route path="products/:id" element={<ProductDetail />} />
+          <Route path="products/:productId/edit" element={<EditProduct />} />
+          <Route path="partners" element={<Partners />} />
+          <Route path="partner-applications" element={<PartnerApplications />} />
+          <Route path="partner-list" element={<PartnerList />} />
+          <Route path="partner-permissions" element={<PartnerPermissions />} />
+          <Route path="inventory-approval" element={<InventoryApproval />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="users/create" element={<CreateUser />} />
+          <Route path="users/edit/:userId" element={<EditUser />} />
+          <Route path="pricing" element={<Pricing />} />
+          <Route path="price-table" element={<Pricing />} />
+          <Route path="condition-adjustments" element={<Pricing />} />
+          <Route path="promotions" element={<Pricing />} />
+          <Route path="finance" element={<Finance />} />
+          <Route path="commission-rules" element={<Finance />} />
+          <Route path="wallet-payouts" element={<Finance />} />
+          <Route path="reports" element={<Reports />} />
+        </Route>
       </Route>
 
       {/* Partner Routes (No Main Layout - Has PartnerLayout) */}
       <Route path="/partner/login" element={<PartnerLogin />} />
-      <Route
-        path="/partner/*"
-        element={
-          <PartnerProtectedRoute>
-            <PartnerLayout />
-          </PartnerProtectedRoute>
-        }
-      >
-        <Route path="dashboard" element={<PartnerDashboard />} />
-        <Route path="inventory" element={<PartnerInventory />} />
-        <Route path="orders" element={<PartnerOrders />} />
-        <Route path="payouts" element={<PartnerPayouts />} />
-        <Route path="kyc" element={<PartnerKYC />} />
+      <Route path="/partner" element={<PartnerProtectedRoute />}>
+        <Route element={<PartnerLayout />}>
+          <Route path="dashboard" element={<PartnerDashboard />} />
+          <Route path="inventory" element={<PartnerInventory />} />
+          <Route path="orders" element={<PartnerOrders />} />
+          <Route path="payouts" element={<PartnerPayouts />} />
+          <Route path="kyc" element={<PartnerKYC />} />
+        </Route>
       </Route>
 
       {/* Agent Routes (No Main Layout) */}

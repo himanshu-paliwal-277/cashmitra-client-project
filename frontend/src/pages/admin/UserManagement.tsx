@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';import styled from 'styled-components';
-import { theme } from '../../theme';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import {
   Users,
@@ -10,474 +9,42 @@ import {
   Edit,
   Trash2,
   Eye,
-  MoreVertical,
-  UserPlus,
-  Mail,
-  Phone,
-  Calendar,
   Shield,
   CheckCircle,
   XCircle,
   AlertCircle,
-  Download,
   RefreshCw,
 } from 'lucide-react';
 
-const Container = styled.div`
-  background-color: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.lg};
-  box-shadow: ${theme.shadows.sm};
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  max-height: calc(100vh - 100px);
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: string;
+  isVerified: boolean;
+  createdAt: string;
+}
 
-  @media (max-width: 768px) {
-    max-height: calc(100vh - 80px);
-  }
-`;
-
-const Header = styled.div`
-  padding: ${theme.spacing[6]};
-  border-bottom: 1px solid ${theme.colors.border.primary};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: ${theme.spacing[4]};
-  flex-shrink: 0;
-
-  @media (max-width: 768px) {
-    padding: ${theme.spacing[4]};
-  }
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-`;
-
-const Title = styled.h2`
-  font-size: ${theme.typography.fontSize.xl};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const HeaderRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: space-between;
-  }
-`;
-
-const SearchContainer = styled.div`
-  position: relative;
-  width: 300px;
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[10]};
-  border: 1px solid ${theme.colors.border.primary};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.sm};
-  transition: border-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary.main};
-    box-shadow: 0 0 0 3px ${theme.colors.primary[100]};
-  }
-`;
-
-const SearchIcon = styled.div`
-  position: absolute;
-  left: ${theme.spacing[3]};
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${theme.colors.text.secondary};
-`;
-
-const Button = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  background-color: ${(props: any) => props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
-  color: ${(props: any) => props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
-  border: 1px solid
-    ${(props: any) => props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${theme.typography.fontWeight.medium};
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: ${(props: any) => props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const FilterContainer = styled.div`
-  padding: ${theme.spacing[4]} ${theme.spacing[6]};
-  border-bottom: 1px solid ${theme.colors.border.primary};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[4]};
-  flex-wrap: wrap;
-  flex-shrink: 0;
-
-  @media (max-width: 768px) {
-    padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  }
-`;
-
-const FilterSelect = styled.select`
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  border: 1px solid ${theme.colors.border.primary};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.sm};
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary.main};
-  }
-`;
-
-const StatsContainer = styled.div`
-  padding: ${theme.spacing[4]} ${theme.spacing[6]};
-  border-bottom: 1px solid ${theme.colors.border.primary};
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: ${theme.spacing[4]};
-  flex-shrink: 0;
-
-  @media (max-width: 768px) {
-    padding: ${theme.spacing[3]} ${theme.spacing[4]};
-    grid-template-columns: repeat(2, 1fr);
-  }
-`;
-
-const StatCard = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[3]};
-  background-color: ${theme.colors.grey[50]};
-  border-radius: ${theme.borderRadius.md};
-`;
-
-const StatIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: ${theme.borderRadius.md};
-  background-color: ${(props: any) => props.color || theme.colors.primary[100]};
-  color: ${(props: any) => props.textColor || theme.colors.primary.main};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatContent = styled.div`
-  flex: 1;
-`;
-
-const StatValue = styled.div`
-  font-size: ${theme.typography.fontSize.lg};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.text.primary};
-`;
-
-const StatLabel = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const TableContainer = styled.div`
-  flex: 1;
-  overflow-x: auto;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  max-height: calc(100vh - 450px);
-
-  @media (max-width: 768px) {
-    margin: 0 -${theme.spacing[6]};
-    border-radius: 0;
-    max-height: calc(100vh - 400px);
-  }
-
-  /* Custom scrollbar styles */
-  &::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: ${theme.colors.grey[100]};
-    border-radius: ${theme.borderRadius.md};
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${theme.colors.grey[300]};
-    border-radius: ${theme.borderRadius.md};
-
-    &:hover {
-      background: ${theme.colors.grey[400]};
-    }
-  }
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 800px;
-
-  @media (max-width: 768px) {
-    min-width: 600px;
-  }
-`;
-
-const TableHeader = styled.thead`
-  background-color: ${theme.colors.grey[50]};
-`;
-
-const TableHeaderCell = styled.th`
-  padding: ${theme.spacing[3]} ${theme.spacing[6]};
-  text-align: left;
-  font-size: ${theme.typography.fontSize.xs};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.secondary};
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  @media (max-width: 768px) {
-    padding: ${theme.spacing[3]} ${theme.spacing[4]};
-    font-size: ${theme.typography.fontSize.xs};
-  }
-`;
-
-const TableRow = styled.tr`
-  border-bottom: 1px solid ${theme.colors.border.primary};
-
-  &:hover {
-    background-color: ${theme.colors.grey[50]};
-  }
-`;
-
-const TableCell = styled.td`
-  padding: ${theme.spacing[4]} ${theme.spacing[6]};
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.primary};
-  vertical-align: middle;
-  white-space: normal;
-  word-wrap: break-word;
-
-  @media (max-width: 768px) {
-    padding: ${theme.spacing[3]} ${theme.spacing[4]};
-    font-size: ${theme.typography.fontSize.xs};
-  }
-
-  &:first-child {
-    min-width: 200px;
-    max-width: 300px;
-  }
-
-  &:last-child {
-    width: 120px;
-    white-space: nowrap;
-  }
-`;
-
-const UserAvatar = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: ${theme.colors.primary[100]};
-  color: ${theme.colors.primary.main};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: ${theme.typography.fontWeight.bold};
-  font-size: ${theme.typography.fontSize.sm};
-`;
-
-const UserInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-`;
-
-const UserDetails = styled.div`
-  flex: 1;
-`;
-
-const UserName = styled.div`
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${theme.colors.text.primary};
-`;
-
-const UserEmail = styled.div`
-  font-size: ${theme.typography.fontSize.xs};
-  color: ${theme.colors.text.secondary};
-`;
-
-const Badge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  font-size: ${theme.typography.fontSize.xs};
-  font-weight: ${theme.typography.fontWeight.medium};
-  border-radius: ${theme.borderRadius.full};
-  text-transform: capitalize;
-
-  ${(props: any) => {
-    switch (props.variant) {
-      case 'admin':
-        return `
-          background-color: ${theme.colors.primary[100]};
-          color: ${theme.colors.primary[600]};
-        `;
-      case 'partner':
-        return `
-          background-color: ${theme.colors.success[100]};
-          color: ${theme.colors.success[600]};
-        `;
-      case 'verified':
-        return `
-          background-color: ${theme.colors.success[100]};
-          color: ${theme.colors.success[600]};
-        `;
-      case 'unverified':
-        return `
-          background-color: ${theme.colors.warning[100]};
-          color: ${theme.colors.warning[600]};
-        `;
-      default:
-        return `
-          background-color: ${theme.colors.grey[100]};
-          color: ${theme.colors.grey[600]};
-        `;
-    }
-  }}
-`;
-
-const ActionButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: none;
-  border: none;
-  border-radius: ${theme.borderRadius.md};
-  cursor: pointer;
-  color: ${theme.colors.text.secondary};
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: ${theme.colors.grey[100]};
-    color: ${theme.colors.primary.main};
-  }
-`;
-
-const ActionsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: ${theme.spacing[8]};
-  color: ${theme.colors.text.secondary};
-  min-height: 300px;
-`;
-
-const EmptyState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: ${theme.spacing[8]};
-  text-align: center;
-  color: ${theme.colors.text.secondary};
-  min-height: 300px;
-`;
-
-const EmptyIcon = styled.div`
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: ${theme.colors.grey[100]};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: ${theme.spacing[4]};
-  color: ${theme.colors.grey[400]};
-`;
-
-const Pagination = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: ${theme.spacing[4]} ${theme.spacing[6]};
-  border-top: 1px solid ${theme.colors.border.primary};
-  flex-shrink: 0;
-  background-color: ${theme.colors.white};
-
-  @media (max-width: 768px) {
-    padding: ${theme.spacing[3]} ${theme.spacing[4]};
-    flex-direction: column;
-    gap: ${theme.spacing[3]};
-  }
-`;
-
-const PaginationInfo = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const PaginationControls = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  margin-left: auto;
-`;
+interface Stats {
+  total: number;
+  verified: number;
+  unverified: number;
+  admins: number;
+  partners: number;
+  regularUsers: number;
+}
 
 const UserManagement = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [verificationFilter, setVerificationFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<Stats>({
     total: 0,
     verified: 0,
     unverified: 0,
@@ -498,7 +65,6 @@ const UserManagement = () => {
       };
 
       const response = await adminService.getAllUsers(params);
-      console.log('API Response:', response); // Debug log
 
       // Handle different response formats
       const userData = response.users || response.data || response || [];
@@ -507,17 +73,18 @@ const UserManagement = () => {
 
       // Ensure userData is an array
       const usersArray = Array.isArray(userData) ? userData : [];
-      console.log('Users Array:', usersArray); // Debug log      setUsers(usersArray);
+
+      setUsers(usersArray);
       setTotalPages(pages);
 
       // Calculate stats
       const statsData = {
         total: totalCount,
-        verified: usersArray.filter(user => user && user.isVerified).length,
-        unverified: usersArray.filter(user => user && !user.isVerified).length,
-        admins: usersArray.filter(user => user && user.role === 'admin').length,
-        partners: usersArray.filter(user => user && user.role === 'partner').length,
-        regularUsers: usersArray.filter(user => user && user.role === 'user').length,
+        verified: usersArray.filter((user: User) => user && user.isVerified).length,
+        unverified: usersArray.filter((user: User) => user && !user.isVerified).length,
+        admins: usersArray.filter((user: User) => user && user.role === 'admin').length,
+        partners: usersArray.filter((user: User) => user && user.role === 'partner').length,
+        regularUsers: usersArray.filter((user: User) => user && user.role === 'user').length,
       };
       setStats(statsData);
     } catch (error) {
@@ -530,14 +97,13 @@ const UserManagement = () => {
 
   useEffect(() => {
     fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, searchTerm, roleFilter, verificationFilter]);
 
-  const handleDeleteUser = async (userId: any) => {
+  const handleDeleteUser = async (userId: string) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
         await adminService.deleteUser(userId);
-        fetchUsers(); // Refresh the list
+        fetchUsers();
       } catch (error) {
         console.error('Error deleting user:', error);
         alert('Failed to delete user');
@@ -545,16 +111,16 @@ const UserManagement = () => {
     }
   };
 
-  const getUserInitials = (name: any) => {
+  const getUserInitials = (name: string) => {
     return name
       .split(' ')
-      .map((word: any) => word.charAt(0))
+      .map((word) => word.charAt(0))
       .join('')
       .toUpperCase()
       .slice(0, 2);
   };
 
-  const formatDate = (dateString: any) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -562,217 +128,307 @@ const UserManagement = () => {
     });
   };
 
-  // Debug logs
-  console.log('Users data:', users);
-  console.log('Users length:', users?.length);
-  console.log('Loading state:', loading);
-  console.log('Stats:', stats);
-  console.log('Is users array?', Array.isArray(users));
-
   // Filter users based on search and filter criteria
   const filteredUsers = Array.isArray(users)
-    ? users.filter(user => {        if (!user || !user.name || !user.email) return false;
+    ? users.filter((user) => {
+        if (!user || !user.name || !user.email) return false;
 
         const matchesSearch =
-          searchTerm === '' ||          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||          (user.phone && user.phone.toLowerCase().includes(searchTerm.toLowerCase()));        const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+          searchTerm === '' ||
+          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (user.phone && user.phone.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        const matchesRole = roleFilter === 'all' || user.role === roleFilter;
         const matchesVerification =
-          verificationFilter === 'all' ||          (verificationFilter === 'verified' && user.isVerified) ||          (verificationFilter === 'unverified' && !user.isVerified);
+          verificationFilter === 'all' ||
+          (verificationFilter === 'verified' && user.isVerified) ||
+          (verificationFilter === 'unverified' && !user.isVerified);
 
         return matchesSearch && matchesRole && matchesVerification;
       })
     : [];
 
-  console.log('Filtered Users:', filteredUsers); // Debug log
-  console.log('Filtered users length:', filteredUsers?.length);
-  console.log('Is filteredUsers array?', Array.isArray(filteredUsers));
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'partner':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'driver':
+        return 'bg-purple-100 text-purple-700 border-purple-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
 
   return (
-    <Container>
-      <Header>
-        <HeaderLeft>
-          <Title>
-            <Users size={24} />
-            User Management
-          </Title>
-        </HeaderLeft>
-        <HeaderRight>
-          <SearchContainer>
-            <SearchIcon>
-              <Search size={16} />
-            </SearchIcon>
-            <SearchInput
-              type="text"
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e: any) => setSearchTerm(e.target.value)}
-            />
-          </SearchContainer>
-          <Button onClick={fetchUsers}>
-            <RefreshCw size={16} />
-            Refresh
-          </Button>
-          <Button variant="primary" onClick={() => navigate('/admin/users/create')}>
-            <Plus size={16} />
-            Add User
-          </Button>
-        </HeaderRight>
-      </Header>
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-100px)] lg:max-h-[calc(100vh-100px)]">
+      {/* Header */}
+      <div className="p-4 sm:p-6 border-b border-gray-200 flex-shrink-0">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          {/* Left side */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">User Management</h2>
+          </div>
 
-      <FilterContainer>
-        <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
-          <Filter size={16} />
-          <span>Filters:</span>
+          {/* Right side */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+            {/* Search */}
+            <div className="relative flex-1 sm:flex-initial sm:w-64 lg:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={fetchUsers}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                <span className="hidden sm:inline">Refresh</span>
+              </button>
+              <button
+                onClick={() => navigate('/admin/users/create')}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">Add User</span>
+              </button>
+            </div>
+          </div>
         </div>
-        <FilterSelect value={roleFilter} onChange={(e: any) => setRoleFilter(e.target.value)}>
-          <option value="all">All Roles</option>
-          <option value="user">Users</option>
-          <option value="partner">Partners</option>
-          <option value="admin">Admins</option>
-          <option value="driver">Drivers</option>
-        </FilterSelect>
-        <FilterSelect
-          value={verificationFilter}
-          onChange={(e: any) => setVerificationFilter(e.target.value)}
-        >
-          <option value="all">All Status</option>
-          <option value="verified">Verified</option>
-          <option value="unverified">Unverified</option>
-        </FilterSelect>
-      </FilterContainer>
+      </div>
 
-      <StatsContainer>
-        <StatCard>
-          <StatIcon color={theme.colors.primary[100]} textColor={theme.colors.primary.main}>
-            <Users size={20} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.total}</StatValue>
-            <StatLabel>Total Users</StatLabel>
-          </StatContent>
-        </StatCard>
-        <StatCard>
-          <StatIcon color={theme.colors.success[100]} textColor={theme.colors.success.main}>
-            <CheckCircle size={20} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.verified}</StatValue>
-            <StatLabel>Verified</StatLabel>
-          </StatContent>
-        </StatCard>
-        <StatCard>
-          <StatIcon color={theme.colors.warning[100]} textColor={theme.colors.warning.main}>
-            <AlertCircle size={20} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.unverified}</StatValue>
-            <StatLabel>Unverified</StatLabel>
-          </StatContent>
-        </StatCard>
-        <StatCard>
-          <StatIcon color={theme.colors.info[100]} textColor={theme.colors.info.main}>
-            <Shield size={20} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.partners}</StatValue>
-            <StatLabel>Partners</StatLabel>
-          </StatContent>
-        </StatCard>
-      </StatsContainer>
+      {/* Filters */}
+      <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex-shrink-0 bg-gray-50">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <Filter className="w-4 h-4" />
+            <span>Filters:</span>
+          </div>
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
+          >
+            <option value="all">All Roles</option>
+            <option value="user">Users</option>
+            <option value="partner">Partners</option>
+            <option value="admin">Admins</option>
+            <option value="driver">Drivers</option>
+          </select>
+          <select
+            value={verificationFilter}
+            onChange={(e) => setVerificationFilter(e.target.value)}
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
+          >
+            <option value="all">All Status</option>
+            <option value="verified">Verified</option>
+            <option value="unverified">Unverified</option>
+          </select>
+        </div>
+      </div>
 
-      <TableContainer>
+      {/* Stats */}
+      <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex-shrink-0 bg-gradient-to-r from-gray-50 to-white">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+              <Users className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-lg sm:text-xl font-bold text-gray-900">{stats.total}</div>
+              <div className="text-xs text-gray-600 truncate">Total Users</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-lg sm:text-xl font-bold text-gray-900">{stats.verified}</div>
+              <div className="text-xs text-gray-600 truncate">Verified</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 rounded-lg bg-yellow-100 text-yellow-600 flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-lg sm:text-xl font-bold text-gray-900">{stats.unverified}</div>
+              <div className="text-xs text-gray-600 truncate">Unverified</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0">
+              <Shield className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-lg sm:text-xl font-bold text-gray-900">{stats.partners}</div>
+              <div className="text-xs text-gray-600 truncate">Partners</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Table Container */}
+      <div className="flex-1 overflow-x-auto overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
         {loading ? (
-          <LoadingContainer>
-            <RefreshCw size={20} className="animate-spin" />
-            Loading users...
-          </LoadingContainer>
+          <div className="flex flex-col items-center justify-center min-h-[300px] text-gray-500">
+            <RefreshCw className="w-8 h-8 animate-spin mb-3 text-blue-600" />
+            <p className="text-sm">Loading users...</p>
+          </div>
         ) : filteredUsers.length === 0 ? (
-          <EmptyState>
-            <EmptyIcon>
-              <Users size={32} />
-            </EmptyIcon>
-            <h3>No users found</h3>
-            <p>Try adjusting your search criteria or add a new user.</p>
-          </EmptyState>
+          <div className="flex flex-col items-center justify-center min-h-[300px] text-center p-6">
+            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+              <Users className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">No users found</h3>
+            <p className="text-sm text-gray-500">Try adjusting your search criteria or add a new user.</p>
+          </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHeaderCell>User</TableHeaderCell>
-                <TableHeaderCell>Role</TableHeaderCell>
-                <TableHeaderCell>Status</TableHeaderCell>
-                <TableHeaderCell>Phone</TableHeaderCell>
-                <TableHeaderCell>Joined</TableHeaderCell>
-                <TableHeaderCell>Actions</TableHeaderCell>
-              </TableRow>
-            </TableHeader>
-            <tbody>
-              {filteredUsers.map(user => (                <TableRow key={user._id}>
-                  <TableCell>
-                    <UserInfo>                      <UserAvatar>{getUserInitials(user.name)}</UserAvatar>
-                      <UserDetails>                        <UserName>{user.name}</UserName>                        <UserEmail>{user.email}</UserEmail>
-                      </UserDetails>
-                    </UserInfo>
-                  </TableCell>
-                  <TableCell>                    <Badge variant={user.role}>                      {user.role === 'admin' && <Shield size={12} />}                      {user.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>                    <Badge variant={user.isVerified ? 'verified' : 'unverified'}>                      {user.isVerified ? (
+          <table className="w-full min-w-[800px]">
+            <thead className="bg-gray-50 sticky top-0 z-10">
+              <tr>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  User
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Role
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Phone
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Joined
+                </th>
+                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredUsers.map((user) => (
+                <tr key={user._id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-4 sm:px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-sm flex-shrink-0 shadow-sm">
+                        {getUserInitials(user.name)}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-medium text-gray-900 truncate">{user.name}</div>
+                        <div className="text-xs text-gray-500 truncate">{user.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 sm:px-6 py-4">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full border ${getRoleBadgeColor(
+                        user.role
+                      )}`}
+                    >
+                      {user.role === 'admin' && <Shield className="w-3 h-3" />}
+                      <span className="capitalize">{user.role}</span>
+                    </span>
+                  </td>
+                  <td className="px-4 sm:px-6 py-4">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-full border ${
+                        user.isVerified
+                          ? 'bg-green-100 text-green-700 border-green-200'
+                          : 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                      }`}
+                    >
+                      {user.isVerified ? (
                         <>
-                          <CheckCircle size={12} /> Verified
+                          <CheckCircle className="w-3 h-3" /> Verified
                         </>
                       ) : (
                         <>
-                          <XCircle size={12} /> Unverified
+                          <XCircle className="w-3 h-3" /> Unverified
                         </>
                       )}
-                    </Badge>
-                  </TableCell>                  <TableCell>{user.phone || 'N/A'}</TableCell>                  <TableCell>{formatDate(user.createdAt)}</TableCell>
-                  <TableCell>
-                    <ActionsContainer>
-                      <ActionButton title="View Details">
-                        <Eye size={16} />
-                      </ActionButton>
-                      <ActionButton
-                        title="Edit User"                        onClick={() => navigate(`/admin/users/edit/${user._id}`)}
+                    </span>
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 text-sm text-gray-900">{user.phone || 'N/A'}</td>
+                  <td className="px-4 sm:px-6 py-4 text-sm text-gray-500">{formatDate(user.createdAt)}</td>
+                  <td className="px-4 sm:px-6 py-4">
+                    <div className="flex items-center gap-1">
+                      <button
+                        title="View Details"
+                        className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-blue-600 transition-colors"
                       >
-                        <Edit size={16} />
-                      </ActionButton>                      <ActionButton title="Delete User" onClick={() => handleDeleteUser(user._id)}>
-                        <Trash2 size={16} />
-                      </ActionButton>
-                    </ActionsContainer>
-                  </TableCell>
-                </TableRow>
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button
+                        title="Edit User"
+                        onClick={() => navigate(`/admin/users/edit/${user._id}`)}
+                        className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-blue-600 transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        title="Delete User"
+                        onClick={() => handleDeleteUser(user._id)}
+                        className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-red-600 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               ))}
             </tbody>
-          </Table>
+          </table>
         )}
-      </TableContainer>
+      </div>
 
+      {/* Pagination */}
       {!loading && filteredUsers.length > 0 && (
-        <Pagination>
-          <PaginationInfo>
+        <div className="px-4 sm:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3 flex-shrink-0 bg-white">
+          <div className="text-sm text-gray-600">
             Showing {(currentPage - 1) * 10 + 1} to {Math.min(currentPage * 10, stats.total)} of{' '}
             {stats.total} users
-          </PaginationInfo>
-          <PaginationControls>
-            <Button disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>
-              Previous
-            </Button>
-            <span
-              style={{ padding: `0 ${theme.spacing[3]}`, fontSize: theme.typography.fontSize.sm }}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
+              Previous
+            </button>
+            <span className="px-3 text-sm text-gray-600">
               Page {currentPage} of {totalPages}
             </span>
-            <Button
+            <button
               disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(prev => prev + 1)}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Next
-            </Button>
-          </PaginationControls>
-        </Pagination>
+            </button>
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

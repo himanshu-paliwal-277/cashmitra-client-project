@@ -36,7 +36,8 @@ import {
   Clock,
 } from 'lucide-react';
 
-function AdminDashboard() {  const { admin, logout } = useAdminAuth();
+function AdminDashboard() {
+  const { adminUser, logout } = useAdminAuth() as any;
   const [activeTab, setActiveTab] = useState('dashboard');
   const [analytics, setAnalytics] = useState(null);
   const [partners, setPartners] = useState([]);
@@ -59,6 +60,9 @@ function AdminDashboard() {  const { admin, logout } = useAdminAuth();
         case 'dashboard':
           const analyticsData = await adminService.getAnalytics();
           setAnalytics(analyticsData);
+          // Also fetch recent orders for the dashboard
+          const recentOrdersData = await adminService.getOrders(1, 5);
+          setOrders(recentOrdersData.orders || []);
           break;
         case 'partners':
           const partnersData = await adminService.getPartners();
@@ -122,328 +126,287 @@ function AdminDashboard() {  const { admin, logout } = useAdminAuth();
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 relative overflow-x-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.3)_0%,transparent_50%),radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.1)_0%,transparent_50%),radial-gradient(circle_at_40%_80%,rgba(120,119,198,0.2)_0%,transparent_50%)] pointer-events-none" />
-
-      {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xl border-b border-white/20 shadow-xl">
-        <div className="px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <Package className="w-8 h-8 text-blue-600" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Cashify
-              </h1>
-              <span className="px-2 py-1 text-xs font-semibold text-blue-600 bg-blue-100 rounded-lg border border-blue-200">
-                ADMIN
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6">
-            {/* Quick Stats */}
-            <div className="hidden lg:flex items-center gap-4 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-2xl shadow-lg border border-slate-200">
-              {[
-                {
-                  icon: Users,
-                  value: '1.2k',
-                  label: 'Users',
-                  color: 'from-blue-500 to-purple-500',
-                },
-                {
-                  icon: Store,
-                  value: '156',
-                  label: 'Partners',
-                  color: 'from-green-500 to-emerald-500',
-                },
-                {
-                  icon: ShoppingBag,
-                  value: '2.8k',
-                  label: 'Orders',
-                  color: 'from-amber-500 to-orange-500',
-                },
-              ].map((stat, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 px-4 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
-                >
-                  <div
-                    className={`w-10 h-10 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-white`}
-                  >
-                    <stat.icon className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-lg font-bold text-slate-900">{stat.value}</div>
-                    <div className="text-xs text-slate-600">{stat.label}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors relative">
-              <Bell className="w-5 h-5 text-slate-600" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
-
-            <button
-              onClick={logout}
-              className="flex items-center gap-3 px-4 py-2 hover:bg-slate-100 rounded-lg transition-colors"
-            >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
-                {admin?.name?.charAt(0) || 'A'}
-              </div>
-              <div className="hidden md:block text-left">
-                <div className="text-sm font-semibold text-slate-900">{admin?.name || 'Admin'}</div>
-                <div className="text-xs text-slate-600">Administrator</div>
-              </div>
-              <LogOut className="w-4 h-4 text-slate-600" />
-            </button>
-          </div>
+    <div className="min-h-full">
+      {/* Navigation Tabs */}
+      <div className="mb-6">
+        <div className="flex gap-2 bg-white/90 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-slate-200 overflow-x-auto scrollbar-hide">
+          {sidebarItems.map(item => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm transition-all whitespace-nowrap min-h-[44px] ${
+                  activeTab === item.id
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-blue-600'
+                }`}
+              >
+                <Icon className="w-5 h-5 flex-shrink-0" />
+                <span className="hidden sm:inline">{item.label}</span>
+              </button>
+            );
+          })}
         </div>
-
-        {/* Navigation Tabs */}
-        <div className="px-6 pb-4">
-          <div className="flex gap-2 bg-white/90 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-slate-200 overflow-x-auto">
-            {sidebarItems.map(item => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all whitespace-nowrap ${
-                    activeTab === item.id
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-blue-600'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <main className="px-6 py-8 relative z-10">
+      <div className="relative">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <RefreshCw className="w-12 h-12 text-white animate-spin mb-4" />
-            <p className="text-xl text-white font-semibold">Loading dashboard data...</p>
+          <div className="flex flex-col items-center justify-center py-16 sm:py-20 bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200">
+            <RefreshCw className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 animate-spin mb-3 sm:mb-4" />
+            <p className="text-lg sm:text-xl text-slate-700 font-semibold px-4 text-center">
+              Loading dashboard data...
+            </p>
           </div>
         ) : (
           <>
             {activeTab === 'dashboard' && (
               <>
-                {/* Welcome Section */}
-                <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-8 sm:p-12 mb-8 shadow-2xl border border-white/30 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full transform translate-x-1/2 -translate-y-1/2" />
+                {/* Welcome Banner */}
+                <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 mb-6 sm:mb-8 shadow-xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-white/10 rounded-full transform translate-x-1/3 -translate-y-1/3" />
+                  <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-48 sm:h-48 bg-white/5 rounded-full transform -translate-x-1/4 translate-y-1/4" />
                   <div className="relative z-10">
-                    <div className="flex items-center gap-4 mb-4">
-                      <Home className="w-12 h-12 text-blue-600" />
-                      <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        Welcome to Cashify Dashboard
-                      </h1>
-                    </div>
-                    <p className="text-xl text-slate-600 font-medium mb-8">
-                      Manage your platform with powerful tools and real-time insights
-                    </p>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                      {[
-                        {
-                          icon: Users,                          value: analytics?.overview?.totalUsers || 1245,
-                          label: 'Total Users',
-                          gradient: 'from-blue-500 to-purple-500',
-                        },
-                        {
-                          icon: Store,                          value: analytics?.overview?.totalPartners || 156,
-                          label: 'Active Partners',
-                          gradient: 'from-green-500 to-emerald-500',
-                        },
-                        {
-                          icon: ShoppingBag,                          value: analytics?.overview?.totalOrders || 2890,
-                          label: 'Orders Today',
-                          gradient: 'from-amber-500 to-orange-500',
-                        },
-                        {
-                          icon: DollarSign,                          value: `₹${analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}`,
-                          label: 'Revenue',
-                          gradient: 'from-purple-500 to-pink-500',
-                        },
-                      ].map((stat, index) => (
-                        <div
-                          key={index}
-                          className="bg-white/80 rounded-2xl p-6 text-center border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1"
-                        >
-                          <div
-                            className={`w-15 h-15 mx-auto mb-4 rounded-2xl bg-gradient-to-r ${stat.gradient} flex items-center justify-center text-white shadow-lg`}
-                          >
-                            <stat.icon className="w-7 h-7" />
-                          </div>
-                          <div className="text-3xl font-bold text-slate-900 mb-2">{stat.value}</div>
-                          <div className="text-sm text-slate-600 font-medium">{stat.label}</div>
-                        </div>
-                      ))}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <Home className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                      </div>
+                      <div>
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+                          Welcome back, {adminUser?.name || 'Admin'}!
+                        </h1>
+                        <p className="text-blue-100 text-sm sm:text-base lg:text-lg mt-1">
+                          Here's what's happening with your platform today
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {/* Key Metrics Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                   {[
                     {
-                      icon: Users,                      value: analytics?.overview?.totalUsers || 1245,
+                      icon: Users,
+                      value: analytics?.overview?.totalUsers || 0,
                       label: 'Total Users',
-                      trend: '+12%',
-                      color: '#667eea',
+                      gradient: 'from-blue-500 to-blue-600',
+                      bgColor: 'bg-blue-50',
+                      textColor: 'text-blue-600',
                     },
                     {
-                      icon: Store,                      value: analytics?.overview?.totalPartners || 156,
-                      label: 'Verified Partners',
-                      trend: '+8%',
-                      color: '#10B981',
+                      icon: Store,
+                      value: analytics?.overview?.totalPartners || 0,
+                      label: 'Active Partners',
+                      gradient: 'from-green-500 to-green-600',
+                      bgColor: 'bg-green-50',
+                      textColor: 'text-green-600',
                     },
                     {
-                      icon: ShoppingBag,                      value: analytics?.overview?.totalOrders || 2890,
+                      icon: ShoppingBag,
+                      value: analytics?.overview?.totalOrders || 0,
                       label: 'Total Orders',
-                      trend: '+24%',
-                      color: '#F59E0B',
+                      gradient: 'from-amber-500 to-amber-600',
+                      bgColor: 'bg-amber-50',
+                      textColor: 'text-amber-600',
                     },
                     {
-                      icon: DollarSign,                      value: `₹${analytics?.revenue?.totalRevenue?.toLocaleString() || '2,45,000'}`,
+                      icon: DollarSign,
+                      value: `₹${(analytics?.revenue?.totalRevenue || 0).toLocaleString()}`,
                       label: 'Total Revenue',
-                      trend: '+18%',
-                      color: '#8B5CF6',
-                    },
-                    {
-                      icon: HelpCircle,                      value: analytics?.questionnaires?.total || 450,
-                      label: 'Questionnaires',
-                      trend: '+15%',
-                      color: '#EF4444',
-                    },
-                    {
-                      icon: Smartphone,                      value: analytics?.devices?.mobile || 890,
-                      label: 'Mobile Devices',
-                      trend: 'Popular',
-                      color: '#06B6D4',
-                    },
-                    {
-                      icon: Activity,                      value: analytics?.activity?.activeToday || 234,
-                      label: 'Active Today',
-                      trend: '+5%',
-                      color: '#84CC16',
-                    },
-                    {
-                      icon: Target,                      value: `${analytics?.performance?.conversionRate || '3.2'}%`,
-                      label: 'Conversion Rate',
-                      trend: '+0.4%',
-                      color: '#F97316',
+                      gradient: 'from-purple-500 to-purple-600',
+                      bgColor: 'bg-purple-50',
+                      textColor: 'text-purple-600',
                     },
                   ].map((stat, index) => (
                     <div
                       key={index}
-                      className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl hover:-translate-y-2 transition-all relative overflow-hidden"
+                      className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1 min-h-[140px] flex flex-col justify-between"
                     >
-                      <div
-                        className="absolute top-0 left-0 right-0 h-1.5 rounded-t-2xl"
-                        style={{ background: stat.color }}
-                      />
-                      <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div
-                          className="w-14 h-14 rounded-xl flex items-center justify-center text-white shadow-lg"
-                          style={{
-                            background: `linear-gradient(135deg, ${stat.color}, ${stat.color}dd)`,
-                          }}
+                          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl ${stat.bgColor} flex items-center justify-center flex-shrink-0`}
                         >
-                          <stat.icon className="w-8 h-8" />
-                        </div>
-                        <div className="text-right">
-                          <div className="text-3xl font-bold text-slate-900">{stat.value}</div>
-                          <div className="text-xs text-slate-600 font-medium uppercase tracking-wide mt-1">
-                            {stat.label}
-                          </div>
+                          <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.textColor}`} />
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm font-semibold text-green-600">
-                        <ArrowUpRight className="w-4 h-4" />
-                        {stat.trend}
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1 break-words">
+                          {stat.value}
+                        </div>
+                        <div className="text-xs sm:text-sm text-slate-600 font-medium">
+                          {stat.label}
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Recent Orders */}
-                <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
-                  <div className="px-8 py-6 border-b border-slate-200 bg-blue-50/50 flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <Clock className="w-6 h-6 text-blue-600" />
-                      <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-blue-600 bg-clip-text text-transparent">
-                        Recent Orders
-                      </h3>
+                {/* Additional Stats Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                  {[
+                    {
+                      icon: HelpCircle,
+                      value: analytics?.questionnaires?.total || 0,
+                      label: 'Questionnaires',
+                      trend: `${analytics?.questionnaires?.completionRate || '0'}%`,
+                      bgColor: 'bg-red-50',
+                      textColor: 'text-red-600',
+                    },
+                    {
+                      icon: Smartphone,
+                      value: analytics?.devices?.mobile || 0,
+                      label: 'Mobile Devices',
+                      trend: `${analytics?.devices?.laptop || 0} Laptops`,
+                      bgColor: 'bg-cyan-50',
+                      textColor: 'text-cyan-600',
+                    },
+                    {
+                      icon: Activity,
+                      value: analytics?.activity?.activeToday || 0,
+                      label: 'Active Today',
+                      trend: `${analytics?.activity?.totalVisits || 0} Visits`,
+                      bgColor: 'bg-lime-50',
+                      textColor: 'text-lime-600',
+                    },
+                    {
+                      icon: Target,
+                      value: `${analytics?.performance?.conversionRate || '0'}%`,
+                      label: 'Conversion Rate',
+                      trend: `${analytics?.performance?.completedOrders || 0} Completed`,
+                      bgColor: 'bg-orange-50',
+                      textColor: 'text-orange-600',
+                    },
+                  ].map((stat, index) => (
+                    <div
+                      key={index}
+                      className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-lg border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all min-h-[140px] flex flex-col justify-between"
+                    >
+                      <div className="flex items-center justify-between mb-3 sm:mb-4">
+                        <div
+                          className={`w-11 h-11 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl ${stat.bgColor} flex items-center justify-center flex-shrink-0`}
+                        >
+                          <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.textColor}`} />
+                        </div>
+                        <div className="flex items-center gap-1 text-xs sm:text-sm font-semibold text-green-600 flex-shrink-0">
+                          <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4" />
+                          {stat.trend}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1 break-words">
+                          {stat.value}
+                        </div>
+                        <div className="text-xs sm:text-sm text-slate-600 font-medium">
+                          {stat.label}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Recent Orders Table */}
+                <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200 overflow-hidden">
+                  <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                          Recent Orders
+                        </h3>
+                        <p className="text-xs sm:text-sm text-slate-600">
+                          Latest transactions and activities
+                        </p>
+                      </div>
                     </div>
                     <button
                       onClick={() => setActiveTab('orders')}
-                      className="flex items-center gap-2 px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold hover:bg-blue-600 hover:text-white transition-all"
+                      className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg sm:rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-sm min-h-[44px] text-sm sm:text-base"
                     >
                       <Eye className="w-4 h-4" />
-                      View All Orders
+                      <span>View All</span>
                     </button>
                   </div>
-                  <div className="p-8 overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-slate-200">
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                  <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                    <table className="w-full min-w-[640px]">
+                      <thead className="bg-slate-50">
+                        <tr>
+                          <th className="text-left py-3 sm:py-4 px-4 sm:px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider whitespace-nowrap">
                             Order ID
                           </th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                          <th className="text-left py-3 sm:py-4 px-4 sm:px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider whitespace-nowrap">
                             Customer
                           </th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                          <th className="text-left py-3 sm:py-4 px-4 sm:px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider whitespace-nowrap">
                             Type
                           </th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                          <th className="text-left py-3 sm:py-4 px-4 sm:px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider whitespace-nowrap">
                             Amount
                           </th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                          <th className="text-left py-3 sm:py-4 px-4 sm:px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider whitespace-nowrap">
                             Status
                           </th>
-                          <th className="text-left py-3 px-4 text-sm font-semibold text-slate-600">
+                          <th className="text-left py-3 sm:py-4 px-4 sm:px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider whitespace-nowrap">
                             Date
                           </th>
                         </tr>
                       </thead>
-                      <tbody>
-                        {orders.slice(0, 5).map((order, index) => (
-                          <tr                            key={order._id || index}
-                            className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
-                          >
-                            <td className="py-4 px-4 font-medium text-slate-900">                              #{order._id?.slice(-6) || `ORD${String(index + 1).padStart(3, '0')}`}
-                            </td>
-                            <td className="py-4 px-4 text-slate-700">                              {order.user?.name || `Customer ${index + 1}`}
-                            </td>
-                            <td className="py-4 px-4 text-slate-700">                              {order.orderType || 'Sell'}
-                            </td>
-                            <td className="py-4 px-4 font-semibold text-slate-900">                              ₹{order.totalAmount || Math.floor(Math.random() * 50000 + 10000)}
-                            </td>
-                            <td className="py-4 px-4">
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-semibold ${                                  order.status === 'completed'
-                                    ? 'bg-green-100 text-green-700'                                    : order.status === 'pending'
-                                      ? 'bg-amber-100 text-amber-700'
-                                      : 'bg-red-100 text-red-700'
-                                }`}
-                              >                                {order.status || 'pending'}
-                              </span>
-                            </td>
-                            <td className="py-4 px-4 text-slate-600">                              {order.createdAt                                ? new Date(order.createdAt).toLocaleDateString()
-                                : new Date().toLocaleDateString()}
+                      <tbody className="divide-y divide-slate-100">
+                        {orders.length > 0 ? (
+                          orders.slice(0, 5).map((order, index) => (
+                            <tr
+                              key={order._id || index}
+                              className="hover:bg-slate-50 transition-colors"
+                            >
+                              <td className="py-3 sm:py-4 px-4 sm:px-6 font-medium text-slate-900 text-sm whitespace-nowrap">
+                                #
+                                {order._id?.slice(-6) || `ORD${String(index + 1).padStart(3, '0')}`}
+                              </td>
+                              <td className="py-3 sm:py-4 px-4 sm:px-6 text-slate-700 text-sm whitespace-nowrap">
+                                {order.user?.name || `Customer ${index + 1}`}
+                              </td>
+                              <td className="py-3 sm:py-4 px-4 sm:px-6 whitespace-nowrap">
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">
+                                  {order.orderType || 'Sell'}
+                                </span>
+                              </td>
+                              <td className="py-3 sm:py-4 px-4 sm:px-6 font-semibold text-slate-900 text-sm whitespace-nowrap">
+                                ₹{(order.totalAmount || 0).toLocaleString()}
+                              </td>
+                              <td className="py-3 sm:py-4 px-4 sm:px-6 whitespace-nowrap">
+                                <span
+                                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                                    order.status === 'completed'
+                                      ? 'bg-green-100 text-green-700'
+                                      : order.status === 'pending'
+                                        ? 'bg-amber-100 text-amber-700'
+                                        : 'bg-slate-100 text-slate-700'
+                                  }`}
+                                >
+                                  {order.status || 'pending'}
+                                </span>
+                              </td>
+                              <td className="py-3 sm:py-4 px-4 sm:px-6 text-slate-600 text-xs sm:text-sm whitespace-nowrap">
+                                {order.createdAt
+                                  ? new Date(order.createdAt).toLocaleDateString()
+                                  : new Date().toLocaleDateString()}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td
+                              colSpan={6}
+                              className="py-8 px-4 text-center text-slate-500 text-sm"
+                            >
+                              No orders found. Orders will appear here once customers start placing
+                              orders.
                             </td>
                           </tr>
-                        ))}
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -462,130 +425,165 @@ function AdminDashboard() {  const { admin, logout } = useAdminAuth();
             {activeTab === 'purchase-orders' && <RealTimePurchaseOrders />}
             {activeTab === 'pickup-management' && <PickupManagement />}
             {activeTab === 'partners' && (
-              <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
-                <div className="px-8 py-6 border-b border-slate-200 bg-blue-50/50 flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <Store className="w-6 h-6 text-blue-600" />
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-blue-600 bg-clip-text text-transparent">
-                      Partner Management
-                    </h3>
+              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200 overflow-hidden">
+                <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Store className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                        Partner Management
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600">
+                        Manage and verify partners
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={() => openModal('verifyPartner')}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg sm:rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-sm min-h-[44px] text-sm sm:text-base"
                   >
                     <Plus className="w-4 h-4" />
-                    Verify Partners
+                    <span>Verify Partners</span>
                   </button>
                 </div>
-                <div className="p-8">
-                  <p className="text-slate-600">Partner management content...</p>
+                <div className="p-6 sm:p-8">
+                  <p className="text-slate-600 text-sm sm:text-base">
+                    Partner management content...
+                  </p>
                 </div>
               </div>
             )}
             {activeTab === 'orders' && (
-              <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
-                <div className="px-8 py-6 border-b border-slate-200 bg-blue-50/50 flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <ShoppingBag className="w-6 h-6 text-blue-600" />
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-blue-600 bg-clip-text text-transparent">
-                      Order Management
-                    </h3>
+              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200 overflow-hidden">
+                <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                      <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                        Order Management
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600">
+                        View and manage all orders
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-100 transition-all">
+                  <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+                    <button className="flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-300 text-slate-700 rounded-lg sm:rounded-xl font-semibold hover:bg-slate-50 transition-all min-h-[44px] flex-1 sm:flex-initial text-sm sm:text-base">
                       <Filter className="w-4 h-4" />
-                      Filter
+                      <span>Filter</span>
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-100 transition-all">
+                    <button className="flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-300 text-slate-700 rounded-lg sm:rounded-xl font-semibold hover:bg-slate-50 transition-all min-h-[44px] flex-1 sm:flex-initial text-sm sm:text-base">
                       <Download className="w-4 h-4" />
-                      Export
+                      <span>Export</span>
                     </button>
                   </div>
                 </div>
-                <div className="p-8">
-                  <p className="text-slate-600">Order management content...</p>
+                <div className="p-6 sm:p-8">
+                  <p className="text-slate-600 text-sm sm:text-base">Order management content...</p>
                 </div>
               </div>
             )}
             {activeTab === 'catalog' && (
-              <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
-                <div className="px-8 py-6 border-b border-slate-200 bg-blue-50/50 flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <Package className="w-6 h-6 text-blue-600" />
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-blue-600 bg-clip-text text-transparent">
-                      Product Catalog
-                    </h3>
+              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200 overflow-hidden">
+                <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Package className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                        Product Catalog
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600">Manage product inventory</p>
+                    </div>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
                     <button
                       onClick={() => openModal('addProduct')}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all"
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg sm:rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-sm min-h-[44px] flex-1 sm:flex-initial text-sm sm:text-base"
                     >
                       <Plus className="w-4 h-4" />
-                      Add Product
+                      <span>Add Product</span>
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-100 transition-all">
+                    <button className="flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-300 text-slate-700 rounded-lg sm:rounded-xl font-semibold hover:bg-slate-50 transition-all min-h-[44px] flex-1 sm:flex-initial text-sm sm:text-base">
                       <Download className="w-4 h-4" />
-                      Export
+                      <span className="hidden sm:inline">Export</span>
+                      <Download className="w-4 h-4 sm:hidden" />
                     </button>
                   </div>
                 </div>
-                <div className="p-8">
-                  <p className="text-slate-600">Product catalog content...</p>
+                <div className="p-6 sm:p-8">
+                  <p className="text-slate-600 text-sm sm:text-base">Product catalog content...</p>
                 </div>
               </div>
             )}
             {activeTab === 'analytics' && (
-              <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-12 text-center">
-                <BarChart3 className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-slate-900 mb-4">Analytics & Reports</h2>
-                <p className="text-slate-600 mb-6">Detailed analytics coming soon...</p>
+              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200 p-8 sm:p-12 text-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <BarChart3 className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 sm:mb-3">
+                  Analytics & Reports
+                </h2>
+                <p className="text-sm sm:text-base text-slate-600 mb-6 sm:mb-8 max-w-md mx-auto px-4">
+                  Detailed analytics and insights coming soon. Track your platform's performance and
+                  growth.
+                </p>
                 <button
                   onClick={loadDashboardData}
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all mx-auto"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg sm:rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-sm min-h-[44px] text-sm sm:text-base"
                 >
-                  <RefreshCw className="w-5 h-5" />
-                  Refresh Data
+                  <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>Refresh Data</span>
                 </button>
               </div>
             )}
             {activeTab === 'settings' && (
-              <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-12 text-center">
-                <Settings className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-slate-900 mb-4">System Settings</h2>
-                <p className="text-slate-600 mb-6">Configure your system settings...</p>
+              <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200 p-8 sm:p-12 text-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <Settings className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 sm:mb-3">
+                  System Settings
+                </h2>
+                <p className="text-sm sm:text-base text-slate-600 mb-6 sm:mb-8 max-w-md mx-auto px-4">
+                  Configure your system preferences and manage platform settings.
+                </p>
                 <button
                   onClick={loadDashboardData}
-                  className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all mx-auto"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg sm:rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-sm min-h-[44px] text-sm sm:text-base"
                 >
-                  <RefreshCw className="w-5 h-5" />
-                  Refresh
+                  <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>Refresh</span>
                 </button>
               </div>
             )}
           </>
         )}
-      </main>
+      </div>
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-slate-900">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 max-w-md w-full max-h-[80vh] overflow-y-auto shadow-2xl">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 {modalType === 'verifyPartner' && 'Verify Partner'}
                 {modalType === 'addProduct' && 'Add Product'}
                 {modalType === 'editProduct' && 'Edit Product'}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-slate-600">Modal content for {modalType}...</p>
+            <p className="text-slate-600 text-sm sm:text-base">Modal content for {modalType}...</p>
           </div>
         </div>
       )}

@@ -13,6 +13,7 @@
     "lint:fix": "eslint src --ext .js,.jsx --fix"
   },
   "dependencies": {
+    "@radix-ui/react-accordion": "^1.2.12",
     "axios": "^1.12.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
