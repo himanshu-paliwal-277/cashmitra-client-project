@@ -1,128 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { productCategoriesAPI } from '../../../api/productCategories';
-import './PhoneDropdown.css';
+import { productsAPI } from '../../../api/productCategories';
 
 const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: any) => {
   const navigate = useNavigate();
   const [phones, setPhones] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchPhones();
-  }, []);
+    if (isVisible) {
+      fetchPhones();
+    }
+  }, [isVisible]);
 
   const fetchPhones = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // First, get all categories to find the mobile/phone category
-      const categoriesResponse = await productCategoriesAPI.getCategories();
-
-      if (categoriesResponse.success && categoriesResponse.data?.data) {
-        const categoryList = categoriesResponse.data.data;
-
-        // Find mobile/phone category
-        const mobileCategory = categoryList.find(
-          (cat: any) =>
-            cat.name &&
-            (cat.name.toLowerCase().includes('mobile') ||
-              cat.name.toLowerCase().includes('phone') ||
-              cat.name.toLowerCase().includes('smartphone'))
-        );
-
-        if (mobileCategory) {
-          // Fetch products for the mobile category
-          const productsResponse = await productCategoriesAPI.getProductsByCategory(
-            mobileCategory._id,
-            {
-              page: 1,
-              limit: 8, // Show only 8 phones in dropdown
-              sort: 'createdAt',
-              order: 'desc',
-            }
-          );
-
-          if (productsResponse.success && productsResponse.data?.data) {
-            setPhones(productsResponse.data.data);
-          } else {
-            // Fallback to search
-            await fetchFallbackPhones();
-          }
-        } else {
-          // Fallback to search
-          await fetchFallbackPhones();
-        }
-      } else {
-        // Fallback to search
-        await fetchFallbackPhones();
-      }
-    } catch (err) {
-      console.error('Error fetching phones:', err);
-      setError('Failed to load phones');
-      await fetchFallbackPhones();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchFallbackPhones = async () => {
-    try {
-      // Try to search for mobile products
-      const searchResponse = await productCategoriesAPI.searchProducts('mobile phone', {
+      // Search for mobile/smartphone products
+      const searchResponse = await productsAPI.searchProducts('', {
         limit: 8,
+        page: 1,
       });
 
       if (searchResponse.success && searchResponse.data?.data) {
         setPhones(searchResponse.data.data);
       } else {
-        // Use static fallback data
-        setPhones(getFallbackPhones());
+        setError(searchResponse.error || 'Failed to load phones');
       }
     } catch (err) {
-      console.error('Fallback search failed:', err);
-      setPhones(getFallbackPhones());
+      console.error('Error fetching phones:', err);
+      setError('Failed to load phones');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getFallbackPhones = () => [
-    {
-      _id: '1',
-      name: 'iPhone 15 Pro',
-      brand: 'Apple',
-      price: 134900,
-      image: '/phones/iphone-15-pro.jpg',
-      condition: 'New',
-    },
-    {
-      _id: '2',
-      name: 'Samsung Galaxy S24',
-      brand: 'Samsung',
-      price: 79999,
-      image: '/phones/samsung-s24.jpg',
-      condition: 'New',
-    },
-    {
-      _id: '3',
-      name: 'OnePlus 12',
-      brand: 'OnePlus',
-      price: 64999,
-      image: '/phones/oneplus-12.jpg',
-      condition: 'New',
-    },
-    {
-      _id: '4',
-      name: 'Google Pixel 8',
-      brand: 'Google',
-      price: 75999,
-      image: '/phones/pixel-8.jpg',
-      condition: 'New',
-    },
-  ];
-
-  const formatPrice = (price: any) => {
+  const formatPrice = (price: number) => {
     if (!price) return 'Price not available';
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -148,60 +64,83 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
   if (!isVisible) return null;
 
   return (
-    <div className="phone-dropdown">
-      <div className="phone-dropdown-content">
-        <div className="phone-dropdown-header">
-          <h3>Popular Phones</h3>
-          <button className="view-all-btn" onClick={handleViewAllClick}>
+    <div className="absolute top-full left-0 bg-white border border-gray-200 rounded-md shadow-[0_10px_40px_rgba(0,0,0,0.15)] z-[1000] min-w-[500px] max-w-[600px] animate-fadeInDown">
+      <div className="p-6 md:p-4">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-800">Popular Phones</h3>
+          <button
+            className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors"
+            onClick={handleViewAllClick}
+          >
             View All
           </button>
         </div>
 
+        {/* Loading State */}
         {loading && (
-          <div className="phone-dropdown-loading">
-            <div className="loading-spinner"></div>
-            <p>Loading phones...</p>
+          <div className="flex flex-col items-center justify-center py-10">
+            <div className="w-8 h-8 border-[3px] border-gray-200 border-t-green-600 rounded-full animate-spin mb-3"></div>
+            <p className="text-gray-600 text-sm">Loading phones...</p>
           </div>
         )}
 
+        {/* Error State */}
         {error && !loading && (
-          <div className="phone-dropdown-error">
-            <p>{error}</p>
+          <div className="flex flex-col items-center justify-center py-10">
+            <p className="text-red-500 text-sm mb-4">{error}</p>
+            <button
+              onClick={fetchPhones}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors"
+            >
+              Try Again
+            </button>
           </div>
         )}
 
+        {/* Phones Grid */}
         {!loading && !error && phones.length > 0 && (
-          <div className="phone-dropdown-grid">
-            {phones.slice(0, 8).map(phone => (
+          <div className="grid grid-cols-2 gap-3 mb-5 max-h-[400px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb:hover]:bg-gray-500">
+            {phones.slice(0, 8).map((phone: any) => (
               <div
                 key={phone._id}
-                className="phone-dropdown-item"
+                className="flex items-center p-3 border border-gray-100 rounded-lg cursor-pointer transition-all duration-200 bg-gray-50 hover:bg-green-50 hover:border-green-600  hover:shadow-md group"
                 onClick={() => handlePhoneClick(phone)}
               >
-                <div className="phone-item-image">
+                <div className="w-[50px] h-[50px] flex-shrink-0 flex items-center justify-center mr-3 bg-white rounded-lg border border-gray-200 overflow-hidden">
                   <img
                     src={phone.image || phone.images?.[0] || '/placeholder-phone.jpg'}
                     alt={phone.name}
+                    className="w-full h-full object-contain p-1"
                   />
                 </div>
-                <div className="phone-item-info">
-                  <h4 className="phone-item-name">{phone.name}</h4>
-                  <p className="phone-item-brand">{phone.brand}</p>
-                  <div className="phone-item-price">
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-semibold text-gray-800 leading-tight overflow-hidden text-ellipsis whitespace-nowrap mb-1">
+                    {phone.name}
+                  </h4>
+                  <p className="text-xs text-gray-600 font-medium mb-1">{phone.brand}</p>
+                  <div className="text-sm font-bold text-green-600">
                     {formatPrice(phone.price || phone.pricing?.discountedPrice)}
                   </div>
-                  {phone.condition && (
-                    <span className="phone-item-condition">{phone.condition}</span>
-                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
 
+        {/* Empty State */}
         {!loading && !error && phones.length === 0 && (
-          <div className="phone-dropdown-empty">
-            <p>No phones available at the moment</p>
+          <div className="text-center py-10">
+            <p className="text-gray-600 text-sm">No phones available at the moment</p>
+          </div>
+        )}
+
+        {/* Footer */}
+        {!loading && !error && phones.length > 0 && (
+          <div className="pt-4 border-t border-gray-200 text-center">
+            <p className="text-xs text-gray-600">
+              Get the best deals on refurbished phones with Cashmitra
+            </p>
           </div>
         )}
       </div>

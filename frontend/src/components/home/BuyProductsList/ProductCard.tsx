@@ -48,7 +48,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
           <img
             src={product.images?.main || '/placeholder-phone.png'}
             alt={product.name}
-            className="max-w-full max-h-full object-contain transition-transform duration-400 ease-out drop-shadow-lg"
+            className="max-w-full max-h-full object-contain"
             loading="lazy"
           />
         </div>

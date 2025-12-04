@@ -148,7 +148,7 @@ const Header = () => {
   return (
     <>
       {/* Top Bar - Sticky */}
-      <div className="bg-white w-full shadow-md flex justify-between items-center gap-4 px-4 py-3 lg:gap-6 lg:px-[100px] lg:py-4 md:gap-3 md:px-6 sticky top-0 z-50 border-b border-gray-200">
+      <div className="bg-white w-full shadow-sm flex justify-between items-center gap-4 px-4 py-3 lg:gap-6 lg:px-[100px] lg:py-4 md:gap-3 md:px-6 sticky top-0 z-50 border-b border-gray-200">
         {/* Logo */}
         <Link
           to="/"
@@ -305,71 +305,71 @@ const Header = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="fixed top-[57px] lg:top-[73px] left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 p-4 max-h-[calc(100vh-57px)] lg:max-h-[calc(100vh-73px)] overflow-y-auto">
-        {/* Mobile Search */}
-        <div className="mb-4 pb-4 border-b border-gray-200">
-          <div className="relative w-full">
-            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
-              <Search size={18} />
+          {/* Mobile Search */}
+          <div className="mb-4 pb-4 border-b border-gray-200">
+            <div className="relative w-full">
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                <Search size={18} />
+              </div>
+              <input
+                type="text"
+                placeholder="Search devices..."
+                className="w-full py-3 pl-11 pr-4 border-[1.5px] border-gray-300 rounded-lg text-sm text-gray-800 bg-gray-50 transition-all focus:outline-none focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 placeholder:text-gray-500"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Search devices..."
-              className="w-full py-3 pl-11 pr-4 border-[1.5px] border-gray-300 rounded-lg text-sm text-gray-800 bg-gray-50 transition-all focus:outline-none focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 placeholder:text-gray-500"
-            />
           </div>
-        </div>
 
-        {/* Mobile Nav Items */}
-        <div className="flex flex-col gap-1 mb-4">
-          {navItems.map(item => (
-            <MobileCollapsibleNavItem key={item.id} item={item} onLinkClick={handleLinkClick} />
-          ))}
-        </div>
+          {/* Mobile Nav Items */}
+          <div className="flex flex-col gap-1 mb-4">
+            {navItems.map(item => (
+              <MobileCollapsibleNavItem key={item.id} item={item} onLinkClick={handleLinkClick} />
+            ))}
+          </div>
 
-        {/* Mobile Only Links */}
-        <div className="flex flex-col gap-1 mb-4">
-          {mobileOnlyLinks.map(link => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600 ${
-                currentPath === link.to ? 'bg-gray-100 text-green-600' : ''
-              }`}
-              onClick={() => handleLinkClick(link.to)}
-            >
-              {link.icon}
-              {link.label}
-            </Link>
-          ))}
-        </div>
-
-        {/* Mobile Actions */}
-        <div className="pt-4 border-t border-gray-200 flex flex-col gap-1">
-          {isAuthenticated ? (
-            <>
+          {/* Mobile Only Links */}
+          <div className="flex flex-col gap-1 mb-4">
+            {mobileOnlyLinks.map(link => (
               <Link
-                to="/profile"
-                onClick={() => handleLinkClick('/profile')}
-                className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600"
+                key={link.to}
+                to={link.to}
+                className={`flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600 ${
+                  currentPath === link.to ? 'bg-gray-100 text-green-600' : ''
+                }`}
+                onClick={() => handleLinkClick(link.to)}
               >
-                <Settings /> My Profile
+                {link.icon}
+                {link.label}
               </Link>
+            ))}
+          </div>
+
+          {/* Mobile Actions */}
+          <div className="pt-4 border-t border-gray-200 flex flex-col gap-1">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/profile"
+                  onClick={() => handleLinkClick('/profile')}
+                  className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600"
+                >
+                  <Settings /> My Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 border-none bg-transparent text-red-600 text-[15px] font-medium text-left cursor-pointer rounded-lg transition-colors hover:bg-gray-50"
+                >
+                  <LogOut /> Logout
+                </button>
+              </>
+            ) : (
               <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 border-none bg-transparent text-red-600 text-[15px] font-medium text-left cursor-pointer rounded-lg transition-colors hover:bg-gray-50"
+                onClick={handleLogin}
+                className="w-full px-6 py-2.5 text-sm font-semibold text-white bg-green-600 border-none rounded-lg cursor-pointer transition-all hover:bg-green-700"
               >
-                <LogOut /> Logout
+                Login
               </button>
-            </>
-          ) : (
-            <button
-              onClick={handleLogin}
-              className="w-full px-6 py-2.5 text-sm font-semibold text-white bg-green-600 border-none rounded-lg cursor-pointer transition-all hover:bg-green-700"
-            >
-              Login
-            </button>
-          )}
-        </div>
+            )}
+          </div>
         </div>
       )}
     </>

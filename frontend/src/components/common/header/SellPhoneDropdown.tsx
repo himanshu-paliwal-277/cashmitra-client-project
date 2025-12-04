@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminService } from '../../../services/adminService';
-import './SellPhoneDropdown.css';
+// import { adminService } from '../../../services/adminService';
 import useAdminCategories from '../../../hooks/useAdminCategories';
 
 const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: any) => {
@@ -13,11 +12,12 @@ const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }
     categories: hookCategories,
     loading: hookLoading,
     error: hookError,
-    addCategory,
-    editCategory,
+    // addCategory,
+    // editCategory,
     removeCategory,
     fetchCategories,
   } = useAdminCategories();
+
   useEffect(() => {
     setCategories(hookCategories);
     setLoading(hookLoading);
@@ -37,81 +37,98 @@ const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }
     onLinkClick(path);
   };
 
-  if (loading) {
-    return (
-      <div className="sell-dropdown">
-        <div className="sell-dropdown-content">
-          <div className="sell-dropdown-loading">
-            <div className="loading-spinner"></div>
-            <p>Loading categories...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error && categories.length === 0) {
-    return (
-      <div className="sell-dropdown">
-        <div className="sell-dropdown-content">
-          <div className="sell-dropdown-error">
-            <p>Unable to load categories</p>
-            <button onClick={fetchCategories} className="retry-btn">
-              Try Again
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!isVisible) return null;
 
   return (
-    <div className="sell-dropdown">
-      <div className="sell-dropdown-content">
-        <div className="sell-dropdown-header">
-          <h3>Sell Your Device</h3>
-          <button onClick={handleViewAllClick} className="view-all-btn">
+    <div className="absolute top-full left-0 bg-white border border-gray-200 rounded-md shadow-[0_10px_40px_rgba(0,0,0,0.15)] z-[1000] min-w-[500px] max-w-[600px] max-h-[500px] overflow-y-auto animate-fadeInDown [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb:hover]:bg-gray-500">
+      <div className="p-6 md:p-4">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-800">Sell Your Device</h3>
+          <button
+            onClick={handleViewAllClick}
+            className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors"
+          >
             View All Categories
           </button>
         </div>
 
-        <div className="sell-categories-grid">
-          {categories.map(category => {
-            const imageUrl = category.image || getCategoryImage(category.name);
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-10">
+            <div className="w-8 h-8 border-[3px] border-gray-200 border-t-green-600 rounded-full animate-spin mb-3"></div>
+            <p className="text-gray-600 text-sm">Loading categories...</p>
+          </div>
+        )}
 
-            return (
-              <div
-                key={category.id}
-                className="sell-category-item"
-                onClick={() => handleCategoryClick(category)}
-              >
-                <div className="category-image">
-                  <img
-                    src={imageUrl}
-                    alt={category.name}
-                    onError={e => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                  <div className="category-icon-fallback" style={{ display: 'none' }}>
-                    {getCategoryIcon(category.icon || category.name)}
+        {/* Error State */}
+        {error && !loading && categories.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-10">
+            <p className="text-red-500 text-sm mb-4">Unable to load categories</p>
+            <button
+              onClick={fetchCategories}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {/* Categories Grid */}
+        {!loading && categories.length > 0 && (
+          <>
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              {categories.map((category: any) => {
+                const imageUrl = category.image || getCategoryImage(category.name);
+
+                return (
+                  <div
+                    key={category.id}
+                    className="flex items-center p-3 border border-gray-100 rounded-lg cursor-pointer transition-all duration-200 bg-gray-50 hover:bg-green-50 hover:border-green-600 hover:shadow-md group"
+                    onClick={() => handleCategoryClick(category)}
+                  >
+                    <div className="w-[50px] h-[50px] flex-shrink-0 flex items-center justify-center mr-3 bg-white rounded-lg border border-gray-200 overflow-hidden">
+                      <img
+                        src={imageUrl}
+                        alt={category.name}
+                        className="w-full h-full object-contain p-1"
+                        onError={e => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                      <div className="hidden w-full h-full items-center justify-center text-2xl">
+                        {getCategoryIcon(category.icon || category.name)}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-1">{category.name}</h4>
+                      <p className="text-xs text-gray-600 leading-snug line-clamp-2">
+                        {category.description || `Sell your ${category.name.toLowerCase()}`}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="category-info">
-                  <h4 className="category-name">{category.name}</h4>
-                  <p className="category-description">
-                    {category.description || `Sell your ${category.name.toLowerCase()}`}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
 
-        <div className="sell-dropdown-footer">
-          <p className="sell-info">Get instant quotes and sell your devices quickly with Cashify</p>
-        </div>
+            {/* Footer */}
+            <div className="pt-4 border-t border-gray-200 text-center">
+              <p className="text-xs text-gray-600 leading-snug">
+                Get instant quotes and sell your devices quickly with Cashmitra
+              </p>
+            </div>
+          </>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && categories.length === 0 && (
+          <div className="text-center py-10">
+            <p className="text-gray-600 text-sm">No categories available at the moment</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -119,7 +136,7 @@ const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }
 
 // Helper function to get category images from URLs
 const getCategoryImage = (categoryName: any) => {
-  const imageMap = {
+  const imageMap: Record<string, string> = {
     Smartphone: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
     Mobile: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
     Phone: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
@@ -140,7 +157,7 @@ const getCategoryImage = (categoryName: any) => {
 
 // Helper function to get category icons (fallback)
 const getCategoryIcon = (iconName: any) => {
-  const iconMap = {
+  const iconMap: Record<string, string> = {
     Smartphone: '📱',
     Mobile: '📱',
     Phone: '📱',
