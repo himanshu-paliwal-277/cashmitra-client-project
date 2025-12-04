@@ -275,9 +275,9 @@ export const productsAPI = {
   // Search products
   searchProducts: async (query: any, filters = {}) => {
     try {
-      const response = await api.get('/products/search', {
+      const response = await api.get('/products', {
         params: {
-          q: query,
+          search: query,
           ...filters,
         },
       });
