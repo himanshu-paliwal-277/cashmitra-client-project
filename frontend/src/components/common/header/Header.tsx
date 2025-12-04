@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import {
   Menu,
   X,
@@ -14,467 +13,24 @@ import {
   ShoppingCart,
   Search,
   Info,
-  Store,
   ChevronDown,
 } from 'lucide-react';
-import theme from '../../../theme';
-import Button from '../../ui/Button';
 import SellPhoneDropdown from './SellPhoneDropdown';
 import PhoneDropdown from './PhoneDropdown';
 import { useAuth } from '../../../contexts/AuthContext';
-
-// Main Header Container
-const NavContainer = styled.nav`
-  background: white;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid ${theme.colors.grey[200]};
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  position: sticky;
-  top: 0;
-  z-index: ${theme.zIndex.sticky};
-`;
-
-// Top Bar - Logo, Search, Actions
-const TopBar = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  margin: 0 auto;
-  padding: 1rem 2rem;
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    padding: 1rem 1.5rem;
-    gap: 1.25rem;
-  }
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    padding: 0.75rem 1rem;
-    justify-content: space-between;
-    gap: 0.75rem;
-  }
-`;
-
-// Logo Section
-const LogoSection = styled(Link)`
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-  flex-shrink: 0;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-
-const LogoImage = styled.img`
-  height: 40px;
-  width: auto;
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    height: 32px;
-  }
-`;
-
-const BrandText = styled.h1`
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 0 0.5rem;
-  letter-spacing: -0.5px;
-  color: ${theme.colors.primary.main};
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    font-size: 1.375rem;
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    display: none;
-  }
-`;
-
-// Search Section
-const SearchSection = styled.div`
-  flex: 1;
-  max-width: 600px;
-  min-width: 200px;
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    display: none;
-  }
-`;
-
-const SearchContainer = styled.div`
-  position: relative;
-  width: 100%;
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.75rem;
-  border: 1.5px solid ${theme.colors.grey[300]};
-  border-radius: 8px;
-  font-size: 14px;
-  color: ${theme.colors.text.primary};
-  background: ${theme.colors.grey[50]};
-  transition: all 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary.main};
-    background: white;
-    box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
-  }
-
-  &::placeholder {
-    color: ${theme.colors.text.secondary};
-  }
-`;
-
-const SearchIcon = styled.div`
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${theme.colors.text.secondary};
-  pointer-events: none;
-`;
-
-// Actions Section
-const ActionsSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-shrink: 0;
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    gap: 0.5rem;
-  }
-`;
-
-const LocationButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0.5rem 0.75rem;
-  background: transparent;
-  border: 1px solid ${theme.colors.grey[300]};
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  color: ${theme.colors.text.primary};
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${theme.colors.grey[50]};
-    border-color: ${theme.colors.grey[400]};
-  }
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    display: none;
-  }
-`;
-
-const IconButton = styled.button`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: transparent;
-  color: ${theme.colors.text.primary};
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${theme.colors.grey[100]};
-    color: ${theme.colors.primary.main};
-  }
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    width: 36px;
-    height: 36px;
-  }
-`;
-
-const CartButton = styled(IconButton)`
-  &::after {
-    content: '${(props: any) => (props.$itemCount > 0 ? props.$itemCount : '')}';
-    display: ${(props: any) => (props.$itemCount > 0 ? 'flex' : 'none')};
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 4px;
-    background: ${theme.colors.error.main};
-    color: white;
-    font-size: 10px;
-    font-weight: 700;
-    border-radius: 9px;
-    align-items: center;
-    justify-content: center;
-  }
-`;
-
-const LoginButton = styled(Button)`
-  padding: 0.625rem 1.5rem;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 8px;
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    padding: 0.5rem 1rem;
-    font-size: 13px;
-  }
-`;
-
-// Profile Dropdown
-const ProfileDropdownContainer = styled.div`
-  position: relative;
-`;
-
-const DropdownMenu = styled.div`
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: white;
-  border: 1px solid ${theme.colors.grey[200]};
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  min-width: 220px;
-  z-index: ${theme.zIndex.dropdown};
-  opacity: ${(props: any) => (props.$isOpen ? 1 : 0)};
-  visibility: ${(props: any) => (props.$isOpen ? 'visible' : 'hidden')};
-  transform: ${(props: any) => (props.$isOpen ? 'translateY(0)' : 'translateY(-8px)')};
-  transition: all 0.2s ease;
-  overflow: hidden;
-`;
-
-const DropdownItem = styled.button`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border: none;
-  background: transparent;
-  color: ${theme.colors.text.primary};
-  font-size: 14px;
-  font-weight: 500;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.2s ease;
-
-  &:hover {
-    background: ${theme.colors.grey[50]};
-  }
-
-  &.logout {
-    color: ${theme.colors.error.main};
-    border-top: 1px solid ${theme.colors.grey[100]};
-  }
-
-  svg {
-    width: 18px;
-    height: 18px;
-  }
-`;
-
-// Bottom Header Bar
-const BottomNavBar = styled.div`
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-top: 1px solid ${theme.colors.grey[200]};
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    padding: 0 1.5rem;
-  }
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    display: none;
-  }
-`;
-
-const NavItemWrapper = styled.div`
-  position: relative;
-`;
-
-const NavItem = styled.button`
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 1rem 1.25rem;
-  background: transparent;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
-  color: ${theme.colors.text.primary};
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-
-  &:hover {
-    color: ${theme.colors.primary.main};
-    background: ${theme.colors.grey[50]};
-  }
-
-  &.active {
-    color: ${theme.colors.primary.main};
-    font-weight: 600;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 1.25rem;
-      right: 1.25rem;
-      height: 3px;
-      background: ${theme.colors.primary.main};
-      border-radius: 2px 2px 0 0;
-    }
-  }
-
-  svg {
-    width: 14px;
-    height: 14px;
-    transition: transform 0.2s ease;
-  }
-`;
-
-const NavDropdownWrapper = styled.div`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: ${theme.zIndex.dropdown};
-  padding-top: 8px;
-  display: ${(props: any) => (props.$isOpen ? 'block' : 'none')};
-`;
-
-// Mobile Menu
-const MobileMenuButton = styled(IconButton)`
-  display: none;
-  @media (max-width: ${theme.breakpoints.md}) {
-    display: flex;
-  }
-`;
-
-const MobileMenuContainer = styled.div`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border-top: 1px solid ${theme.colors.grey[200]};
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  z-index: 999;
-  padding: 1rem;
-  display: ${(props: any) => (props.$isOpen ? 'block' : 'none')};
-  max-height: calc(100vh - 60px); // Adjust based on TopBar height
-  overflow-y: auto;
-`;
-
-const MobileSearchContainer = styled.div`
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid ${theme.colors.grey[200]};
-`;
-
-const MobileNavSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 1rem;
-`;
-
-const MobileNavLink = styled(Link)`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  font-size: 15px;
-  font-weight: 500;
-  color: ${theme.colors.text.primary};
-  text-decoration: none;
-  border-radius: 8px;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-
-  &:hover,
-  &.active {
-    background: ${theme.colors.grey[100]};
-    color: ${theme.colors.primary.main};
-  }
-
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-`;
-
-const MobileCollapsibleTrigger = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  font-size: 15px;
-  font-weight: 500;
-  color: ${theme.colors.text.primary};
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  user-select: none;
-
-  &:hover {
-    background: ${theme.colors.grey[100]};
-  }
-
-  svg {
-    transition: transform 0.2s ease;
-    transform: ${(props: any) => (props.$isOpen ? 'rotate(180deg)' : 'rotate(0)')};
-  }
-`;
-
-const MobileCollapsibleContent = styled.div`
-  padding: 0.5rem 0 0.5rem 1rem;
-  border-left: 2px solid ${theme.colors.grey[200]};
-  margin-left: 20px;
-`;
-
-const MobileActions = styled.div`
-  padding-top: 1rem;
-  border-top: 1px solid ${theme.colors.grey[200]};
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
 
 const MobileCollapsibleNavItem = ({ item, onLinkClick }: any) => {
   const [isOpen, setIsOpen] = useState(false);
 
   if (!item.hasDropdown) {
     return (
-      <MobileNavLink to={item.href} onClick={onLinkClick}>
+      <Link
+        to={item.href}
+        onClick={onLinkClick}
+        className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 rounded-lg hover:bg-gray-100 hover:text-green-600 transition-colors"
+      >
         {item.label}
-      </MobileNavLink>
+      </Link>
     );
   }
 
@@ -482,38 +38,40 @@ const MobileCollapsibleNavItem = ({ item, onLinkClick }: any) => {
 
   return (
     <div>
-      <MobileCollapsibleTrigger $isOpen={isOpen} onClick={() => setIsOpen(!isOpen)}>
+      <div
+        className="flex items-center justify-between gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors select-none"
+        onClick={() => setIsOpen(!isOpen)}
+      >
         <span>{item.label}</span>
-        <ChevronDown size={20} />
-      </MobileCollapsibleTrigger>
+        <ChevronDown
+          size={20}
+          className={`transition-transform ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+        />
+      </div>
       {isOpen && (
-        <MobileCollapsibleContent>
+        <div className="pt-2 pb-2 pl-4 ml-5 border-l-2 border-gray-200">
           <DropdownComponent isVisible={true} onLinkClick={onLinkClick} />
-        </MobileCollapsibleContent>
+        </div>
       )}
     </div>
   );
 };
 
-// Main Header Component
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   const isAuthenticated = !!user;
-
-  const handleLogin = () => {
-    navigate('/login');
-  };
+  const currentPath = location.pathname;
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [openNavDropdown, setOpenNavDropdown] = useState(null);
-  const [navDropdownTimer, setNavDropdownTimer] = useState(null);
+  const [openNavDropdown, setOpenNavDropdown] = useState<string | null>(null);
+  const [navDropdownTimer, setNavDropdownTimer] = useState<any>(null);
 
-  const profileDropdownRef = useRef(null);
-  const navDropdownRef = useRef(null);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const navDropdownRef = useRef<HTMLDivElement>(null);
 
   const closeAllMenus = () => {
     setIsMobileMenuOpen(false);
@@ -521,25 +79,37 @@ const Header = () => {
     setOpenNavDropdown(null);
   };
 
-  const handleLinkClick = (path: any) => {
+  const handleLinkClick = (path?: string) => {
     if (path) navigate(path);
+    closeAllMenus();
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
+    closeAllMenus();
+  };
+
+  const handleLogout = () => {
+    logout();
     closeAllMenus();
   };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: any) => {
-      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target as Node)
+      ) {
         setIsProfileDropdownOpen(false);
       }
-      // Note: We don't close nav dropdown on outside click anymore, as it's hover-based.
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handlers for hover-based Header dropdown
-  const handleNavMouseEnter = (itemId: any) => {
+  // Handlers for hover-based navigation dropdown
+  const handleNavMouseEnter = (itemId: string) => {
     if (navDropdownTimer) clearTimeout(navDropdownTimer);
     setOpenNavDropdown(itemId);
   };
@@ -551,7 +121,6 @@ const Header = () => {
     setNavDropdownTimer(timer);
   };
 
-  // Main Header items
   const navItems = [
     {
       id: 'buy-phone',
@@ -570,7 +139,6 @@ const Header = () => {
     { id: 'buy-refurbished', label: 'Buy Refurbished', href: '/buy-device' },
   ];
 
-  // Mobile-specific links
   const mobileOnlyLinks = [
     { to: '/about', label: 'About Us', icon: <Info /> },
     { to: '/orders', label: 'Track Orders', icon: <Package /> },
@@ -578,177 +146,233 @@ const Header = () => {
   ];
 
   return (
-    <NavContainer>
-      <TopBar>
-        <LogoSection to="/">
-          <LogoImage src="/main-logo.png" alt="Cashmitra Logo" />
-          <BrandText className="!text-green-700 !font-extrabold">CASHMITRA</BrandText>
-        </LogoSection>
+    <>
+      {/* Top Bar - Sticky */}
+      <div className="bg-white w-full shadow-md flex justify-between items-center gap-4 px-4 py-3 lg:gap-6 lg:px-[100px] lg:py-4 md:gap-3 md:px-6 sticky top-0 z-50 border-b border-gray-200">
+        {/* Logo */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 flex-shrink-0 transition-opacity hover:opacity-80"
+        >
+          <img src="/main-logo.png" alt="Cashmitra Logo" className="h-8 w-auto lg:h-10" />
+          <h1 className="text-lg font-extrabold tracking-tight text-green-700 lg:text-2xl">
+            CASHMITRA
+          </h1>
+        </Link>
 
-        <SearchSection>
-          <SearchContainer>
-            <SearchIcon>
+        {/* Search - Hidden on mobile */}
+        <div className="hidden lg:flex flex-1 max-w-[600px] min-w-[200px]">
+          <div className="relative w-full">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
               <Search size={18} />
-            </SearchIcon>
-            <SearchInput type="text" placeholder="Search for mobiles, accessories & more" />
-          </SearchContainer>
-        </SearchSection>
+            </div>
+            <input
+              type="text"
+              placeholder="Search for mobiles, accessories & more"
+              className="w-full py-3 pl-11 pr-4 border-[1.5px] border-gray-300 rounded-lg text-sm text-gray-800 bg-gray-50 transition-all focus:outline-none focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 placeholder:text-gray-500"
+            />
+          </div>
+        </div>
 
-        <ActionsSection>
-          <LocationButton>
+        {/* Actions */}
+        <div className="flex items-center gap-2 flex-shrink-0 lg:gap-4">
+          {/* Location - Hidden on mobile and tablet */}
+          <button className="hidden xl:flex items-center gap-1.5 px-3 py-2 bg-transparent border border-gray-300 rounded-md text-sm font-medium text-gray-800 transition-all hover:bg-gray-50 hover:border-gray-400">
             <MapPin size={16} />
             Gurgaon
             <ChevronDown size={14} />
-          </LocationButton>
+          </button>
 
-          <CartButton
+          {/* Cart */}
+          <button
             onClick={() => handleLinkClick('/buy/cart')}
             title="Shopping Cart"
-            $itemCount={0}
+            className="relative flex items-center justify-center w-9 h-9 lg:w-10 lg:h-10 border-none bg-transparent text-gray-800 cursor-pointer rounded-lg transition-all hover:bg-gray-100 hover:text-green-600"
           >
-            <ShoppingCart size={20} />
-          </CartButton>
+            <ShoppingCart size={18} className="lg:w-5 lg:h-5" />
+            {/* Cart badge - uncomment and add count if needed
+            <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              0
+            </span>
+            */}
+          </button>
 
+          {/* Profile/Login */}
           {isAuthenticated ? (
-            <ProfileDropdownContainer ref={profileDropdownRef}>
-              <IconButton
+            <div ref={profileDropdownRef} className="relative hidden lg:block">
+              <button
                 onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                 title="My Account"
+                className="flex items-center justify-center w-9 h-9 lg:w-10 lg:h-10 border-none bg-transparent text-gray-800 cursor-pointer rounded-lg transition-all hover:bg-gray-100 hover:text-green-600"
               >
-                <User size={20} />
-              </IconButton>
-              <DropdownMenu $isOpen={isProfileDropdownOpen}>
-                <DropdownItem onClick={() => handleLinkClick('/profile')}>
-                  <Settings /> My Profile
-                </DropdownItem>
-                <DropdownItem onClick={() => handleLinkClick('/orders')}>
-                  <Package /> My Orders
-                </DropdownItem>
-                <DropdownItem onClick={() => handleLinkClick('/account/addresses')}>
-                  <MapPin /> Saved Addresses
-                </DropdownItem>
-                <DropdownItem
-                  className="logout"
-                  onClick={() => {
-                    onLogout?.();
-                    closeAllMenus();
-                  }}
+                <User size={18} className="lg:w-5 lg:h-5" />
+              </button>
+
+              <div
+                className={`absolute top-[calc(100%+8px)] right-0 bg-white border border-gray-200 rounded-xl shadow-2xl min-w-[220px] z-50 overflow-hidden transition-all ${
+                  isProfileDropdownOpen
+                    ? 'opacity-100 visible translate-y-0'
+                    : 'opacity-0 invisible -translate-y-2'
+                }`}
+              >
+                <button
+                  onClick={() => handleLinkClick('/profile')}
+                  className="w-full flex items-center gap-3 px-4 py-3 border-none bg-transparent text-gray-800 text-sm font-medium text-left cursor-pointer transition-colors hover:bg-gray-50"
                 >
-                  <LogOut /> Logout
-                </DropdownItem>
-              </DropdownMenu>
-            </ProfileDropdownContainer>
+                  <Settings size={18} /> My Profile
+                </button>
+                <button
+                  onClick={() => handleLinkClick('/orders')}
+                  className="w-full flex items-center gap-3 px-4 py-3 border-none bg-transparent text-gray-800 text-sm font-medium text-left cursor-pointer transition-colors hover:bg-gray-50"
+                >
+                  <Package size={18} /> My Orders
+                </button>
+                <button
+                  onClick={() => handleLinkClick('/account/addresses')}
+                  className="w-full flex items-center gap-3 px-4 py-3 border-none bg-transparent text-gray-800 text-sm font-medium text-left cursor-pointer transition-colors hover:bg-gray-50"
+                >
+                  <MapPin size={18} /> Saved Addresses
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 border-none bg-transparent text-red-600 text-sm font-medium text-left cursor-pointer border-t border-gray-100 transition-colors hover:bg-gray-50"
+                >
+                  <LogOut size={18} /> Logout
+                </button>
+              </div>
+            </div>
           ) : (
-            <LoginButton
-              variant="primary"
-              size="sm"
-              onClick={() => {
-                onLogin?.();
-                closeAllMenus();
-              }}
+            <button
+              onClick={handleLogin}
+              className="hidden lg:block px-4 py-2 lg:px-6 lg:py-2.5 text-xs lg:text-sm font-semibold text-white bg-green-600 border-none rounded-lg cursor-pointer transition-all hover:bg-green-700"
             >
               Login
-            </LoginButton>
+            </button>
           )}
 
-          <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </MobileMenuButton>
-        </ActionsSection>
-      </TopBar>
-
-      <BottomNavBar ref={navDropdownRef}>
-        {navItems.map(item => (
-          <NavItemWrapper
-            key={item.id}
-            onMouseEnter={() => item.hasDropdown && handleNavMouseEnter(item.id)}
-            onMouseLeave={() => item.hasDropdown && handleNavMouseLeave()}
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="flex lg:hidden items-center justify-center w-9 h-9 border-none bg-transparent text-gray-800 cursor-pointer rounded-lg transition-all hover:bg-gray-100"
           >
-            <NavItem
-              onClick={() => !item.hasDropdown && handleLinkClick(item.href)}
-              className={
-                openNavDropdown === item.id || (!item.hasDropdown && currentPath === item.href)
-                  ? 'active'
-                  : ''
-              }
+            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Bottom Navigation Bar - Hidden on mobile */}
+      <nav className="hidden lg:block bg-white w-full border-b border-gray-200 shadow-sm">
+        <div
+          ref={navDropdownRef}
+          className="w-full max-w-[1400px] mx-auto px-6 xl:px-8 flex items-center gap-2"
+        >
+          {navItems.map(item => (
+            <div
+              key={item.id}
+              className="relative"
+              onMouseEnter={() => item.hasDropdown && handleNavMouseEnter(item.id)}
+              onMouseLeave={() => item.hasDropdown && handleNavMouseLeave()}
             >
-              {item.label}
+              <button
+                onClick={() => !item.hasDropdown && handleLinkClick(item.href)}
+                className={`relative flex items-center gap-1.5 px-5 py-4 bg-transparent border-none text-sm font-medium text-gray-800 cursor-pointer transition-all whitespace-nowrap hover:text-green-600 hover:bg-gray-50 ${
+                  openNavDropdown === item.id || (!item.hasDropdown && currentPath === item.href)
+                    ? 'text-green-600 after:content-[""] after:absolute after:bottom-0 after:left-5 after:right-5 after:h-[3px] after:bg-green-600 after:rounded-t'
+                    : ''
+                }`}
+              >
+                {item.label}
+                {item.hasDropdown && (
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform ${openNavDropdown === item.id ? 'rotate-180' : ''}`}
+                  />
+                )}
+              </button>
+
               {item.hasDropdown && (
-                <ChevronDown
-                  style={{ transform: openNavDropdown === item.id ? 'rotate(180deg)' : 'none' }}
-                />
+                <div
+                  className={`absolute top-full left-0 z-50 pt-2 ${openNavDropdown === item.id ? 'block' : 'hidden'}`}
+                >
+                  <item.dropdownComponent isVisible={true} onLinkClick={handleLinkClick} />
+                </div>
               )}
-            </NavItem>
-            {item.hasDropdown && (
-              <NavDropdownWrapper $isOpen={openNavDropdown === item.id}>
-                <item.dropdownComponent isVisible={true} onLinkClick={handleLinkClick} />
-              </NavDropdownWrapper>
-            )}
-          </NavItemWrapper>
-        ))}
-      </BottomNavBar>
+            </div>
+          ))}
+        </div>
+      </nav>
 
-      <MobileMenuContainer $isOpen={isMobileMenuOpen}>
-        <MobileSearchContainer>
-          <SearchContainer>
-            <SearchIcon>
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="fixed top-[57px] lg:top-[73px] left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 p-4 max-h-[calc(100vh-57px)] lg:max-h-[calc(100vh-73px)] overflow-y-auto">
+        {/* Mobile Search */}
+        <div className="mb-4 pb-4 border-b border-gray-200">
+          <div className="relative w-full">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
               <Search size={18} />
-            </SearchIcon>
-            <SearchInput type="text" placeholder="Search devices..." />
-          </SearchContainer>
-        </MobileSearchContainer>
+            </div>
+            <input
+              type="text"
+              placeholder="Search devices..."
+              className="w-full py-3 pl-11 pr-4 border-[1.5px] border-gray-300 rounded-lg text-sm text-gray-800 bg-gray-50 transition-all focus:outline-none focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 placeholder:text-gray-500"
+            />
+          </div>
+        </div>
 
-        <MobileNavSection>
+        {/* Mobile Nav Items */}
+        <div className="flex flex-col gap-1 mb-4">
           {navItems.map(item => (
             <MobileCollapsibleNavItem key={item.id} item={item} onLinkClick={handleLinkClick} />
           ))}
-        </MobileNavSection>
+        </div>
 
-        <MobileNavSection>
+        {/* Mobile Only Links */}
+        <div className="flex flex-col gap-1 mb-4">
           {mobileOnlyLinks.map(link => (
-            <MobileNavLink
+            <Link
               key={link.to}
               to={link.to}
-              className={currentPath === link.to ? 'active' : ''}
+              className={`flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600 ${
+                currentPath === link.to ? 'bg-gray-100 text-green-600' : ''
+              }`}
               onClick={() => handleLinkClick(link.to)}
             >
               {link.icon}
               {link.label}
-            </MobileNavLink>
+            </Link>
           ))}
-        </MobileNavSection>
+        </div>
 
-        <MobileActions>
+        {/* Mobile Actions */}
+        <div className="pt-4 border-t border-gray-200 flex flex-col gap-1">
           {isAuthenticated ? (
             <>
-              <MobileNavLink to="/profile" onClick={() => handleLinkClick('/profile')}>
+              <Link
+                to="/profile"
+                onClick={() => handleLinkClick('/profile')}
+                className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600"
+              >
                 <Settings /> My Profile
-              </MobileNavLink>
-              <DropdownItem
-                className="logout"
-                onClick={() => {
-                  onLogout?.();
-                  closeAllMenus();
-                }}
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 border-none bg-transparent text-red-600 text-[15px] font-medium text-left cursor-pointer rounded-lg transition-colors hover:bg-gray-50"
               >
                 <LogOut /> Logout
-              </DropdownItem>
+              </button>
             </>
           ) : (
-            <LoginButton
-              variant="primary"
-              fullWidth
-              onClick={() => {
-                onLogin?.();
-                closeAllMenus();
-              }}
+            <button
+              onClick={handleLogin}
+              className="w-full px-6 py-2.5 text-sm font-semibold text-white bg-green-600 border-none rounded-lg cursor-pointer transition-all hover:bg-green-700"
             >
               Login
-            </LoginButton>
+            </button>
           )}
-        </MobileActions>
-      </MobileMenuContainer>
-    </NavContainer>
+        </div>
+        </div>
+      )}
+    </>
   );
 };
 
