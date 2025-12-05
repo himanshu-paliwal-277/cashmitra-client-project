@@ -172,7 +172,7 @@ const Marketplace = () => {
   };
 
   const handleProductClick = (productId: any) => {
-    navigate(`/buy/product-details/${productId}`);
+    navigate(`/buy/product/${productId}`);
   };
 
   const handleAddToCart = (e: any, product: any) => {

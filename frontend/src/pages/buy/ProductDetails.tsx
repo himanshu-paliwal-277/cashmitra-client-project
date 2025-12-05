@@ -38,7 +38,6 @@ import {
 } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
 import adminService from '../../services/adminService';
-import './ProductDetails.css';
 import { useAuth } from '../../contexts/AuthContext';
 import productService from '../../services/productService';
 

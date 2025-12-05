@@ -29,7 +29,7 @@ const BuyProductsList = () => {
   };
 
   const handleProductClick = (productId: any) => {
-    navigate(`/buy/product-details/${productId}`);
+    navigate(`/buy/product/${productId}`);
   };
 
   return (

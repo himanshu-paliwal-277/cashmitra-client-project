@@ -202,7 +202,7 @@ const SavedAddresses = () => {
               return (
                 <Card
                   key={id}
-                  className={`relative p-7 bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-[18px] shadow-[0_10px_25px_rgba(2,6,23,0.06)] transition-all duration-[180ms] hover:-translate-y-0.5 hover:border-blue-600/35 hover:shadow-[0_18px_40px_rgba(2,6,23,0.08)] ${
+                  className={`relative p-7 bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-[18px] shadow-[0_10px_25px_rgba(2,6,23,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-600/35 hover:shadow-[0_18px_40px_rgba(2,6,23,0.08)] ${
                     address.isDefault
                       ? 'border-blue-600/50 shadow-[0_20px_45px_rgba(37,99,235,0.12),0_10px_25px_rgba(2,6,23,0.06)]'
                       : ''
