@@ -12,6 +12,7 @@ import {
   Shield,
   Zap,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const CategorySelection = () => {
   const { categories: apiCategories, loading, error } = useSellCategories();
@@ -22,13 +23,20 @@ const CategorySelection = () => {
   const [hasMoreProducts, setHasMoreProducts] = useState(false);
   const [categoryName, setCategoryName] = useState('');
 
+  const navigate = useNavigate();
+
   // Parse URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const categoryFromUrl = urlParams.get('category');
 
   // Function to fetch products by category
   const fetchProductsByCategory = async (categoryNameParam: any, page = 1, append = false) => {
-    if (!categoryNameParam || !apiCategories || apiCategories.length === 0) {
+    if (
+      !categoryNameParam ||
+      !apiCategories ||
+      !Array.isArray(apiCategories) ||
+      apiCategories.length === 0
+    ) {
       return;
     }
 
@@ -36,7 +44,7 @@ const CategorySelection = () => {
       setProductsLoading(true);
       setProductsError(null);
 
-      const matchingCategory = apiCategories.find(
+      const matchingCategory = apiCategories?.find(
         cat => cat.name.toLowerCase() === categoryNameParam.toLowerCase()
       );
 
@@ -88,13 +96,20 @@ const CategorySelection = () => {
 
   // Function to handle product click
   const handleProductClick = (product: any) => {
-    // Navigate to brand selection for the category
     const category = categoryFromUrl || product.categoryId?.name?.toLowerCase() || 'mobile';
-    window.location.href = `/sell/${category}/brand`;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    navigate(`/sell/${category}/brand`);
   };
 
   useEffect(() => {
-    if (categoryFromUrl && apiCategories && apiCategories.length > 0) {
+    if (
+      categoryFromUrl &&
+      apiCategories &&
+      Array.isArray(apiCategories) &&
+      apiCategories?.length > 0
+    ) {
       fetchProductsByCategory(categoryFromUrl);
     }
   }, [categoryFromUrl, apiCategories]);
@@ -133,24 +148,25 @@ const CategorySelection = () => {
   // If no category is selected, show super category selection
   if (!categoryFromUrl) {
     // Extract unique super categories from the brands/categories data
-    const superCategories = apiCategories
-      ? Array.from(
-          new Map(
-            apiCategories
-              .filter((cat: any) => cat.superCategory)
-              .map((cat: any) => [cat.superCategory._id, cat.superCategory])
-          ).values()
-        )
-      : [];
+    const superCategories =
+      apiCategories && Array.isArray(apiCategories)
+        ? Array.from(
+            new Map(
+              apiCategories
+                ?.filter((cat: any) => cat.superCategory)
+                .map((cat: any) => [cat.superCategory._id, cat.superCategory])
+            ).values()
+          )
+        : [];
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         {/* Header Section */}
-        <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-8 sm:py-12 px-4 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-12 px-4 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
 
-          <div className="max-w-7xl mx-auto relative z-10">
+          <div className="main-container mx-auto relative z-10">
             <div className="text-center">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 text-white">
                 Sell Your Device
@@ -163,13 +179,16 @@ const CategorySelection = () => {
         </div>
 
         {/* Super Categories Grid */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="main-container py-12">
           {superCategories.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {superCategories.map((superCat: any) => (
                 <div
                   key={superCat._id}
-                  onClick={() => (window.location.href = `/sell/${superCat.name}/brand`)}
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    navigate(`/sell/${superCat.name}/brand`);
+                  }}
                   className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 border-slate-100 hover:border-blue-400 group overflow-hidden"
                 >
                   {/* Category Image */}
@@ -219,15 +238,15 @@ const CategorySelection = () => {
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="main-container mx-auto relative z-10">
           {/* Back Button */}
-          <button
+          {/* <button
             onClick={() => (window.location.href = '/sell')}
             className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-6 transition-colors group"
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="font-medium">Back to Categories</span>
-          </button>
+          </button> */}
 
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 text-white">

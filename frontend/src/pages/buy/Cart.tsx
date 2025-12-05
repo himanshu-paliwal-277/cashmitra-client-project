@@ -207,7 +207,7 @@ const Cart = ({ onBack }: any) => {
     return (
       <div className="cart-page">
         <header className="cart-header">
-          <div className="container cart-header__inner">
+          <div className="main-container cart-header__inner">
             <button className="back-btn" onClick={handleBack}>
               <ArrowLeft size={16} />
               Continue Shopping
@@ -220,7 +220,7 @@ const Cart = ({ onBack }: any) => {
         </header>
 
         <section className="cart-body">
-          <div className="container">
+          <div className="main-container">
             <div className="empty-card">
               <div className="empty-card__icon">
                 <Shield size={48} className="text-blue-500" />
@@ -251,7 +251,7 @@ const Cart = ({ onBack }: any) => {
     return (
       <div className="cart-page">
         <header className="cart-header">
-          <div className="container cart-header__inner">
+          <div className="main-container cart-header__inner">
             <button className="back-btn" onClick={handleBack}>
               <ArrowLeft size={16} />
               Continue Shopping
@@ -264,7 +264,7 @@ const Cart = ({ onBack }: any) => {
         </header>
 
         <section className="cart-body">
-          <div className="container">
+          <div className="main-container">
             <div className="empty-card">
               <div className="empty-card__icon">
                 <ShoppingBag size={38} />
@@ -287,7 +287,7 @@ const Cart = ({ onBack }: any) => {
   return (
     <div className="cart-page">
       <header className="cart-header">
-        <div className="container cart-header__inner">
+        <div className="main-container cart-header__inner">
           <button className="back-btn" onClick={handleBack}>
             <ArrowLeft size={16} />
             Continue Shopping
@@ -301,7 +301,7 @@ const Cart = ({ onBack }: any) => {
       </header>
 
       <section className="cart-body">
-        <div className="container">
+        <div className="main-container">
           {(error || localError) && (
             <div className="alert error">
               <AlertCircle size={18} />

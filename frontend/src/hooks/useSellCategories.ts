@@ -13,7 +13,7 @@ export const useSellCategories = () => {
       const response = await api.get('/sell/categories');
       const data = response.data?.data || response.data || [];
       setCategories(data);
-      return response;
+      return response.data;
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to fetch categories';
       setError(errorMessage);

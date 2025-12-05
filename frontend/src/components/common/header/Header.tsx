@@ -136,7 +136,7 @@ const Header = () => {
       dropdownComponent: SellPhoneDropdown,
     },
     { id: 'sell-gadgets', label: 'Sell Gadgets', href: '/sell' },
-    { id: 'buy-refurbished', label: 'Buy Refurbished', href: '/buy-device' },
+    { id: 'buy-refurbished', label: 'Buy Refurbished', href: '/buy' },
   ];
 
   const mobileOnlyLinks = [
@@ -148,7 +148,7 @@ const Header = () => {
   return (
     <>
       {/* Top Bar - Sticky */}
-      <div className="bg-white w-full shadow-sm flex justify-between items-center gap-4 px-4 py-3 lg:gap-6 lg:px-[100px] lg:py-4 md:gap-3 md:px-6 sticky top-0 z-50 border-b border-gray-200">
+      <div className="bg-white w-full shadow-sm flex justify-between items-center gap-4 px-4 py-3 lg:gap-6 lg:px-[100px] lg:py-4 md:gap-3 md:px-6 sticky top-0 z-[2000] border-b border-gray-200">
         {/* Logo */}
         <Link
           to="/"

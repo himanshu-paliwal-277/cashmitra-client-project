@@ -106,7 +106,7 @@ defects, accessories, conditionAnswers, priceQuote, bookingData`
 ### **Main pages**
 
 - Marketplace → `/buy`
-- Category Home → `/buy-device`
+- Category Home → `/buy`
 - Product Details → `/buy/product/:id`
 - Cart → `/buy/cart`
 - Checkout → `/buy/checkout`

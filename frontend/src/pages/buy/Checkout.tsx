@@ -204,7 +204,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
     <div className="co-page">
       {/* Header */}
       <header className="co-header">
-        <div className="co-header-inner">
+        <div className="main-container py-6">
           <button className="co-back" onClick={handleBack}>
             <ArrowLeft size={18} />
             <span>Back to Shopping</span>
@@ -215,7 +215,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
       </header>
 
       {/* Main */}
-      <div className="co-container">
+      <div className="main-container">
         <div className="co-grid">
           {/* Left column */}
           <div className="co-left">

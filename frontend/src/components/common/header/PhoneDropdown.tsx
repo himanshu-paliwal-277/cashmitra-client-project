@@ -124,7 +124,7 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
   if (!isVisible) return null;
 
   return (
-    <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-[1000] min-w-[560px] max-w-[600px] overflow-hidden backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-200">
+    <div className="absolute top-full left-0 mt-2 bg-white rounded-md shadow-2xl border border-gray-100 z-[1000] min-w-[560px] max-w-[600px] overflow-hidden backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-200">
       {/* Header with gradient */}
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-100">
         <div className="flex justify-between items-center">
@@ -194,7 +194,7 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
                 return (
                   <div
                     key={phone._id}
-                    className="group relative flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl cursor-pointer transition-all duration-300 hover:border-green-500 hover:shadow-lg hover:-translate-y-0.5"
+                    className="group relative flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-md cursor-pointer transition-all duration-300 hover:border-green-500 hover:shadow-lg"
                     onClick={() => handlePhoneClick(phone)}
                   >
                     {/* Discount Badge */}
