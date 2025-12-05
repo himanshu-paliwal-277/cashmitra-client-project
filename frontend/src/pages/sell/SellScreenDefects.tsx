@@ -38,20 +38,25 @@ const SellScreenDefects = () => {
       buttons: '🔘',
       charging: '🔌',
       default: '🔧',
-    };    return categoryIcons[category] || categoryIcons.default;
+    };
+    return categoryIcons[category] || categoryIcons.default;
   };
 
   // Fetch defects from API
   useEffect(() => {
     const fetchDefects = async () => {
-      if (!product?.data?.categoryId) {        setError('Product category not found');
+      const categoryId =
+        product?.categoryId || product?.data?.categoryId?._id || product?.data?.categoryId;
+
+      if (!categoryId) {
+        setError('Product category not found');
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
-        const response = await sellService.getCustomerDefects(product.data.categoryId._id);
+        const response = await sellService.getCustomerDefects(categoryId);
 
         let defects = [];
         let groupedDefectsFromAPI = {};
@@ -60,9 +65,16 @@ const SellScreenDefects = () => {
           defects = response.defects;
           if (response.grouped && typeof response.grouped === 'object') {
             groupedDefectsFromAPI = response.grouped;
-          }        } else if (response && response.success && response.data) {          if (response.data.defects && Array.isArray(response.data.defects)) {            defects = response.data.defects;            if (response.data.grouped && typeof response.data.grouped === 'object') {              groupedDefectsFromAPI = response.data.grouped;
+          }
+        } else if (response && response.success && response.data) {
+          if (response.data.defects && Array.isArray(response.data.defects)) {
+            defects = response.data.defects;
+            if (response.data.grouped && typeof response.data.grouped === 'object') {
+              groupedDefectsFromAPI = response.data.grouped;
             }
-          }        } else if (response && response.data && Array.isArray(response.data)) {          defects = response.data;
+          }
+        } else if (response && response.data && Array.isArray(response.data)) {
+          defects = response.data;
         } else if (response && Array.isArray(response)) {
           defects = response;
         }
@@ -78,7 +90,8 @@ const SellScreenDefects = () => {
             delta: defect.delta,
             order: defect.order || 0,
           }));
-        }        transformedDefects.sort((a, b) => {
+        }
+        transformedDefects.sort((a, b) => {
           if (a.category !== b.category) {
             return a.category.localeCompare(b.category);
           }
@@ -88,17 +101,19 @@ const SellScreenDefects = () => {
         let finalGroupedDefects = {};
 
         if (Object.keys(groupedDefectsFromAPI).length > 0) {
-          finalGroupedDefects = Object.keys(groupedDefectsFromAPI).reduce((acc, category) => {            acc[category] = groupedDefectsFromAPI[category].map((defect: any) => ({
+          finalGroupedDefects = Object.keys(groupedDefectsFromAPI).reduce((acc, category) => {
+            acc[category] = groupedDefectsFromAPI[category].map((defect: any) => ({
               id: defect._id || defect.key || defect.id,
               label: defect.title || defect.label || defect.name,
               icon: defect.icon || getCategoryIcon(defect.category),
               category: defect.category || category,
               delta: defect.delta,
-              order: defect.order || 0
+              order: defect.order || 0,
             }));
             return acc;
           }, {});
-        } else {          finalGroupedDefects = transformedDefects.reduce((acc, defect) => {
+        } else {
+          finalGroupedDefects = transformedDefects.reduce((acc, defect) => {
             if (!acc[defect.category]) {
               acc[defect.category] = [];
             }
@@ -110,10 +125,12 @@ const SellScreenDefects = () => {
         const defectOptionsWithNoDefects = [
           { id: 'no-defects', label: 'No Defects', icon: '✓', category: 'none', order: -1 },
           ...transformedDefects,
-        ];        setDefectOptions(defectOptionsWithNoDefects);
+        ];
+        setDefectOptions(defectOptionsWithNoDefects);
         setGroupedDefects(finalGroupedDefects);
       } catch (err) {
-        console.error('Error fetching defects:', err);        setError('Failed to load defects');
+        console.error('Error fetching defects:', err);
+        setError('Failed to load defects');
 
         const fallbackDefects = [
           { id: 'no-defects', label: 'No Defects', icon: '✓' },
@@ -124,7 +141,8 @@ const SellScreenDefects = () => {
           { id: 'body-damage', label: 'Body Damage', icon: '🔨' },
           { id: 'water-damage', label: 'Water Damage', icon: '💧' },
           { id: 'button-issues', label: 'Button Issues', icon: '🔘' },
-        ];        setDefectOptions(fallbackDefects);
+        ];
+        setDefectOptions(fallbackDefects);
       } finally {
         setLoading(false);
       }
@@ -134,25 +152,48 @@ const SellScreenDefects = () => {
   }, [product?._id]);
 
   const handleDefectToggle = (defectId: any) => {
-    if (defectId === 'no-defects') {      setSelectedDefects(['no-defects']);
+    if (defectId === 'no-defects') {
+      setSelectedDefects(['no-defects']);
       setSelectedDefectsDetails([
-        {          id: 'no-defects',          label: 'No Defects',          icon: '✓',          category: 'none',          delta: 0,          questionText: 'Screen/Body Condition',          answerText: 'No Defects',          questionType: 'defect_selection',          section: 'screen_defects',
+        {
+          id: 'no-defects',
+          label: 'No Defects',
+          icon: '✓',
+          category: 'none',
+          delta: 0,
+          questionText: 'Screen/Body Condition',
+          answerText: 'No Defects',
+          questionType: 'defect_selection',
+          section: 'screen_defects',
         },
       ]);
-    } else {      setSelectedDefects(prev => {
-        const filtered = prev.filter(id => id !== 'no-defects');        if (filtered.includes(defectId)) {
+    } else {
+      setSelectedDefects(prev => {
+        const filtered = prev.filter(id => id !== 'no-defects');
+        if (filtered.includes(defectId)) {
           const newSelected = filtered.filter(id => id !== defectId);
-          setSelectedDefectsDetails(prevDetails =>            prevDetails.filter(defect => defect.id !== defectId)
+          setSelectedDefectsDetails(prevDetails =>
+            prevDetails.filter(defect => defect.id !== defectId)
           );
           return newSelected;
         } else {
-          const defectToAdd =            defectOptions.find(d => d.id === defectId) ||
+          const defectToAdd =
+            defectOptions.find(d => d.id === defectId) ||
             Object.values(groupedDefects)
-              .flat()              .find(d => d.id === defectId);
+              .flat()
+              .find(d => d.id === defectId);
 
-          if (defectToAdd) {            setSelectedDefectsDetails(prevDetails => [              ...prevDetails.filter(d => d.id !== 'no-defects'),
-              {                id: defectToAdd.id,                label: defectToAdd.label,                icon: defectToAdd.icon,                category: defectToAdd.category,                delta: defectToAdd.delta || 0,
-                questionText: 'Screen/Body Condition',                answerText: defectToAdd.label,
+          if (defectToAdd) {
+            setSelectedDefectsDetails(prevDetails => [
+              ...prevDetails.filter(d => d.id !== 'no-defects'),
+              {
+                id: defectToAdd.id,
+                label: defectToAdd.label,
+                icon: defectToAdd.icon,
+                category: defectToAdd.category,
+                delta: defectToAdd.delta || 0,
+                questionText: 'Screen/Body Condition',
+                answerText: defectToAdd.label,
                 questionType: 'defect_selection',
                 section: 'screen_defects',
               },
@@ -166,14 +207,13 @@ const SellScreenDefects = () => {
   };
 
   const handleContinue = () => {
-    const productId = product?._id || product?.data.id;
+    // Extract category, brand, and model from URL params
+    const pathParts = window.location.pathname.split('/');
+    const category = pathParts[2]; // /sell/Mobile/Apple/model/defects
+    const brand = pathParts[3];
+    const model = pathParts[4];
 
-    if (!productId) {
-      alert('Product information is missing. Please go back and select a product again.');
-      return;
-    }
-
-    navigate(`/sell/accessories/${productId}`, {
+    navigate(`/sell/${category}/${brand}/${model}/accessories`, {
       state: {
         selectedVariant,
         product,
@@ -204,11 +244,26 @@ const SellScreenDefects = () => {
     );
   }
 
-  const brandName = product.brand || product.data?.brand || 'Brand';
+  const brandName = product.category || product.data?.brand || 'Brand';
   const productName = product.name || product.data?.name || 'Product';
-  const basePrice = product.pricing?.discountedPrice || product.basePrice || '2,160';
-  const productImage =
-    product.images && product.images['0'] ? product.images['0'].replace(/["`]/g, '') : null;
+  const basePrice = selectedVariant?.label
+    ? typeof selectedVariant === 'object' && selectedVariant.basePrice
+      ? selectedVariant.basePrice
+      : '2,160'
+    : '2,160';
+
+  // Handle image - check if it's an array or object
+  let productImage = null;
+  if (product.images) {
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      productImage = product.images[0];
+    } else if (typeof product.images === 'object') {
+      productImage = product.images.main || product.images.gallery || product.images.thumbnail;
+    }
+  }
+  if (!productImage) {
+    productImage = '/placeholder-phone.jpg';
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -245,7 +300,7 @@ const SellScreenDefects = () => {
           {/* Page Header */}
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold mb-3">
-              Sell {brandName} {productName} ({selectedVariant})
+              Sell {brandName} {productName} ({selectedVariant?.label || 'Variant'})
             </h1>
             <p className="text-lg text-blue-100">
               <span className="text-green-400 font-bold">₹{basePrice}+</span> already sold on our
@@ -300,18 +355,21 @@ const SellScreenDefects = () => {
                 {/* No Defects Option */}
                 <div
                   onClick={() => handleDefectToggle('no-defects')}
-                  className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${                    selectedDefects.includes('no-defects')
+                  className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
+                    selectedDefects.includes('no-defects')
                       ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-500 shadow-lg'
                       : 'bg-white border-slate-200 hover:border-blue-400 hover:bg-blue-50'
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${                        selectedDefects.includes('no-defects')
+                      className={`w-16 h-16 rounded-xl flex items-center justify-center text-3xl ${
+                        selectedDefects.includes('no-defects')
                           ? 'bg-green-500 text-white'
                           : 'bg-slate-100'
                       }`}
-                    >                      {selectedDefects.includes('no-defects') ? (
+                    >
+                      {selectedDefects.includes('no-defects') ? (
                         <CheckCircle className="w-8 h-8" />
                       ) : (
                         '✓'
@@ -319,7 +377,8 @@ const SellScreenDefects = () => {
                     </div>
                     <div className="flex-1">
                       <h3
-                        className={`text-lg font-bold ${                          selectedDefects.includes('no-defects')
+                        className={`text-lg font-bold ${
+                          selectedDefects.includes('no-defects')
                             ? 'text-green-700'
                             : 'text-slate-900'
                         }`}
@@ -337,7 +396,9 @@ const SellScreenDefects = () => {
                     <h3 className="text-lg font-bold text-slate-900 mb-4 capitalize border-b-2 border-slate-200 pb-2">
                       {category}
                     </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">                      {categoryDefects.map((defect: any) => {                        const isSelected = selectedDefects.includes(defect.id);
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                      {categoryDefects.map((defect: any) => {
+                        const isSelected = selectedDefects.includes(defect.id);
                         return (
                           <div
                             key={defect.id}
@@ -405,7 +466,9 @@ const SellScreenDefects = () => {
               {/* Product Name */}
               <h4 className="text-lg font-bold text-slate-900 text-center mb-6">
                 {brandName} {productName}
-                <span className="block text-sm text-slate-600 mt-1">({selectedVariant})</span>
+                <span className="block text-sm text-slate-600 mt-1">
+                  ({selectedVariant?.label || 'Variant'})
+                </span>
               </h4>
 
               {/* Price */}
@@ -436,15 +499,20 @@ const SellScreenDefects = () => {
                           no: 'Not Working',
                         };
                         return (
-                          <p key={questionId} className="text-xs text-slate-600">                            {questionLabels[questionId] || questionId}:{' '}                            {answerLabels[answer] || answer}
+                          <p key={questionId} className="text-xs text-slate-600">
+                            {questionLabels[questionId] || questionId}:{' '}
+                            {answerLabels[answer] || answer}
                           </p>
                         );
                       } else if (
                         answer &&
-                        typeof answer === 'object' &&                        answer.questionText &&                        answer.answerText
+                        typeof answer === 'object' &&
+                        answer.questionText &&
+                        answer.answerText
                       ) {
                         return (
-                          <p key={questionId} className="text-xs text-slate-600">                            {String(answer.questionText)}: {String(answer.answerText)}
+                          <p key={questionId} className="text-xs text-slate-600">
+                            {String(answer.questionText)}: {String(answer.answerText)}
                           </p>
                         );
                       }
@@ -456,14 +524,19 @@ const SellScreenDefects = () => {
                 {/* Screen Defects */}
                 {selectedDefects.length > 0 && (
                   <div className="bg-slate-50 rounded-lg p-3">
-                    <p className="text-xs font-semibold text-slate-700 mb-2">Screen Condition</p>                    {selectedDefects.includes('no-defects') ? (
+                    <p className="text-xs font-semibold text-slate-700 mb-2">Screen Condition</p>
+                    {selectedDefects.includes('no-defects') ? (
                       <p className="text-xs text-green-600 font-semibold">✓ No Defects</p>
                     ) : (
                       <div>
                         <p className="text-xs text-slate-600 mb-1">
                           {selectedDefects.length} defect(s) selected
                         </p>
-                        {selectedDefectsDetails.map(defect => (                          <p key={defect.id} className="text-xs text-slate-600">                            • {defect.label}                            {defect.delta !== 0 &&                              ` (${defect.delta > 0 ? '+' : ''}₹${defect.delta})`}
+                        {selectedDefectsDetails.map(defect => (
+                          <p key={defect.id} className="text-xs text-slate-600">
+                            • {defect.label}
+                            {defect.delta !== 0 &&
+                              ` (${defect.delta > 0 ? '+' : ''}₹${defect.delta})`}
                           </p>
                         ))}
                       </div>

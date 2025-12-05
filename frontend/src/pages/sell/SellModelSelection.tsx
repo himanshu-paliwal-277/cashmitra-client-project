@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { adminService } from '../../services/adminService';
+import { useNavigate, useParams } from 'react-router-dom';
+import api from '../../services/api';
 import {
   Home,
   ChevronRight,
@@ -13,44 +13,48 @@ import {
 
 const SellModelSelection = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [product, setProduct] = useState(null);
-  const [selectedVariant, setSelectedVariant] = useState('');
+  const { category, brand } = useParams();
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Get productId from query parameters
-  const searchParams = new URLSearchParams(location.search);
-  const productId = searchParams.get('productId');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProducts = async () => {
+      if (!category || !brand) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const response = await adminService.getBuyProductById(productId);
-        setProduct(response.data);
-      } catch (error) {
-        console.error('Error fetching product:', error);
+        setLoading(true);
+        setError(null);
+
+        // Fetch products by category and brand
+        const response = await api.get(`/sell/products/search`, {
+          params: { category, brand },
+        });
+
+        if (response.data && response.data.data) {
+          setProducts(response.data.data);
+        }
+      } catch (err: any) {
+        console.error('Error fetching products:', err);
+        setError(err.response?.data?.message || 'Failed to fetch products');
       } finally {
         setLoading(false);
       }
     };
 
-    if (productId) {
-      fetchProduct();
-    } else {
-      setLoading(false);
-    }
-  }, [productId]);
+    fetchProducts();
+  }, [category, brand]);
 
-  const handleVariantSelect = (variant: any) => {
-    setSelectedVariant(variant);
+  const handleProductClick = (product: any) => {
+    setSelectedProduct(product);
   };
 
-  const handleGetValue = () => {
-    if (selectedVariant) {
-      navigate(`/sell/device-evaluation/${productId}`, {
-        state: { selectedVariant, product },
-      });
-    }
+  const handleBack = () => {
+    navigate(`/sell/${category}/brand`);
   };
 
   if (loading) {
@@ -58,42 +62,33 @@ const SellModelSelection = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-slate-600 font-medium">Loading product details...</p>
+          <p className="text-slate-600 font-medium">Loading models...</p>
         </div>
       </div>
     );
   }
 
-  if (!product) {
+  if (error || products.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Package className="w-8 h-8 text-red-600" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900 mb-2">Product Not Found</h3>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">No Models Found</h3>
           <p className="text-slate-600 mb-6">
-            The product you&apos;re looking for doesn&apos;t exist.
+            {error || `No models available for ${brand} in ${category} category.`}
           </p>
           <button
-            onClick={() => navigate('/sell')}
+            onClick={handleBack}
             className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg"
           >
-            Back to Categories
+            Back to Brands
           </button>
         </div>
       </div>
     );
   }
-
-  // Get variants from API data or fallback to default
-  const variants =    product.productDetails?.memoryStorage?.phoneVariants?.length > 0      ? product.productDetails.memoryStorage.phoneVariants
-      : ['16 GB', '32 GB', '64 GB', '128 GB'];
-
-  // Get product image
-  const productImage =    product.images && product.images['0'] ? product.images['0'].replace(/["`]/g, '') : null;
-
-  // Dynamic breadcrumb and title  const brandName = product.brand || 'Brand';  const productName = product.name || 'Product';  const basePrice = product.pricing?.discountedPrice || product.basePrice || '2,160';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -117,26 +112,18 @@ const SellModelSelection = () => {
               Sell Device
             </a>
             <ChevronRight className="w-4 h-4" />
-            <a
-              href={`/sell/${brandName.toLowerCase()}`}
-              className="hover:text-white transition-colors"
-            >
-              {brandName}
+            <a href={`/sell/${category}/brand`} className="hover:text-white transition-colors">
+              {category}
             </a>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-white font-medium">
-              {brandName} {productName}
-            </span>
+            <span className="text-white font-medium">{brand} Models</span>
           </nav>
 
           {/* Page Header */}
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-3">
-              Sell {brandName} {productName}
-            </h1>
+          <div className="text-center">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-3">Select your {brand} model</h1>
             <p className="text-lg text-blue-100">
-              <span className="text-green-400 font-bold">₹{basePrice}+</span> already sold on our
-              platform
+              Choose the model of your {brand} device to get an instant quote
             </p>
           </div>
         </div>
@@ -144,150 +131,93 @@ const SellModelSelection = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Product Section - Left Side */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
-              {/* Product Image */}
-              <div className="w-48 h-72 mx-auto mb-8 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center overflow-hidden shadow-lg">
-                {productImage ? (
-                  <img
-                    src={productImage}
-                    alt={productName}
-                    className="max-w-full max-h-full object-contain p-4"
-                  />
-                ) : (
-                  <Package className="w-20 h-20 text-slate-400" />
-                )}
-              </div>
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {products.map((product: any) => {
+            const productImage = product.images && product.images[0] ? product.images[0] : null;
+            const basePrice =
+              product.variants && product.variants[0] ? product.variants[0].basePrice : 0;
+            const isSelected = selectedProduct?._id === product._id;
 
-              {/* Variant Selection */}
-              <div className="mb-8">
-                <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <CheckCircle className="w-6 h-6 text-blue-600" />
-                  Choose a variant
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {variants.map((variant: any, index: any) => {
-                    const variantText =
-                      typeof variant === 'string'
-                        ? variant
-                        : `${variant.storage || variant.memory || 'Unknown'}`;
-                    const isSelected = selectedVariant === variant;
-
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => handleVariantSelect(variant)}
-                        className={`p-4 rounded-xl font-semibold text-center transition-all border-2 ${
-                          isSelected
-                            ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-500 text-green-700 shadow-lg scale-105'
-                            : 'bg-white border-slate-200 text-slate-700 hover:border-blue-400 hover:bg-blue-50'
-                        }`}
-                      >
-                        {variantText}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Get Value Button */}
-              <button
-                onClick={handleGetValue}
-                disabled={!selectedVariant}
-                className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${
-                  selectedVariant
-                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:scale-105'
-                    : 'bg-slate-300 text-slate-500 cursor-not-allowed'
+            return (
+              <div
+                key={product._id}
+                onClick={() => handleProductClick(product)}
+                className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 overflow-hidden ${
+                  isSelected
+                    ? 'border-blue-500 scale-105'
+                    : 'border-slate-100 hover:border-blue-300'
                 }`}
               >
-                Get Exact Value
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
+                {/* Product Image */}
+                <div className="relative h-56 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center overflow-hidden">
+                  {productImage ? (
+                    <img
+                      src={productImage}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                  ) : (
+                    <Package className="w-16 h-16 text-slate-400" />
+                  )}
+                  {isSelected && (
+                    <div className="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                      <CheckCircle className="w-4 h-4" />
+                      Selected
+                    </div>
+                  )}
+                </div>
 
-          {/* Sidebar - Right Side */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200 sticky top-8">
-              {/* Product Image Thumbnail */}
-              <div className="w-24 h-36 mx-auto mb-4 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center overflow-hidden">
-                {productImage ? (
-                  <img
-                    src={productImage}
-                    alt={productName}
-                    className="max-w-full max-h-full object-contain p-2"
-                  />
-                ) : (
-                  <Package className="w-12 h-12 text-slate-400" />
-                )}
+                {/* Product Info */}
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-2">
+                    {product.name}
+                  </h3>
+                  <p className="text-sm text-slate-600 mb-3">{product.categoryId?.name}</p>
+
+                  {/* Price */}
+                  <div className="flex items-center gap-1 text-2xl font-bold text-green-600 mb-4">
+                    ₹{basePrice.toLocaleString()}+
+                  </div>
+
+                  {/* Variants Count */}
+                  <div className="flex items-center gap-2 text-sm text-slate-600 mb-4">
+                    <Monitor className="w-4 h-4" />
+                    <span>{product.variants?.length || 0} variants available</span>
+                  </div>
+
+                  {/* Button */}
+                  <button
+                    className={`w-full py-3 rounded-xl font-semibold transition-all shadow-lg ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
+                        : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700'
+                    }`}
+                  >
+                    {isSelected ? 'Selected' : 'Select Model'}
+                  </button>
+                </div>
               </div>
-
-              {/* Product Name */}
-              <h4 className="text-lg font-bold text-slate-900 text-center mb-6">
-                {brandName} {productName}
-              </h4>
-
-              {/* Price Section */}
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-6 border-2 border-green-200">
-                <p className="text-sm text-slate-600 mb-1">Get Up To</p>
-                <p className="text-3xl font-bold text-green-600">₹{basePrice}</p>
-              </div>
-
-              {/* Device Details */}
-              <div className="space-y-4">
-                <h5 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                  Device Details
-                </h5>                {product.productDetails?.display?.size && (
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Monitor className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-600">Display</p>
-                      <p className="text-sm font-semibold text-slate-900">                        {product.productDetails.display.size}
-                      </p>
-                    </div>
-                  </div>
-                )}                {product.productDetails?.battery?.capacity && (
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Battery className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-600">Battery</p>
-                      <p className="text-sm font-semibold text-slate-900">                        {product.productDetails.battery.capacity}
-                      </p>
-                    </div>
-                  </div>
-                )}                {product.productDetails?.design?.weight && (
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <CheckCircle className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-600">Weight</p>
-                      <p className="text-sm font-semibold text-slate-900">                        {product.productDetails.design.weight}
-                      </p>
-                    </div>
-                  </div>
-                )}                {product.availability && (
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                    <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Package className="w-5 h-5 text-amber-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-600">Availability</p>
-                      <p className="text-sm font-semibold text-slate-900">                        {product.availability.inStock ? 'In Stock' : 'Out of Stock'}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
+
+        {/* Continue Button */}
+        {selectedProduct && (
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={() =>
+                navigate(`/sell/${category}/${brand}/${selectedProduct._id}/variant`, {
+                  state: { product: selectedProduct },
+                })
+              }
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2"
+            >
+              Continue with {selectedProduct.name}
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

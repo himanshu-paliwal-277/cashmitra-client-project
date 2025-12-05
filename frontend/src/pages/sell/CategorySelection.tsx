@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAdminCategories } from '../../hooks/useAdminCategories';
+import { useSellCategories } from '../../hooks/useSellCategories';
 import sellService from '../../services/sellService';
 import {
   Loader,
@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const CategorySelection = () => {
-  const { categories: apiCategories, loading, error } = useAdminCategories();
+  const { categories: apiCategories, loading, error } = useSellCategories();
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(false);
   const [productsError, setProductsError] = useState(null);
@@ -35,12 +35,14 @@ const CategorySelection = () => {
       setProductsLoading(true);
       setProductsError(null);
 
-      const matchingCategory = apiCategories.find(        cat => cat.name.toLowerCase() === categoryNameParam.toLowerCase()
+      const matchingCategory = apiCategories.find(
+        cat => cat.name.toLowerCase() === categoryNameParam.toLowerCase()
       );
 
       if (!matchingCategory) {
         throw new Error(`Category "${categoryNameParam}" not found`);
-      }      setCategoryName(matchingCategory.name);
+      }
+      setCategoryName(matchingCategory.name);
 
       const response = await sellService.getSellProductsByCategory(categoryNameParam, {
         page,
@@ -48,7 +50,8 @@ const CategorySelection = () => {
       });
 
       if (response && response.data && response.data.products) {
-        if (append) {          setProducts(prev => [...prev, ...response.data.products]);
+        if (append) {
+          setProducts(prev => [...prev, ...response.data.products]);
         } else {
           setProducts(response.data.products);
         }
@@ -65,7 +68,8 @@ const CategorySelection = () => {
         setHasMoreProducts(false);
       }
     } catch (error) {
-      console.error('Error fetching products:', error);      setProductsError(error.message || 'Failed to fetch products');
+      console.error('Error fetching products:', error);
+      setProductsError(error.message || 'Failed to fetch products');
       if (!append) {
         setProducts([]);
       }
@@ -83,7 +87,9 @@ const CategorySelection = () => {
 
   // Function to handle product click
   const handleProductClick = (product: any) => {
-    window.location.href = `/sell/product/${product.id}/variants`;
+    // Navigate to brand selection for the category
+    const category = categoryFromUrl || product.categoryId?.name?.toLowerCase() || 'mobile';
+    window.location.href = `/sell/${category}/brand`;
   };
 
   useEffect(() => {
@@ -118,6 +124,88 @@ const CategorySelection = () => {
           >
             Retry
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // If no category is selected, show super category selection
+  if (!categoryFromUrl) {
+    // Extract unique super categories from the brands/categories data
+    const superCategories = apiCategories
+      ? Array.from(
+          new Map(
+            apiCategories
+              .filter((cat: any) => cat.superCategory)
+              .map((cat: any) => [cat.superCategory._id, cat.superCategory])
+          ).values()
+        )
+      : [];
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        {/* Header Section */}
+        <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-8 sm:py-12 px-4 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
+
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="text-center">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 text-white">
+                Sell Your Device
+              </h1>
+              <p className="text-lg text-blue-100 max-w-2xl mx-auto">
+                Choose your device category to get started
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Super Categories Grid */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {superCategories.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {superCategories.map((superCat: any) => (
+                <div
+                  key={superCat._id}
+                  onClick={() => (window.location.href = `/sell/${superCat.name}/brand`)}
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 border-slate-100 hover:border-blue-400 group overflow-hidden"
+                >
+                  {/* Category Image */}
+                  <div className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
+                    {superCat.image ? (
+                      <img
+                        src={superCat.image}
+                        alt={superCat.displayName || superCat.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Package className="w-16 h-16 text-slate-400" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  </div>
+
+                  {/* Category Info */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
+                      {superCat.displayName || superCat.name}
+                    </h3>
+                    <p className="text-sm text-slate-600">
+                      Sell your {(superCat.name || '').toLowerCase()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+              <Package className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-slate-900 mb-2">No Categories Available</h3>
+              <p className="text-slate-600">Please check back later.</p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -230,13 +318,17 @@ const CategorySelection = () => {
             {/* Products Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
               {products.map(product => (
-                <div                  key={product.id}
+                <div
+                  key={product.id}
                   onClick={() => handleProductClick(product)}
                   className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 border-slate-100 hover:border-blue-400 group overflow-hidden"
                 >
                   {/* Product Image */}
-                  <div className="relative h-56 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center overflow-hidden">                    {product.images && product.images.length > 0 ? (
-                      <img                        src={product.images[0]}                        alt={product.name}
+                  <div className="relative h-56 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center overflow-hidden">
+                    {product.images && product.images.length > 0 ? (
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                     ) : (
@@ -248,25 +340,31 @@ const CategorySelection = () => {
 
                   {/* Product Info */}
                   <div className="p-5">
-                    <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">                      {product.name}
-                    </h3>                    {product.categoryId?.name && (                      <p className="text-sm text-slate-600 mb-3">{product.categoryId.name}</p>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      {product.name}
+                    </h3>
+                    {product.categoryId?.name && (
+                      <p className="text-sm text-slate-600 mb-3">{product.categoryId.name}</p>
                     )}
 
                     {/* Stats */}
                     <div className="flex items-center justify-between mb-4 text-sm">
                       <div className="flex items-center gap-1 text-amber-600">
                         <Star className="w-4 h-4 fill-current" />
-                        <span className="font-semibold">                          {product.rating ? product.rating.toFixed(1) : 'N/A'}
+                        <span className="font-semibold">
+                          {product.rating ? product.rating.toFixed(1) : 'N/A'}
                         </span>
                       </div>
                       <div className="flex items-center gap-1 text-slate-600">
-                        <Package className="w-4 h-4" />                        <span>{product.variants?.length || 0} variants</span>
+                        <Package className="w-4 h-4" />
+                        <span>{product.variants?.length || 0} variants</span>
                       </div>
                     </div>
 
                     {/* Price */}
                     <div className="flex items-center gap-1 text-2xl font-bold text-green-600 mb-4">
-                      <IndianRupee className="w-5 h-5" />                      <span>{product.basePrice ? `${product.basePrice}+` : 'Get Quote'}</span>
+                      <IndianRupee className="w-5 h-5" />
+                      <span>{product.basePrice ? `${product.basePrice}+` : 'Get Quote'}</span>
                     </div>
 
                     {/* Button */}

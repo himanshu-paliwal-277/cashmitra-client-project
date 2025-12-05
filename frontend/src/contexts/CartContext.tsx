@@ -1,6 +1,48 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { API_BASE_URL } from '../config/api';const CartContext = createContext();
+import { API_BASE_URL } from '../config/api';
+
+interface CartItem {
+  productId: string;
+  inventoryId: string;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  brand?: string;
+  model?: string;
+  condition?: any;
+  addedAt?: string;
+  subtotal?: number;
+  product?: any;
+  partner?: any;
+  isAvailable?: boolean;
+  variant?: any;
+  images?: string[];
+  shopName?: string;
+  id?: string;
+  title?: string;
+  badge?: string;
+  specs?: string;
+  originalPrice?: number;
+  unavailable?: boolean;
+}
+
+interface CartContextType {
+  cartItems: CartItem[];
+  loading: boolean;
+  error: string | null;
+  addToCart: (product: any, quantity?: number) => Promise<{ success: boolean; error?: string }>;
+  removeFromCart: (productId: string) => Promise<void>;
+  updateQuantity: (productId: string, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
+  getCartTotal: () => number;
+  getCartItemsCount: () => number;
+  clearError: () => void;
+  syncCartWithServer: () => Promise<void>;
+}
+
+const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const useCart = () => {
   const context = useContext(CartContext);
@@ -10,12 +52,11 @@ export const useCart = () => {
   return context;
 };
 
-export const CartProvider = ({
-  children
-}: any) => {
+export const CartProvider = ({ children }: any) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);  const { user, getAuthToken } = useAuth();
+  const [error, setError] = useState(null);
+  const { user, getAuthToken } = useAuth();
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -61,28 +102,46 @@ export const CartProvider = ({
         const serverCartItems = serverCartResponse.cart || [];
 
         // Transform server cart items to match frontend format
-        const transformedServerItems = serverCartItems.map((item: any) => ({
-          productId: item.inventoryId,
-          inventoryId: item.inventoryId,
-          quantity: item.quantity,
-          price: item.price,
-          subtotal: item.subtotal,
-          product: item.product,
-          partner: item.partner,
-          isAvailable: item.isAvailable,
+        const transformedServerItems = serverCartItems.map((item: any) => {
+          // Handle images - can be array or object with main/gallery/thumbnail
+          let imageUrl = '/placeholder-phone.jpg';
+          if (item.product?.images) {
+            if (Array.isArray(item.product.images)) {
+              imageUrl = item.product.images[0] || '/placeholder-phone.jpg';
+            } else if (typeof item.product.images === 'object') {
+              imageUrl =
+                item.product.images.main ||
+                item.product.images.gallery ||
+                item.product.images.thumbnail ||
+                '/placeholder-phone.jpg';
+            }
+          }
 
-          // Map product fields for compatibility
-          name:
-            item.product?.brand && item.product?.model
-              ? `${item.product.brand} ${item.product.model}`
-              : 'Unknown Product',
+          return {
+            productId: item.productId,
+            inventoryId: item.productId, // Use productId as inventoryId for consistency
+            quantity: item.quantity,
+            price: item.price,
+            subtotal: item.subtotal,
+            product: item.product,
+            partner: item.partner,
+            isAvailable: item.isAvailable,
+            image: imageUrl,
 
-          brand: item.product?.brand,
-          model: item.product?.model,
-          variant: item.product?.variant,
-          images: item.product?.images || [],
-          shopName: item.partner?.shopName
-        }));
+            // Map product fields for compatibility
+            name:
+              item.product?.brand && item.product?.model
+                ? `${item.product.brand} ${item.product.model}`
+                : item.product?.name || 'Unknown Product',
+
+            brand: item.product?.brand,
+            model: item.product?.model,
+            variant: item.product?.variant,
+            images: item.product?.images || [],
+            shopName: item.partner?.shopName,
+            addedAt: item.addedAt,
+          };
+        });
 
         // If there are local cart items, sync them to server first
         if (cartItems.length > 0) {
@@ -117,12 +176,12 @@ export const CartProvider = ({
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-              inventoryId: item.inventoryId || item.productId,
+              productId: item.productId || item.inventoryId,
               quantity: item.quantity,
             }),
           });
         } catch (itemError) {
-          console.warn(`Failed to sync item ${item.inventoryId || item.productId}:`, itemError);
+          console.warn(`Failed to sync item ${item.productId || item.inventoryId}:`, itemError);
         }
       }
     } catch (err) {
@@ -169,7 +228,7 @@ export const CartProvider = ({
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            inventoryId: item.inventoryId || item.productId,
+            productId: item.productId || item.inventoryId,
             quantity: item.quantity,
           }),
         });
@@ -183,13 +242,17 @@ export const CartProvider = ({
     console.log('product: ', product);
     try {
       setLoading(true);
-      setError(null);      const existingItemIndex = cartItems.findIndex(item => item.productId === product._id);
+      setError(null);
+      const existingItemIndex = cartItems.findIndex(item => item.productId === product._id);
 
       let updatedCart;
       if (existingItemIndex >= 0) {
         // Update existing item and move to front
-        const updatedItem = {          ...cartItems[existingItemIndex],          quantity: cartItems[existingItemIndex].quantity + quantity,
-          inventoryId:            cartItems[existingItemIndex].inventoryId || cartItems[existingItemIndex].productId, // Ensure inventoryId exists
+        const updatedItem = {
+          ...cartItems[existingItemIndex],
+          quantity: cartItems[existingItemIndex].quantity + quantity,
+          inventoryId:
+            cartItems[existingItemIndex].inventoryId || cartItems[existingItemIndex].productId, // Ensure inventoryId exists
           addedAt: new Date().toISOString(), // Update timestamp
         };
         const otherItems = cartItems.filter((_, index) => index !== existingItemIndex);
@@ -209,15 +272,20 @@ export const CartProvider = ({
           addedAt: new Date().toISOString(), // Add timestamp for ordering
         };
         updatedCart = [cartItem, ...cartItems]; // Add to beginning for most recent first
-      }      setCartItems(updatedCart);
+      }
+      setCartItems(updatedCart);
 
       // Update server if user is logged in
       if (user) {
         await updateServerCart(updatedCart);
+        // Sync with server to get full product details
+        await syncCartWithServer();
       }
 
       return { success: true };
-    } catch (err) {      setError(err.message);      return { success: false, error: err.message };
+    } catch (err) {
+      setError(err.message);
+      return { success: false, error: err.message };
     } finally {
       setLoading(false);
     }
@@ -228,19 +296,22 @@ export const CartProvider = ({
       setLoading(true);
       setError(null);
 
-      // Find the item to get its inventoryId      const itemToRemove = cartItems.find(item => item.productId === productId);
+      // Find the item to get its inventoryId
+      const itemToRemove = cartItems.find(item => item.productId === productId);
       if (!itemToRemove) {
         throw new Error('Item not found in cart');
       }
 
-      // Update local state first      const updatedCart = cartItems.filter(item => item.productId !== productId);
+      // Update local state first
+      const updatedCart = cartItems.filter(item => item.productId !== productId);
       setCartItems(updatedCart);
 
       // Update server if user is logged in
       if (user) {
         const token = getAuthToken();
-        if (token) {          const inventoryId = itemToRemove.inventoryId || itemToRemove.productId;
-          const response = await fetch(`${API_BASE_URL}/buy/cart/${inventoryId}`, {
+        if (token) {
+          const productIdToRemove = itemToRemove.productId;
+          const response = await fetch(`${API_BASE_URL}/buy/cart/${productIdToRemove}`, {
             method: 'DELETE',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -255,7 +326,8 @@ export const CartProvider = ({
         }
       }
     } catch (err) {
-      console.error('Error removing from cart:', err);      setError(err.message);
+      console.error('Error removing from cart:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -271,21 +343,26 @@ export const CartProvider = ({
         return;
       }
 
-      // Find the item to get its inventoryId      const itemToUpdate = cartItems.find(item => item.productId === productId);
+      // Find the item to get its inventoryId
+      const itemToUpdate = cartItems.find(item => item.productId === productId);
       if (!itemToUpdate) {
         throw new Error('Item not found in cart');
       }
 
       // Update local state first
-      const updatedCart = cartItems.map(item =>        item.productId === productId          ? { ...item, quantity, inventoryId: item.inventoryId || item.productId }
+      const updatedCart = cartItems.map(item =>
+        item.productId === productId
+          ? { ...item, quantity, inventoryId: item.inventoryId || item.productId }
           : item
-      );      setCartItems(updatedCart);
+      );
+      setCartItems(updatedCart);
 
       // Update server if user is logged in
       if (user) {
         const token = getAuthToken();
-        if (token) {          const inventoryId = itemToUpdate.inventoryId || itemToUpdate.productId;
-          const response = await fetch(`${API_BASE_URL}/buy/cart/${inventoryId}`, {
+        if (token) {
+          const productIdToUpdate = itemToUpdate.productId;
+          const response = await fetch(`${API_BASE_URL}/buy/cart/${productIdToUpdate}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -302,7 +379,8 @@ export const CartProvider = ({
         }
       }
     } catch (err) {
-      console.error('Error updating quantity:', err);      setError(err.message);
+      console.error('Error updating quantity:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -323,9 +401,10 @@ export const CartProvider = ({
           // Since there's no dedicated clear endpoint, we'll remove each item individually
           const itemsToRemove = [...cartItems]; // Create a copy to avoid state mutation issues
 
-          for (const item of itemsToRemove) {            const inventoryId = item.inventoryId || item.productId;
+          for (const item of itemsToRemove) {
+            const productIdToRemove = item.productId;
             try {
-              const response = await fetch(`${API_BASE_URL}/buy/cart/${inventoryId}`, {
+              const response = await fetch(`${API_BASE_URL}/buy/cart/${productIdToRemove}`, {
                 method: 'DELETE',
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -333,25 +412,28 @@ export const CartProvider = ({
               });
 
               if (!response.ok) {
-                console.warn(`Failed to remove item ${inventoryId} from server cart`);
+                console.warn(`Failed to remove item ${productIdToRemove} from server cart`);
               }
             } catch (itemError) {
-              console.warn(`Error removing item ${inventoryId}:`, itemError);
+              console.warn(`Error removing item ${productIdToRemove}:`, itemError);
             }
           }
         }
       }
     } catch (err) {
-      console.error('Error clearing cart:', err);      setError(err.message);
+      console.error('Error clearing cart:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const getCartTotal = () => {    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const getCartTotal = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const getCartItemsCount = () => {    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  const getCartItemsCount = () => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
   const clearError = () => {

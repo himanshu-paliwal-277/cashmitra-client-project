@@ -6,10 +6,13 @@
  * @version 1.0.0
  */
 
-const { validationResult } = require('express-validator');
-const SellOrder = require('../models/sellOrder.model');
-const SellOfferSession = require('../models/sellOfferSession.model');
-const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middleware');
+const { validationResult } = require("express-validator");
+const SellOrder = require("../models/sellOrder.model");
+const SellOfferSession = require("../models/sellOfferSession.model");
+const {
+  ApiError,
+  asyncHandler,
+} = require("../middlewares/errorHandler.middleware");
 
 /**
  * Create new order from session
@@ -19,7 +22,7 @@ const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middlewa
 exports.createOrder = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
+    throw new ApiError(400, "Validation Error", errors.array());
   }
 
   const { sessionId, pickup, payment, orderNumber } = req.body;
@@ -28,26 +31,28 @@ exports.createOrder = asyncHandler(async (req, res) => {
   // Verify session exists and belongs to user
   const session = await SellOfferSession.findById(sessionId);
   if (!session) {
-    throw new ApiError(404, 'Session not found');
+    throw new ApiError(404, "Session not found");
   }
 
   if (session.userId && session.userId.toString() !== userId) {
-    throw new ApiError(403, 'Session does not belong to user');
+    throw new ApiError(403, "Session does not belong to user");
   }
 
   // Check if session is expired
   if (session.expiresAt < new Date()) {
-    throw new ApiError(410, 'Session has expired');
+    throw new ApiError(410, "Session has expired");
   }
 
   // Check if order already exists for this session
   const existingOrder = await SellOrder.findOne({ sessionId });
   if (existingOrder) {
-    throw new ApiError(400, 'Order already exists for this session');
+    throw new ApiError(400, "Order already exists for this session");
   }
 
   // Generate orderNumber if not provided
-  const finalOrderNumber = orderNumber || `ORD${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+  const finalOrderNumber =
+    orderNumber ||
+    `ORD${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
   const order = new SellOrder({
     userId,
@@ -55,15 +60,15 @@ exports.createOrder = asyncHandler(async (req, res) => {
     pickup,
     payment,
     quoteAmount: session.finalPrice,
-    orderNumber: finalOrderNumber
+    orderNumber: finalOrderNumber,
   });
 
   await order.save();
 
   res.status(201).json({
     success: true,
-    message: 'Order created successfully',
-    data: order
+    message: "Order created successfully",
+    data: order,
   });
 });
 
@@ -75,31 +80,33 @@ exports.createOrder = asyncHandler(async (req, res) => {
 exports.getOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const userId = req.user.id;
-  const isAdmin = req.user.role === 'admin';
+  const isAdmin = req.user.role === "admin";
 
   const order = await SellOrder.findById(orderId)
     .populate({
-      path: 'sessionId',
+      path: "sessionId",
       populate: {
-        path: 'productId',
-        select: 'name images'
-      }
+        path: "productId",
+        select: "name images",
+      },
     })
-    .populate('userId', 'name email phone')
-    .populate('assignedTo', 'name email');
+    .populate("userId", "name email phone")
+    .populate("assignedTo", "name email");
 
   if (!order) {
-    throw new ApiError(404, 'Order not found');
+    throw new ApiError(404, "Order not found");
   }
 
   // Check if user can access this order
-  if (!isAdmin && order.userId.toString() !== userId) {
-    throw new ApiError(403, 'Access denied');
+  // order.userId is populated, so we need to compare _id
+  const orderUserId = order.userId._id || order.userId;
+  if (!isAdmin && orderUserId.toString() !== userId) {
+    throw new ApiError(403, "Access denied");
   }
 
   res.json({
     success: true,
-    data: order
+    data: order,
   });
 });
 
@@ -119,11 +126,11 @@ exports.getUserOrders = asyncHandler(async (req, res) => {
 
   const orders = await SellOrder.find(query)
     .populate({
-      path: 'sessionId',
+      path: "sessionId",
       populate: {
-        path: 'productId',
-        select: 'name images'
-      }
+        path: "productId",
+        select: "name images",
+      },
     })
     .sort({ createdAt: -1 })
     .limit(limit * 1)
@@ -140,9 +147,9 @@ exports.getUserOrders = asyncHandler(async (req, res) => {
         totalPages: Math.ceil(total / limit),
         totalOrders: total,
         hasNext: page * limit < total,
-        hasPrev: page > 1
-      }
-    }
+        hasPrev: page > 1,
+      },
+    },
   });
 });
 
@@ -152,42 +159,42 @@ exports.getUserOrders = asyncHandler(async (req, res) => {
  * @access Private (Admin only)
  */
 exports.getAllOrders = asyncHandler(async (req, res) => {
-  const { 
-    page = 1, 
-    limit = 10, 
-    status, 
+  const {
+    page = 1,
+    limit = 10,
+    status,
     search,
-    sortBy = 'createdAt',
-    sortOrder = 'desc'
+    sortBy = "createdAt",
+    sortOrder = "desc",
   } = req.query;
 
   const query = {};
-  
+
   if (status) {
     query.status = status;
   }
 
   if (search) {
     query.$or = [
-      { orderNumber: { $regex: search, $options: 'i' } },
-      { 'pickup.address.fullName': { $regex: search, $options: 'i' } },
-      { 'pickup.address.phone': { $regex: search, $options: 'i' } }
+      { orderNumber: { $regex: search, $options: "i" } },
+      { "pickup.address.fullName": { $regex: search, $options: "i" } },
+      { "pickup.address.phone": { $regex: search, $options: "i" } },
     ];
   }
 
   const sortOptions = {};
-  sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
+  sortOptions[sortBy] = sortOrder === "desc" ? -1 : 1;
 
   const orders = await SellOrder.find(query)
     .populate({
-      path: 'sessionId',
+      path: "sessionId",
       populate: {
-        path: 'productId',
-        select: 'name images'
-      }
+        path: "productId",
+        select: "name images",
+      },
     })
-    .populate('userId', 'name email phone')
-    .populate('assignedTo', 'name email')
+    .populate("userId", "name email phone")
+    .populate("assignedTo", "name email")
     .sort(sortOptions)
     .limit(limit * 1)
     .skip((page - 1) * limit);
@@ -203,9 +210,9 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
         totalPages: Math.ceil(total / limit),
         totalOrders: total,
         hasNext: page * limit < total,
-        hasPrev: page > 1
-      }
-    }
+        hasPrev: page > 1,
+      },
+    },
   });
 });
 
@@ -220,21 +227,21 @@ exports.updateOrderStatus = asyncHandler(async (req, res) => {
 
   const order = await SellOrder.findById(orderId);
   if (!order) {
-    throw new ApiError(404, 'Order not found');
+    throw new ApiError(404, "Order not found");
   }
 
   // Update based on status
   switch (status) {
-    case 'confirmed':
+    case "confirmed":
       await order.confirmOrder();
       break;
-    case 'cancelled':
+    case "cancelled":
       await order.cancelOrder(notes);
       break;
-    case 'picked':
+    case "picked":
       await order.markAsPicked(actualAmount, notes);
       break;
-    case 'paid':
+    case "paid":
       await order.markAsPaid();
       break;
     default:
@@ -253,8 +260,8 @@ exports.updateOrderStatus = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Order status updated successfully',
-    data: order
+    message: "Order status updated successfully",
+    data: order,
   });
 });
 
@@ -269,41 +276,43 @@ exports.assignOrder = asyncHandler(async (req, res) => {
   const staffId = req.body.staffId || req.body.assignedTo;
 
   if (!staffId) {
-    throw new ApiError(400, 'Staff ID or assignedTo is required');
+    throw new ApiError(400, "Staff ID or assignedTo is required");
   }
 
   const order = await SellOrder.findById(orderId);
   if (!order) {
-    throw new ApiError(404, 'Order not found');
+    throw new ApiError(404, "Order not found");
   }
 
   // Verify the staff/agent exists
-  const User = require('../models/user.model');
+  const User = require("../models/user.model");
   const staff = await User.findById(staffId);
   if (!staff) {
-    throw new ApiError(404, 'Staff/Agent not found');
+    throw new ApiError(404, "Staff/Agent not found");
   }
 
-  console.log('=== ASSIGNING ORDER TO STAFF ===');
-  console.log('Order ID:', orderId);
-  console.log('Staff ID:', staffId);
-  console.log('Staff Name:', staff.name);
-  console.log('Staff Role:', staff.role);
+  console.log("=== ASSIGNING ORDER TO STAFF ===");
+  console.log("Order ID:", orderId);
+  console.log("Staff ID:", staffId);
+  console.log("Staff Name:", staff.name);
+  console.log("Staff Role:", staff.role);
 
   order.assignedTo = staffId;
   await order.save();
 
-  const updatedOrder = await SellOrder.findById(orderId)
-    .populate('assignedTo', 'name email phone');
+  const updatedOrder = await SellOrder.findById(orderId).populate(
+    "assignedTo",
+    "name email phone"
+  );
 
-  console.log('✅ Order assigned successfully');
-  console.log('Updated Order assignedTo:', updatedOrder.assignedTo);
-  console.log('================================');
+  console.log("✅ Order assigned successfully");
+  console.log("Updated Order assignedTo:", updatedOrder.assignedTo);
+  console.log("================================");
 
   res.json({
     success: true,
-    message: 'Order assigned successfully',
-    data: updatedOrder
+    message: "Order assigned successfully",
+    data: updatedOrder,
   });
 });
 
@@ -316,21 +325,24 @@ exports.updatePickupDetails = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { pickup } = req.body;
   const userId = req.user.id;
-  const isAdmin = req.user.role === 'admin';
+  const isAdmin = req.user.role === "admin";
 
   const order = await SellOrder.findById(orderId);
   if (!order) {
-    throw new ApiError(404, 'Order not found');
+    throw new ApiError(404, "Order not found");
   }
 
   // Check if user can update this order
   if (!isAdmin && order.userId.toString() !== userId) {
-    throw new ApiError(403, 'Access denied');
+    throw new ApiError(403, "Access denied");
   }
 
   // Only allow updates for draft or confirmed orders
-  if (!['draft', 'confirmed'].includes(order.status)) {
-    throw new ApiError(400, 'Cannot update pickup details for this order status');
+  if (!["draft", "confirmed"].includes(order.status)) {
+    throw new ApiError(
+      400,
+      "Cannot update pickup details for this order status"
+    );
   }
 
   order.pickup = pickup;
@@ -338,8 +350,8 @@ exports.updatePickupDetails = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Pickup details updated successfully',
-    data: order
+    message: "Pickup details updated successfully",
+    data: order,
   });
 });
 
@@ -354,14 +366,14 @@ exports.getOrdersByStatus = asyncHandler(async (req, res) => {
 
   const orders = await SellOrder.getOrdersByStatus(status)
     .populate({
-      path: 'sessionId',
+      path: "sessionId",
       populate: {
-        path: 'productId',
-        select: 'name images'
-      }
+        path: "productId",
+        select: "name images",
+      },
     })
-    .populate('userId', 'name email phone')
-    .populate('assignedTo', 'name email')
+    .populate("userId", "name email phone")
+    .populate("assignedTo", "name email")
     .sort({ createdAt: -1 })
     .limit(limit * 1)
     .skip((page - 1) * limit);
@@ -377,9 +389,9 @@ exports.getOrdersByStatus = asyncHandler(async (req, res) => {
         totalPages: Math.ceil(total / limit),
         totalOrders: total,
         hasNext: page * limit < total,
-        hasPrev: page > 1
-      }
-    }
+        hasPrev: page > 1,
+      },
+    },
   });
 });
 
@@ -389,20 +401,26 @@ exports.getOrdersByStatus = asyncHandler(async (req, res) => {
  * @access Private (Admin only)
  */
 exports.getOrderStats = asyncHandler(async (req, res) => {
-  const { period = '30d' } = req.query;
-  
+  const { period = "30d" } = req.query;
+
   let dateFilter = {};
   const now = new Date();
-  
+
   switch (period) {
-    case '7d':
-      dateFilter = { createdAt: { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } };
+    case "7d":
+      dateFilter = {
+        createdAt: { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) },
+      };
       break;
-    case '30d':
-      dateFilter = { createdAt: { $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) } };
+    case "30d":
+      dateFilter = {
+        createdAt: { $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) },
+      };
       break;
-    case '90d':
-      dateFilter = { createdAt: { $gte: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000) } };
+    case "90d":
+      dateFilter = {
+        createdAt: { $gte: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000) },
+      };
       break;
     default:
       dateFilter = {};
@@ -412,18 +430,18 @@ exports.getOrderStats = asyncHandler(async (req, res) => {
     { $match: dateFilter },
     {
       $group: {
-        _id: '$status',
+        _id: "$status",
         count: { $sum: 1 },
-        totalAmount: { $sum: '$quoteAmount' },
-        avgAmount: { $avg: '$quoteAmount' }
-      }
-    }
+        totalAmount: { $sum: "$quoteAmount" },
+        avgAmount: { $avg: "$quoteAmount" },
+      },
+    },
   ]);
 
   const totalOrders = await SellOrder.countDocuments(dateFilter);
   const totalRevenue = await SellOrder.aggregate([
-    { $match: { ...dateFilter, status: 'paid' } },
-    { $group: { _id: null, total: { $sum: '$actualAmount' } } }
+    { $match: { ...dateFilter, status: "paid" } },
+    { $group: { _id: null, total: { $sum: "$actualAmount" } } },
   ]);
 
   res.json({
@@ -432,8 +450,8 @@ exports.getOrderStats = asyncHandler(async (req, res) => {
       totalOrders,
       totalRevenue: totalRevenue[0]?.total || 0,
       statusBreakdown: stats,
-      period
-    }
+      period,
+    },
   });
 });
 
@@ -446,24 +464,24 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { reason } = req.body;
   const userId = req.user.id;
-  const isAdmin = req.user.role === 'admin';
+  const isAdmin = req.user.role === "admin";
 
   const order = await SellOrder.findById(orderId);
   if (!order) {
-    throw new ApiError(404, 'Order not found');
+    throw new ApiError(404, "Order not found");
   }
 
   // Check if user can cancel this order
   if (!isAdmin && order.userId.toString() !== userId) {
-    throw new ApiError(403, 'Access denied');
+    throw new ApiError(403, "Access denied");
   }
 
   await order.cancelOrder(reason);
 
   res.json({
     success: true,
-    message: 'Order cancelled successfully',
-    data: order
+    message: "Order cancelled successfully",
+    data: order,
   });
 });
 
@@ -477,19 +495,19 @@ exports.deleteOrder = asyncHandler(async (req, res) => {
 
   const order = await SellOrder.findById(orderId);
   if (!order) {
-    throw new ApiError(404, 'Order not found');
+    throw new ApiError(404, "Order not found");
   }
 
   // Only allow deletion of draft or cancelled orders
-  if (!['draft', 'cancelled'].includes(order.status)) {
-    throw new ApiError(400, 'Cannot delete order with current status');
+  if (!["draft", "cancelled"].includes(order.status)) {
+    throw new ApiError(400, "Cannot delete order with current status");
   }
 
   await order.deleteOne();
 
   res.json({
     success: true,
-    message: 'Order deleted successfully'
+    message: "Order deleted successfully",
   });
 });
 
@@ -503,17 +521,17 @@ exports.getOrderPickupDetails = asyncHandler(async (req, res) => {
 
   const order = await SellOrder.findById(orderId)
     .populate({
-      path: 'sessionId',
+      path: "sessionId",
       populate: {
-        path: 'productId',
-        select: 'name images'
-      }
+        path: "productId",
+        select: "name images",
+      },
     })
-    .populate('userId', 'name email phone')
-    .select('orderNumber pickup userId sessionId status createdAt');
+    .populate("userId", "name email phone")
+    .select("orderNumber pickup userId sessionId status createdAt");
 
   if (!order) {
-    throw new ApiError(404, 'Order not found');
+    throw new ApiError(404, "Order not found");
   }
 
   // Extract address information from pickup details
@@ -521,28 +539,28 @@ exports.getOrderPickupDetails = asyncHandler(async (req, res) => {
     orderNumber: order.orderNumber,
     orderId: order._id,
     customer: {
-      name: order.pickup?.address?.fullName || order.userId?.name || '',
-      phone: order.pickup?.address?.phone || order.userId?.phone || '',
-      email: order.userId?.email || ''
+      name: order.pickup?.address?.fullName || order.userId?.name || "",
+      phone: order.pickup?.address?.phone || order.userId?.phone || "",
+      email: order.userId?.email || "",
     },
     address: {
-      street: order.pickup?.address?.street || '',
-      city: order.pickup?.address?.city || '',
-      state: order.pickup?.address?.state || '',
-      pincode: order.pickup?.address?.pincode || ''
+      street: order.pickup?.address?.street || "",
+      city: order.pickup?.address?.city || "",
+      state: order.pickup?.address?.state || "",
+      pincode: order.pickup?.address?.pincode || "",
     },
     product: {
-      name: order.sessionId?.productId?.name || 'Unknown Product',
-      images: order.sessionId?.productId?.images || []
+      name: order.sessionId?.productId?.name || "Unknown Product",
+      images: order.sessionId?.productId?.images || [],
     },
     status: order.status,
-    createdAt: order.createdAt
+    createdAt: order.createdAt,
   };
 
   res.json({
     success: true,
-    message: 'Order pickup details retrieved successfully',
-    data: addressInfo
+    message: "Order pickup details retrieved successfully",
+    data: addressInfo,
   });
 });
 
@@ -552,37 +570,42 @@ exports.getOrderPickupDetails = asyncHandler(async (req, res) => {
  * @access Private (Admin only)
  */
 exports.getOrdersForPickup = asyncHandler(async (req, res) => {
-  const { status = 'confirmed' } = req.query;
+  const { status = "confirmed" } = req.query;
 
-  const orders = await SellOrder.find({ 
-    status: { $in: ['confirmed', 'processing'] }
+  const orders = await SellOrder.find({
+    status: { $in: ["confirmed", "processing"] },
   })
     .populate({
-      path: 'sessionId',
+      path: "sessionId",
       populate: {
-        path: 'productId',
-        select: 'name'
-      }
+        path: "productId",
+        select: "name",
+      },
     })
-    .populate('userId', 'name')
-    .select('orderNumber pickup userId sessionId status createdAt')
+    .populate("userId", "name")
+    .select("orderNumber pickup userId sessionId status createdAt")
     .sort({ createdAt: -1 })
     .limit(100);
 
-  const orderList = orders.map(order => ({
+  const orderList = orders.map((order) => ({
     orderId: order._id,
     orderNumber: order.orderNumber,
-    customerName: order.pickup?.address?.fullName || order.userId?.name || 'Unknown Customer',
-    productName: order.sessionId?.productId?.name || 'Unknown Product',
+    customerName:
+      order.pickup?.address?.fullName ||
+      order.userId?.name ||
+      "Unknown Customer",
+    productName: order.sessionId?.productId?.name || "Unknown Product",
     status: order.status,
     createdAt: order.createdAt,
-    hasAddress: !!(order.pickup?.address?.street && order.pickup?.address?.city)
+    hasAddress: !!(
+      order.pickup?.address?.street && order.pickup?.address?.city
+    ),
   }));
 
   res.json({
     success: true,
-    message: 'Orders for pickup retrieved successfully',
-    data: orderList
+    message: "Orders for pickup retrieved successfully",
+    data: orderList,
   });
 });
 
@@ -595,34 +618,34 @@ exports.rescheduleOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { newDate, newTimeWindow } = req.body;
   const userId = req.user.id;
-  const isAdmin = req.user.role === 'admin';
+  const isAdmin = req.user.role === "admin";
 
   const order = await SellOrder.findById(orderId);
   if (!order) {
-    throw new ApiError(404, 'Order not found');
+    throw new ApiError(404, "Order not found");
   }
 
   // Check if user can reschedule this order
   if (!isAdmin && order.userId.toString() !== userId) {
-    throw new ApiError(403, 'Access denied');
+    throw new ApiError(403, "Access denied");
   }
 
   // Only allow rescheduling for confirmed orders
-  if (!['confirmed', 'draft'].includes(order.status)) {
-    throw new ApiError(400, 'Cannot reschedule order with current status');
+  if (!["confirmed", "draft"].includes(order.status)) {
+    throw new ApiError(400, "Cannot reschedule order with current status");
   }
 
   // Update pickup slot
   order.pickup.slot = {
     date: new Date(newDate),
-    window: newTimeWindow
+    window: newTimeWindow,
   };
 
   await order.save();
 
   res.json({
     success: true,
-    message: 'Order rescheduled successfully',
-    data: order
+    message: "Order rescheduled successfully",
+    data: order,
   });
 });

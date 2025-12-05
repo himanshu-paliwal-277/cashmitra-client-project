@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import sellService from '../../services/sellService';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import api from '../../services/api';
 import {
   ArrowLeft,
   Home,
@@ -14,12 +14,10 @@ import {
   Award,
 } from 'lucide-react';
 
-const ProductVariantSelection = ({
-  onContinue,
-  onBack
-}: any) => {
-  const { productId } = useParams();
+const ProductVariantSelection = ({ onContinue, onBack }: any) => {
+  const { category, brand, model } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [product, setProduct] = useState(null);
   const [variants, setVariants] = useState([]);
@@ -28,66 +26,65 @@ const ProductVariantSelection = ({
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (productId) {
+    // Check if product was passed via state
+    if (location.state?.product) {
+      const productData = location.state.product;
+      setProduct({
+        id: productData._id || productData.id,
+        name: productData.name,
+        category: productData.categoryId?.name || category,
+        categoryId: productData.categoryId?._id || productData.categoryId?.id,
+        images: productData.images || [],
+        status: productData.status,
+        slug: productData.slug,
+        tags: productData.tags || [],
+        soldCount: 1250,
+      });
+      setVariants(productData.variants || productData.activeVariants || []);
+      setLoading(false);
+    } else if (model) {
+      // Fetch product by ID if not in state
       fetchProductDetails();
+    } else {
+      setLoading(false);
+      setError('Product information not found');
     }
-  }, [productId]);
+  }, [location.state, model]);
 
   const fetchProductDetails = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await sellService.getProductVariants(productId);
+      // Fetch product by ID
+      const response = await api.get(`/sell/products/search`, {
+        params: { category, brand },
+      });
 
-      if (response && response.success && response.data) {
-        const productData = response.data;
+      if (response.data && response.data.data) {
+        // Find the product with matching ID
+        const productData = response.data.data.find((p: any) => p._id === model);
 
-        const product = {
-          id: productData._id || productData.id,
-          name: productData.name,
-          category:
-            productData.categoryId?.name || productData.categoryId?.displayName || 'Product',
-          categoryId: productData.categoryId?._id || productData.categoryId?.id,
-          images: productData.images || [],
-          status: productData.status,
-          slug: productData.slug,
-          tags: productData.tags || [],
-          createdBy: productData.createdBy,
-          createdAt: productData.createdAt,
-          updatedAt: productData.updatedAt,
-          soldCount: 1250,
-        };
-
-        const variants =
-          productData.variants?.map((variant: any) => ({
-            id: variant._id || variant.id,
-            _id: variant._id,
-            label: variant.label,
-            basePrice: variant.basePrice,
-            isActive: variant.isActive,
-            name: variant.label
-          })) || [];        setProduct(product);
-        setVariants(variants);
-      } else {
-        const mockProduct = {
-          id: productId,
-          name: 'iPhone 14 Pro',
-          brand: 'Apple',
-          category: 'Mobile',
-          images: ['/images/iphone-14-pro.jpg'],
-          soldCount: 1250,
-        };
-
-        const mockVariants = [
-          { id: 1, label: '6GB RAM, 128GB Storage', basePrice: 45000, isActive: true },
-          { id: 2, label: '6GB RAM, 256GB Storage', basePrice: 52000, isActive: true },
-          { id: 3, label: '6GB RAM, 512GB Storage', basePrice: 65000, isActive: true },
-          { id: 4, label: '6GB RAM, 1TB Storage', basePrice: 78000, isActive: true },
-        ];        setVariants(mockVariants);        setProduct(mockProduct);
+        if (productData) {
+          setProduct({
+            id: productData._id || productData.id,
+            name: productData.name,
+            category: productData.categoryId?.name || category,
+            categoryId: productData.categoryId?._id || productData.categoryId?.id,
+            images: productData.images || [],
+            status: productData.status,
+            slug: productData.slug,
+            tags: productData.tags || [],
+            soldCount: 1250,
+          });
+          setVariants(productData.variants || productData.activeVariants || []);
+        } else {
+          setError('Product not found');
+        }
       }
     } catch (error) {
-      console.error('Error fetching product details:', error);      setError('Failed to load product details. Please try again.');
+      console.error('Error fetching product details:', error);
+      setError('Failed to load product details. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -98,12 +95,14 @@ const ProductVariantSelection = ({
   };
 
   const handleGetExactValue = () => {
-    if (selectedVariant && product && onContinue) {      const variantId = selectedVariant._id || selectedVariant.id;      const categoryId = product.categoryId;
-      navigate(        `/sell/product/${product.id}/variant/${variantId}/condition?categoryId=${categoryId}`
-      );
-    } else if (selectedVariant && product) {      const variantId = selectedVariant._id || selectedVariant.id;      const categoryId = product.categoryId;
-      navigate(        `/sell/product/${product.id}/variant/${variantId}/condition?categoryId=${categoryId}`
-      );
+    if (selectedVariant && product) {
+      // Navigate to evaluation page with the selected variant
+      navigate(`/sell/${category}/${brand}/${model}/evaluation`, {
+        state: {
+          product,
+          selectedVariant,
+        },
+      });
     }
   };
 
@@ -169,8 +168,10 @@ const ProductVariantSelection = ({
           >
             Sell Old Mobile Phone
           </button>
-          <ArrowRight className="w-4 h-4 text-slate-400" />          <span className="text-slate-900 font-medium">{product?.category || 'Product'}</span>
-          <ArrowRight className="w-4 h-4 text-slate-400" />          <span className="text-slate-900 font-medium">{product?.name}</span>
+          <ArrowRight className="w-4 h-4 text-slate-400" />
+          <span className="text-slate-900 font-medium">{product?.category || 'Product'}</span>
+          <ArrowRight className="w-4 h-4 text-slate-400" />
+          <span className="text-slate-900 font-medium">{product?.name}</span>
         </nav>
 
         {/* Back Button */}
@@ -183,9 +184,11 @@ const ProductVariantSelection = ({
         </button>
 
         {/* Product Header */}
-        <div className="text-center mb-12">          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">{product?.name}</h1>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">{product?.name}</h1>
           <div className="flex items-center justify-center gap-2 text-blue-600">
-            <TrendingUp className="w-5 h-5" />            <p className="text-lg font-semibold">{product?.soldCount}+ already sold</p>
+            <TrendingUp className="w-5 h-5" />
+            <p className="text-lg font-semibold">{product?.soldCount}+ already sold</p>
           </div>
         </div>
 
@@ -224,8 +227,11 @@ const ProductVariantSelection = ({
           {/* Product Image */}
           <div className="lg:col-span-1 flex justify-center">
             <div className="w-full max-w-sm">
-              <div className="aspect-[3/4] bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex items-center justify-center">                {product?.images && product.images.length > 0 ? (
-                  <img                    src={product.images[0]}                    alt={product.name}
+              <div className="aspect-[3/4] bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex items-center justify-center">
+                {product?.images && product.images.length > 0 ? (
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -246,13 +252,16 @@ const ProductVariantSelection = ({
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     {variants.map(variant => (
-                      <button                        key={variant.id}
+                      <button
+                        key={variant.id}
                         onClick={() => handleVariantSelect(variant)}
-                        className={`relative p-6 rounded-xl border-2 transition-all duration-300 hover:scale-105 text-left ${                          selectedVariant?.id === variant.id
+                        className={`relative p-6 rounded-xl border-2 transition-all duration-300 hover:scale-105 text-left ${
+                          selectedVariant?.id === variant.id
                             ? 'border-blue-500 bg-blue-50 shadow-lg'
                             : 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-md'
                         }`}
-                      >                        {selectedVariant?.id === variant.id && (
+                      >
+                        {selectedVariant?.id === variant.id && (
                           <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
                             <Check className="w-5 h-5 text-white" />
                           </div>
@@ -260,18 +269,23 @@ const ProductVariantSelection = ({
 
                         <div className="mb-3">
                           <p
-                            className={`text-base font-semibold ${                              selectedVariant?.id === variant.id
+                            className={`text-base font-semibold ${
+                              selectedVariant?.id === variant.id
                                 ? 'text-blue-600'
                                 : 'text-slate-900'
                             }`}
-                          >                            {variant.label || variant.storage || variant.name || 'Variant'}
+                          >
+                            {variant.label || variant.storage || variant.name || 'Variant'}
                           </p>
                         </div>
 
                         <div
-                          className={`text-sm font-medium ${                            selectedVariant?.id === variant.id ? 'text-blue-600' : 'text-slate-600'
+                          className={`text-sm font-medium ${
+                            selectedVariant?.id === variant.id ? 'text-blue-600' : 'text-slate-600'
                           }`}
-                        >                          {variant.basePrice                            ? `₹${variant.basePrice.toLocaleString()}+`
+                        >
+                          {variant.basePrice
+                            ? `₹${variant.basePrice.toLocaleString()}+`
                             : 'Get Quote'}
                         </div>
                       </button>
@@ -288,8 +302,10 @@ const ProductVariantSelection = ({
                         <div>
                           <h4 className="text-lg font-bold text-slate-900 mb-1">
                             Selected Variant
-                          </h4>                          <p className="text-slate-700 mb-2">{selectedVariant.label}</p>
-                          <p className="text-2xl font-bold text-blue-600">                            ₹{selectedVariant.basePrice?.toLocaleString()}+
+                          </h4>
+                          <p className="text-slate-700 mb-2">{selectedVariant.label}</p>
+                          <p className="text-2xl font-bold text-blue-600">
+                            ₹{selectedVariant.basePrice?.toLocaleString()}+
                           </p>
                           <p className="text-sm text-slate-600 mt-1">
                             Final price depends on device condition

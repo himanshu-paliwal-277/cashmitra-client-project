@@ -64,7 +64,13 @@ const SellDeviceEvaluation = () => {
 
   const handleContinue = () => {
     if (isAllAnswered) {
-      navigate(`/sell/screen-defects/${product._id}`, {
+      // Extract category, brand, and model from URL params or product data
+      const pathParts = window.location.pathname.split('/');
+      const category = pathParts[2]; // /sell/Mobile/Apple/model/evaluation
+      const brand = pathParts[3];
+      const model = pathParts[4];
+
+      navigate(`/sell/${category}/${brand}/${model}/defects`, {
         state: { selectedVariant, product, deviceEvaluation: answers },
       });
     }
@@ -90,11 +96,22 @@ const SellDeviceEvaluation = () => {
     );
   }
 
-  const brandName = product.brand || 'Brand';
+  const brandName = product.category || 'Brand';
   const productName = product.name || 'Product';
-  const basePrice = product.pricing?.discountedPrice || product.basePrice || '2,160';
-  const productImage =
-    product.images && product.images['0'] ? product.images['0'].replace(/["`]/g, '') : null;
+  const basePrice = selectedVariant?.basePrice || '2,160';
+  
+  // Handle image - check if it's an array or object
+  let productImage = null;
+  if (product.images) {
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      productImage = product.images[0];
+    } else if (typeof product.images === 'object') {
+      productImage = product.images.main || product.images.gallery || product.images.thumbnail;
+    }
+  }
+  if (!productImage) {
+    productImage = '/placeholder-phone.jpg';
+  }
 
   // Calculate progress
   const answeredCount = Object.values(answers).filter(answer => answer !== '').length;
@@ -136,7 +153,7 @@ const SellDeviceEvaluation = () => {
           {/* Page Header */}
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold mb-3">
-              Sell {brandName} {productName} ({selectedVariant})
+              Sell {brandName} {productName} ({selectedVariant?.label || 'Variant'})
             </h1>
             <p className="text-lg text-blue-100">
               <span className="text-green-400 font-bold">₹{basePrice}+</span> already sold on our
@@ -171,7 +188,8 @@ const SellDeviceEvaluation = () => {
               {/* Questions */}
               <div className="space-y-8">
                 {questions.map((question, index) => {
-                  const QuestionIcon = question.icon;                  const isAnswered = answers[question.id] !== '';
+                  const QuestionIcon = question.icon;
+                  const isAnswered = answers[question.id] !== '';
 
                   return (
                     <div
@@ -203,7 +221,8 @@ const SellDeviceEvaluation = () => {
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-16">
-                        {question.options.map(option => {                          const isSelected = answers[question.id] === option.value;
+                        {question.options.map(option => {
+                          const isSelected = answers[question.id] === option.value;
 
                           return (
                             <button
@@ -267,7 +286,9 @@ const SellDeviceEvaluation = () => {
               {/* Product Name */}
               <h4 className="text-lg font-bold text-slate-900 text-center mb-6">
                 {brandName} {productName}
-                <span className="block text-sm text-slate-600 mt-1">({selectedVariant})</span>
+                <span className="block text-sm text-slate-600 mt-1">
+                  ({selectedVariant?.label || 'Variant'})
+                </span>
               </h4>
 
               {/* Price Section */}

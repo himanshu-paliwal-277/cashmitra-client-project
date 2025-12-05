@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import useUserOrders from '../../hooks/useUserOrders';
+import CancelOrderDialog from '../../components/CancelOrderDialog';
 import './Orders.css';
 
 const statusIcon = (status: any) => {
@@ -33,6 +34,12 @@ const statusIcon = (status: any) => {
       return <Clock size={16} />;
     case 'confirmed':
       return <Check size={16} />;
+    case 'draft':
+      return <Clock size={16} />;
+    case 'picked_up':
+      return <Truck size={16} />;
+    case 'paid':
+      return <CheckCircle size={16} />;
     case 'cancelled':
       return <X size={16} />;
     default:
@@ -52,6 +59,12 @@ const statusLabel = (status: any) => {
       return 'Pending';
     case 'confirmed':
       return 'Confirmed';
+    case 'draft':
+      return 'Draft';
+    case 'picked_up':
+      return 'Picked Up';
+    case 'paid':
+      return 'Paid';
     case 'cancelled':
       return 'Cancelled';
     default:
@@ -59,7 +72,8 @@ const statusLabel = (status: any) => {
   }
 };
 
-const Orders = () => {  const { user } = useAuth();
+const Orders = () => {
+  const { user } = useAuth();
   const {
     orders = [],
     loading,
@@ -74,6 +88,9 @@ const Orders = () => {  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [timeFilter, setTimeFilter] = useState('all');
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   useEffect(() => {
     fetchOrders(); /* eslint-disable-next-line */
@@ -91,7 +108,10 @@ const Orders = () => {  const { user } = useAuth();
     };
 
     return orders.filter(o => {
-      const txt = [        o?._id,        o?.orderType,        ...(o?.items || []).flatMap((it: any) => [
+      const txt = [
+        o?._id,
+        o?.orderType,
+        ...(o?.items || []).flatMap((it: any) => [
           it?.product?.name,
           it?.product?.brand,
           it?.product?.model,
@@ -102,7 +122,9 @@ const Orders = () => {  const { user } = useAuth();
         .toLowerCase();
 
       const matchSearch = !s || txt.includes(s);
-      const matchStatus =        statusFilter === 'all' || (o?.status || '').toLowerCase() === statusFilter;      const matchTime = timeOk(o?.createdAt);
+      const matchStatus =
+        statusFilter === 'all' || (o?.status || '').toLowerCase() === statusFilter;
+      const matchTime = timeOk(o?.createdAt);
       return matchSearch && matchStatus && matchTime;
     });
   }, [orders, searchTerm, statusFilter, timeFilter]);
@@ -148,6 +170,9 @@ const Orders = () => {  const { user } = useAuth();
               <option value="pending">Pending</option>
               <option value="processing">Processing</option>
               <option value="confirmed">Confirmed</option>
+              <option value="draft">Draft</option>
+              <option value="picked_up">Picked Up</option>
+              <option value="paid">Paid</option>
               <option value="shipped">Shipped</option>
               <option value="delivered">Delivered</option>
               <option value="cancelled">Cancelled</option>
@@ -206,24 +231,36 @@ const Orders = () => {  const { user } = useAuth();
           </div>
         ) : (
           <div className="orders-list">
-            {filtered.map(order => {              const created = order?.createdAt                ? new Date(order.createdAt).toLocaleDateString('en-IN', {
+            {filtered.map(order => {
+              const created = order?.createdAt
+                ? new Date(order.createdAt).toLocaleDateString('en-IN', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
                   })
-                : '—';              const status = (order?.status || 'unknown').toLowerCase();              const payMethod = order?.paymentDetails?.method || '—';              const payStatus = (order?.paymentDetails?.status || '—').toLowerCase();              const address = order?.shippingDetails?.address || {};
-              const commissionRate =                order?.commission?.rate != null ? Number(order.commission.rate) : null;
-              const commissionAmt =                order?.commission?.amount != null ? Number(order.commission.amount) : null;
+                : '—';
+              const status = (order?.status || 'unknown').toLowerCase();
+              const payMethod = order?.paymentDetails?.method || '—';
+              const payStatus = (order?.paymentDetails?.status || '—').toLowerCase();
+              const address = order?.shippingDetails?.address || {};
+              const commissionRate =
+                order?.commission?.rate != null ? Number(order.commission.rate) : null;
+              const commissionAmt =
+                order?.commission?.amount != null ? Number(order.commission.amount) : null;
 
-              return (                <div key={order._id} className="order-card simple">
+              return (
+                <div key={order._id} className="order-card simple">
                   {/* Top row */}
                   <div className="order-top">
-                    <div className="order-top-left">                      <h3 className="order-id">#{order._id}</h3>
+                    <div className="order-top-left">
+                      <h3 className="order-id">#{order._id}</h3>
                       <div className="order-chips">
                         <span className="chip">
                           <Calendar size={14} /> {created}
-                        </span>                        {order.orderType && (
-                          <span className="chip outline">                            {(order.orderType || '').toUpperCase()}
+                        </span>
+                        {order.orderType && (
+                          <span className="chip outline">
+                            {(order.orderType || '').toUpperCase()}
                           </span>
                         )}
                         <span className={`chip status badge-${status}`}>
@@ -233,8 +270,16 @@ const Orders = () => {  const { user } = useAuth();
                     </div>
 
                     <div className="order-total">
-                      <div className="total-label">Total</div>
-                      <div className="total-value">                        ₹{Number(order.totalAmount || 0).toLocaleString()}
+                      <div className="total-label">
+                        {order.orderType === 'sell' ? 'You Get' : 'Total'}
+                      </div>
+                      <div className="total-value">
+                        ₹
+                        {Number(
+                          order.orderType === 'sell'
+                            ? order.quoteAmount || 0
+                            : order.totalAmount || 0
+                        ).toLocaleString()}
                       </div>
                     </div>
                   </div>
@@ -244,26 +289,68 @@ const Orders = () => {  const { user } = useAuth();
                     {/* Items (compact list) */}
                     <div className="simple-block">
                       <div className="block-title">
-                        <Package size={16} /> Items
+                        <Package size={16} /> {order.orderType === 'sell' ? 'Device' : 'Items'}
                       </div>
-                      <div className="items-compact">                        {(order.items || []).map((it: any, idx: any) => (
-                          <div className="item-compact" key={idx}>
+                      <div className="items-compact">
+                        {order.orderType === 'sell' ? (
+                          // Sell order - single device from session
+                          <div className="item-compact">
                             <div className="item-compact-img">
                               <img
-                                src={it?.product?.images?.[0] || '/placeholder-image.jpg'}
-                                alt={it?.product?.name || 'Product'}
+                                src={
+                                  order?.sessionId?.productId?.images?.[0] ||
+                                  '/placeholder-phone.jpg'
+                                }
+                                alt={order?.sessionId?.productId?.name || 'Device'}
                                 loading="lazy"
                               />
                             </div>
                             <div className="item-compact-info">
                               <div className="item-compact-title">
-                                {it?.product?.brand || ''}{' '}
-                                {it?.product?.model || it?.product?.name || ''}
+                                {order?.sessionId?.productId?.name || 'Device'}
                               </div>
-                              <div className="item-compact-meta">Qty: {it?.quantity || 1}</div>
+                              <div className="item-compact-meta">
+                                Order: {order.orderNumber || order._id?.slice(-6)}
+                              </div>
                             </div>
                           </div>
-                        ))}
+                        ) : (
+                          // Buy order - multiple items
+                          (order.items || []).map((it: any, idx: any) => {
+                            // Handle images - can be array or object with main/gallery/thumbnail
+                            let imageUrl = '/placeholder-image.jpg';
+                            if (it?.product?.images) {
+                              if (Array.isArray(it.product.images)) {
+                                imageUrl = it.product.images[0] || '/placeholder-image.jpg';
+                              } else if (typeof it.product.images === 'object') {
+                                imageUrl =
+                                  it.product.images.main ||
+                                  it.product.images.gallery ||
+                                  it.product.images.thumbnail ||
+                                  '/placeholder-image.jpg';
+                              }
+                            }
+
+                            return (
+                              <div className="item-compact" key={idx}>
+                                <div className="item-compact-img">
+                                  <img
+                                    src={imageUrl}
+                                    alt={it?.product?.name || 'Product'}
+                                    loading="lazy"
+                                  />
+                                </div>
+                                <div className="item-compact-info">
+                                  <div className="item-compact-title">
+                                    {it?.product?.brand || ''}{' '}
+                                    {it?.product?.model || it?.product?.name || ''}
+                                  </div>
+                                  <div className="item-compact-meta">Qty: {it?.quantity || 1}</div>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
                       </div>
                     </div>
 
@@ -274,30 +361,59 @@ const Orders = () => {  const { user } = useAuth();
                       </div>
                       <div className="kv">
                         <span className="k">Method</span>
-                        <span className="v">{payMethod}</span>
+                        <span className="v">
+                          {order.orderType === 'sell' ? order?.payment?.method || '—' : payMethod}
+                        </span>
                       </div>
                       <div className="kv">
                         <span className="k">Status</span>
                         <span
                           className={`v pill ${payStatus === 'paid' ? 'ok' : payStatus === 'pending' ? 'warn' : ''}`}
-                        >                          {order?.paymentDetails?.status || '—'}
+                        >
+                          {order.orderType === 'sell'
+                            ? order?.payment?.status || '—'
+                            : order?.paymentDetails?.status || '—'}
                         </span>
                       </div>
                     </div>
 
-                    {/* Shipping */}
+                    {/* Shipping / Pickup */}
                     <div className="simple-block">
                       <div className="block-title">
-                        <MapPin size={16} /> Shipping
+                        <MapPin size={16} /> {order.orderType === 'sell' ? 'Pickup' : 'Shipping'}
                       </div>
                       <div className="addr">
-                        <div>{address.street || '—'}</div>
-                        <div>
-                          {[address.city, address.state, address.pincode]
-                            .filter(Boolean)
-                            .join(', ') || '—'}
-                        </div>
-                        <div>{address.country || '—'}</div>
+                        {order.orderType === 'sell' ? (
+                          <>
+                            <div>
+                              {order?.pickup?.address?.street || order?.formattedAddress || '—'}
+                            </div>
+                            <div>
+                              {[
+                                order?.pickup?.address?.city,
+                                order?.pickup?.address?.state,
+                                order?.pickup?.address?.pincode,
+                              ]
+                                .filter(Boolean)
+                                .join(', ') || '—'}
+                            </div>
+                            {order?.pickupSlotDisplay && (
+                              <div className="text-sm text-slate-600 mt-1">
+                                📅 {order.pickupSlotDisplay}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <div>{address.street || '—'}</div>
+                            <div>
+                              {[address.city, address.state, address.pincode]
+                                .filter(Boolean)
+                                .join(', ') || '—'}
+                            </div>
+                            <div>{address.country || '—'}</div>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -322,33 +438,69 @@ const Orders = () => {  const { user } = useAuth();
                   </div>
 
                   {/* Actions (kept minimal) */}
-                  <div className="order-actions simple">                    <Link to={`/account/orders/${order._id}`} className="btn ghost">
+                  <div className="order-actions simple">
+                    <Link to={`/account/orders/${order._id}`} className="btn ghost">
                       <Eye size={16} />
                       <span>View Order</span>
-                    </Link>                    <button className="btn ghost" onClick={() => downloadInvoice(order._id)}>
-                      <Download size={16} />
-                      <span>Invoice</span>
-                    </button>
+                    </Link>
 
-                    {status === 'shipped' && (                      <button className="btn primary" onClick={() => trackOrder(order._id)}>
+                    {order.orderType !== 'sell' && (
+                      <button
+                        className="btn ghost"
+                        onClick={() => alert('Invoice download feature coming soon!')}
+                        title="Coming soon"
+                      >
+                        <Download size={16} />
+                        <span>Invoice</span>
+                      </button>
+                    )}
+
+                    {order.orderType === 'buy' && status === 'shipped' && (
+                      <button
+                        className="btn primary"
+                        onClick={() => alert('Order tracking feature coming soon!')}
+                        title="Coming soon"
+                      >
                         <Truck size={16} />
                         <span>Track</span>
                       </button>
                     )}
 
-                    {(status === 'pending' ||
-                      status === 'processing' ||
-                      status === 'confirmed') && (                      <button className="btn danger" onClick={() => cancelOrder(order._id)}>
+                    {(status === 'pending' || status === 'confirmed' || status === 'draft') && (
+                      <button
+                        className="btn danger"
+                        onClick={() => {
+                          setSelectedOrderId(order._id);
+                          setCancelDialogOpen(true);
+                        }}
+                      >
                         <X size={16} />
                         <span>Cancel</span>
                       </button>
                     )}
 
-                    {status === 'delivered' && (                      <button className="btn" onClick={() => requestReturn(order._id)}>
+                    {order.orderType === 'buy' && status === 'delivered' && (
+                      <button
+                        className="btn"
+                        onClick={() => alert('Return/Reorder feature coming soon!')}
+                        title="Coming soon"
+                      >
                         <RefreshCw size={16} />
                         <span>Return / Reorder</span>
                       </button>
                     )}
+
+                    {order.orderType === 'sell' &&
+                      (status === 'draft' || status === 'confirmed') && (
+                        <button
+                          className="btn"
+                          onClick={() => alert('Reschedule pickup feature coming soon!')}
+                          title="Coming soon"
+                        >
+                          <Calendar size={16} />
+                          <span>Reschedule</span>
+                        </button>
+                      )}
                   </div>
                 </div>
               );
@@ -356,6 +508,33 @@ const Orders = () => {  const { user } = useAuth();
           </div>
         )}
       </div>
+
+      {/* Cancel Order Dialog */}
+      <CancelOrderDialog
+        isOpen={cancelDialogOpen}
+        onClose={() => {
+          setCancelDialogOpen(false);
+          setSelectedOrderId(null);
+        }}
+        onConfirm={async reason => {
+          if (!selectedOrderId) return;
+
+          setCancelLoading(true);
+          try {
+            await cancelOrder(selectedOrderId, reason);
+            setCancelDialogOpen(false);
+            setSelectedOrderId(null);
+            fetchOrders(); // Refresh the orders list
+            alert('Order cancelled successfully!');
+          } catch (err: any) {
+            alert(err?.response?.data?.message || 'Failed to cancel order');
+          } finally {
+            setCancelLoading(false);
+          }
+        }}
+        orderNumber={selectedOrderId || ''}
+        loading={cancelLoading}
+      />
     </div>
   );
 };

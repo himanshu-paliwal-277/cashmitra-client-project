@@ -22,11 +22,19 @@ import useUserAddresses from '../../hooks/useUserAddresses';
 import api from '../../services/api';
 import './Checkout.css';
 
-const Checkout = ({
-  onBack,
-  onOrderComplete
-}: any) => {
-  const navigate = useNavigate();  const { user, setOrderData } = useAuth();  const { cartItems, getCartTotal, clearCart } = useCart();
+const Checkout = ({ onBack, onOrderComplete }: any) => {
+  const navigate = useNavigate();
+  const { user, setOrderData } = useAuth();
+
+  // Handle back navigation
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate('/buy');
+    }
+  };
+  const { cartItems, getCartTotal, clearCart } = useCart();
   const { addresses = [], loading: addressLoading, addAddress } = useUserAddresses();
 
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -51,7 +59,9 @@ const Checkout = ({
   });
 
   useEffect(() => {
-    if (addresses.length > 0 && !selectedAddress) {      const def = addresses.find(a => a.isDefault) || addresses[0];      setSelectedAddress(def._id || def.id);
+    if (addresses.length > 0 && !selectedAddress) {
+      const def = addresses.find(a => a.isDefault) || addresses[0];
+      setSelectedAddress(def._id || def.id);
     }
   }, [addresses, selectedAddress]);
 
@@ -135,12 +145,14 @@ const Checkout = ({
 
   const handlePlaceOrder = async () => {
     try {
-      setOrderLoading(true);      const selectedAddressObj = addresses.find(a => (a._id || a.id) === selectedAddress);
+      setOrderLoading(true);
+      const selectedAddressObj = addresses.find(a => (a._id || a.id) === selectedAddress);
       if (!selectedAddressObj) throw new Error('Please select a delivery address');
 
       let processedCartItems = cartItems;
       if (!Array.isArray(cartItems) && typeof cartItems === 'object' && cartItems !== null) {
-        const keys = Object.keys(cartItems);        const numeric = keys.every(k => !isNaN(k));
+        const keys = Object.keys(cartItems);
+        const numeric = keys.every(k => !isNaN(k));
         if (numeric && keys.length) processedCartItems = Object.values(cartItems);
       }
       if (!Array.isArray(processedCartItems) || processedCartItems.length === 0) {
@@ -156,7 +168,12 @@ const Checkout = ({
 
       const orderData = {
         items,
-        shippingAddress: {          street: selectedAddressObj.street,          city: selectedAddressObj.city,          state: selectedAddressObj.state,          pincode: selectedAddressObj.pincode,          phone: formatPhoneForValidation(selectedAddressObj.phone),
+        shippingAddress: {
+          street: selectedAddressObj.street,
+          city: selectedAddressObj.city,
+          state: selectedAddressObj.state,
+          pincode: selectedAddressObj.pincode,
+          phone: formatPhoneForValidation(selectedAddressObj.phone),
         },
         paymentMethod: selectedPayment,
       };
@@ -164,20 +181,23 @@ const Checkout = ({
       const response = await api.post('/sales/orders', orderData);
 
       if (response.data.success) {
-        setOrderData(response.data.data.order);
+        const order = response.data.data.order;
+        setOrderData(order);
         await clearCart();
-        navigate('/buy/order-confirmation', { state: { orderData: response.data.data.order } });
-        if (onOrderComplete) onOrderComplete(response.data.data.order);
+        navigate(`/order-confirmation/${order._id}`, { state: { orderData: order } });
+        if (onOrderComplete) onOrderComplete(order);
       }
     } catch (err) {
-      console.error('Error placing order:', err);      alert(err.message || 'Failed to place order. Please try again.');
+      console.error('Error placing order:', err);
+      alert(err.message || 'Failed to place order. Please try again.');
     } finally {
       setOrderLoading(false);
     }
   };
 
   const sortedCart = useMemo(() => {
-    const arr = Array.isArray(cartItems) ? cartItems : [];    return [...arr].sort((a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
+    const arr = Array.isArray(cartItems) ? cartItems : [];
+    return [...arr].sort((a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
   }, [cartItems]);
 
   return (
@@ -185,7 +205,7 @@ const Checkout = ({
       {/* Header */}
       <header className="co-header">
         <div className="co-header-inner">
-          <button className="co-back" onClick={onBack}>
+          <button className="co-back" onClick={handleBack}>
             <ArrowLeft size={18} />
             <span>Back to Shopping</span>
           </button>
@@ -212,7 +232,8 @@ const Checkout = ({
                 <div className="co-empty muted">Loading addresses…</div>
               ) : addresses.length > 0 ? (
                 <div className="addr-list">
-                  {addresses.map(address => {                    const id = address._id || address.id;
+                  {addresses.map(address => {
+                    const id = address._id || address.id;
                     const isActive = selectedAddress === id;
                     return (
                       <button
@@ -221,13 +242,18 @@ const Checkout = ({
                         onClick={() => setSelectedAddress(id)}
                       >
                         {isActive && <CheckCircle size={20} className="addr-check" />}
-                        <div className="addr-name">                          {address.fullName} • {address.addressType}
+                        <div className="addr-name">
+                          {address.fullName} • {address.addressType}
                         </div>
                         <div className="addr-lines">
-                          <div>                            {address.street}                            {address.addressLine2 ? `, ${address.addressLine2}` : ''}
+                          <div>
+                            {address.street}
+                            {address.addressLine2 ? `, ${address.addressLine2}` : ''}
                           </div>
-                          <div>                            {address.city}, {address.state} — {address.pincode}
-                          </div>                          <div className="addr-phone">{address.phone}</div>
+                          <div>
+                            {address.city}, {address.state} — {address.pincode}
+                          </div>
+                          <div className="addr-phone">{address.phone}</div>
                         </div>
                       </button>
                     );
@@ -322,16 +348,16 @@ const Checkout = ({
             {sortedCart.length > 0 ? (
               <div className="sum-items">
                 {sortedCart.map(item => (
-                  <div key={item.inventoryId} className="sum-item">
+                  <div key={item.productId || item.inventoryId} className="sum-item">
                     <div className="sum-img">
                       <img
                         src={item.image || '/placeholder-image.jpg'}
-                        alt={item.title || 'Item'}
+                        alt={item.name || 'Item'}
                         loading="lazy"
                       />
                     </div>
                     <div className="sum-info">
-                      <div className="sum-name">{item.title}</div>
+                      <div className="sum-name">{item.name}</div>
                       <div className="sum-meta">
                         <span>{item.condition?.label || item.condition || 'N/A'}</span>
                         <span>•</span>
