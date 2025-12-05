@@ -29,7 +29,8 @@ const SellAccessories = () => {
     screenDefects,
   } = location.state || {};
 
-  const currentProductId = productId || id;
+  const currentProductId = productId || id || product?.id || product?._id;
+  const currentVariantId = variantId || selectedVariant?.id || selectedVariant?._id;
   const finalSelectedDefects = selectedDefects || screenDefects || [];
   const finalAnswers = answers || deviceEvaluation || {};
 
@@ -39,7 +40,11 @@ const SellAccessories = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!product?.data?.categoryId) {      setError('Product category not found');
+    const categoryId =
+      product?.categoryId || product?.data?.categoryId?._id || product?.data?.categoryId;
+
+    if (!categoryId) {
+      setError('Product category not found');
       setLoading(false);
       return;
     }
@@ -51,17 +56,23 @@ const SellAccessories = () => {
     try {
       setLoading(true);
       setError(null);
-      const accessoriesData = await sellService.getCustomerAccessories(product.data.categoryId._id);
+      const categoryId =
+        product?.categoryId || product?.data?.categoryId?._id || product?.data?.categoryId;
+      const accessoriesData = await sellService.getCustomerAccessories(categoryId);
       setAccessories(accessoriesData || []);
     } catch (err) {
-      console.error('Error fetching accessories:', err);      setError('Failed to load accessories. Please try again.');
+      console.error('Error fetching accessories:', err);
+      setError('Failed to load accessories. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAccessoryToggle = (accessory: any) => {    setSelectedAccessories(prev => {      const isSelected = prev.some(a => a._id === accessory._id);
-      if (isSelected) {        return prev.filter(a => a._id !== accessory._id);
+  const handleAccessoryToggle = (accessory: any) => {
+    setSelectedAccessories(prev => {
+      const isSelected = prev.some(a => a._id === accessory._id);
+      if (isSelected) {
+        return prev.filter(a => a._id !== accessory._id);
       } else {
         return [...prev, accessory];
       }
@@ -69,18 +80,28 @@ const SellAccessories = () => {
   };
 
   const handleContinue = () => {
-    navigate('/sell/quote', {
+    // Extract category from URL params
+    const pathParts = window.location.pathname.split('/');
+    const category = pathParts[2]; // /sell/Mobile/Apple/model/accessories
+
+    navigate(`/sell/${category}/quote`, {
       state: {
         assessmentData: {
           productId: currentProductId,
-          variantId,
+          variantId: currentVariantId,
           selectedVariant,
           answers: finalAnswers,
           selectedDefects: finalSelectedDefects,
           selectedAccessories,
           productDetails: product,
         },
-        product,
+        product: {
+          data: {
+            id: currentProductId,
+            _id: currentProductId,
+            ...product,
+          },
+        },
       },
     });
   };
@@ -105,14 +126,30 @@ const SellAccessories = () => {
     );
   }
 
-  const brandName = product.brand || product.data?.brand || 'Brand';
-  const productName = product.model || product.name || product.data?.name || 'Product';
-  const basePrice = product.pricing?.discountedPrice || product.basePrice || '2,160';
-  const productImage =
-    product.images && product.images['0'] ? product.images['0'].replace(/["`]/g, '') : null;
+  const brandName = product.category || product.data?.brand || 'Brand';
+  const productName = product.name || product.data?.name || 'Product';
+  const basePrice = selectedVariant?.label
+    ? typeof selectedVariant === 'object' && selectedVariant.basePrice
+      ? selectedVariant.basePrice
+      : '2,160'
+    : '2,160';
+
+  // Handle image - check if it's an array or object
+  let productImage = null;
+  if (product.images) {
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      productImage = product.images[0];
+    } else if (typeof product.images === 'object') {
+      productImage = product.images.main || product.images.gallery || product.images.thumbnail;
+    }
+  }
+  if (!productImage) {
+    productImage = '/placeholder-phone.jpg';
+  }
 
   // Calculate total accessory value
-  const totalAccessoryValue = selectedAccessories.reduce(    (sum, acc) => sum + (acc.delta?.value || 0),
+  const totalAccessoryValue = selectedAccessories.reduce(
+    (sum, acc) => sum + (acc.delta?.value || 0),
     0
   );
 
@@ -151,7 +188,7 @@ const SellAccessories = () => {
           {/* Page Header */}
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold mb-3">
-              Sell {brandName} {productName} ({selectedVariant})
+              Sell {brandName} {productName} ({selectedVariant?.label || 'Variant'})
             </h1>
             <p className="text-lg text-blue-100">
               <span className="text-green-400 font-bold">₹{basePrice}+</span> already sold on our
@@ -209,9 +246,11 @@ const SellAccessories = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                  {accessories.map(accessory => {                    const isSelected = selectedAccessories.some(a => a._id === accessory._id);
+                  {accessories.map(accessory => {
+                    const isSelected = selectedAccessories.some(a => a._id === accessory._id);
                     return (
-                      <div                        key={accessory._id}
+                      <div
+                        key={accessory._id}
                         onClick={() => handleAccessoryToggle(accessory)}
                         className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
                           isSelected
@@ -235,10 +274,12 @@ const SellAccessories = () => {
                             className={`text-lg font-bold mb-2 ${
                               isSelected ? 'text-green-700' : 'text-slate-900'
                             }`}
-                          >                            {accessory.title}
+                          >
+                            {accessory.title}
                           </h3>
                           <div className="flex items-center gap-1 text-green-600 font-semibold">
-                            <Plus className="w-4 h-4" />                            <span>₹{accessory.delta?.value || 0}</span>
+                            <Plus className="w-4 h-4" />
+                            <span>₹{accessory.delta?.value || 0}</span>
                           </div>
                         </div>
                       </div>
@@ -299,7 +340,9 @@ const SellAccessories = () => {
               {/* Product Name */}
               <h4 className="text-lg font-bold text-slate-900 text-center mb-6">
                 {brandName} {productName}
-                <span className="block text-sm text-slate-600 mt-1">({selectedVariant})</span>
+                <span className="block text-sm text-slate-600 mt-1">
+                  ({selectedVariant?.label || 'Variant'})
+                </span>
               </h4>
 
               {/* Price Section */}
@@ -352,8 +395,11 @@ const SellAccessories = () => {
                     <p className="text-xs font-semibold text-slate-700 mb-2">
                       Selected Accessories
                     </p>
-                    {selectedAccessories.map(accessory => (                      <div key={accessory._id} className="flex items-center justify-between mb-1">                        <p className="text-xs text-slate-600">• {accessory.title}</p>
-                        <p className="text-xs text-green-600 font-semibold">                          +₹{accessory.delta?.value || 0}
+                    {selectedAccessories.map(accessory => (
+                      <div key={accessory._id} className="flex items-center justify-between mb-1">
+                        <p className="text-xs text-slate-600">• {accessory.title}</p>
+                        <p className="text-xs text-green-600 font-semibold">
+                          +₹{accessory.delta?.value || 0}
                         </p>
                       </div>
                     ))}

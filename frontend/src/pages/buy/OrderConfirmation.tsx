@@ -25,13 +25,10 @@ import Button from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import './OrderConfirmation.css';
 
-const OrderConfirmation = ({
-  orderData,
-  onContinueShopping,
-  onGoHome
-}: any) => {
+const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }: any) => {
   const location = useLocation();
-  const navigate = useNavigate();  const { currentOrder, clearOrderData } = useAuth();
+  const navigate = useNavigate();
+  const { currentOrder, clearOrderData } = useAuth();
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Get order data from context first, then navigation state or props
@@ -108,28 +105,37 @@ const OrderConfirmation = ({
     {
       icon: Download,
       label: 'Download Invoice',
-      variant: 'ghost',
+      variant: 'ghost' as const,
       onClick: () => {
-        console.log('Download invoice');
-        // Add download functionality here
+        alert('Invoice download feature coming soon!');
       },
     },
     {
       icon: Share2,
       label: 'Share Order',
-      variant: 'ghost',
+      variant: 'ghost' as const,
       onClick: () => {
-        console.log('Share order');
-        // Add share functionality here
+        if (navigator.share) {
+          navigator
+            .share({
+              title: 'My Order',
+              text: `Order #${order?._id || 'N/A'}`,
+              url: window.location.href,
+            })
+            .catch(() => {
+              alert('Share feature coming soon!');
+            });
+        } else {
+          alert('Share feature coming soon!');
+        }
       },
     },
     {
       icon: Package,
       label: 'Track Package',
-      variant: 'primary',
+      variant: 'primary' as const,
       onClick: () => {
-        console.log('Track package');
-        // Add tracking functionality here
+        alert('Order tracking feature coming soon!');
       },
     },
   ];
@@ -215,9 +221,16 @@ const OrderConfirmation = ({
                   >
                     <div className="item-image">
                       <img
-                        src={item.product?.images?.[0] || '/api/placeholder/100/100'}
+                        src={
+                          item.product?.images?.main ||
+                          item.product?.images?.gallery ||
+                          item.product?.images?.thumbnail ||
+                          (Array.isArray(item.product?.images) ? item.product.images[0] : null) ||
+                          '/placeholder-phone.jpg'
+                        }
                         alt={item.product?.name || 'Product'}
-                        onError={e => {                          e.target.src = '/api/placeholder/100/100';
+                        onError={(e: any) => {
+                          e.target.src = '/placeholder-phone.jpg';
                         }}
                       />
                     </div>
@@ -231,7 +244,13 @@ const OrderConfirmation = ({
                       <div className="item-price">
                         <span className="item-quantity">Qty: {item.quantity || 1}</span>
                         <span className="item-total">
-                          {formatCurrency((item.product?.price || 0) * (item.quantity || 1))}
+                          {formatCurrency(
+                            item.price
+                              ? item.price * (item.quantity || 1)
+                              : order?.totalAmount
+                                ? order.totalAmount / (order.items?.length || 1)
+                                : 0
+                          )}
                         </span>
                       </div>
                     </div>
@@ -239,7 +258,7 @@ const OrderConfirmation = ({
                 )) || (
                   <div className="order-item">
                     <div className="item-image">
-                      <img src="/api/placeholder/100/100" alt="No items" />
+                      <img src="/placeholder-phone.jpg" alt="No items" />
                     </div>
                     <div className="item-info">
                       <h3 className="item-title">No items found</h3>
@@ -336,7 +355,8 @@ const OrderConfirmation = ({
                 <div className="actions-list">
                   {quickActions.map((action, index) => {
                     const IconComponent = action.icon;
-                    return (                      <Button
+                    return (
+                      <Button
                         key={index}
                         variant={action.variant}
                         size="sm"
@@ -428,7 +448,8 @@ const OrderConfirmation = ({
                     </div>
                   </div>
                 </div>
-                <div className="support-actions">                  <Button variant="primary" size="sm" className="action-button">
+                <div className="support-actions">
+                  <Button variant="primary" size="sm" className="action-button">
                     <MessageCircle size={16} />
                     Chat Support
                   </Button>
@@ -437,11 +458,13 @@ const OrderConfirmation = ({
             </div>
           </div>
 
-          <div className="navigation-actions">            <Button variant="primary" size="lg" onClick={handleContinueShopping}>
+          <div className="navigation-actions">
+            <Button variant="primary" size="lg" onClick={handleContinueShopping}>
               <ShoppingBag size={20} />
               Continue Shopping
               <ArrowRight size={20} />
-            </Button>            <Button variant="ghost" size="lg" onClick={handleGoHome}>
+            </Button>
+            <Button variant="ghost" size="lg" onClick={handleGoHome}>
               <Home size={20} />
               Go to Home
             </Button>

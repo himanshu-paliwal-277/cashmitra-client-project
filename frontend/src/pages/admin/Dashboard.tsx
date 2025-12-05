@@ -7,6 +7,7 @@ import RealTimeCharts from '../../components/admin/RealTimeCharts';
 import RealTimeSalesOrders from '../../components/admin/RealTimeSalesOrders';
 import RealTimePurchaseOrders from '../../components/admin/RealTimePurchaseOrders';
 import { PickupManagement } from './index';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import {
   Users,
   ShoppingBag,
@@ -153,11 +154,8 @@ function AdminDashboard() {
       {/* Main Content */}
       <div className="relative">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16 sm:py-20 bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200">
-            <RefreshCw className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 animate-spin mb-3 sm:mb-4" />
-            <p className="text-lg sm:text-xl text-slate-700 font-semibold px-4 text-center">
-              Loading dashboard data...
-            </p>
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200">
+            <LoadingSpinner size="xl" text="Loading dashboard data..." />
           </div>
         ) : (
           <>

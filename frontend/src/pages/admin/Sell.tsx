@@ -1,17 +1,7 @@
 import { useState, useEffect } from 'react';
 import useAdminSell from '../../hooks/useAdminSell';
-import {
-  TrendingUp,
-  Plus,
-  Filter,
-  Eye,
-  X,
-  Package,
-  CreditCard,
-  MapPin,
-  Clock,
-  Edit,
-} from 'lucide-react';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { TrendingUp, Filter, Eye, X, Package, CreditCard, MapPin, Clock, Edit } from 'lucide-react';
 
 const Sell = () => {
   const [sellOrders, setSellOrders] = useState([]);
@@ -28,7 +18,10 @@ const Sell = () => {
 
   const { sellOrders: hookSellOrders, stats: hookStats, loading: hookLoading } = useAdminSell();
 
-  useEffect(() => {    if (hookSellOrders && hookSellOrders.orders) {      setSellOrders(hookSellOrders.orders);      const orders = hookSellOrders.orders;
+  useEffect(() => {
+    if (hookSellOrders && Array.isArray(hookSellOrders)) {
+      setSellOrders(hookSellOrders);
+      const orders = hookSellOrders;
       const totalOrders = orders.length;
       const pendingOrders = orders.filter((order: any) => order.status === 'pending').length;
       const approvedOrders = orders.filter((order: any) => order.status === 'approved').length;
@@ -44,8 +37,8 @@ const Sell = () => {
         avgQuote: avgAmount,
       });
     } else {
-      setSellOrders(hookSellOrders || []);
-      setStats(hookStats);
+      setSellOrders([]);
+      setStats(hookStats || { total: 0, pending: 0, approved: 0, avgQuote: 0 });
     }
     setLoading(hookLoading);
   }, [hookSellOrders, hookStats, hookLoading]);
@@ -74,7 +67,10 @@ const Sell = () => {
   ];
 
   const filteredOrders = sellOrders.filter(
-    order =>      (order.assessmentId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||      (order.notes || '').toLowerCase().includes(searchTerm.toLowerCase()) ||      (order._id || '').toLowerCase().includes(searchTerm.toLowerCase())
+    order =>
+      (order.assessmentId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.notes || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order._id || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const formatDate = (dateString: any) => {
@@ -98,15 +94,11 @@ const Sell = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 bg-slate-50 min-h-screen">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="mb-8">
         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 flex items-center gap-3">
           <TrendingUp className="w-8 h-8 text-blue-600" />
           Sell Management
         </h1>
-        <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
-          <Plus className="w-5 h-5" />
-          Create Sell Request
-        </button>
       </div>
 
       {/* Stats Grid */}
@@ -178,36 +170,49 @@ const Sell = () => {
             </thead>
             <tbody className="divide-y divide-slate-200">
               {loading ? (
-                <tr>                  <td colSpan="8" className="px-6 py-12 text-center text-slate-600">
-                    Loading...
+                <tr>
+                  <td colSpan={8} className="px-6 py-12">
+                    <LoadingSpinner size="md" text="Loading sell orders..." />
                   </td>
                 </tr>
               ) : filteredOrders.length === 0 ? (
-                <tr>                  <td colSpan="8" className="px-6 py-12 text-center text-slate-600">
+                <tr>
+                  <td colSpan={8} className="px-6 py-12 text-center text-slate-600">
                     No sell orders found
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map(order => (                  <tr key={order._id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 text-sm text-slate-900 font-medium">                      {order.assessmentId || 'N/A'}
-                    </td>                    <td className="px-6 py-4 text-sm text-slate-700">{order.orderType || 'N/A'}</td>
-                    <td className="px-6 py-4 text-sm text-slate-900 font-semibold">                      ₹{(order.totalAmount || 0).toLocaleString()}
+                filteredOrders.map(order => (
+                  <tr key={order._id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 text-sm text-slate-900 font-medium">
+                      {order.assessmentId || 'N/A'}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-700">                      ₹{(order.commission?.amount || 0).toLocaleString()} (                      {((order.commission?.rate || 0) * 100).toFixed(1)}%)
+                    <td className="px-6 py-4 text-sm text-slate-700">{order.orderType || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm text-slate-900 font-semibold">
+                      ₹{(order.totalAmount || 0).toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-700">                      {order.paymentDetails?.method || 'N/A'}
+                    <td className="px-6 py-4 text-sm text-slate-700">
+                      ₹{(order.commission?.amount || 0).toLocaleString()} (
+                      {((order.commission?.rate || 0) * 100).toFixed(1)}%)
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-700">
+                      {order.paymentDetails?.method || 'N/A'}
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${                          order.status === 'pending'
-                            ? 'bg-amber-100 text-amber-700'                            : order.status === 'approved'
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          order.status === 'pending'
+                            ? 'bg-amber-100 text-amber-700'
+                            : order.status === 'approved'
                               ? 'bg-green-100 text-green-700'
                               : 'bg-red-100 text-red-700'
                         }`}
-                      >                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      >
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-700">                      {formatDate(order.createdAt)}
+                    <td className="px-6 py-4 text-sm text-slate-700">
+                      {formatDate(order.createdAt)}
                     </td>
                     <td className="px-6 py-4">
                       <button
@@ -256,23 +261,32 @@ const Sell = () => {
                   Order Information
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[                    { label: 'Order ID', value: selectedOrder._id },                    { label: 'Assessment ID', value: selectedOrder.assessmentId },                    { label: 'Order Type', value: selectedOrder.orderType },
+                  {[
+                    { label: 'Order ID', value: selectedOrder._id },
+                    { label: 'Assessment ID', value: selectedOrder.assessmentId },
+                    { label: 'Order Type', value: selectedOrder.orderType },
                     {
                       label: 'Status',
                       value: (
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${                            selectedOrder.status === 'pending'
-                              ? 'bg-amber-100 text-amber-700'                              : selectedOrder.status === 'approved'
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            selectedOrder.status === 'pending'
+                              ? 'bg-amber-100 text-amber-700'
+                              : selectedOrder.status === 'approved'
                                 ? 'bg-green-100 text-green-700'
                                 : 'bg-red-100 text-red-700'
                           }`}
-                        >                          {selectedOrder.status.charAt(0).toUpperCase() +                            selectedOrder.status.slice(1)}
+                        >
+                          {selectedOrder.status.charAt(0).toUpperCase() +
+                            selectedOrder.status.slice(1)}
                         </span>
                       ),
                     },
                     {
-                      label: 'Total Amount',                      value: `₹${(selectedOrder.totalAmount || 0).toLocaleString()}`,
-                    },                    { label: 'Created Date', value: formatDate(selectedOrder.createdAt) },
+                      label: 'Total Amount',
+                      value: `₹${(selectedOrder.totalAmount || 0).toLocaleString()}`,
+                    },
+                    { label: 'Created Date', value: formatDate(selectedOrder.createdAt) },
                   ].map((item, index) => (
                     <div
                       key={index}
@@ -298,14 +312,16 @@ const Sell = () => {
                     <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">
                       Commission Rate
                     </div>
-                    <div className="text-sm text-slate-900 font-medium">                      {((selectedOrder.commission?.rate || 0) * 100).toFixed(1)}%
+                    <div className="text-sm text-slate-900 font-medium">
+                      {((selectedOrder.commission?.rate || 0) * 100).toFixed(1)}%
                     </div>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-xl border-l-4 border-green-500">
                     <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">
                       Commission Amount
                     </div>
-                    <div className="text-sm text-slate-900 font-medium">                      ₹{(selectedOrder.commission?.amount || 0).toLocaleString()}
+                    <div className="text-sm text-slate-900 font-medium">
+                      ₹{(selectedOrder.commission?.amount || 0).toLocaleString()}
                     </div>
                   </div>
                 </div>
@@ -322,7 +338,8 @@ const Sell = () => {
                     <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">
                       Payment Method
                     </div>
-                    <div className="text-sm text-slate-900 font-medium">                      {selectedOrder.paymentDetails?.method || 'N/A'}
+                    <div className="text-sm text-slate-900 font-medium">
+                      {selectedOrder.paymentDetails?.method || 'N/A'}
                     </div>
                   </div>
                   <div className="bg-slate-50 p-4 rounded-xl border-l-4 border-purple-500">
@@ -331,13 +348,16 @@ const Sell = () => {
                     </div>
                     <div className="text-sm text-slate-900 font-medium">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${                          selectedOrder.paymentDetails?.status === 'completed'
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          selectedOrder.paymentDetails?.status === 'completed'
                             ? 'bg-green-100 text-green-700'
                             : 'bg-amber-100 text-amber-700'
                         }`}
-                      >                        {(selectedOrder.paymentDetails?.status || 'Unknown')
+                      >
+                        {(selectedOrder.paymentDetails?.status || 'Unknown')
                           .charAt(0)
-                          .toUpperCase() +                          (selectedOrder.paymentDetails?.status || 'Unknown').slice(1)}
+                          .toUpperCase() +
+                          (selectedOrder.paymentDetails?.status || 'Unknown').slice(1)}
                       </span>
                     </div>
                   </div>
@@ -354,7 +374,8 @@ const Sell = () => {
                   <div className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">
                     Country
                   </div>
-                  <div className="text-sm text-slate-900 font-medium">                    {selectedOrder.shippingDetails?.address?.country || 'N/A'}
+                  <div className="text-sm text-slate-900 font-medium">
+                    {selectedOrder.shippingDetails?.address?.country || 'N/A'}
                   </div>
                 </div>
               </div>
@@ -362,9 +383,11 @@ const Sell = () => {
               {/* Items */}
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <Package className="w-5 h-5 text-blue-600" />                  Items ({selectedOrder.items?.length || 0})
+                  <Package className="w-5 h-5 text-blue-600" />
+                  Items ({selectedOrder.items?.length || 0})
                 </h3>
-                <div className="space-y-4">                  {selectedOrder.items?.map((item: any, index: any) => (
+                <div className="space-y-4">
+                  {selectedOrder.items?.map((item: any, index: any) => (
                     <div
                       key={item._id || index}
                       className="bg-slate-50 border border-slate-200 rounded-xl p-4"
@@ -412,7 +435,8 @@ const Sell = () => {
                   <Clock className="w-5 h-5 text-amber-600" />
                   Status History
                 </h3>
-                <div className="space-y-3">                  {selectedOrder.statusHistory?.map((history: any, index: any) => (
+                <div className="space-y-3">
+                  {selectedOrder.statusHistory?.map((history: any, index: any) => (
                     <div
                       key={history._id || index}
                       className="flex items-start gap-4 p-4 bg-slate-50 rounded-xl"
@@ -442,13 +466,15 @@ const Sell = () => {
                 </div>
               </div>
 
-              {/* Notes */}              {selectedOrder.notes && (
+              {/* Notes */}
+              {selectedOrder.notes && (
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
                     <Edit className="w-5 h-5 text-slate-600" />
                     Notes
                   </h3>
-                  <div className="bg-slate-50 p-4 rounded-xl border-l-4 border-slate-500">                    <div className="text-sm text-slate-900">{selectedOrder.notes}</div>
+                  <div className="bg-slate-50 p-4 rounded-xl border-l-4 border-slate-500">
+                    <div className="text-sm text-slate-900">{selectedOrder.notes}</div>
                   </div>
                 </div>
               )}

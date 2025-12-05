@@ -1,51 +1,84 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import useAdminBrands from '../../hooks/useAdminBrands';
-import useAdminCategories from '../../hooks/useAdminCategories';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useSellCategories } from '../../hooks/useSellCategories';
 import { ArrowRight, ArrowLeft, Home, Loader, Search, ChevronRight, Package } from 'lucide-react';
+import api from '../../services/api';
 
 const BrandSelection = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { category } = useParams();
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredBrands, setFilteredBrands] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   // Get category from URL params
   const urlParams = new URLSearchParams(location.search);
-  const categoryId = urlParams.get('category');
+  const categoryId = urlParams.get('category') || category;
 
-  const { categories } = useAdminCategories();
-  const { brands, loading, error } = useAdminBrands();
+  const { categories } = useSellCategories();
+
+  // Fetch brands from public sell endpoint
+  useEffect(() => {
+    const fetchBrands = async () => {
+      if (!categoryId) return;
+
+      setLoading(true);
+      setError(null);
+      try {
+        // Convert category to lowercase for API call
+        const categoryLower = categoryId.toLowerCase();
+        const response = await api.get(`/sell/brands/${categoryLower}`);
+        if (response.data && response.data.brands) {
+          setBrands(response.data.brands);
+        }
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch brands');
+        console.error('Error fetching brands:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBrands();
+  }, [categoryId]);
 
   // Set selected category based on URL param
   useEffect(() => {
-    if (categories && categoryId) {      const category = categories.find(cat => cat.name === categoryId);      setSelectedCategory(category);
+    if (categories && categoryId) {
+      const category = categories.find(cat => cat.name === categoryId);
+      setSelectedCategory(category);
     }
   }, [categories, categoryId]);
 
-  // Filter brands based on selected category and search query
+  // Filter brands based on search query
   useEffect(() => {
-    if (brands && selectedCategory) {
-      let filtered = brands.filter(        brand => brand.categories && brand.categories.includes(selectedCategory.name)
-      );
+    if (brands) {
+      let filtered = brands;
 
       if (searchQuery) {
-        filtered = filtered.filter(          brand => brand.brand && brand.brand.toLowerCase().includes(searchQuery.toLowerCase())
+        filtered = brands.filter(
+          (brand: any) => brand && brand.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
 
       setFilteredBrands(filtered);
     }
-  }, [brands, selectedCategory, searchQuery]);
+  }, [brands, searchQuery]);
 
   const handleBrandClick = (brand: any) => {
     setSelectedBrand(brand);
   };
 
   const handleNext = () => {
-    if (selectedBrand) {      navigate(`/sell/model?category=${categoryId}&brand=${selectedBrand.brand}`);
+    if (selectedBrand) {
+      // Handle both string and object formats
+      const brandName = typeof selectedBrand === 'string' ? selectedBrand : selectedBrand.brand;
+      navigate(`/sell/${categoryId}/${brandName}/model`);
     }
   };
 
@@ -117,10 +150,7 @@ const BrandSelection = () => {
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm mb-6 text-white">
-            <a
-              href="/"
-              className="flex items-center gap-1 text-white transition-colors group"
-            >
+            <a href="/" className="flex items-center gap-1 text-white transition-colors group">
               <Home className="w-4 h-4 group-hover:scale-110 transition-transform" />
               <span>Home</span>
             </a>
@@ -129,15 +159,18 @@ const BrandSelection = () => {
               Sell Device
             </a>
             <ChevronRight className="w-4 h-4" />
-            <span className="text-white font-medium">              {selectedCategory?.name || 'Select Brand'}
+            <span className="text-white font-medium">
+              {selectedCategory?.name || 'Select Brand'}
             </span>
           </nav>
 
           {/* Page Header */}
           <div className="text-center">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 text-white">              Select your {selectedCategory?.name || 'device'} brand
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 text-white">
+              Select your {selectedCategory?.name || 'device'} brand
             </h1>
-            <p className="text-lg text-blue-100 max-w-2xl mx-auto">              Choose the brand of your {selectedCategory?.name?.toLowerCase() || 'device'} to
+            <p className="text-lg text-blue-100 max-w-2xl mx-auto">
+              Choose the brand of your {selectedCategory?.name?.toLowerCase() || 'device'} to
               continue with the selling process
             </p>
           </div>
@@ -162,10 +195,19 @@ const BrandSelection = () => {
         {/* Brand Grid */}
         {filteredBrands.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 mb-12">
-            {filteredBrands.map(brand => {              const colorScheme = getBrandColor(brand.brand);              const isSelected = selectedBrand?._id === brand._id;
+            {filteredBrands.map((brand, index) => {
+              // Handle both string and object formats
+              const brandName = typeof brand === 'string' ? brand : brand.brand;
+              const brandId = typeof brand === 'string' ? brand : brand._id;
+              const colorScheme = getBrandColor(brandName);
+              const isSelected =
+                typeof selectedBrand === 'string'
+                  ? selectedBrand === brand
+                  : selectedBrand?._id === brandId;
 
               return (
-                <div                  key={brand._id}
+                <div
+                  key={brandId || index}
                   onClick={() => handleBrandClick(brand)}
                   className={`bg-white rounded-2xl p-6 text-center cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-2 ${
                     isSelected
@@ -174,10 +216,13 @@ const BrandSelection = () => {
                   }`}
                 >
                   {/* Brand Logo/Initials */}
-                  <div                    className={`w-20 h-20 ${colorScheme.light} rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform ${
+                  <div
+                    className={`w-20 h-20 ${colorScheme.light} rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform ${
                       isSelected ? 'scale-110' : 'group-hover:scale-110'
                     }`}
-                  >                    <span className={`text-2xl font-bold ${colorScheme.text}`}>                      {getBrandInitials(brand.brand)}
+                  >
+                    <span className={`text-2xl font-bold ${colorScheme.text}`}>
+                      {getBrandInitials(brandName)}
                     </span>
                   </div>
 
@@ -186,7 +231,8 @@ const BrandSelection = () => {
                     className={`text-base sm:text-lg font-bold mb-2 transition-colors ${
                       isSelected ? 'text-blue-600' : 'text-slate-900'
                     }`}
-                  >                    {brand.brand}
+                  >
+                    {brandName}
                   </h3>
 
                   {/* Models Count */}

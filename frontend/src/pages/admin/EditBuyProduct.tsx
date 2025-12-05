@@ -1,544 +1,42 @@
-import React, { useState, useEffect } from 'react';import styled from 'styled-components';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
-  Plus,
-  Settings,
-  Tag,
-  X,
   Save,
-  CheckCircle,
+  Package,
+  DollarSign,
+  Camera,
+  Monitor,
+  Cpu,
+  Battery,
+  Wifi,
+  HardDrive,
+  Palette,
+  Truck,
+  CreditCard,
+  Tag,
   Shield,
-  AlertCircle,
-  Upload,
+  Star,
+  Plus,
 } from 'lucide-react';
 import adminService from '../../services/adminService';
 import cloudinaryService from '../../services/cloudinaryService';
-
-const LoadingSpinner = styled.div`
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid #e5e7eb;
-  border-top: 2px solid #10b981;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
-const LoadingOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
-
-const LoadingContent = styled.div`
-  background: white;
-  padding: 2rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-weight: 500;
-`;
-
-const Title = styled.h1`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2937;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  padding: 2rem;
-  background: white;
-  border-top: 1px solid #e2e8f0;
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-`;
-
-const AddButton = styled.button`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 0.875rem 1.5rem;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  }
-
-  &:hover::before {
-    left: 100%;
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
-  }
-`;
-
-// All styled components
-const Container = styled.div`
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  padding: 2rem;
-`;
-
-const ContentWrapper = styled.div`
-  max-width: 1400px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  background: white;
-  border-radius: 1rem;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  padding: 2rem;
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const HeaderRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const BackButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px 0 rgba(102, 126, 234, 0.3);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px 0 rgba(102, 126, 234, 0.4);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const PageTitle = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-`;
-
-const PageSubtitle = styled.p`
-  color: #718096;
-  margin: 0.5rem 0 0 0;
-  font-size: 1rem;
-`;
-
-const FormContainer = styled.div`
-  background: white;
-  border-radius: 1rem;
-  box-shadow:
-    0 10px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-`;
-
-const FormSection = styled.div`
-  padding: 2rem;
-  border-bottom: 1px solid #e2e8f0;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:nth-child(odd) {
-    background: #f8fafc;
-  }
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const Label = styled.label`
-  font-weight: 600;
-  color: #2d3748;
-  font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-
-  &::after {
-    content: ${(props: any) => props.required ? '"*"' : '""'};
-    color: #e53e3e;
-    margin-left: 0.25rem;
-  }
-`;
-
-const Input = styled.input`
-  padding: 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
-  background: white;
-  color: #2d3748;
-
-  &:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
-  }
-
-  &:hover {
-    border-color: #cbd5e0;
-  }
-
-  &::placeholder {
-    color: #a0aec0;
-  }
-`;
-
-const Select = styled.select`
-  padding: 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
-  background: white;
-  color: #2d3748;
-  transition: all 0.3s ease;
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
-  }
-
-  &:hover {
-    border-color: #cbd5e0;
-  }
-`;
-
-const TextArea = styled.textarea`
-  padding: 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
-  resize: vertical;
-  min-height: 120px;
-  transition: all 0.3s ease;
-  background: white;
-  color: #2d3748;
-  font-family: inherit;
-
-  &:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
-  }
-
-  &:hover {
-    border-color: #cbd5e0;
-  }
-
-  &::placeholder {
-    color: #a0aec0;
-  }
-`;
-
-const ImageUploadContainer = styled.div`
-  border: 2px dashed #d1d5db;
-  border-radius: 0.5rem;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #6b7280;
-
-  &:hover {
-    border-color: #10b981;
-    background: #f0fdf4;
-  }
-`;
-
-const ImageItem = styled.div`
-  position: relative;
-  display: inline-block;
-  margin: 0.5rem;
-`;
-
-const PreviewImage = styled.img`
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 0.375rem;
-  border: 1px solid #d1d5db;
-`;
-
-const RemoveButton = styled.button`
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #dc2626;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 12px;
-
-  &:hover {
-    background: #b91c1c;
-  }
-`;
-
-const RemoveImageButton = styled.button`
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #dc2626;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 12px;
-
-  &:hover {
-    background: #b91c1c;
-  }
-`;
-
-const SaveButton = styled.button`
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-  }
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
-  }
-
-  &:hover::before {
-    left: 100%;
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: 0 4px 15px rgba(72, 187, 120, 0.2);
-  }
-`;
-
-const CancelButton = styled.button`
-  background: white;
-  color: #718096;
-  border: 2px solid #e2e8f0;
-  padding: 1rem 2rem;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: #f7fafc;
-    border-color: #cbd5e0;
-    color: #4a5568;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const ErrorMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #dc2626;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-`;
-
-const SuccessMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #10b981;
-  font-size: 0.875rem;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 0.375rem;
-  padding: 0.75rem;
-  margin-top: 1rem;
-`;
-
-const DynamicFieldContainer = styled.div`
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-`;
-
-const DynamicFieldHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-
-  h3 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #1f2937;
-  }
-`;
-
-const ImagePreview = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
-`;
+import {
+  FormSection,
+  FormGrid,
+  FormGroup,
+  Input,
+  Select,
+  TextArea,
+  ImageUploadContainer,
+  ImagePreview,
+  DynamicFieldContainer,
+  DynamicFieldItem,
+  ActionButtons,
+  LoadingOverlay,
+  SuccessMessage,
+  ErrorMessage as ErrorMsg,
+} from '../../components/admin/ProductFormComponents';
 
 const EditBuyProduct = () => {
   const navigate = useNavigate();
@@ -546,49 +44,27 @@ const EditBuyProduct = () => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [categories, setCategories] = useState([]);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<any>({});
   const [success, setSuccess] = useState('');
 
-  // Initial form data structure (same as AddBuyProduct)
-  const initialFormData = {
-    // Basic Information
+  // Form data structure
+  const [formData, setFormData] = useState<any>({
     categoryId: '',
     name: '',
     brand: '',
     images: [],
     badges: [],
-
-    // Pricing
     pricing: {
       originalPrice: '',
       discountedPrice: '',
-      discount: {
-        type: 'percentage',
-        value: '',
-      },
-      emi: {
-        available: false,
-        startingFrom: '',
-        tenure: '',
-      },
+      discount: { type: 'percentage', value: '' },
+      emi: { available: false, startingFrom: '', tenure: '' },
     },
-
-    // Condition Options
     conditionOptions: [],
-
-    // Variants
     variants: [],
-
-    // Add-ons
     addOns: [],
-
-    // Offers
     offers: [],
-
-    // Reviews
     reviews: [],
-
-    // Payment Options
     paymentOptions: {
       cod: true,
       online: true,
@@ -597,33 +73,17 @@ const EditBuyProduct = () => {
       emiPlans: [],
       methods: [],
     },
-
-    // Availability
     availability: {
       inStock: true,
       quantity: '',
       estimatedDelivery: '',
       location: '',
     },
-
-    // Top Specs
     topSpecs: [],
-
-    // Product Details
     productDetails: {
       camera: {
-        rear: {
-          primary: '',
-          secondary: '',
-          features: [],
-        },
-        front: {
-          primary: '',
-          features: [],
-        },
-      },
-      rearCamera: {
-        features: [],
+        rear: { primary: '', secondary: '', features: [] },
+        front: { primary: '', features: [] },
       },
       network: {
         sim: '',
@@ -632,9 +92,6 @@ const EditBuyProduct = () => {
         bluetooth: '',
         gps: false,
         nfc: false,
-      },
-      networkConnectivity: {
-        wifiFeatures: [],
       },
       display: {
         size: '',
@@ -655,75 +112,34 @@ const EditBuyProduct = () => {
         expandable: false,
         cardSlot: '',
       },
-      memoryStorage: {
-        phoneVariants: [],
-      },
-      performance: {
-        antutu: '',
-        geekbench: {
-          single: '',
-          multi: '',
-        },
-      },
       battery: {
         capacity: '',
         type: '',
-        charging: {
-          wired: '',
-          wireless: false,
-          reverse: false,
-        },
+        charging: { wired: '', wireless: false, reverse: false },
       },
       design: {
-        dimensions: {
-          height: '',
-          width: '',
-          thickness: '',
-        },
+        dimensions: { height: '', width: '', thickness: '' },
         weight: '',
         colors: [],
         material: '',
         waterResistance: '',
       },
       sensors: [],
-      sensorsMisc: {
-        sensors: [],
-      },
     },
-
-    // Trust & Legal
     trustMetrics: {
       warranty: '',
       returnPolicy: '',
       authenticity: false,
     },
-
-    // Active status
     isActive: true,
-
-    // Sort order
     sortOrder: 0,
-
-    // Description
     description: '',
-
-    // Related Products
     relatedProducts: [],
-
-    // Legal
-    legal: {
-      termsAccepted: false,
-      privacyAccepted: false,
-    },
-  };
-
-  const [formData, setFormData] = useState(initialFormData);
+  });
 
   useEffect(() => {
     fetchCategories();
-    if (id) {
-      fetchProductData();
-    }
+    if (id) fetchProductData();
   }, [id]);
 
   const fetchCategories = async () => {
@@ -732,23 +148,7 @@ const EditBuyProduct = () => {
       setCategories(response.data || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      setErrors({ categories: 'Failed to load categories' });
     }
-  };
-
-  // Deep merge function to properly merge nested objects
-  const deepMerge = (target: any, source: any) => {
-    const result = { ...target };
-
-    for (const key in source) {
-      if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-        result[key] = deepMerge(result[key] || {}, source[key]);
-      } else {
-        result[key] = source[key];
-      }
-    }
-
-    return result;
   };
 
   const fetchProductData = async () => {
@@ -756,96 +156,157 @@ const EditBuyProduct = () => {
       setInitialLoading(true);
       const response = await adminService.getBuyProductById(id);
       if (response.data) {
-        // Deep merge the fetched data with the initial structure to ensure all fields exist
-        const productData = deepMerge(initialFormData, response.data);
+        const productData = response.data;
 
-        // Ensure arrays are properly initialized
-        productData.images = Array.isArray(productData.images) ? productData.images : [];
-        productData.badges = Array.isArray(productData.badges) ? productData.badges : [];
-        productData.conditionOptions = Array.isArray(productData.conditionOptions)
-          ? productData.conditionOptions
+        // Convert images object to array
+        const imagesArray = productData.images
+          ? typeof productData.images === 'object' && !Array.isArray(productData.images)
+            ? Object.values(productData.images).filter((img: any) => img)
+            : Array.isArray(productData.images)
+              ? productData.images
+              : []
           : [];
-        productData.variants = Array.isArray(productData.variants) ? productData.variants : [];
-        productData.addOns = Array.isArray(productData.addOns) ? productData.addOns : [];
-        productData.offers = Array.isArray(productData.offers) ? productData.offers : [];
-        productData.topSpecs = Array.isArray(productData.topSpecs) ? productData.topSpecs : [];
-        productData.relatedProducts = Array.isArray(productData.relatedProducts)
-          ? productData.relatedProducts
+
+        // Convert topSpecs object to array
+        const topSpecsArray = productData.topSpecs
+          ? typeof productData.topSpecs === 'object' && !Array.isArray(productData.topSpecs)
+            ? Object.entries(productData.topSpecs).map(([key, value]) => `${key}: ${value}`)
+            : Array.isArray(productData.topSpecs)
+              ? productData.topSpecs
+              : []
           : [];
-        productData.reviews = Array.isArray(productData.reviews) ? productData.reviews : [];
 
-        // Ensure payment options arrays are properly initialized
-        if (productData.paymentOptions) {
-          productData.paymentOptions.emiPlans = Array.isArray(productData.paymentOptions.emiPlans)
-            ? productData.paymentOptions.emiPlans
-            : [];
-          productData.paymentOptions.methods = Array.isArray(productData.paymentOptions.methods)
-            ? productData.paymentOptions.methods
-            : [];
-        }
+        // Convert badges object to array
+        const badgesArray = productData.badges
+          ? typeof productData.badges === 'object' && !Array.isArray(productData.badges)
+            ? Object.entries(productData.badges).map(([key, value]) => `${key}: ${value}`)
+            : Array.isArray(productData.badges)
+              ? productData.badges
+              : []
+          : [];
 
-        // Ensure nested arrays in productDetails are properly initialized
-        if (productData.productDetails) {
-          productData.productDetails.cameraFeatures = Array.isArray(
-            productData.productDetails.cameraFeatures
-          )
-            ? productData.productDetails.cameraFeatures
-            : [];
-          productData.productDetails.displayFeatures = Array.isArray(
-            productData.productDetails.displayFeatures
-          )
-            ? productData.productDetails.displayFeatures
-            : [];
-          productData.productDetails.designColors = Array.isArray(
-            productData.productDetails.designColors
-          )
-            ? productData.productDetails.designColors
-            : [];
-          productData.productDetails.sensors = Array.isArray(productData.productDetails.sensors)
-            ? productData.productDetails.sensors
-            : [];
-
-          // Ensure rearCamera features array
-          if (productData.productDetails.rearCamera) {
-            productData.productDetails.rearCamera.features = Array.isArray(
-              productData.productDetails.rearCamera.features
-            )
-              ? productData.productDetails.rearCamera.features
-              : [];
-          }
-
-          // Ensure networkConnectivity wifiFeatures array
-          if (productData.productDetails.networkConnectivity) {
-            productData.productDetails.networkConnectivity.wifiFeatures = Array.isArray(
-              productData.productDetails.networkConnectivity.wifiFeatures
-            )
-              ? productData.productDetails.networkConnectivity.wifiFeatures
-              : [];
-          }
-
-          // Ensure memoryStorage phoneVariants array
-          if (productData.productDetails.memoryStorage) {
-            productData.productDetails.memoryStorage.phoneVariants = Array.isArray(
-              productData.productDetails.memoryStorage.phoneVariants
-            )
-              ? productData.productDetails.memoryStorage.phoneVariants
-              : [];
-          }
-
-          // Ensure sensorsMisc sensors array
-          if (productData.productDetails.sensorsMisc) {
-            productData.productDetails.sensorsMisc.sensors = Array.isArray(
-              productData.productDetails.sensorsMisc.sensors
-            )
-              ? productData.productDetails.sensorsMisc.sensors
-              : [];
-          }
-        }
-
-        setFormData(productData);
+        setFormData({
+          ...formData,
+          ...productData,
+          categoryId: productData.categoryId?._id || productData.categoryId || '',
+          images: imagesArray,
+          badges: badgesArray,
+          conditionOptions: Array.isArray(productData.conditionOptions)
+            ? productData.conditionOptions
+            : [],
+          variants: Array.isArray(productData.variants) ? productData.variants : [],
+          addOns: Array.isArray(productData.addOns) ? productData.addOns : [],
+          offers: Array.isArray(productData.offers) ? productData.offers : [],
+          topSpecs: topSpecsArray,
+          relatedProducts: Array.isArray(productData.relatedProducts)
+            ? productData.relatedProducts
+            : [],
+          pricing: {
+            originalPrice: productData.pricing?.mrp || productData.pricing?.originalPrice || '',
+            discountedPrice: productData.pricing?.discountedPrice || '',
+            discount: {
+              type: productData.pricing?.discount?.type || 'percentage',
+              value:
+                productData.pricing?.discountPercent || productData.pricing?.discount?.value || '',
+            },
+            emi: {
+              available:
+                productData.paymentOptions?.emiAvailable ||
+                productData.pricing?.emi?.available ||
+                false,
+              startingFrom: productData.pricing?.emi?.startingFrom || '',
+              tenure: productData.pricing?.emi?.tenure || '',
+            },
+          },
+          availability: {
+            inStock:
+              productData.availability?.inStock !== undefined
+                ? productData.availability.inStock
+                : true,
+            quantity: productData.availability?.quantity || '',
+            estimatedDelivery: productData.availability?.estimatedDelivery || '',
+            location: productData.availability?.location || '',
+          },
+          productDetails: {
+            camera: {
+              rear: {
+                primary: productData.productDetails?.camera?.rear?.primary || '',
+                secondary: productData.productDetails?.camera?.rear?.secondary || '',
+                features: Array.isArray(productData.productDetails?.camera?.rear?.features)
+                  ? productData.productDetails.camera.rear.features
+                  : [],
+              },
+              front: {
+                primary: productData.productDetails?.camera?.front?.primary || '',
+                features: Array.isArray(productData.productDetails?.camera?.front?.features)
+                  ? productData.productDetails.camera.front.features
+                  : [],
+              },
+            },
+            network: {
+              sim: productData.productDetails?.network?.sim || '',
+              network: productData.productDetails?.network?.network || '',
+              wifi: productData.productDetails?.network?.wifi || '',
+              bluetooth: productData.productDetails?.network?.bluetooth || '',
+              gps: productData.productDetails?.network?.gps || false,
+              nfc: productData.productDetails?.network?.nfc || false,
+            },
+            display: {
+              size: productData.productDetails?.display?.size || '',
+              resolution: productData.productDetails?.display?.resolution || '',
+              type: productData.productDetails?.display?.type || '',
+              protection: productData.productDetails?.display?.protection || '',
+              features: Array.isArray(productData.productDetails?.display?.features)
+                ? productData.productDetails.display.features
+                : [],
+            },
+            general: {
+              os: productData.productDetails?.general?.os || '',
+              processor: productData.productDetails?.general?.processor || '',
+              chipset: productData.productDetails?.general?.chipset || '',
+              gpu: productData.productDetails?.general?.gpu || '',
+            },
+            memory: {
+              ram: productData.productDetails?.memory?.ram || '',
+              storage: productData.productDetails?.memory?.storage || '',
+              expandable: productData.productDetails?.memory?.expandable || false,
+              cardSlot: productData.productDetails?.memory?.cardSlot || '',
+            },
+            battery: {
+              capacity: productData.productDetails?.battery?.capacity || '',
+              type: productData.productDetails?.battery?.type || '',
+              charging: {
+                wired: productData.productDetails?.battery?.charging?.wired || '',
+                wireless: productData.productDetails?.battery?.charging?.wireless || false,
+                reverse: productData.productDetails?.battery?.charging?.reverse || false,
+              },
+            },
+            design: {
+              dimensions: {
+                height: productData.productDetails?.design?.dimensions?.height || '',
+                width: productData.productDetails?.design?.dimensions?.width || '',
+                thickness: productData.productDetails?.design?.dimensions?.thickness || '',
+              },
+              weight: productData.productDetails?.design?.weight || '',
+              colors: Array.isArray(productData.productDetails?.design?.colors)
+                ? productData.productDetails.design.colors
+                : [],
+              material: productData.productDetails?.design?.material || '',
+              waterResistance: productData.productDetails?.design?.waterResistance || '',
+            },
+            sensors: Array.isArray(productData.productDetails?.sensors)
+              ? productData.productDetails.sensors
+              : [],
+          },
+          trustMetrics: {
+            warranty: productData.trustMetrics?.warranty || '',
+            returnPolicy: productData.trustMetrics?.returnPolicy || '',
+            authenticity: productData.trustMetrics?.authenticity || false,
+          },
+        });
       }
     } catch (error) {
-      console.error('Error fetching product data:', error);
+      console.error('Error fetching product:', error);
       setErrors({ fetch: 'Failed to load product data' });
     } finally {
       setInitialLoading(false);
@@ -854,73 +315,78 @@ const EditBuyProduct = () => {
 
   const handleInputChange = (e: any) => {
     const { name, value, type, checked } = e.target;
+    const val = type === 'checkbox' ? checked : value;
 
     if (name.includes('.')) {
       const keys = name.split('.');
-      setFormData(prev => {
+      setFormData((prev: any) => {
         const newData = { ...prev };
         let current = newData;
-
-        for (let i = 0; i < keys.length - 1; i++) {          if (!current[keys[i]]) current[keys[i]] = {};          current = current[keys[i]];
-        }        current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
+        for (let i = 0; i < keys.length - 1; i++) {
+          if (!current[keys[i]]) current[keys[i]] = {};
+          current = current[keys[i]];
+        }
+        current[keys[keys.length - 1]] = val;
         return newData;
       });
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value,
-      }));
+      setFormData((prev: any) => ({ ...prev, [name]: val }));
     }
 
-    // Clear error for this field    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+    if (errors[name]) {
+      setErrors((prev: any) => ({ ...prev, [name]: '' }));
     }
   };
 
-  const handleArrayAdd = (fieldPath: any, newItem = '') => {
+  const handleArrayAdd = (fieldPath: string, newItem: any = '') => {
     const keys = fieldPath.split('.');
-    setFormData(prev => {
+    setFormData((prev: any) => {
       const newData = { ...prev };
       let current = newData;
-
-      for (let i = 0; i < keys.length - 1; i++) {        current = current[keys[i]];
-      }      if (!Array.isArray(current[keys[keys.length - 1]])) {        current[keys[keys.length - 1]] = [];
-      }      current[keys[keys.length - 1]].push(newItem);
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+      if (!Array.isArray(current[keys[keys.length - 1]])) {
+        current[keys[keys.length - 1]] = [];
+      }
+      current[keys[keys.length - 1]].push(newItem);
       return newData;
     });
   };
 
-  const handleArrayRemove = (fieldPath: any, index: any) => {
+  const handleArrayRemove = (fieldPath: string, index: number) => {
     const keys = fieldPath.split('.');
-    setFormData(prev => {
+    setFormData((prev: any) => {
       const newData = { ...prev };
       let current = newData;
-
-      for (let i = 0; i < keys.length - 1; i++) {        current = current[keys[i]];
-      }      current[keys[keys.length - 1]].splice(index, 1);
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]].splice(index, 1);
       return newData;
     });
   };
 
-  const handleArrayUpdate = (fieldPath: any, index: any, value: any) => {
+  const handleArrayUpdate = (fieldPath: string, index: number, value: any) => {
     const keys = fieldPath.split('.');
-    setFormData(prev => {
+    setFormData((prev: any) => {
       const newData = { ...prev };
       let current = newData;
-
-      for (let i = 0; i < keys.length - 1; i++) {        current = current[keys[i]];
-      }      current[keys[keys.length - 1]][index] = value;
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]][index] = value;
       return newData;
     });
   };
 
   const handleImageUpload = async (e: any) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
     setLoading(true);
     try {
-      const uploadPromises = files.map(file =>
+      const uploadPromises = files.map((file: any) =>
         cloudinaryService.uploadImage(file, {
           folder: 'buy-products',
           transformation: [
@@ -930,11 +396,12 @@ const EditBuyProduct = () => {
           ],
         })
       );
-      const uploadResults = await Promise.all(uploadPromises);      const newImages = uploadResults.map(result => result.secure_url);      setFormData(prev => ({
+      const uploadResults = await Promise.all(uploadPromises);
+      const newImages = uploadResults.map((result: any) => result.secure_url);
+      setFormData((prev: any) => ({
         ...prev,
         images: [...prev.images, ...newImages],
       }));
-
       setSuccess('Images uploaded successfully!');
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
@@ -945,275 +412,112 @@ const EditBuyProduct = () => {
     }
   };
 
-  const handleImageRemove = (index: any) => {
-    setFormData(prev => ({
+  const handleImageRemove = (index: number) => {
+    setFormData((prev: any) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      images: prev.images.filter((_: any, i: number) => i !== index),
     }));
   };
 
   const validateForm = () => {
-    const newErrors = {};
-
-    // Required fields validation    if (!formData.categoryId) newErrors.categoryId = 'Category is required';    if (!formData.name.trim()) newErrors.name = 'Product name is required';    if (!formData.brand.trim()) newErrors.brand = 'Brand is required';    if (!formData.description.trim()) newErrors.description = 'Description is required';
-
-    // Pricing validation
-    if (!formData.pricing.originalPrice || parseFloat(formData.pricing.originalPrice) <= 0) {      newErrors['pricing.originalPrice'] = 'Valid original price is required';
+    const newErrors: any = {};
+    if (!formData.categoryId) newErrors.categoryId = 'Category is required';
+    if (!formData.name.trim()) newErrors.name = 'Product name is required';
+    if (!formData.brand.trim()) newErrors.brand = 'Brand is required';
+    if (!formData.description.trim()) newErrors.description = 'Description is required';
+    if (!formData.pricing.originalPrice || parseFloat(formData.pricing.originalPrice) <= 0) {
+      newErrors['pricing.originalPrice'] = 'Valid original price is required';
     }
-
-    if (
-      formData.pricing.discountedPrice &&
-      parseFloat(formData.pricing.discountedPrice) >= parseFloat(formData.pricing.originalPrice)
-    ) {      newErrors['pricing.discountedPrice'] = 'Discounted price must be less than original price';
+    if (formData.images.length === 0) {
+      newErrors.images = 'At least one product image is required';
     }
-
-    if (
-      formData.pricing?.discount?.value &&
-      (parseFloat(formData.pricing.discount.value) < 0 ||
-        parseFloat(formData.pricing.discount.value) > 100)
-    ) {      newErrors['pricing.discount.value'] = 'Discount value must be between 0 and 100';
-    }
-
-    // Availability validation
-    if (
-      formData.availability.inStock &&
-      (!formData.availability.quantity || parseInt(formData.availability.quantity) <= 0)
-    ) {      newErrors['availability.quantity'] = 'Quantity is required when product is in stock';
-    }
-
-    // Images validation
-    if (formData.images.length === 0) {      newErrors.images = 'At least one product image is required';
-    }
-
-    // Top specs validation - at least one spec required
-    if (formData.topSpecs.length === 0) {      newErrors.topSpecs = 'At least one top specification is required';
-    }
-
-    // Condition options validation - at least one condition required
-    if (formData.conditionOptions.length === 0) {      newErrors.conditionOptions = 'At least one condition option is required';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
     try {
-      // Prepare the data for API submission - matching AddBuyProduct logic exactly
+      // Convert images array back to object format
+      const imagesObj = formData.images.reduce((acc: any, img: string, index: number) => {
+        if (index === 0) acc.main = img;
+        else if (index === 1) acc.gallery = img;
+        else if (index === 2) acc.thumbnail = img;
+        return acc;
+      }, {});
+
       const productData = {
         ...formData,
-        // Convert object-like arrays to proper arrays and handle images properly
-        images: Array.isArray(formData.images)
-          ? formData.images              .filter(img => img && (typeof img === 'string' ? img : img.url))              .map(img => (typeof img === 'string' ? img : img.url))
-          : Object.values(formData.images || {})              .filter(img => img && (typeof img === 'string' ? img : img.url))              .map(img => (typeof img === 'string' ? img : img.url)),
-        conditionOptions: Array.isArray(formData.conditionOptions)
-          ? formData.conditionOptions.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.conditionOptions || {}).filter(              item => item && Object.keys(item).length > 0
-            ),
-        variants: Array.isArray(formData.variants)
-          ? formData.variants.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.variants || {}).filter(              item => item && Object.keys(item).length > 0
-            ),
-        addOns: Array.isArray(formData.addOns)
-          ? formData.addOns.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.addOns || {}).filter(              item => item && Object.keys(item).length > 0
-            ),
-        offers: Array.isArray(formData.offers)
-          ? formData.offers.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.offers || {}).filter(              item => item && Object.keys(item).length > 0
-            ),
-        relatedProducts: Array.isArray(formData.relatedProducts)
-          ? formData.relatedProducts.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.relatedProducts || {}).filter(              item => item && Object.keys(item).length > 0
-            ),
-        topSpecs: Array.isArray(formData.topSpecs)
-          ? formData.topSpecs
-          : Object.values(formData.topSpecs || {}),
-        badges: Array.isArray(formData.badges)
-          ? formData.badges
-          : Object.values(formData.badges || {}),
-        reviews: Array.isArray(formData.reviews)
-          ? formData.reviews.filter(item => item && Object.keys(item).length > 0)
-          : Object.values(formData.reviews || {}).filter(              item => item && Object.keys(item).length > 0
-            ),
+        images: formData.images.length > 0 ? imagesObj : {},
+        pricing: {
+          mrp: parseFloat(formData.pricing.originalPrice) || 0,
+          discountedPrice: parseFloat(formData.pricing.discountedPrice) || 0,
+          discountPercent: parseFloat(formData.pricing.discount.value) || 0,
+        },
         paymentOptions: {
           ...formData.paymentOptions,
-          emiPlans: Array.isArray(formData.paymentOptions?.emiPlans)
-            ? formData.paymentOptions.emiPlans.filter(item => item && Object.keys(item).length > 0)
-            : Object.values(formData.paymentOptions?.emiPlans || {}).filter(                item => item && Object.keys(item).length > 0
-              ),
-          methods: Array.isArray(formData.paymentOptions?.methods)
-            ? formData.paymentOptions.methods.filter(                item => item && typeof item === 'string' && item.trim() !== ''
-              )
-            : Object.values(formData.paymentOptions?.methods || {}).filter(
-                item => item && typeof item === 'string' && item.trim() !== ''
-              ),
+          emiAvailable: formData.pricing?.emi?.available || false,
         },
-        // Ensure pricing values are numbers
-        pricing: {
-          ...formData.pricing,
-          originalPrice: parseFloat(formData.pricing.originalPrice) || 0,
-          discountedPrice: parseFloat(formData.pricing.discountedPrice) || 0,
-          discount: {
-            ...formData.pricing?.discount,
-            value: parseFloat(formData.pricing?.discount?.value) || 0,
-          },
-          emi: {
-            ...formData.pricing?.emi,
-            available: formData.pricing?.emi?.available || false,
-            startingFrom: parseFloat(formData.pricing?.emi?.startingFrom) || 0,
-            tenure: parseInt(formData.pricing?.emi?.tenure) || 0,
-          },
-        },
-        // Ensure availability quantity is a number
         availability: {
           ...formData.availability,
           quantity: parseInt(formData.availability.quantity) || 0,
         },
-        // Ensure rating values are numbers
-        rating: {          ...formData.rating,          average: parseFloat(formData.rating.average) || 0,          count: parseInt(formData.rating.count) || 0,
-        },
-        // Fix nested arrays in productDetails - matching AddBuyProduct exactly
-        productDetails: {
-          ...formData.productDetails,
-          // Handle both camera and rearCamera/frontCamera structures
-          camera: formData.productDetails.camera
-            ? {
-                ...formData.productDetails.camera,
-                rear: {
-                  ...formData.productDetails.camera.rear,
-                  features: Array.isArray(formData.productDetails.camera.rear?.features)
-                    ? formData.productDetails.camera.rear.features
-                    : Object.values(formData.productDetails.camera.rear?.features || {}),
-                },
-                front: {
-                  ...formData.productDetails.camera.front,
-                  features: Array.isArray(formData.productDetails.camera.front?.features)
-                    ? formData.productDetails.camera.front.features
-                    : Object.values(formData.productDetails.camera.front?.features || {}),
-                },
-              }
-            : undefined,
-          rearCamera: formData.productDetails.rearCamera
-            ? {
-                ...formData.productDetails.rearCamera,
-                features: Array.isArray(formData.productDetails.rearCamera.features)
-                  ? formData.productDetails.rearCamera.features
-                  : Object.values(formData.productDetails.rearCamera.features || {}),
-              }
-            : undefined,          frontCamera: formData.productDetails.frontCamera
-            ? {                ...formData.productDetails.frontCamera,                features: Array.isArray(formData.productDetails.frontCamera?.features)                  ? formData.productDetails.frontCamera.features                  : Object.values(formData.productDetails.frontCamera?.features || {}),
-              }
-            : undefined,
-          display: formData.productDetails.display
-            ? {
-                ...formData.productDetails.display,
-                features: Array.isArray(formData.productDetails.display.features)
-                  ? formData.productDetails.display.features.filter(
-                      item => item && Object.keys(item).length > 0
-                    )
-                  : Object.values(formData.productDetails.display.features || {}).filter(                      item => item && Object.keys(item).length > 0
-                    ),
-              }
-            : undefined,
-          design: formData.productDetails.design
-            ? {
-                ...formData.productDetails.design,
-                colors: Array.isArray(formData.productDetails.design.colors)
-                  ? formData.productDetails.design.colors.filter(
-                      item => item && Object.keys(item).length > 0
-                    )
-                  : Object.values(formData.productDetails.design.colors || {}).filter(                      item => item && Object.keys(item).length > 0
-                    ),
-              }
-            : undefined,
-          networkConnectivity: formData.productDetails.networkConnectivity
-            ? {
-                ...formData.productDetails.networkConnectivity,
-                wifiFeatures: Array.isArray(
-                  formData.productDetails.networkConnectivity.wifiFeatures
-                )
-                  ? formData.productDetails.networkConnectivity.wifiFeatures
-                  : Object.values(formData.productDetails.networkConnectivity.wifiFeatures || {}),
-              }
-            : undefined,
-          memoryStorage: formData.productDetails.memoryStorage
-            ? {
-                ...formData.productDetails.memoryStorage,
-                phoneVariants: Array.isArray(formData.productDetails.memoryStorage.phoneVariants)
-                  ? formData.productDetails.memoryStorage.phoneVariants.filter(
-                      item => item && Object.keys(item).length > 0
-                    )
-                  : Object.values(formData.productDetails.memoryStorage.phoneVariants || {}).filter(                      item => item && Object.keys(item).length > 0
-                    ),
-              }
-            : undefined,
-          sensorsMisc: formData.productDetails.sensorsMisc
-            ? {
-                ...formData.productDetails.sensorsMisc,
-                sensors: Array.isArray(formData.productDetails.sensorsMisc.sensors)
-                  ? formData.productDetails.sensorsMisc.sensors
-                  : Object.values(formData.productDetails.sensorsMisc.sensors || {}),
-              }
-            : undefined,
-          sensors: formData.productDetails.sensors
-            ? Array.isArray(formData.productDetails.sensors)
-              ? formData.productDetails.sensors.filter(item => item && Object.keys(item).length > 0)
-              : Object.values(formData.productDetails.sensors || {}).filter(                  item => item && Object.keys(item).length > 0
-                )
-            : undefined,
-        },
-        // Ensure sortOrder is a number        sortOrder: parseInt(formData.sortOrder) || 0,
       };
 
       await adminService.updateBuyProduct(id, productData);
       setSuccess('Product updated successfully!');
-      setTimeout(() => {
-        navigate('/admin/products');
-      }, 2000);
-    } catch (error) {
-      console.error('Error updating product:', error);      setErrors({ submit: error.response?.data?.message || 'Failed to update product' });
+      setTimeout(() => navigate('/admin/buy-products'), 2000);
+    } catch (error: any) {
+      console.error('Error updating product:', error);
+      setErrors({ submit: error.message || 'Failed to update product' });
     } finally {
       setLoading(false);
     }
   };
 
   if (initialLoading) {
-    return (
-      <LoadingOverlay>
-        <LoadingContent>
-          <LoadingSpinner />
-          Loading product data...
-        </LoadingContent>
-      </LoadingOverlay>
-    );
+    return <LoadingOverlay message="Loading product data..." />;
   }
 
   return (
-    <Container>
-      <Header>
-        <BackButton onClick={() => navigate('/admin/buy-products')}>
-          <ArrowLeft size={20} />
-          Back to Products
-        </BackButton>
-        <Title>Edit Product</Title>
-      </Header>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <button
+                onClick={() => navigate('/admin/buy-products')}
+                className="flex items-center gap-2 px-4 py-2 mb-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg text-sm font-medium"
+              >
+                <ArrowLeft size={18} />
+                Back to Products
+              </button>
+              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Edit Product
+              </h1>
+              <p className="text-gray-600 mt-1">Update product information and details</p>
+            </div>
+          </div>
+        </div>
 
-      <FormContainer>
-        <form onSubmit={handleSubmit}>
-          {/* Basic Information Section */}
-          <FormSection>
-            <SectionTitle>Basic Information</SectionTitle>
+        {/* Success/Error Messages */}
+        {success && <SuccessMessage message={success} onClose={() => setSuccess('')} />}
+        {errors.submit && <ErrorMsg message={errors.submit} />}
+        {errors.fetch && <ErrorMsg message={errors.fetch} />}
+
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+        >
+          {/* Basic Information */}
+          <FormSection title="Basic Information" icon={Package}>
             <FormGrid>
-              <FormGroup>
-                <Label>Category *</Label>
+              <FormGroup label="Category" required error={errors.categoryId}>
                 <Select
                   name="categoryId"
                   value={formData.categoryId}
@@ -1221,131 +525,96 @@ const EditBuyProduct = () => {
                   required
                 >
                   <option value="">Select Category</option>
-                  {categories.map(category => (                    <option key={category._id} value={category._id}>                      {category.name}
+                  {categories.map((cat: any) => (
+                    <option key={cat._id || cat.id} value={cat._id || cat.id}>
+                      {cat.name}
                     </option>
                   ))}
-                </Select>                {errors.categoryId && (
-                  <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors.categoryId}
-                  </ErrorMessage>
-                )}
+                </Select>
               </FormGroup>
 
-              <FormGroup>
-                <Label>Product Name *</Label>
+              <FormGroup label="Product Name" required error={errors.name}>
                 <Input
-                  type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  placeholder="Enter product name"
+                  placeholder="e.g., iPhone 14 Pro Max"
                   required
-                />                {errors.name && (
-                  <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors.name}
-                  </ErrorMessage>
-                )}
+                />
               </FormGroup>
 
-              <FormGroup>
-                <Label>Brand *</Label>
+              <FormGroup label="Brand" required error={errors.brand}>
                 <Input
-                  type="text"
                   name="brand"
                   value={formData.brand}
                   onChange={handleInputChange}
-                  placeholder="Enter brand name"
+                  placeholder="e.g., Apple"
                   required
-                />                {errors.brand && (
-                  <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors.brand}
-                  </ErrorMessage>
-                )}
+                />
               </FormGroup>
 
-              <FormGroup>
-                <Label>Status</Label>
-                <Select name="isActive" value={formData.isActive} onChange={handleInputChange}>                  <option value={true}>Active</option>                  <option value={false}>Inactive</option>
-                </Select>
+              <FormGroup label="Sort Order">
+                <Input
+                  type="number"
+                  name="sortOrder"
+                  value={formData.sortOrder}
+                  onChange={handleInputChange}
+                  placeholder="0"
+                />
+              </FormGroup>
+
+              <FormGroup label="Active Status">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="isActive"
+                    checked={formData.isActive}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">Product is active</span>
+                </label>
               </FormGroup>
             </FormGrid>
-
-            {/* Images Section */}
-            <FormGroup style={{ marginTop: '1.5rem' }}>
-              <Label>Product Images</Label>              <ImageUploadContainer onClick={() => document.getElementById('imageUpload').click()}>
-                <Upload size={24} style={{ margin: '0 auto 0.5rem' }} />
-                <p>Click to upload images or drag and drop</p>
-                <p style={{ fontSize: '0.75rem', color: '#6b7280' }}>PNG, JPG, GIF up to 10MB</p>
-              </ImageUploadContainer>
-              <input
-                id="imageUpload"
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-                style={{ display: 'none' }}
-              />
-
-              {formData.images.length > 0 && (
-                <ImagePreview>
-                  {formData.images.map((image, index) => (
-                    <ImageItem key={index}>
-                      <PreviewImage src={image} alt={`Product ${index + 1}`} />
-                      <RemoveImageButton onClick={() => handleImageRemove(index)}>
-                        <X size={12} />
-                      </RemoveImageButton>
-                    </ImageItem>
-                  ))}
-                </ImagePreview>
-              )}              {errors.images && (
-                <ErrorMessage>
-                  <AlertCircle size={16} />                  {errors.images}
-                </ErrorMessage>
-              )}
-            </FormGroup>
           </FormSection>
 
-          {/* Pricing Section */}
-          <FormSection>
-            <SectionTitle>Pricing Information</SectionTitle>
+          {/* Images */}
+          <FormSection title="Product Images" icon={Camera}>
+            <ImageUploadContainer onUpload={handleImageUpload} loading={loading}>
+              {formData.images.length > 0 && (
+                <ImagePreview images={formData.images} onRemove={handleImageRemove} />
+              )}
+            </ImageUploadContainer>
+            {errors.images && <ErrorMsg message={errors.images} />}
+          </FormSection>
+
+          {/* Pricing */}
+          <FormSection title="Pricing" icon={DollarSign}>
             <FormGrid>
-              <FormGroup>
-                <Label>Original Price *</Label>
+              <FormGroup label="Original Price" required error={errors['pricing.originalPrice']}>
                 <Input
                   type="number"
                   name="pricing.originalPrice"
                   value={formData.pricing.originalPrice}
                   onChange={handleInputChange}
-                  placeholder="Enter original price"
+                  placeholder="99999"
+                  step="0.01"
                   required
-                  style={{                    borderColor: errors['pricing.originalPrice'] ? '#dc2626' : '#d1d5db',
-                  }}
-                />                {errors['pricing.originalPrice'] && (
-                  <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors['pricing.originalPrice']}
-                  </ErrorMessage>
-                )}
+                />
               </FormGroup>
 
-              <FormGroup>
-                <Label>Discounted Price</Label>
+              <FormGroup label="Discounted Price">
                 <Input
                   type="number"
                   name="pricing.discountedPrice"
                   value={formData.pricing.discountedPrice}
                   onChange={handleInputChange}
-                  placeholder="Enter discounted price"
-                  style={{                    borderColor: errors['pricing.discountedPrice'] ? '#dc2626' : '#d1d5db',
-                  }}
-                />                {errors['pricing.discountedPrice'] && (
-                  <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors['pricing.discountedPrice']}
-                  </ErrorMessage>
-                )}
+                  placeholder="89999"
+                  step="0.01"
+                />
               </FormGroup>
 
-              <FormGroup>
-                <Label>Discount Type</Label>
+              <FormGroup label="Discount Type">
                 <Select
                   name="pricing.discount.type"
                   value={formData.pricing?.discount?.type || 'percentage'}
@@ -1356,64 +625,90 @@ const EditBuyProduct = () => {
                 </Select>
               </FormGroup>
 
-              <FormGroup>
-                <Label>Discount Value</Label>
+              <FormGroup label="Discount Value">
                 <Input
                   type="number"
                   name="pricing.discount.value"
                   value={formData.pricing?.discount?.value || ''}
                   onChange={handleInputChange}
-                  placeholder="Enter discount value"
-                  style={{                    borderColor: errors['pricing.discount.value'] ? '#dc2626' : '#d1d5db',
-                  }}
-                />                {errors['pricing.discount.value'] && (
-                  <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors['pricing.discount.value']}
-                  </ErrorMessage>
-                )}
+                  placeholder="10"
+                  step="0.01"
+                />
               </FormGroup>
             </FormGrid>
+
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">EMI Options</h3>
+              <FormGrid>
+                <FormGroup label="EMI Available">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="pricing.emi.available"
+                      checked={formData.pricing?.emi?.available || false}
+                      onChange={handleInputChange}
+                      className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                    />
+                    <span className="text-sm text-gray-700">Enable EMI</span>
+                  </label>
+                </FormGroup>
+
+                {formData.pricing?.emi?.available && (
+                  <>
+                    <FormGroup label="Starting From">
+                      <Input
+                        type="number"
+                        name="pricing.emi.startingFrom"
+                        value={formData.pricing?.emi?.startingFrom || ''}
+                        onChange={handleInputChange}
+                        placeholder="2999"
+                      />
+                    </FormGroup>
+
+                    <FormGroup label="Tenure (months)">
+                      <Input
+                        type="number"
+                        name="pricing.emi.tenure"
+                        value={formData.pricing?.emi?.tenure || ''}
+                        onChange={handleInputChange}
+                        placeholder="12"
+                      />
+                    </FormGroup>
+                  </>
+                )}
+              </FormGrid>
+            </div>
           </FormSection>
 
           {/* Condition Options */}
-          <FormSection>
-            <SectionTitle>Condition Options</SectionTitle>
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <Label>Product Conditions</Label>
-                <AddButton
-                  type="button"
-                  onClick={() => {                    setFormData(prev => ({
-                      ...prev,
-                      conditionOptions: [
-                        ...prev.conditionOptions,
-                        { condition: '', price: '', description: '' },
-                      ],
-                    }));
-                  }}
-                >
-                  <Plus size={16} />
-                  Add Condition
-                </AddButton>
-              </DynamicFieldHeader>
-
-              {formData.conditionOptions.map((option, index) => (
-                <div
+          <FormSection title="Condition Options" icon={Tag}>
+            <DynamicFieldContainer
+              title="Product Conditions"
+              onAdd={() =>
+                handleArrayAdd('conditionOptions', {
+                  label: '',
+                  price: '',
+                  description: '',
+                })
+              }
+              addLabel="Add Condition"
+            >
+              {formData.conditionOptions?.map((option: any, index: number) => (
+                <DynamicFieldItem
                   key={index}
-                  style={{
-                    marginBottom: '1rem',
-                    padding: '1rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                  }}
+                  onRemove={() => handleArrayRemove('conditionOptions', index)}
                 >
                   <FormGrid>
-                    <FormGroup>
-                      <Label>Condition</Label>
-                      <Select                        value={option.condition}
+                    <FormGroup label="Condition">
+                      <Select
+                        value={option.label || ''}
                         onChange={(e: any) => {
-                          const newOptions = [...formData.conditionOptions];                          newOptions[index] = { ...option, condition: e.target.value };
-                          setFormData(prev => ({ ...prev, conditionOptions: newOptions }));
+                          const newOptions = [...formData.conditionOptions];
+                          newOptions[index] = { ...option, label: e.target.value };
+                          setFormData((prev: any) => ({
+                            ...prev,
+                            conditionOptions: newOptions,
+                          }));
                         }}
                       >
                         <option value="">Select Condition</option>
@@ -1426,13 +721,17 @@ const EditBuyProduct = () => {
                       </Select>
                     </FormGroup>
 
-                    <FormGroup>
-                      <Label>Price</Label>
+                    <FormGroup label="Price">
                       <Input
-                        type="number"                        value={option.price}
+                        type="number"
+                        value={option.price || ''}
                         onChange={(e: any) => {
-                          const newOptions = [...formData.conditionOptions];                          newOptions[index] = { ...option, price: e.target.value };
-                          setFormData(prev => ({ ...prev, conditionOptions: newOptions }));
+                          const newOptions = [...formData.conditionOptions];
+                          newOptions[index] = { ...option, price: e.target.value };
+                          setFormData((prev: any) => ({
+                            ...prev,
+                            conditionOptions: newOptions,
+                          }));
                         }}
                         placeholder="0.00"
                         step="0.01"
@@ -1440,73 +739,355 @@ const EditBuyProduct = () => {
                     </FormGroup>
                   </FormGrid>
 
-                  <FormGroup>
-                    <Label>Description</Label>
-                    <TextArea                      value={option.description}
+                  <FormGroup label="Description">
+                    <TextArea
+                      value={option.description || ''}
                       onChange={(e: any) => {
-                        const newOptions = [...formData.conditionOptions];                        newOptions[index] = { ...option, description: e.target.value };
-                        setFormData(prev => ({ ...prev, conditionOptions: newOptions }));
+                        const newOptions = [...formData.conditionOptions];
+                        newOptions[index] = { ...option, description: e.target.value };
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          conditionOptions: newOptions,
+                        }));
                       }}
                       placeholder="Describe the condition details"
                       rows={2}
                     />
                   </FormGroup>
-
-                  <RemoveButton
-                    type="button"
-                    onClick={() => {
-                      setFormData(prev => ({
-                        ...prev,
-                        conditionOptions: prev.conditionOptions.filter((_, i) => i !== index),
-                      }));
-                    }}
-                    style={{ marginTop: '0.5rem' }}
-                  >
-                    Remove Condition
-                  </RemoveButton>
-                </div>
+                </DynamicFieldItem>
               ))}
-            </DynamicFieldContainer>            {errors.conditionOptions && <ErrorMessage>{errors.conditionOptions}</ErrorMessage>}
+            </DynamicFieldContainer>
+          </FormSection>
+
+          {/* Variants */}
+          <FormSection title="Product Variants" icon={Package}>
+            <DynamicFieldContainer
+              title="Variants"
+              onAdd={() =>
+                handleArrayAdd('variants', {
+                  variantId: '',
+                  storage: '',
+                  color: '',
+                  price: '',
+                  stock: true,
+                })
+              }
+              addLabel="Add Variant"
+            >
+              {formData.variants?.map((variant: any, index: number) => (
+                <DynamicFieldItem key={index} onRemove={() => handleArrayRemove('variants', index)}>
+                  <FormGrid>
+                    <FormGroup label="Variant ID">
+                      <Input
+                        value={variant.variantId || ''}
+                        onChange={(e: any) => {
+                          const newVariants = [...formData.variants];
+                          newVariants[index] = { ...variant, variantId: e.target.value };
+                          setFormData((prev: any) => ({ ...prev, variants: newVariants }));
+                        }}
+                        placeholder="VAR-001"
+                      />
+                    </FormGroup>
+
+                    <FormGroup label="Storage">
+                      <Input
+                        value={variant.storage || ''}
+                        onChange={(e: any) => {
+                          const newVariants = [...formData.variants];
+                          newVariants[index] = { ...variant, storage: e.target.value };
+                          setFormData((prev: any) => ({ ...prev, variants: newVariants }));
+                        }}
+                        placeholder="128GB"
+                      />
+                    </FormGroup>
+
+                    <FormGroup label="Color">
+                      <Input
+                        value={variant.color || ''}
+                        onChange={(e: any) => {
+                          const newVariants = [...formData.variants];
+                          newVariants[index] = { ...variant, color: e.target.value };
+                          setFormData((prev: any) => ({ ...prev, variants: newVariants }));
+                        }}
+                        placeholder="Space Gray"
+                      />
+                    </FormGroup>
+
+                    <FormGroup label="Price">
+                      <Input
+                        type="number"
+                        value={variant.price || ''}
+                        onChange={(e: any) => {
+                          const newVariants = [...formData.variants];
+                          newVariants[index] = { ...variant, price: e.target.value };
+                          setFormData((prev: any) => ({ ...prev, variants: newVariants }));
+                        }}
+                        placeholder="0.00"
+                        step="0.01"
+                      />
+                    </FormGroup>
+
+                    <FormGroup label="In Stock">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={variant.stock || false}
+                          onChange={(e: any) => {
+                            const newVariants = [...formData.variants];
+                            newVariants[index] = { ...variant, stock: e.target.checked };
+                            setFormData((prev: any) => ({ ...prev, variants: newVariants }));
+                          }}
+                          className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                        />
+                        <span className="text-sm text-gray-700">Available</span>
+                      </label>
+                    </FormGroup>
+                  </FormGrid>
+                </DynamicFieldItem>
+              ))}
+            </DynamicFieldContainer>
+          </FormSection>
+
+          {/* Add-ons */}
+          <FormSection title="Add-ons" icon={Plus}>
+            <DynamicFieldContainer
+              title="Product Add-ons"
+              onAdd={() =>
+                handleArrayAdd('addOns', {
+                  name: '',
+                  cost: '',
+                  description: '',
+                })
+              }
+              addLabel="Add Add-on"
+            >
+              {formData.addOns?.map((addon: any, index: number) => (
+                <DynamicFieldItem key={index} onRemove={() => handleArrayRemove('addOns', index)}>
+                  <FormGrid>
+                    <FormGroup label="Add-on Name">
+                      <Input
+                        value={addon.name || ''}
+                        onChange={(e: any) => {
+                          const newAddOns = [...formData.addOns];
+                          newAddOns[index] = { ...addon, name: e.target.value };
+                          setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
+                        }}
+                        placeholder="Extended Warranty"
+                      />
+                    </FormGroup>
+
+                    <FormGroup label="Cost">
+                      <Input
+                        type="number"
+                        value={addon.cost || ''}
+                        onChange={(e: any) => {
+                          const newAddOns = [...formData.addOns];
+                          newAddOns[index] = { ...addon, cost: e.target.value };
+                          setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
+                        }}
+                        placeholder="0.00"
+                        step="0.01"
+                      />
+                    </FormGroup>
+                  </FormGrid>
+
+                  <FormGroup label="Description">
+                    <TextArea
+                      value={addon.description || ''}
+                      onChange={(e: any) => {
+                        const newAddOns = [...formData.addOns];
+                        newAddOns[index] = { ...addon, description: e.target.value };
+                        setFormData((prev: any) => ({ ...prev, addOns: newAddOns }));
+                      }}
+                      placeholder="Describe the add-on"
+                      rows={2}
+                    />
+                  </FormGroup>
+                </DynamicFieldItem>
+              ))}
+            </DynamicFieldContainer>
+          </FormSection>
+
+          {/* Offers */}
+          <FormSection title="Special Offers" icon={Tag}>
+            <DynamicFieldContainer
+              title="Offers"
+              onAdd={() =>
+                handleArrayAdd('offers', {
+                  title: '',
+                  discount: '',
+                  validUntil: '',
+                  description: '',
+                })
+              }
+              addLabel="Add Offer"
+            >
+              {formData.offers?.map((offer: any, index: number) => (
+                <DynamicFieldItem key={index} onRemove={() => handleArrayRemove('offers', index)}>
+                  <FormGrid>
+                    <FormGroup label="Offer Title">
+                      <Input
+                        value={offer.title || ''}
+                        onChange={(e: any) => {
+                          const newOffers = [...formData.offers];
+                          newOffers[index] = { ...offer, title: e.target.value };
+                          setFormData((prev: any) => ({ ...prev, offers: newOffers }));
+                        }}
+                        placeholder="Early Bird Discount"
+                      />
+                    </FormGroup>
+
+                    <FormGroup label="Discount (%)">
+                      <Input
+                        type="number"
+                        value={offer.discount || ''}
+                        onChange={(e: any) => {
+                          const newOffers = [...formData.offers];
+                          newOffers[index] = { ...offer, discount: e.target.value };
+                          setFormData((prev: any) => ({ ...prev, offers: newOffers }));
+                        }}
+                        placeholder="10"
+                        min="0"
+                        max="100"
+                      />
+                    </FormGroup>
+
+                    <FormGroup label="Valid Until">
+                      <Input
+                        type="date"
+                        value={offer.validUntil || ''}
+                        onChange={(e: any) => {
+                          const newOffers = [...formData.offers];
+                          newOffers[index] = { ...offer, validUntil: e.target.value };
+                          setFormData((prev: any) => ({ ...prev, offers: newOffers }));
+                        }}
+                      />
+                    </FormGroup>
+                  </FormGrid>
+
+                  <FormGroup label="Description">
+                    <TextArea
+                      value={offer.description || ''}
+                      onChange={(e: any) => {
+                        const newOffers = [...formData.offers];
+                        newOffers[index] = { ...offer, description: e.target.value };
+                        setFormData((prev: any) => ({ ...prev, offers: newOffers }));
+                      }}
+                      placeholder="Describe the offer details"
+                      rows={2}
+                    />
+                  </FormGroup>
+                </DynamicFieldItem>
+              ))}
+            </DynamicFieldContainer>
+          </FormSection>
+
+          {/* Payment Options */}
+          <FormSection title="Payment Options" icon={CreditCard}>
+            <FormGrid>
+              <FormGroup label="Cash on Delivery">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="paymentOptions.cod"
+                    checked={formData.paymentOptions?.cod || false}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">Enable COD</span>
+                </label>
+              </FormGroup>
+
+              <FormGroup label="Online Payment">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="paymentOptions.online"
+                    checked={formData.paymentOptions?.online || false}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">Enable Online Payment</span>
+                </label>
+              </FormGroup>
+
+              <FormGroup label="EMI Options">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="paymentOptions.emi"
+                    checked={formData.paymentOptions?.emi || false}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">Enable EMI</span>
+                </label>
+              </FormGroup>
+
+              <FormGroup label="Exchange Available">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="paymentOptions.exchange"
+                    checked={formData.paymentOptions?.exchange || false}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">Enable Exchange</span>
+                </label>
+              </FormGroup>
+            </FormGrid>
+          </FormSection>
+
+          {/* Top Specs */}
+          <FormSection title="Top Specifications" icon={Star}>
+            <DynamicFieldContainer
+              title="Key Features"
+              onAdd={() => handleArrayAdd('topSpecs', '')}
+              addLabel="Add Spec"
+            >
+              {formData.topSpecs?.map((spec: any, index: number) => (
+                <DynamicFieldItem key={index} onRemove={() => handleArrayRemove('topSpecs', index)}>
+                  <FormGroup label={`Specification ${index + 1}`}>
+                    <Input
+                      value={spec || ''}
+                      onChange={(e: any) => handleArrayUpdate('topSpecs', index, e.target.value)}
+                      placeholder="Enter specification"
+                    />
+                  </FormGroup>
+                </DynamicFieldItem>
+              ))}
+            </DynamicFieldContainer>
           </FormSection>
 
           {/* Availability */}
-          <FormSection>
-            <SectionTitle>Availability & Delivery</SectionTitle>
+          <FormSection title="Availability" icon={Truck}>
             <FormGrid>
-              <FormGroup>
-                <Label>
+              <FormGroup label="In Stock">
+                <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     name="availability.inStock"
                     checked={formData.availability.inStock}
                     onChange={handleInputChange}
-                    style={{ marginRight: '0.5rem' }}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
                   />
-                  In Stock
-                </Label>
+                  <span className="text-sm text-gray-700">Product in stock</span>
+                </label>
               </FormGroup>
 
-              <FormGroup>
-                <Label>Quantity</Label>
+              <FormGroup label="Quantity">
                 <Input
                   type="number"
                   name="availability.quantity"
                   value={formData.availability.quantity}
                   onChange={handleInputChange}
-                  placeholder="0"
-                  style={{                    borderColor: errors['availability.quantity'] ? '#dc2626' : '#d1d5db',
-                  }}
-                />                {errors['availability.quantity'] && (
-                  <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors['availability.quantity']}
-                  </ErrorMessage>
-                )}
+                  placeholder="100"
+                />
               </FormGroup>
 
-              <FormGroup>
-                <Label>Estimated Delivery</Label>
+              <FormGroup label="Estimated Delivery">
                 <Input
-                  type="text"
                   name="availability.estimatedDelivery"
                   value={formData.availability.estimatedDelivery}
                   onChange={handleInputChange}
@@ -1514,880 +1095,421 @@ const EditBuyProduct = () => {
                 />
               </FormGroup>
 
-              <FormGroup>
-                <Label>Location</Label>
+              <FormGroup label="Location">
                 <Input
-                  type="text"
                   name="availability.location"
                   value={formData.availability.location}
                   onChange={handleInputChange}
-                  placeholder="Warehouse location"
+                  placeholder="Mumbai, India"
                 />
               </FormGroup>
             </FormGrid>
           </FormSection>
 
-          {/* Payment Options */}
-          <FormSection>
-            <SectionTitle>Payment Options</SectionTitle>
+          {/* Display Specifications */}
+          <FormSection title="Display" icon={Monitor}>
             <FormGrid>
-              <FormGroup>
-                <Label>
-                  <input
-                    type="checkbox"
-                    name="paymentOptions.cod"
-                    checked={formData.paymentOptions.cod}
-                    onChange={handleInputChange}
-                    style={{ marginRight: '0.5rem' }}
-                  />
-                  Cash on Delivery
-                </Label>
+              <FormGroup label="Screen Size">
+                <Input
+                  name="productDetails.display.size"
+                  value={formData.productDetails.display.size}
+                  onChange={handleInputChange}
+                  placeholder='6.7"'
+                />
               </FormGroup>
 
-              <FormGroup>
-                <Label>
-                  <input
-                    type="checkbox"
-                    name="paymentOptions.online"
-                    checked={formData.paymentOptions.online}
-                    onChange={handleInputChange}
-                    style={{ marginRight: '0.5rem' }}
-                  />
-                  Online Payment
-                </Label>
+              <FormGroup label="Resolution">
+                <Input
+                  name="productDetails.display.resolution"
+                  value={formData.productDetails.display.resolution}
+                  onChange={handleInputChange}
+                  placeholder="2778 x 1284"
+                />
               </FormGroup>
 
-              <FormGroup>
-                <Label>
-                  <input
-                    type="checkbox"
-                    name="paymentOptions.emi"
-                    checked={formData.paymentOptions.emi}
-                    onChange={handleInputChange}
-                    style={{ marginRight: '0.5rem' }}
-                  />
-                  EMI Options
-                </Label>
+              <FormGroup label="Display Type">
+                <Input
+                  name="productDetails.display.type"
+                  value={formData.productDetails.display.type}
+                  onChange={handleInputChange}
+                  placeholder="Super Retina XDR OLED"
+                />
               </FormGroup>
 
-              <FormGroup>
-                <Label>
-                  <input
-                    type="checkbox"
-                    name="paymentOptions.exchange"
-                    checked={formData.paymentOptions.exchange}
-                    onChange={handleInputChange}
-                    style={{ marginRight: '0.5rem' }}
-                  />
-                  Exchange Available
-                </Label>
+              <FormGroup label="Protection">
+                <Input
+                  name="productDetails.display.protection"
+                  value={formData.productDetails.display.protection}
+                  onChange={handleInputChange}
+                  placeholder="Ceramic Shield"
+                />
               </FormGroup>
             </FormGrid>
           </FormSection>
 
-          {/* Top Specs */}
-          <FormSection>
-            <SectionTitle>Top Specifications</SectionTitle>
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <Label>Key Features</Label>
-                <AddButton type="button" onClick={() => handleArrayAdd('topSpecs', '')}>
-                  <Plus size={16} />
-                  Add Spec
-                </AddButton>
-              </DynamicFieldHeader>
+          {/* Performance */}
+          <FormSection title="Performance" icon={Cpu}>
+            <FormGrid>
+              <FormGroup label="Processor">
+                <Input
+                  name="productDetails.general.processor"
+                  value={formData.productDetails.general.processor}
+                  onChange={handleInputChange}
+                  placeholder="A16 Bionic"
+                />
+              </FormGroup>
 
-              {formData.topSpecs.map((spec, index) => (
-                <FormGroup key={index} style={{ marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                    <Input
-                      type="text"
-                      value={spec}
-                      onChange={(e: any) => handleArrayUpdate('topSpecs', index, e.target.value)}
-                      placeholder="Enter specification"
-                      style={{ flex: 1 }}
-                    />
-                    <RemoveButton
-                      type="button"
-                      onClick={() => handleArrayRemove('topSpecs', index)}
-                    >
-                      Remove
-                    </RemoveButton>
-                  </div>
-                </FormGroup>
-              ))}
-            </DynamicFieldContainer>            {errors.topSpecs && (
-              <ErrorMessage>
-                <AlertCircle size={16} />                {errors.topSpecs}
-              </ErrorMessage>
-            )}
+              <FormGroup label="Chipset">
+                <Input
+                  name="productDetails.general.chipset"
+                  value={formData.productDetails.general.chipset}
+                  onChange={handleInputChange}
+                  placeholder="Apple A16 Bionic"
+                />
+              </FormGroup>
+
+              <FormGroup label="GPU">
+                <Input
+                  name="productDetails.general.gpu"
+                  value={formData.productDetails.general.gpu}
+                  onChange={handleInputChange}
+                  placeholder="Apple GPU (5-core)"
+                />
+              </FormGroup>
+
+              <FormGroup label="Operating System">
+                <Input
+                  name="productDetails.general.os"
+                  value={formData.productDetails.general.os}
+                  onChange={handleInputChange}
+                  placeholder="iOS 16"
+                />
+              </FormGroup>
+            </FormGrid>
           </FormSection>
 
-          {/* Technical Specifications */}
-          <FormSection>
-            <SectionTitle>Technical Specifications</SectionTitle>
+          {/* Memory & Storage */}
+          <FormSection title="Memory & Storage" icon={HardDrive}>
+            <FormGrid>
+              <FormGroup label="RAM">
+                <Input
+                  name="productDetails.memory.ram"
+                  value={formData.productDetails.memory.ram}
+                  onChange={handleInputChange}
+                  placeholder="6GB"
+                />
+              </FormGroup>
 
-            {/* Display */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                Display
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Screen Size</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.display.size"
-                    value={formData.productDetails.display.size}
-                    onChange={handleInputChange}
-                    placeholder="6.7 inches"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Resolution</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.display.resolution"
-                    value={formData.productDetails.display.resolution}
-                    onChange={handleInputChange}
-                    placeholder="1284 x 2778 pixels"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Display Type</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.display.type"
-                    value={formData.productDetails.display.type}
-                    onChange={handleInputChange}
-                    placeholder="Super Retina XDR OLED"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Protection</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.display.protection"
-                    value={formData.productDetails.display.protection}
-                    onChange={handleInputChange}
-                    placeholder="Ceramic Shield"
-                  />
-                </FormGroup>
-              </FormGrid>
-            </div>
+              <FormGroup label="Storage">
+                <Input
+                  name="productDetails.memory.storage"
+                  value={formData.productDetails.memory.storage}
+                  onChange={handleInputChange}
+                  placeholder="128GB"
+                />
+              </FormGroup>
 
-            {/* Performance */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                Performance
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Operating System</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.general.os"
-                    value={formData.productDetails.general.os}
+              <FormGroup label="Expandable Storage">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="productDetails.memory.expandable"
+                    checked={formData.productDetails.memory.expandable}
                     onChange={handleInputChange}
-                    placeholder="iOS 17"
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
                   />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Processor</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.general.processor"
-                    value={formData.productDetails.general.processor}
-                    onChange={handleInputChange}
-                    placeholder="A17 Pro"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Chipset</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.general.chipset"
-                    value={formData.productDetails.general.chipset}
-                    onChange={handleInputChange}
-                    placeholder="Apple A17 Pro (3 nm)"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>GPU</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.general.gpu"
-                    value={formData.productDetails.general.gpu}
-                    onChange={handleInputChange}
-                    placeholder="Apple GPU (6-core graphics)"
-                  />
-                </FormGroup>
-              </FormGrid>
-            </div>
+                  <span className="text-sm text-gray-700">Supports expandable storage</span>
+                </label>
+              </FormGroup>
 
-            {/* Memory */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                Memory & Storage
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>RAM</Label>
+              {formData.productDetails.memory.expandable && (
+                <FormGroup label="Card Slot">
                   <Input
-                    type="text"
-                    name="productDetails.memory.ram"
-                    value={formData.productDetails.memory.ram}
-                    onChange={handleInputChange}
-                    placeholder="8GB"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Storage</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.memory.storage"
-                    value={formData.productDetails.memory.storage}
-                    onChange={handleInputChange}
-                    placeholder="256GB"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>
-                    <input
-                      type="checkbox"
-                      name="productDetails.memory.expandable"
-                      checked={formData.productDetails.memory.expandable}
-                      onChange={handleInputChange}
-                      style={{ marginRight: '0.5rem' }}
-                    />
-                    Expandable Storage
-                  </Label>
-                </FormGroup>
-                <FormGroup>
-                  <Label>Card Slot</Label>
-                  <Input
-                    type="text"
                     name="productDetails.memory.cardSlot"
                     value={formData.productDetails.memory.cardSlot}
                     onChange={handleInputChange}
-                    placeholder="microSD up to 1TB"
+                    placeholder="microSD, up to 1TB"
                   />
                 </FormGroup>
-              </FormGrid>
-            </div>
+              )}
+            </FormGrid>
+          </FormSection>
 
-            {/* Camera */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                Camera
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Rear Primary Camera</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.camera.rear.primary"
-                    value={formData.productDetails.camera.rear.primary}
-                    onChange={handleInputChange}
-                    placeholder="50MP"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Rear Secondary Camera</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.camera.rear.secondary"
-                    value={formData.productDetails.camera.rear.secondary}
-                    onChange={handleInputChange}
-                    placeholder="12MP Ultra-wide"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Front Camera</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.camera.front.primary"
-                    value={formData.productDetails.camera.front.primary}
-                    onChange={handleInputChange}
-                    placeholder="32MP"
-                  />
-                </FormGroup>
-              </FormGrid>
-            </div>
-
-            {/* Battery */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                Battery & Charging
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Battery Capacity</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.battery.capacity"
-                    value={formData.productDetails.battery.capacity}
-                    onChange={handleInputChange}
-                    placeholder="5000mAh"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Battery Type</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.battery.type"
-                    value={formData.productDetails.battery.type}
-                    onChange={handleInputChange}
-                    placeholder="Li-Po"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Wired Charging</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.battery.charging.wired"
-                    value={formData.productDetails.battery.charging.wired}
-                    onChange={handleInputChange}
-                    placeholder="67W"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>
-                    <input
-                      type="checkbox"
-                      name="productDetails.battery.charging.wireless"
-                      checked={formData.productDetails.battery.charging.wireless}
+          {/* Camera */}
+          <FormSection title="Camera" icon={Camera}>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">Rear Camera</h3>
+                <FormGrid>
+                  <FormGroup label="Primary Camera">
+                    <Input
+                      name="productDetails.camera.rear.primary"
+                      value={formData.productDetails.camera.rear.primary}
                       onChange={handleInputChange}
-                      style={{ marginRight: '0.5rem' }}
+                      placeholder="48MP"
                     />
-                    Wireless Charging
-                  </Label>
-                </FormGroup>
-              </FormGrid>
-            </div>
+                  </FormGroup>
 
-            {/* Design */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                Design & Build
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Height</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.design.dimensions.height"
-                    value={formData.productDetails.design.dimensions.height}
-                    onChange={handleInputChange}
-                    placeholder="160.5mm"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Width</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.design.dimensions.width"
-                    value={formData.productDetails.design.dimensions.width}
-                    onChange={handleInputChange}
-                    placeholder="74.8mm"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Thickness</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.design.dimensions.thickness"
-                    value={formData.productDetails.design.dimensions.thickness}
-                    onChange={handleInputChange}
-                    placeholder="8.2mm"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Weight</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.design.weight"
-                    value={formData.productDetails.design.weight}
-                    onChange={handleInputChange}
-                    placeholder="195g"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Material</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.design.material"
-                    value={formData.productDetails.design.material}
-                    onChange={handleInputChange}
-                    placeholder="Glass front, aluminum frame"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Water Resistance</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.design.waterResistance"
-                    value={formData.productDetails.design.waterResistance}
-                    onChange={handleInputChange}
-                    placeholder="IP68"
-                  />
-                </FormGroup>
-              </FormGrid>
-            </div>
+                  <FormGroup label="Secondary Camera">
+                    <Input
+                      name="productDetails.camera.rear.secondary"
+                      value={formData.productDetails.camera.rear.secondary}
+                      onChange={handleInputChange}
+                      placeholder="12MP Ultra Wide"
+                    />
+                  </FormGroup>
+                </FormGrid>
+              </div>
 
-            {/* Network */}
-            <div>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: '600',
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                Connectivity
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>SIM</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.network.sim"
-                    value={formData.productDetails.network.sim}
-                    onChange={handleInputChange}
-                    placeholder="Dual SIM"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Network</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.network.network"
-                    value={formData.productDetails.network.network}
-                    onChange={handleInputChange}
-                    placeholder="5G, 4G LTE"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Wi-Fi</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.network.wifi"
-                    value={formData.productDetails.network.wifi}
-                    onChange={handleInputChange}
-                    placeholder="Wi-Fi 6E"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Bluetooth</Label>
-                  <Input
-                    type="text"
-                    name="productDetails.network.bluetooth"
-                    value={formData.productDetails.network.bluetooth}
-                    onChange={handleInputChange}
-                    placeholder="5.3"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>
-                    <input
-                      type="checkbox"
-                      name="productDetails.network.gps"
-                      checked={formData.productDetails.network.gps}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">Front Camera</h3>
+                <FormGrid>
+                  <FormGroup label="Front Camera">
+                    <Input
+                      name="productDetails.camera.front.primary"
+                      value={formData.productDetails.camera.front.primary}
                       onChange={handleInputChange}
-                      style={{ marginRight: '0.5rem' }}
+                      placeholder="12MP TrueDepth"
                     />
-                    GPS
-                  </Label>
-                </FormGroup>
-                <FormGroup>
-                  <Label>
-                    <input
-                      type="checkbox"
-                      name="productDetails.network.nfc"
-                      checked={formData.productDetails.network.nfc}
-                      onChange={handleInputChange}
-                      style={{ marginRight: '0.5rem' }}
-                    />
-                    NFC
-                  </Label>
-                </FormGroup>
-              </FormGrid>
+                  </FormGroup>
+                </FormGrid>
+              </div>
             </div>
           </FormSection>
 
-          {/* Trust & Legal */}
-          <FormSection>
-            <SectionTitle>
-              <Shield size={20} />
-              Trust & Legal
-            </SectionTitle>
+          {/* Battery */}
+          <FormSection title="Battery" icon={Battery}>
             <FormGrid>
-              <FormGroup>
-                <Label>Warranty</Label>
+              <FormGroup label="Battery Capacity">
                 <Input
-                  type="text"
-                  name="trustMetrics.warranty"
-                  value={formData.trustMetrics?.warranty || ''}
+                  name="productDetails.battery.capacity"
+                  value={formData.productDetails.battery.capacity}
                   onChange={handleInputChange}
-                  placeholder="1 year manufacturer warranty"
+                  placeholder="4323 mAh"
                 />
               </FormGroup>
-              <FormGroup>
-                <Label>Return Policy</Label>
+
+              <FormGroup label="Battery Type">
                 <Input
-                  type="text"
-                  name="trustMetrics.returnPolicy"
-                  value={formData.trustMetrics?.returnPolicy || ''}
+                  name="productDetails.battery.type"
+                  value={formData.productDetails.battery.type}
                   onChange={handleInputChange}
-                  placeholder="7 days return policy"
+                  placeholder="Li-Ion"
                 />
               </FormGroup>
-              <FormGroup>
-                <Label>
-                  <input
-                    type="checkbox"
-                    name="trustMetrics.authenticity"
-                    checked={formData.trustMetrics?.authenticity || false}
-                    onChange={handleInputChange}
-                    style={{ marginRight: '0.5rem' }}
-                  />
-                  Authenticity Guaranteed
-                </Label>
+
+              <FormGroup label="Wired Charging">
+                <Input
+                  name="productDetails.battery.charging.wired"
+                  value={formData.productDetails.battery.charging.wired}
+                  onChange={handleInputChange}
+                  placeholder="20W"
+                />
               </FormGroup>
-              <FormGroup>
-                <Label>
+
+              <FormGroup label="Wireless Charging">
+                <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    name="isActive"
-                    checked={formData.isActive || false}
+                    name="productDetails.battery.charging.wireless"
+                    checked={formData.productDetails.battery.charging.wireless}
                     onChange={handleInputChange}
-                    style={{ marginRight: '0.5rem' }}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
                   />
-                  Active Product
-                </Label>
+                  <span className="text-sm text-gray-700">Supports wireless charging</span>
+                </label>
               </FormGroup>
             </FormGrid>
           </FormSection>
 
-          {/* Variants */}
-          <FormSection>
-            <SectionTitle>
-              <Settings size={20} />
-              Product Variants
-            </SectionTitle>
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <h3>Variants</h3>
-                <AddButton
-                  type="button"
-                  onClick={() =>                    handleArrayAdd('variants', { name: '', price: '', stock: '', sku: '' })
-                  }
-                >
-                  <Plus size={16} />
-                  Add Variant
-                </AddButton>
-              </DynamicFieldHeader>
-              {formData.variants?.map((variant, index) => (
-                <div
-                  key={index}
-                  style={{
-                    marginBottom: '1rem',
-                    padding: '1rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '0.5rem',
-                  }}
-                >
-                  <FormGrid>
-                    <FormGroup>
-                      <Label>Variant Name</Label>
-                      <Input
-                        type="text"                        value={variant.name || ''}                        onChange={(e: any) => handleArrayUpdate('variants', index, 'name', e.target.value)}
-                        placeholder="e.g., 128GB, Red Color"
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Price</Label>
-                      <Input
-                        type="number"                        value={variant.price || ''}                        onChange={(e: any) => handleArrayUpdate('variants', index, 'price', e.target.value)
-                        }
-                        placeholder="0.00"
-                        step="0.01"
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Stock</Label>
-                      <Input
-                        type="number"                        value={variant.stock || ''}                        onChange={(e: any) => handleArrayUpdate('variants', index, 'stock', e.target.value)
-                        }
-                        placeholder="0"
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>SKU</Label>
-                      <Input
-                        type="text"                        value={variant.sku || ''}                        onChange={(e: any) => handleArrayUpdate('variants', index, 'sku', e.target.value)}
-                        placeholder="Unique SKU"
-                      />
-                    </FormGroup>
-                  </FormGrid>
-                  <RemoveButton
-                    type="button"
-                    onClick={() => handleArrayRemove('variants', index)}
-                    style={{ marginTop: '0.5rem' }}
-                  >
-                    Remove Variant
-                  </RemoveButton>
-                </div>
-              ))}
-            </DynamicFieldContainer>
+          {/* Network & Connectivity */}
+          <FormSection title="Network & Connectivity" icon={Wifi}>
+            <FormGrid>
+              <FormGroup label="SIM">
+                <Input
+                  name="productDetails.network.sim"
+                  value={formData.productDetails.network.sim}
+                  onChange={handleInputChange}
+                  placeholder="Dual SIM"
+                />
+              </FormGroup>
+
+              <FormGroup label="Network">
+                <Input
+                  name="productDetails.network.network"
+                  value={formData.productDetails.network.network}
+                  onChange={handleInputChange}
+                  placeholder="5G, 4G LTE"
+                />
+              </FormGroup>
+
+              <FormGroup label="Wi-Fi">
+                <Input
+                  name="productDetails.network.wifi"
+                  value={formData.productDetails.network.wifi}
+                  onChange={handleInputChange}
+                  placeholder="Wi-Fi 6"
+                />
+              </FormGroup>
+
+              <FormGroup label="Bluetooth">
+                <Input
+                  name="productDetails.network.bluetooth"
+                  value={formData.productDetails.network.bluetooth}
+                  onChange={handleInputChange}
+                  placeholder="5.3"
+                />
+              </FormGroup>
+
+              <FormGroup label="GPS">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="productDetails.network.gps"
+                    checked={formData.productDetails.network.gps}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">GPS enabled</span>
+                </label>
+              </FormGroup>
+
+              <FormGroup label="NFC">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="productDetails.network.nfc"
+                    checked={formData.productDetails.network.nfc}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">NFC enabled</span>
+                </label>
+              </FormGroup>
+            </FormGrid>
           </FormSection>
 
-          {/* Add-ons */}
-          <FormSection>
-            <SectionTitle>
-              <Plus size={20} />
-              Add-ons & Accessories
-            </SectionTitle>
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <h3>Add-ons</h3>
-                <AddButton
-                  type="button"                  onClick={() => handleArrayAdd('addOns', { name: '', price: '', description: '' })}
-                >
-                  <Plus size={16} />
-                  Add Add-on
-                </AddButton>
-              </DynamicFieldHeader>
-              {formData.addOns?.map((addon, index) => (
-                <div
-                  key={index}
-                  style={{
-                    marginBottom: '1rem',
-                    padding: '1rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '0.5rem',
-                  }}
-                >
-                  <FormGrid>
-                    <FormGroup>
-                      <Label>Add-on Name</Label>
-                      <Input
-                        type="text"                        value={addon.name || ''}                        onChange={(e: any) => handleArrayUpdate('addOns', index, 'name', e.target.value)}
-                        placeholder="e.g., Screen Protector, Case"
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Price</Label>
-                      <Input
-                        type="number"                        value={addon.price || ''}                        onChange={(e: any) => handleArrayUpdate('addOns', index, 'price', e.target.value)}
-                        placeholder="0.00"
-                        step="0.01"
-                      />
-                    </FormGroup>
-                  </FormGrid>
-                  <FormGroup>
-                    <Label>Description</Label>
-                    <TextArea                      value={addon.description || ''}                      onChange={(e: any) => handleArrayUpdate('addOns', index, 'description', e.target.value)
-                      }
-                      placeholder="Describe the add-on"
-                      rows={2}
-                    />
-                  </FormGroup>
-                  <RemoveButton
-                    type="button"
-                    onClick={() => handleArrayRemove('addOns', index)}
-                    style={{ marginTop: '0.5rem' }}
-                  >
-                    Remove Add-on
-                  </RemoveButton>
-                </div>
-              ))}
-            </DynamicFieldContainer>
+          {/* Design */}
+          <FormSection title="Design" icon={Palette}>
+            <FormGrid>
+              <FormGroup label="Weight">
+                <Input
+                  name="productDetails.design.weight"
+                  value={formData.productDetails.design.weight}
+                  onChange={handleInputChange}
+                  placeholder="240g"
+                />
+              </FormGroup>
+
+              <FormGroup label="Height">
+                <Input
+                  name="productDetails.design.dimensions.height"
+                  value={formData.productDetails.design.dimensions.height}
+                  onChange={handleInputChange}
+                  placeholder="160.7mm"
+                />
+              </FormGroup>
+
+              <FormGroup label="Width">
+                <Input
+                  name="productDetails.design.dimensions.width"
+                  value={formData.productDetails.design.dimensions.width}
+                  onChange={handleInputChange}
+                  placeholder="78.1mm"
+                />
+              </FormGroup>
+
+              <FormGroup label="Thickness">
+                <Input
+                  name="productDetails.design.dimensions.thickness"
+                  value={formData.productDetails.design.dimensions.thickness}
+                  onChange={handleInputChange}
+                  placeholder="7.85mm"
+                />
+              </FormGroup>
+
+              <FormGroup label="Material">
+                <Input
+                  name="productDetails.design.material"
+                  value={formData.productDetails.design.material}
+                  onChange={handleInputChange}
+                  placeholder="Glass front and back, stainless steel frame"
+                />
+              </FormGroup>
+
+              <FormGroup label="Water Resistance">
+                <Input
+                  name="productDetails.design.waterResistance"
+                  value={formData.productDetails.design.waterResistance}
+                  onChange={handleInputChange}
+                  placeholder="IP68"
+                />
+              </FormGroup>
+            </FormGrid>
           </FormSection>
 
-          {/* Offers */}
-          <FormSection>
-            <SectionTitle>
-              <Tag size={20} />
-              Special Offers
-            </SectionTitle>
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <h3>Offers</h3>
-                <AddButton
-                  type="button"
-                  onClick={() =>                    handleArrayAdd('offers', {
-                      title: '',
-                      description: '',
-                      discount: '',
-                      validUntil: '',
-                    })
-                  }
-                >
-                  <Plus size={16} />
-                  Add Offer
-                </AddButton>
-              </DynamicFieldHeader>
-              {formData.offers?.map((offer, index) => (
-                <div
-                  key={index}
-                  style={{
-                    marginBottom: '1rem',
-                    padding: '1rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '0.5rem',
-                  }}
-                >
-                  <FormGrid>
-                    <FormGroup>
-                      <Label>Offer Title</Label>
-                      <Input
-                        type="text"                        value={offer.title || ''}                        onChange={(e: any) => handleArrayUpdate('offers', index, 'title', e.target.value)}
-                        placeholder="e.g., Early Bird Discount"
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Discount (%)</Label>
-                      <Input
-                        type="number"                        value={offer.discount || ''}                        onChange={(e: any) => handleArrayUpdate('offers', index, 'discount', e.target.value)
-                        }
-                        placeholder="10"
-                        min="0"
-                        max="100"
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Valid Until</Label>
-                      <Input
-                        type="date"                        value={offer.validUntil || ''}                        onChange={(e: any) => handleArrayUpdate('offers', index, 'validUntil', e.target.value)
-                        }
-                      />
-                    </FormGroup>
-                  </FormGrid>
-                  <FormGroup>
-                    <Label>Description</Label>
-                    <TextArea                      value={offer.description || ''}                      onChange={(e: any) => handleArrayUpdate('offers', index, 'description', e.target.value)
-                      }
-                      placeholder="Describe the offer details"
-                      rows={2}
-                    />
-                  </FormGroup>
-                  <RemoveButton
-                    type="button"
-                    onClick={() => handleArrayRemove('offers', index)}
-                    style={{ marginTop: '0.5rem' }}
-                  >
-                    Remove Offer
-                  </RemoveButton>
-                </div>
-              ))}
-            </DynamicFieldContainer>
+          {/* Trust & Legal */}
+          <FormSection title="Trust & Legal" icon={Shield}>
+            <FormGrid>
+              <FormGroup label="Warranty">
+                <Input
+                  name="trustMetrics.warranty"
+                  value={formData.trustMetrics.warranty}
+                  onChange={handleInputChange}
+                  placeholder="1 Year Manufacturer Warranty"
+                />
+              </FormGroup>
+
+              <FormGroup label="Return Policy">
+                <Input
+                  name="trustMetrics.returnPolicy"
+                  value={formData.trustMetrics.returnPolicy}
+                  onChange={handleInputChange}
+                  placeholder="7 Days Return Policy"
+                />
+              </FormGroup>
+
+              <FormGroup label="Authenticity">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="trustMetrics.authenticity"
+                    checked={formData.trustMetrics.authenticity}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">Certified authentic product</span>
+                </label>
+              </FormGroup>
+            </FormGrid>
           </FormSection>
 
-          {/* Description Section */}
-          <FormSection>
-            <SectionTitle>Product Description</SectionTitle>
-            <FormGroup>
-              <Label>Description *</Label>
+          {/* Description */}
+          <FormSection title="Product Description" icon={Package}>
+            <FormGroup label="Description" required error={errors.description}>
               <TextArea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Enter product description"
+                placeholder="Enter detailed product description..."
                 rows={6}
                 required
-              />              {errors.description && (
-                <ErrorMessage>
-                  <AlertCircle size={16} />                  {errors.description}
-                </ErrorMessage>
-              )}
+              />
             </FormGroup>
           </FormSection>
 
           {/* Action Buttons */}
-          <ActionButtons>
-            <SaveButton type="submit" disabled={loading}>
-              {loading ? <LoadingSpinner /> : <Save size={20} />}
-              {loading ? 'Updating...' : 'Update Product'}
-            </SaveButton>
-            <CancelButton type="button" onClick={() => navigate('/admin/buy-products')}>
-              <X size={20} />
-              Cancel
-            </CancelButton>
-          </ActionButtons>
-
-          {success && (
-            <SuccessMessage style={{ padding: '1rem 2rem' }}>
-              <CheckCircle size={16} />
-              {success}
-            </SuccessMessage>
-          )}          {errors.submit && (
-            <div style={{ padding: '1rem 2rem' }}>
-              <ErrorMessage>
-                <AlertCircle size={16} />                {errors.submit}
-              </ErrorMessage>
-            </div>
-          )}
+          <ActionButtons
+            onSave={handleSubmit}
+            onCancel={() => navigate('/admin/buy-products')}
+            loading={loading}
+            saveText="Update Product"
+          />
         </form>
-      </FormContainer>
-    </Container>
+      </div>
+
+      {loading && <LoadingOverlay message="Updating product..." />}
+    </div>
   );
 };
 

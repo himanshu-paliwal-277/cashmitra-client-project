@@ -185,7 +185,7 @@ const Header = () => {
 
           {/* Cart */}
           <button
-            onClick={() => handleLinkClick('/buy/cart')}
+            onClick={() => handleLinkClick('/cart')}
             title="Shopping Cart"
             className="relative flex items-center justify-center w-9 h-9 lg:w-10 lg:h-10 border-none bg-transparent text-gray-800 cursor-pointer rounded-lg transition-all hover:bg-gray-100 hover:text-green-600"
           >

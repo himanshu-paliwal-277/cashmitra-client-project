@@ -1,14 +1,12 @@
 // PickupBooking.jsx - Updated with booking- prefixed classNames and no navbar
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './PickupBooking.css'; // Import separate CSS
 import sellService from '../../services/sellService';
 import {
-  ArrowLeft,
   MapPin,
   Calendar,
   Clock,
-  CreditCard,
   Check,
   ArrowRight,
   Home,
@@ -19,7 +17,6 @@ import {
 
 const PickupBooking = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const location = useLocation();
 
   const { assessmentData, product, priceData, sessionId, selectedVariant } = location.state || {};
@@ -39,18 +36,20 @@ const PickupBooking = () => {
     locality: 'Lorem ipsum dolor sit amet',
     landmark: '',
     city: 'Delhi',
+    state: 'Delhi',
     alternateNumber: '',
+    fullName: '',
     saveAs: 'Home',
     selectedDate: '',
     selectedTime: '',
-    paymentType: 'bank',
+    paymentType: 'bank_transfer',
   });
 
   const [selectedDateInfo, setSelectedDateInfo] = useState(null);
 
-  // Generate next 5 days starting from tomorrow (Oct 20, 2025, since current is Oct 19)
+  // Generate next 5 days starting from tomorrow based on current date
   const getPickupDates = () => {
-    const today = new Date('2025-10-19');
+    const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -74,8 +73,8 @@ const PickupBooking = () => {
 
   const paymentOptions = [
     {
-      id: 'bank',
-      type: 'bank',
+      id: 'bank_transfer',
+      type: 'bank_transfer',
       label: 'Bank Transfer',
       icon: '🏦',
       description: 'Direct bank account transfer',
@@ -88,9 +87,9 @@ const PickupBooking = () => {
       description: 'Pay via UPI apps like GPay, PhonePe',
     },
     {
-      id: 'cod',
-      type: 'cod',
-      label: 'Cash on Delivery',
+      id: 'cash',
+      type: 'cash',
+      label: 'Cash on Pickup',
       icon: '💵',
       description: 'Pay cash when we pick up your device',
     },
@@ -137,21 +136,24 @@ const PickupBooking = () => {
   const handleContinue = async () => {
     if (currentStep === 1) {
       // Validate address
-      if (!formData.pincode || !formData.flatNo || !formData.locality) {        setSubmitError('Please fill all required address fields');
+      if (!formData.pincode || !formData.flatNo || !formData.locality) {
+        setSubmitError('Please fill all required address fields');
         return;
       }
       setCurrentStep(2);
       setSubmitError(null);
     } else if (currentStep === 2) {
       // Validate pickup
-      if (!formData.selectedDate || !formData.selectedTime) {        setSubmitError('Please select pickup date and time');
+      if (!formData.selectedDate || !formData.selectedTime) {
+        setSubmitError('Please select pickup date and time');
         return;
       }
       setCurrentStep(3);
       setSubmitError(null);
     } else if (currentStep === 3) {
       // Validate payment
-      if (!formData.paymentType) {        setSubmitError('Please select a payment method');
+      if (!formData.paymentType) {
+        setSubmitError('Please select a payment method');
         return;
       }
 
@@ -187,7 +189,8 @@ const PickupBooking = () => {
               'Realme',
               'Huawei',
             ];
-            const foundBrand = productData.tags.find((tag: any) => brandTags.some(brand => tag.toLowerCase().includes(brand.toLowerCase()))
+            const foundBrand = productData.tags.find((tag: any) =>
+              brandTags.some(brand => tag.toLowerCase().includes(brand.toLowerCase()))
             );
             if (foundBrand) return foundBrand;
           }
@@ -209,13 +212,15 @@ const PickupBooking = () => {
         // Create the sell order with correct payload structure for /api/sell-orders
         const orderData = {
           sessionId: sessionId || location.state?.sessionId,
-          orderNumber: `ORD${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`,
+          orderNumber: `ORD${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
           pickup: {
-            address: {              fullName: userData?.name || formData.fullName || 'User',
+            address: {
+              fullName: userData?.name || formData.fullName || 'User',
               phone: formData.alternateNumber || userData?.phone || '1234567890',
               street:
                 `${formData.flatNo}, ${formData.locality}${formData.landmark ? `, Near ${formData.landmark}` : ''}`.trim(),
-              city: formData.city,              state: formData.state || 'Delhi',
+              city: formData.city,
+              state: formData.state || 'Delhi',
               pincode: formData.pincode,
             },
             slot: {
@@ -233,24 +238,44 @@ const PickupBooking = () => {
         // Call the API to create the sell order using the correct endpoint
         const response = await sellService.createSellOrderCorrect(orderData);
 
-        // Create booking data for confirmation page
+        // Extract the actual order data from response
+        const orderResponseData = response.data || response;
+
+        // Create booking data for confirmation page using backend response
         const bookingData = {
-          bookingId: response.orderId || response.id || `ORD${Date.now()}`,
-          pickupDate: formData.selectedDate,
-          timeSlot: formData.selectedTime,
-          fullName: orderData.pickup.address.fullName,
-          phone: orderData.pickup.address.phone,
-          address: orderData.pickup.address.street,
-          city: formData.city,
-          pincode: formData.pincode,
-          orderStatus: response.status || 'confirmed',
-          finalPrice: getTotalAmount(),
+          bookingId:
+            orderResponseData.orderNumber ||
+            orderResponseData._id ||
+            orderResponseData.id ||
+            `ORD${Date.now()}`,
+          pickupDate: orderResponseData.pickup?.slot?.date || formData.selectedDate,
+          timeSlot: orderResponseData.pickup?.slot?.window || formData.selectedTime,
+          fullName:
+            orderResponseData.pickup?.address?.fullName || orderData.pickup.address.fullName,
+          phone: orderResponseData.pickup?.address?.phone || orderData.pickup.address.phone,
+          address: orderResponseData.pickup?.address?.street || orderData.pickup.address.street,
+          city: orderResponseData.pickup?.address?.city || formData.city,
+          pincode: orderResponseData.pickup?.address?.pincode || formData.pincode,
+          orderStatus: orderResponseData.status || 'confirmed',
+          finalPrice: orderResponseData.quoteAmount || getTotalAmount(),
         };
 
         // Navigate to confirmation page
-        navigate('/sell/confirmation', { state: { bookingData, orderData } });
+        // Extract category from URL params
+        const pathParts = window.location.pathname.split('/');
+        const category = pathParts[2]; // /sell/Mobile/pickup
+
+        navigate(`/sell/${category}/confirmation`, {
+          state: {
+            bookingData,
+            orderData: orderResponseData,
+            product,
+            priceData,
+          },
+        });
       } catch (error) {
-        console.error('Error creating sell order:', error);        setSubmitError(error.message || 'Failed to create booking. Please try again.');
+        console.error('Error creating sell order:', error);
+        setSubmitError(error.message || 'Failed to create booking. Please try again.');
       } finally {
         setIsSubmitting(false);
       }
@@ -565,12 +590,14 @@ const PickupBooking = () => {
 
             <div className="booking-price-row">
               <span className="booking-label">Processing Fee</span>
-              <span className="booking-value">- ₹49</span>
+              <span className="booking-value">+ ₹49</span>
             </div>
 
             <div className="booking-total-row">
               <span className="booking-label">Total Amount</span>
-              <span className="booking-value">{formatPrice(getTotalAmount())}</span>
+              <span className="booking-value">
+                {formatPrice((priceData?.quotedPrice || priceData?.basePrice || 1200) + 49)}
+              </span>
             </div>
 
             <button

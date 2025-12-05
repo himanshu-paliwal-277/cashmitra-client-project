@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import {
   DollarSign,
   Plus,
@@ -70,11 +72,11 @@ const TabsList = styled.div`
 const Tab = styled.button`
   flex: 1;
   padding: 1rem 1.5rem;
-  background: ${(props: any) => props.active ? '#f9fafb' : 'white'};
+  background: ${(props: any) => (props.active ? '#f9fafb' : 'white')};
   border: none;
-  border-bottom: 2px solid ${(props: any) => props.active ? '#8b5cf6' : 'transparent'};
-  font-weight: ${(props: any) => props.active ? '600' : '500'};
-  color: ${(props: any) => props.active ? '#8b5cf6' : '#6b7280'};
+  border-bottom: 2px solid ${(props: any) => (props.active ? '#8b5cf6' : 'transparent')};
+  font-weight: ${(props: any) => (props.active ? '600' : '500')};
+  color: ${(props: any) => (props.active ? '#8b5cf6' : '#6b7280')};
   cursor: pointer;
   transition: all 0.2s;
 
@@ -165,7 +167,7 @@ const PriceChange = styled.div`
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: ${(props: any) => props.positive ? '#10b981' : '#ef4444'};
+  color: ${(props: any) => (props.positive ? '#10b981' : '#ef4444')};
 `;
 
 const PriceDetails = styled.div`
@@ -201,8 +203,8 @@ const ActionButtons = styled.div`
 
 const IconButton = styled.button`
   flex: 1;
-  background: ${(props: any) => props.primary ? '#8b5cf6' : '#f3f4f6'};
-  color: ${(props: any) => props.primary ? 'white' : '#6b7280'};
+  background: ${(props: any) => (props.primary ? '#8b5cf6' : '#f3f4f6')};
+  color: ${(props: any) => (props.primary ? 'white' : '#6b7280')};
   border: none;
   padding: 0.75rem;
   border-radius: 0.375rem;
@@ -216,8 +218,8 @@ const IconButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: ${(props: any) => props.primary ? '#7c3aed' : '#e5e7eb'};
-    color: ${(props: any) => props.primary ? 'white' : '#374151'};
+    background: ${(props: any) => (props.primary ? '#7c3aed' : '#e5e7eb')};
+    color: ${(props: any) => (props.primary ? 'white' : '#374151')};
   }
 `;
 
@@ -336,16 +338,21 @@ const Pricing = () => {
       },
     ];
 
-    setTimeout(() => {      setPriceData(mockPriceData);      setAdjustments(mockAdjustments);
+    setTimeout(() => {
+      setPriceData(mockPriceData);
+      setAdjustments(mockAdjustments);
       setLoading(false);
     }, 1000);
   }, []);
 
   const filteredPriceData = priceData.filter(
-    item =>      item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||      item.brand.toLowerCase().includes(searchTerm.toLowerCase())
+    item =>
+      item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.brand.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredAdjustments = adjustments.filter(item =>    item.product.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredAdjustments = adjustments.filter(item =>
+    item.product.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -386,30 +393,40 @@ const Pricing = () => {
           </FilterSection>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>Loading...</div>
+            <LoadingSpinner size="lg" text="Loading pricing data..." />
           ) : activeTab === 'price-table' ? (
             <PricingGrid>
-              {filteredPriceData.map(item => (                <PricingCard key={item.id}>
-                  <ProductHeader>                    <ProductName>{item.product}</ProductName>                    <PriceChange positive={item.change > 0}>                      {item.change > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}                      {Math.abs(item.change)}%
+              {filteredPriceData.map(item => (
+                <PricingCard key={item.id}>
+                  <ProductHeader>
+                    <ProductName>{item.product}</ProductName>
+                    <PriceChange positive={item.change > 0}>
+                      {item.change > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                      {Math.abs(item.change)}%
                     </PriceChange>
                   </ProductHeader>
 
                   <PriceDetails>
                     <PriceRow>
-                      <ConditionLabel>Excellent</ConditionLabel>                      <PriceValue>₹{item.prices.excellent.toLocaleString()}</PriceValue>
+                      <ConditionLabel>Excellent</ConditionLabel>
+                      <PriceValue>₹{item.prices.excellent.toLocaleString()}</PriceValue>
                     </PriceRow>
                     <PriceRow>
-                      <ConditionLabel>Good</ConditionLabel>                      <PriceValue>₹{item.prices.good.toLocaleString()}</PriceValue>
+                      <ConditionLabel>Good</ConditionLabel>
+                      <PriceValue>₹{item.prices.good.toLocaleString()}</PriceValue>
                     </PriceRow>
                     <PriceRow>
-                      <ConditionLabel>Fair</ConditionLabel>                      <PriceValue>₹{item.prices.fair.toLocaleString()}</PriceValue>
+                      <ConditionLabel>Fair</ConditionLabel>
+                      <PriceValue>₹{item.prices.fair.toLocaleString()}</PriceValue>
                     </PriceRow>
                     <PriceRow>
-                      <ConditionLabel>Poor</ConditionLabel>                      <PriceValue>₹{item.prices.poor.toLocaleString()}</PriceValue>
+                      <ConditionLabel>Poor</ConditionLabel>
+                      <PriceValue>₹{item.prices.poor.toLocaleString()}</PriceValue>
                     </PriceRow>
                   </PriceDetails>
 
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1rem' }}>                    Last updated: {item.lastUpdated}
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '1rem' }}>
+                    Last updated: {item.lastUpdated}
                   </div>
 
                   <ActionButtons>
@@ -448,7 +465,15 @@ const Pricing = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredAdjustments.map(adjustment => (                      <TableRow key={adjustment.id}>                        <TableCell>{adjustment.product}</TableCell>                        <TableCell>{adjustment.condition}</TableCell>                        <TableCell>₹{adjustment.oldPrice.toLocaleString()}</TableCell>                        <TableCell>₹{adjustment.newPrice.toLocaleString()}</TableCell>                        <TableCell>{adjustment.reason}</TableCell>                        <TableCell>{adjustment.adjustedBy}</TableCell>                        <TableCell>{adjustment.adjustedAt}</TableCell>
+                    filteredAdjustments.map(adjustment => (
+                      <TableRow key={adjustment.id}>
+                        <TableCell>{adjustment.product}</TableCell>
+                        <TableCell>{adjustment.condition}</TableCell>
+                        <TableCell>₹{adjustment.oldPrice.toLocaleString()}</TableCell>
+                        <TableCell>₹{adjustment.newPrice.toLocaleString()}</TableCell>
+                        <TableCell>{adjustment.reason}</TableCell>
+                        <TableCell>{adjustment.adjustedBy}</TableCell>
+                        <TableCell>{adjustment.adjustedAt}</TableCell>
                         <TableCell>
                           <div style={{ display: 'flex', gap: '0.5rem' }}>
                             <IconButton style={{ padding: '0.25rem' }}>

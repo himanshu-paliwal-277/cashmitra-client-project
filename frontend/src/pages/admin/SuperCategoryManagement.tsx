@@ -1,16 +1,27 @@
-import React, { useState, useEffect, useCallback } from 'react';import styled from 'styled-components';
-import { Plus, Edit2, Trash2, Image as ImageIcon, Search } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Plus, Edit2, Trash2, Image as ImageIcon, Search, ArrowLeft, Package } from 'lucide-react';
 import { API_BASE_URL } from '../../config/api';
 import SuperCategoryForm from './SuperCategoryForm';
+import SkeletonLoader from '../../components/common/SkeletonLoader';
 
 const SuperCategoryManagement = () => {
   const [superCategories, setSuperCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [error, setError] = useState('');
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const fetchSuperCategories = useCallback(async () => {
     try {
@@ -22,8 +33,8 @@ const SuperCategoryManagement = () => {
       if (filterActive !== 'all') {
         url += `isActive=${filterActive === 'active'}&`;
       }
-      if (searchTerm) {
-        url += `search=${searchTerm}&`;
+      if (debouncedSearchTerm) {
+        url += `search=${debouncedSearchTerm}&`;
       }
 
       const response = await fetch(url, {
@@ -50,11 +61,12 @@ const SuperCategoryManagement = () => {
         setError(errorMessage);
       }
     } catch (err) {
-      console.error('Error fetching super categories:', err);      setError('Error fetching super categories: ' + (err.message || 'Unknown error'));
+      console.error('Error fetching super categories:', err);
+      setError('Error fetching super categories: ' + (err.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }
-  }, [filterActive, searchTerm]);
+  }, [filterActive, debouncedSearchTerm]);
 
   useEffect(() => {
     fetchSuperCategories();
@@ -86,7 +98,8 @@ const SuperCategoryManagement = () => {
       } else {
         alert(data.message || 'Failed to delete super category');
       }
-    } catch (err) {      alert('Error deleting super category: ' + err.message);
+    } catch (err) {
+      alert('Error deleting super category: ' + err.message);
     }
   };
 
@@ -108,417 +121,208 @@ const SuperCategoryManagement = () => {
 
   if (showForm) {
     return (
-      <Container>
-        <Header>
-          <Title>{editingCategory ? 'Edit Super Category' : 'Create Super Category'}</Title>
-          <BackButton onClick={handleFormClose}>← Back to List</BackButton>
-        </Header>
-        <SuperCategoryForm
-          category={editingCategory}
-          onClose={handleFormClose}
-          onSave={handleFormClose}
-        />
-      </Container>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+              {editingCategory ? 'Edit Super Category' : 'Create Super Category'}
+            </h1>
+            <button
+              onClick={handleFormClose}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-xl font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <ArrowLeft size={20} />
+              Back to List
+            </button>
+          </div>
+          <SuperCategoryForm
+            category={editingCategory}
+            onClose={handleFormClose}
+            onSave={handleFormClose}
+          />
+        </div>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <Title>Super Category Management</Title>
-        <CreateButton onClick={handleCreate}>
-          <Plus size={20} />
-          Create Super Category
-        </CreateButton>
-      </Header>
-
-      <FilterBar>
-        <SearchBox>
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Search super categories..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
-        </SearchBox>
-
-        <FilterButtons>
-          <FilterButton active={filterActive === 'all'} onClick={() => setFilterActive('all')}>
-            All
-          </FilterButton>
-          <FilterButton
-            active={filterActive === 'active'}
-            onClick={() => setFilterActive('active')}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
+              <Package className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+              Super Category Management
+            </h1>
+          </div>
+          <button
+            onClick={handleCreate}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
           >
-            Active
-          </FilterButton>
-          <FilterButton
-            active={filterActive === 'inactive'}
-            onClick={() => setFilterActive('inactive')}
-          >
-            Inactive
-          </FilterButton>
-        </FilterButtons>
-      </FilterBar>
-
-      {error && (
-        <ErrorMessage>{typeof error === 'string' ? error : JSON.stringify(error)}</ErrorMessage>
-      )}
-
-      {loading ? (
-        <LoadingMessage>Loading super categories...</LoadingMessage>
-      ) : superCategories.length === 0 ? (
-        <EmptyMessage>
-          <ImageIcon size={48} />
-          <p>No super categories found</p>
-          <CreateButton onClick={handleCreate}>
             <Plus size={20} />
-            Create First Super Category
-          </CreateButton>
-        </EmptyMessage>
-      ) : (
-        <Grid>
-          {superCategories.map(category => (            <Card key={category._id}>
-              <CardImage>                {category.image ? (                  <img src={category.image} alt={category.name} />
-                ) : (
-                  <PlaceholderImage>
-                    <ImageIcon size={48} />
-                  </PlaceholderImage>
-                )}                <StatusBadge active={category.isActive}>                  {category.isActive ? 'Active' : 'Inactive'}
-                </StatusBadge>
-              </CardImage>
+            Create Super Category
+          </button>
+        </div>
 
-              <CardContent>                <CategoryName>{category.name}</CategoryName>
-                <CategoryDescription>                  {category.description || 'No description'}
-                </CategoryDescription>
+        {/* Filter Bar */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-6">
+          {/* Search Box */}
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search super categories..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all duration-200 text-gray-700 placeholder-gray-400"
+            />
+          </div>
 
-                <CategoryStats>
-                  <Stat>
-                    <StatLabel>Categories:</StatLabel>                    <StatValue>{category.categories?.length || 0}</StatValue>
-                  </Stat>
-                  <Stat>
-                    <StatLabel>Order:</StatLabel>                    <StatValue>{category.sortOrder || 0}</StatValue>
-                  </Stat>
-                </CategoryStats>
-              </CardContent>
+          {/* Filter Buttons */}
+          <div className="flex gap-2 bg-white p-1.5 rounded-xl border-2 border-gray-200 shadow-sm">
+            <button
+              onClick={() => setFilterActive('all')}
+              className={`px-4 sm:px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+                filterActive === 'all'
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFilterActive('active')}
+              className={`px-4 sm:px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+                filterActive === 'active'
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              Active
+            </button>
+            <button
+              onClick={() => setFilterActive('inactive')}
+              className={`px-4 sm:px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+                filterActive === 'inactive'
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              Inactive
+            </button>
+          </div>
+        </div>
 
-              <CardActions>
-                <ActionButton onClick={() => handleEdit(category)} variant="edit">
-                  <Edit2 size={18} />
-                  Edit
-                </ActionButton>                <ActionButton onClick={() => handleDelete(category._id)} variant="delete">
-                  <Trash2 size={18} />
-                  Delete
-                </ActionButton>
-              </CardActions>
-            </Card>
-          ))}
-        </Grid>
-      )}
-    </Container>
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl text-red-700 flex items-start gap-3">
+            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-200 flex items-center justify-center mt-0.5">
+              <span className="text-red-700 text-xs font-bold">!</span>
+            </div>
+            <p className="flex-1">{typeof error === 'string' ? error : JSON.stringify(error)}</p>
+          </div>
+        )}
+
+        {/* Content */}
+        {loading ? (
+          <SkeletonLoader type="card" rows={6} />
+        ) : superCategories.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-12 text-center">
+            <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+              <ImageIcon size={40} className="text-gray-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No super categories found</h3>
+            <p className="text-gray-600 mb-6">Get started by creating your first super category</p>
+            <button
+              onClick={handleCreate}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              <Plus size={20} />
+              Create First Super Category
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {superCategories.map(category => (
+              <div
+                key={category._id}
+                className="group bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-transparent hover:border-green-500 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+              >
+                {/* Image */}
+                <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                  {category.image ? (
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon size={48} className="text-gray-400" />
+                    </div>
+                  )}
+                  <div
+                    className={`absolute top-3 right-3 px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md ${
+                      category.isActive ? 'bg-green-500/90 text-white' : 'bg-red-500/90 text-white'
+                    }`}
+                  >
+                    {category.isActive ? 'Active' : 'Inactive'}
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-5">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
+                    {category.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2 min-h-[2.5rem]">
+                    {category.description || 'No description'}
+                  </p>
+
+                  {/* Stats */}
+                  <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">Categories:</span>
+                      <span className="text-sm font-bold text-green-600">
+                        {category.categories?.length || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">Order:</span>
+                      <span className="text-sm font-bold text-green-600">
+                        {category.sortOrder || 0}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(category)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-50 hover:bg-green-500 text-green-600 hover:text-white rounded-lg font-semibold transition-all duration-200"
+                    >
+                      <Edit2 size={16} />
+                      <span className="hidden sm:inline">Edit</span>
+                    </button>
+                    <button
+                      onClick={() => handleDelete(category._id)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg font-semibold transition-all duration-200"
+                    >
+                      <Trash2 size={16} />
+                      <span className="hidden sm:inline">Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
-
-// Styled Components
-const Container = styled.div`
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-`;
-
-const CreateButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 200, 83, 0.4);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const BackButton = styled.button`
-  padding: 0.75rem 1.5rem;
-  background: #f5f5f5;
-  color: #333;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: #e0e0e0;
-  }
-`;
-
-const FilterBar = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-`;
-
-const SearchBox = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: white;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  flex: 1;
-  transition: all 0.3s ease;
-
-  &:focus-within {
-    border-color: #00c853;
-    box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
-  }
-
-  svg {
-    color: #666;
-  }
-
-  input {
-    border: none;
-    outline: none;
-    font-size: 1rem;
-    flex: 1;
-    background: transparent;
-
-    &::placeholder {
-      color: #999;
-    }
-  }
-`;
-
-const FilterButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  background: white;
-  padding: 0.25rem;
-  border-radius: 12px;
-  border: 2px solid #e0e0e0;
-`;
-
-const FilterButton = styled.button`
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: ${(props: any) => props.active ? 'linear-gradient(135deg, #00C853 0%, #00E676 100%)' : 'transparent'};
-  color: ${(props: any) => props.active ? 'white' : '#666'};
-
-  &:hover {
-    background: ${(props: any) => props.active ? 'linear-gradient(135deg, #00C853 0%, #00E676 100%)' : '#f5f5f5'};
-  }
-`;
-
-const ErrorMessage = styled.div`
-  padding: 1rem;
-  background: #ffe6e6;
-  border: 2px solid #ff4444;
-  border-radius: 12px;
-  color: #cc0000;
-  margin-bottom: 1rem;
-`;
-
-const LoadingMessage = styled.div`
-  text-align: center;
-  padding: 3rem;
-  font-size: 1.2rem;
-  color: #666;
-`;
-
-const EmptyMessage = styled.div`
-  text-align: center;
-  padding: 4rem 2rem;
-
-  svg {
-    color: #ccc;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    font-size: 1.2rem;
-    color: #666;
-    margin-bottom: 2rem;
-  }
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Card = styled.div`
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    border-color: #00c853;
-  }
-`;
-
-const CardImage = styled.div`
-  position: relative;
-  height: 200px;
-  overflow: hidden;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const PlaceholderImage = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg {
-    color: #999;
-  }
-`;
-
-const StatusBadge = styled.div`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: ${(props: any) => props.active ? '#00C853' : '#ff4444'};
-  color: white;
-  backdrop-filter: blur(10px);
-`;
-
-const CardContent = styled.div`
-  padding: 1.5rem;
-`;
-
-const CategoryName = styled.h3`
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 0.5rem;
-`;
-
-const CategoryDescription = styled.p`
-  font-size: 0.95rem;
-  color: #666;
-  margin-bottom: 1rem;
-  line-height: 1.5;
-`;
-
-const CategoryStats = styled.div`
-  display: flex;
-  gap: 1.5rem;
-  margin-top: 1rem;
-`;
-
-const Stat = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-`;
-
-const StatLabel = styled.span`
-  font-size: 0.9rem;
-  color: #999;
-`;
-
-const StatValue = styled.span`
-  font-size: 1rem;
-  font-weight: 700;
-  color: #00c853;
-`;
-
-const CardActions = styled.div`
-  display: flex;
-  border-top: 2px solid #f5f5f5;
-`;
-
-const ActionButton = styled.button`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  border: none;
-  background: ${(props: any) => props.variant === 'edit' ? '#f5f5f5' : '#fff'};
-  color: ${(props: any) => props.variant === 'edit' ? '#00C853' : '#ff4444'};
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: ${(props: any) => props.variant === 'edit' ? '#00C853' : '#ff4444'};
-    color: white;
-  }
-
-  &:not(:last-child) {
-    border-right: 2px solid #f5f5f5;
-  }
-`;
 
 export default SuperCategoryManagement;
