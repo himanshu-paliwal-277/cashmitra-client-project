@@ -272,7 +272,7 @@ const SellScreenDefects = () => {
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="main-container relative z-10">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm mb-6 text-blue-100 flex-wrap">
             <a
@@ -311,7 +311,7 @@ const SellScreenDefects = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="main-container py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Defects Section - Left Side */}
           <div className="lg:col-span-2">

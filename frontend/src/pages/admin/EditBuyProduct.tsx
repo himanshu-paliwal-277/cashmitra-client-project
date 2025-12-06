@@ -484,7 +484,7 @@ const EditBuyProduct = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="main-container">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

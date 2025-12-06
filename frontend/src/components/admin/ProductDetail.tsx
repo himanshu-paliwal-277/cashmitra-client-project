@@ -131,7 +131,7 @@ const ProductDetail = () => {
   if (!product) {
     return (
       <div className="min-h-screen bg-slate-50 p-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="main-container mx-auto">
           <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-center gap-3 mb-6">
             <AlertCircle className="w-5 h-5 text-red-600" />
             <p className="text-red-800">Product not found</p>
@@ -152,7 +152,7 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="main-container">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <button

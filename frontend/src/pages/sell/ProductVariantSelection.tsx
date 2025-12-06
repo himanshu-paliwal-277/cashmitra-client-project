@@ -151,7 +151,7 @@ const ProductVariantSelection = ({ onContinue, onBack }: any) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 py-8 px-4 sm:py-12">
-      <div className="max-w-7xl mx-auto">
+      <div className="main-container">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 mb-8 text-sm text-slate-600 flex-wrap">
           <button

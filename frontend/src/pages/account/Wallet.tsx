@@ -133,7 +133,8 @@ const Wallet = () => {
             <Activity className="w-8 h-8 text-red-600" />
           </div>
           <h3 className="text-xl font-bold text-slate-900 mb-2">Error Loading Wallet</h3>
-          <p className="text-slate-600 mb-6">{error}</p>          <Button variant="primary" onClick={() => window.location.reload()}>
+          <p className="text-slate-600 mb-6">{error}</p>
+          <Button variant="primary" onClick={() => window.location.reload()}>
             Retry
           </Button>
         </div>
@@ -143,7 +144,7 @@ const Wallet = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="main-container">
         {/* Header */}
         <div className="mb-8 sm:mb-12">
           <div className="flex items-center gap-3 mb-3">

@@ -271,7 +271,7 @@ const Cart = ({ onBack }: any) => {
               </div>
               <h2>Your cart is empty</h2>
               <p>Looks like you haven’t added any items yet.</p>
-              <Button variant="primary" size="lg" onClick={handleBack}>
+              <Button className="bg-green-500" variant="primary" size="lg" onClick={handleBack}>
                 Start Shopping
               </Button>
             </div>

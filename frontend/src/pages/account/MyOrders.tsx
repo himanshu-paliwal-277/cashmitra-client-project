@@ -22,7 +22,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import useUserOrders from '../../hooks/useUserOrders';
 import CancelOrderDialog from '../../components/CancelOrderDialog';
 
-const statusIcon = (status: any) => {
+const statusIcon = status => {
   switch ((status || '').toLowerCase()) {
     case 'delivered':
       return <CheckCircle size={16} />;
@@ -46,7 +46,7 @@ const statusIcon = (status: any) => {
   }
 };
 
-const statusLabel = (status: any) => {
+const statusLabel = status => {
   switch ((status || '').toLowerCase()) {
     case 'delivered':
       return 'Delivered';
@@ -88,7 +88,7 @@ const MyOrders = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [timeFilter, setTimeFilter] = useState('all');
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [cancelLoading, setCancelLoading] = useState(false);
 
   useEffect(() => {
@@ -98,7 +98,7 @@ const MyOrders = () => {
   const filtered = useMemo(() => {
     const s = searchTerm.toLowerCase().trim();
     const now = Date.now();
-    const timeOk = (t: any) => {
+    const timeOk = t => {
       const ms = new Date(t).getTime();
       if (timeFilter === 'week') return ms > now - 7 * 24 * 60 * 60 * 1000;
       if (timeFilter === 'month') return ms > now - 30 * 24 * 60 * 60 * 1000;
@@ -110,7 +110,7 @@ const MyOrders = () => {
       const txt = [
         o?._id,
         o?.orderType,
-        ...(o?.items || []).flatMap((it: any) => [
+        ...(o?.items || []).flatMap(it => [
           it?.product?.name,
           it?.product?.brand,
           it?.product?.model,
@@ -128,31 +128,61 @@ const MyOrders = () => {
     });
   }, [orders, searchTerm, statusFilter, timeFilter]);
 
+  // Status badge classes
+  const getStatusClasses = status => {
+    const statusClasses = {
+      delivered: 'text-emerald-900 bg-emerald-50 border-emerald-200',
+      shipped: 'text-blue-900 bg-indigo-50 border-blue-200',
+      processing: 'text-amber-900 bg-amber-50 border-amber-300',
+      pending: 'text-amber-900 bg-amber-50 border-amber-300',
+      confirmed: 'text-cyan-900 bg-cyan-50 border-cyan-200',
+      draft: 'text-gray-900 bg-gray-50 border-gray-200',
+      picked_up: 'text-blue-900 bg-indigo-50 border-blue-200',
+      paid: 'text-emerald-900 bg-emerald-50 border-emerald-200',
+      cancelled: 'text-red-900 bg-red-50 border-red-200',
+    };
+    return statusClasses[status] || 'bg-gray-50 border-gray-200 text-gray-600';
+  };
+
   return (
-    <div className="orders-page">
-      <div className="orders-container">
+    <div
+      className="min-h-screen py-10"
+      style={{
+        background: `radial-gradient(1000px 700px at 10% -10%, rgba(37, 99, 235, 0.07), transparent 45%), radial-gradient(800px 600px at 110% 10%, rgba(22, 163, 74, 0.05), transparent 45%), #fff`,
+      }}
+    >
+      <div className="main-container">
         {/* Header */}
-        <div className="orders-header">
-          <div className="orders-header-content">
-            <h1 className="orders-title">My Orders</h1>
-            <p className="orders-subtitle">Simple overview of your orders</p>
+        <div className="flex items-center justify-between gap-4 mb-7">
+          <div>
+            <h1
+              className="m-0 text-gray-900 font-bold"
+              style={{ fontSize: 'clamp(1.6rem, 2.2vw, 2rem)' }}
+            >
+              My Orders
+            </h1>
+            <p className="mt-1 mb-0 text-gray-600">Simple overview of your orders</p>
           </div>
-          <button className="btn refresh-btn" onClick={fetchOrders} disabled={loading}>
-            <RefreshCw size={16} className={loading ? 'spin' : ''} />
+          <button
+            className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
+            onClick={fetchOrders}
+            disabled={loading}
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
             <span>{loading ? 'Loading...' : 'Refresh'}</span>
           </button>
         </div>
 
-        {/* Filters (kept minimal) */}
-        <div className="filters-card compact">
-          <div className="filters-grid compact">
-            <div className="search-container">
-              <div className="search-icon">
+        {/* Filters */}
+        <div className="bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-[18px] p-3 shadow-[0_10px_25px_rgba(2,6,23,0.06)] mb-7">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_180px_180px] gap-4">
+            <div className="flex items-center border-2 border-gray-200 rounded-xl bg-white overflow-hidden">
+              <div className="grid place-items-center w-10 h-10 text-gray-400">
                 <Search size={16} />
               </div>
               <input
                 type="text"
-                className="search-input"
+                className="flex-1 h-10 border-none outline-none px-3 bg-transparent text-gray-900 placeholder:text-gray-400"
                 placeholder="Search by ID, brand, model…"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
@@ -160,7 +190,7 @@ const MyOrders = () => {
             </div>
 
             <select
-              className="filter-select"
+              className="h-10 w-full border-2 border-gray-200 rounded-xl px-2.5 bg-white text-gray-900 outline-none transition-all duration-150 focus:border-blue-600/60 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.16)]"
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
               aria-label="Filter by status"
@@ -178,7 +208,7 @@ const MyOrders = () => {
             </select>
 
             <select
-              className="filter-select"
+              className="h-10 w-full border-2 border-gray-200 rounded-xl px-2.5 bg-white text-gray-900 outline-none transition-all duration-150 focus:border-blue-600/60 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.16)]"
               value={timeFilter}
               onChange={e => setTimeFilter(e.target.value)}
               aria-label="Filter by time"
@@ -193,43 +223,49 @@ const MyOrders = () => {
 
         {/* Content */}
         {loading ? (
-          <div className="empty-state loading">
-            <div className="empty-icon">
+          <div className="text-center border border-dashed border-gray-200 rounded-2xl py-8 px-4 bg-gradient-to-b from-white to-gray-50 text-gray-600">
+            <div className="w-[86px] h-[86px] mx-auto mb-3 rounded-full grid place-items-center bg-gray-100 text-gray-600 border border-dashed border-gray-200 animate-pulse">
               <RefreshCw size={40} />
             </div>
-            <h3 className="empty-title">Loading Orders…</h3>
-            <p className="empty-description">Fetching your latest updates.</p>
+            <h3 className="my-1 text-gray-900 font-bold">Loading Orders…</h3>
+            <p className="my-1 mb-4">Fetching your latest updates.</p>
           </div>
         ) : error ? (
-          <div className="empty-state">
-            <div className="empty-icon">
+          <div className="text-center border border-dashed border-gray-200 rounded-2xl py-8 px-4 bg-gradient-to-b from-white to-gray-50 text-gray-600">
+            <div className="w-[86px] h-[86px] mx-auto mb-3 rounded-full grid place-items-center bg-gray-100 text-gray-600 border border-dashed border-gray-200">
               <X size={40} />
             </div>
-            <h3 className="empty-title">Error Loading Orders</h3>
-            <p className="empty-description">{error}</p>
-            <button className="btn empty-action" onClick={fetchOrders}>
+            <h3 className="my-1 text-gray-900 font-bold">Error Loading Orders</h3>
+            <p className="my-1 mb-4">{error}</p>
+            <button
+              className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50 no-underline"
+              onClick={fetchOrders}
+            >
               <RefreshCw size={18} />
               <span>Try Again</span>
             </button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">
+          <div className="text-center border border-dashed border-gray-200 rounded-2xl py-8 px-4 bg-gradient-to-b from-white to-gray-50 text-gray-600">
+            <div className="w-[86px] h-[86px] mx-auto mb-3 rounded-full grid place-items-center bg-gray-100 text-gray-600 border border-dashed border-gray-200">
               <Package size={40} />
             </div>
-            <h3 className="empty-title">No Orders Found</h3>
-            <p className="empty-description">
+            <h3 className="my-1 text-gray-900 font-bold">No Orders Found</h3>
+            <p className="my-1 mb-4">
               {searchTerm || statusFilter !== 'all'
                 ? 'No orders match your current filters.'
                 : "You haven't placed any orders yet."}
             </p>
-            <a href="/" className="btn empty-action link">
+            <a
+              href="/"
+              className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50 no-underline"
+            >
               <span>Start Shopping</span>
               <ArrowRight size={18} />
             </a>
           </div>
         ) : (
-          <div className="orders-list">
+          <div className="grid grid-cols-1 gap-5">
             {filtered.map(order => {
               const created = order?.createdAt
                 ? new Date(order.createdAt).toLocaleDateString('en-IN', {
@@ -248,31 +284,36 @@ const MyOrders = () => {
                 order?.commission?.amount != null ? Number(order.commission.amount) : null;
 
               return (
-                <div key={order._id} className="order-card simple">
+                <div
+                  key={order._id}
+                  className="bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-2xl shadow-[0_10px_25px_rgba(2,6,23,0.06)] overflow-hidden"
+                >
                   {/* Top row */}
-                  <div className="order-top">
-                    <div className="order-top-left">
-                      <h3 className="order-id">#{order._id}</h3>
-                      <div className="order-chips">
-                        <span className="chip">
+                  <div className="flex items-center justify-between px-3.5 pt-3.5 pb-2.5 border-b border-gray-200 gap-4">
+                    <div>
+                      <h3 className="m-0 text-gray-900 text-[1.05rem] font-bold">#{order._id}</h3>
+                      <div className="flex flex-wrap gap-2 mt-1.5">
+                        <span className="inline-flex items-center gap-1.5 bg-white border border-gray-200 px-2 py-0.5 rounded-full text-[0.82rem] text-gray-600">
                           <Calendar size={14} /> {created}
                         </span>
                         {order.orderType && (
-                          <span className="chip outline">
+                          <span className="inline-flex items-center gap-1.5 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-full text-[0.82rem] text-gray-600">
                             {(order.orderType || '').toUpperCase()}
                           </span>
                         )}
-                        <span className={`chip status badge-${status}`}>
+                        <span
+                          className={`inline-flex items-center gap-1.5 border px-2 py-0.5 rounded-full text-[0.82rem] font-bold ${getStatusClasses(status)}`}
+                        >
                           {statusIcon(status)} {statusLabel(status)}
                         </span>
                       </div>
                     </div>
 
-                    <div className="order-total">
-                      <div className="total-label">
+                    <div className="text-right">
+                      <div className="text-xs text-gray-600">
                         {order.orderType === 'sell' ? 'You Get' : 'Total'}
                       </div>
-                      <div className="total-value">
+                      <div className="text-lg font-extrabold text-gray-900">
                         ₹
                         {Number(
                           order.orderType === 'sell'
@@ -284,17 +325,17 @@ const MyOrders = () => {
                   </div>
 
                   {/* Middle grid: Items | Payment | Shipping | Commission */}
-                  <div className="order-simple-grid">
-                    {/* Items (compact list) */}
-                    <div className="simple-block">
-                      <div className="block-title">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5">
+                    {/* Items */}
+                    <div className="border border-gray-200 rounded-xl bg-white p-3">
+                      <div className="inline-flex items-center gap-1.5 font-extrabold text-blue-900 mb-2">
                         <Package size={16} /> {order.orderType === 'sell' ? 'Device' : 'Items'}
                       </div>
-                      <div className="items-compact">
+                      <div className="grid gap-2">
                         {order.orderType === 'sell' ? (
                           // Sell order - single device from session
-                          <div className="item-compact">
-                            <div className="item-compact-img">
+                          <div className="flex gap-2.5">
+                            <div className="w-14 h-14 rounded-[10px] overflow-hidden border border-gray-200 bg-gray-50 flex-none">
                               <img
                                 src={
                                   order?.sessionId?.productId?.images?.[0] ||
@@ -302,20 +343,21 @@ const MyOrders = () => {
                                 }
                                 alt={order?.sessionId?.productId?.name || 'Device'}
                                 loading="lazy"
+                                className="w-full h-full object-cover"
                               />
                             </div>
-                            <div className="item-compact-info">
-                              <div className="item-compact-title">
+                            <div className="min-w-0">
+                              <div className="text-gray-900 font-bold whitespace-nowrap overflow-hidden text-ellipsis">
                                 {order?.sessionId?.productId?.name || 'Device'}
                               </div>
-                              <div className="item-compact-meta">
+                              <div className="text-gray-600 text-[0.85rem]">
                                 Order: {order.orderNumber || order._id?.slice(-6)}
                               </div>
                             </div>
                           </div>
                         ) : (
                           // Buy order - multiple items
-                          (order.items || []).map((it: any, idx: any) => {
+                          (order.items || []).map((it, idx) => {
                             // Handle images - can be array or object with main/gallery/thumbnail
                             let imageUrl = '/placeholder-image.jpg';
                             if (it?.product?.images) {
@@ -331,20 +373,23 @@ const MyOrders = () => {
                             }
 
                             return (
-                              <div className="item-compact" key={idx}>
-                                <div className="item-compact-img">
+                              <div className="flex gap-2.5" key={idx}>
+                                <div className="w-14 h-14 rounded-[10px] overflow-hidden border border-gray-200 bg-gray-50 flex-none">
                                   <img
                                     src={imageUrl}
                                     alt={it?.product?.name || 'Product'}
                                     loading="lazy"
+                                    className="w-full h-full object-cover"
                                   />
                                 </div>
-                                <div className="item-compact-info">
-                                  <div className="item-compact-title">
+                                <div className="min-w-0">
+                                  <div className="text-gray-900 font-bold whitespace-nowrap overflow-hidden text-ellipsis">
                                     {it?.product?.brand || ''}{' '}
                                     {it?.product?.model || it?.product?.name || ''}
                                   </div>
-                                  <div className="item-compact-meta">Qty: {it?.quantity || 1}</div>
+                                  <div className="text-gray-600 text-[0.85rem]">
+                                    Qty: {it?.quantity || 1}
+                                  </div>
                                 </div>
                               </div>
                             );
@@ -354,20 +399,26 @@ const MyOrders = () => {
                     </div>
 
                     {/* Payment */}
-                    <div className="simple-block">
-                      <div className="block-title">
+                    <div className="border border-gray-200 rounded-xl bg-white p-3">
+                      <div className="inline-flex items-center gap-1.5 font-extrabold text-blue-900 mb-2">
                         <CreditCard size={16} /> Payment
                       </div>
-                      <div className="kv">
-                        <span className="k">Method</span>
-                        <span className="v">
+                      <div className="flex items-center justify-between gap-3 py-1">
+                        <span className="text-gray-600">Method</span>
+                        <span className="text-gray-900 font-bold">
                           {order.orderType === 'sell' ? order?.payment?.method || '—' : payMethod}
                         </span>
                       </div>
-                      <div className="kv">
-                        <span className="k">Status</span>
+                      <div className="flex items-center justify-between gap-3 py-1">
+                        <span className="text-gray-600">Status</span>
                         <span
-                          className={`v pill ${payStatus === 'paid' ? 'ok' : payStatus === 'pending' ? 'warn' : ''}`}
+                          className={`px-2 py-0.5 rounded-full border font-bold ${
+                            payStatus === 'paid'
+                              ? 'text-emerald-900 bg-emerald-50 border-emerald-200'
+                              : payStatus === 'pending'
+                                ? 'text-amber-900 bg-amber-50 border-amber-300'
+                                : 'bg-gray-50 border-gray-200 text-gray-900'
+                          }`}
                         >
                           {order.orderType === 'sell'
                             ? order?.payment?.status || '—'
@@ -377,11 +428,11 @@ const MyOrders = () => {
                     </div>
 
                     {/* Shipping / Pickup */}
-                    <div className="simple-block">
-                      <div className="block-title">
+                    <div className="border border-gray-200 rounded-xl bg-white p-3">
+                      <div className="inline-flex items-center gap-1.5 font-extrabold text-blue-900 mb-2">
                         <MapPin size={16} /> {order.orderType === 'sell' ? 'Pickup' : 'Shipping'}
                       </div>
-                      <div className="addr">
+                      <div className="text-gray-600 text-sm">
                         {order.orderType === 'sell' ? (
                           <>
                             <div>
@@ -417,35 +468,38 @@ const MyOrders = () => {
                     </div>
 
                     {/* Commission */}
-                    <div className="simple-block">
-                      <div className="block-title">
+                    <div className="border border-gray-200 rounded-xl bg-white p-3">
+                      <div className="inline-flex items-center gap-1.5 font-extrabold text-blue-900 mb-2">
                         <BadgePercent size={16} /> Commission
                       </div>
-                      <div className="kv">
-                        <span className="k">Rate</span>
-                        <span className="v">
+                      <div className="flex items-center justify-between gap-3 py-1">
+                        <span className="text-gray-600">Rate</span>
+                        <span className="text-gray-900 font-bold">
                           {commissionRate != null ? `${(commissionRate * 100).toFixed(0)}%` : '—'}
                         </span>
                       </div>
-                      <div className="kv">
-                        <span className="k">Amount</span>
-                        <span className="v">
+                      <div className="flex items-center justify-between gap-3 py-1">
+                        <span className="text-gray-600">Amount</span>
+                        <span className="text-gray-900 font-bold">
                           {commissionAmt != null ? `₹${commissionAmt.toLocaleString()}` : '—'}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Actions (kept minimal) */}
-                  <div className="order-actions simple">
-                    <Link to={`/account/orders/${order._id}`} className="btn ghost">
+                  {/* Actions */}
+                  <div className="flex flex-wrap gap-2 border-t border-gray-200 px-3.5 pt-3 pb-3.5">
+                    <Link
+                      to={`/account/orders/${order._id}`}
+                      className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50 no-underline"
+                    >
                       <Eye size={16} />
                       <span>View Order</span>
                     </Link>
 
                     {order.orderType !== 'sell' && (
                       <button
-                        className="btn ghost"
+                        className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50"
                         onClick={() => alert('Invoice download feature coming soon!')}
                         title="Coming soon"
                       >
@@ -456,7 +510,7 @@ const MyOrders = () => {
 
                     {order.orderType === 'buy' && status === 'shipped' && (
                       <button
-                        className="btn primary"
+                        className="inline-flex items-center gap-2 border border-blue-600/35 bg-indigo-50 text-blue-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:bg-indigo-100 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)]"
                         onClick={() => alert('Order tracking feature coming soon!')}
                         title="Coming soon"
                       >
@@ -467,7 +521,7 @@ const MyOrders = () => {
 
                     {(status === 'pending' || status === 'confirmed' || status === 'draft') && (
                       <button
-                        className="btn danger"
+                        className="inline-flex items-center gap-2 border border-red-600/35 bg-red-50 text-red-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:bg-red-100 hover:shadow-[0_0_0_3px_rgba(220,38,38,0.16)]"
                         onClick={() => {
                           setSelectedOrderId(order._id);
                           setCancelDialogOpen(true);
@@ -480,7 +534,7 @@ const MyOrders = () => {
 
                     {order.orderType === 'buy' && status === 'delivered' && (
                       <button
-                        className="btn"
+                        className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50"
                         onClick={() => alert('Return/Reorder feature coming soon!')}
                         title="Coming soon"
                       >
@@ -492,7 +546,7 @@ const MyOrders = () => {
                     {order.orderType === 'sell' &&
                       (status === 'draft' || status === 'confirmed') && (
                         <button
-                          className="btn"
+                          className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50"
                           onClick={() => alert('Reschedule pickup feature coming soon!')}
                           title="Coming soon"
                         >
@@ -525,7 +579,7 @@ const MyOrders = () => {
             setSelectedOrderId(null);
             fetchOrders(); // Refresh the orders list
             alert('Order cancelled successfully!');
-          } catch (err: any) {
+          } catch (err) {
             alert(err?.response?.data?.message || 'Failed to cancel order');
           } finally {
             setCancelLoading(false);

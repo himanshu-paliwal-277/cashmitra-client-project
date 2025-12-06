@@ -485,7 +485,7 @@ const CategoryManagement = () => {
             />
           </SearchContainer>
 
-          <Button variant="primary" onClick={resetForm}>
+          <Button className="bg-green-500" variant="primary" onClick={resetForm}>
             <Plus size={16} />
             Add Category
           </Button>
@@ -583,12 +583,12 @@ const CategoryManagement = () => {
 
             <FormActions>
               {editingCategory && (
-                <Button onClick={resetForm}>
+                <Button className="bg-green-500" onClick={resetForm}>
                   <X size={16} />
                   Cancel
                 </Button>
               )}
-              <Button variant="primary" onClick={handleSaveCategory}>
+              <Button className="bg-green-500" variant="primary" onClick={handleSaveCategory}>
                 <Save size={16} />
                 {editingCategory ? 'Update Category' : 'Create Category'}
               </Button>

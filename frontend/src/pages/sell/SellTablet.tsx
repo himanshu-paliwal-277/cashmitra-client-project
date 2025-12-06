@@ -13,10 +13,7 @@ import {
 } from 'lucide-react';
 import { brands } from '../../data/products';
 
-const SellTablet = ({
-  onBrandSelect,
-  onBack
-}: any) => {
+const SellTablet = ({ onBrandSelect, onBack }: any) => {
   const [selectedBrand, setSelectedBrand] = useState(null);
 
   const tabletBrands = brands.tablet || [];
@@ -65,7 +62,7 @@ const SellTablet = ({
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12 px-4 sm:py-16">
-        <div className="max-w-7xl mx-auto">
+        <div className="main-container">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 mb-8 text-sm text-blue-100">
             <a href="/" className="flex items-center gap-1 text-white transition-colors">
@@ -85,7 +82,9 @@ const SellTablet = ({
             <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full mb-6">
               <Tablet className="w-10 h-10" />
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 text-white">Sell Your Tablet</h1>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 text-white">
+              Sell Your Tablet
+            </h1>
             <p className="text-lg sm:text-xl text-blue-100 mb-8">
               Convert your tablet into instant cash. Get premium pricing with our specialized tablet
               evaluation process and secure pickup service.
@@ -108,7 +107,7 @@ const SellTablet = ({
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="main-container py-12">
         {/* Features Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {features.map((feature, index) => (

@@ -54,7 +54,8 @@ const SellCategoryHome = () => {
       const data = await getSellSuperCategories();
       setSuperCategories(data || []);
     } catch (err) {
-      console.error('Error fetching super categories:', err);      setError(err.message || 'Failed to load categories');
+      console.error('Error fetching super categories:', err);
+      setError(err.message || 'Failed to load categories');
     } finally {
       setLoading(false);
     }
@@ -93,8 +94,10 @@ const SellCategoryHome = () => {
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
 
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-white">Sell Your Old Device</h1>
+        <div className="main-container text-center relative z-10">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-white">
+            Sell Your Old Device
+          </h1>
           <p className="text-lg sm:text-xl text-blue-100 max-w-2xl mx-auto">
             Get the best price for your old gadgets. Quick evaluation, instant payment, and free
             pickup!
@@ -102,7 +105,7 @@ const SellCategoryHome = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="main-container">
         {/* Features Bar */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 bg-white rounded-2xl shadow-2xl p-6 sm:p-8 -mt-8 relative z-20 border border-slate-200">
           <div className="flex items-center gap-3 p-2">
@@ -164,17 +167,22 @@ const SellCategoryHome = () => {
                 const {
                   icon: IconComponent,
                   color,
-                  bgGradient,                } = getIconForSuperCategory(superCat.name);
+                  bgGradient,
+                } = getIconForSuperCategory(superCat.name);
                 return (
-                  <div                    key={superCat._id}
+                  <div
+                    key={superCat._id}
                     onClick={() => handleSuperCategoryClick(superCat)}
                     className="group bg-white rounded-2xl p-6 text-center cursor-pointer transition-all hover:shadow-2xl hover:-translate-y-2 border-2 border-transparent hover:border-blue-500"
                   >
                     <div className="relative mb-4">
                       <div
                         className={`w-20 h-20 bg-gradient-to-br ${bgGradient} rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all`}
-                      >                        {superCat.image ? (
-                          <img                            src={superCat.image}                            alt={superCat.name}
+                      >
+                        {superCat.image ? (
+                          <img
+                            src={superCat.image}
+                            alt={superCat.name}
                             className="w-full h-full object-cover rounded-2xl"
                           />
                         ) : (
@@ -182,9 +190,12 @@ const SellCategoryHome = () => {
                         )}
                       </div>
                     </div>
-                    <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">                      {superCat.name}
-                    </h3>                    {superCat.description && (
-                      <p className="text-xs sm:text-sm text-slate-600 line-clamp-2">                        {superCat.description}
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">
+                      {superCat.name}
+                    </h3>
+                    {superCat.description && (
+                      <p className="text-xs sm:text-sm text-slate-600 line-clamp-2">
+                        {superCat.description}
                       </p>
                     )}
                   </div>
@@ -193,9 +204,12 @@ const SellCategoryHome = () => {
             </div>
 
             {/* Categories under each Super Category */}
-            {superCategories.map(superCat => {              if (!superCat.categories || superCat.categories.length === 0) return null;              const { icon: IconComponent, bgGradient } = getIconForSuperCategory(superCat.name);
+            {superCategories.map(superCat => {
+              if (!superCat.categories || superCat.categories.length === 0) return null;
+              const { icon: IconComponent, bgGradient } = getIconForSuperCategory(superCat.name);
 
-              return (                <div key={superCat._id} className="mb-16">
+              return (
+                <div key={superCat._id} className="mb-16">
                   {/* Section Header */}
                   <div className="flex items-center justify-between mb-6 px-2">
                     <div className="flex items-center gap-3">
@@ -204,7 +218,8 @@ const SellCategoryHome = () => {
                       >
                         <IconComponent className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="text-xl sm:text-2xl font-bold text-slate-900">                        {superCat.name}
+                      <h3 className="text-xl sm:text-2xl font-bold text-slate-900">
+                        {superCat.name}
                       </h3>
                     </div>
                     <button
@@ -217,26 +232,29 @@ const SellCategoryHome = () => {
                   </div>
 
                   {/* Categories Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">                    {superCat.categories.slice(0, 5).map((category: any) => <div
-                      key={category._id}
-                      onClick={() => handleCategoryClick(category)}
-                      className="bg-white rounded-xl p-4 text-center cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 border-2 border-slate-100 hover:border-blue-400 group"
-                    >
-                      <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center mx-auto mb-3 overflow-hidden group-hover:scale-110 transition-transform">
-                        {category.image ? (
-                          <img
-                            src={category.image}
-                            alt={category.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <Smartphone className="w-8 h-8 text-slate-500" />
-                        )}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {superCat.categories.slice(0, 5).map((category: any) => (
+                      <div
+                        key={category._id}
+                        onClick={() => handleCategoryClick(category)}
+                        className="bg-white rounded-xl p-4 text-center cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 border-2 border-slate-100 hover:border-blue-400 group"
+                      >
+                        <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center mx-auto mb-3 overflow-hidden group-hover:scale-110 transition-transform">
+                          {category.image ? (
+                            <img
+                              src={category.image}
+                              alt={category.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Smartphone className="w-8 h-8 text-slate-500" />
+                          )}
+                        </div>
+                        <h4 className="text-sm sm:text-base font-semibold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                          {category.name}
+                        </h4>
                       </div>
-                      <h4 className="text-sm sm:text-base font-semibold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                        {category.name}
-                      </h4>
-                    </div>)}
+                    ))}
                   </div>
                 </div>
               );

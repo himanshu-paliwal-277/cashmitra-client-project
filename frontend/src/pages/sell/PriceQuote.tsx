@@ -205,14 +205,14 @@ const PriceQuote = () => {
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
 
-        <div className="max-w-7xl mx-auto relative z-10 text-center">
+        <div className="main-container relative z-10 text-center">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">🎉 Your Price Quote is Ready!</h1>
           <p className="text-lg text-blue-100">Great news! Here&apos;s what your device is worth</p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="main-container">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Product Section - Left Side */}
           <div className="lg:col-span-2 space-y-6">

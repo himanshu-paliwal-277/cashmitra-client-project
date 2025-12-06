@@ -86,19 +86,22 @@ const SellProducts = () => {
       bgGradient: 'from-amber-50 to-orange-50',
     },
     {
-      label: 'Active Products',      value: displayProducts.filter(p => p.status === 'active').length.toString(),
+      label: 'Active Products',
+      value: displayProducts.filter(p => p.status === 'active').length.toString(),
       icon: CheckCircle2,
       gradient: 'from-emerald-500 to-teal-600',
       bgGradient: 'from-emerald-50 to-teal-50',
     },
     {
-      label: 'Total Variants',      value: displayProducts.reduce((sum, p) => sum + (p.variants?.length || 0), 0).toString(),
+      label: 'Total Variants',
+      value: displayProducts.reduce((sum, p) => sum + (p.variants?.length || 0), 0).toString(),
       icon: Sparkles,
       gradient: 'from-blue-500 to-indigo-600',
       bgGradient: 'from-blue-50 to-indigo-50',
     },
     {
-      label: 'Categories',      value: new Set(displayProducts.map(p => p.categoryId?._id || p.categoryId)).size.toString(),
+      label: 'Categories',
+      value: new Set(displayProducts.map(p => p.categoryId?._id || p.categoryId)).size.toString(),
       icon: Grid,
       gradient: 'from-purple-500 to-pink-600',
       bgGradient: 'from-purple-50 to-pink-50',
@@ -128,7 +131,8 @@ const SellProducts = () => {
 
   const handleSaveProduct = async (productData: any) => {
     try {
-      if (selectedProduct) {        await updateProduct(selectedProduct.id, productData);
+      if (selectedProduct) {
+        await updateProduct(selectedProduct.id, productData);
       } else {
         await createProduct(productData);
       }
@@ -147,7 +151,8 @@ const SellProducts = () => {
   };
 
   const handleManageQuestions = (product: any) => {
-    setSelectedProductForQuestions(product);    fetchQuestions({ productId: product._id || product.id });
+    setSelectedProductForQuestions(product);
+    fetchQuestions({ productId: product._id || product.id });
   };
 
   const handleBackToProducts = () => {
@@ -167,13 +172,17 @@ const SellProducts = () => {
   const handleSaveQuestion = async (questionData: any) => {
     try {
       const dataWithProduct = {
-        ...questionData,        productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
+        ...questionData,
+        productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
       };
 
-      if (selectedQuestion) {        await updateQuestion(selectedQuestion._id || selectedQuestion.id, dataWithProduct);
+      if (selectedQuestion) {
+        await updateQuestion(selectedQuestion._id || selectedQuestion.id, dataWithProduct);
       } else {
         await createQuestion(dataWithProduct);
-      }      fetchQuestions({        productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
+      }
+      fetchQuestions({
+        productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
       });
       setIsQuestionModalOpen(false);
       setSelectedQuestion(null);
@@ -186,7 +195,9 @@ const SellProducts = () => {
   const handleDeleteQuestion = async (questionId: any) => {
     if (window.confirm('Are you sure you want to delete this question?')) {
       try {
-        await deleteQuestion(questionId);        fetchQuestions({          productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
+        await deleteQuestion(questionId);
+        fetchQuestions({
+          productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
         });
       } catch (error) {
         console.error('Error deleting question:', error);
@@ -200,9 +211,14 @@ const SellProducts = () => {
   };
 
   const filteredProducts = displayProducts.filter(product => {
-    const matchesSearch =      (product.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||      (product.description?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      (product.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (product.description?.toLowerCase() || '').includes(searchTerm.toLowerCase());
     const matchesCategory =
-      !selectedCategory ||      product.categoryId?._id === selectedCategory ||      product.categoryId === selectedCategory;    const matchesStatus = !selectedStatus || product.status === selectedStatus;
+      !selectedCategory ||
+      product.categoryId?._id === selectedCategory ||
+      product.categoryId === selectedCategory;
+    const matchesStatus = !selectedStatus || product.status === selectedStatus;
 
     return matchesSearch && matchesCategory && matchesStatus;
   });
@@ -211,7 +227,9 @@ const SellProducts = () => {
     let aValue = a[sortBy];
     let bValue = b[sortBy];
 
-    if (sortBy === 'price') {      aValue = parseFloat(aValue) || 0;      bValue = parseFloat(bValue) || 0;
+    if (sortBy === 'price') {
+      aValue = parseFloat(aValue) || 0;
+      bValue = parseFloat(bValue) || 0;
     }
 
     if (sortOrder === 'asc') {
@@ -226,83 +244,86 @@ const SellProducts = () => {
       active: 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white',
       inactive: 'bg-gradient-to-r from-red-500 to-rose-600 text-white',
       draft: 'bg-gradient-to-r from-gray-500 to-slate-600 text-white',
-    };    return styles[status] || styles.draft;
+    };
+    return styles[status] || styles.draft;
   };
 
-  const renderProductCard = (product: any) => <div
-    key={product._id || product.id}
-    className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-2xl hover:border-amber-300 transition-all duration-300 hover:-translate-y-1"
-  >
-    <div className="relative h-56 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden">
-      {product.images && product.images.length > 0 ? (
-        <img
-          src={product.images[0]}
-          alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-        />
-      ) : (
-        <Package
-          className="text-gray-400 group-hover:text-amber-500 transition-colors duration-300"
-          size={64}
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div
-        className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold shadow-lg ${getStatusBadge(product.status)}`}
-      >
-        {product.status}
-      </div>
-    </div>
-
-    <div className="p-5">
-      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-amber-600 transition-colors">
-        {product.name}
-      </h3>
-      <p className="text-sm text-gray-500 mb-3 flex items-center gap-2">
-        <ShoppingBag size={14} />
-        {product.categoryId?.name || product.categoryId?.displayName || 'Uncategorized'}
-      </p>
-      <div className="flex items-baseline gap-2 mb-4">
-        <span className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-          $
-          {product.variants && product.variants.length > 0
-            ? product.variants[0].basePrice
-            : 'N/A'}
-        </span>
-        {product.variants && product.variants.length > 1 && (
-          <span className="text-xs text-gray-500">+{product.variants.length - 1} variants</span>
+  const renderProductCard = (product: any) => (
+    <div
+      key={product._id || product.id}
+      className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-2xl hover:border-amber-300 transition-all duration-300 hover:-translate-y-1"
+    >
+      <div className="relative h-56 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden">
+        {product.images && product.images.length > 0 ? (
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+        ) : (
+          <Package
+            className="text-gray-400 group-hover:text-amber-500 transition-colors duration-300"
+            size={64}
+          />
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div
+          className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold shadow-lg ${getStatusBadge(product.status)}`}
+        >
+          {product.status}
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <button
-          onClick={() => handleEditProduct(product)}
-          className="flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg hover:from-amber-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg"
-        >
-          <Edit size={14} />
-          Edit
-        </button>
-        <button
-          onClick={() => handleManageQuestions(product)}
-          className="flex items-center justify-center gap-2 px-3 py-2 bg-white border-2 border-amber-200 text-amber-700 rounded-lg hover:bg-amber-50 hover:border-amber-400 transition-all duration-200 text-sm font-medium"
-        >
-          <HelpCircle size={14} />
-          Questions
-        </button>
-        <button className="flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm font-medium">
-          <Eye size={14} />
-          View
-        </button>
-        <button
-          onClick={() => handleDeleteProduct(product._id || product.id)}
-          className="flex items-center justify-center gap-2 px-3 py-2 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-400 transition-all duration-200 text-sm font-medium"
-        >
-          <Trash2 size={14} />
-          Delete
-        </button>
+      <div className="p-5">
+        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-amber-600 transition-colors">
+          {product.name}
+        </h3>
+        <p className="text-sm text-gray-500 mb-3 flex items-center gap-2">
+          <ShoppingBag size={14} />
+          {product.categoryId?.name || product.categoryId?.displayName || 'Uncategorized'}
+        </p>
+        <div className="flex items-baseline gap-2 mb-4">
+          <span className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+            $
+            {product.variants && product.variants.length > 0
+              ? product.variants[0].basePrice
+              : 'N/A'}
+          </span>
+          {product.variants && product.variants.length > 1 && (
+            <span className="text-xs text-gray-500">+{product.variants.length - 1} variants</span>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => handleEditProduct(product)}
+            className="flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg hover:from-amber-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-md hover:shadow-lg"
+          >
+            <Edit size={14} />
+            Edit
+          </button>
+          <button
+            onClick={() => handleManageQuestions(product)}
+            className="flex items-center justify-center gap-2 px-3 py-2 bg-white border-2 border-amber-200 text-amber-700 rounded-lg hover:bg-amber-50 hover:border-amber-400 transition-all duration-200 text-sm font-medium"
+          >
+            <HelpCircle size={14} />
+            Questions
+          </button>
+          <button className="flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm font-medium">
+            <Eye size={14} />
+            View
+          </button>
+          <button
+            onClick={() => handleDeleteProduct(product._id || product.id)}
+            className="flex items-center justify-center gap-2 px-3 py-2 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 hover:border-red-400 transition-all duration-200 text-sm font-medium"
+          >
+            <Trash2 size={14} />
+            Delete
+          </button>
+        </div>
       </div>
     </div>
-  </div>;
+  );
 
   const renderProductTable = () => (
     <div className="overflow-x-auto">
@@ -319,39 +340,51 @@ const SellProducts = () => {
         </thead>
         <tbody className="divide-y divide-gray-100">
           {sortedProducts.map(product => (
-            <tr              key={product._id || product.id}
+            <tr
+              key={product._id || product.id}
               className="hover:bg-amber-50/50 transition-colors duration-150"
             >
               <td className="px-6 py-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">                    {product.images && product.images.length > 0 ? (
-                      <img                        src={product.images[0]}                        alt={product.name}
+                  <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                    {product.images && product.images.length > 0 ? (
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <Package size={20} className="text-gray-400" />
                     )}
                   </div>
-                  <div className="min-w-0">                    <div className="font-semibold text-gray-900 truncate">{product.name}</div>                    <div className="text-sm text-gray-500 truncate">{product.slug}</div>
+                  <div className="min-w-0">
+                    <div className="font-semibold text-gray-900 truncate">{product.name}</div>
+                    <div className="text-sm text-gray-500 truncate">{product.slug}</div>
                   </div>
                 </div>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-600">                {product.categoryId?.name || product.categoryId?.displayName || 'Uncategorized'}
+              <td className="px-6 py-4 text-sm text-gray-600">
+                {product.categoryId?.name || product.categoryId?.displayName || 'Uncategorized'}
               </td>
               <td className="px-6 py-4">
                 <span className="text-lg font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                  $                  {product.variants && product.variants.length > 0                    ? product.variants[0].basePrice
+                  $
+                  {product.variants && product.variants.length > 0
+                    ? product.variants[0].basePrice
                     : 'N/A'}
                 </span>
               </td>
               <td className="px-6 py-4">
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-                  <Sparkles size={12} />                  {product.variants?.length || 0}
+                  <Sparkles size={12} />
+                  {product.variants?.length || 0}
                 </span>
               </td>
               <td className="px-6 py-4">
-                <span                  className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(product.status)}`}
-                >                  {product.status}
+                <span
+                  className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(product.status)}`}
+                >
+                  {product.status}
                 </span>
               </td>
               <td className="px-6 py-4">
@@ -376,7 +409,8 @@ const SellProducts = () => {
                   >
                     <HelpCircle size={16} />
                   </button>
-                  <button                    onClick={() => handleDeleteProduct(product._id || product.id)}
+                  <button
+                    onClick={() => handleDeleteProduct(product._id || product.id)}
                     className="p-2 hover:bg-red-100 rounded-lg transition-colors duration-150 text-red-600 hover:text-red-700"
                     title="Delete"
                   >
@@ -393,7 +427,7 @@ const SellProducts = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50/30 to-orange-50/30 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="main-container space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -442,7 +476,8 @@ const SellProducts = () => {
                   </button>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                      <HelpCircle className="text-amber-600" size={24} />                      Questions for {selectedProductForQuestions.name}
+                      <HelpCircle className="text-amber-600" size={24} />
+                      Questions for {selectedProductForQuestions.name}
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
                       Manage product assessment questions
@@ -484,11 +519,13 @@ const SellProducts = () => {
             ) : (
               <div className="p-6 space-y-4">
                 {questions.map(question => (
-                  <div                    key={question._id || question.id}
+                  <div
+                    key={question._id || question.id}
                     className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-all duration-200"
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <h4 className="text-lg font-semibold text-gray-900 flex-1">                        {question.title}
+                      <h4 className="text-lg font-semibold text-gray-900 flex-1">
+                        {question.title}
                       </h4>
                       <div className="flex items-center gap-2 ml-4">
                         <button
@@ -497,7 +534,8 @@ const SellProducts = () => {
                         >
                           <Edit size={16} />
                         </button>
-                        <button                          onClick={() => handleDeleteQuestion(question._id || question.id)}
+                        <button
+                          onClick={() => handleDeleteQuestion(question._id || question.id)}
                           className="p-2 hover:bg-red-100 rounded-lg transition-colors duration-150 text-red-600"
                         >
                           <Trash2 size={16} />
@@ -507,18 +545,24 @@ const SellProducts = () => {
 
                     <div className="flex flex-wrap gap-2 mb-3">
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-                        <FileText size={12} />                        {question.uiType}
+                        <FileText size={12} />
+                        {question.uiType}
                       </span>
-                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">                        {question.section}
+                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                        {question.section}
                       </span>
-                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">                        {question.key}
-                      </span>                      {question.required && (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                        {question.key}
+                      </span>
+                      {question.required && (
                         <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
                           Required
                         </span>
                       )}
-                    </div>                    {question.description && (
-                      <p className="text-sm text-gray-600 leading-relaxed">                        {question.description}
+                    </div>
+                    {question.description && (
+                      <p className="text-sm text-gray-600 leading-relaxed">
+                        {question.description}
                       </p>
                     )}
                   </div>
@@ -578,7 +622,9 @@ const SellProducts = () => {
                   className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 font-medium text-gray-700 min-w-[180px]"
                 >
                   <option value="">All Categories</option>
-                  {categories.map(category => (                    <option key={category.id} value={category.id}>                      {category.name}
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
                     </option>
                   ))}
                 </select>
@@ -599,7 +645,9 @@ const SellProducts = () => {
                 <select
                   value={`${sortBy}-${sortOrder}`}
                   onChange={e => {
-                    const [field, order] = e.target.value.split('-');                    setSortBy(field);                    setSortOrder(order);
+                    const [field, order] = e.target.value.split('-');
+                    setSortBy(field);
+                    setSortOrder(order);
                   }}
                   className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 font-medium text-gray-700 min-w-[160px]"
                 >
@@ -647,7 +695,8 @@ const SellProducts = () => {
                       `Filtered from ${displayProducts.length} total products`}
                   </p>
                 </div>
-                <button                  onClick={fetchProducts}
+                <button
+                  onClick={fetchProducts}
                   className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
                 >
                   <RefreshCw size={16} />
@@ -708,7 +757,8 @@ const SellProducts = () => {
         onClose={handleCloseQuestionModal}
         question={selectedQuestion}
         onSave={handleSaveQuestion}
-        products={displayProducts}        selectedProductId={selectedProductForQuestions?._id || selectedProductForQuestions?.id}
+        products={displayProducts}
+        selectedProductId={selectedProductForQuestions?._id || selectedProductForQuestions?.id}
         loading={questionsLoading}
       />
     </div>

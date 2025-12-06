@@ -695,10 +695,10 @@ const ProductModal = ({ isOpen, onClose, product, onSave }: any) => {
           </ModalBody>
 
           <ModalFooter>
-            <Button type="button" className="secondary" onClick={onClose}>
+            <Button type="button" className="bg-green-500" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" className="primary" disabled={loading}>
+            <Button type="submit" className="bg-green-500" disabled={loading}>
               <Save size={16} />
               {loading ? 'Saving...' : 'Save Product'}
             </Button>
