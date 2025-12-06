@@ -1,14 +1,14 @@
-const User = require('../models/user.model');
-const Partner = require('../models/partner.model');
-const Product = require('../models/product.model');
-const { Order } = require('../models/order.model');
-const Transaction = require('../models/transaction.model');
-const Inventory = require('../models/inventory.model');
-const Wallet = require('../models/wallet.model');
-const ConditionQuestionnaire = require('../models/conditionQuestionnaire.model');
-const { generateToken } = require('../utils/jwt.utils');
-const { validationResult } = require('express-validator');
-const mongoose = require('mongoose');
+const User = require("../models/user.model");
+const Partner = require("../models/partner.model");
+const Product = require("../models/product.model");
+const { Order } = require("../models/order.model");
+const Transaction = require("../models/transaction.model");
+const Inventory = require("../models/inventory.model");
+const Wallet = require("../models/wallet.model");
+const ConditionQuestionnaire = require("../models/conditionQuestionnaire.model");
+const { generateToken } = require("../utils/jwt.utils");
+const { validationResult } = require("express-validator");
+const mongoose = require("mongoose");
 
 // @desc    Admin login
 // @route   POST /api/admin/login
@@ -24,7 +24,9 @@ const loginAdmin = async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email
-    const user = await User.findOne({ email, role: 'admin' }).select('+password');
+    const user = await User.findOne({ email, role: "admin" }).select(
+      "+password"
+    );
 
     // Check if user exists and password matches
     if (user && (await user.matchPassword(password))) {
@@ -36,11 +38,11 @@ const loginAdmin = async (req, res) => {
         token: generateToken(user._id, user.role),
       });
     } else {
-      res.status(401).json({ message: 'Invalid admin credentials' });
+      res.status(401).json({ message: "Invalid admin credentials" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -51,7 +53,7 @@ const getAdminProfile = async (req, res) => {
   try {
     const admin = await User.findById(req.user._id);
 
-    if (admin && admin.role === 'admin') {
+    if (admin && admin.role === "admin") {
       res.json({
         _id: admin._id,
         name: admin.name,
@@ -59,11 +61,11 @@ const getAdminProfile = async (req, res) => {
         role: admin.role,
       });
     } else {
-      res.status(404).json({ message: 'Admin not found' });
+      res.status(404).json({ message: "Admin not found" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -83,7 +85,7 @@ const createAdmin = async (req, res) => {
     // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     // Create new admin user
@@ -92,7 +94,7 @@ const createAdmin = async (req, res) => {
       email,
       password,
       phone,
-      role: 'admin',
+      role: "admin",
     });
 
     if (admin) {
@@ -103,11 +105,11 @@ const createAdmin = async (req, res) => {
         role: admin.role,
       });
     } else {
-      res.status(400).json({ message: 'Invalid admin data' });
+      res.status(400).json({ message: "Invalid admin data" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -117,35 +119,35 @@ const createAdmin = async (req, res) => {
 const getAllPartners = async (req, res) => {
   try {
     const { status, page = 1, limit = 10, search } = req.query;
-    
+
     const filter = {};
     if (status) filter.verificationStatus = status;
-    
+
     if (search) {
       filter.$or = [
-        { shopName: { $regex: search, $options: 'i' } },
-        { shopEmail: { $regex: search, $options: 'i' } },
-        { gstNumber: { $regex: search, $options: 'i' } }
+        { shopName: { $regex: search, $options: "i" } },
+        { shopEmail: { $regex: search, $options: "i" } },
+        { gstNumber: { $regex: search, $options: "i" } },
       ];
     }
-    
+
     const partners = await Partner.find(filter)
-      .populate('user', 'name email phone')
+      .populate("user", "name email phone")
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
-    
+
     const total = await Partner.countDocuments(filter);
-    
+
     res.json({
       partners,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total
+      total,
     });
   } catch (error) {
-    console.error('Error fetching partners:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching partners:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -155,32 +157,32 @@ const getAllPartners = async (req, res) => {
 const getPartnerById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const partner = await Partner.findById(id)
-      .populate('user', 'name email phone createdAt')
-      .populate('wallet.transactions');
-    
+      .populate("user", "name email phone createdAt")
+      .populate("wallet.transactions");
+
     if (!partner) {
-      return res.status(404).json({ message: 'Partner not found' });
+      return res.status(404).json({ message: "Partner not found" });
     }
-    
+
     // Get additional stats
     const inventoryCount = await Inventory.countDocuments({ partner: id });
-    const orderCount = await Order.countDocuments({ 'items.partner': id });
-    
+    const orderCount = await Order.countDocuments({ "items.partner": id });
+
     res.json({
       success: true,
       data: {
         ...partner.toObject(),
         stats: {
           inventoryCount,
-          orderCount
-        }
-      }
+          orderCount,
+        },
+      },
     });
   } catch (error) {
-    console.error('Error fetching partner:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching partner:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -199,27 +201,29 @@ const createPartner = async (req, res) => {
       shopLogo,
       shopImages,
       bankDetails,
-      upiId
+      upiId,
     } = req.body;
-    
+
     // Check if user exists
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
-    
+
     // Check if user already has a partner profile
     const existingPartner = await Partner.findOne({ user: userId });
     if (existingPartner) {
-      return res.status(400).json({ message: 'User already has a partner profile' });
+      return res
+        .status(400)
+        .json({ message: "User already has a partner profile" });
     }
-    
+
     // Check if GST number is unique
     const existingGST = await Partner.findOne({ gstNumber });
     if (existingGST) {
-      return res.status(400).json({ message: 'GST number already exists' });
+      return res.status(400).json({ message: "GST number already exists" });
     }
-    
+
     // Create partner
     const partner = await Partner.create({
       user: userId,
@@ -232,27 +236,29 @@ const createPartner = async (req, res) => {
       shopImages,
       bankDetails,
       upiId,
-      verificationStatus: 'pending',
-      isVerified: false
+      verificationStatus: "pending",
+      isVerified: false,
     });
-    
+
     // Update user role to partner
-    await User.findByIdAndUpdate(userId, { role: 'partner' });
-    
-    const populatedPartner = await Partner.findById(partner._id)
-      .populate('user', 'name email phone');
-    
+    await User.findByIdAndUpdate(userId, { role: "partner" });
+
+    const populatedPartner = await Partner.findById(partner._id).populate(
+      "user",
+      "name email phone"
+    );
+
     res.status(201).json({
       success: true,
-      message: 'Partner created successfully',
-      data: populatedPartner
+      message: "Partner created successfully",
+      data: populatedPartner,
     });
   } catch (error) {
-    console.error('Error creating partner:', error);
+    console.error("Error creating partner:", error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: 'GST number already exists' });
+      return res.status(400).json({ message: "GST number already exists" });
     }
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -263,45 +269,44 @@ const updatePartner = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-    
+
     // Remove fields that shouldn't be updated directly
     delete updateData.user;
     delete updateData._id;
     delete updateData.createdAt;
     delete updateData.updatedAt;
-    
+
     // If GST number is being updated, check uniqueness
     if (updateData.gstNumber) {
-      const existingGST = await Partner.findOne({ 
+      const existingGST = await Partner.findOne({
         gstNumber: updateData.gstNumber,
-        _id: { $ne: id }
+        _id: { $ne: id },
       });
       if (existingGST) {
-        return res.status(400).json({ message: 'GST number already exists' });
+        return res.status(400).json({ message: "GST number already exists" });
       }
     }
-    
-    const partner = await Partner.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    ).populate('user', 'name email phone');
-    
+
+    const partner = await Partner.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    }).populate("user", "name email phone");
+
     if (!partner) {
-      return res.status(404).json({ message: 'Partner not found' });
+      return res.status(404).json({ message: "Partner not found" });
     }
-    
+
     res.json({
       success: true,
-      message: 'Partner updated successfully',
-      data: partner
+      message: "Partner updated successfully",
+      data: partner,
     });
   } catch (error) {
-    console.error('Error updating partner:', error);
+    console.error("Error updating partner:", error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: 'GST number already exists' });
+      return res.status(400).json({ message: "GST number already exists" });
     }
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -311,56 +316,58 @@ const updatePartner = async (req, res) => {
 const deletePartner = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const partner = await Partner.findById(id);
     if (!partner) {
-      return res.status(404).json({ message: 'Partner not found' });
+      return res.status(404).json({ message: "Partner not found" });
     }
-    
+
     // Check for active inventory
-    const activeInventory = await Inventory.countDocuments({ 
+    const activeInventory = await Inventory.countDocuments({
       partner: id,
       isAvailable: true,
-      quantity: { $gt: 0 }
+      quantity: { $gt: 0 },
     });
-    
+
     if (activeInventory > 0) {
-      return res.status(400).json({ 
-        message: 'Cannot delete partner with active inventory. Please remove all inventory first.' 
+      return res.status(400).json({
+        message:
+          "Cannot delete partner with active inventory. Please remove all inventory first.",
       });
     }
-    
+
     // Check for pending orders
-    const pendingOrders = await Order.countDocuments({ 
-      'items.partner': id,
-      'items.status': { $in: ['pending', 'processing', 'shipped'] }
+    const pendingOrders = await Order.countDocuments({
+      "items.partner": id,
+      "items.status": { $in: ["pending", "processing", "shipped"] },
     });
-    
+
     if (pendingOrders > 0) {
-      return res.status(400).json({ 
-        message: 'Cannot delete partner with pending orders. Please complete all orders first.' 
+      return res.status(400).json({
+        message:
+          "Cannot delete partner with pending orders. Please complete all orders first.",
       });
     }
-    
+
     // Delete related data
     await Promise.all([
       Inventory.deleteMany({ partner: id }),
-      Wallet.deleteOne({ partner: id })
+      Wallet.deleteOne({ partner: id }),
     ]);
-    
+
     // Update user role back to 'user'
-    await User.findByIdAndUpdate(partner.user, { role: 'user' });
-    
+    await User.findByIdAndUpdate(partner.user, { role: "user" });
+
     // Delete partner
     await Partner.findByIdAndDelete(id);
-    
+
     res.json({
       success: true,
-      message: 'Partner deleted successfully'
+      message: "Partner deleted successfully",
     });
   } catch (error) {
-    console.error('Error deleting partner:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error deleting partner:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -371,38 +378,38 @@ const verifyPartner = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, notes } = req.body;
-    
-    if (!['approved', 'rejected'].includes(status)) {
-      return res.status(400).json({ message: 'Invalid status' });
+
+    if (!["approved", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
     }
-    
+
     const partner = await Partner.findByIdAndUpdate(
       id,
       {
         verificationStatus: status,
-        isVerified: status === 'approved',
+        isVerified: status === "approved",
         verificationNotes: notes,
-        verifiedAt: status === 'approved' ? new Date() : undefined
+        verifiedAt: status === "approved" ? new Date() : undefined,
       },
       { new: true }
-    ).populate('user', 'name email');
-    
+    ).populate("user", "name email");
+
     if (!partner) {
-      return res.status(404).json({ message: 'Partner not found' });
+      return res.status(404).json({ message: "Partner not found" });
     }
-    
+
     // Create wallet for approved partner
-    if (status === 'approved') {
+    if (status === "approved") {
       const existingWallet = await Wallet.findOne({ partner: partner._id });
       if (!existingWallet) {
         await Wallet.create({ partner: partner._id });
       }
     }
-    
+
     res.json({ message: `Partner ${status} successfully`, partner });
   } catch (error) {
-    console.error('Error verifying partner:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error verifying partner:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -411,48 +418,48 @@ const verifyPartner = async (req, res) => {
 // @access  Private/Admin
 const getAllOrders = async (req, res) => {
   try {
-    const { 
-      type, 
-      status, 
-      page = 1, 
-      limit = 10, 
-      startDate, 
+    const {
+      type,
+      status,
+      page = 1,
+      limit = 10,
+      startDate,
       endDate,
       partnerId,
-      userId 
+      userId,
     } = req.query;
-    
+
     const filter = {};
     if (type) filter.orderType = type;
     if (status) filter.status = status;
     if (partnerId) filter.partner = partnerId;
     if (userId) filter.user = userId;
-    
+
     if (startDate || endDate) {
       filter.createdAt = {};
       if (startDate) filter.createdAt.$gte = new Date(startDate);
       if (endDate) filter.createdAt.$lte = new Date(endDate);
     }
-    
+
     const orders = await Order.find(filter)
-      .populate('user', 'name email phone')
-      .populate('partner', 'shopName shopEmail')
-      .populate('items.product', 'category brand model')
+      .populate("user", "name email phone")
+      .populate("partner", "shopName shopEmail")
+      .populate("items.product", "category brand model")
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
-    
+
     const total = await Order.countDocuments(filter);
-    
+
     res.json({
       orders,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total
+      total,
     });
   } catch (error) {
-    console.error('Error fetching orders:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -462,13 +469,13 @@ const getAllOrders = async (req, res) => {
 const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
-      .populate('user', 'name email phone')
-      .populate('partner', 'shopName shopEmail shopPhone shopAddress')
-      .populate('items.product', 'category brand model images specifications')
-      .populate('items.inventory', 'condition price');
+      .populate("user", "name email phone")
+      .populate("partner", "shopName shopEmail shopPhone shopAddress")
+      .populate("items.product", "category brand model images specifications")
+      .populate("items.inventory", "condition price");
 
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ message: "Order not found" });
     }
 
     // Enhanced order response with complete tracking details
@@ -476,20 +483,20 @@ const getOrderById = async (req, res) => {
       _id: order._id,
       assessmentId: order.assessmentId,
       orderType: order.orderType,
-      
+
       // User details
       user: order.user,
-      
+
       // Partner details
       partner: order.partner,
-      
+
       // Items with complete details
       items: order.items,
-      
+
       // Financial details
       totalAmount: order.totalAmount,
       commission: order.commission,
-      
+
       // Payment tracking
       paymentDetails: {
         method: order.paymentDetails?.method,
@@ -497,7 +504,7 @@ const getOrderById = async (req, res) => {
         status: order.paymentDetails?.status,
         paidAt: order.paymentDetails?.paidAt,
       },
-      
+
       // Shipping and delivery tracking
       shippingDetails: {
         address: order.shippingDetails?.address,
@@ -507,50 +514,50 @@ const getOrderById = async (req, res) => {
         estimatedDelivery: order.shippingDetails?.estimatedDelivery,
         deliveredAt: order.shippingDetails?.deliveredAt,
       },
-      
+
       // Current status
       status: order.status,
-      
+
       // Complete status history for tracking
       statusHistory: order.statusHistory || [],
-      
+
       // Additional notes
       notes: order.notes,
-      
+
       // Timestamps
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-      
+
       // Order timeline for better tracking visualization
       timeline: generateOrderTimeline(order),
-      
+
       // Order progress percentage
       progressPercentage: calculateOrderProgress(order.status),
     };
 
     res.json(orderResponse);
   } catch (error) {
-    console.error('Get order by ID error:', error);
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    console.error("Get order by ID error:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
 // Helper function to generate order timeline
 const generateOrderTimeline = (order) => {
   const timeline = [];
-  
+
   // Add creation event
   timeline.push({
-    status: 'created',
+    status: "created",
     timestamp: order.createdAt,
-    title: 'Order Created',
+    title: "Order Created",
     description: `Order ${order.assessmentId || order._id} was created`,
     completed: true,
   });
-  
+
   // Add status history events
   if (order.statusHistory && order.statusHistory.length > 0) {
-    order.statusHistory.forEach(history => {
+    order.statusHistory.forEach((history) => {
       timeline.push({
         status: history.status,
         timestamp: history.timestamp,
@@ -560,10 +567,10 @@ const generateOrderTimeline = (order) => {
       });
     });
   }
-  
+
   // Add future steps based on current status
   const futureSteps = getFutureSteps(order.status);
-  futureSteps.forEach(step => {
+  futureSteps.forEach((step) => {
     timeline.push({
       status: step.status,
       timestamp: null,
@@ -572,11 +579,12 @@ const generateOrderTimeline = (order) => {
       completed: false,
     });
   });
-  
+
   return timeline.sort((a, b) => {
     if (a.completed && !b.completed) return -1;
     if (!a.completed && b.completed) return 1;
-    if (a.timestamp && b.timestamp) return new Date(a.timestamp) - new Date(b.timestamp);
+    if (a.timestamp && b.timestamp)
+      return new Date(a.timestamp) - new Date(b.timestamp);
     return 0;
   });
 };
@@ -584,31 +592,33 @@ const generateOrderTimeline = (order) => {
 // Helper function to get status title
 const getStatusTitle = (status) => {
   const statusTitles = {
-    pending: 'Order Pending',
-    confirmed: 'Order Confirmed',
-    processing: 'Processing Order',
-    verified: 'Order Verified',
-    shipped: 'Order Shipped',
-    delivered: 'Order Delivered',
-    completed: 'Order Completed',
-    cancelled: 'Order Cancelled',
-    refunded: 'Order Refunded',
+    pending: "Order Pending",
+    confirmed: "Order Confirmed",
+    processing: "Processing Order",
+    verified: "Order Verified",
+    shipped: "Order Shipped",
+    delivered: "Order Delivered",
+    completed: "Order Completed",
+    cancelled: "Order Cancelled",
+    refunded: "Order Refunded",
   };
-  return statusTitles[status] || status.charAt(0).toUpperCase() + status.slice(1);
+  return (
+    statusTitles[status] || status.charAt(0).toUpperCase() + status.slice(1)
+  );
 };
 
 // Helper function to get status description
 const getStatusDescription = (status) => {
   const statusDescriptions = {
-    pending: 'Order is awaiting confirmation',
-    confirmed: 'Order has been confirmed and is being prepared',
-    processing: 'Order is being processed by our team',
-    verified: 'Order details have been verified',
-    shipped: 'Order has been shipped and is on its way',
-    delivered: 'Order has been successfully delivered',
-    completed: 'Order has been completed successfully',
-    cancelled: 'Order has been cancelled',
-    refunded: 'Order amount has been refunded',
+    pending: "Order is awaiting confirmation",
+    confirmed: "Order has been confirmed and is being prepared",
+    processing: "Order is being processed by our team",
+    verified: "Order details have been verified",
+    shipped: "Order has been shipped and is on its way",
+    delivered: "Order has been successfully delivered",
+    completed: "Order has been completed successfully",
+    cancelled: "Order has been cancelled",
+    refunded: "Order amount has been refunded",
   };
   return statusDescriptions[status] || `Order status updated to ${status}`;
 };
@@ -617,38 +627,114 @@ const getStatusDescription = (status) => {
 const getFutureSteps = (currentStatus) => {
   const statusFlow = {
     pending: [
-      { status: 'confirmed', title: 'Confirm Order', description: 'Order will be confirmed' },
-      { status: 'processing', title: 'Process Order', description: 'Order will be processed' },
-      { status: 'shipped', title: 'Ship Order', description: 'Order will be shipped' },
-      { status: 'delivered', title: 'Deliver Order', description: 'Order will be delivered' },
-      { status: 'completed', title: 'Complete Order', description: 'Order will be completed' },
+      {
+        status: "confirmed",
+        title: "Confirm Order",
+        description: "Order will be confirmed",
+      },
+      {
+        status: "processing",
+        title: "Process Order",
+        description: "Order will be processed",
+      },
+      {
+        status: "shipped",
+        title: "Ship Order",
+        description: "Order will be shipped",
+      },
+      {
+        status: "delivered",
+        title: "Deliver Order",
+        description: "Order will be delivered",
+      },
+      {
+        status: "completed",
+        title: "Complete Order",
+        description: "Order will be completed",
+      },
     ],
     confirmed: [
-      { status: 'processing', title: 'Process Order', description: 'Order will be processed' },
-      { status: 'shipped', title: 'Ship Order', description: 'Order will be shipped' },
-      { status: 'delivered', title: 'Deliver Order', description: 'Order will be delivered' },
-      { status: 'completed', title: 'Complete Order', description: 'Order will be completed' },
+      {
+        status: "processing",
+        title: "Process Order",
+        description: "Order will be processed",
+      },
+      {
+        status: "shipped",
+        title: "Ship Order",
+        description: "Order will be shipped",
+      },
+      {
+        status: "delivered",
+        title: "Deliver Order",
+        description: "Order will be delivered",
+      },
+      {
+        status: "completed",
+        title: "Complete Order",
+        description: "Order will be completed",
+      },
     ],
     processing: [
-      { status: 'verified', title: 'Verify Order', description: 'Order will be verified' },
-      { status: 'shipped', title: 'Ship Order', description: 'Order will be shipped' },
-      { status: 'delivered', title: 'Deliver Order', description: 'Order will be delivered' },
-      { status: 'completed', title: 'Complete Order', description: 'Order will be completed' },
+      {
+        status: "verified",
+        title: "Verify Order",
+        description: "Order will be verified",
+      },
+      {
+        status: "shipped",
+        title: "Ship Order",
+        description: "Order will be shipped",
+      },
+      {
+        status: "delivered",
+        title: "Deliver Order",
+        description: "Order will be delivered",
+      },
+      {
+        status: "completed",
+        title: "Complete Order",
+        description: "Order will be completed",
+      },
     ],
     verified: [
-      { status: 'shipped', title: 'Ship Order', description: 'Order will be shipped' },
-      { status: 'delivered', title: 'Deliver Order', description: 'Order will be delivered' },
-      { status: 'completed', title: 'Complete Order', description: 'Order will be completed' },
+      {
+        status: "shipped",
+        title: "Ship Order",
+        description: "Order will be shipped",
+      },
+      {
+        status: "delivered",
+        title: "Deliver Order",
+        description: "Order will be delivered",
+      },
+      {
+        status: "completed",
+        title: "Complete Order",
+        description: "Order will be completed",
+      },
     ],
     shipped: [
-      { status: 'delivered', title: 'Deliver Order', description: 'Order will be delivered' },
-      { status: 'completed', title: 'Complete Order', description: 'Order will be completed' },
+      {
+        status: "delivered",
+        title: "Deliver Order",
+        description: "Order will be delivered",
+      },
+      {
+        status: "completed",
+        title: "Complete Order",
+        description: "Order will be completed",
+      },
     ],
     delivered: [
-      { status: 'completed', title: 'Complete Order', description: 'Order will be completed' },
+      {
+        status: "completed",
+        title: "Complete Order",
+        description: "Order will be completed",
+      },
     ],
   };
-  
+
   return statusFlow[currentStatus] || [];
 };
 
@@ -665,7 +751,7 @@ const calculateOrderProgress = (status) => {
     cancelled: 0,
     refunded: 0,
   };
-  
+
   return progressMap[status] || 0;
 };
 
@@ -674,151 +760,155 @@ const calculateOrderProgress = (status) => {
 // @access  Private/Admin
 const getDashboardAnalytics = async (req, res) => {
   try {
-    const { period = '30d' } = req.query;
-    
+    const { period = "30d" } = req.query;
+
     // Calculate date range
     const endDate = new Date();
     const startDate = new Date();
-    
+
     switch (period) {
-      case '7d':
+      case "7d":
         startDate.setDate(endDate.getDate() - 7);
         break;
-      case '30d':
+      case "30d":
         startDate.setDate(endDate.getDate() - 30);
         break;
-      case '90d':
+      case "90d":
         startDate.setDate(endDate.getDate() - 90);
         break;
-      case '1y':
+      case "1y":
         startDate.setFullYear(endDate.getFullYear() - 1);
         break;
       default:
         startDate.setDate(endDate.getDate() - 30);
     }
-    
+
     // Get basic counts
-    const [totalUsers, totalPartners, totalOrders, totalProducts] = await Promise.all([
-      User.countDocuments({ role: { $ne: 'admin' } }),
-      Partner.countDocuments(),
-      Order.countDocuments(),
-      Product.countDocuments()
-    ]);
-    
+    const [totalUsers, totalPartners, totalOrders, totalProducts] =
+      await Promise.all([
+        User.countDocuments({ role: { $ne: "admin" } }),
+        Partner.countDocuments(),
+        Order.countDocuments(),
+        Product.countDocuments(),
+      ]);
+
     // Get period-specific data
     const periodFilter = { createdAt: { $gte: startDate, $lte: endDate } };
-    
+
     const [newUsers, newPartners, newOrders] = await Promise.all([
-      User.countDocuments({ ...periodFilter, role: { $ne: 'admin' } }),
+      User.countDocuments({ ...periodFilter, role: { $ne: "admin" } }),
       Partner.countDocuments(periodFilter),
-      Order.countDocuments(periodFilter)
+      Order.countDocuments(periodFilter),
     ]);
-    
+
     // Revenue analytics
     const revenueData = await Order.aggregate([
       {
         $match: {
           ...periodFilter,
-          status: 'completed'
-        }
+          status: "completed",
+        },
       },
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: '$totalAmount' },
-          totalCommission: { $sum: '$commission.amount' },
-          averageOrderValue: { $avg: '$totalAmount' }
-        }
-      }
+          totalRevenue: { $sum: "$totalAmount" },
+          totalCommission: { $sum: "$commission.amount" },
+          averageOrderValue: { $avg: "$totalAmount" },
+        },
+      },
     ]);
-    
+
     // Order status distribution
     const orderStatusData = await Order.aggregate([
       { $match: periodFilter },
       {
         $group: {
-          _id: '$status',
-          count: { $sum: 1 }
-        }
-      }
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
     ]);
-    
+
     // Top performing partners
     const topPartners = await Order.aggregate([
       {
         $match: {
           ...periodFilter,
-          status: 'completed'
-        }
+          status: "completed",
+        },
       },
       {
         $group: {
-          _id: '$partner',
+          _id: "$partner",
           totalOrders: { $sum: 1 },
-          totalRevenue: { $sum: '$totalAmount' },
-          totalCommission: { $sum: '$commission.amount' }
-        }
+          totalRevenue: { $sum: "$totalAmount" },
+          totalCommission: { $sum: "$commission.amount" },
+        },
       },
       {
         $lookup: {
-          from: 'partners',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'partner'
-        }
+          from: "partners",
+          localField: "_id",
+          foreignField: "_id",
+          as: "partner",
+        },
       },
-      { $unwind: '$partner' },
+      { $unwind: "$partner" },
       { $sort: { totalRevenue: -1 } },
-      { $limit: 5 }
+      { $limit: 5 },
     ]);
-    
+
     // Daily order trends
     const dailyTrends = await Order.aggregate([
       { $match: periodFilter },
       {
         $group: {
           _id: {
-            year: { $year: '$createdAt' },
-            month: { $month: '$createdAt' },
-            day: { $dayOfMonth: '$createdAt' }
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" },
           },
           orders: { $sum: 1 },
-          revenue: { $sum: '$totalAmount' }
-        }
+          revenue: { $sum: "$totalAmount" },
+        },
       },
-      { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } }
+      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
     ]);
-    
+
     // Condition Questionnaire analytics
     const [totalQuestionnaires, completedQuestionnaires] = await Promise.all([
       ConditionQuestionnaire.countDocuments(),
-      ConditionQuestionnaire.countDocuments({ status: 'active' })
+      ConditionQuestionnaire.countDocuments({ status: "active" }),
     ]);
-    
+
     // Device category analytics
     const deviceAnalytics = await Product.aggregate([
       {
         $group: {
-          _id: '$category',
-          count: { $sum: 1 }
-        }
+          _id: "$category",
+          count: { $sum: 1 },
+        },
       },
-      { $sort: { count: -1 } }
+      { $sort: { count: -1 } },
     ]);
-    
+
     // Activity analytics (users active today)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const activeToday = await User.countDocuments({
       lastActive: { $gte: today },
-      role: { $ne: 'admin' }
+      role: { $ne: "admin" },
     });
-    
+
     // Performance metrics
     const totalVisits = await Order.countDocuments();
-    const completedOrders = await Order.countDocuments({ status: 'completed' });
-    const conversionRate = totalVisits > 0 ? ((completedOrders / totalVisits) * 100).toFixed(1) : '0.0';
-    
+    const completedOrders = await Order.countDocuments({ status: "completed" });
+    const conversionRate =
+      totalVisits > 0
+        ? ((completedOrders / totalVisits) * 100).toFixed(1)
+        : "0.0";
+
     res.json({
       overview: {
         totalUsers,
@@ -827,41 +917,44 @@ const getDashboardAnalytics = async (req, res) => {
         totalProducts,
         newUsers,
         newPartners,
-        newOrders
+        newOrders,
       },
       revenue: revenueData[0] || {
         totalRevenue: 0,
         totalCommission: 0,
-        averageOrderValue: 0
+        averageOrderValue: 0,
       },
       questionnaires: {
         total: totalQuestionnaires,
         completed: completedQuestionnaires,
-        completionRate: totalQuestionnaires > 0 ? ((completedQuestionnaires / totalQuestionnaires) * 100).toFixed(1) : '0.0'
+        completionRate:
+          totalQuestionnaires > 0
+            ? ((completedQuestionnaires / totalQuestionnaires) * 100).toFixed(1)
+            : "0.0",
       },
       devices: {
-        mobile: deviceAnalytics.find(d => d._id === 'mobile')?.count || 0,
-        laptop: deviceAnalytics.find(d => d._id === 'laptop')?.count || 0,
-        tablet: deviceAnalytics.find(d => d._id === 'tablet')?.count || 0,
-        analytics: deviceAnalytics
+        mobile: deviceAnalytics.find((d) => d._id === "mobile")?.count || 0,
+        laptop: deviceAnalytics.find((d) => d._id === "laptop")?.count || 0,
+        tablet: deviceAnalytics.find((d) => d._id === "tablet")?.count || 0,
+        analytics: deviceAnalytics,
       },
       activity: {
         activeToday,
-        totalVisits
+        totalVisits,
       },
       performance: {
         conversionRate,
         completedOrders,
-        totalVisits
+        totalVisits,
       },
       orderStatusDistribution: orderStatusData,
       topPartners,
       dailyTrends,
-      period
+      period,
     });
   } catch (error) {
-    console.error('Error fetching analytics:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching analytics:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -870,45 +963,45 @@ const getDashboardAnalytics = async (req, res) => {
 // @access  Private/Admin
 const getCatalog = async (req, res) => {
   try {
-    const { 
-      category, 
-      brand, 
+    const {
+      category,
+      brand,
       model,
-      page = 1, 
-      limit = 10, 
-      search, 
+      page = 1,
+      limit = 10,
+      search,
       status,
-      sortBy = 'createdAt',
-      sortOrder = 'desc',
+      sortBy = "createdAt",
+      sortOrder = "desc",
       minPrice,
-      maxPrice
+      maxPrice,
     } = req.query;
-    
+
     // Validate pagination parameters
     const pageNum = Math.max(1, parseInt(page));
     const limitNum = Math.min(50, Math.max(1, parseInt(limit))); // Max 50 items per page
-    
+
     // Build filter object
     const filter = {};
-    
-    if (category && category !== 'all') {
+
+    if (category && category !== "all") {
       filter.category = category;
     }
-    
-    if (brand && brand !== 'all') {
+
+    if (brand && brand !== "all") {
       filter.brand = brand;
     }
-    
-    if (model && model !== 'all') {
+
+    if (model && model !== "all") {
       // Handle model filtering with case-insensitive matching and URL decoding
       const decodedModel = decodeURIComponent(model);
-      filter.model = { $regex: decodedModel.trim(), $options: 'i' };
+      filter.model = { $regex: decodedModel.trim(), $options: "i" };
     }
-    
-    if (status && status !== 'all') {
+
+    if (status && status !== "all") {
       filter.status = status;
     }
-    
+
     // Price range filter
     if (minPrice || maxPrice) {
       filter.basePrice = {};
@@ -919,53 +1012,61 @@ const getCatalog = async (req, res) => {
         filter.basePrice.$lte = parseFloat(maxPrice);
       }
     }
-    
+
     // Search filter (only if no specific model is provided)
     if (search && search.trim() && !model) {
-      const searchRegex = { $regex: search.trim(), $options: 'i' };
+      const searchRegex = { $regex: search.trim(), $options: "i" };
       filter.$or = [
         { brand: searchRegex },
         { series: searchRegex },
         { model: searchRegex },
-        { category: searchRegex }
+        { category: searchRegex },
       ];
     }
-    
+
     // Build sort object
     const sortOptions = {};
-    const validSortFields = ['createdAt', 'updatedAt', 'brand', 'model', 'basePrice', 'category'];
-    const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
-    const sortDirection = sortOrder === 'asc' ? 1 : -1;
+    const validSortFields = [
+      "createdAt",
+      "updatedAt",
+      "brand",
+      "model",
+      "basePrice",
+      "category",
+    ];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : "createdAt";
+    const sortDirection = sortOrder === "asc" ? 1 : -1;
     sortOptions[sortField] = sortDirection;
-    
+
     // Execute queries in parallel for better performance
-    const [products, total, brands, categories, statusCounts] = await Promise.all([
-      Product.find(filter)
-        .sort(sortOptions)
-        .limit(limitNum)
-        .skip((pageNum - 1) * limitNum)
-        .populate('createdBy', 'name email')
-        .lean(),
-      Product.countDocuments(filter),
-      Product.distinct('brand'),
-      Product.distinct('category'),
-      Product.aggregate([
-        { $group: { _id: '$status', count: { $sum: 1 } } }
-      ])
-    ]);
-    
+    const [products, total, brands, categories, statusCounts] =
+      await Promise.all([
+        Product.find(filter)
+          .sort(sortOptions)
+          .limit(limitNum)
+          .skip((pageNum - 1) * limitNum)
+          .populate("createdBy", "name email")
+          .lean(),
+        Product.countDocuments(filter),
+        Product.distinct("brand"),
+        Product.distinct("category"),
+        Product.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+      ]);
+
     // Calculate price range
     const priceStats = await Product.aggregate([
-      { $group: {
-        _id: null,
-        minPrice: { $min: '$basePrice' },
-        maxPrice: { $max: '$basePrice' },
-        avgPrice: { $avg: '$basePrice' }
-      }}
+      {
+        $group: {
+          _id: null,
+          minPrice: { $min: "$basePrice" },
+          maxPrice: { $max: "$basePrice" },
+          avgPrice: { $avg: "$basePrice" },
+        },
+      },
     ]);
-    
+
     const totalPages = Math.ceil(total / limitNum);
-    
+
     res.json({
       success: true,
       products,
@@ -975,7 +1076,7 @@ const getCatalog = async (req, res) => {
         totalItems: total,
         itemsPerPage: limitNum,
         hasNextPage: pageNum < totalPages,
-        hasPrevPage: pageNum > 1
+        hasPrevPage: pageNum > 1,
       },
       filters: {
         brands: brands.sort(),
@@ -984,26 +1085,29 @@ const getCatalog = async (req, res) => {
           acc[item._id] = item.count;
           return acc;
         }, {}),
-        priceRange: priceStats[0] || { minPrice: 0, maxPrice: 0, avgPrice: 0 }
+        priceRange: priceStats[0] || { minPrice: 0, maxPrice: 0, avgPrice: 0 },
       },
       meta: {
-        searchTerm: search || '',
+        searchTerm: search || "",
         appliedFilters: {
-          category: category || 'all',
-          brand: brand || 'all',
-          status: status || 'all',
-          priceRange: { min: minPrice, max: maxPrice }
+          category: category || "all",
+          brand: brand || "all",
+          status: status || "all",
+          priceRange: { min: minPrice, max: maxPrice },
         },
         sortBy: sortField,
-        sortOrder
-      }
+        sortOrder,
+      },
     });
   } catch (error) {
-    console.error('Error fetching catalog:', error);
-    res.status(500).json({ 
+    console.error("Error fetching catalog:", error);
+    res.status(500).json({
       success: false,
-      message: 'Failed to fetch product catalog',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to fetch product catalog",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -1016,13 +1120,13 @@ const addProduct = async (req, res) => {
     // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: errors.array()
+        message: "Validation failed",
+        errors: errors.array(),
       });
     }
-    
+
     const {
       category,
       brand,
@@ -1032,53 +1136,59 @@ const addProduct = async (req, res) => {
       depreciationRate,
       specifications,
       images,
-      status = 'active',
+      status = "active",
       description,
-      features
+      features,
     } = req.body;
-    
+
     // Required field validation
     if (!category || !brand || !model || !basePrice) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: category, brand, model, and basePrice are required'
+        message:
+          "Missing required fields: category, brand, model, and basePrice are required",
       });
     }
-    
+
     // Validate price
     if (isNaN(basePrice) || parseFloat(basePrice) <= 0) {
       return res.status(400).json({
         success: false,
-        message: 'Base price must be a positive number'
+        message: "Base price must be a positive number",
       });
     }
-    
+
     // Validate depreciation rate
-    if (depreciationRate && (isNaN(depreciationRate) || parseFloat(depreciationRate) < 0 || parseFloat(depreciationRate) > 100)) {
+    if (
+      depreciationRate &&
+      (isNaN(depreciationRate) ||
+        parseFloat(depreciationRate) < 0 ||
+        parseFloat(depreciationRate) > 100)
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Depreciation rate must be between 0 and 100'
+        message: "Depreciation rate must be between 0 and 100",
       });
     }
-    
+
     // Check for duplicate product
     const existingProduct = await Product.findOne({
       category: category.toLowerCase(),
       brand: brand.toLowerCase(),
-      model: model.toLowerCase()
+      model: model.toLowerCase(),
     });
-    
+
     if (existingProduct) {
       return res.status(409).json({
         success: false,
-        message: 'Product with this category, brand, and model already exists'
+        message: "Product with this category, brand, and model already exists",
       });
     }
-    
+
     // Process images
     let processedImages = [];
     if (images) {
-      if (typeof images === 'string') {
+      if (typeof images === "string") {
         try {
           processedImages = JSON.parse(images);
         } catch (e) {
@@ -1087,87 +1197,93 @@ const addProduct = async (req, res) => {
       } else if (Array.isArray(images)) {
         processedImages = images;
       }
-      
+
       // Validate and clean image URLs
       processedImages = processedImages
-        .map(img => {
-          if (typeof img === 'string') return img.trim();
-          return img.url || img.secure_url || '';
+        .map((img) => {
+          if (typeof img === "string") return img.trim();
+          return img.url || img.secure_url || "";
         })
-        .filter(url => url && url.length > 0)
+        .filter((url) => url && url.length > 0)
         .slice(0, 10); // Limit to 10 images
     }
-    
+
     // Process specifications
     let processedSpecs = {};
     if (specifications) {
-      if (typeof specifications === 'string') {
+      if (typeof specifications === "string") {
         try {
           processedSpecs = JSON.parse(specifications);
         } catch (e) {
           processedSpecs = {};
         }
-      } else if (typeof specifications === 'object') {
+      } else if (typeof specifications === "object") {
         processedSpecs = specifications;
       }
     }
-    
+
     // Create product data
     const productData = {
       category: category.toLowerCase(),
       brand: brand.trim(),
-      series: series ? series.trim() : '',
+      series: series ? series.trim() : "",
       model: model.trim(),
       basePrice: parseFloat(basePrice),
       depreciationRate: depreciationRate ? parseFloat(depreciationRate) : 15,
       specifications: processedSpecs,
       images: processedImages,
-      status: ['active', 'inactive', 'pending'].includes(status) ? status : 'active',
-      description: description ? description.trim() : '',
+      status: ["active", "inactive", "pending"].includes(status)
+        ? status
+        : "active",
+      description: description ? description.trim() : "",
       features: Array.isArray(features) ? features : [],
       createdBy: req.user._id,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
-    
+
     // Create the product
     const product = await Product.create(productData);
-    
+
     // Populate the created product for response
     const populatedProduct = await Product.findById(product._id)
-      .populate('createdBy', 'name email')
+      .populate("createdBy", "name email")
       .lean();
-    
-    res.status(201).json({ 
+
+    res.status(201).json({
       success: true,
-      message: 'Product added successfully to catalog',
-      product: populatedProduct
+      message: "Product added successfully to catalog",
+      product: populatedProduct,
     });
-    
   } catch (error) {
-    console.error('Error adding product to catalog:', error);
-    
+    console.error("Error adding product to catalog:", error);
+
     // Handle specific MongoDB errors
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
-        message: 'Product with this combination already exists'
+        message: "Product with this combination already exists",
       });
     }
-    
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(err => err.message);
+
+    if (error.name === "ValidationError") {
+      const validationErrors = Object.values(error.errors).map(
+        (err) => err.message
+      );
       return res.status(400).json({
         success: false,
-        message: 'Product validation failed',
-        errors: validationErrors
+        message: "Product validation failed",
+        errors: validationErrors,
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to add product to catalog',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to add product to catalog",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -1177,42 +1293,42 @@ const addProduct = async (req, res) => {
 // @access  Private/Admin
 const uploadProductImages = async (req, res) => {
   try {
-    const cloudinary = require('../config/cloudinary.config');
+    const cloudinary = require("../config/cloudinary.config");
     const uploadedImages = [];
-    
+
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: 'No images provided' });
+      return res.status(400).json({ message: "No images provided" });
     }
-    
+
     // Upload each image to Cloudinary
     for (const file of req.files) {
       try {
         const result = await cloudinary.uploader.upload(file.path, {
-          folder: 'cashify/products',
+          folder: "cashify/products",
           transformation: [
-            { width: 800, height: 800, crop: 'fill', quality: 'auto' },
-            { format: 'webp' }
-          ]
+            { width: 800, height: 800, crop: "fill", quality: "auto" },
+            { format: "webp" },
+          ],
         });
-        
+
         uploadedImages.push({
           url: result.secure_url,
           publicId: result.public_id,
           width: result.width,
-          height: result.height
+          height: result.height,
         });
       } catch (uploadError) {
-        console.error('Error uploading image:', uploadError);
+        console.error("Error uploading image:", uploadError);
       }
     }
-    
-    res.json({ 
-      message: 'Images uploaded successfully', 
-      images: uploadedImages 
+
+    res.json({
+      message: "Images uploaded successfully",
+      images: uploadedImages,
     });
   } catch (error) {
-    console.error('Error uploading images:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error uploading images:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -1222,24 +1338,24 @@ const uploadProductImages = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // Validate product ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid product ID format'
+        message: "Invalid product ID format",
       });
     }
-    
+
     // Check if product exists
     const existingProduct = await Product.findById(id);
     if (!existingProduct) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: "Product not found",
       });
     }
-    
+
     const {
       category,
       brand,
@@ -1251,70 +1367,74 @@ const updateProduct = async (req, res) => {
       images,
       status,
       description,
-      features
+      features,
     } = req.body;
-    
+
     // Build update object with only provided fields
     const updateData = {};
-    
+
     if (category !== undefined) {
       updateData.category = category.toLowerCase();
     }
-    
+
     if (brand !== undefined) {
       updateData.brand = brand.trim();
     }
-    
+
     if (series !== undefined) {
-      updateData.series = series ? series.trim() : '';
+      updateData.series = series ? series.trim() : "";
     }
-    
+
     if (model !== undefined) {
       updateData.model = model.trim();
     }
-    
+
     if (basePrice !== undefined) {
       if (isNaN(basePrice) || parseFloat(basePrice) <= 0) {
         return res.status(400).json({
           success: false,
-          message: 'Base price must be a positive number'
+          message: "Base price must be a positive number",
         });
       }
       updateData.basePrice = parseFloat(basePrice);
     }
-    
+
     if (depreciationRate !== undefined) {
-      if (isNaN(depreciationRate) || parseFloat(depreciationRate) < 0 || parseFloat(depreciationRate) > 100) {
+      if (
+        isNaN(depreciationRate) ||
+        parseFloat(depreciationRate) < 0 ||
+        parseFloat(depreciationRate) > 100
+      ) {
         return res.status(400).json({
           success: false,
-          message: 'Depreciation rate must be between 0 and 100'
+          message: "Depreciation rate must be between 0 and 100",
         });
       }
       updateData.depreciationRate = parseFloat(depreciationRate);
     }
-    
+
     if (status !== undefined) {
-      if (!['active', 'inactive', 'pending'].includes(status)) {
+      if (!["active", "inactive", "pending"].includes(status)) {
         return res.status(400).json({
           success: false,
-          message: 'Status must be one of: active, inactive, pending'
+          message: "Status must be one of: active, inactive, pending",
         });
       }
       updateData.status = status;
     }
-    
+
     if (description !== undefined) {
       updateData.description = description.trim();
     }
-    
+
     if (features !== undefined) {
       updateData.features = Array.isArray(features) ? features : [];
     }
-    
+
     // Process images if provided
     if (images !== undefined) {
       let processedImages = [];
-      if (typeof images === 'string') {
+      if (typeof images === "string") {
         try {
           processedImages = JSON.parse(images);
         } catch (e) {
@@ -1323,84 +1443,96 @@ const updateProduct = async (req, res) => {
       } else if (Array.isArray(images)) {
         processedImages = images;
       }
-      
+
       updateData.images = processedImages
-        .map(img => {
-          if (typeof img === 'string') return img.trim();
-          return img.url || img.secure_url || '';
+        .map((img) => {
+          if (typeof img === "string") return img.trim();
+          return img.url || img.secure_url || "";
         })
-        .filter(url => url && url.length > 0)
+        .filter((url) => url && url.length > 0)
         .slice(0, 10);
     }
-    
+
     // Process specifications if provided
     if (specifications !== undefined) {
       let processedSpecs = {};
-      if (typeof specifications === 'string') {
+      if (typeof specifications === "string") {
         try {
           processedSpecs = JSON.parse(specifications);
         } catch (e) {
           processedSpecs = {};
         }
-      } else if (typeof specifications === 'object') {
+      } else if (typeof specifications === "object") {
         processedSpecs = specifications;
       }
       updateData.specifications = processedSpecs;
     }
-    
+
     // Check for duplicate if category, brand, or model is being updated
     if (category || brand || model) {
-      const checkCategory = category ? category.toLowerCase() : existingProduct.category;
-      const checkBrand = brand ? brand.toLowerCase() : existingProduct.brand.toLowerCase();
-      const checkModel = model ? model.toLowerCase() : existingProduct.model.toLowerCase();
-      
+      const checkCategory = category
+        ? category.toLowerCase()
+        : existingProduct.category;
+      const checkBrand = brand
+        ? brand.toLowerCase()
+        : existingProduct.brand.toLowerCase();
+      const checkModel = model
+        ? model.toLowerCase()
+        : existingProduct.model.toLowerCase();
+
       const duplicateProduct = await Product.findOne({
         _id: { $ne: id },
         category: checkCategory,
         brand: checkBrand,
-        model: checkModel
+        model: checkModel,
       });
-      
+
       if (duplicateProduct) {
         return res.status(409).json({
           success: false,
-          message: 'Another product with this category, brand, and model combination already exists'
+          message:
+            "Another product with this category, brand, and model combination already exists",
         });
       }
     }
-    
+
     // Add updated timestamp
     updateData.updatedAt = new Date();
-    
+
     // Update the product
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    ).populate('createdBy', 'name email').lean();
-    
-    res.json({ 
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    })
+      .populate("createdBy", "name email")
+      .lean();
+
+    res.json({
       success: true,
-      message: 'Product updated successfully',
-      product: updatedProduct
+      message: "Product updated successfully",
+      product: updatedProduct,
     });
-    
   } catch (error) {
-    console.error('Error updating product:', error);
-    
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(err => err.message);
+    console.error("Error updating product:", error);
+
+    if (error.name === "ValidationError") {
+      const validationErrors = Object.values(error.errors).map(
+        (err) => err.message
+      );
       return res.status(400).json({
         success: false,
-        message: 'Product validation failed',
-        errors: validationErrors
+        message: "Product validation failed",
+        errors: validationErrors,
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to update product',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to update product",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -1411,17 +1543,20 @@ const updateProduct = async (req, res) => {
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    
-    const product = await Product.findById(id).populate('createdBy', 'name email');
-    
+
+    const product = await Product.findById(id).populate(
+      "createdBy",
+      "name email"
+    );
+
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
-    
+
     res.json({ product });
   } catch (error) {
-    console.error('Error fetching product:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching product:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -1435,7 +1570,7 @@ const updateProductStatus = async (req, res) => {
 
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid product ID' });
+      return res.status(400).json({ message: "Invalid product ID" });
     }
 
     // Find and update the product status
@@ -1446,23 +1581,23 @@ const updateProductStatus = async (req, res) => {
     );
 
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
 
-    res.json({ 
-      message: 'Product status updated successfully',
+    res.json({
+      message: "Product status updated successfully",
       product: {
         _id: product._id,
         category: product.category,
         brand: product.brand,
         series: product.series,
         model: product.model,
-        status: product.status
-      }
+        status: product.status,
+      },
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -1473,100 +1608,107 @@ const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const { force = false } = req.query; // Allow force delete with query param
-    
+
     // Validate product ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid product ID format'
+        message: "Invalid product ID format",
       });
     }
-    
+
     // Check if product exists
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: "Product not found",
       });
     }
-    
+
     // Safety checks before deletion (unless force delete)
     if (!force) {
       // Check if product has any active orders
       const activeOrders = await Order.find({
-        'items.product': id,
-        status: { $in: ['pending', 'processing', 'shipped', 'confirmed'] }
+        "items.product": id,
+        status: { $in: ["pending", "processing", "shipped", "confirmed"] },
       });
-      
+
       if (activeOrders.length > 0) {
         return res.status(400).json({
           success: false,
           message: `Cannot delete product with ${activeOrders.length} active order(s). Please complete or cancel all orders first, or use force delete.`,
           activeOrdersCount: activeOrders.length,
-          canForceDelete: true
+          canForceDelete: true,
         });
       }
-      
+
       // Check if product has inventory
       const inventory = await Inventory.find({ product: id });
       if (inventory.length > 0) {
-        const totalStock = inventory.reduce((sum, item) => sum + (item.quantity || 0), 0);
+        const totalStock = inventory.reduce(
+          (sum, item) => sum + (item.quantity || 0),
+          0
+        );
         if (totalStock > 0) {
           return res.status(400).json({
             success: false,
             message: `Cannot delete product with ${totalStock} items in inventory. Please remove inventory first, or use force delete.`,
             inventoryCount: totalStock,
-            canForceDelete: true
+            canForceDelete: true,
           });
         }
       }
-      
+
       // Check if product has recent transactions (last 30 days)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      
+
       const recentTransactions = await Transaction.find({
-        'productDetails.productId': id,
-        createdAt: { $gte: thirtyDaysAgo }
+        "productDetails.productId": id,
+        createdAt: { $gte: thirtyDaysAgo },
       });
-      
+
       if (recentTransactions.length > 0) {
         return res.status(400).json({
           success: false,
           message: `Product has ${recentTransactions.length} recent transaction(s) in the last 30 days. Consider deactivating instead of deleting, or use force delete.`,
           recentTransactionsCount: recentTransactions.length,
           canForceDelete: true,
-          suggestion: 'Consider setting status to inactive instead of deleting'
+          suggestion: "Consider setting status to inactive instead of deleting",
         });
       }
     }
-    
+
     // Store product info for response
     const deletedProductInfo = {
       id: product._id,
       category: product.category,
       brand: product.brand,
       model: product.model,
-      deletedAt: new Date()
+      deletedAt: new Date(),
     };
-    
+
     // Delete images from Cloudinary if they exist
     if (product.images && product.images.length > 0) {
-      const cloudinary = require('../config/cloudinary.config');
-      
+      const cloudinary = require("../config/cloudinary.config");
+
       for (const imageUrl of product.images) {
         try {
           // Extract public_id from Cloudinary URL
-          const publicId = imageUrl.split('/').slice(-2).join('/').split('.')[0];
+          const publicId = imageUrl
+            .split("/")
+            .slice(-2)
+            .join("/")
+            .split(".")[0];
           await cloudinary.uploader.destroy(`cashify/products/${publicId}`);
         } catch (deleteError) {
-          console.error('Error deleting image from Cloudinary:', deleteError);
+          console.error("Error deleting image from Cloudinary:", deleteError);
           // Continue with product deletion even if image deletion fails
         }
       }
     }
-    
+
     // If force delete, clean up related data
     if (force) {
       await Promise.all([
@@ -1574,39 +1716,41 @@ const deleteProduct = async (req, res) => {
         Inventory.deleteMany({ product: id }),
         // Update orders to mark product as deleted
         Order.updateMany(
-          { 'items.product': id },
-          { $set: { 'items.$.productDeleted': true } }
-        )
+          { "items.product": id },
+          { $set: { "items.$.productDeleted": true } }
+        ),
       ]);
     }
-    
+
     // Delete the product
     await Product.findByIdAndDelete(id);
-    
-    res.json({ 
+
+    res.json({
       success: true,
-      message: force 
-        ? 'Product and related data deleted successfully (forced)'
-        : 'Product deleted successfully',
+      message: force
+        ? "Product and related data deleted successfully (forced)"
+        : "Product deleted successfully",
       deletedProduct: deletedProductInfo,
-      forced: force
+      forced: force,
     });
-    
   } catch (error) {
-    console.error('Error deleting product:', error);
-    
+    console.error("Error deleting product:", error);
+
     // Handle specific errors
-    if (error.name === 'CastError') {
+    if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
-        message: 'Invalid product ID format'
+        message: "Invalid product ID format",
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to delete product',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to delete product",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -1622,24 +1766,24 @@ const getCommissionSettings = async (req, res) => {
       sellCommission: {
         mobile: 5, // 5%
         tablet: 4, // 4%
-        laptop: 3  // 3%
+        laptop: 3, // 3%
       },
       buyCommission: {
         mobile: 8, // 8%
         tablet: 7, // 7%
-        laptop: 6  // 6%
+        laptop: 6, // 6%
       },
       deliveryCharges: {
         local: 50,
         regional: 100,
-        national: 200
-      }
+        national: 200,
+      },
     };
-    
+
     res.json(commissionSettings);
   } catch (error) {
-    console.error('Error fetching commission settings:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching commission settings:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -1650,10 +1794,10 @@ const updateCommissionSettings = async (req, res) => {
   try {
     // This would typically update a settings collection
     // For now, just returning success
-    res.json({ message: 'Commission settings updated successfully' });
+    res.json({ message: "Commission settings updated successfully" });
   } catch (error) {
-    console.error('Error updating commission settings:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error updating commission settings:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -1667,16 +1811,16 @@ const getAllUsers = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const search = req.query.search || '';
-    const role = req.query.role || '';
+    const search = req.query.search || "";
+    const role = req.query.role || "";
 
     // Build query
     let query = {};
     if (search) {
       query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { phone: { $regex: search, $options: 'i' } }
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
       ];
     }
     if (role) {
@@ -1684,7 +1828,7 @@ const getAllUsers = async (req, res) => {
     }
 
     const users = await User.find(query)
-      .select('-password')
+      .select("-password")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -1693,9 +1837,9 @@ const getAllUsers = async (req, res) => {
 
     // Set cache control headers to prevent 304 responses
     res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+      Expires: "0",
     });
 
     res.json({
@@ -1704,12 +1848,12 @@ const getAllUsers = async (req, res) => {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -1719,17 +1863,20 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
-      .select('-password')
-      .populate('roleTemplate', 'name displayName description color permissions');
-    
+      .select("-password")
+      .populate(
+        "roleTemplate",
+        "name displayName description color permissions"
+      );
+
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.json(user);
   } catch (error) {
-    console.error('Error fetching user:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -1743,12 +1890,20 @@ const createUser = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password, phone, role = 'user', address, roleTemplate } = req.body;
+    const {
+      name,
+      email,
+      password,
+      phone,
+      role = "user",
+      address,
+      roleTemplate,
+    } = req.body;
 
     // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     // Prepare user data
@@ -1759,11 +1914,11 @@ const createUser = async (req, res) => {
       phone,
       role,
       address,
-      isVerified: true // Admin created users are verified by default
+      isVerified: true, // Admin created users are verified by default
     };
 
     // Add roleTemplate only if role is partner and a template is selected
-    if (role === 'partner' && roleTemplate) {
+    if (role === "partner" && roleTemplate) {
       userData.roleTemplate = roleTemplate;
     }
 
@@ -1771,33 +1926,33 @@ const createUser = async (req, res) => {
     const user = await User.create(userData);
 
     // If role is partner, create Partner profile automatically
-    if (role === 'partner') {
+    if (role === "partner") {
       try {
         // Check if partner profile already exists
         const existingPartner = await Partner.findOne({ user: user._id });
-        
+
         if (!existingPartner) {
           // Create basic partner profile with minimal required fields
           await Partner.create({
             user: user._id,
-            shopName: name || 'Partner Shop', // Use user's name as default shop name
+            shopName: name || "Partner Shop", // Use user's name as default shop name
             shopEmail: email,
-            shopPhone: phone || '0000000000',
+            shopPhone: phone || "0000000000",
             gstNumber: `GST${Date.now()}`, // Generate temporary GST number
             shopAddress: {
-              street: address?.street || '',
-              city: address?.city || '',
-              state: address?.state || '',
-              pincode: address?.pincode || '000000',
-              country: address?.country || 'India'
+              street: address?.street || "",
+              city: address?.city || "",
+              state: address?.state || "",
+              pincode: address?.pincode || "000000",
+              country: address?.country || "India",
             },
             isVerified: false,
-            verificationStatus: 'pending'
+            verificationStatus: "pending",
           });
           console.log(`✅ Partner profile created for user: ${email}`);
         }
       } catch (partnerError) {
-        console.error('Error creating partner profile:', partnerError);
+        console.error("Error creating partner profile:", partnerError);
         // Don't fail the user creation if partner profile creation fails
         // Partner can complete their profile later
       }
@@ -1805,18 +1960,22 @@ const createUser = async (req, res) => {
 
     // Return user without password, with populated roleTemplate
     const userResponse = await User.findById(user._id)
-      .select('-password')
-      .populate('roleTemplate', 'name displayName description color permissions');
-    
+      .select("-password")
+      .populate(
+        "roleTemplate",
+        "name displayName description color permissions"
+      );
+
     res.status(201).json({
-      message: role === 'partner' 
-        ? 'Partner user created successfully. Please complete partner profile for full access.' 
-        : 'User created successfully',
-      user: userResponse
+      message:
+        role === "partner"
+          ? "Partner user created successfully. Please complete partner profile for full access."
+          : "User created successfully",
+      user: userResponse,
     });
   } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error creating user:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -1830,18 +1989,19 @@ const updateUser = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, phone, role, address, isVerified, roleTemplate } = req.body;
-    
+    const { name, email, phone, role, address, isVerified, roleTemplate } =
+      req.body;
+
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Check if email is being changed and if it already exists
     if (email && email !== user.email) {
       const emailExists = await User.findOne({ email });
       if (emailExists) {
-        return res.status(400).json({ message: 'Email already exists' });
+        return res.status(400).json({ message: "Email already exists" });
       }
     }
 
@@ -1854,12 +2014,12 @@ const updateUser = async (req, res) => {
     if (phone) user.phone = phone;
     if (role) user.role = role;
     if (address) user.address = { ...user.address, ...address };
-    if (typeof isVerified === 'boolean') user.isVerified = isVerified;
-    
+    if (typeof isVerified === "boolean") user.isVerified = isVerified;
+
     // Update roleTemplate for partner users
-    if (role === 'partner' && roleTemplate !== undefined) {
+    if (role === "partner" && roleTemplate !== undefined) {
       user.roleTemplate = roleTemplate || null;
-    } else if (role !== 'partner') {
+    } else if (role !== "partner") {
       // Clear roleTemplate if role is changed from partner to something else
       user.roleTemplate = null;
     }
@@ -1867,43 +2027,51 @@ const updateUser = async (req, res) => {
     const updatedUser = await user.save();
 
     // If role changed to partner, create Partner profile if it doesn't exist
-    if (role === 'partner' && oldRole !== 'partner') {
+    if (role === "partner" && oldRole !== "partner") {
       try {
-        const existingPartner = await Partner.findOne({ user: updatedUser._id });
-        
+        const existingPartner = await Partner.findOne({
+          user: updatedUser._id,
+        });
+
         if (!existingPartner) {
           await Partner.create({
             user: updatedUser._id,
-            shopName: name || 'Partner Shop',
+            shopName: name || "Partner Shop",
             shopEmail: email || updatedUser.email,
-            shopPhone: phone || updatedUser.phone || '0000000000',
+            shopPhone: phone || updatedUser.phone || "0000000000",
             gstNumber: `GST${Date.now()}`,
             shopAddress: {
-              street: address?.street || updatedUser.address?.street || '',
-              city: address?.city || updatedUser.address?.city || '',
-              state: address?.state || updatedUser.address?.state || '',
-              pincode: address?.pincode || updatedUser.address?.pincode || '000000',
-              country: address?.country || updatedUser.address?.country || 'India'
+              street: address?.street || updatedUser.address?.street || "",
+              city: address?.city || updatedUser.address?.city || "",
+              state: address?.state || updatedUser.address?.state || "",
+              pincode:
+                address?.pincode || updatedUser.address?.pincode || "000000",
+              country:
+                address?.country || updatedUser.address?.country || "India",
             },
             isVerified: false,
-            verificationStatus: 'pending'
+            verificationStatus: "pending",
           });
-          console.log(`✅ Partner profile created for user: ${updatedUser.email}`);
+          console.log(
+            `✅ Partner profile created for user: ${updatedUser.email}`
+          );
         }
       } catch (partnerError) {
-        console.error('Error creating partner profile:', partnerError);
+        console.error("Error creating partner profile:", partnerError);
       }
     }
 
-    const userResponse = await User.findById(updatedUser._id).select('-password');
+    const userResponse = await User.findById(updatedUser._id).select(
+      "-password"
+    );
 
     res.json({
-      message: 'User updated successfully',
-      user: userResponse
+      message: "User updated successfully",
+      user: userResponse,
     });
   } catch (error) {
-    console.error('Error updating user:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -1913,22 +2081,22 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    
+
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Prevent deletion of admin users
-    if (user.role === 'admin') {
-      return res.status(400).json({ message: 'Cannot delete admin users' });
+    if (user.role === "admin") {
+      return res.status(400).json({ message: "Cannot delete admin users" });
     }
 
     await User.findByIdAndDelete(req.params.id);
-    
-    res.json({ message: 'User deleted successfully' });
+
+    res.json({ message: "User deleted successfully" });
   } catch (error) {
-    console.error('Error deleting user:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -1939,25 +2107,25 @@ const updateUserPassword = async (req, res) => {
   try {
     const { newPassword } = req.body;
     const user = await User.findById(req.params.id);
-    
+
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Update password (will be hashed by pre-save middleware)
     user.password = newPassword;
     await user.save();
-    
-    res.json({ 
+
+    res.json({
       success: true,
-      message: 'Password updated successfully' 
+      message: "Password updated successfully",
     });
   } catch (error) {
-    console.error('Error updating user password:', error);
-    res.status(500).json({ 
+    console.error("Error updating user password:", error);
+    res.status(500).json({
       success: false,
-      message: 'Failed to update password',
-      error: error.message 
+      message: "Failed to update password",
+      error: error.message,
     });
   }
 };
@@ -1975,11 +2143,11 @@ const getSellOrders = async (req, res) => {
       partnerId,
       startDate,
       endDate,
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
+      sortBy = "createdAt",
+      sortOrder = "desc",
     } = req.query;
 
-    const query = { orderType: 'sell' };
+    const query = { orderType: "sell" };
 
     // Apply filters
     if (status) query.status = status;
@@ -1992,18 +2160,18 @@ const getSellOrders = async (req, res) => {
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sortOptions = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
+    const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
 
     const [orders, total] = await Promise.all([
       Order.find(query)
-        .populate('user', 'name email phone')
-        .populate('partner', 'businessName email phone')
-        .populate('items.inventory', 'product condition')
-        .populate('items.product', 'name brand model')
+        .populate("user", "name email phone")
+        .populate("partner", "businessName email phone")
+        .populate("items.inventory", "product condition")
+        .populate("items.product", "name brand model")
         .sort(sortOptions)
         .skip(skip)
         .limit(parseInt(limit)),
-      Order.countDocuments(query)
+      Order.countDocuments(query),
     ]);
 
     res.json({
@@ -2013,12 +2181,12 @@ const getSellOrders = async (req, res) => {
         totalPages: Math.ceil(total / parseInt(limit)),
         totalOrders: total,
         hasNext: skip + orders.length < total,
-        hasPrev: parseInt(page) > 1
-      }
+        hasPrev: parseInt(page) > 1,
+      },
     });
   } catch (error) {
-    console.error('Error fetching sell orders:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching sell orders:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -2035,11 +2203,11 @@ const getBuyOrders = async (req, res) => {
       partnerId,
       startDate,
       endDate,
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
+      sortBy = "createdAt",
+      sortOrder = "desc",
     } = req.query;
 
-    const query = { orderType: 'buy' };
+    const query = { orderType: "buy" };
 
     // Apply filters
     if (status) query.status = status;
@@ -2052,18 +2220,18 @@ const getBuyOrders = async (req, res) => {
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sortOptions = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
+    const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
 
     const [orders, total] = await Promise.all([
       Order.find(query)
-        .populate('user', 'name email phone')
-        .populate('partner', 'businessName email phone')
-        .populate('items.inventory', 'product condition')
-        .populate('items.product', 'name brand model images pricing')
+        .populate("user", "name email phone")
+        .populate("partner", "shopName shopEmail shopPhone email phone")
+        .populate("items.inventory", "product condition")
+        .populate("items.product", "name brand model images pricing")
         .sort(sortOptions)
         .skip(skip)
         .limit(parseInt(limit)),
-      Order.countDocuments(query)
+      Order.countDocuments(query),
     ]);
 
     res.json({
@@ -2073,12 +2241,12 @@ const getBuyOrders = async (req, res) => {
         totalPages: Math.ceil(total / parseInt(limit)),
         totalOrders: total,
         hasNext: skip + orders.length < total,
-        hasPrev: parseInt(page) > 1
-      }
+        hasPrev: parseInt(page) > 1,
+      },
     });
   } catch (error) {
-    console.error('Error fetching buy orders:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching buy orders:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -2092,7 +2260,7 @@ const updateOrderStatus = async (req, res) => {
 
     const order = await Order.findById(orderId);
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ message: "Order not found" });
     }
 
     // Update order status
@@ -2106,19 +2274,64 @@ const updateOrderStatus = async (req, res) => {
 
     // Populate order details for response
     await order.populate([
-      { path: 'user', select: 'name email phone' },
-      { path: 'partner', select: 'businessName email phone' },
-      { path: 'items.inventory', select: 'product condition' },
-      { path: 'items.product', select: 'name brand model' }
+      { path: "user", select: "name email phone" },
+      { path: "partner", select: "businessName email phone" },
+      { path: "items.inventory", select: "product condition" },
+      { path: "items.product", select: "name brand model" },
     ]);
 
     res.json({
-      message: 'Order status updated successfully',
-      order
+      message: "Order status updated successfully",
+      order,
     });
   } catch (error) {
-    console.error('Error updating order status:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error updating order status:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// @desc    Assign partner to order
+// @route   PUT /api/admin/orders/:id/assign-partner
+// @access  Private/Admin
+const assignPartnerToOrder = async (req, res) => {
+  try {
+    const { partner } = req.body;
+    const orderId = req.params.id;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Verify partner exists
+    if (partner) {
+      const partnerExists = await Partner.findById(partner);
+      if (!partnerExists) {
+        return res.status(404).json({ message: "Partner not found" });
+      }
+    }
+
+    // Update order partner
+    order.partner = partner;
+    order.updatedAt = new Date();
+
+    await order.save();
+
+    // Populate order details for response
+    await order.populate([
+      { path: "user", select: "name email phone" },
+      { path: "partner", select: "businessName shopName email phone" },
+      { path: "items.inventory", select: "product condition" },
+      { path: "items.product", select: "name brand model" },
+    ]);
+
+    res.json({
+      message: "Partner assigned successfully",
+      order,
+    });
+  } catch (error) {
+    console.error("Error assigning partner to order:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -2128,18 +2341,19 @@ const updateOrderStatus = async (req, res) => {
 const getBrands = async (req, res) => {
   try {
     const { category, page = 1, limit = 50 } = req.query;
-    
+
     // Validate pagination parameters
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
-    
+
     if (pageNum < 1 || limitNum < 1 || limitNum > 100) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Invalid pagination parameters. Page must be >= 1, limit must be between 1-100' 
+        message:
+          "Invalid pagination parameters. Page must be >= 1, limit must be between 1-100",
       });
     }
-    
+
     const matchStage = {};
     if (category) {
       matchStage.category = category;
@@ -2149,37 +2363,37 @@ const getBrands = async (req, res) => {
       { $match: matchStage },
       {
         $group: {
-          _id: '$brand',
+          _id: "$brand",
           count: { $sum: 1 },
-          models: { $addToSet: '$model' },
-          categories: { $addToSet: '$category' },
-          lastUpdated: { $max: '$updatedAt' }
-        }
+          models: { $addToSet: "$model" },
+          categories: { $addToSet: "$category" },
+          lastUpdated: { $max: "$updatedAt" },
+        },
       },
       {
         $project: {
           _id: 0,
-          brand: '$_id',
-          productCount: '$count',
-          modelCount: { $size: '$models' },
+          brand: "$_id",
+          productCount: "$count",
+          modelCount: { $size: "$models" },
           categories: 1,
-          lastUpdated: 1
-        }
+          lastUpdated: 1,
+        },
       },
       {
-        $sort: { productCount: -1, brand: 1 }
+        $sort: { productCount: -1, brand: 1 },
       },
       { $skip: (pageNum - 1) * limitNum },
-      { $limit: limitNum }
+      { $limit: limitNum },
     ]);
 
     // Get total count for pagination
     const totalBrands = await Product.aggregate([
       { $match: matchStage },
-      { $group: { _id: '$brand' } },
-      { $count: 'total' }
+      { $group: { _id: "$brand" } },
+      { $count: "total" },
     ]);
-    
+
     const total = totalBrands[0]?.total || 0;
 
     res.json({
@@ -2188,14 +2402,17 @@ const getBrands = async (req, res) => {
       total,
       page: pageNum,
       totalPages: Math.ceil(total / limitNum),
-      data: brands
+      data: brands,
     });
   } catch (error) {
-    console.error('Error fetching brands:', error);
-    res.status(500).json({ 
+    console.error("Error fetching brands:", error);
+    res.status(500).json({
       success: false,
-      message: 'Failed to fetch brands',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to fetch brands",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -2209,36 +2426,38 @@ const createBrand = async (req, res) => {
 
     // Comprehensive input validation
     const validationErrors = [];
-    
-    if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
-      validationErrors.push('Brand name is required and must be at least 2 characters');
+
+    if (!brand || typeof brand !== "string" || brand.trim().length < 2) {
+      validationErrors.push(
+        "Brand name is required and must be at least 2 characters"
+      );
     }
-    
-    if (!category || typeof category !== 'string') {
-      validationErrors.push('Category is required');
+
+    if (!category || typeof category !== "string") {
+      validationErrors.push("Category is required");
     }
-    
+
     if (basePrice && (isNaN(basePrice) || basePrice < 0)) {
-      validationErrors.push('Base price must be a valid positive number');
+      validationErrors.push("Base price must be a valid positive number");
     }
-    
+
     if (validationErrors.length > 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: validationErrors
+        message: "Validation failed",
+        errors: validationErrors,
       });
     }
 
     const brandName = brand.trim().toLowerCase();
-    
+
     // Check if brand already exists
     const existingBrand = await Product.findOne({ brand: brandName });
     if (existingBrand) {
-      return res.status(409).json({ 
+      return res.status(409).json({
         success: false,
         message: `Brand '${brand}' already exists`,
-        conflictField: 'brand'
+        conflictField: "brand",
       });
     }
 
@@ -2246,16 +2465,16 @@ const createBrand = async (req, res) => {
     const productData = {
       category,
       brand: brandName,
-      model: (model && model.trim()) || 'default-model',
+      model: (model && model.trim()) || "default-model",
       basePrice: basePrice || 0,
       variant: variant || {
-        ram: '4GB',
-        storage: '64GB'
+        ram: "4GB",
+        storage: "64GB",
       },
       createdBy: req.user.id,
-      status: 'active'
+      status: "active",
     };
-    
+
     const newProduct = new Product(productData);
     await newProduct.save();
 
@@ -2267,34 +2486,39 @@ const createBrand = async (req, res) => {
         category: newProduct.category,
         model: newProduct.model,
         productId: newProduct._id,
-        createdAt: newProduct.createdAt
-      }
+        createdAt: newProduct.createdAt,
+      },
     });
   } catch (error) {
-    console.error('Error creating brand:', error);
-    
+    console.error("Error creating brand:", error);
+
     // Handle specific MongoDB errors
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({ 
+    if (error.name === "ValidationError") {
+      const validationErrors = Object.values(error.errors).map(
+        (err) => err.message
+      );
+      return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: validationErrors
+        message: "Validation failed",
+        errors: validationErrors,
       });
     }
-    
+
     if (error.code === 11000) {
-      return res.status(409).json({ 
+      return res.status(409).json({
         success: false,
-        message: 'Brand already exists',
-        conflictField: Object.keys(error.keyPattern)[0]
+        message: "Brand already exists",
+        conflictField: Object.keys(error.keyPattern)[0],
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to create brand',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to create brand",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -2309,67 +2533,79 @@ const updateBrand = async (req, res) => {
 
     // Input validation
     const validationErrors = [];
-    
-    if (!brandName || typeof brandName !== 'string' || brandName.trim().length < 2) {
-      validationErrors.push('Brand name parameter is required and must be at least 2 characters');
+
+    if (
+      !brandName ||
+      typeof brandName !== "string" ||
+      brandName.trim().length < 2
+    ) {
+      validationErrors.push(
+        "Brand name parameter is required and must be at least 2 characters"
+      );
     }
 
-    if (!newBrandName || typeof newBrandName !== 'string' || newBrandName.trim().length < 2) {
-      validationErrors.push('New brand name is required and must be at least 2 characters');
+    if (
+      !newBrandName ||
+      typeof newBrandName !== "string" ||
+      newBrandName.trim().length < 2
+    ) {
+      validationErrors.push(
+        "New brand name is required and must be at least 2 characters"
+      );
     }
-    
+
     if (validationErrors.length > 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: validationErrors
+        message: "Validation failed",
+        errors: validationErrors,
       });
     }
 
     const oldBrandName = brandName.trim().toLowerCase();
     const newBrandNameLower = newBrandName.trim().toLowerCase();
-    
+
     // Check if trying to update to the same name
     if (oldBrandName === newBrandNameLower) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'New brand name must be different from current brand name'
+        message: "New brand name must be different from current brand name",
       });
     }
 
     // Check if the original brand exists
     const originalBrand = await Product.findOne({ brand: oldBrandName });
     if (!originalBrand) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: `Brand '${brandName}' not found`
+        message: `Brand '${brandName}' not found`,
       });
     }
 
     // Check if new brand name already exists
     const existingBrand = await Product.findOne({ brand: newBrandNameLower });
     if (existingBrand) {
-      return res.status(409).json({ 
+      return res.status(409).json({
         success: false,
         message: `Brand '${newBrandName}' already exists`,
-        conflictField: 'newBrandName'
+        conflictField: "newBrandName",
       });
     }
 
     // Update all products with the old brand name
     const result = await Product.updateMany(
       { brand: oldBrandName },
-      { 
+      {
         brand: newBrandNameLower,
         updatedAt: new Date(),
-        updatedBy: req.user.id
+        updatedBy: req.user.id,
       }
     );
 
     if (result.modifiedCount === 0) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         success: false,
-        message: 'Failed to update brand. No products were modified'
+        message: "Failed to update brand. No products were modified",
       });
     }
 
@@ -2381,24 +2617,27 @@ const updateBrand = async (req, res) => {
         newBrand: newBrandName,
         matchedProducts: result.matchedCount,
         updatedProducts: result.modifiedCount,
-        updatedAt: new Date().toISOString()
-      }
+        updatedAt: new Date().toISOString(),
+      },
     });
   } catch (error) {
-    console.error('Error updating brand:', error);
-    
+    console.error("Error updating brand:", error);
+
     // Handle specific MongoDB errors
-    if (error.name === 'CastError') {
-      return res.status(400).json({ 
+    if (error.name === "CastError") {
+      return res.status(400).json({
         success: false,
-        message: 'Invalid brand identifier format'
+        message: "Invalid brand identifier format",
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to update brand',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to update brand",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -2412,18 +2651,24 @@ const deleteBrand = async (req, res) => {
     const { confirmDeletion } = req.body;
 
     // Input validation
-    if (!brandName || typeof brandName !== 'string' || brandName.trim().length < 2) {
-      return res.status(400).json({ 
+    if (
+      !brandName ||
+      typeof brandName !== "string" ||
+      brandName.trim().length < 2
+    ) {
+      return res.status(400).json({
         success: false,
-        message: 'Brand name parameter is required and must be at least 2 characters'
+        message:
+          "Brand name parameter is required and must be at least 2 characters",
       });
     }
-    
+
     // Require explicit confirmation for deletion
     if (!confirmDeletion) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Deletion confirmation is required. Set confirmDeletion to true in request body'
+        message:
+          "Deletion confirmation is required. Set confirmDeletion to true in request body",
       });
     }
 
@@ -2431,21 +2676,21 @@ const deleteBrand = async (req, res) => {
 
     // Find all products with this brand
     const products = await Product.find({ brand: brandNameLower });
-    
+
     if (products.length === 0) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: `Brand '${brandName}' not found`
+        message: `Brand '${brandName}' not found`,
       });
     }
-    
+
     // Check for active orders or dependencies before deletion
-    const productIds = products.map(p => p._id);
-    
+    const productIds = products.map((p) => p._id);
+
     // You might want to check for active orders here
     // const activeOrders = await Order.find({ productId: { $in: productIds }, status: { $in: ['pending', 'processing'] } });
     // if (activeOrders.length > 0) {
-    //   return res.status(409).json({ 
+    //   return res.status(409).json({
     //     success: false,
     //     message: `Cannot delete brand. ${activeOrders.length} active orders found for products of this brand`
     //   });
@@ -2455,9 +2700,9 @@ const deleteBrand = async (req, res) => {
     const result = await Product.deleteMany({ brand: brandNameLower });
 
     if (result.deletedCount === 0) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         success: false,
-        message: 'Failed to delete brand. No products were removed'
+        message: "Failed to delete brand. No products were removed",
       });
     }
 
@@ -2468,24 +2713,27 @@ const deleteBrand = async (req, res) => {
         brand: brandName,
         deletedProducts: result.deletedCount,
         deletedAt: new Date().toISOString(),
-        deletedBy: req.user.id
-      }
+        deletedBy: req.user.id,
+      },
     });
   } catch (error) {
-    console.error('Error deleting brand:', error);
-    
+    console.error("Error deleting brand:", error);
+
     // Handle specific MongoDB errors
-    if (error.name === 'CastError') {
-      return res.status(400).json({ 
+    if (error.name === "CastError") {
+      return res.status(400).json({
         success: false,
-        message: 'Invalid brand identifier format'
+        message: "Invalid brand identifier format",
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to delete brand',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to delete brand",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -2496,51 +2744,60 @@ const deleteBrand = async (req, res) => {
 const getModels = async (req, res) => {
   try {
     const { category, brand, page = 1, limit = 50, search } = req.query;
-    
+
     // Validate pagination parameters
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
-    
+
     if (pageNum < 1 || limitNum < 1 || limitNum > 100) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Invalid pagination parameters. Page must be >= 1, limit must be between 1-100' 
+        message:
+          "Invalid pagination parameters. Page must be >= 1, limit must be between 1-100",
       });
     }
-    
+
     const matchStage = {};
-    
+
     if (category) {
-      const validCategories = ['Mobile Phones', 'Laptops', 'Tablets', 'Smartwatches', 'Headphones'];
+      const validCategories = [
+        "Mobile Phones",
+        "Laptops",
+        "Tablets",
+        "Smartwatches",
+        "Headphones",
+      ];
       if (!validCategories.includes(category)) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           success: false,
-          message: `Invalid category. Valid categories: ${validCategories.join(', ')}` 
+          message: `Invalid category. Valid categories: ${validCategories.join(
+            ", "
+          )}`,
         });
       }
       matchStage.category = category;
     }
-    
+
     if (brand) {
-      if (typeof brand !== 'string' || brand.trim().length < 2) {
-        return res.status(400).json({ 
+      if (typeof brand !== "string" || brand.trim().length < 2) {
+        return res.status(400).json({
           success: false,
-          message: 'Brand parameter must be at least 2 characters' 
+          message: "Brand parameter must be at least 2 characters",
         });
       }
       matchStage.brand = brand.toLowerCase();
     }
-    
+
     if (search) {
-      if (typeof search !== 'string' || search.trim().length < 2) {
-        return res.status(400).json({ 
+      if (typeof search !== "string" || search.trim().length < 2) {
+        return res.status(400).json({
           success: false,
-          message: 'Search parameter must be at least 2 characters' 
+          message: "Search parameter must be at least 2 characters",
         });
       }
       matchStage.$or = [
-        { model: { $regex: search.trim(), $options: 'i' } },
-        { brand: { $regex: search.trim(), $options: 'i' } }
+        { model: { $regex: search.trim(), $options: "i" } },
+        { brand: { $regex: search.trim(), $options: "i" } },
       ];
     }
 
@@ -2549,33 +2806,33 @@ const getModels = async (req, res) => {
       {
         $group: {
           _id: {
-            model: '$model',
-            brand: '$brand',
-            category: '$category'
+            model: "$model",
+            brand: "$brand",
+            category: "$category",
           },
           count: { $sum: 1 },
-          variants: { $addToSet: '$variant' },
-          avgPrice: { $avg: '$basePrice' },
-          lastUpdated: { $max: '$updatedAt' }
-        }
+          variants: { $addToSet: "$variant" },
+          avgPrice: { $avg: "$basePrice" },
+          lastUpdated: { $max: "$updatedAt" },
+        },
       },
       {
         $project: {
           _id: 0,
-          model: '$_id.model',
-          brand: '$_id.brand',
-          category: '$_id.category',
-          productCount: '$count',
-          variantCount: { $size: '$variants' },
-          avgPrice: { $round: ['$avgPrice', 2] },
-          lastUpdated: 1
-        }
+          model: "$_id.model",
+          brand: "$_id.brand",
+          category: "$_id.category",
+          productCount: "$count",
+          variantCount: { $size: "$variants" },
+          avgPrice: { $round: ["$avgPrice", 2] },
+          lastUpdated: 1,
+        },
       },
       {
-        $sort: { brand: 1, model: 1 }
+        $sort: { brand: 1, model: 1 },
       },
       { $skip: (pageNum - 1) * limitNum },
-      { $limit: limitNum }
+      { $limit: limitNum },
     ]);
 
     // Get total count for pagination
@@ -2584,15 +2841,15 @@ const getModels = async (req, res) => {
       {
         $group: {
           _id: {
-            model: '$model',
-            brand: '$brand',
-            category: '$category'
-          }
-        }
+            model: "$model",
+            brand: "$brand",
+            category: "$category",
+          },
+        },
       },
-      { $count: 'total' }
+      { $count: "total" },
     ]);
-    
+
     const total = totalModels[0]?.total || 0;
 
     res.json({
@@ -2602,14 +2859,17 @@ const getModels = async (req, res) => {
       page: pageNum,
       totalPages: Math.ceil(total / limitNum),
       filters: { category, brand, search },
-      data: models
+      data: models,
     });
   } catch (error) {
-    console.error('Error fetching models:', error);
-    res.status(500).json({ 
+    console.error("Error fetching models:", error);
+    res.status(500).json({
       success: false,
-      message: 'Failed to fetch models',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to fetch models",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -2623,26 +2883,28 @@ const createModel = async (req, res) => {
 
     // Comprehensive input validation
     const validationErrors = [];
-    
-    if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
-      validationErrors.push('Brand is required and must be at least 2 characters');
-    }
-    
-    if (!model || typeof model !== 'string' || model.trim().length < 2) {
-      validationErrors.push('Model is required and must be at least 2 characters');
-    }
-    
-    if (basePrice && (isNaN(basePrice) || basePrice < 0)) {
-      validationErrors.push('Base price must be a valid positive number');
-    }
-    
 
-    
+    if (!brand || typeof brand !== "string" || brand.trim().length < 2) {
+      validationErrors.push(
+        "Brand is required and must be at least 2 characters"
+      );
+    }
+
+    if (!model || typeof model !== "string" || model.trim().length < 2) {
+      validationErrors.push(
+        "Model is required and must be at least 2 characters"
+      );
+    }
+
+    if (basePrice && (isNaN(basePrice) || basePrice < 0)) {
+      validationErrors.push("Base price must be a valid positive number");
+    }
+
     if (validationErrors.length > 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: validationErrors
+        message: "Validation failed",
+        errors: validationErrors,
       });
     }
 
@@ -2652,36 +2914,40 @@ const createModel = async (req, res) => {
     // Check if brand exists and get its category
     const existingBrand = await Product.findOne({ brand: brandName });
     if (!existingBrand) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
         message: `Brand '${brand}' does not exist. Please create the brand first.`,
-        missingResource: 'brand'
+        missingResource: "brand",
       });
     }
 
     // Check if model already exists for this brand
-    const existingModel = await Product.findOne({ 
-      brand: brandName, 
-      model: modelName 
+    const existingModel = await Product.findOne({
+      brand: brandName,
+      model: modelName,
     });
-    
+
     if (existingModel) {
-      return res.status(409).json({ 
+      return res.status(409).json({
         success: false,
         message: `Model '${model}' already exists for brand '${brand}'`,
-        conflictField: 'model'
+        conflictField: "model",
       });
     }
 
     // Validate variant structure if provided
-    if (variant && typeof variant === 'object') {
-      const requiredVariantFields = ['ram', 'storage'];
-      const missingFields = requiredVariantFields.filter(field => !variant[field]);
+    if (variant && typeof variant === "object") {
+      const requiredVariantFields = ["ram", "storage"];
+      const missingFields = requiredVariantFields.filter(
+        (field) => !variant[field]
+      );
       if (missingFields.length > 0) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           success: false,
-          message: `Variant missing required fields: ${missingFields.join(', ')}`,
-          missingFields
+          message: `Variant missing required fields: ${missingFields.join(
+            ", "
+          )}`,
+          missingFields,
         });
       }
     }
@@ -2693,13 +2959,13 @@ const createModel = async (req, res) => {
       model: modelName,
       basePrice: basePrice || 0,
       variant: variant || {
-        ram: '4GB',
-        storage: '64GB'
+        ram: "4GB",
+        storage: "64GB",
       },
       createdBy: req.user.id,
-      status: 'active'
+      status: "active",
     };
-    
+
     const newProduct = new Product(productData);
     await newProduct.save();
 
@@ -2713,34 +2979,39 @@ const createModel = async (req, res) => {
         basePrice: newProduct.basePrice,
         variant: newProduct.variant,
         productId: newProduct._id,
-        createdAt: newProduct.createdAt
-      }
+        createdAt: newProduct.createdAt,
+      },
     });
   } catch (error) {
-    console.error('Error creating model:', error);
-    
+    console.error("Error creating model:", error);
+
     // Handle specific MongoDB errors
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({ 
+    if (error.name === "ValidationError") {
+      const validationErrors = Object.values(error.errors).map(
+        (err) => err.message
+      );
+      return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: validationErrors
+        message: "Validation failed",
+        errors: validationErrors,
       });
     }
-    
+
     if (error.code === 11000) {
-      return res.status(409).json({ 
+      return res.status(409).json({
         success: false,
-        message: 'Model already exists for this brand',
-        conflictField: Object.keys(error.keyPattern)[0]
+        message: "Model already exists for this brand",
+        conflictField: Object.keys(error.keyPattern)[0],
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to create model',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to create model",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -2755,67 +3026,81 @@ const updateModel = async (req, res) => {
 
     // Input validation
     const validationErrors = [];
-    
-    if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
-      validationErrors.push('Brand parameter is required and must be at least 2 characters');
-    }
-    
-    if (!modelName || typeof modelName !== 'string' || modelName.trim().length < 2) {
-      validationErrors.push('Model name parameter is required and must be at least 2 characters');
+
+    if (!brand || typeof brand !== "string" || brand.trim().length < 2) {
+      validationErrors.push(
+        "Brand parameter is required and must be at least 2 characters"
+      );
     }
 
-    if (!newModelName || typeof newModelName !== 'string' || newModelName.trim().length < 2) {
-      validationErrors.push('New model name is required and must be at least 2 characters');
+    if (
+      !modelName ||
+      typeof modelName !== "string" ||
+      modelName.trim().length < 2
+    ) {
+      validationErrors.push(
+        "Model name parameter is required and must be at least 2 characters"
+      );
     }
-    
+
+    if (
+      !newModelName ||
+      typeof newModelName !== "string" ||
+      newModelName.trim().length < 2
+    ) {
+      validationErrors.push(
+        "New model name is required and must be at least 2 characters"
+      );
+    }
+
     if (basePrice && (isNaN(basePrice) || basePrice < 0)) {
-      validationErrors.push('Base price must be a valid positive number');
+      validationErrors.push("Base price must be a valid positive number");
     }
-    
+
     if (validationErrors.length > 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: validationErrors
+        message: "Validation failed",
+        errors: validationErrors,
       });
     }
 
     const brandLower = brand.trim().toLowerCase();
     const oldModelLower = modelName.trim().toLowerCase();
     const newModelLower = newModelName.trim().toLowerCase();
-    
+
     // Check if trying to update to the same name
     if (oldModelLower === newModelLower) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'New model name must be different from current model name'
+        message: "New model name must be different from current model name",
       });
     }
 
     // Check if the original model exists
-    const originalModel = await Product.findOne({ 
-      brand: brandLower, 
-      model: oldModelLower 
+    const originalModel = await Product.findOne({
+      brand: brandLower,
+      model: oldModelLower,
     });
-    
+
     if (!originalModel) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: `Model '${modelName}' not found for brand '${brand}'`
+        message: `Model '${modelName}' not found for brand '${brand}'`,
       });
     }
 
     // Check if new model name already exists for this brand
-    const existingModel = await Product.findOne({ 
-      brand: brandLower, 
-      model: newModelLower 
+    const existingModel = await Product.findOne({
+      brand: brandLower,
+      model: newModelLower,
     });
-    
+
     if (existingModel) {
-      return res.status(409).json({ 
+      return res.status(409).json({
         success: false,
         message: `Model '${newModelName}' already exists for brand '${brand}'`,
-        conflictField: 'newModelName'
+        conflictField: "newModelName",
       });
     }
 
@@ -2823,30 +3108,30 @@ const updateModel = async (req, res) => {
     const updateData = {
       model: newModelLower,
       updatedAt: new Date(),
-      updatedBy: req.user.id
+      updatedBy: req.user.id,
     };
-    
+
     if (basePrice !== undefined) {
       updateData.basePrice = basePrice;
     }
-    
-    if (variant && typeof variant === 'object') {
+
+    if (variant && typeof variant === "object") {
       updateData.variant = { ...originalModel.variant, ...variant };
     }
 
     // Update all products with the old model name
     const result = await Product.updateMany(
-      { 
-        brand: brandLower, 
-        model: oldModelLower 
+      {
+        brand: brandLower,
+        model: oldModelLower,
       },
       updateData
     );
 
     if (result.modifiedCount === 0) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         success: false,
-        message: 'Failed to update model. No products were modified'
+        message: "Failed to update model. No products were modified",
       });
     }
 
@@ -2860,24 +3145,27 @@ const updateModel = async (req, res) => {
         matchedProducts: result.matchedCount,
         updatedProducts: result.modifiedCount,
         updatedFields: Object.keys(updateData),
-        updatedAt: new Date().toISOString()
-      }
+        updatedAt: new Date().toISOString(),
+      },
     });
   } catch (error) {
-    console.error('Error updating model:', error);
-    
+    console.error("Error updating model:", error);
+
     // Handle specific MongoDB errors
-    if (error.name === 'CastError') {
-      return res.status(400).json({ 
+    if (error.name === "CastError") {
+      return res.status(400).json({
         success: false,
-        message: 'Invalid model identifier format'
+        message: "Invalid model identifier format",
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to update model',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to update model",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -2892,28 +3180,37 @@ const deleteModel = async (req, res) => {
 
     // Input validation
     const validationErrors = [];
-    
-    if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
-      validationErrors.push('Brand parameter is required and must be at least 2 characters');
+
+    if (!brand || typeof brand !== "string" || brand.trim().length < 2) {
+      validationErrors.push(
+        "Brand parameter is required and must be at least 2 characters"
+      );
     }
-    
-    if (!modelName || typeof modelName !== 'string' || modelName.trim().length < 2) {
-      validationErrors.push('Model name parameter is required and must be at least 2 characters');
+
+    if (
+      !modelName ||
+      typeof modelName !== "string" ||
+      modelName.trim().length < 2
+    ) {
+      validationErrors.push(
+        "Model name parameter is required and must be at least 2 characters"
+      );
     }
-    
+
     if (validationErrors.length > 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: validationErrors
+        message: "Validation failed",
+        errors: validationErrors,
       });
     }
-    
+
     // Require explicit confirmation for deletion
     if (!confirmDeletion) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Deletion confirmation is required. Set confirmDeletion to true in request body'
+        message:
+          "Deletion confirmation is required. Set confirmDeletion to true in request body",
       });
     }
 
@@ -2921,40 +3218,40 @@ const deleteModel = async (req, res) => {
     const modelLower = modelName.trim().toLowerCase();
 
     // Find all products with this brand and model
-    const products = await Product.find({ 
-      brand: brandLower, 
-      model: modelLower 
+    const products = await Product.find({
+      brand: brandLower,
+      model: modelLower,
     });
-    
+
     if (products.length === 0) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: `Model '${modelName}' not found for brand '${brand}'`
+        message: `Model '${modelName}' not found for brand '${brand}'`,
       });
     }
-    
+
     // Check for active orders or dependencies before deletion
-    const productIds = products.map(p => p._id);
-    
+    const productIds = products.map((p) => p._id);
+
     // You might want to check for active orders here
     // const activeOrders = await Order.find({ productId: { $in: productIds }, status: { $in: ['pending', 'processing'] } });
     // if (activeOrders.length > 0) {
-    //   return res.status(409).json({ 
+    //   return res.status(409).json({
     //     success: false,
     //     message: `Cannot delete model. ${activeOrders.length} active orders found for this model`
     //   });
     // }
 
     // Delete all products with this brand and model
-    const result = await Product.deleteMany({ 
-      brand: brandLower, 
-      model: modelLower 
+    const result = await Product.deleteMany({
+      brand: brandLower,
+      model: modelLower,
     });
 
     if (result.deletedCount === 0) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         success: false,
-        message: 'Failed to delete model. No products were removed'
+        message: "Failed to delete model. No products were removed",
       });
     }
 
@@ -2966,24 +3263,27 @@ const deleteModel = async (req, res) => {
         model: modelName,
         deletedProducts: result.deletedCount,
         deletedAt: new Date().toISOString(),
-        deletedBy: req.user.id
-      }
+        deletedBy: req.user.id,
+      },
     });
   } catch (error) {
-    console.error('Error deleting model:', error);
-    
+    console.error("Error deleting model:", error);
+
     // Handle specific MongoDB errors
-    if (error.name === 'CastError') {
-      return res.status(400).json({ 
+    if (error.name === "CastError") {
+      return res.status(400).json({
         success: false,
-        message: 'Invalid model identifier format'
+        message: "Invalid model identifier format",
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to delete model',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to delete model",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -2993,43 +3293,43 @@ const deleteModel = async (req, res) => {
 // Get all condition questionnaires
 const getConditionQuestionnaires = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
-      category, 
-      brand, 
-      model, 
-      isActive, 
+    const {
+      page = 1,
+      limit = 10,
+      category,
+      brand,
+      model,
+      isActive,
       search,
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
+      sortBy = "createdAt",
+      sortOrder = "desc",
     } = req.query;
 
     // Build filter object
     const filter = {};
-    
+
     if (category) filter.category = category.toLowerCase();
-    if (brand) filter.brand = new RegExp(brand, 'i');
-    if (model) filter.model = new RegExp(model, 'i');
-    if (isActive !== undefined) filter.isActive = isActive === 'true';
-    
+    if (brand) filter.brand = new RegExp(brand, "i");
+    if (model) filter.model = new RegExp(model, "i");
+    if (isActive !== undefined) filter.isActive = isActive === "true";
+
     // Add search functionality
     if (search) {
       filter.$or = [
-        { title: new RegExp(search, 'i') },
-        { description: new RegExp(search, 'i') },
-        { 'metadata.tags': new RegExp(search, 'i') }
+        { title: new RegExp(search, "i") },
+        { description: new RegExp(search, "i") },
+        { "metadata.tags": new RegExp(search, "i") },
       ];
     }
 
     // Build sort object
     const sort = {};
-    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    sort[sortBy] = sortOrder === "desc" ? -1 : 1;
 
     // Execute query with pagination
     const questionnaires = await ConditionQuestionnaire.find(filter)
-      .populate('createdBy', 'name email')
-      .populate('updatedBy', 'name email')
+      .populate("createdBy", "name email")
+      .populate("updatedBy", "name email")
       .sort(sort)
       .limit(limit * 1)
       .skip((page - 1) * limit)
@@ -3046,12 +3346,12 @@ const getConditionQuestionnaires = async (req, res) => {
           _id: null,
           totalQuestionnaires: { $sum: 1 },
           activeQuestionnaires: {
-            $sum: { $cond: [{ $eq: ['$isActive', true] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ["$isActive", true] }, 1, 0] },
           },
-          totalResponses: { $sum: '$analytics.totalResponses' },
-          avgCompletionTime: { $avg: '$analytics.averageCompletionTime' },
-          categoriesCount: { $addToSet: '$category' }
-        }
+          totalResponses: { $sum: "$analytics.totalResponses" },
+          avgCompletionTime: { $avg: "$analytics.averageCompletionTime" },
+          categoriesCount: { $addToSet: "$category" },
+        },
       },
       {
         $project: {
@@ -3059,10 +3359,10 @@ const getConditionQuestionnaires = async (req, res) => {
           totalQuestionnaires: 1,
           activeQuestionnaires: 1,
           totalResponses: 1,
-          avgCompletionTime: { $round: ['$avgCompletionTime', 2] },
-          categoriesCount: { $size: '$categoriesCount' }
-        }
-      }
+          avgCompletionTime: { $round: ["$avgCompletionTime", 2] },
+          categoriesCount: { $size: "$categoriesCount" },
+        },
+      },
     ]);
 
     res.json({
@@ -3075,23 +3375,23 @@ const getConditionQuestionnaires = async (req, res) => {
           totalItems: total,
           itemsPerPage: parseInt(limit),
           hasNextPage: page < Math.ceil(total / limit),
-          hasPrevPage: page > 1
+          hasPrevPage: page > 1,
         },
         stats: stats[0] || {
           totalQuestionnaires: 0,
           activeQuestionnaires: 0,
           totalResponses: 0,
           avgCompletionTime: 0,
-          categoriesCount: 0
-        }
-      }
+          categoriesCount: 0,
+        },
+      },
     });
   } catch (error) {
-    console.error('Error fetching condition questionnaires:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Server error while fetching questionnaires',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    console.error("Error fetching condition questionnaires:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching questionnaires",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -3102,33 +3402,33 @@ const getConditionQuestionnaireById = async (req, res) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid questionnaire ID format' 
+      return res.status(400).json({
+        success: false,
+        message: "Invalid questionnaire ID format",
       });
     }
 
     const questionnaire = await ConditionQuestionnaire.findById(id)
-      .populate('createdBy', 'name email')
-      .populate('updatedBy', 'name email');
+      .populate("createdBy", "name email")
+      .populate("updatedBy", "name email");
 
     if (!questionnaire) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Condition questionnaire not found' 
+      return res.status(404).json({
+        success: false,
+        message: "Condition questionnaire not found",
       });
     }
 
     res.json({
       success: true,
-      data: questionnaire
+      data: questionnaire,
     });
   } catch (error) {
-    console.error('Error fetching condition questionnaire:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Server error while fetching questionnaire',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    console.error("Error fetching condition questionnaire:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching questionnaire",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -3138,10 +3438,10 @@ const createConditionQuestionnaire = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Validation failed', 
-        errors: errors.array() 
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: errors.array(),
       });
     }
 
@@ -3156,15 +3456,15 @@ const createConditionQuestionnaire = async (req, res) => {
       version,
       isActive = true,
       isDefault = false,
-      metadata: rawMetadata
+      metadata: rawMetadata,
     } = req.body;
-    console.log('req.body: ', req.body);
+    console.log("req.body: ", req.body);
 
     // Transform questions from object to array if needed
     let questions;
     if (Array.isArray(rawQuestions)) {
       questions = rawQuestions;
-    } else if (rawQuestions && typeof rawQuestions === 'object') {
+    } else if (rawQuestions && typeof rawQuestions === "object") {
       // Convert object to array (for frontend compatibility)
       questions = Object.values(rawQuestions);
     } else {
@@ -3174,17 +3474,17 @@ const createConditionQuestionnaire = async (req, res) => {
     // Transform metadata tags from object to array if needed
     let metadata = rawMetadata;
     if (metadata && metadata.tags && !Array.isArray(metadata.tags)) {
-      if (typeof metadata.tags === 'object') {
+      if (typeof metadata.tags === "object") {
         // Convert object to array
         metadata = {
           ...metadata,
-          tags: Object.values(metadata.tags)
+          tags: Object.values(metadata.tags),
         };
       } else {
         // Set to empty array if not valid
         metadata = {
           ...metadata,
-          tags: []
+          tags: [],
         };
       }
     }
@@ -3193,7 +3493,7 @@ const createConditionQuestionnaire = async (req, res) => {
     if (!questions || !Array.isArray(questions) || questions.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'At least one question is required'
+        message: "At least one question is required",
       });
     }
 
@@ -3203,15 +3503,22 @@ const createConditionQuestionnaire = async (req, res) => {
       if (!question.id || !question.title) {
         return res.status(400).json({
           success: false,
-          message: `Question ${i + 1} must have id and title`
+          message: `Question ${i + 1} must have id and title`,
         });
       }
-      
-      if (question.type === 'single_choice' || question.type === 'multiple_choice') {
-        if (!question.options || !Array.isArray(question.options) || question.options.length === 0) {
+
+      if (
+        question.type === "single_choice" ||
+        question.type === "multiple_choice"
+      ) {
+        if (
+          !question.options ||
+          !Array.isArray(question.options) ||
+          question.options.length === 0
+        ) {
           return res.status(400).json({
             success: false,
-            message: `Question ${i + 1} with choice type must have options`
+            message: `Question ${i + 1} with choice type must have options`,
           });
         }
       }
@@ -3233,46 +3540,46 @@ const createConditionQuestionnaire = async (req, res) => {
       brand,
       model,
       questions,
-      version: version || '1.0.0',
+      version: version || "1.0.0",
       isActive,
       isDefault,
       metadata: {
         estimatedTime: metadata?.estimatedTime || 5,
-        difficulty: metadata?.difficulty || 'easy',
+        difficulty: metadata?.difficulty || "easy",
         tags: metadata?.tags || [],
-        instructions: metadata?.instructions
+        instructions: metadata?.instructions,
       },
-      createdBy: req.user.id
+      createdBy: req.user.id,
     });
 
     await questionnaire.save();
 
     // Populate the created questionnaire
-    await questionnaire.populate('createdBy', 'name email');
+    await questionnaire.populate("createdBy", "name email");
 
     res.status(201).json({
       success: true,
-      message: 'Condition questionnaire created successfully',
-      data: questionnaire
+      message: "Condition questionnaire created successfully",
+      data: questionnaire,
     });
   } catch (error) {
-    console.error('Error creating condition questionnaire:', error);
-    
-    if (error.name === 'ValidationError') {
+    console.error("Error creating condition questionnaire:", error);
+
+    if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
-        message: 'Validation error',
-        errors: Object.values(error.errors).map(err => ({
+        message: "Validation error",
+        errors: Object.values(error.errors).map((err) => ({
           field: err.path,
-          message: err.message
-        }))
+          message: err.message,
+        })),
       });
     }
-    
-    res.status(500).json({ 
-      success: false, 
-      message: 'Server error while creating questionnaire',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+
+    res.status(500).json({
+      success: false,
+      message: "Server error while creating questionnaire",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -3282,19 +3589,19 @@ const updateConditionQuestionnaire = async (req, res) => {
   try {
     const { id } = req.params;
     const errors = validationResult(req);
-    
+
     if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Validation failed', 
-        errors: errors.array() 
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: errors.array(),
       });
     }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid questionnaire ID format' 
+      return res.status(400).json({
+        success: false,
+        message: "Invalid questionnaire ID format",
       });
     }
 
@@ -3309,7 +3616,7 @@ const updateConditionQuestionnaire = async (req, res) => {
       version,
       isActive,
       isDefault,
-      metadata: rawMetadata
+      metadata: rawMetadata,
     } = req.body;
 
     // Transform questions from object to array if needed
@@ -3317,7 +3624,7 @@ const updateConditionQuestionnaire = async (req, res) => {
     if (rawQuestions !== undefined) {
       if (Array.isArray(rawQuestions)) {
         questions = rawQuestions;
-      } else if (rawQuestions && typeof rawQuestions === 'object') {
+      } else if (rawQuestions && typeof rawQuestions === "object") {
         // Convert object to array (for frontend compatibility)
         questions = Object.values(rawQuestions);
       } else {
@@ -3328,17 +3635,17 @@ const updateConditionQuestionnaire = async (req, res) => {
     // Transform metadata tags from object to array if needed
     let metadata = rawMetadata;
     if (metadata && metadata.tags && !Array.isArray(metadata.tags)) {
-      if (typeof metadata.tags === 'object') {
+      if (typeof metadata.tags === "object") {
         // Convert object to array
         metadata = {
           ...metadata,
-          tags: Object.values(metadata.tags)
+          tags: Object.values(metadata.tags),
         };
       } else {
         // Set to empty array if not valid
         metadata = {
           ...metadata,
-          tags: []
+          tags: [],
         };
       }
     }
@@ -3346,9 +3653,9 @@ const updateConditionQuestionnaire = async (req, res) => {
     // Check if questionnaire exists
     const existingQuestionnaire = await ConditionQuestionnaire.findById(id);
     if (!existingQuestionnaire) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Condition questionnaire not found' 
+      return res.status(404).json({
+        success: false,
+        message: "Condition questionnaire not found",
       });
     }
 
@@ -3357,7 +3664,7 @@ const updateConditionQuestionnaire = async (req, res) => {
       if (!Array.isArray(questions) || questions.length === 0) {
         return res.status(400).json({
           success: false,
-          message: 'At least one question is required'
+          message: "At least one question is required",
         });
       }
 
@@ -3367,15 +3674,22 @@ const updateConditionQuestionnaire = async (req, res) => {
         if (!question.id || !question.title) {
           return res.status(400).json({
             success: false,
-            message: `Question ${i + 1} must have id and title`
+            message: `Question ${i + 1} must have id and title`,
           });
         }
-        
-        if (question.type === 'single_choice' || question.type === 'multiple_choice') {
-          if (!question.options || !Array.isArray(question.options) || question.options.length === 0) {
+
+        if (
+          question.type === "single_choice" ||
+          question.type === "multiple_choice"
+        ) {
+          if (
+            !question.options ||
+            !Array.isArray(question.options) ||
+            question.options.length === 0
+          ) {
             return res.status(400).json({
               success: false,
-              message: `Question ${i + 1} with choice type must have options`
+              message: `Question ${i + 1} with choice type must have options`,
             });
           }
         }
@@ -3385,10 +3699,10 @@ const updateConditionQuestionnaire = async (req, res) => {
     // Handle default questionnaire logic
     if (isDefault === true && category) {
       await ConditionQuestionnaire.updateMany(
-        { 
-          category: category.toLowerCase(), 
-          isDefault: true, 
-          _id: { $ne: id } 
+        {
+          category: category.toLowerCase(),
+          isDefault: true,
+          _id: { $ne: id },
         },
         { $set: { isDefault: false } }
       );
@@ -3397,25 +3711,26 @@ const updateConditionQuestionnaire = async (req, res) => {
     // Prepare update object
     const updateData = {
       updatedBy: req.user.id,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     // Add fields to update if provided
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
     if (category !== undefined) updateData.category = category.toLowerCase();
-    if (subcategory !== undefined) updateData.subcategory = subcategory?.toLowerCase();
+    if (subcategory !== undefined)
+      updateData.subcategory = subcategory?.toLowerCase();
     if (brand !== undefined) updateData.brand = brand;
     if (model !== undefined) updateData.model = model;
     if (questions !== undefined) updateData.questions = questions;
     if (version !== undefined) updateData.version = version;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (isDefault !== undefined) updateData.isDefault = isDefault;
-    
+
     if (metadata) {
       updateData.metadata = {
         ...existingQuestionnaire.metadata,
-        ...metadata
+        ...metadata,
       };
     }
 
@@ -3425,32 +3740,32 @@ const updateConditionQuestionnaire = async (req, res) => {
       updateData,
       { new: true, runValidators: true }
     )
-    .populate('createdBy', 'name email')
-    .populate('updatedBy', 'name email');
+      .populate("createdBy", "name email")
+      .populate("updatedBy", "name email");
 
     res.json({
       success: true,
-      message: 'Condition questionnaire updated successfully',
-      data: updatedQuestionnaire
+      message: "Condition questionnaire updated successfully",
+      data: updatedQuestionnaire,
     });
   } catch (error) {
-    console.error('Error updating condition questionnaire:', error);
-    
-    if (error.name === 'ValidationError') {
+    console.error("Error updating condition questionnaire:", error);
+
+    if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
-        message: 'Validation error',
-        errors: Object.values(error.errors).map(err => ({
+        message: "Validation error",
+        errors: Object.values(error.errors).map((err) => ({
           field: err.path,
-          message: err.message
-        }))
+          message: err.message,
+        })),
       });
     }
-    
-    res.status(500).json({ 
-      success: false, 
-      message: 'Server error while updating questionnaire',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating questionnaire",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -3461,31 +3776,32 @@ const deleteConditionQuestionnaire = async (req, res) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid questionnaire ID format' 
+      return res.status(400).json({
+        success: false,
+        message: "Invalid questionnaire ID format",
       });
     }
 
     // Check if questionnaire exists
     const questionnaire = await ConditionQuestionnaire.findById(id);
     if (!questionnaire) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Condition questionnaire not found' 
+      return res.status(404).json({
+        success: false,
+        message: "Condition questionnaire not found",
       });
     }
 
     // Check if questionnaire is being used in any products or orders
     // This is a safety check to prevent deletion of questionnaires in use
-    const isInUse = await Product.exists({ 
-      'conditionFactors.questionnaireId': id 
+    const isInUse = await Product.exists({
+      "conditionFactors.questionnaireId": id,
     });
 
     if (isInUse) {
       return res.status(400).json({
         success: false,
-        message: 'Cannot delete questionnaire as it is currently being used by products. Please deactivate it instead.'
+        message:
+          "Cannot delete questionnaire as it is currently being used by products. Please deactivate it instead.",
       });
     }
 
@@ -3496,32 +3812,32 @@ const deleteConditionQuestionnaire = async (req, res) => {
         isActive: false,
         deletedAt: new Date(),
         deletedBy: req.user.id,
-        'metadata.deletionReason': req.body.reason || 'Deleted by admin'
+        "metadata.deletionReason": req.body.reason || "Deleted by admin",
       },
       { new: true }
     );
 
     // If force delete is requested and questionnaire is not in use
-    if (req.query.force === 'true') {
+    if (req.query.force === "true") {
       await ConditionQuestionnaire.findByIdAndDelete(id);
-      
+
       return res.json({
         success: true,
-        message: 'Condition questionnaire permanently deleted'
+        message: "Condition questionnaire permanently deleted",
       });
     }
 
     res.json({
       success: true,
-      message: 'Condition questionnaire deactivated successfully',
-      data: deletedQuestionnaire
+      message: "Condition questionnaire deactivated successfully",
+      data: deletedQuestionnaire,
     });
   } catch (error) {
-    console.error('Error deleting condition questionnaire:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Server error while deleting questionnaire',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    console.error("Error deleting condition questionnaire:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while deleting questionnaire",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -3534,27 +3850,27 @@ const getQuestionnairesByCategory = async (req, res) => {
 
     const filter = {
       category: category.toLowerCase(),
-      isActive: isActive === 'true'
+      isActive: isActive === "true",
     };
 
-    if (brand) filter.brand = new RegExp(brand, 'i');
-    if (model) filter.model = new RegExp(model, 'i');
+    if (brand) filter.brand = new RegExp(brand, "i");
+    if (model) filter.model = new RegExp(model, "i");
 
     const questionnaires = await ConditionQuestionnaire.find(filter)
-      .select('title description version isDefault metadata questions')
+      .select("title description version isDefault metadata questions")
       .sort({ isDefault: -1, createdAt: -1 })
       .lean();
 
     res.json({
       success: true,
-      data: questionnaires
+      data: questionnaires,
     });
   } catch (error) {
-    console.error('Error fetching questionnaires by category:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Server error while fetching questionnaires',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    console.error("Error fetching questionnaires by category:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching questionnaires",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -3567,58 +3883,59 @@ const updateModelByName = async (req, res) => {
     const { modelName } = req.params;
     const updateData = req.body;
 
-    console.log('Updating model:', modelName, 'with data:', updateData);
+    console.log("Updating model:", modelName, "with data:", updateData);
 
     // Decode URL-encoded model name
     const decodedModelName = decodeURIComponent(modelName);
-    
+
     // Input validation
     if (!decodedModelName || decodedModelName.trim().length < 2) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Model name parameter is required and must be at least 2 characters'
+        message:
+          "Model name parameter is required and must be at least 2 characters",
       });
     }
 
     // Find the model first to check if it exists
-    const existingModel = await Product.findOne({ 
-      model: decodedModelName.trim().toLowerCase() 
+    const existingModel = await Product.findOne({
+      model: decodedModelName.trim().toLowerCase(),
     });
-    
+
     if (!existingModel) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: `Model '${decodedModelName}' not found`
+        message: `Model '${decodedModelName}' not found`,
       });
     }
 
     // Prepare update data
     const updateFields = {
       updatedAt: new Date(),
-      updatedBy: req.user?.id
+      updatedBy: req.user?.id,
     };
-    
+
     // Map frontend fields to backend fields
     if (updateData.model && updateData.model !== decodedModelName) {
       updateFields.model = updateData.model.trim().toLowerCase();
     }
-    
+
     if (updateData.brand) {
       updateFields.brand = updateData.brand.trim().toLowerCase();
     }
-    
+
     if (updateData.description !== undefined) {
       updateFields.description = updateData.description;
     }
-    
+
     if (updateData.releaseYear) {
       updateFields.releaseYear = parseInt(updateData.releaseYear);
     }
-    
+
     if (updateData.isActive !== undefined) {
       updateFields.isActive = updateData.isActive;
     }
-    
+
     if (updateData.variants && Array.isArray(updateData.variants)) {
       updateFields.variants = updateData.variants;
     }
@@ -3630,9 +3947,9 @@ const updateModelByName = async (req, res) => {
     );
 
     if (result.modifiedCount === 0) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'No products were updated. Model may not exist.'
+        message: "No products were updated. Model may not exist.",
       });
     }
 
@@ -3644,16 +3961,19 @@ const updateModelByName = async (req, res) => {
         matchedProducts: result.matchedCount,
         updatedProducts: result.modifiedCount,
         updatedFields: Object.keys(updateFields),
-        updatedAt: new Date().toISOString()
-      }
+        updatedAt: new Date().toISOString(),
+      },
     });
   } catch (error) {
-    console.error('Error updating model by name:', error);
-    
-    res.status(500).json({ 
+    console.error("Error updating model by name:", error);
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to update model',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to update model",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -3664,35 +3984,36 @@ const updateModelByName = async (req, res) => {
 const deleteModelByName = async (req, res) => {
   try {
     const { modelName } = req.params;
-    
+
     // Decode URL-encoded model name
     const decodedModelName = decodeURIComponent(modelName);
-    
-    console.log('Deleting model:', decodedModelName);
+
+    console.log("Deleting model:", decodedModelName);
 
     // Input validation
     if (!decodedModelName || decodedModelName.trim().length < 2) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Model name parameter is required and must be at least 2 characters'
+        message:
+          "Model name parameter is required and must be at least 2 characters",
       });
     }
 
     // Find all products with this model name
-    const products = await Product.find({ 
-      model: decodedModelName.trim().toLowerCase() 
+    const products = await Product.find({
+      model: decodedModelName.trim().toLowerCase(),
     });
-    
+
     if (products.length === 0) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: `Model '${decodedModelName}' not found`
+        message: `Model '${decodedModelName}' not found`,
       });
     }
 
     // Delete all products with this model name
-    const result = await Product.deleteMany({ 
-      model: decodedModelName.trim().toLowerCase() 
+    const result = await Product.deleteMany({
+      model: decodedModelName.trim().toLowerCase(),
     });
 
     res.json({
@@ -3701,16 +4022,19 @@ const deleteModelByName = async (req, res) => {
       data: {
         modelName: decodedModelName,
         deletedProducts: result.deletedCount,
-        deletedAt: new Date().toISOString()
-      }
+        deletedAt: new Date().toISOString(),
+      },
     });
   } catch (error) {
-    console.error('Error deleting model by name:', error);
-    
-    res.status(500).json({ 
+    console.error("Error deleting model by name:", error);
+
+    res.status(500).json({
       success: false,
-      message: 'Failed to delete model',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: "Failed to delete model",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
     });
   }
 };
@@ -3746,6 +4070,7 @@ module.exports = {
   getSellOrders,
   getBuyOrders,
   updateOrderStatus,
+  assignPartnerToOrder,
   getBrands,
   createBrand,
   updateBrand,
@@ -3762,5 +4087,5 @@ module.exports = {
   createConditionQuestionnaire,
   updateConditionQuestionnaire,
   deleteConditionQuestionnaire,
-  getQuestionnairesByCategory
+  getQuestionnairesByCategory,
 };

@@ -165,9 +165,41 @@ const SellOrders = () => {
         assignedTo: agentId,
       });
       fetchOrders(pagination.currentPage, statusFilter, searchTerm);
+      alert('Agent assigned successfully!');
     } catch (err) {
       console.error('Failed to assign agent to order', err);
       alert('Failed to assign agent. Please try again.');
+    }
+  };
+
+  const handleUpdateStatus = async (orderId: any, newStatus: string, notes = '') => {
+    if (!newStatus) return;
+
+    try {
+      await api.put(`/sell-orders/${orderId}/status`, {
+        status: newStatus,
+        notes: notes || `Status updated to ${newStatus}`,
+      });
+      fetchOrders(pagination.currentPage, statusFilter, searchTerm);
+      alert(`Order status updated to ${newStatus}!`);
+    } catch (err: any) {
+      console.error('Failed to update order status', err);
+      alert(err.response?.data?.message || 'Failed to update status. Please try again.');
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: any) => {
+    if (!confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/sell-orders/${orderId}`);
+      fetchOrders(pagination.currentPage, statusFilter, searchTerm);
+      alert('Order deleted successfully!');
+    } catch (err: any) {
+      console.error('Failed to delete order', err);
+      alert(err.response?.data?.message || 'Failed to delete order. Please try again.');
     }
   };
 
@@ -534,9 +566,34 @@ const SellOrders = () => {
                       <Eye size={14} className="sm:w-4 sm:h-4" />
                       <span>View Details</span>
                     </button>
-                    <button className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-xs sm:text-sm">
-                      <Edit size={14} className="sm:w-4 sm:h-4" />
-                      <span>Update Status</span>
+
+                    {/* Status Update Dropdown */}
+                    <select
+                      className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-xs sm:text-sm cursor-pointer"
+                      onChange={e => {
+                        if (e.target.value) {
+                          handleUpdateStatus(order._id, e.target.value);
+                          e.target.value = ''; // Reset selection
+                        }
+                      }}
+                      defaultValue=""
+                    >
+                      <option value="">Update Status</option>
+                      <option value="draft">Draft</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="picked_up">Picked Up</option>
+                      <option value="paid">Paid</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => handleDeleteOrder(order._id)}
+                      className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-red-50 border border-red-200 text-red-600 rounded-lg hover:bg-red-100 transition-all duration-200 font-medium text-xs sm:text-sm"
+                      title="Delete Order"
+                    >
+                      <X size={14} className="sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Delete</span>
                     </button>
                   </div>
                 </div>

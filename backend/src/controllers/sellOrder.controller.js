@@ -233,16 +233,17 @@ exports.updateOrderStatus = asyncHandler(async (req, res) => {
   // Update based on status
   switch (status) {
     case "confirmed":
-      await order.confirmOrder();
+      await order.confirm();
       break;
     case "cancelled":
-      await order.cancelOrder(notes);
+      await order.cancel(notes);
       break;
+    case "picked_up":
     case "picked":
-      await order.markAsPicked(actualAmount, notes);
+      await order.markPicked(actualAmount, assignedTo);
       break;
     case "paid":
-      await order.markAsPaid();
+      await order.markPaid();
       break;
     default:
       order.status = status;
