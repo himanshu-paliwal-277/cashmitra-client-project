@@ -101,22 +101,31 @@ export const ImageUploadContainer = ({ onUpload, loading, children }: any) => (
 // Image Preview Grid
 export const ImagePreview = ({ images, onRemove }: any) => (
   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4">
-    {images.map((img: any, index: number) => (
-      <div key={index} className="relative group aspect-square">
-        <img
-          src={typeof img === 'string' ? img : img.url}
-          alt={`Product ${index + 1}`}
-          className="w-full h-full object-cover rounded-lg border border-gray-200"
-        />
-        <button
-          type="button"
-          onClick={() => onRemove(index)}
-          className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
-        >
-          <X size={14} />
-        </button>
-      </div>
-    ))}
+    {images
+      .filter((img: any) => img != null) // Filter out null/undefined values
+      .map((img: any, index: number) => {
+        // Get the image URL safely
+        const imageUrl = typeof img === 'string' ? img : img?.url || img?.preview || '';
+
+        if (!imageUrl) return null; // Skip if no valid URL
+
+        return (
+          <div key={index} className="relative group aspect-square">
+            <img
+              src={imageUrl}
+              alt={`Product ${index + 1}`}
+              className="w-full h-full object-cover rounded-lg border border-gray-200"
+            />
+            <button
+              type="button"
+              onClick={() => onRemove(index)}
+              className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        );
+      })}
   </div>
 );
 

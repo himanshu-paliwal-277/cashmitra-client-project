@@ -218,21 +218,6 @@ const AdminLayout = () => {
                 Sales & Orders
               </h3>
               <Link
-                to="/admin/sell"
-                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
-                  location.pathname === '/admin/sell'
-                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
-                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
-                } active:translate-x-0.5`}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
-                  <TrendingUp size={18} />
-                </span>
-                Sell
-              </Link>
-
-              <Link
                 to="/admin/leads"
                 className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
                   location.pathname === '/admin/leads'
@@ -260,21 +245,6 @@ const AdminLayout = () => {
                   <ShoppingCart size={18} />
                 </span>
                 Sell Orders
-              </Link>
-
-              <Link
-                to="/admin/buy"
-                className={`flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all duration-200 group ${
-                  location.pathname === '/admin/buy'
-                    ? 'text-blue-600 font-semibold bg-blue-50 border-l-blue-600'
-                    : 'text-slate-700 font-medium bg-transparent border-l-transparent hover:bg-slate-50 hover:text-blue-600 hover:border-l-blue-400'
-                } active:translate-x-0.5`}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <span className="mr-3.5 flex items-center justify-center w-5 h-5 flex-shrink-0 transition-transform duration-200 group-hover:scale-110">
-                  <ShoppingBag size={18} />
-                </span>
-                Buy
               </Link>
 
               <Link

@@ -397,12 +397,19 @@ const EditBuyProduct = () => {
         })
       );
       const uploadResults = await Promise.all(uploadPromises);
-      const newImages = uploadResults.map((result: any) => result.secure_url);
+
+      // Extract URLs from the upload results
+      // cloudinaryService returns: { success: true, data: { url: '...' } }
+      const newImages = uploadResults
+        .filter((result: any) => result.success && result.data?.url)
+        .map((result: any) => result.data.url);
+
       setFormData((prev: any) => ({
         ...prev,
         images: [...prev.images, ...newImages],
       }));
-      setSuccess('Images uploaded successfully!');
+
+      setSuccess(`${newImages.length} image(s) uploaded successfully!`);
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       console.error('Error uploading images:', error);

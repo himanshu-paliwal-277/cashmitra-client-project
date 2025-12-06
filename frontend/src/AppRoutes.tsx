@@ -74,12 +74,11 @@ const CreateUser = lazy(() => import('./components/admin/CreateUser'));
 const EditUser = lazy(() => import('./components/admin/EditUser'));
 const CreateProduct = lazy(() => import('./components/admin/CreateProduct'));
 const EditProduct = lazy(() => import('./components/admin/EditProduct'));
-const Sell = lazy(() => import('./pages/admin/Sell'));
+
 const SuperCategoryManagement = lazy(() => import('./pages/admin/SuperCategoryManagement'));
 const SellSuperCategoryManagement = lazy(() => import('./pages/admin/SellSuperCategoryManagement'));
 const Leads = lazy(() => import('./pages/admin/Leads'));
 const SellOrders = lazy(() => import('./pages/admin/SellOrders'));
-const Buy = lazy(() => import('./pages/admin/Buy'));
 const BuyOrders = lazy(() => import('./pages/admin/BuyOrders'));
 const Pricing = lazy(() => import('./pages/admin/Pricing'));
 const Finance = lazy(() => import('./pages/admin/Finance'));
@@ -107,7 +106,6 @@ const SellSessionsManagement = lazy(() => import('./pages/admin/SellSessionsMana
 const SellConfigurationManagement = lazy(() => import('./pages/admin/SellConfigurationManagement'));
 const PickupManagement = lazy(() => import('./pages/admin/PickupManagement'));
 const SellOrdersManagement = lazy(() => import('./pages/admin/SellOrdersManagement'));
-const OrderView = lazy(() => import('./pages/admin/OrderView'));
 const AdminProtectedRoute = lazy(() => import('./components/admin/ProtectedRoute'));
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout'));
 
@@ -132,7 +130,6 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
       <Route path="/admin" element={<AdminProtectedRoute />}>
         <Route element={<AdminLayout />}>
           <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="sell" element={<Sell />} />
           <Route path="sell-super-categories" element={<SellSuperCategoryManagement />} />
           <Route path="sell-categories" element={<SellCategories />} />
           <Route path="sell-products" element={<SellProducts />} />
@@ -144,8 +141,6 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="sell-orders" element={<SellOrders />} />
           <Route path="sell-orders-management" element={<SellOrdersManagement />} />
           <Route path="leads" element={<Leads />} />
-          <Route path="buy" element={<Buy />} />
-          <Route path="buy/order/:orderId" element={<OrderView />} />
           <Route path="buy-super-categories" element={<SuperCategoryManagement />} />
           <Route path="buy-categories" element={<BuyCategories />} />
           <Route path="buy-products" element={<BuyProducts />} />
