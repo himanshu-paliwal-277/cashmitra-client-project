@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Menu,
@@ -35,6 +35,7 @@ import {
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import PermissionsSidebar from './PermissionsSidebar';
 import usePermissionsSidebar from '../../hooks/usePermissionsSidebar';
+import { PageLoader } from '../common/PageLoader';
 
 const AdminLayout = () => {
   const location = useLocation();
@@ -744,12 +745,14 @@ const AdminLayout = () => {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col overflow-hidden bg-slate-50">
-          {/* Page Content */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 lg:p-8">
-            <Outlet context={{ openPermissionsSidebar }} />
-          </div>
-        </main>
+        <Suspense fallback={<PageLoader text="Loading page..." />}>
+          <main className="flex-1 flex flex-col overflow-hidden bg-slate-50">
+            {/* Page Content */}
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 lg:p-8">
+              <Outlet context={{ openPermissionsSidebar }} />
+            </div>
+          </main>
+        </Suspense>
       </div>
 
       {/* Permissions Sidebar */}
