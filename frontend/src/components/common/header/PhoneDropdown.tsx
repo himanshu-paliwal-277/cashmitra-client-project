@@ -198,9 +198,9 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
                     onClick={() => handlePhoneClick(phone)}
                   >
                     {/* Discount Badge */}
-                    {discount && discount > 0 && (
+                    {Number(discount) > 0 && (
                       <div className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                        {discount}% OFF
+                        {Number(discount)}% OFF
                       </div>
                     )}
 

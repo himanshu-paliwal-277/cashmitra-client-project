@@ -224,7 +224,7 @@ const MyOrders = () => {
         {/* Content */}
         {loading ? (
           <div className="text-center border border-dashed border-gray-200 rounded-2xl py-8 px-4 bg-gradient-to-b from-white to-gray-50 text-gray-600">
-            <div className="w-[86px] h-[86px] mx-auto mb-3 rounded-full grid place-items-center bg-gray-100 text-gray-600 border border-dashed border-gray-200 animate-pulse">
+            <div className="w-[86px] h-[86px] animate-spin mx-auto mb-3 rounded-full grid place-items-center bg-gray-100 text-gray-600 border border-dashed border-gray-200 animate-pulse">
               <RefreshCw size={40} />
             </div>
             <h3 className="my-1 text-gray-900 font-bold">Loading Orders…</h3>

@@ -2,7 +2,8 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import Footer from '../common/footer/Footer';
 import Header from '../common/header/Header';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
+import { PageLoader } from '../common/PageLoader';
 
 const MainLayout = () => {
   const { pathname } = useLocation();
@@ -17,9 +18,11 @@ const MainLayout = () => {
       <Header />
 
       {/* Main Content */}
-      <main className="flex-1">
-        <Outlet />
-      </main>
+      <Suspense fallback={<PageLoader text="Loading page..." />}>
+        <main className="flex-1">
+          <Outlet />
+        </main>
+      </Suspense>
 
       {/* Footer */}
       <Footer />

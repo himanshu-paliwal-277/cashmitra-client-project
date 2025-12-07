@@ -415,7 +415,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
               <span>Your payment information is secure and encrypted</span>
             </div>
 
-            <button
+            <Button
               className="btn sum-place"
               onClick={handlePlaceOrder}
               disabled={orderLoading || !sortedCart.length}
@@ -424,7 +424,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
               <span>
                 {orderLoading ? 'Processing…' : `Place Order - ₹${total.toLocaleString()}`}
               </span>
-            </button>
+            </Button>
           </aside>
         </div>
       </div>

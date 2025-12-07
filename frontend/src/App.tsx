@@ -1,4 +1,4 @@
-import { useState, Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
@@ -8,10 +8,10 @@ import { AdminAuthProvider } from './contexts/AdminAuthContext';
 import { PartnerAuthProvider } from './contexts/PartnerAuthContext';
 import { AgentAuthProvider } from './contexts/AgentAuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
-import { FullScreenLoader } from './components/Loader';
 
 // Import the new AppRoutes component
 import AppRoutes from './AppRoutes';
+import { AppLoader } from './components/common/AppLoader';
 
 /**
  * AppContent component
@@ -31,11 +31,7 @@ function AppContent() {
     setSellFlowData(prev => ({ ...prev, [key]: value }));
   };
 
-  return (
-    <Suspense fallback={<FullScreenLoader text="Loading..." />}>
-      <AppRoutes sellFlowData={sellFlowData} updateSellFlowData={updateSellFlowData} />
-    </Suspense>
-  );
+  return <AppRoutes sellFlowData={sellFlowData} updateSellFlowData={updateSellFlowData} />;
 }
 
 /**
@@ -60,7 +56,9 @@ function App() {
               <AdminAuthProvider>
                 <PartnerAuthProvider>
                   <AgentAuthProvider>
-                    <AppContent />
+                    <Suspense fallback={<AppLoader text="Starting App..." />}>
+                      <AppContent />
+                    </Suspense>
                   </AgentAuthProvider>
                 </PartnerAuthProvider>
               </AdminAuthProvider>

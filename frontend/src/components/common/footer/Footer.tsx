@@ -69,26 +69,17 @@ const Footer = () => {
           <h3 className="text-lg font-semibold">Sell</h3>
           <ul className="flex flex-col gap-2">
             <li>
-              <Link
-                className="text-gray-300 text-sm hover:text-primary-light"
-                to="/sell?category=mobile"
-              >
+              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/sell">
                 Sell Mobile
               </Link>
             </li>
             <li>
-              <Link
-                className="text-gray-300 text-sm hover:text-primary-light"
-                to="/sell?category=tablet"
-              >
+              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/sell">
                 Sell Tablet
               </Link>
             </li>
             <li>
-              <Link
-                className="text-gray-300 text-sm hover:text-primary-light"
-                to="/sell?category=laptop"
-              >
+              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/sell">
                 Sell Laptop
               </Link>
             </li>

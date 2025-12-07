@@ -167,7 +167,7 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }: any) => 
           <p className="header-subtitle">
             Thank you for your purchase. We'll send you updates about your order.
           </p>
-          <div className="order-number hover-lift">
+          <div className="order-number hover-lift bg-green-500">
             <span className="order-label">Order Number</span>
             <span className="order-id">{order?._id || order?.orderId || 'ORD1234567890'}</span>
           </div>

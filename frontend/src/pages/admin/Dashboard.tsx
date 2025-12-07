@@ -154,7 +154,7 @@ function AdminDashboard() {
       {/* Main Content */}
       <div className="relative">
         {loading ? (
-          <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200">
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200 min-h-screen">
             <LoadingSpinner size="xl" text="Loading dashboard data..." />
           </div>
         ) : (
