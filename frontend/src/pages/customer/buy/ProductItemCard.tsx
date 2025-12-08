@@ -57,7 +57,7 @@ const ProductItemCard: React.FC<ProductItemCardProps> = ({
       onClick={() => handleProductClick(productId)}
       className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200 cursor-pointer group"
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden ">
         <img
           src={productImage}
           alt={productTitle}
@@ -82,13 +82,14 @@ const ProductItemCard: React.FC<ProductItemCardProps> = ({
             e.stopPropagation();
             toggleWishlist(productId);
           }}
-          className={`absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-            wishlist.has(productId)
-              ? 'bg-red-500 text-white'
-              : 'bg-white/90 text-slate-600 hover:bg-red-500 hover:text-white'
-          }`}
+          className={`absolute top-3 right-3 bg-white rounded-full p-2`}
         >
-          <Heart className="w-5 h-5" fill={wishlist.has(productId) ? 'currentColor' : 'none'} />
+          <Heart
+            className="w-6 h-6"
+            fill={wishlist.has(productId) ? 'red' : 'none'}
+            stroke={wishlist.has(productId) ? 'red' : 'currentColor'}
+            strokeWidth={1}
+          />
         </button>
       </div>
 

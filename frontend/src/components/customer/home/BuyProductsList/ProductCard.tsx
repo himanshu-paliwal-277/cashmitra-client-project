@@ -23,7 +23,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
 
   return (
     <article
-      className="relative bg-white rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ease-out shadow-sm border-2 border-gray-300 hover:shadow-xl flex flex-col"
+      className="relative bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-300 ease-out shadow-md hover:shadow-lg flex flex-col group"
       onClick={() => onClick(product._id)}
     >
       {/* Assured Badge */}
@@ -48,7 +48,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
           <img
             src={product.images?.main || '/placeholder-phone.png'}
             alt={product.name}
-            className="max-w-full max-h-full object-contain"
+            className="max-w-full max-h-full object-contain group-hover:scale-105 transition-all duration-300 ease-out"
             loading="lazy"
           />
         </div>

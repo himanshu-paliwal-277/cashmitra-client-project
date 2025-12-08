@@ -34,7 +34,7 @@ const HomeBanner = () => {
             variant="primary"
             size="lg"
             rightIcon={<ArrowRight size={20} />}
-            onClick={() => navigate('/sell-device')}
+            onClick={() => navigate('/sell')}
           >
             Start Selling
           </Button>

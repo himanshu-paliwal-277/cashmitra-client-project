@@ -148,7 +148,7 @@ const Header = () => {
   return (
     <>
       {/* Top Bar - Sticky */}
-      <div className="bg-white w-full shadow-sm flex justify-between items-center gap-4 px-4 py-3 lg:gap-6 lg:px-[100px] lg:py-4 md:gap-3 md:px-6 sticky top-0 z-[2000] border-b border-gray-200">
+      <div className="bg-white w-full main-container shadow-sm flex justify-between items-center gap-4 py-3 lg:gap-6 lg:py-4 md:gap-3 sticky top-0 z-[2000] border-b border-gray-200">
         {/* Logo */}
         <Link
           to="/"
@@ -262,10 +262,7 @@ const Header = () => {
 
       {/* Bottom Navigation Bar - Hidden on mobile */}
       <nav className="hidden lg:block bg-white w-full border-b border-gray-200 shadow-sm">
-        <div
-          ref={navDropdownRef}
-          className="w-full max-w-[1400px] mx-auto px-6 xl:px-8 flex items-center gap-2"
-        >
+        <div ref={navDropdownRef} className="w-full main-container flex items-center gap-2">
           {navItems.map(item => (
             <div
               key={item.id}

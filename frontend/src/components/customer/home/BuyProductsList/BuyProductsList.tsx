@@ -33,7 +33,7 @@ const BuyProductsList = () => {
   };
 
   return (
-    <section className="buy-products-section main-container">
+    <section className="buy-products-section main-container bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       <div className="section-header">
         <h2>Buy Refurbished Devices</h2>
         <button className="view-all-button">
