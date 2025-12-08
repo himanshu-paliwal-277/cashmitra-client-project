@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { AlertCircle } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '../../utils/utils';
 
 const Input = React.forwardRef(
   (
-    {      className,      type,      error,      label,      leftIcon,      rightIcon,      helperText,      required,      id,
-      ...props
-    },
+    { className, type, error, label, leftIcon, rightIcon, helperText, required, id, ...props },
     ref
   ) => {
     const generatedId = React.useId();
@@ -43,7 +41,8 @@ const Input = React.forwardRef(
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               className
-            )}            ref={ref}
+            )}
+            ref={ref}
             aria-invalid={hasError}
             aria-describedby={error ? `${inputId}-error` : undefined}
             {...props}

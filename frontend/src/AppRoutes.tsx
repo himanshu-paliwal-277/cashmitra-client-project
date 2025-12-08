@@ -5,53 +5,53 @@ import { Routes, Route } from 'react-router-dom';
 const MainLayout = lazy(() => import('./components/layout/MainLayout'));
 
 // Auth Pages (Lazy)
-const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
-const SignupPage = lazy(() => import('./pages/auth/SignupPage'));
+const LoginPage = lazy(() => import('./pages/customer/auth/LoginPage'));
+const SignupPage = lazy(() => import('./pages/customer/auth/SignupPage'));
 
 // Public Pages (Lazy)
-const Home = lazy(() => import('./pages/Home'));
-const Help = lazy(() => import('./pages/Help'));
-const About = lazy(() => import('./pages/About'));
-const Contact = lazy(() => import('./pages/Contact'));
-const Privacy = lazy(() => import('./pages/Privacy'));
-const Terms = lazy(() => import('./pages/Terms'));
-const ReturnsRefund = lazy(() => import('./pages/ReturnsRefund'));
-const NotFound = lazy(() => import('./pages/NotFound'));
+const Home = lazy(() => import('./pages/customer/Home'));
+const Help = lazy(() => import('./pages/customer/Help'));
+const About = lazy(() => import('./pages/customer/About'));
+const Contact = lazy(() => import('./pages/customer/Contact'));
+const Privacy = lazy(() => import('./pages/customer/Privacy'));
+const Terms = lazy(() => import('./pages/customer/Terms'));
+const ReturnsRefund = lazy(() => import('./pages/customer/ReturnsRefund'));
+const NotFound = lazy(() => import('./pages/customer/NotFound'));
 
 // Sell Flow Pages (Lazy)
-const CategorySelection = lazy(() => import('./pages/sell/CategorySelection'));
-const BrandSelection = lazy(() => import('./pages/sell/BrandSelection'));
-const ConditionQuestionnaire = lazy(() => import('./pages/sell/ConditionQuestionnaire'));
-const ProductCondition = lazy(() => import('./pages/sell/ProductCondition'));
-const PriceQuote = lazy(() => import('./pages/sell/PriceQuote'));
-const PickupBooking = lazy(() => import('./pages/sell/PickupBooking'));
-const BookingConfirmation = lazy(() => import('./pages/sell/BookingConfirmation'));
-const SellTablet = lazy(() => import('./pages/sell/SellTablet'));
-const SellLaptop = lazy(() => import('./pages/sell/SellLaptop'));
-const SellMobileForm = lazy(() => import('./pages/sell/SellMobileForm'));
-const CategoryProducts = lazy(() => import('./pages/sell/CategoryProducts'));
-const ProductVariantSelection = lazy(() => import('./pages/sell/ProductVariantSelection'));
-const SellModelSelection = lazy(() => import('./pages/sell/SellModelSelection'));
-const SellDeviceEvaluation = lazy(() => import('./pages/sell/SellDeviceEvaluation'));
-const SellScreenDefects = lazy(() => import('./pages/sell/SellScreenDefects'));
-const SellAccessories = lazy(() => import('./pages/sell/SellAccessories'));
-const SellCategoryHome = lazy(() => import('./pages/sell/SellCategoryHome'));
+const CategorySelection = lazy(() => import('./pages/customer/sell/CategorySelection'));
+const BrandSelection = lazy(() => import('./pages/customer/sell/BrandSelection'));
+const ConditionQuestionnaire = lazy(() => import('./pages/customer/sell/ConditionQuestionnaire'));
+const ProductCondition = lazy(() => import('./pages/customer/sell/ProductCondition'));
+const PriceQuote = lazy(() => import('./pages/customer/sell/PriceQuote'));
+const PickupBooking = lazy(() => import('./pages/customer/sell/PickupBooking'));
+const BookingConfirmation = lazy(() => import('./pages/customer/sell/BookingConfirmation'));
+const SellTablet = lazy(() => import('./pages/customer/sell/SellTablet'));
+const SellLaptop = lazy(() => import('./pages/customer/sell/SellLaptop'));
+const SellMobileForm = lazy(() => import('./pages/customer/sell/SellMobileForm'));
+const CategoryProducts = lazy(() => import('./pages/customer/sell/CategoryProducts'));
+const ProductVariantSelection = lazy(() => import('./pages/customer/sell/ProductVariantSelection'));
+const SellModelSelection = lazy(() => import('./pages/customer/sell/SellModelSelection'));
+const SellDeviceEvaluation = lazy(() => import('./pages/customer/sell/SellDeviceEvaluation'));
+const SellScreenDefects = lazy(() => import('./pages/customer/sell/SellScreenDefects'));
+const SellAccessories = lazy(() => import('./pages/customer/sell/SellAccessories'));
+const SellCategoryHome = lazy(() => import('./pages/customer/sell/SellCategoryHome'));
 
 // Buy Flow Pages (Lazy)
-const Marketplace = lazy(() => import('./pages/buy/Marketplace'));
-const BuyCategoryHome = lazy(() => import('./pages/buy/BuyCategoryHome'));
-const ProductDetails = lazy(() => import('./pages/buy/ProductDetails'));
-const Cart = lazy(() => import('./pages/buy/Cart'));
-const Checkout = lazy(() => import('./pages/buy/Checkout'));
-const OrderConfirmation = lazy(() => import('./pages/buy/OrderConfirmation'));
+const Marketplace = lazy(() => import('./pages/customer/buy/Marketplace'));
+const BuyCategoryHome = lazy(() => import('./pages/customer/buy/BuyCategoryHome'));
+const ProductDetails = lazy(() => import('./pages/customer/buy/ProductDetails'));
+const Cart = lazy(() => import('./pages/customer/buy/Cart'));
+const Checkout = lazy(() => import('./pages/customer/buy/Checkout'));
+const OrderConfirmation = lazy(() => import('./pages/customer/buy/OrderConfirmation'));
 
 // Account Pages (Lazy)
-const MyProfile = lazy(() => import('./pages/account/MyProfile'));
-const MyOrders = lazy(() => import('./pages/account/MyOrders'));
+const MyProfile = lazy(() => import('./pages/customer/account/MyProfile'));
+const MyOrders = lazy(() => import('./pages/customer/account/MyOrders'));
 const UserOrderDetails = lazy(() => import('./components/UserOrderDetails'));
-const Wallet = lazy(() => import('./pages/account/Wallet'));
-const KYC = lazy(() => import('./pages/account/KYC'));
-const SavedAddresses = lazy(() => import('./pages/account/SavedAddresses'));
+const Wallet = lazy(() => import('./pages/customer/account/Wallet'));
+const KYC = lazy(() => import('./pages/customer/account/KYC'));
+const SavedAddresses = lazy(() => import('./pages/customer/account/SavedAddresses'));
 
 // Partner Pages (Lazy)
 const PartnerLogin = lazy(() => import('./pages/partner/Login'));

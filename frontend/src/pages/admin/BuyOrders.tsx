@@ -6,9 +6,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '../../utils/utils';
 import Card from '../../components/ui/Card';
-import api from '../../config/api';
+import api from '../../utils/api';
 import {
   Package,
   Search,

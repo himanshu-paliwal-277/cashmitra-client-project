@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL } from '../utils/api';
 
 interface CartItem {
   productId: string;

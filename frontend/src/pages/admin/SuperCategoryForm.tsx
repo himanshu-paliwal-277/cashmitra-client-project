@@ -1,14 +1,9 @@
-import React, { useState, useEffect } from 'react';import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { Upload, X, Save, Image as ImageIcon } from 'lucide-react';
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL } from '../../utils/api';
 
-const SuperCategoryForm = ({
-  category,
-  onClose,
-  onSave,
-  onSuccess,
-  apiType = 'buy'
-}: any) => {
+const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'buy' }: any) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -41,7 +36,8 @@ const SuperCategoryForm = ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    // Clear error for this field    if (errors[name]) {
+    // Clear error for this field
+    if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
@@ -66,7 +62,8 @@ const SuperCategoryForm = ({
 
       // Create preview
       const reader = new FileReader();
-      reader.onloadend = () => {        setImagePreview(reader.result);
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -92,15 +89,19 @@ const SuperCategoryForm = ({
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {      newErrors.name = 'Name is required';
-    } else if (formData.name.length > 50) {      newErrors.name = 'Name must be 50 characters or less';
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.length > 50) {
+      newErrors.name = 'Name must be 50 characters or less';
     }
 
-    if (formData.description && formData.description.length > 200) {      newErrors.description = 'Description must be 200 characters or less';
+    if (formData.description && formData.description.length > 200) {
+      newErrors.description = 'Description must be 200 characters or less';
     }
 
     // Image is required only when creating new category
-    if (!category && !imageFile && !imagePreview) {      newErrors.image = 'Image is required';
+    if (!category && !imageFile && !imagePreview) {
+      newErrors.image = 'Image is required';
     }
 
     setErrors(newErrors);
@@ -147,7 +148,8 @@ const SuperCategoryForm = ({
       if (imageFile) {
         try {
           imageUrl = await uploadImageToCloudinary(imageFile);
-        } catch (uploadError) {          setErrors({ submit: 'Failed to upload image: ' + uploadError.message });
+        } catch (uploadError) {
+          setErrors({ submit: 'Failed to upload image: ' + uploadError.message });
           setLoading(false);
           return;
         }
@@ -195,7 +197,8 @@ const SuperCategoryForm = ({
         setErrors({ submit: data.message || 'Failed to save super category' });
       }
     } catch (err) {
-      console.error('Error saving super category:', err);      setErrors({ submit: 'Error saving super category: ' + err.message });
+      console.error('Error saving super category:', err);
+      setErrors({ submit: 'Error saving super category: ' + err.message });
     } finally {
       setLoading(false);
     }
@@ -217,8 +220,10 @@ const SuperCategoryForm = ({
               value={formData.name}
               onChange={handleChange}
               placeholder="e.g., Mobile, Laptop, Watch"
-              maxLength={50}              hasError={errors.name}
-            />            {errors.name && <ErrorText>{errors.name}</ErrorText>}
+              maxLength={50}
+              hasError={errors.name}
+            />
+            {errors.name && <ErrorText>{errors.name}</ErrorText>}
             <CharCount>{formData.name.length}/50</CharCount>
           </FormGroup>
 
@@ -230,8 +235,10 @@ const SuperCategoryForm = ({
               onChange={handleChange}
               placeholder="Brief description of the super category"
               rows={4}
-              maxLength={200}              hasError={errors.description}
-            />            {errors.description && <ErrorText>{errors.description}</ErrorText>}
+              maxLength={200}
+              hasError={errors.description}
+            />
+            {errors.description && <ErrorText>{errors.description}</ErrorText>}
             <CharCount>{formData.description.length}/200</CharCount>
           </FormGroup>
 
@@ -276,7 +283,8 @@ const SuperCategoryForm = ({
                 <X size={20} />
               </RemoveImageButton>
             </ImagePreview>
-          ) : (            <DropZone onDrop={handleDrop} onDragOver={handleDragOver} hasError={errors.image}>
+          ) : (
+            <DropZone onDrop={handleDrop} onDragOver={handleDragOver} hasError={errors.image}>
               <ImageIcon size={48} />
               <DropText>Drag and drop an image here</DropText>
               <DropSubText>or</DropSubText>
@@ -292,8 +300,10 @@ const SuperCategoryForm = ({
               />
               <DropHint>PNG, JPG, GIF up to 5MB</DropHint>
             </DropZone>
-          )}          {errors.image && <ErrorText>{errors.image}</ErrorText>}
-        </FormSection>        {errors.submit && <SubmitError>{errors.submit}</SubmitError>}
+          )}
+          {errors.image && <ErrorText>{errors.image}</ErrorText>}
+        </FormSection>
+        {errors.submit && <SubmitError>{errors.submit}</SubmitError>}
 
         <FormActions>
           <CancelButton type="button" onClick={onClose} disabled={loading}>
@@ -373,16 +383,16 @@ const Required = styled.span`
 
 const Input = styled.input`
   padding: 0.75rem 1rem;
-  border: 2px solid ${(props: any) => props.hasError ? '#ff4444' : '#e0e0e0'};
+  border: 2px solid ${(props: any) => (props.hasError ? '#ff4444' : '#e0e0e0')};
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: ${(props: any) => props.hasError ? '#ff4444' : '#00C853'};
+    border-color: ${(props: any) => (props.hasError ? '#ff4444' : '#00C853')};
     box-shadow: 0 0 0 3px
-      ${(props: any) => props.hasError ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 83, 0.1)'};
+      ${(props: any) => (props.hasError ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 83, 0.1)')};
   }
 
   &::placeholder {
@@ -392,7 +402,7 @@ const Input = styled.input`
 
 const Textarea = styled.textarea`
   padding: 0.75rem 1rem;
-  border: 2px solid ${(props: any) => props.hasError ? '#ff4444' : '#e0e0e0'};
+  border: 2px solid ${(props: any) => (props.hasError ? '#ff4444' : '#e0e0e0')};
   border-radius: 12px;
   font-size: 1rem;
   font-family: inherit;
@@ -401,9 +411,9 @@ const Textarea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: ${(props: any) => props.hasError ? '#ff4444' : '#00C853'};
+    border-color: ${(props: any) => (props.hasError ? '#ff4444' : '#00C853')};
     box-shadow: 0 0 0 3px
-      ${(props: any) => props.hasError ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 83, 0.1)'};
+      ${(props: any) => (props.hasError ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 83, 0.1)')};
   }
 
   &::placeholder {
@@ -441,7 +451,7 @@ const ErrorText = styled.span`
 `;
 
 const DropZone = styled.div`
-  border: 3px dashed ${(props: any) => props.hasError ? '#ff4444' : '#e0e0e0'};
+  border: 3px dashed ${(props: any) => (props.hasError ? '#ff4444' : '#e0e0e0')};
   border-radius: 16px;
   padding: 3rem 2rem;
   text-align: center;
@@ -449,7 +459,7 @@ const DropZone = styled.div`
   background: #fafafa;
 
   &:hover {
-    border-color: ${(props: any) => props.hasError ? '#ff4444' : '#00C853'};
+    border-color: ${(props: any) => (props.hasError ? '#ff4444' : '#00C853')};
     background: #f5f5f5;
   }
 

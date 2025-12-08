@@ -17,7 +17,7 @@ import {
   Sparkles,
   Grid,
 } from 'lucide-react';
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL } from '../../utils/api';
 import SkeletonLoader from '../../components/common/SkeletonLoader';
 
 const BuyCategories = () => {

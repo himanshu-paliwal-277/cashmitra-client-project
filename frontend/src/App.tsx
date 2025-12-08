@@ -1,7 +1,7 @@
 import { Suspense, useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import { theme } from './theme';
+import { theme } from './utils';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { AdminAuthProvider } from './contexts/AdminAuthContext';

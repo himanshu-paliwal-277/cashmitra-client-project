@@ -5,8 +5,9 @@
  * @version 1.0.0
  */
 
-import React, { useState, useEffect } from 'react';import styled from 'styled-components';
-import { theme } from '../../theme';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { theme } from '../../utils';
 import {
   Settings,
   Save,
@@ -428,8 +429,10 @@ const SellConfigurationManagement = () => {
 
       // Initialize with default values from CONFIG_SECTIONS
       const defaultConfig = {};
-      Object.entries(CONFIG_SECTIONS).forEach(([sectionKey, section]) => {        defaultConfig[sectionKey] = {};
-        section.settings.forEach(setting => {          defaultConfig[sectionKey][setting.key] = setting.defaultValue;
+      Object.entries(CONFIG_SECTIONS).forEach(([sectionKey, section]) => {
+        defaultConfig[sectionKey] = {};
+        section.settings.forEach(setting => {
+          defaultConfig[sectionKey][setting.key] = setting.defaultValue;
         });
       });
 
@@ -438,7 +441,8 @@ const SellConfigurationManagement = () => {
       // setConfig({ ...defaultConfig, ...response.data });
 
       setConfig(defaultConfig);
-    } catch (err) {      setError('Failed to load configuration');
+    } catch (err) {
+      setError('Failed to load configuration');
       console.error('Error loading configuration:', err);
     } finally {
       setLoading(false);
@@ -447,19 +451,23 @@ const SellConfigurationManagement = () => {
 
   const saveConfiguration = async () => {
     try {
-      setSaving(true);      setSaveStatus('saving');
+      setSaving(true);
+      setSaveStatus('saving');
       setError(null);
 
       // In a real app, you would save to API
       // await api.put('/admin/sell/configuration', config);
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));      setSaveStatus('saved');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSaveStatus('saved');
       setHasChanges(false);
 
       // Clear save status after 3 seconds
       setTimeout(() => setSaveStatus(null), 3000);
-    } catch (err) {      setSaveStatus('error');      setError('Failed to save configuration');
+    } catch (err) {
+      setSaveStatus('error');
+      setError('Failed to save configuration');
       console.error('Error saving configuration:', err);
     } finally {
       setSaving(false);
@@ -494,11 +502,13 @@ const SellConfigurationManagement = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = e => {
-        try {          const importedConfig = JSON.parse(e.target.result);
+        try {
+          const importedConfig = JSON.parse(e.target.result);
           setConfig(importedConfig);
           setHasChanges(true);
           setSaveStatus(null);
-        } catch (err) {          setError('Invalid configuration file');
+        } catch (err) {
+          setError('Invalid configuration file');
         }
       };
       reader.readAsText(file);
@@ -508,7 +518,8 @@ const SellConfigurationManagement = () => {
   const updateSetting = (sectionKey: any, settingKey: any, value: any) => {
     setConfig(prev => ({
       ...prev,
-      [sectionKey]: {        ...prev[sectionKey],
+      [sectionKey]: {
+        ...prev[sectionKey],
         [settingKey]: value,
       },
     }));
@@ -516,7 +527,8 @@ const SellConfigurationManagement = () => {
     setSaveStatus(null);
   };
 
-  const renderSettingInput = (sectionKey: any, setting: any) => {    const value = config[sectionKey]?.[setting.key] ?? setting.defaultValue;
+  const renderSettingInput = (sectionKey: any, setting: any) => {
+    const value = config[sectionKey]?.[setting.key] ?? setting.defaultValue;
 
     switch (setting.type) {
       case 'text':
@@ -527,11 +539,12 @@ const SellConfigurationManagement = () => {
           <Input
             type={setting.type}
             value={value}
-            onChange={(e: any) => updateSetting(
-              sectionKey,
-              setting.key,
-              setting.type === 'number' ? Number(e.target.value) : e.target.value
-            )
+            onChange={(e: any) =>
+              updateSetting(
+                sectionKey,
+                setting.key,
+                setting.type === 'number' ? Number(e.target.value) : e.target.value
+              )
             }
             placeholder={setting.placeholder}
           />
@@ -552,9 +565,11 @@ const SellConfigurationManagement = () => {
             value={value}
             onChange={(e: any) => updateSetting(sectionKey, setting.key, e.target.value)}
           >
-            {setting.options.map((option: any) => <option key={option} value={option}>
-              {option.charAt(0).toUpperCase() + option.slice(1)}
-            </option>)}
+            {setting.options.map((option: any) => (
+              <option key={option} value={option}>
+                {option.charAt(0).toUpperCase() + option.slice(1)}
+              </option>
+            ))}
           </Select>
         );
 
@@ -675,7 +690,8 @@ const SellConfigurationManagement = () => {
         </LoadingSpinner>
       </Container>
     );
-  }  const currentSection = CONFIG_SECTIONS[activeSection];
+  }
+  const currentSection = CONFIG_SECTIONS[activeSection];
 
   return (
     <Container>
@@ -691,7 +707,8 @@ const SellConfigurationManagement = () => {
             onChange={importConfiguration}
             style={{ display: 'none' }}
             id="import-config"
-          />          <ActionButton onClick={() => document.getElementById('import-config').click()}>
+          />
+          <ActionButton onClick={() => document.getElementById('import-config').click()}>
             <Upload size={16} />
             Import
           </ActionButton>
@@ -775,30 +792,32 @@ const SellConfigurationManagement = () => {
               </EmptyState>
             ) : (
               <SettingsGrid>
-                {currentSection.settings.map((setting: any) => <SettingCard key={setting.key}>
-                  <SettingHeader>
-                    <SettingInfo>
-                      <SettingLabel>{setting.label}</SettingLabel>
-                      <SettingDescription>{setting.description}</SettingDescription>
-                    </SettingInfo>
-                    <SettingActions>
-                      <SettingButton
-                        onClick={() =>
-                          updateSetting(activeSection, setting.key, setting.defaultValue)
-                        }
-                        title="Reset to default"
-                      >
-                        <RotateCcw size={14} />
-                      </SettingButton>
-                    </SettingActions>
-                  </SettingHeader>
-                  <SettingContent>
-                    <InputGroup>
-                      <InputLabel>{setting.label}</InputLabel>
-                      {renderSettingInput(activeSection, setting)}
-                    </InputGroup>
-                  </SettingContent>
-                </SettingCard>)}
+                {currentSection.settings.map((setting: any) => (
+                  <SettingCard key={setting.key}>
+                    <SettingHeader>
+                      <SettingInfo>
+                        <SettingLabel>{setting.label}</SettingLabel>
+                        <SettingDescription>{setting.description}</SettingDescription>
+                      </SettingInfo>
+                      <SettingActions>
+                        <SettingButton
+                          onClick={() =>
+                            updateSetting(activeSection, setting.key, setting.defaultValue)
+                          }
+                          title="Reset to default"
+                        >
+                          <RotateCcw size={14} />
+                        </SettingButton>
+                      </SettingActions>
+                    </SettingHeader>
+                    <SettingContent>
+                      <InputGroup>
+                        <InputLabel>{setting.label}</InputLabel>
+                        {renderSettingInput(activeSection, setting)}
+                      </InputGroup>
+                    </SettingContent>
+                  </SettingCard>
+                ))}
               </SettingsGrid>
             )}
           </ContentBody>
@@ -847,16 +866,18 @@ const ActionButton = styled.button`
   gap: 8px;
   padding: 10px 16px;
   border: 1px solid
-    ${(props: any) => props.variant === 'primary' ? theme.colors.primary : theme.colors.border};
-  background: ${(props: any) => props.variant === 'primary' ? theme.colors.primary : 'white'};
-  color: ${(props: any) => props.variant === 'primary' ? 'white' : theme.colors.text.primary};
+    ${(props: any) => (props.variant === 'primary' ? theme.colors.primary : theme.colors.border)};
+  background: ${(props: any) => (props.variant === 'primary' ? theme.colors.primary : 'white')};
+  color: ${(props: any) => (props.variant === 'primary' ? 'white' : theme.colors.text.primary)};
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {    background: ${(props: any) => props.variant === 'primary' ? theme.colors.primaryHover : theme.colors.background};
+  &:hover {
+    background: ${(props: any) =>
+      props.variant === 'primary' ? theme.colors.primaryHover : theme.colors.background};
     transform: translateY(-1px);
   }
 
@@ -910,8 +931,8 @@ const SectionItem = styled.div`
   cursor: pointer;
   transition: all 0.2s ease;
   border-left: 3px solid transparent;
-  background: ${(props: any) => props.active ? theme.colors.background : 'transparent'};
-  border-left-color: ${(props: any) => props.active ? theme.colors.primary : 'transparent'};
+  background: ${(props: any) => (props.active ? theme.colors.background : 'transparent')};
+  border-left-color: ${(props: any) => (props.active ? theme.colors.primary : 'transparent')};
 
   &:hover {
     background: ${theme.colors.background};
@@ -925,8 +946,8 @@ const SectionIcon = styled.div`
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: ${(props: any) => props.active ? theme.colors.primary : theme.colors.background};
-  color: ${(props: any) => props.active ? 'white' : theme.colors.text.secondary};
+  background: ${(props: any) => (props.active ? theme.colors.primary : theme.colors.background)};
+  color: ${(props: any) => (props.active ? 'white' : theme.colors.text.secondary)};
   transition: all 0.2s ease;
 `;
 
@@ -937,7 +958,7 @@ const SectionInfo = styled.div`
 const SectionName = styled.div`
   font-size: 14px;
   font-weight: 500;
-  color: ${(props: any) => props.active ? theme.colors.primary : theme.colors.text.primary};
+  color: ${(props: any) => (props.active ? theme.colors.primary : theme.colors.text.primary)};
   margin-bottom: 2px;
 `;
 
@@ -1184,15 +1205,17 @@ const ArrayItemButton = styled.button`
   width: 32px;
   height: 32px;
   border: 1px solid
-    ${(props: any) => props.variant === 'danger' ? theme.colors.error : theme.colors.border};
-  background: ${(props: any) => props.variant === 'danger' ? theme.colors.error : 'white'};
-  color: ${(props: any) => props.variant === 'danger' ? 'white' : theme.colors.text.secondary};
+    ${(props: any) => (props.variant === 'danger' ? theme.colors.error : theme.colors.border)};
+  background: ${(props: any) => (props.variant === 'danger' ? theme.colors.error : 'white')};
+  color: ${(props: any) => (props.variant === 'danger' ? 'white' : theme.colors.text.secondary)};
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {    background: ${(props: any) => props.variant === 'danger' ? theme.colors.errorHover : theme.colors.background};
-    color: ${(props: any) => props.variant === 'danger' ? 'white' : theme.colors.text.primary};
+  &:hover {
+    background: ${(props: any) =>
+      props.variant === 'danger' ? theme.colors.errorHover : theme.colors.background};
+    color: ${(props: any) => (props.variant === 'danger' ? 'white' : theme.colors.text.primary)};
   }
 `;
 
@@ -1245,7 +1268,7 @@ const SaveStatus = styled.div`
         return theme.colors.text.secondary;
     }
   }};
-  opacity: ${(props: any) => props.status ? 1 : 0};
+  opacity: ${(props: any) => (props.status ? 1 : 0)};
   transition: all 0.3s ease;
 `;
 

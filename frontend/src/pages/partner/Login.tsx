@@ -19,7 +19,7 @@ import {
   FeatureItem,
   BrandSection,
   LogoContainer,
-} from '../../styles/AuthStyles';
+} from './AuthStyles';
 
 const PartnerLogin = () => {
   const navigate = useNavigate();

@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { cn } from '../../lib/utils';
+import { cn } from '../../utils/utils';
 import Card from '../../components/ui/Card';
 import {
   ArrowLeft,
@@ -63,20 +63,23 @@ const OrderView = () => {
       const response = await adminService.getOrderById(orderId);
       setOrder(response);
       setNewStatus(response.status || 'pending');
-    } catch (err) {      setError(err.message || 'Failed to fetch order details');
+    } catch (err) {
+      setError(err.message || 'Failed to fetch order details');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleStatusUpdate = async () => {    if (!newStatus || newStatus === (order?.status || '')) return;
+  const handleStatusUpdate = async () => {
+    if (!newStatus || newStatus === (order?.status || '')) return;
 
     try {
       setUpdating(true);
       await adminService.updateOrderStatus(orderId, newStatus);
       await fetchOrderDetails();
       console.log('Order status updated successfully');
-    } catch (err) {      setError(err.message || 'Failed to update order status');
+    } catch (err) {
+      setError(err.message || 'Failed to update order status');
     } finally {
       setUpdating(false);
     }
@@ -110,7 +113,8 @@ const OrderView = () => {
       completed: 'bg-emerald-100 text-emerald-800',
       cancelled: 'bg-red-100 text-red-800',
       refunded: 'bg-orange-100 text-orange-800',
-    };    return colors[status] || 'bg-gray-100 text-gray-800';
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
   if (loading) {
@@ -162,7 +166,8 @@ const OrderView = () => {
         </div>
       </div>
     );
-  }  const user = order?.user;
+  }
+  const user = order?.user;
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
@@ -176,7 +181,8 @@ const OrderView = () => {
           Back
         </button>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Order Details</h1>
-        <span className="ml-auto px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-lg">          #{order?._id || 'N/A'}
+        <span className="ml-auto px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-lg">
+          #{order?._id || 'N/A'}
         </span>
       </div>
 
@@ -184,41 +190,57 @@ const OrderView = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content - 2 columns */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Order Overview */}          <Card>            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
+          {/* Order Overview */}
+          <Card>
+            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <Package size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Order Overview</h2>
-              </div>            </Card.Header>            <Card.Body>
+              </div>
+            </Card.Header>
+            <Card.Body>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-sm text-gray-600">Order Type:</span>
                 <span
                   className={cn(
-                    'px-3 py-1 rounded-lg text-sm font-medium',                    order?.orderType === 'buy'
+                    'px-3 py-1 rounded-lg text-sm font-medium',
+                    order?.orderType === 'buy'
                       ? 'bg-blue-100 text-blue-800'
                       : 'bg-yellow-100 text-yellow-800'
                   )}
-                >                  {order?.orderType?.charAt(0).toUpperCase() + order?.orderType?.slice(1) || 'N/A'}
+                >
+                  {order?.orderType?.charAt(0).toUpperCase() + order?.orderType?.slice(1) || 'N/A'}
                 </span>
-              </div>              {order?.progressPercentage !== undefined && (
+              </div>
+              {order?.progressPercentage !== undefined && (
                 <div>
                   <div className="flex justify-between items-center mb-2 text-sm text-gray-600">
-                    <span>Order Progress</span>                    <span className="font-medium">{order?.progressPercentage}%</span>
+                    <span>Order Progress</span>
+                    <span className="font-medium">{order?.progressPercentage}%</span>
                   </div>
                   <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-300"                      style={{ width: `${order?.progressPercentage}%` }}
+                      className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-300"
+                      style={{ width: `${order?.progressPercentage}%` }}
                     />
                   </div>
                 </div>
-              )}            </Card.Body>
+              )}
+            </Card.Body>
           </Card>
 
-          {/* Product Information */}          <Card>            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
+          {/* Product Information */}
+          <Card>
+            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <Package size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Product Information</h2>
-              </div>            </Card.Header>            <Card.Body>              {order?.items && order.items.length > 0 && (
-                <>                  {order.items.map((item: any, index: any) => {
+              </div>
+            </Card.Header>
+            <Card.Body>
+              {order?.items && order.items.length > 0 && (
+                <>
+                  {order.items.map((item: any, index: any) => {
                     const product = item.product;
                     return (
                       <div key={item._id || index} className="flex gap-6 mb-6 last:mb-0">
@@ -277,15 +299,18 @@ const OrderView = () => {
                           </div>
 
                           <div className="flex items-center gap-4">
-                            <div className="text-2xl font-bold text-green-600">                              {formatCurrency(order?.totalAmount / item.quantity)}
+                            <div className="text-2xl font-bold text-green-600">
+                              {formatCurrency(order?.totalAmount / item.quantity)}
                             </div>
-                            {product?.basePrice &&                              product.basePrice > order?.totalAmount / item.quantity && (
+                            {product?.basePrice &&
+                              product.basePrice > order?.totalAmount / item.quantity && (
                                 <>
                                   <div className="text-base text-gray-500 line-through">
                                     {formatCurrency(product.basePrice)}
                                   </div>
                                   <div className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm font-medium">
-                                    {Math.round(                                      ((product.basePrice - order?.totalAmount / item.quantity) /
+                                    {Math.round(
+                                      ((product.basePrice - order?.totalAmount / item.quantity) /
                                         product.basePrice) *
                                         100
                                     )}
@@ -299,14 +324,19 @@ const OrderView = () => {
                     );
                   })}
                 </>
-              )}            </Card.Body>
+              )}
+            </Card.Body>
           </Card>
 
-          {/* Customer Information */}          <Card>            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
+          {/* Customer Information */}
+          <Card>
+            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <User size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Customer Information</h2>
-              </div>            </Card.Header>            <Card.Body>
+              </div>
+            </Card.Header>
+            <Card.Body>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
                   <User size={20} className="text-blue-600 mt-0.5" />
@@ -337,26 +367,39 @@ const OrderView = () => {
                 <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
                   <Calendar size={20} className="text-blue-600 mt-0.5" />
                   <div className="flex-1">
-                    <div className="text-sm text-gray-600 mb-1">Order Date</div>                    <div className="font-medium text-gray-900">{formatDate(order?.createdAt)}</div>
+                    <div className="text-sm text-gray-600 mb-1">Order Date</div>
+                    <div className="font-medium text-gray-900">{formatDate(order?.createdAt)}</div>
                   </div>
                 </div>
-              </div>            </Card.Body>
+              </div>
+            </Card.Body>
           </Card>
 
-          {/* Shipping Information */}          {order?.shippingDetails && (            <Card>              <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
+          {/* Shipping Information */}
+          {order?.shippingDetails && (
+            <Card>
+              <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
                 <div className="flex items-center gap-3">
                   <MapPin size={20} className="text-amber-600" />
                   <h2 className="text-xl font-semibold text-gray-900">Shipping Information</h2>
-                </div>              </Card.Header>              <Card.Body>
+                </div>
+              </Card.Header>
+              <Card.Body>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg sm:col-span-2">
                     <MapPin size={20} className="text-blue-600 mt-0.5" />
                     <div className="flex-1">
                       <div className="text-sm text-gray-600 mb-1">Delivery Address</div>
-                      <div className="font-medium text-gray-900">                        {order?.shippingDetails?.address ? (
-                          <>                            {order?.shippingDetails?.address?.street}
-                            <br />                            {order?.shippingDetails?.address?.city},{' '}                            {order?.shippingDetails?.address?.state}
-                            <br />                            {order?.shippingDetails?.address?.pincode},{' '}                            {order?.shippingDetails?.address?.country}
+                      <div className="font-medium text-gray-900">
+                        {order?.shippingDetails?.address ? (
+                          <>
+                            {order?.shippingDetails?.address?.street}
+                            <br />
+                            {order?.shippingDetails?.address?.city},{' '}
+                            {order?.shippingDetails?.address?.state}
+                            <br />
+                            {order?.shippingDetails?.address?.pincode},{' '}
+                            {order?.shippingDetails?.address?.country}
                           </>
                         ) : (
                           'N/A'
@@ -369,7 +412,8 @@ const OrderView = () => {
                     <Phone size={20} className="text-blue-600 mt-0.5" />
                     <div className="flex-1">
                       <div className="text-sm text-gray-600 mb-1">Contact Phone</div>
-                      <div className="font-medium text-gray-900">                        {order?.shippingDetails?.contactPhone || user?.phone || 'N/A'}
+                      <div className="font-medium text-gray-900">
+                        {order?.shippingDetails?.contactPhone || user?.phone || 'N/A'}
                       </div>
                     </div>
                   </div>
@@ -378,38 +422,49 @@ const OrderView = () => {
                     <Truck size={20} className="text-blue-600 mt-0.5" />
                     <div className="flex-1">
                       <div className="text-sm text-gray-600 mb-1">Delivery Method</div>
-                      <div className="font-medium text-gray-900">                        {order?.shippingDetails?.deliveryMethod || 'Standard Delivery'}
+                      <div className="font-medium text-gray-900">
+                        {order?.shippingDetails?.deliveryMethod || 'Standard Delivery'}
                       </div>
                     </div>
-                  </div>                  {order?.shippingDetails?.trackingId && (
+                  </div>
+                  {order?.shippingDetails?.trackingId && (
                     <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg sm:col-span-2">
                       <Tag size={20} className="text-blue-600 mt-0.5" />
                       <div className="flex-1">
                         <div className="text-sm text-gray-600 mb-1">Tracking ID</div>
-                        <div className="font-medium text-gray-900">                          {order?.shippingDetails?.trackingId}
+                        <div className="font-medium text-gray-900">
+                          {order?.shippingDetails?.trackingId}
                         </div>
                       </div>
                     </div>
                   )}
-                </div>              </Card.Body>
+                </div>
+              </Card.Body>
             </Card>
           )}
         </div>
 
         {/* Sidebar - 1 column */}
         <div className="space-y-6">
-          {/* Order Status */}          <Card>            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
+          {/* Order Status */}
+          <Card>
+            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <Shield size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Order Status</h2>
-              </div>            </Card.Header>            <Card.Body>
+              </div>
+            </Card.Header>
+            <Card.Body>
               <div className="mb-6">
                 <div
                   className={cn(
-                    'flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-sm',                    getStatusColor(order?.status || 'pending')
+                    'flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-sm',
+                    getStatusColor(order?.status || 'pending')
                   )}
                 >
-                  <CheckCircle size={16} />                  {order?.status                    ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
+                  <CheckCircle size={16} />
+                  {order?.status
+                    ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
                     : 'Pending'}
                 </div>
               </div>
@@ -430,25 +485,32 @@ const OrderView = () => {
               </div>
 
               <button
-                onClick={handleStatusUpdate}                disabled={updating || newStatus === (order?.status || '')}
+                onClick={handleStatusUpdate}
+                disabled={updating || newStatus === (order?.status || '')}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
               >
                 <Save size={16} />
                 {updating ? 'Updating...' : 'Update Status'}
-              </button>            </Card.Body>
+              </button>
+            </Card.Body>
           </Card>
 
-          {/* Payment Information */}          <Card>            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
+          {/* Payment Information */}
+          <Card>
+            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <CreditCard size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Payment Information</h2>
-              </div>            </Card.Header>            <Card.Body>
+              </div>
+            </Card.Header>
+            <Card.Body>
               <div className="space-y-4">
                 <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
                   <DollarSign size={20} className="text-blue-600 mt-0.5" />
                   <div className="flex-1">
                     <div className="text-sm text-gray-600 mb-1">Total Amount</div>
-                    <div className="text-lg font-bold text-gray-900">                      {formatCurrency(order?.totalAmount)}
+                    <div className="text-lg font-bold text-gray-900">
+                      {formatCurrency(order?.totalAmount)}
                     </div>
                   </div>
                 </div>
@@ -457,7 +519,8 @@ const OrderView = () => {
                   <CreditCard size={20} className="text-blue-600 mt-0.5" />
                   <div className="flex-1">
                     <div className="text-sm text-gray-600 mb-1">Payment Method</div>
-                    <div className="font-medium text-gray-900">                      {order?.paymentDetails?.method || 'N/A'}
+                    <div className="font-medium text-gray-900">
+                      {order?.paymentDetails?.method || 'N/A'}
                     </div>
                   </div>
                 </div>
@@ -466,31 +529,43 @@ const OrderView = () => {
                   <CheckCircle size={20} className="text-blue-600 mt-0.5" />
                   <div className="flex-1">
                     <div className="text-sm text-gray-600 mb-1">Payment Status</div>
-                    <div className="font-medium text-gray-900">                      {order?.paymentDetails?.status || 'N/A'}
+                    <div className="font-medium text-gray-900">
+                      {order?.paymentDetails?.status || 'N/A'}
                     </div>
                   </div>
-                </div>                {order?.commission && (
+                </div>
+                {order?.commission && (
                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
                     <TrendingUp size={20} className="text-blue-600 mt-0.5" />
                     <div className="flex-1">
-                      <div className="text-sm text-gray-600 mb-1">                        Commission ({(order?.commission?.rate * 100).toFixed(1)}%)
+                      <div className="text-sm text-gray-600 mb-1">
+                        Commission ({(order?.commission?.rate * 100).toFixed(1)}%)
                       </div>
-                      <div className="font-medium text-gray-900">                        {formatCurrency(order?.commission?.amount)}
+                      <div className="font-medium text-gray-900">
+                        {formatCurrency(order?.commission?.amount)}
                       </div>
                     </div>
                   </div>
                 )}
-              </div>            </Card.Body>
+              </div>
+            </Card.Body>
           </Card>
 
-          {/* Order Timeline */}          <Card>            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
+          {/* Order Timeline */}
+          <Card>
+            <Card.Header divider className="bg-gradient-to-r from-gray-50 to-gray-100">
               <div className="flex items-center gap-3">
                 <Clock size={20} className="text-amber-600" />
                 <h2 className="text-xl font-semibold text-gray-900">Order Timeline</h2>
-              </div>            </Card.Header>            <Card.Body>
-              <div className="relative pl-8">                {order?.timeline && order.timeline.length > 0 ? (                  order.timeline.map((item: any, index: any) => (
+              </div>
+            </Card.Header>
+            <Card.Body>
+              <div className="relative pl-8">
+                {order?.timeline && order.timeline.length > 0 ? (
+                  order.timeline.map((item: any, index: any) => (
                     <div key={index} className="relative pb-8 last:pb-0">
-                      {/* Vertical Line */}                      {index !== order.timeline.length - 1 && (
+                      {/* Vertical Line */}
+                      {index !== order.timeline.length - 1 && (
                         <div
                           className={cn(
                             'absolute left-[-1.5rem] top-8 w-0.5 h-full',
@@ -520,9 +595,12 @@ const OrderView = () => {
                         </div>
                       </div>
                     </div>
-                  ))                ) : order?.statusHistory && order.statusHistory.length > 0 ? (                  order.statusHistory.map((item: any, index: any) => (
+                  ))
+                ) : order?.statusHistory && order.statusHistory.length > 0 ? (
+                  order.statusHistory.map((item: any, index: any) => (
                     <div key={index} className="relative pb-8 last:pb-0">
-                      {/* Vertical Line */}                      {index !== order.statusHistory.length - 1 && (
+                      {/* Vertical Line */}
+                      {index !== order.statusHistory.length - 1 && (
                         <div className="absolute left-[-1.5rem] top-8 w-0.5 h-full bg-green-500" />
                       )}
 
@@ -549,7 +627,8 @@ const OrderView = () => {
                     <div className="text-sm">No timeline data available</div>
                   </div>
                 )}
-              </div>            </Card.Body>
+              </div>
+            </Card.Body>
           </Card>
         </div>
       </div>

@@ -24,7 +24,7 @@ import {
   Sparkles,
   AlertCircle,
 } from 'lucide-react';
-import api from '../../config/api';
+import api from '../../utils/api';
 import adminService from '../../services/adminService';
 import pickupService from '../../services/pickupService';
 

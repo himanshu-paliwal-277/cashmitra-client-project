@@ -5,7 +5,7 @@ import useAdminCategories from '../../hooks/useAdminCategories';
 import useAdminBrands from '../../hooks/useAdminBrands';
 import useAdminModels from '../../hooks/useAdminModels';
 import styled from 'styled-components';
-import { theme } from '../../theme';
+import { theme } from '../../utils';
 import {
   ArrowLeft,
   Save,

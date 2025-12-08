@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import styled from 'styled-components';
-import { theme } from '../../theme';
+import { theme } from '../../utils';
 import {
   ArrowLeft,
   Save,

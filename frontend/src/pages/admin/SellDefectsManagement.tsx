@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '../../utils/utils';
 import useSellDefects from '../../hooks/useSellDefects';
 import DefectModal from '../../components/DefectModal';
 import Card from '../../components/ui/Card';
@@ -65,7 +65,8 @@ const SellDefectsManagement = () => {
       status: statusFilter !== 'all' ? statusFilter : undefined,
       category: categoryFilter !== 'all' ? categoryFilter : undefined,
       impact: impactFilter !== 'all' ? impactFilter : undefined,
-    };    fetchDefects(params);
+    };
+    fetchDefects(params);
   }, [
     currentPage,
     sortBy,
@@ -93,7 +94,8 @@ const SellDefectsManagement = () => {
       high: 'bg-red-100 text-red-800',
       medium: 'bg-yellow-100 text-yellow-800',
       low: 'bg-green-100 text-green-800',
-    };    return colors[severity] || 'bg-gray-100 text-gray-800';
+    };
+    return colors[severity] || 'bg-gray-100 text-gray-800';
   };
 
   // Helper function to format date
@@ -108,13 +110,16 @@ const SellDefectsManagement = () => {
   };
 
   const stats = {
-    totalDefects: pagination?.total || 0,    activeDefects: filteredDefects.filter(d => d.isActive).length,
+    totalDefects: pagination?.total || 0,
+    activeDefects: filteredDefects.filter(d => d.isActive).length,
     avgPriceImpact:
       filteredDefects.length > 0
-        ? Math.round(            filteredDefects.reduce((sum, d) => sum + Math.abs(d.delta?.value || 0), 0) /
+        ? Math.round(
+            filteredDefects.reduce((sum, d) => sum + Math.abs(d.delta?.value || 0), 0) /
               filteredDefects.length
           )
-        : 0,    categories: [...new Set(filteredDefects.map(d => d.category))].length,
+        : 0,
+    categories: [...new Set(filteredDefects.map(d => d.category))].length,
   };
 
   const handleCreateDefect = async (defectData: any) => {
@@ -221,7 +226,8 @@ const SellDefectsManagement = () => {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">        <Card className="p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+        <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-yellow-100 rounded-xl">
               <AlertTriangle size={20} className="text-yellow-600" />
@@ -233,7 +239,8 @@ const SellDefectsManagement = () => {
             <TrendingUp size={12} />
             +2 this month
           </div>
-        </Card>        <Card className="p-6">
+        </Card>
+        <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-green-100 rounded-xl">
               <CheckCircle size={20} className="text-green-600" />
@@ -245,7 +252,8 @@ const SellDefectsManagement = () => {
             <TrendingUp size={12} />
             +1 this week
           </div>
-        </Card>        <Card className="p-6">
+        </Card>
+        <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-red-100 rounded-xl">
               <Percent size={20} className="text-red-600" />
@@ -257,7 +265,8 @@ const SellDefectsManagement = () => {
             <TrendingDown size={12} />
             -2% this month
           </div>
-        </Card>        <Card className="p-6">
+        </Card>
+        <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-indigo-100 rounded-xl">
               <Grid size={20} className="text-indigo-600" />
@@ -272,7 +281,8 @@ const SellDefectsManagement = () => {
         </Card>
       </div>
 
-      {/* Filters Section */}      <Card className="mb-8 p-6">
+      {/* Filters Section */}
+      <Card className="mb-8 p-6">
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Search Input */}
           <div className="flex-1 relative">
@@ -324,7 +334,8 @@ const SellDefectsManagement = () => {
         </div>
       </Card>
 
-      {/* Defects Table */}      <Card className="overflow-hidden">
+      {/* Defects Table */}
+      <Card className="overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-xl font-semibold text-gray-900">
             Defects ({filteredDefects.length})
@@ -381,39 +392,53 @@ const SellDefectsManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredDefects.map(defect => (                  <tr key={defect._id || defect.id} className="hover:bg-gray-50 transition-colors">
+                {filteredDefects.map(defect => (
+                  <tr key={defect._id || defect.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 border-b border-gray-200">
-                      <div>                        <div className="font-medium text-gray-900">{defect.title}</div>                        <div className="text-xs text-gray-500 mt-1">{defect.key}</div>
+                      <div>
+                        <div className="font-medium text-gray-900">{defect.title}</div>
+                        <div className="text-xs text-gray-500 mt-1">{defect.key}</div>
                       </div>
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200">
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs capitalize">                        {defect.category}
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs capitalize">
+                        {defect.category}
                       </span>
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200">
-                      <div className="flex items-center gap-1 text-sm font-medium text-gray-900">                        {defect.delta?.sign === '-' ? '−' : '+'}                        {defect.delta?.value || 0}                        {defect.delta?.type === 'percent' ? '%' : ''}
+                      <div className="flex items-center gap-1 text-sm font-medium text-gray-900">
+                        {defect.delta?.sign === '-' ? '−' : '+'}
+                        {defect.delta?.value || 0}
+                        {defect.delta?.type === 'percent' ? '%' : ''}
                       </div>
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200">
                       <span
                         className={cn(
-                          'px-2 py-1 rounded text-xs font-medium capitalize',                          getSeverityColor(getSeverity(defect.delta))
+                          'px-2 py-1 rounded text-xs font-medium capitalize',
+                          getSeverityColor(getSeverity(defect.delta))
                         )}
-                      >                        {getSeverity(defect.delta)}
+                      >
+                        {getSeverity(defect.delta)}
                       </span>
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200">
                       <span
                         className={cn(
-                          'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',                          defect.isActive
+                          'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
+                          defect.isActive
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                         )}
-                      >                        {defect.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}                        {defect.isActive ? 'Active' : 'Inactive'}
+                      >
+                        {defect.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
+                        {defect.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200">
-                      <div className="flex flex-wrap gap-1 max-w-xs">                        {defect.variantIds && defect.variantIds.length > 0 ? (                          defect.variantIds.slice(0, 3).map((variantId: any, index: any) => (
+                      <div className="flex flex-wrap gap-1 max-w-xs">
+                        {defect.variantIds && defect.variantIds.length > 0 ? (
+                          defect.variantIds.slice(0, 3).map((variantId: any, index: any) => (
                             <span
                               key={index}
                               className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs"
@@ -423,13 +448,16 @@ const SellDefectsManagement = () => {
                           ))
                         ) : (
                           <span className="text-xs text-gray-500 italic">All devices</span>
-                        )}                        {defect.variantIds && defect.variantIds.length > 3 && (
-                          <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">                            +{defect.variantIds.length - 3}
+                        )}
+                        {defect.variantIds && defect.variantIds.length > 3 && (
+                          <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
+                            +{defect.variantIds.length - 3}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 border-b border-gray-200 text-sm text-gray-600">                      {formatDate(defect.updatedAt)}
+                    <td className="px-4 py-3 border-b border-gray-200 text-sm text-gray-600">
+                      {formatDate(defect.updatedAt)}
                     </td>
                     <td className="px-4 py-3 border-b border-gray-200">
                       <div className="flex gap-2">
@@ -440,7 +468,8 @@ const SellDefectsManagement = () => {
                         >
                           <Edit size={16} />
                         </button>
-                        <button                          onClick={() => handleDeleteDefect(defect._id || defect.id)}
+                        <button
+                          onClick={() => handleDeleteDefect(defect._id || defect.id)}
                           className="p-2 border border-red-300 rounded bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-500 transition-colors"
                           title="Delete"
                         >
@@ -508,7 +537,10 @@ const SellDefectsManagement = () => {
           setShowModal(false);
           setEditingDefect(null);
         }}
-        onSave={          editingDefect ? (data: any) => handleUpdateDefect(editingDefect.id, data) : handleCreateDefect
+        onSave={
+          editingDefect
+            ? (data: any) => handleUpdateDefect(editingDefect.id, data)
+            : handleCreateDefect
         }
         defect={editingDefect}
         loading={loading}

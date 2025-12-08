@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '../../utils/utils';
 import useSellQuestions from '../../hooks/useSellQuestions';
 import QuestionModal from '../../components/admin/QuestionModal';
 import Card from '../../components/ui/Card';
@@ -73,8 +73,9 @@ const SellQuestionsManagement = () => {
   };
 
   const deriveType = (q: any) => q.uiType || 'radio';
-  const deriveStatus = (q: any) => q && typeof q.isActive === 'boolean' ? (q.isActive ? 'active' : 'inactive') : 'inactive';
-  const getDisplayOptions = (q: any) => Array.isArray(q?.options) ? q.options : [];
+  const deriveStatus = (q: any) =>
+    q && typeof q.isActive === 'boolean' ? (q.isActive ? 'active' : 'inactive') : 'inactive';
+  const getDisplayOptions = (q: any) => (Array.isArray(q?.options) ? q.options : []);
 
   const stats = [
     {
@@ -141,7 +142,8 @@ const SellQuestionsManagement = () => {
 
   const handleSaveQuestion = async (questionData: any) => {
     try {
-      if (selectedQuestion) {        await updateQuestion(selectedQuestion._id, questionData);
+      if (selectedQuestion) {
+        await updateQuestion(selectedQuestion._id, questionData);
       } else {
         await createQuestion(questionData);
       }
@@ -182,16 +184,25 @@ const SellQuestionsManagement = () => {
   };
 
   const handleReorder = async (questionId: any, direction: any) => {
-    try {      const currentIndex = questions.findIndex(q => q._id === questionId);
-      const newOrder =        direction === 'up' ? questions[currentIndex].order - 1 : questions[currentIndex].order + 1;
+    try {
+      const currentIndex = questions.findIndex(q => q._id === questionId);
+      const newOrder =
+        direction === 'up' ? questions[currentIndex].order - 1 : questions[currentIndex].order + 1;
 
       if (newOrder >= 1 && newOrder <= questions.length) {
         const otherQuestion = questions.find(
-          q =>            q.order === newOrder &&            q.section === questions[currentIndex].section &&            (q.categoryId?._id || q.categoryId) ===              (questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId)
+          q =>
+            q.order === newOrder &&
+            q.section === questions[currentIndex].section &&
+            (q.categoryId?._id || q.categoryId) ===
+              (questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId)
         );
         if (otherQuestion) {
           await reorderQuestions({
-            categoryId:              questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId,            section: questions[currentIndex].section,            questionIds: [questionId, otherQuestion._id],
+            categoryId:
+              questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId,
+            section: questions[currentIndex].section,
+            questionIds: [questionId, otherQuestion._id],
           });
         }
         fetchQuestions();
@@ -209,108 +220,118 @@ const SellQuestionsManagement = () => {
       multiselect: 'bg-purple-100 text-purple-800',
       slider: 'bg-orange-100 text-orange-800',
       toggle: 'bg-pink-100 text-pink-800',
-    };    return colors[type] || 'bg-gray-100 text-gray-800';
-  };  const renderQuestionCard = (question: any) => <Card key={question._id} hoverable className="flex flex-col h-full transition-all duration-200">    <Card.Header divider className="bg-gray-50">
-      <div className="flex justify-between items-start gap-4">
-        <div className="flex-1 min-w-0">
-          <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
-            {question.title}
-          </h3>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
-            <span className="font-medium">Order: {question.order}</span>
-            <span>•</span>
-            <span className="truncate">
-              {question.categoryId?.name || question.categoryId || 'Unknown'}
+    };
+    return colors[type] || 'bg-gray-100 text-gray-800';
+  };
+  const renderQuestionCard = (question: any) => (
+    <Card key={question._id} hoverable className="flex flex-col h-full transition-all duration-200">
+      <Card.Header divider className="bg-gray-50">
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
+              {question.title}
+            </h3>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+              <span className="font-medium">Order: {question.order}</span>
+              <span>•</span>
+              <span className="truncate">
+                {question.categoryId?.name || question.categoryId || 'Unknown'}
+              </span>
+              <span>•</span>
+              <span>{getDisplayOptions(question).length} options</span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 items-end">
+            <span
+              className={cn(
+                'px-2 py-1 rounded text-xs font-medium capitalize whitespace-nowrap',
+                getTypeBadgeColor(deriveType(question))
+              )}
+            >
+              {questionTypes.find(t => t.id === deriveType(question))?.name || deriveType(question)}
             </span>
-            <span>•</span>
-            <span>{getDisplayOptions(question).length} options</span>
+            <div className="flex gap-1">
+              <button
+                onClick={() => handleReorder(question._id, 'up')}
+                disabled={question.order === 1}
+                className="p-1 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronUp size={14} />
+              </button>
+              <button
+                onClick={() => handleReorder(question._id, 'down')}
+                disabled={question.order === questions.length}
+                className="p-1 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronDown size={14} />
+              </button>
+            </div>
           </div>
         </div>
-        <div className="flex flex-col gap-2 items-end">
-          <span
-            className={cn(
-              'px-2 py-1 rounded text-xs font-medium capitalize whitespace-nowrap',
-              getTypeBadgeColor(deriveType(question))
-            )}
-          >
-            {questionTypes.find(t => t.id === deriveType(question))?.name || deriveType(question)}
-          </span>
-          <div className="flex gap-1">
-            <button
-              onClick={() => handleReorder(question._id, 'up')}
-              disabled={question.order === 1}
-              className="p-1 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronUp size={14} />
-            </button>
-            <button
-              onClick={() => handleReorder(question._id, 'down')}
-              disabled={question.order === questions.length}
-              className="p-1 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronDown size={14} />
-            </button>
-          </div>
-        </div>
-      </div>    </Card.Header>    <Card.Body className="flex-1">
-      {question.description && (
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{question.description}</p>
-      )}
+      </Card.Header>
+      <Card.Body className="flex-1">
+        {question.description && (
+          <p className="text-sm text-gray-600 mb-4 line-clamp-2">{question.description}</p>
+        )}
 
-      {getDisplayOptions(question).length > 0 && (
-        <div>
-          <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-            <Tag size={14} />
-            Options ({getDisplayOptions(question).length})
-          </div>
-          <div className="space-y-1">
-            {getDisplayOptions(question)
-              .slice(0, 3)
-              .map((option: any, index: any) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
-                >
-                  <span className="text-gray-700 truncate flex-1">{option.label}</span>
-                  <span className="text-gray-600 font-medium ml-2">
-                    {option.delta
-                      ? `${option.delta.sign}${option.delta.value}${option.delta.type === 'percent' ? '%' : ''}`
-                      : option.value}
-                  </span>
+        {getDisplayOptions(question).length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+              <Tag size={14} />
+              Options ({getDisplayOptions(question).length})
+            </div>
+            <div className="space-y-1">
+              {getDisplayOptions(question)
+                .slice(0, 3)
+                .map((option: any, index: any) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm"
+                  >
+                    <span className="text-gray-700 truncate flex-1">{option.label}</span>
+                    <span className="text-gray-600 font-medium ml-2">
+                      {option.delta
+                        ? `${option.delta.sign}${option.delta.value}${option.delta.type === 'percent' ? '%' : ''}`
+                        : option.value}
+                    </span>
+                  </div>
+                ))}
+              {getDisplayOptions(question).length > 3 && (
+                <div className="p-2 bg-gray-50 rounded text-sm text-gray-500 italic text-center">
+                  +{getDisplayOptions(question).length - 3} more options...
                 </div>
-              ))}
-            {getDisplayOptions(question).length > 3 && (
-              <div className="p-2 bg-gray-50 rounded text-sm text-gray-500 italic text-center">
-                +{getDisplayOptions(question).length - 3} more options...
-              </div>
-            )}
+              )}
+            </div>
           </div>
+        )}
+      </Card.Body>
+      <Card.Footer divider className="bg-gray-50">
+        <div className="flex gap-2">
+          <button
+            onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
+            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+          >
+            <Eye size={14} />
+            View
+          </button>
+          <button
+            onClick={() => handleEditQuestion(question)}
+            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
+          >
+            <Edit size={14} />
+            Edit
+          </button>
+          <button
+            onClick={() => handleDeleteQuestion(question._id)}
+            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-red-500 hover:text-red-600 transition-colors"
+          >
+            <Trash2 size={14} />
+            Delete
+          </button>
         </div>
-      )}    </Card.Body>    <Card.Footer divider className="bg-gray-50">
-      <div className="flex gap-2">
-        <button
-          onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
-          className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
-        >
-          <Eye size={14} />
-          View
-        </button>
-        <button
-          onClick={() => handleEditQuestion(question)}
-          className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
-        >
-          <Edit size={14} />
-          Edit
-        </button>
-        <button
-          onClick={() => handleDeleteQuestion(question._id)}
-          className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-red-500 hover:text-red-600 transition-colors"
-        >
-          <Trash2 size={14} />
-          Delete
-        </button>
-      </div>    </Card.Footer>
-  </Card>;
+      </Card.Footer>
+    </Card>
+  );
 
   const renderQuestionTable = () => (
     <div className="overflow-x-auto">
@@ -369,16 +390,22 @@ const SellQuestionsManagement = () => {
           </tr>
         </thead>
         <tbody>
-          {questions.map(question => (            <tr key={question._id} className="hover:bg-gray-50 transition-colors">
+          {questions.map(question => (
+            <tr key={question._id} className="hover:bg-gray-50 transition-colors">
               <td className="px-4 py-3 border-b border-gray-200">
-                <div className="flex items-center gap-2">                  <span className="font-semibold text-gray-900">{question.order}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-gray-900">{question.order}</span>
                   <div className="flex gap-1">
-                    <button                      onClick={() => handleReorder(question._id, 'up')}                      disabled={question.order === 1}
+                    <button
+                      onClick={() => handleReorder(question._id, 'up')}
+                      disabled={question.order === 1}
                       className="p-0.5 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:text-amber-600 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronUp size={12} />
                     </button>
-                    <button                      onClick={() => handleReorder(question._id, 'down')}                      disabled={question.order === questions.length}
+                    <button
+                      onClick={() => handleReorder(question._id, 'down')}
+                      disabled={question.order === questions.length}
                       className="p-0.5 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:text-amber-600 hover:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronDown size={12} />
@@ -386,8 +413,11 @@ const SellQuestionsManagement = () => {
                   </div>
                 </div>
               </td>
-              <td className="px-4 py-3 border-b border-gray-200">                <div className="font-semibold text-gray-900">{question.title}</div>                {question.description && (
-                  <div className="text-sm text-gray-600 mt-1 truncate max-w-md">                    {question.description.substring(0, 60)}...
+              <td className="px-4 py-3 border-b border-gray-200">
+                <div className="font-semibold text-gray-900">{question.title}</div>
+                {question.description && (
+                  <div className="text-sm text-gray-600 mt-1 truncate max-w-md">
+                    {question.description.substring(0, 60)}...
                   </div>
                 )}
               </td>
@@ -402,7 +432,8 @@ const SellQuestionsManagement = () => {
                     deriveType(question)}
                 </span>
               </td>
-              <td className="px-4 py-3 border-b border-gray-200 text-gray-700">                {question.categoryId?.name || question.categoryId || 'Unknown'}
+              <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+                {question.categoryId?.name || question.categoryId || 'Unknown'}
               </td>
               <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
                 {getDisplayOptions(question).length}
@@ -421,7 +452,8 @@ const SellQuestionsManagement = () => {
               </td>
               <td className="px-4 py-3 border-b border-gray-200">
                 <div className="flex gap-2">
-                  <button                    onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
+                  <button
+                    onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
                     className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
                     title="View"
                   >
@@ -434,7 +466,8 @@ const SellQuestionsManagement = () => {
                   >
                     <Edit size={14} />
                   </button>
-                  <button                    onClick={() => handleDeleteQuestion(question._id)}
+                  <button
+                    onClick={() => handleDeleteQuestion(question._id)}
                     className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-red-500 hover:text-red-600 transition-colors"
                     title="Delete"
                   >
@@ -560,7 +593,8 @@ const SellQuestionsManagement = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        {stats.map((stat, index) => (          <Card key={index} className="flex items-center gap-4 p-6">
+        {stats.map((stat, index) => (
+          <Card key={index} className="flex items-center gap-4 p-6">
             <div className={cn('p-3 rounded-xl text-white', stat.color)}>
               <stat.icon size={24} />
             </div>
@@ -572,7 +606,8 @@ const SellQuestionsManagement = () => {
         ))}
       </div>
 
-      {/* Filters Section */}      <Card className="mb-8 p-6">
+      {/* Filters Section */}
+      <Card className="mb-8 p-6">
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Search Input */}
           <div className="flex-1 relative">
@@ -608,7 +643,9 @@ const SellQuestionsManagement = () => {
             className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
           >
             <option value="">All Categories</option>
-            {categories.map(category => (              <option key={category._id} value={category._id}>                {category.name}
+            {categories.map(category => (
+              <option key={category._id} value={category._id}>
+                {category.name}
               </option>
             ))}
           </select>
@@ -661,7 +698,8 @@ const SellQuestionsManagement = () => {
         </div>
       </Card>
 
-      {/* Questions Section */}      <Card className="overflow-hidden">
+      {/* Questions Section */}
+      <Card className="overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-gray-900">
             Questions ({pagination.total || 0})

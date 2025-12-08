@@ -5,8 +5,9 @@
  * @version 1.0.0
  */
 
-import React, { useState, useEffect, useMemo } from 'react';import styled from 'styled-components';
-import { theme } from '../../theme';
+import React, { useState, useEffect, useMemo } from 'react';
+import styled from 'styled-components';
+import { theme } from '../../utils';
 import useSellOrders from '../../hooks/useSellOrders';
 import {
   Search,
@@ -102,7 +103,8 @@ const HeaderRight = styled.div`
 
 const ActionButton = styled.button`
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: ${(props: any) => props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
+  border: ${(props: any) =>
+    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
   border-radius: ${theme.borderRadius.md};
   background: ${(props: any) => {
     switch (props.variant) {
@@ -235,7 +237,7 @@ const StatLabel = styled.div`
 const StatChange = styled.div`
   font-size: ${theme.typography.fontSize.xs};
   font-weight: ${theme.typography.fontWeight.medium};
-  color: ${(props: any) => props.positive ? theme.colors.success.main : theme.colors.error.main};
+  color: ${(props: any) => (props.positive ? theme.colors.success.main : theme.colors.error.main)};
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
@@ -330,8 +332,8 @@ const ViewButton = styled.button`
   padding: ${theme.spacing[2]};
   border: 1px solid ${theme.colors.grey[300]};
   border-radius: ${theme.borderRadius.md};
-  background: ${(props: any) => props.active ? theme.colors.primary.main : 'white'};
-  color: ${(props: any) => props.active ? 'white' : theme.colors.text.secondary};
+  background: ${(props: any) => (props.active ? theme.colors.primary.main : 'white')};
+  color: ${(props: any) => (props.active ? 'white' : theme.colors.text.secondary)};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -339,7 +341,8 @@ const ViewButton = styled.button`
   transition: all ${theme.transitions.duration.normal};
 
   &:hover:not(:disabled) {
-    background: ${(props: any) => props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${(props: any) =>
+      props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 `;
 
@@ -417,7 +420,8 @@ const OrderStatus = styled.div`
         return theme.colors.primary[100];
       case 'picked_up':
         return theme.colors.info[100];
-      case 'inspected':        return theme.colors.secondary[100];
+      case 'inspected':
+        return theme.colors.secondary[100];
       case 'completed':
         return theme.colors.success[100];
       case 'cancelled':
@@ -434,7 +438,8 @@ const OrderStatus = styled.div`
         return theme.colors.primary[700];
       case 'picked_up':
         return theme.colors.info[700];
-      case 'inspected':        return theme.colors.secondary[700];
+      case 'inspected':
+        return theme.colors.secondary[700];
       case 'completed':
         return theme.colors.success[700];
       case 'cancelled':
@@ -569,7 +574,8 @@ const TableRow = styled.tr`
   border-bottom: 1px solid ${theme.colors.grey[200]};
   transition: all ${theme.transitions.duration.normal};
 
-  &:hover {    background: ${theme.colors.grey[25]};
+  &:hover {
+    background: ${theme.colors.grey[25]};
   }
 
   &:last-child {
@@ -615,14 +621,15 @@ const PaginationButton = styled.button`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
   border: 1px solid ${theme.colors.grey[300]};
   border-radius: ${theme.borderRadius.md};
-  background: ${(props: any) => props.active ? theme.colors.primary.main : 'white'};
-  color: ${(props: any) => props.active ? 'white' : theme.colors.text.primary};
+  background: ${(props: any) => (props.active ? theme.colors.primary.main : 'white')};
+  color: ${(props: any) => (props.active ? 'white' : theme.colors.text.primary)};
   font-size: ${theme.typography.fontSize.sm};
   cursor: pointer;
   transition: all ${theme.transitions.duration.normal};
 
   &:hover:not(:disabled) {
-    background: ${(props: any) => props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
+    background: ${(props: any) =>
+      props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
   }
 
   &:disabled {
@@ -680,11 +687,14 @@ const SellOrdersManagement = () => {
     loading,
     error,
     pagination,
-    statistics,    fetchOrders,    fetchOrderById,
+    statistics,
+    fetchOrders,
+    fetchOrderById,
     updateOrderStatus,
     assignStaff,
     updatePickupDetails,
-    deleteOrder,    fetchStatistics,
+    deleteOrder,
+    fetchStatistics,
   } = useSellOrders();
 
   // Local state
@@ -732,7 +742,12 @@ const SellOrdersManagement = () => {
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(
-        order =>          order._id.toLowerCase().includes(searchLower) ||          order.customerInfo?.fullName?.toLowerCase().includes(searchLower) ||          order.customerInfo?.email?.toLowerCase().includes(searchLower) ||          order.customerInfo?.phone?.includes(searchTerm) ||          order.deviceInfo?.name?.toLowerCase().includes(searchLower)
+        order =>
+          order._id.toLowerCase().includes(searchLower) ||
+          order.customerInfo?.fullName?.toLowerCase().includes(searchLower) ||
+          order.customerInfo?.email?.toLowerCase().includes(searchLower) ||
+          order.customerInfo?.phone?.includes(searchTerm) ||
+          order.deviceInfo?.name?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -833,126 +848,134 @@ const SellOrdersManagement = () => {
         return theme.colors.primary.main;
       case 'picked_up':
         return theme.colors.info.main;
-      case 'inspected':        return theme.colors.secondary.main;
+      case 'inspected':
+        return theme.colors.secondary.main;
       case 'completed':
         return theme.colors.success.main;
       case 'cancelled':
         return theme.colors.error.main;
-      default:        return theme.colors.grey.main;
+      default:
+        return theme.colors.grey.main;
     }
   };
 
-  const renderOrderCard = (order: any) => <OrderCard key={order._id}>
-    <OrderHeader>
-      <OrderId>
-        <FileText size={16} />#{order._id.slice(-8)}
-      </OrderId>
-      <OrderStatus status={order.status}>{order.status.replace('_', ' ')}</OrderStatus>
-    </OrderHeader>
+  const renderOrderCard = (order: any) => (
+    <OrderCard key={order._id}>
+      <OrderHeader>
+        <OrderId>
+          <FileText size={16} />#{order._id.slice(-8)}
+        </OrderId>
+        <OrderStatus status={order.status}>{order.status.replace('_', ' ')}</OrderStatus>
+      </OrderHeader>
 
-    <OrderContent>
-      <OrderInfo>
-        <InfoItem>
-          <InfoIcon>
-            <User size={16} />
-          </InfoIcon>
-          {order.customerInfo?.fullName || 'N/A'}
-        </InfoItem>
-        <InfoItem>
-          <InfoIcon>
-            <Phone size={16} />
-          </InfoIcon>
-          {order.customerInfo?.phone || 'N/A'}
-        </InfoItem>
-        <InfoItem>
-          <InfoIcon>
-            <Calendar size={16} />
-          </InfoIcon>
-          {formatDate(order.createdAt)}
-        </InfoItem>
-        <InfoItem>
-          <InfoIcon>
-            <Truck size={16} />
-          </InfoIcon>
-          {order.pickup?.method === 'home_pickup' ? 'Home Pickup' : 'Store Drop'}
-        </InfoItem>
-      </OrderInfo>
+      <OrderContent>
+        <OrderInfo>
+          <InfoItem>
+            <InfoIcon>
+              <User size={16} />
+            </InfoIcon>
+            {order.customerInfo?.fullName || 'N/A'}
+          </InfoItem>
+          <InfoItem>
+            <InfoIcon>
+              <Phone size={16} />
+            </InfoIcon>
+            {order.customerInfo?.phone || 'N/A'}
+          </InfoItem>
+          <InfoItem>
+            <InfoIcon>
+              <Calendar size={16} />
+            </InfoIcon>
+            {formatDate(order.createdAt)}
+          </InfoItem>
+          <InfoItem>
+            <InfoIcon>
+              <Truck size={16} />
+            </InfoIcon>
+            {order.pickup?.method === 'home_pickup' ? 'Home Pickup' : 'Store Drop'}
+          </InfoItem>
+        </OrderInfo>
 
-      <DeviceInfo>
-        <DeviceName>
-          <Smartphone size={18} />
-          {order.deviceInfo?.name || 'Device'}
-        </DeviceName>
-        <DeviceDetails>
-          {order.deviceInfo?.variant &&
-            `${order.deviceInfo.variant.storage} • ${order.deviceInfo.variant.color}`}
-        </DeviceDetails>
-      </DeviceInfo>
+        <DeviceInfo>
+          <DeviceName>
+            <Smartphone size={18} />
+            {order.deviceInfo?.name || 'Device'}
+          </DeviceName>
+          <DeviceDetails>
+            {order.deviceInfo?.variant &&
+              `${order.deviceInfo.variant.storage} • ${order.deviceInfo.variant.color}`}
+          </DeviceDetails>
+        </DeviceInfo>
 
-      <PriceInfo>
-        <PriceLabel>Final Price</PriceLabel>
-        <PriceValue>{formatPrice(order.finalPrice || 0)}</PriceValue>
-      </PriceInfo>
-    </OrderContent>
+        <PriceInfo>
+          <PriceLabel>Final Price</PriceLabel>
+          <PriceValue>{formatPrice(order.finalPrice || 0)}</PriceValue>
+        </PriceInfo>
+      </OrderContent>
 
-    <OrderActions>
-      <ActionGroup>
-        <ActionIcon onClick={() => console.log('View order:', order._id)}>
-          <Eye size={16} />
-        </ActionIcon>
-        <ActionIcon onClick={() => console.log('Edit order:', order._id)}>
-          <Edit size={16} />
-        </ActionIcon>
-        <ActionIcon onClick={() => handleDeleteOrder(order._id)}>
-          <Trash2 size={16} />
-        </ActionIcon>
-      </ActionGroup>
-      <ActionGroup>
-        <ActionIcon onClick={() => console.log('More actions:', order._id)}>
-          <MoreVertical size={16} />
-        </ActionIcon>
-      </ActionGroup>
-    </OrderActions>
-  </OrderCard>;
+      <OrderActions>
+        <ActionGroup>
+          <ActionIcon onClick={() => console.log('View order:', order._id)}>
+            <Eye size={16} />
+          </ActionIcon>
+          <ActionIcon onClick={() => console.log('Edit order:', order._id)}>
+            <Edit size={16} />
+          </ActionIcon>
+          <ActionIcon onClick={() => handleDeleteOrder(order._id)}>
+            <Trash2 size={16} />
+          </ActionIcon>
+        </ActionGroup>
+        <ActionGroup>
+          <ActionIcon onClick={() => console.log('More actions:', order._id)}>
+            <MoreVertical size={16} />
+          </ActionIcon>
+        </ActionGroup>
+      </OrderActions>
+    </OrderCard>
+  );
 
-  const renderOrderRow = (order: any) => <TableRow key={order._id}>
-    <TableCell>
-      <input
-        type="checkbox"        checked={selectedOrders.includes(order._id)}
-        onChange={e => {
-          if (e.target.checked) {            setSelectedOrders([...selectedOrders, order._id]);
-          } else {
-            setSelectedOrders(selectedOrders.filter(id => id !== order._id));
-          }
-        }}
-      />
-    </TableCell>
-    <TableCell>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <FileText size={16} />#{order._id.slice(-8)}
-      </div>
-    </TableCell>
-    <TableCell>{order.customerInfo?.fullName || 'N/A'}</TableCell>
-    <TableCell>{order.deviceInfo?.name || 'Device'}</TableCell>
-    <TableCell>
-      <OrderStatus status={order.status}>{order.status.replace('_', ' ')}</OrderStatus>
-    </TableCell>
-    <TableCell>{formatPrice(order.finalPrice || 0)}</TableCell>
-    <TableCell>{formatDate(order.createdAt)}</TableCell>
-    <TableCell>
-      <ActionGroup>
-        <ActionIcon onClick={() => console.log('View order:', order._id)}>
-          <Eye size={16} />
-        </ActionIcon>
-        <ActionIcon onClick={() => console.log('Edit order:', order._id)}>
-          <Edit size={16} />
-        </ActionIcon>
-        <ActionIcon onClick={() => handleDeleteOrder(order._id)}>
-          <Trash2 size={16} />
-        </ActionIcon>
-      </ActionGroup>
-    </TableCell>
-  </TableRow>;
+  const renderOrderRow = (order: any) => (
+    <TableRow key={order._id}>
+      <TableCell>
+        <input
+          type="checkbox"
+          checked={selectedOrders.includes(order._id)}
+          onChange={e => {
+            if (e.target.checked) {
+              setSelectedOrders([...selectedOrders, order._id]);
+            } else {
+              setSelectedOrders(selectedOrders.filter(id => id !== order._id));
+            }
+          }}
+        />
+      </TableCell>
+      <TableCell>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <FileText size={16} />#{order._id.slice(-8)}
+        </div>
+      </TableCell>
+      <TableCell>{order.customerInfo?.fullName || 'N/A'}</TableCell>
+      <TableCell>{order.deviceInfo?.name || 'Device'}</TableCell>
+      <TableCell>
+        <OrderStatus status={order.status}>{order.status.replace('_', ' ')}</OrderStatus>
+      </TableCell>
+      <TableCell>{formatPrice(order.finalPrice || 0)}</TableCell>
+      <TableCell>{formatDate(order.createdAt)}</TableCell>
+      <TableCell>
+        <ActionGroup>
+          <ActionIcon onClick={() => console.log('View order:', order._id)}>
+            <Eye size={16} />
+          </ActionIcon>
+          <ActionIcon onClick={() => console.log('Edit order:', order._id)}>
+            <Edit size={16} />
+          </ActionIcon>
+          <ActionIcon onClick={() => handleDeleteOrder(order._id)}>
+            <Trash2 size={16} />
+          </ActionIcon>
+        </ActionGroup>
+      </TableCell>
+    </TableRow>
+  );
 
   if (loading && !orders) {
     return (
@@ -995,12 +1018,16 @@ const SellOrdersManagement = () => {
             <StatIcon type="total">
               <ShoppingBag size={24} />
             </StatIcon>
-            <StatContent>              <StatValue>{statistics.totalOrders || 0}</StatValue>
-              <StatLabel>Total Orders</StatLabel>              <StatChange positive={statistics.ordersGrowth >= 0}>                {statistics.ordersGrowth >= 0 ? (
+            <StatContent>
+              <StatValue>{statistics.totalOrders || 0}</StatValue>
+              <StatLabel>Total Orders</StatLabel>
+              <StatChange positive={statistics.ordersGrowth >= 0}>
+                {statistics.ordersGrowth >= 0 ? (
                   <TrendingUp size={12} />
                 ) : (
                   <TrendingDown size={12} />
-                )}                {Math.abs(statistics.ordersGrowth || 0)}% from last month
+                )}
+                {Math.abs(statistics.ordersGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
           </StatCard>
@@ -1009,12 +1036,16 @@ const SellOrdersManagement = () => {
             <StatIcon type="pending">
               <Clock size={24} />
             </StatIcon>
-            <StatContent>              <StatValue>{statistics.pendingOrders || 0}</StatValue>
-              <StatLabel>Pending Orders</StatLabel>              <StatChange positive={statistics.pendingGrowth <= 0}>                {statistics.pendingGrowth <= 0 ? (
+            <StatContent>
+              <StatValue>{statistics.pendingOrders || 0}</StatValue>
+              <StatLabel>Pending Orders</StatLabel>
+              <StatChange positive={statistics.pendingGrowth <= 0}>
+                {statistics.pendingGrowth <= 0 ? (
                   <TrendingDown size={12} />
                 ) : (
                   <TrendingUp size={12} />
-                )}                {Math.abs(statistics.pendingGrowth || 0)}% from last month
+                )}
+                {Math.abs(statistics.pendingGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
           </StatCard>
@@ -1023,12 +1054,16 @@ const SellOrdersManagement = () => {
             <StatIcon type="completed">
               <CheckCircle size={24} />
             </StatIcon>
-            <StatContent>              <StatValue>{statistics.completedOrders || 0}</StatValue>
-              <StatLabel>Completed Orders</StatLabel>              <StatChange positive={statistics.completedGrowth >= 0}>                {statistics.completedGrowth >= 0 ? (
+            <StatContent>
+              <StatValue>{statistics.completedOrders || 0}</StatValue>
+              <StatLabel>Completed Orders</StatLabel>
+              <StatChange positive={statistics.completedGrowth >= 0}>
+                {statistics.completedGrowth >= 0 ? (
                   <TrendingUp size={12} />
                 ) : (
                   <TrendingDown size={12} />
-                )}                {Math.abs(statistics.completedGrowth || 0)}% from last month
+                )}
+                {Math.abs(statistics.completedGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
           </StatCard>
@@ -1037,12 +1072,16 @@ const SellOrdersManagement = () => {
             <StatIcon type="revenue">
               <DollarSign size={24} />
             </StatIcon>
-            <StatContent>              <StatValue>{formatPrice(statistics.totalRevenue || 0)}</StatValue>
-              <StatLabel>Total Revenue</StatLabel>              <StatChange positive={statistics.revenueGrowth >= 0}>                {statistics.revenueGrowth >= 0 ? (
+            <StatContent>
+              <StatValue>{formatPrice(statistics.totalRevenue || 0)}</StatValue>
+              <StatLabel>Total Revenue</StatLabel>
+              <StatChange positive={statistics.revenueGrowth >= 0}>
+                {statistics.revenueGrowth >= 0 ? (
                   <TrendingUp size={12} />
                 ) : (
                   <TrendingDown size={12} />
-                )}                {Math.abs(statistics.revenueGrowth || 0)}% from last month
+                )}
+                {Math.abs(statistics.revenueGrowth || 0)}% from last month
               </StatChange>
             </StatContent>
           </StatCard>
@@ -1063,7 +1102,10 @@ const SellOrdersManagement = () => {
 
           <FilterGroup>
             <FilterLabel>Status</FilterLabel>
-            <FilterSelect value={statusFilter} onChange={(e: any) => setStatusFilter(e.target.value)}>
+            <FilterSelect
+              value={statusFilter}
+              onChange={(e: any) => setStatusFilter(e.target.value)}
+            >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
               <option value="confirmed">Confirmed</option>
@@ -1170,7 +1212,8 @@ const SellOrdersManagement = () => {
                         type="checkbox"
                         checked={selectedOrders.length === filteredOrders.length}
                         onChange={e => {
-                          if (e.target.checked) {                            setSelectedOrders(filteredOrders.map(order => order._id));
+                          if (e.target.checked) {
+                            setSelectedOrders(filteredOrders.map(order => order._id));
                           } else {
                             setSelectedOrders([]);
                           }
@@ -1194,7 +1237,8 @@ const SellOrdersManagement = () => {
           {pagination && pagination.totalPages > 1 && (
             <Pagination>
               <PaginationInfo>
-                Showing {(currentPage - 1) * 12 + 1} to{' '}                {Math.min(currentPage * 12, pagination.totalItems)} of {pagination.totalItems}{' '}
+                Showing {(currentPage - 1) * 12 + 1} to{' '}
+                {Math.min(currentPage * 12, pagination.totalItems)} of {pagination.totalItems}{' '}
                 orders
               </PaginationInfo>
               <PaginationControls>

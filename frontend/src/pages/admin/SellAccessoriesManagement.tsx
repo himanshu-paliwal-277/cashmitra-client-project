@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '../../utils/utils';
 import useSellAccessories from '../../hooks/useSellAccessories';
 import useAdminCategories from '../../hooks/useAdminCategories';
 import Card from '../../components/ui/Card';

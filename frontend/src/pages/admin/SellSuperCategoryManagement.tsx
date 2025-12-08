@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';import styled from 'styled-components';
+import React, { useState, useEffect, useCallback } from 'react';
+import styled from 'styled-components';
 import { Plus, Edit2, Trash2, Image as ImageIcon, Search } from 'lucide-react';
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL } from '../../utils/api';
 import SuperCategoryForm from './SuperCategoryForm';
 
 const SellSuperCategoryManagement = () => {
@@ -49,7 +50,8 @@ const SellSuperCategoryManagement = () => {
         setError(errorMessage);
       }
     } catch (err) {
-      console.error('Error fetching super categories:', err);      setError('Error fetching super categories: ' + (err.message || 'Unknown error'));
+      console.error('Error fetching super categories:', err);
+      setError('Error fetching super categories: ' + (err.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }
@@ -85,7 +87,8 @@ const SellSuperCategoryManagement = () => {
       } else {
         alert(data.message || 'Failed to delete super category');
       }
-    } catch (err) {      alert('Error deleting super category: ' + err.message);
+    } catch (err) {
+      alert('Error deleting super category: ' + err.message);
     }
   };
 
@@ -110,7 +113,9 @@ const SellSuperCategoryManagement = () => {
   };
 
   const filteredCategories = superCategories.filter(category => {
-    const matchesSearch =      category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||      category.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category.description?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
@@ -164,23 +169,33 @@ const SellSuperCategoryManagement = () => {
         </EmptyMessage>
       ) : (
         <Grid>
-          {filteredCategories.map(category => (            <Card key={category._id}>
-              <CardImage>                {category.image ? (                  <img src={category.image} alt={category.name} />
+          {filteredCategories.map(category => (
+            <Card key={category._id}>
+              <CardImage>
+                {category.image ? (
+                  <img src={category.image} alt={category.name} />
                 ) : (
                   <ImageIcon size={48} color="#cbd5e0" />
                 )}
               </CardImage>
               <CardContent>
-                <CardHeader>                  <CategoryName>{category.name}</CategoryName>                  <StatusBadge isActive={category.isActive}>                    {category.isActive ? 'Active' : 'Inactive'}
+                <CardHeader>
+                  <CategoryName>{category.name}</CategoryName>
+                  <StatusBadge isActive={category.isActive}>
+                    {category.isActive ? 'Active' : 'Inactive'}
                   </StatusBadge>
-                </CardHeader>                <CardDescription>{category.description || 'No description'}</CardDescription>
+                </CardHeader>
+                <CardDescription>{category.description || 'No description'}</CardDescription>
                 <CardFooter>
-                  <CardMeta>                    <MetaItem>Sort: {category.sortOrder || 0}</MetaItem>                    <MetaItem>{new Date(category.createdAt).toLocaleDateString()}</MetaItem>
+                  <CardMeta>
+                    <MetaItem>Sort: {category.sortOrder || 0}</MetaItem>
+                    <MetaItem>{new Date(category.createdAt).toLocaleDateString()}</MetaItem>
                   </CardMeta>
                   <CardActions>
                     <ActionButton onClick={() => handleEdit(category)}>
                       <Edit2 size={16} />
-                    </ActionButton>                    <ActionButton danger onClick={() => handleDelete(category._id)}>
+                    </ActionButton>
+                    <ActionButton danger onClick={() => handleDelete(category._id)}>
                       <Trash2 size={16} />
                     </ActionButton>
                   </CardActions>
@@ -254,9 +269,9 @@ const FilterGroup = styled.div`
 
 const FilterButton = styled.button`
   padding: 0.5rem 1rem;
-  border: 1px solid ${(props: any) => props.active ? '#f59e0b' : '#e2e8f0'};
-  background: ${(props: any) => props.active ? '#f59e0b' : 'white'};
-  color: ${(props: any) => props.active ? 'white' : '#4a5568'};
+  border: 1px solid ${(props: any) => (props.active ? '#f59e0b' : '#e2e8f0')};
+  background: ${(props: any) => (props.active ? '#f59e0b' : 'white')};
+  color: ${(props: any) => (props.active ? 'white' : '#4a5568')};
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
@@ -265,7 +280,7 @@ const FilterButton = styled.button`
 
   &:hover {
     border-color: #f59e0b;
-    background: ${(props: any) => props.active ? '#d97706' : '#fffbeb'};
+    background: ${(props: any) => (props.active ? '#d97706' : '#fffbeb')};
   }
 `;
 
@@ -370,8 +385,8 @@ const StatusBadge = styled.span`
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: ${(props: any) => props.isActive ? '#d1fae5' : '#fee2e2'};
-  color: ${(props: any) => props.isActive ? '#065f46' : '#991b1b'};
+  background: ${(props: any) => (props.isActive ? '#d1fae5' : '#fee2e2')};
+  color: ${(props: any) => (props.isActive ? '#065f46' : '#991b1b')};
 `;
 
 const CardDescription = styled.p`
@@ -407,15 +422,15 @@ const CardActions = styled.div`
 
 const ActionButton = styled.button`
   padding: 0.5rem;
-  background: ${(props: any) => props.danger ? '#fee2e2' : '#f3f4f6'};
-  color: ${(props: any) => props.danger ? '#dc2626' : '#4a5568'};
+  background: ${(props: any) => (props.danger ? '#fee2e2' : '#f3f4f6')};
+  color: ${(props: any) => (props.danger ? '#dc2626' : '#4a5568')};
   border: none;
   border-radius: 0.375rem;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: ${(props: any) => props.danger ? '#fecaca' : '#e2e8f0'};
+    background: ${(props: any) => (props.danger ? '#fecaca' : '#e2e8f0')};
     transform: scale(1.1);
   }
 `;

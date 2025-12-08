@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, Heart, ShoppingCart, Eye } from 'lucide-react';
-import { productCategoriesAPI } from '../../api/productCategories';
+import { productCategoriesAPI } from '../../services/productCategories';
 import './PhoneList.css';
 
 const PhoneList = () => {
