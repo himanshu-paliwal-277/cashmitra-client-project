@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { X, Save, AlertCircle } from 'lucide-react';
-import adminService from '../services/adminService';
+import adminService from '../../services/adminService';
 
 const ModalOverlay = styled.div`
   position: fixed;

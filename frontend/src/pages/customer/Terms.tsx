@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import TermsHero from '../../components/terms/TermsHero';
-import TermsContent from '../../components/terms/TermsContent';
-import TermsTableOfContents from '../../components/terms/TermsTableOfContents';
+import TermsHero from '../../components/customer/terms/TermsHero';
+import TermsContent from '../../components/customer/terms/TermsContent';
+import TermsTableOfContents from '../../components/customer/terms/TermsTableOfContents';
 
 const Terms = () => {
   useEffect(() => {

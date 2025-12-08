@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import Button from './ui/Button';
+import Button from '../../ui/Button';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -56,9 +56,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             </div>
 
             {/* Heading */}
-            <h1 className="mb-4 text-4xl font-bold text-gray-900">
-              Oops! Something went wrong
-            </h1>
+            <h1 className="mb-4 text-4xl font-bold text-gray-900">Oops! Something went wrong</h1>
 
             {/* Description */}
             <p className="mb-2 text-lg text-gray-600">
@@ -81,11 +79,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 Try Again
               </Button>
 
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => (window.location.href = '/')}
-              >
+              <Button size="lg" variant="outline" onClick={() => (window.location.href = '/')}>
                 Go to Home
               </Button>
             </div>

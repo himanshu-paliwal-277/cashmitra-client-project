@@ -1,9 +1,9 @@
 import { Suspense, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../../contexts/AdminAuthContext';
-import PermissionsSidebar from './PermissionsSidebar';
-import usePermissionsSidebar from '../../hooks/usePermissionsSidebar';
-import { PageLoader } from '../common/PageLoader';
+import { useAdminAuth } from '../../../contexts/AdminAuthContext';
+import PermissionsSidebar from '../PermissionsSidebar';
+import usePermissionsSidebar from '../../../hooks/usePermissionsSidebar';
+import { PageLoader } from '../../customer/common/PageLoader';
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
 

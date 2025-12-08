@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit2, Trash2, Image as ImageIcon, Search, ArrowLeft, Package } from 'lucide-react';
 import { API_BASE_URL } from '../../utils/api';
 import SuperCategoryForm from './SuperCategoryForm';
-import SkeletonLoader from '../../components/common/SkeletonLoader';
+import SkeletonLoader from '../../components/customer/common/SkeletonLoader';
 
 const SuperCategoryManagement = () => {
   const [superCategories, setSuperCategories] = useState([]);

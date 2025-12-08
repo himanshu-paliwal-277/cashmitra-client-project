@@ -1,7 +1,7 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import Footer from '../common/footer/Footer';
-import Header from '../common/header/Header';
+import Footer from './Footer';
+import Header from './Header';
 import { Suspense, useEffect } from 'react';
 import { PageLoader } from '../common/PageLoader';
 

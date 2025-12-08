@@ -6,7 +6,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '../ui/carousel';
+} from '../../ui/carousel';
 
 const HeroCarousel = () => {
   const plugin = React.useRef(

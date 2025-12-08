@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import ReturnsHero from '../../components/returns/ReturnsHero';
-import ReturnsContent from '../../components/returns/ReturnsContent';
-import ReturnsTableOfContents from '../../components/returns/ReturnsTableOfContents';
+import ReturnsHero from '../../components/customer/returns/ReturnsHero';
+import ReturnsContent from '../../components/customer/returns/ReturnsContent';
+import ReturnsTableOfContents from '../../components/customer/returns/ReturnsTableOfContents';
 
 const ReturnsRefund = () => {
   useEffect(() => {

@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import ContactHero from '../../components/contact/ContactHero';
-import ContactForm from '../../components/contact/ContactForm';
-import ContactInfo from '../../components/contact/ContactInfo';
-import ContactFAQ from '../../components/contact/ContactFAQ';
+import ContactHero from '../../components/customer/contact/ContactHero';
+import ContactForm from '../../components/customer/contact/ContactForm';
+import ContactInfo from '../../components/customer/contact/ContactInfo';
+import ContactFAQ from '../../components/customer/contact/ContactFAQ';
 
 const Contact = () => {
   useEffect(() => {

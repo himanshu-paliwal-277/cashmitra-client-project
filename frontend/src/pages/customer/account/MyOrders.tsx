@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import useUserOrders from '../../../hooks/useUserOrders';
-import CancelOrderDialog from '../../../components/CancelOrderDialog';
+import CancelOrderDialog from '../../../components/customer/CancelOrderDialog';
 
 const statusIcon = status => {
   switch ((status || '').toLowerCase()) {

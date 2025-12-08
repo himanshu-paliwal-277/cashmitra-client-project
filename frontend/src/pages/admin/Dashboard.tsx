@@ -7,7 +7,7 @@ import RealTimeCharts from '../../components/admin/RealTimeCharts';
 import RealTimeSalesOrders from '../../components/admin/RealTimeSalesOrders';
 import RealTimePurchaseOrders from '../../components/admin/RealTimePurchaseOrders';
 import { PickupManagement } from './index';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import LoadingSpinner from '../../components/customer/common/LoadingSpinner';
 import {
   Users,
   ShoppingBag,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Clock, Truck, Users, ArrowRight } from 'lucide-react';
-import Button from '../ui/Button';
+import Button from '../../ui/Button';
 
 const HomeBanner = () => {
   const navigate = useNavigate();

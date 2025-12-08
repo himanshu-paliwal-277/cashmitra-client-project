@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import './BuyProductsList.css';
-import adminService from '../../../services/adminService';
+import adminService from '../../../../services/adminService';
 import ProductCard from './ProductCard';
 
 const BuyProductsList = () => {

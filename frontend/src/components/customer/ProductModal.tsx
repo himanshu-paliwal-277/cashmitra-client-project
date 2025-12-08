@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { adminService } from '../services/adminService';
+import { adminService } from '../../services/adminService';
 import { X, Upload, Star, Plus, Trash2, Save, AlertCircle, Image as ImageIcon } from 'lucide-react';
 
 const ModalOverlay = styled.div`

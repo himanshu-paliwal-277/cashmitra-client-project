@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import PrivacyHero from '../../components/privacy/PrivacyHero';
-import PrivacyContent from '../../components/privacy/PrivacyContent';
-import PrivacyTableOfContents from '../../components/privacy/PrivacyTableOfContents';
+import PrivacyHero from '../../components/customer/privacy/PrivacyHero';
+import PrivacyContent from '../../components/customer/privacy/PrivacyContent';
+import PrivacyTableOfContents from '../../components/customer/privacy/PrivacyTableOfContents';
 
 const Privacy = () => {
   useEffect(() => {

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
-import ProductModal from '../../components/ProductModal';
-import SkeletonLoader from '../../components/common/SkeletonLoader';
-import DeleteDialog from '../../components/common/DeleteDialog';
+import ProductModal from '../../components/customer/ProductModal';
+import SkeletonLoader from '../../components/customer/common/SkeletonLoader';
+import DeleteDialog from '../../components/customer/common/DeleteDialog';
 import ProductViewModal from '../../components/admin/ProductViewModal';
 import {
   Package,

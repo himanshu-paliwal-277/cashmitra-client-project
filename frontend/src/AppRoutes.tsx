@@ -2,7 +2,7 @@ import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 // Layouts
-const MainLayout = lazy(() => import('./components/layout/MainLayout'));
+const MainLayout = lazy(() => import('./components/customer/layout/MainLayout'));
 
 // Auth Pages (Lazy)
 const LoginPage = lazy(() => import('./pages/customer/auth/LoginPage'));
@@ -48,7 +48,7 @@ const OrderConfirmation = lazy(() => import('./pages/customer/buy/OrderConfirmat
 // Account Pages (Lazy)
 const MyProfile = lazy(() => import('./pages/customer/account/MyProfile'));
 const MyOrders = lazy(() => import('./pages/customer/account/MyOrders'));
-const UserOrderDetails = lazy(() => import('./components/UserOrderDetails'));
+const UserOrderDetails = lazy(() => import('./components/customer/UserOrderDetails'));
 const Wallet = lazy(() => import('./pages/customer/account/Wallet'));
 const KYC = lazy(() => import('./pages/customer/account/KYC'));
 const SavedAddresses = lazy(() => import('./pages/customer/account/SavedAddresses'));
@@ -107,7 +107,7 @@ const SellConfigurationManagement = lazy(() => import('./pages/admin/SellConfigu
 const PickupManagement = lazy(() => import('./pages/admin/PickupManagement'));
 const SellOrdersManagement = lazy(() => import('./pages/admin/SellOrdersManagement'));
 const AdminProtectedRoute = lazy(() => import('./components/admin/ProtectedRoute'));
-const AdminLayout = lazy(() => import('./components/admin/AdminLayout'));
+const AdminLayout = lazy(() => import('./components/admin/layout/AdminLayout'));
 
 // Agent Pages (Lazy)
 const AgentLogin = lazy(() => import('./pages/agent/AgentLogin'));

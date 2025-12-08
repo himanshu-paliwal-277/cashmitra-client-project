@@ -31,7 +31,7 @@ import {
   Cpu,
   MemoryStick,
 } from 'lucide-react';
-import ImageUpload from '../common/ImageUpload';
+import ImageUpload from '../customer/common/ImageUpload';
 
 const Container = styled.div`
   min-height: 100vh;

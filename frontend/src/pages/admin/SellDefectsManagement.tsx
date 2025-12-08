@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react';
 import { cn } from '../../utils/utils';
 import useSellDefects from '../../hooks/useSellDefects';
-import DefectModal from '../../components/DefectModal';
+import DefectModal from '../../components/customer/DefectModal';
 import Card from '../../components/ui/Card';
 import {
   Search,

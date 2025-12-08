@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import AboutHero from '../../components/about/AboutHero';
-import AboutStats from '../../components/about/AboutStats';
-import AboutMission from '../../components/about/AboutMission';
-import AboutFeatures from '../../components/about/AboutFeatures';
-import AboutCTA from '../../components/about/AboutCTA';
+import AboutHero from '../../components/customer/about/AboutHero';
+import AboutStats from '../../components/customer/about/AboutStats';
+import AboutMission from '../../components/customer/about/AboutMission';
+import AboutFeatures from '../../components/customer/about/AboutFeatures';
+import AboutCTA from '../../components/customer/about/AboutCTA';
 
 const About = () => {
   useEffect(() => {

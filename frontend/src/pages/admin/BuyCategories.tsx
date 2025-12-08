@@ -18,7 +18,7 @@ import {
   Grid,
 } from 'lucide-react';
 import { API_BASE_URL } from '../../utils/api';
-import SkeletonLoader from '../../components/common/SkeletonLoader';
+import SkeletonLoader from '../../components/customer/common/SkeletonLoader';
 
 const BuyCategories = () => {
   const [categories, setCategories] = useState([]);

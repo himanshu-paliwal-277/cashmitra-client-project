@@ -1,8 +1,8 @@
 import React, { useState, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { Upload, X, Image as ImageIcon, Loader, AlertCircle, Check } from 'lucide-react';
-import cloudinaryService from '../../services/cloudinaryService';
-import { theme } from '../../utils';
+import cloudinaryService from '../../../services/cloudinaryService';
+import { theme } from '../../../utils';
 
 const UploadContainer = styled.div`
   width: 100%;

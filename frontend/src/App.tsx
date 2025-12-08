@@ -7,11 +7,11 @@ import { CartProvider } from './contexts/CartContext';
 import { AdminAuthProvider } from './contexts/AdminAuthContext';
 import { PartnerAuthProvider } from './contexts/PartnerAuthContext';
 import { AgentAuthProvider } from './contexts/AgentAuthContext';
-import ErrorBoundary from './components/ErrorBoundary';
+import ErrorBoundary from './components/customer/common/ErrorBoundary';
 
 // Import the new AppRoutes component
 import AppRoutes from './AppRoutes';
-import { AppLoader } from './components/common/AppLoader';
+import { AppLoader } from './components/customer/common/AppLoader';
 
 /**
  * AppContent component

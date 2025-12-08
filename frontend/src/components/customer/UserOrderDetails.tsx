@@ -19,7 +19,7 @@ import {
   Shield,
   Eye,
 } from 'lucide-react';
-import useUserOrders from '../hooks/useUserOrders';
+import useUserOrders from '../../hooks/useUserOrders';
 import './UserOrderDetails.css';
 
 const UserOrderDetails = () => {
