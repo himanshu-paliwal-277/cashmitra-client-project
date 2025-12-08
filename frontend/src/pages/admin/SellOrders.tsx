@@ -27,6 +27,8 @@ import {
 import api from '../../utils/api';
 import adminService from '../../services/adminService';
 import pickupService from '../../services/pickupService';
+import AdminPageHeader from '../../components/admin/common/AdminPageHeader';
+import AdminStatsCard from '../../components/admin/common/AdminStatsCard';
 
 const SellOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -263,30 +265,22 @@ const SellOrders = () => {
     {
       label: 'Total Orders',
       value: pagination.totalOrders || 0,
-      icon: ShoppingCart,
-      gradient: 'from-blue-500 to-indigo-600',
-      bgGradient: 'from-blue-50 to-indigo-50',
+      icon: <ShoppingCart size={26} />,
     },
     {
       label: 'Confirmed Orders',
       value: stats.confirmed,
-      icon: Clock,
-      gradient: 'from-amber-500 to-orange-600',
-      bgGradient: 'from-amber-50 to-orange-50',
+      icon: <Clock size={26} />,
     },
     {
       label: 'Completed & Paid',
       value: stats.paid,
-      icon: CheckCircle,
-      gradient: 'from-emerald-500 to-teal-600',
-      bgGradient: 'from-emerald-50 to-teal-50',
+      icon: <CheckCircle size={26} />,
     },
     {
       label: 'Total Revenue',
       value: formatCurrency(stats.totalRevenue),
-      icon: DollarSign,
-      gradient: 'from-purple-500 to-pink-600',
-      bgGradient: 'from-purple-50 to-pink-50',
+      icon: <DollarSign size={26} />,
     },
   ];
 
@@ -304,59 +298,30 @@ const SellOrders = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30">
       <div className="max-w-7xl space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg sm:rounded-xl shadow-lg">
-              <ShoppingCart className="text-white" size={24} />
+        <AdminPageHeader
+          icon={<ShoppingCart className="text-white" size={24} />}
+          title="Sell Orders"
+          subtitle="Manage and track sell orders"
+          rightSection={
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm text-sm">
+                <Download size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden sm:inline">Export</span>
+              </button>
+              <button
+                onClick={() => fetchOrders(pagination.currentPage, statusFilter, searchTerm)}
+                className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm text-sm"
+              >
+                <RefreshCw size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden sm:inline">Refresh</span>
+              </button>
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                Sell Orders
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
-                Manage and track sell orders
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm text-sm">
-              <Download size={16} className="sm:w-[18px] sm:h-[18px]" />
-              <span className="hidden sm:inline">Export</span>
-            </button>
-            <button
-              onClick={() => fetchOrders(pagination.currentPage, statusFilter, searchTerm)}
-              className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm text-sm"
-            >
-              <RefreshCw size={16} className="sm:w-[18px] sm:h-[18px]" />
-              <span className="hidden sm:inline">Refresh</span>
-            </button>
-          </div>
-        </div>
+          }
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {statsData.map((stat, index) => (
-            <div
-              key={index}
-              className={`relative bg-gradient-to-br ${stat.bgGradient} rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/50 overflow-hidden group`}
-            >
-              <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-white/20 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 group-hover:scale-150 transition-transform duration-500" />
-              <div className="relative flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2 truncate">
-                    {stat.label}
-                  </p>
-                  <p
-                    className={`text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent break-words`}
-                  >
-                    {stat.value}
-                  </p>
-                </div>
-                <div className="p-3">
-                  <stat.icon color="black" size={20} />
-                </div>
-              </div>
-            </div>
+            <AdminStatsCard label={stat.label} value={stat.value} icon={stat.icon} index={index} />
           ))}
         </div>
 

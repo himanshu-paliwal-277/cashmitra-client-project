@@ -26,6 +26,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import AdminPageHeader from '../../components/admin/common/AdminPageHeader';
 
 const BuyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -250,13 +251,11 @@ const BuyOrders = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-2 bg-green-500 rounded-lg">
-          <Package size={32} className="text-white" />
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Buy Orders</h1>
-      </div>
+      <AdminPageHeader
+        icon={<Package size={32} color="white" />}
+        title="Buy Orders"
+        subtitle="Manage and track buy orders"
+      />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">

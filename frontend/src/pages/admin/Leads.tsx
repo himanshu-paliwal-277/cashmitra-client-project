@@ -31,6 +31,8 @@ import {
   ExternalLink,
   ArrowRight,
 } from 'lucide-react';
+import AdminPageHeader from '../../components/admin/common/AdminPageHeader';
+import AdminStatsCard from '../../components/admin/common/AdminStatsCard';
 
 const Leads = () => {
   const navigate = useNavigate();
@@ -124,30 +126,22 @@ const Leads = () => {
     {
       label: 'Total Leads',
       value: pagination.total,
-      color: 'bg-blue-500',
-      bgGradient: 'from-blue-50 to-indigo-50',
-      icon: Users,
+      icon: <Users size={26} />,
     },
     {
       label: 'Buy Orders',
       value: stats.buyOrders,
-      color: 'bg-green-500',
-      bgGradient: 'from-green-50 to-emerald-50',
-      icon: ShoppingCart,
+      icon: <ShoppingCart size={26} />,
     },
     {
       label: 'Sell Orders',
       value: stats.sellOrders,
-      color: 'bg-amber-500',
-      bgGradient: 'from-amber-50 to-orange-50',
-      icon: TrendingDown,
+      icon: <TrendingDown size={26} />,
     },
     {
       label: 'Total Value',
       value: formatCurrency(stats.totalValue),
-      color: 'bg-purple-500',
-      bgGradient: 'from-purple-50 to-pink-50',
-      icon: DollarSign,
+      icon: <DollarSign size={26} />,
     },
   ];
 
@@ -202,51 +196,33 @@ const Leads = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 ">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-            <Users size={32} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-              Leads Management
-            </h1>
-            <p className="text-sm text-gray-600 mt-1">All customer orders in one place</p>
-          </div>
-        </div>
-        <button
-          onClick={() => fetchLeads(pagination.currentPage, typeFilter, statusFilter)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm"
-        >
-          <RefreshCw size={18} />
-          Refresh
-        </button>
-      </div>
+      <AdminPageHeader
+        icon={<Users size={32} className="text-white" />}
+        title="Leads Management"
+        subtitle="All customer orders in one place"
+        rightSection={
+          <button
+            onClick={() => fetchLeads(pagination.currentPage, typeFilter, statusFilter)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm"
+          >
+            <RefreshCw size={18} />
+            Refresh
+          </button>
+        }
+      />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {statsData.map((stat, index) => (
-          <div
+          <AdminStatsCard
             key={index}
-            className={`relative bg-gradient-to-br ${stat.bgGradient} rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-white/50 overflow-hidden group`}
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
-            <div className="relative flex items-start justify-between">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 mb-2">{stat.label}</p>
-                <p
-                  className={`text-4xl font-bold bg-gradient-to-r ${stat.color.replace('bg-', 'from-')} to-${stat.color.split('-')[1]}-600 bg-clip-text text-transparent`}
-                >
-                  {stat.value}
-                </p>
-              </div>
-              <div className="p-3">
-                <stat.icon color="black" className="" size={24} />
-              </div>
-            </div>
-          </div>
+            index={index}
+            label={stat.label}
+            value={stat.value}
+            icon={stat.icon}
+          />
         ))}
       </div>
 

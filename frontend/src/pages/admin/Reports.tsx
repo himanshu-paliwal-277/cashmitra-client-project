@@ -193,7 +193,7 @@ function Reports() {
 
   // Use real data if available, otherwise fallback to mock data
   const topProducts: Product[] = (salesData as SalesData)?.topProducts
-    ? (salesData as SalesData).topProducts!.map((product) => ({
+    ? (salesData as SalesData).topProducts!.map(product => ({
         name: product.name,
         sales: product.sales,
         revenue: `₹${(product.revenue || 0).toLocaleString()}`,
@@ -208,7 +208,7 @@ function Reports() {
 
   // Use real data if available, otherwise fallback to mock data
   const topPartners: Partner[] = (salesData as SalesData)?.topPartners
-    ? (salesData as SalesData).topPartners!.map((partner) => ({
+    ? (salesData as SalesData).topPartners!.map(partner => ({
         name: partner.name,
         orders: partner.orders,
         revenue: `₹${(partner.revenue || 0).toLocaleString()}`,
@@ -222,7 +222,7 @@ function Reports() {
       ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 lg:mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
@@ -258,7 +258,9 @@ function Reports() {
               <label className="text-sm font-semibold text-slate-700">Report Type</label>
               <select
                 value={reportType}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setReportType(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setReportType(e.target.value)
+                }
                 className="px-3 py-2.5 border border-slate-300 rounded-lg text-sm bg-white hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 cursor-pointer"
               >
                 <option value="overview">Overview</option>
@@ -292,7 +294,9 @@ function Reports() {
                   <input
                     type="date"
                     value={startDate}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartDate(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setStartDate(e.target.value)
+                    }
                     className="px-3 py-2.5 border border-slate-300 rounded-lg text-sm hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   />
                 </div>
@@ -302,7 +306,9 @@ function Reports() {
                   <input
                     type="date"
                     value={endDate}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndDate(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setEndDate(e.target.value)
+                    }
                     className="px-3 py-2.5 border border-slate-300 rounded-lg text-sm hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                   />
                 </div>
@@ -315,10 +321,7 @@ function Reports() {
       {loading && !isRefreshing ? (
         <div className="flex justify-center items-center py-20">
           <div className="text-center">
-            <RefreshCw
-              size={48}
-              className="animate-spin mb-4 mx-auto text-blue-600 opacity-50"
-            />
+            <RefreshCw size={48} className="animate-spin mb-4 mx-auto text-blue-600 opacity-50" />
             <p className="text-slate-600 text-lg">Loading reports data...</p>
           </div>
         </div>
@@ -397,7 +400,9 @@ function Reports() {
                 </div>
                 <div className="h-64 sm:h-80 bg-gradient-to-br from-slate-50 to-indigo-50 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-slate-300 text-slate-500">
                   <BarChart3 size={56} className="mb-3 text-indigo-400" />
-                  <p className="text-center px-4">Order distribution chart would be displayed here</p>
+                  <p className="text-center px-4">
+                    Order distribution chart would be displayed here
+                  </p>
                 </div>
               </Card.Content>
             </Card>
@@ -408,7 +413,9 @@ function Reports() {
             {/* Top Products Table */}
             <Card className="border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="p-4 sm:p-6 border-b border-slate-200 flex justify-between items-center">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900">Top Selling Products</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                  Top Selling Products
+                </h3>
                 <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
                   <Eye size={20} />
                 </button>
@@ -453,7 +460,9 @@ function Reports() {
             {/* Top Partners Table */}
             <Card className="border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="p-4 sm:p-6 border-b border-slate-200 flex justify-between items-center">
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900">Top Performing Partners</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+                  Top Performing Partners
+                </h3>
                 <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
                   <Eye size={20} />
                 </button>

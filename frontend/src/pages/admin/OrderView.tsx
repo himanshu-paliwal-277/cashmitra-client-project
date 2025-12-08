@@ -130,7 +130,7 @@ const OrderView = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="min-h-screen bg-gray-50 ">
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate('/admin/buy')}
@@ -150,7 +150,7 @@ const OrderView = () => {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="min-h-screen bg-gray-50 ">
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate('/admin/buy')}
@@ -170,7 +170,7 @@ const OrderView = () => {
   const user = order?.user;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gray-50 ">
       {/* Header */}
       <div className="flex flex-wrap items-center gap-4 mb-8">
         <button
