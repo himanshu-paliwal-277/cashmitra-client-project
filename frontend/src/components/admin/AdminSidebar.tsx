@@ -26,6 +26,7 @@ import {
   Truck,
 } from 'lucide-react';
 import AdminSidebarItem from './AdminSidebarItem';
+import { useLocation } from 'react-router-dom';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -48,14 +49,7 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
       title: 'Main',
       items: [{ to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' }],
     },
-    {
-      title: 'Buy Product List',
-      items: [
-        { to: '/admin/buy-super-categories', icon: FolderTree, label: 'Super Categories' },
-        { to: '/admin/buy-categories', icon: FolderTree, label: 'Categories' },
-        { to: '/admin/buy-products', icon: Package, label: 'Products' },
-      ],
-    },
+
     {
       title: 'Sales & Orders',
       items: [
@@ -64,6 +58,14 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
         { to: '/admin/buy-orders', icon: ShoppingBag, label: 'Buy Orders' },
         { to: '/admin/pickup-management', icon: Truck, label: 'Pickup Management' },
         { to: '/admin/returns', icon: RotateCcw, label: 'Returns' },
+      ],
+    },
+    {
+      title: 'Buy Product List',
+      items: [
+        { to: '/admin/buy-super-categories', icon: FolderTree, label: 'Super Categories' },
+        { to: '/admin/buy-categories', icon: FolderTree, label: 'Categories' },
+        { to: '/admin/buy-products', icon: Package, label: 'Products' },
       ],
     },
     {
@@ -77,16 +79,16 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
     {
       title: 'Sell Management',
       items: [
-        { to: '/admin/sell-questions-management', icon: HelpCircle, label: 'Questions Management' },
-        { to: '/admin/sell-defects-management', icon: AlertTriangle, label: 'Defects Management' },
+        { to: '/admin/sell-questions', icon: HelpCircle, label: 'Questions Management' },
+        { to: '/admin/sell-defects', icon: AlertTriangle, label: 'Defects Management' },
         {
-          to: '/admin/sell-accessories-management',
+          to: '/admin/sell-accessories',
           icon: Package,
           label: 'Accessories Management',
         },
-        { to: '/admin/sell-sessions-management', icon: Clock, label: 'Sessions Management' },
+        { to: '/admin/sell-sessions', icon: Clock, label: 'Sessions Management' },
         {
-          to: '/admin/sell-configuration-management',
+          to: '/admin/sell-configuration',
           icon: Settings,
           label: 'Configuration Management',
         },
@@ -107,29 +109,31 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
       title: 'Pricing & Finance',
       items: [
         { to: '/admin/pricing', icon: DollarSign, label: 'Pricing' },
-        { to: '/admin/price-table', icon: Table, label: 'Price Table' },
-        { to: '/admin/condition-adjustments', icon: Sliders, label: 'Condition Adjustments' },
-        { to: '/admin/promotions', icon: Gift, label: 'Promotions/Coupons' },
+        // { to: '/admin/price-table', icon: Table, label: 'Price Table' },
+        // { to: '/admin/condition-adjustments', icon: Sliders, label: 'Condition Adjustments' },
+        // { to: '/admin/promotions', icon: Gift, label: 'Promotions/Coupons' },
         { to: '/admin/finance', icon: Calculator, label: 'Finance' },
-        { to: '/admin/commission-rules', icon: CreditCard, label: 'Commission Rules' },
-        { to: '/admin/wallet-payouts', icon: Wallet, label: 'Wallet & Payouts' },
+        // { to: '/admin/commission-rules', icon: CreditCard, label: 'Commission Rules' },
+        // { to: '/admin/wallet-payouts', icon: Wallet, label: 'Wallet & Payouts' },
       ],
     },
     {
       title: 'Analytics & Reports',
       items: [{ to: '/admin/reports', icon: BarChart3, label: 'Reports' }],
     },
-    {
-      title: 'System',
-      items: [{ to: '/admin/settings', icon: Settings, label: 'Settings' }],
-    },
+    // {
+    //   title: 'System',
+    //   items: [{ to: '/admin/settings', icon: Settings, label: 'Settings' }],
+    // },
   ];
+
+  const location = useLocation();
 
   return (
     <aside
       className={`bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ease-out overflow-hidden ${
         isOpen
-          ? 'w-64 sm:w-72 lg:w-80 fixed lg:relative translate-x-0 z-[1000] shadow-xl lg:shadow-none h-full'
+          ? 'w-80 fixed lg:relative translate-x-0 z-[1000] shadow-xl lg:shadow-none h-full'
           : 'w-0 lg:w-0 fixed lg:relative -translate-x-full lg:translate-x-0 z-[1000] h-full border-0'
       }`}
     >
@@ -155,12 +159,13 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
                   icon={item.icon}
                   label={item.label}
                   isOpen={isOpen}
+                  isActive={location.pathname === item.to}
                 />
               ))}
             </div>
 
             {/* Logout button in System section */}
-            {section.title === 'System' && (
+            {/* {section.title === 'System' && (
               <button
                 onClick={onLogout}
                 className="flex items-center py-2.5 sm:py-3 px-3 sm:px-4 mx-2 sm:mx-3 text-sm sm:text-base no-underline rounded-lg border-l-[3px] transition-all group w-full border-none bg-transparent text-left cursor-pointer text-red-600 font-medium border-l-transparent hover:bg-gradient-to-r hover:from-red-50/50 hover:to-pink-50/30 hover:text-red-700 hover:translate-x-1 hover:border-l-red-300/50 hover:shadow-sm active:translate-x-0.5"
@@ -170,7 +175,7 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
                 </span>
                 Logout
               </button>
-            )}
+            )} */}
           </div>
         ))}
       </nav>

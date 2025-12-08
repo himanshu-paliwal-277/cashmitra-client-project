@@ -302,7 +302,7 @@ const SellOrders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 p-3 sm:p-4 md:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30">
       <div className="max-w-7xl space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -352,10 +352,8 @@ const SellOrders = () => {
                     {stat.value}
                   </p>
                 </div>
-                <div
-                  className={`p-2 sm:p-2.5 md:p-3 bg-gradient-to-br ${stat.gradient} rounded-lg sm:rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
-                >
-                  <stat.icon className="text-white" size={20} />
+                <div className="p-3">
+                  <stat.icon color="black" size={20} />
                 </div>
               </div>
             </div>

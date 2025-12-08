@@ -6,13 +6,10 @@ interface AdminSidebarItemProps {
   icon: LucideIcon;
   label: string;
   isOpen: boolean;
+  isActive: boolean;
 }
 
-const AdminSidebarItem = ({ to, icon: Icon, label, isOpen }: AdminSidebarItemProps) => {
-  const location = useLocation();
-  const isActive =
-    location.pathname === to || (to !== '/admin/dashboard' && location.pathname.includes(to));
-
+const AdminSidebarItem = ({ to, icon: Icon, label, isOpen, isActive }: AdminSidebarItemProps) => {
   return (
     <Link
       to={to}

@@ -192,7 +192,7 @@ const Leads = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 p-8">
+      <div className="min-h-[100vh - 100px] bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 p-8">
         <div className="flex flex-col items-center justify-center py-12 text-gray-600">
           <RefreshCw size={48} className="animate-spin mb-4 text-blue-600" />
           <p className="text-lg font-semibold">Loading leads...</p>
@@ -242,10 +242,8 @@ const Leads = () => {
                   {stat.value}
                 </p>
               </div>
-              <div
-                className={`p-3 bg-gradient-to-br ${stat.color} rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300`}
-              >
-                <stat.icon className="text-white" size={24} />
+              <div className="p-3">
+                <stat.icon color="black" className="" size={24} />
               </div>
             </div>
           </div>

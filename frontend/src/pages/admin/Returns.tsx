@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import useAdminReturns from '../../hooks/useAdminReturns';
 import {
   RotateCcw,
@@ -23,7 +24,6 @@ import {
 } from 'lucide-react';
 
 const Container = styled.div`
-  padding: 2rem;
   background-color: #f8fafc;
   min-height: 100vh;
 `;
@@ -279,15 +279,16 @@ const ActionButtons = styled.div`
 `;
 
 const IconButton = styled.button`
-  background: ${(props: any) => props.primary
-  ? '#3b82f6'
-  : props.danger
-    ? '#ef4444'
-    : props.success
-      ? '#10b981'
-      : props.warning
-        ? '#f59e0b'
-        : '#6b7280'};
+  background: ${(props: any) =>
+    props.primary
+      ? '#3b82f6'
+      : props.danger
+        ? '#ef4444'
+        : props.success
+          ? '#10b981'
+          : props.warning
+            ? '#f59e0b'
+            : '#6b7280'};
   color: white;
   border: none;
   padding: 0.5rem;
@@ -522,15 +523,19 @@ const Returns = () => {
   } = useAdminReturns();
 
   useEffect(() => {
-    setReturns(hookReturns);    setStats(hookStats);
+    setReturns(hookReturns);
+    setStats(hookStats);
     setLoading(hookLoading);
   }, [hookReturns, hookStats, hookLoading]);
 
   const handleStatusUpdate = async (returnId: any, newStatus: any, notes = '') => {
     try {
-      await updateReturnStatus(returnId, newStatus, notes);      if (selectedReturn && selectedReturn._id === returnId) {
-        // Refresh the selected return details        const updatedReturn = returns.find(r => r._id === returnId);
-        if (updatedReturn) {          setSelectedReturn({ ...updatedReturn, status: newStatus });
+      await updateReturnStatus(returnId, newStatus, notes);
+      if (selectedReturn && selectedReturn._id === returnId) {
+        // Refresh the selected return details
+        const updatedReturn = returns.find(r => r._id === returnId);
+        if (updatedReturn) {
+          setSelectedReturn({ ...updatedReturn, status: newStatus });
         }
       }
     } catch (error) {
@@ -594,14 +599,20 @@ const Returns = () => {
       completed: [],
       rejected: [],
       cancelled: [],
-    };    return statusFlow[currentStatus]?.includes(newStatus) || false;
+    };
+    return statusFlow[currentStatus]?.includes(newStatus) || false;
   };
 
   const filteredReturns = returns.filter(returnItem => {
-    const matchesSearch =      returnItem.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||      returnItem.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||      returnItem.product?.name?.toLowerCase().includes(searchTerm.toLowerCase());    const matchesStatus = !statusFilter || returnItem.status === statusFilter;
+    const matchesSearch =
+      returnItem.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      returnItem.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      returnItem.product?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = !statusFilter || returnItem.status === statusFilter;
 
     const matchesDate =
-      !dateFilter ||      new Date(returnItem.createdAt).toDateString() === new Date(dateFilter).toDateString();
+      !dateFilter ||
+      new Date(returnItem.createdAt).toDateString() === new Date(dateFilter).toDateString();
 
     return matchesSearch && matchesStatus && matchesDate;
   });
@@ -727,52 +738,72 @@ const Returns = () => {
               </p>
             </div>
           ) : (
-            filteredReturns.map(returnItem => (              <ReturnRow key={returnItem._id}>
-                <OrderInfo>                  <OrderId>#{returnItem.orderId}</OrderId>                  <OrderDate>{new Date(returnItem.createdAt).toLocaleDateString()}</OrderDate>
+            filteredReturns.map(returnItem => (
+              <ReturnRow key={returnItem._id}>
+                <OrderInfo>
+                  <OrderId>#{returnItem.orderId}</OrderId>
+                  <OrderDate>{new Date(returnItem.createdAt).toLocaleDateString()}</OrderDate>
                 </OrderInfo>
 
-                <CustomerInfo>                  <CustomerName>{returnItem.customer?.name || 'N/A'}</CustomerName>
-                  <CustomerContact>                    {returnItem.customer?.phone || returnItem.customer?.email || 'N/A'}
+                <CustomerInfo>
+                  <CustomerName>{returnItem.customer?.name || 'N/A'}</CustomerName>
+                  <CustomerContact>
+                    {returnItem.customer?.phone || returnItem.customer?.email || 'N/A'}
                   </CustomerContact>
                 </CustomerInfo>
 
-                <ProductInfo>                  <ProductName>{returnItem.product?.name || 'N/A'}</ProductName>
-                  <ProductDetails>                    {returnItem.product?.brand} • {returnItem.product?.model}
+                <ProductInfo>
+                  <ProductName>{returnItem.product?.name || 'N/A'}</ProductName>
+                  <ProductDetails>
+                    {returnItem.product?.brand} • {returnItem.product?.model}
                   </ProductDetails>
                 </ProductInfo>
 
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>                  {returnItem.reason || 'Not specified'}
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+                  {returnItem.reason || 'Not specified'}
                 </div>
 
-                <div style={{ color: '#059669', fontSize: '0.875rem', fontWeight: '600' }}>                  ₹{(returnItem.refundAmount || 0).toLocaleString()}
-                </div>                <StatusBadge status={returnItem.status}>                  {getStatusIcon(returnItem.status)}                  {returnItem.status?.charAt(0)?.toUpperCase() + returnItem.status?.slice(1) ||
+                <div style={{ color: '#059669', fontSize: '0.875rem', fontWeight: '600' }}>
+                  ₹{(returnItem.refundAmount || 0).toLocaleString()}
+                </div>
+                <StatusBadge status={returnItem.status}>
+                  {getStatusIcon(returnItem.status)}
+                  {returnItem.status?.charAt(0)?.toUpperCase() + returnItem.status?.slice(1) ||
                     'Requested'}
                 </StatusBadge>
 
                 <ActionButtons>
                   <IconButton primary onClick={() => handleViewDetails(returnItem)}>
                     <Eye size={14} />
-                  </IconButton>                  {canUpdateStatus(returnItem.status, 'approved') && (
+                  </IconButton>
+                  {canUpdateStatus(returnItem.status, 'approved') && (
                     <IconButton
-                      success                      onClick={() => handleStatusUpdate(returnItem._id, 'approved')}
+                      success
+                      onClick={() => handleStatusUpdate(returnItem._id, 'approved')}
                     >
                       <CheckCircle size={14} />
                     </IconButton>
-                  )}                  {canUpdateStatus(returnItem.status, 'rejected') && (
+                  )}
+                  {canUpdateStatus(returnItem.status, 'rejected') && (
                     <IconButton
-                      danger                      onClick={() => handleStatusUpdate(returnItem._id, 'rejected')}
+                      danger
+                      onClick={() => handleStatusUpdate(returnItem._id, 'rejected')}
                     >
                       <XCircle size={14} />
                     </IconButton>
-                  )}                  {canUpdateStatus(returnItem.status, 'picked_up') && (
+                  )}
+                  {canUpdateStatus(returnItem.status, 'picked_up') && (
                     <IconButton
-                      warning                      onClick={() => handleStatusUpdate(returnItem._id, 'picked_up')}
+                      warning
+                      onClick={() => handleStatusUpdate(returnItem._id, 'picked_up')}
                     >
                       <Truck size={14} />
                     </IconButton>
-                  )}                  {canUpdateStatus(returnItem.status, 'completed') && (
+                  )}
+                  {canUpdateStatus(returnItem.status, 'completed') && (
                     <IconButton
-                      success                      onClick={() => handleStatusUpdate(returnItem._id, 'completed')}
+                      success
+                      onClick={() => handleStatusUpdate(returnItem._id, 'completed')}
                     >
                       <CheckCircle size={14} />
                     </IconButton>
@@ -787,7 +818,8 @@ const Returns = () => {
       {showDetailModal && selectedReturn && (
         <Modal>
           <ModalContent>
-            <ModalHeader>              <ModalTitle>Return Details - #{selectedReturn.orderId}</ModalTitle>
+            <ModalHeader>
+              <ModalTitle>Return Details - #{selectedReturn.orderId}</ModalTitle>
               <CloseButton onClick={() => setShowDetailModal(false)}>
                 <X size={20} />
               </CloseButton>
@@ -798,21 +830,25 @@ const Returns = () => {
               <DetailGrid>
                 <DetailItem>
                   <Package size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Order ID:</DetailLabel>                  <DetailValue>#{selectedReturn.orderId}</DetailValue>
+                  <DetailLabel>Order ID:</DetailLabel>
+                  <DetailValue>#{selectedReturn.orderId}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Calendar size={16} style={{ color: '#6b7280' }} />
                   <DetailLabel>Return Date:</DetailLabel>
-                  <DetailValue>                    {new Date(selectedReturn.createdAt).toLocaleDateString()}
+                  <DetailValue>
+                    {new Date(selectedReturn.createdAt).toLocaleDateString()}
                   </DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <DollarSign size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Refund Amount:</DetailLabel>                  <DetailValue>₹{(selectedReturn.refundAmount || 0).toLocaleString()}</DetailValue>
+                  <DetailLabel>Refund Amount:</DetailLabel>
+                  <DetailValue>₹{(selectedReturn.refundAmount || 0).toLocaleString()}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <MessageSquare size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Reason:</DetailLabel>                  <DetailValue>{selectedReturn.reason || 'Not specified'}</DetailValue>
+                  <DetailLabel>Reason:</DetailLabel>
+                  <DetailValue>{selectedReturn.reason || 'Not specified'}</DetailValue>
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
@@ -822,18 +858,22 @@ const Returns = () => {
               <DetailGrid>
                 <DetailItem>
                   <User size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Name:</DetailLabel>                  <DetailValue>{selectedReturn.customer?.name || 'N/A'}</DetailValue>
+                  <DetailLabel>Name:</DetailLabel>
+                  <DetailValue>{selectedReturn.customer?.name || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <Phone size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Phone:</DetailLabel>                  <DetailValue>{selectedReturn.customer?.phone || 'N/A'}</DetailValue>
+                  <DetailLabel>Phone:</DetailLabel>
+                  <DetailValue>{selectedReturn.customer?.phone || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
-                  <DetailLabel>Email:</DetailLabel>                  <DetailValue>{selectedReturn.customer?.email || 'N/A'}</DetailValue>
+                  <DetailLabel>Email:</DetailLabel>
+                  <DetailValue>{selectedReturn.customer?.email || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
                   <MapPin size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Address:</DetailLabel>                  <DetailValue>{selectedReturn.customer?.address || 'N/A'}</DetailValue>
+                  <DetailLabel>Address:</DetailLabel>
+                  <DetailValue>{selectedReturn.customer?.address || 'N/A'}</DetailValue>
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
@@ -843,16 +883,20 @@ const Returns = () => {
               <DetailGrid>
                 <DetailItem>
                   <Package size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Product:</DetailLabel>                  <DetailValue>{selectedReturn.product?.name || 'N/A'}</DetailValue>
+                  <DetailLabel>Product:</DetailLabel>
+                  <DetailValue>{selectedReturn.product?.name || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
-                  <DetailLabel>Brand:</DetailLabel>                  <DetailValue>{selectedReturn.product?.brand || 'N/A'}</DetailValue>
+                  <DetailLabel>Brand:</DetailLabel>
+                  <DetailValue>{selectedReturn.product?.brand || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
-                  <DetailLabel>Model:</DetailLabel>                  <DetailValue>{selectedReturn.product?.model || 'N/A'}</DetailValue>
+                  <DetailLabel>Model:</DetailLabel>
+                  <DetailValue>{selectedReturn.product?.model || 'N/A'}</DetailValue>
                 </DetailItem>
                 <DetailItem>
-                  <DetailLabel>Condition:</DetailLabel>                  <DetailValue>{selectedReturn.product?.condition || 'N/A'}</DetailValue>
+                  <DetailLabel>Condition:</DetailLabel>
+                  <DetailValue>{selectedReturn.product?.condition || 'N/A'}</DetailValue>
                 </DetailItem>
               </DetailGrid>
             </DetailSection>
@@ -864,13 +908,16 @@ const Returns = () => {
                   <TimelineIcon color={getTimelineColor('requested')} />
                   <TimelineContent>
                     <TimelineTitle>Return Requested</TimelineTitle>
-                    <TimelineDate>                      {new Date(selectedReturn.createdAt).toLocaleString()}
+                    <TimelineDate>
+                      {new Date(selectedReturn.createdAt).toLocaleString()}
                     </TimelineDate>
                     <TimelineDescription>
-                      Customer initiated return request for{' '}                      {selectedReturn.reason || 'unspecified reason'}
+                      Customer initiated return request for{' '}
+                      {selectedReturn.reason || 'unspecified reason'}
                     </TimelineDescription>
                   </TimelineContent>
-                </TimelineItem>                {selectedReturn.statusHistory?.map((history: any, index: any) => (
+                </TimelineItem>
+                {selectedReturn.statusHistory?.map((history: any, index: any) => (
                   <TimelineItem key={index}>
                     <TimelineIcon color={getTimelineColor(history.status)} />
                     <TimelineContent>
@@ -884,7 +931,8 @@ const Returns = () => {
                   </TimelineItem>
                 ))}
               </TimelineContainer>
-            </DetailSection>            {selectedReturn.notes && (
+            </DetailSection>
+            {selectedReturn.notes && (
               <DetailSection>
                 <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Additional Notes</h3>
                 <div
@@ -894,59 +942,70 @@ const Returns = () => {
                     borderRadius: '0.5rem',
                     color: '#374151',
                   }}
-                >                  {selectedReturn.notes}
+                >
+                  {selectedReturn.notes}
                 </div>
               </DetailSection>
             )}
 
             <ActionSection>
               <h4 style={{ marginBottom: '1rem', color: '#374151' }}>Quick Actions</h4>
-              <ActionButtons2>                {canUpdateStatus(selectedReturn.status, 'approved') && (
+              <ActionButtons2>
+                {canUpdateStatus(selectedReturn.status, 'approved') && (
                   <Button
                     variant="success"
-                    onClick={() => {                      handleStatusUpdate(selectedReturn._id, 'approved');
+                    onClick={() => {
+                      handleStatusUpdate(selectedReturn._id, 'approved');
                       setShowDetailModal(false);
                     }}
                   >
                     <CheckCircle size={16} />
                     Approve Return
                   </Button>
-                )}                {canUpdateStatus(selectedReturn.status, 'picked_up') && (
+                )}
+                {canUpdateStatus(selectedReturn.status, 'picked_up') && (
                   <Button
                     variant="warning"
-                    onClick={() => {                      handleStatusUpdate(selectedReturn._id, 'picked_up');
+                    onClick={() => {
+                      handleStatusUpdate(selectedReturn._id, 'picked_up');
                       setShowDetailModal(false);
                     }}
                   >
                     <Truck size={16} />
                     Mark as Picked Up
                   </Button>
-                )}                {canUpdateStatus(selectedReturn.status, 'inspecting') && (
+                )}
+                {canUpdateStatus(selectedReturn.status, 'inspecting') && (
                   <Button
                     variant="warning"
-                    onClick={() => {                      handleStatusUpdate(selectedReturn._id, 'inspecting');
+                    onClick={() => {
+                      handleStatusUpdate(selectedReturn._id, 'inspecting');
                       setShowDetailModal(false);
                     }}
                   >
                     <Package size={16} />
                     Start Inspection
                   </Button>
-                )}                {canUpdateStatus(selectedReturn.status, 'completed') && (
+                )}
+                {canUpdateStatus(selectedReturn.status, 'completed') && (
                   <Button
                     variant="success"
-                    onClick={() => {                      handleStatusUpdate(selectedReturn._id, 'completed');
+                    onClick={() => {
+                      handleStatusUpdate(selectedReturn._id, 'completed');
                       setShowDetailModal(false);
                     }}
                   >
                     <CheckCircle size={16} />
                     Complete Return
                   </Button>
-                )}                {canUpdateStatus(selectedReturn.status, 'rejected') && (
+                )}
+                {canUpdateStatus(selectedReturn.status, 'rejected') && (
                   <Button
                     variant="danger"
                     onClick={() => {
                       const reason = prompt('Please provide a reason for rejection:');
-                      if (reason) {                        handleStatusUpdate(selectedReturn._id, 'rejected', reason);
+                      if (reason) {
+                        handleStatusUpdate(selectedReturn._id, 'rejected', reason);
                         setShowDetailModal(false);
                       }
                     }}
@@ -954,10 +1013,12 @@ const Returns = () => {
                     <XCircle size={16} />
                     Reject Return
                   </Button>
-                )}                {canUpdateStatus(selectedReturn.status, 'cancelled') && (
+                )}
+                {canUpdateStatus(selectedReturn.status, 'cancelled') && (
                   <Button
                     variant="danger"
-                    onClick={() => {                      handleStatusUpdate(selectedReturn._id, 'cancelled');
+                    onClick={() => {
+                      handleStatusUpdate(selectedReturn._id, 'cancelled');
                       setShowDetailModal(false);
                     }}
                   >
