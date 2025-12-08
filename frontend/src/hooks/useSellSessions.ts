@@ -1,7 +1,7 @@
 /**
  * @fileoverview Sell Sessions Hook
  * @description React hook for managing sell offer sessions and price calculations
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 1.0.0
  */
 
@@ -30,7 +30,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to create session');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create session');
       throw err;
     } finally {
       setLoading(false);
@@ -51,7 +52,8 @@ const useSellSessions = () => {
 
       setSessions(response.data.data || []);
       return response.data.data || [];
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch sessions');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch sessions');
       throw err;
     } finally {
       setLoading(false);
@@ -72,7 +74,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data.session;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch session');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch session');
       throw err;
     } finally {
       setLoading(false);
@@ -94,7 +97,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to update session answers');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update session answers');
       throw err;
     } finally {
       setLoading(false);
@@ -116,7 +120,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to update session defects');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update session defects');
       throw err;
     } finally {
       setLoading(false);
@@ -138,7 +143,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to update session accessories');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update session accessories');
       throw err;
     } finally {
       setLoading(false);
@@ -159,7 +165,8 @@ const useSellSessions = () => {
 
       setCurrentPrice(response.data.price);
       return response.data.price;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to get current price');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to get current price');
       throw err;
     } finally {
       setLoading(false);
@@ -184,7 +191,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to extend session');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to extend session');
       throw err;
     } finally {
       setLoading(false);
@@ -204,13 +212,16 @@ const useSellSessions = () => {
           },
         });
 
-        // Remove from sessions list        setSessions(prev => prev.filter(session => session._id !== sessionId));
+        // Remove from sessions list
+        setSessions(prev => prev.filter(session => session._id !== sessionId));
 
-        // Clear current session if it was deleted        if (currentSession?._id === sessionId) {
+        // Clear current session if it was deleted
+        if (currentSession?._id === sessionId) {
           setCurrentSession(null);
           setCurrentPrice(null);
         }
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to delete session');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete session');
         throw err;
       } finally {
         setLoading(false);
@@ -232,7 +243,8 @@ const useSellSessions = () => {
       });
 
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to clean expired sessions');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to clean expired sessions');
       throw err;
     } finally {
       setLoading(false);
@@ -251,7 +263,8 @@ const useSellSessions = () => {
       });
 
       return response.data.price;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to calculate price');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to calculate price');
       throw err;
     } finally {
       setLoading(false);

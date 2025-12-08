@@ -1,4 +1,5 @@
-import React, { useState } from 'react';import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 import {
   Shield,
   CheckCircle,
@@ -25,7 +26,6 @@ import {
 const KYCContainer = styled.div`
   min-height: 100vh;
   background: ${(props: any) => props.theme.colors.background};
-  padding: 2rem;
 `;
 
 const Header = styled.div`
@@ -101,8 +101,9 @@ const StatusDescription = styled.p`
 `;
 
 const Button = styled.button`
-  background: ${(props: any) => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${(props: any) => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
+  background: ${(props: any) =>
+    props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
+  color: ${(props: any) => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
   border: 1px solid ${(props: any) => props.theme.colors.primary};
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -114,7 +115,8 @@ const Button = styled.button`
   gap: 0.5rem;
 
   &:hover {
-    background: ${(props: any) => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
+    background: ${(props: any) =>
+      props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
     color: white;
   }
 
@@ -173,8 +175,8 @@ const StepCard = styled.div`
   border-radius: 8px;
   padding: 1.5rem;
   position: relative;
-  background: ${(props: any) => props.completed ? '#F0FDF4' : 'white'};
-  border-color: ${(props: any) => props.completed ? '#10B981' : props.theme.colors.border};
+  background: ${(props: any) => (props.completed ? '#F0FDF4' : 'white')};
+  border-color: ${(props: any) => (props.completed ? '#10B981' : props.theme.colors.border)};
 `;
 
 const StepHeader = styled.div`
@@ -188,7 +190,7 @@ const StepIcon = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background: ${(props: any) => props.completed ? '#10B981' : props.theme.colors.primary};
+  background: ${(props: any) => (props.completed ? '#10B981' : props.theme.colors.primary)};
   display: flex;
   align-items: center;
   justify-content: center;

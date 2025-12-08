@@ -1070,7 +1070,8 @@ export const sortProducts = (products: any, sortBy: any) => {
     case 'discount':
       return sorted.sort((a, b) => b.discount - a.discount);
     case 'newest':
-      return sorted.sort(        (a, b) => new Date(b.createdAt || '2024-01-01') - new Date(a.createdAt || '2024-01-01')
+      return sorted.sort(
+        (a, b) => new Date(b.createdAt || '2024-01-01') - new Date(a.createdAt || '2024-01-01')
       );
     case 'popularity':
     default:
@@ -1215,7 +1216,7 @@ export const helpContent = {
   contactInfo: {
     phone: '+91 1800-123-4567',
     email: 'support@cashify.com',
-    hours: 'Mon-Sat: 9 AM - 8 PM, Sun: 10 AM - 6 PM',
-    address: 'Cashify Technologies Pvt Ltd, Sector 44, Gurugram, Haryana 122003',
+    hours: 'MoCashmitra9 AM - 8 PM, Sun: 10 AM - 6 PM',
+    address: 'Cashmitra Technologies Pvt Ltd, Sector 44, Gurugram, Haryana 122003',
   },
 };

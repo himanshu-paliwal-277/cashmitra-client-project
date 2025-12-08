@@ -1,7 +1,7 @@
 /**
  * @fileoverview Product Modal Component
  * @description Modal for adding and editing sell products
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 1.0.0
  */
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { adminService } from '../../services/adminService';
 import cloudinaryService from '../../services/cloudinaryService';
 import gsmarenaService from '../../services/gsmarenaService';
@@ -548,7 +549,8 @@ const AddBuyProduct = () => {
     const val = type === 'checkbox' ? checked : value;
 
     if (!name.includes('.')) {
-      setFormData(prev => ({ ...prev, [name]: val }));      if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+      setFormData(prev => ({ ...prev, [name]: val }));
+      if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
       return;
     }
     // deep set
@@ -556,8 +558,11 @@ const AddBuyProduct = () => {
     setFormData(prev => {
       const copy = { ...prev };
       let cur = copy;
-      for (let i = 0; i < keys.length - 1; i++) {        if (cur[keys[i]] == null || typeof cur[keys[i]] !== 'object') cur[keys[i]] = {};        cur = cur[keys[i]];
-      }      cur[keys.at(-1)] = val;
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (cur[keys[i]] == null || typeof cur[keys[i]] !== 'object') cur[keys[i]] = {};
+        cur = cur[keys[i]];
+      }
+      cur[keys.at(-1)] = val;
       return copy;
     });
   };
@@ -566,7 +571,10 @@ const AddBuyProduct = () => {
     const keys = path.split('.');
     setFormData(prev => {
       const copy = { ...prev };
-      let cur = copy;      for (let i = 0; i < keys.length - 1; i++) cur = cur[keys[i]];      if (!Array.isArray(cur[keys.at(-1)])) cur[keys.at(-1)] = [];      cur[keys.at(-1)].push(newItem);
+      let cur = copy;
+      for (let i = 0; i < keys.length - 1; i++) cur = cur[keys[i]];
+      if (!Array.isArray(cur[keys.at(-1)])) cur[keys.at(-1)] = [];
+      cur[keys.at(-1)].push(newItem);
       return copy;
     });
   };
@@ -575,7 +583,9 @@ const AddBuyProduct = () => {
     const keys = path.split('.');
     setFormData(prev => {
       const copy = { ...prev };
-      let cur = copy;      for (let i = 0; i < keys.length - 1; i++) cur = cur[keys[i]];      cur[keys.at(-1)].splice(index, 1);
+      let cur = copy;
+      for (let i = 0; i < keys.length - 1; i++) cur = cur[keys[i]];
+      cur[keys.at(-1)].splice(index, 1);
       return copy;
     });
   };
@@ -584,7 +594,9 @@ const AddBuyProduct = () => {
     const keys = path.split('.');
     setFormData(prev => {
       const copy = { ...prev };
-      let cur = copy;      for (let i = 0; i < keys.length - 1; i++) cur = cur[keys[i]];      cur[keys.at(-1)][index] = value;
+      let cur = copy;
+      for (let i = 0; i < keys.length - 1; i++) cur = cur[keys[i]];
+      cur[keys.at(-1)][index] = value;
       return copy;
     });
   };
@@ -603,12 +615,14 @@ const AddBuyProduct = () => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];    const invalid = files.filter(f => !validTypes.includes(f.type));
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const invalid = files.filter(f => !validTypes.includes(f.type));
     if (invalid.length) {
       setErrors(prev => ({ ...prev, images: 'Only JPEG/PNG/WebP allowed' }));
       return;
     }
-    const maxSize = 5 * 1024 * 1024;    const oversized = files.filter(f => f.size > maxSize);
+    const maxSize = 5 * 1024 * 1024;
+    const oversized = files.filter(f => f.size > maxSize);
     if (oversized.length) {
       setErrors(prev => ({ ...prev, images: 'Each image must be < 5MB' }));
       return;
@@ -621,11 +635,14 @@ const AddBuyProduct = () => {
             folder: 'products',
             tags: ['product', 'buy-product'],
           });
-          if (!r?.success) throw new Error(r?.error || 'Upload failed');          return { url: r.data.url, publicId: r.data.publicId, name: file.name };
+          if (!r?.success) throw new Error(r?.error || 'Upload failed');
+          return { url: r.data.url, publicId: r.data.publicId, name: file.name };
         })
-      );      setFormData(prev => ({ ...prev, images: [...prev.images, ...uploaded] }));
+      );
+      setFormData(prev => ({ ...prev, images: [...prev.images, ...uploaded] }));
       setErrors(prev => {
-        const n = { ...prev };        delete n.images;
+        const n = { ...prev };
+        delete n.images;
         return n;
       });
     } catch (err) {
@@ -634,7 +651,8 @@ const AddBuyProduct = () => {
   };
   const removeImage = (index: any) => {
     setFormData(prev => {
-      const imgs = [...prev.images];      if (imgs[index]?.url?.startsWith('blob:')) URL.revokeObjectURL(imgs[index].url);
+      const imgs = [...prev.images];
+      if (imgs[index]?.url?.startsWith('blob:')) URL.revokeObjectURL(imgs[index].url);
       imgs.splice(index, 1);
       return { ...prev, images: imgs };
     });
@@ -659,7 +677,8 @@ const AddBuyProduct = () => {
     // Debounce search
     const timeout = setTimeout(() => {
       performSearch(query);
-    }, 500);    setSearchTimeout(timeout);
+    }, 500);
+    setSearchTimeout(timeout);
   };
 
   const performSearch = async (query: any) => {
@@ -695,7 +714,8 @@ const AddBuyProduct = () => {
         throw new Error('No product data received');
       }
     } catch (error) {
-      console.error('Product fetch error:', error);      let errorMessage = error.message || 'Failed to load product details';
+      console.error('Product fetch error:', error);
+      let errorMessage = error.message || 'Failed to load product details';
       if (
         errorMessage.includes('not found') ||
         errorMessage.includes('not available') ||
@@ -758,7 +778,8 @@ const AddBuyProduct = () => {
         typeof originalPhoneVariants === 'string'
           ? JSON.parse(originalPhoneVariants.replace(/'/g, '"')) || []
           : originalVariantsData;
-      if (Array.isArray(variantSource)) {        processedVariants = variantSource.map((v, index) => ({
+      if (Array.isArray(variantSource)) {
+        processedVariants = variantSource.map((v, index) => ({
           variantId: `var-${index + 1}`,
           storage: typeof v === 'object' && v !== null ? v.storage || '' : String(v),
           color: '',
@@ -767,7 +788,8 @@ const AddBuyProduct = () => {
         }));
       }
     } else if (processedPhoneVariants.length > 0) {
-      // Fallback to processed strings for variants      processedVariants = processedPhoneVariants.map((storage, index) => ({
+      // Fallback to processed strings for variants
+      processedVariants = processedPhoneVariants.map((storage, index) => ({
         variantId: `var-${index + 1}`,
         storage,
         color: '',
@@ -1040,9 +1062,19 @@ const AddBuyProduct = () => {
 
   // --------------------- validation ---------------------
   const validateForm = () => {
-    const err = {};    if (!formData.categoryId) err.categoryId = 'Category is required';    if (!formData.name.trim()) err.name = 'Product name is required';    if (!formData.brand.trim()) err.brand = 'Brand is required';    if (!formData.description.trim()) err.description = 'Description is required';    const mrp = parseFloat(formData.pricing.mrp || 0);    const disc = parseFloat(formData.pricing.discountedPrice || 0);    if (!(mrp > 0)) err['pricing.mrp'] = 'Valid MRP is required';
-    if (disc && disc >= mrp)      err['pricing.discountedPrice'] = 'Discounted price must be less than MRP';    if (!formData.images?.length) err.images = 'At least one image is required';
-    if (!formData.conditionOptions?.length)      err.conditionOptions = 'Add at least one condition option';
+    const err = {};
+    if (!formData.categoryId) err.categoryId = 'Category is required';
+    if (!formData.name.trim()) err.name = 'Product name is required';
+    if (!formData.brand.trim()) err.brand = 'Brand is required';
+    if (!formData.description.trim()) err.description = 'Description is required';
+    const mrp = parseFloat(formData.pricing.mrp || 0);
+    const disc = parseFloat(formData.pricing.discountedPrice || 0);
+    if (!(mrp > 0)) err['pricing.mrp'] = 'Valid MRP is required';
+    if (disc && disc >= mrp)
+      err['pricing.discountedPrice'] = 'Discounted price must be less than MRP';
+    if (!formData.images?.length) err.images = 'At least one image is required';
+    if (!formData.conditionOptions?.length)
+      err.conditionOptions = 'Add at least one condition option';
     setErrors(err);
     return Object.keys(err).length === 0;
   };
@@ -1059,15 +1091,29 @@ const AddBuyProduct = () => {
       // Build request exactly as backend expects
       let productData = {
         ...formData,
-        images: (formData.images || [])          .map(i => (typeof i === 'string' ? i : i.url))
+        images: (formData.images || [])
+          .map(i => (typeof i === 'string' ? i : i.url))
           .filter(Boolean),
-        pricing: {          mrp: parseFloat(formData.pricing.mrp || 0),          discountedPrice: parseFloat(formData.pricing.discountedPrice || 0),          discountPercent: parseFloat(formData.pricing.discountPercent || 0),
+        pricing: {
+          mrp: parseFloat(formData.pricing.mrp || 0),
+          discountedPrice: parseFloat(formData.pricing.discountedPrice || 0),
+          discountPercent: parseFloat(formData.pricing.discountPercent || 0),
         },
-        conditionOptions: (formData.conditionOptions || []).map(c => ({          label: c.label || '',          price: Number(c.price || 0),
+        conditionOptions: (formData.conditionOptions || []).map(c => ({
+          label: c.label || '',
+          price: Number(c.price || 0),
         })),
-        variants: (formData.variants || []).map(v => ({          variantId: v.variantId || '',          storage: v.storage || '',          color: v.color || '',          price: Number(v.price || 0),          stock: !!v.stock,
+        variants: (formData.variants || []).map(v => ({
+          variantId: v.variantId || '',
+          storage: v.storage || '',
+          color: v.color || '',
+          price: Number(v.price || 0),
+          stock: !!v.stock,
         })),
-        addOns: (formData.addOns || []).map(a => ({          name: a.name || '',          cost: Number(a.cost || 0),          description: a.description || '',
+        addOns: (formData.addOns || []).map(a => ({
+          name: a.name || '',
+          cost: Number(a.cost || 0),
+          description: a.description || '',
         })),
         offers: formData.offers || [],
         rating: {
@@ -1081,11 +1127,17 @@ const AddBuyProduct = () => {
             '1star': Number(formData.rating.breakdown['1star'] || 0),
           },
         },
-        reviews: (formData.reviews || []).map(r => ({          reviewer: r.reviewer || '',          rating: Number(r.rating || 0),          date: r.date || '',          comment: r.comment || '',
+        reviews: (formData.reviews || []).map(r => ({
+          reviewer: r.reviewer || '',
+          rating: Number(r.rating || 0),
+          date: r.date || '',
+          comment: r.comment || '',
         })),
         paymentOptions: {
           emiAvailable: !!formData.paymentOptions.emiAvailable,
-          emiPlans: (formData.paymentOptions.emiPlans || []).map(p => ({            months: Number(p.months || 0),            amountPerMonth: Number(p.amountPerMonth || 0),
+          emiPlans: (formData.paymentOptions.emiPlans || []).map(p => ({
+            months: Number(p.months || 0),
+            amountPerMonth: Number(p.amountPerMonth || 0),
           })),
           methods: formData.paymentOptions.methods || [],
         },
@@ -1127,7 +1179,7 @@ const AddBuyProduct = () => {
               : [],
           },
           memoryStorage: {
-            ...formData.productDetails.memoryStorage,
+            ...formData.productDetails.memoryStorCashmitra
             phoneVariants: Array.isArray(formData.productDetails.memoryStorage.phoneVariants)
               ? formData.productDetails.memoryStorage.phoneVariants.map(v => String(v))
               : [],
@@ -1149,28 +1201,39 @@ const AddBuyProduct = () => {
           devicesSold: Number(formData.trustMetrics.devicesSold || 0),
           qualityChecks: Number(formData.trustMetrics.qualityChecks || 0),
         },
-        relatedProducts: (formData.relatedProducts || []).map(rp => ({          id: rp.id || '',          name: rp.name || '',          price: Number(rp.price || 0),          image: rp.image || '',          rating: Number(rp.rating || 0),
+        relatedProducts: (formData.relatedProducts || []).map(rp => ({
+          id: rp.id || '',
+          name: rp.name || '',
+          price: Number(rp.price || 0),
+          image: rp.image || '',
+          rating: Number(rp.rating || 0),
         })),
         sortOrder: Number(formData.sortOrder || 0),
       };
 
-      // Reshape images to match exact schema (object with main, gallery as comma-string, thumbnail)
+      // Reshape images to match exact schema (object wCashmitran, gallery as comma-string, thumbnail)
       const imageUrls = productData.images;
       const main = imageUrls[0] || '';
       const gallery = imageUrls.slice(1).join(',');
       const thumbnail = imageUrls[imageUrls.length - 1] || '';
-      productData.images = {        main,
+      productData.images = {
+        main,
         gallery,
         thumbnail,
       };
 
       // Reshape offers to match exact schema (object with exchangeBonus number, bankOffers array of strings)
-      productData.offers = {        exchangeBonus: 0,
+      productData.offers = {
+        exchangeBonus: 0,
         bankOffers: [],
       };
-      for (let o of formData.offers || []) {        const oType = (o.type || '').toLowerCase();        const oValue = o.value || o.conditions || '';
-        if (oType.includes('exchange') || oType.includes('bonus')) {          productData.offers.exchangeBonus = Number(oValue) || 0;
-        } else if (oType.includes('bank') || oType.includes('offer')) {          if (oValue) productData.offers.bankOffers.push(oValue);
+      for (let o of formData.offers || []) {
+        const oType = (o.type || '').toLowerCase();
+        const oValue = o.value || o.conditions || '';
+        if (oType.includes('exchange') || oType.includes('bonus')) {
+          productData.offers.exchangeBonus = Number(oValue) || 0;
+        } else if (oType.includes('bank') || oType.includes('offer')) {
+          if (oValue) productData.offers.bankOffers.push(oValue);
         }
       }
 
@@ -1179,13 +1242,20 @@ const AddBuyProduct = () => {
         qualityChecks: formData.badges.qualityChecks || '32-Point Quality Check',
         warranty: formData.badges.warranty || '6 Months Warranty',
         refundPolicy: formData.badges.refundPolicy || '7 Days Return',
-        assurance: formData.badges.assurance || 'Cashify Assured',
+        assurance: formData.badges.assurance || 'Cashmitra Assured',
       };
 
-      // Ensure display.type (map from technology) and features array      productData.productDetails.display.type = formData.productDetails.display.technology || '';      if (!Array.isArray(productData.productDetails.display.features)) {        productData.productDetails.display.features = [];
+      // Ensure display.type (map from technology) and features array
+      productData.productDetails.display.type = formData.productDetails.display.technology || '';
+      if (!Array.isArray(productData.productDetails.display.features)) {
+        productData.productDetails.display.features = [];
       }
 
-      // Ensure battery defaults to match schema      productData.productDetails.battery.removable =        formData.productDetails.battery.removable ?? false;      productData.productDetails.battery.reverseCharging =        formData.productDetails.battery.reverseCharging ?? false;
+      // Ensure battery defaults to match schema
+      productData.productDetails.battery.removable =
+        formData.productDetails.battery.removable ?? false;
+      productData.productDetails.battery.reverseCharging =
+        formData.productDetails.battery.reverseCharging ?? false;
 
       // Ensure design dimensions object (empty if not set)
       if (
@@ -1203,7 +1273,8 @@ const AddBuyProduct = () => {
       if (
         !productData.productDetails.memoryStorage.phoneVariants ||
         productData.productDetails.memoryStorage.phoneVariants.length === 0
-      ) {        const uniqueStorages = [...new Set(formData.variants.map(v => v.storage).filter(Boolean))];
+      ) {
+        const uniqueStorages = [...new Set(formData.variants.map(v => v.storage).filter(Boolean))];
         productData.productDetails.memoryStorage.phoneVariants = uniqueStorages;
       }
 
@@ -1211,7 +1282,7 @@ const AddBuyProduct = () => {
       productData.legal = {
         terms: formData.legal.terms || 'Standard terms and conditions apply',
         privacy: formData.legal.privacy || 'Privacy policy compliant',
-        copyright: formData.legal.copyright || '© 2024 Cashify. All rights reserved.',
+        copyright: formData.legal.copyright || '© 2024 Cashmitra. All rights reserved.',
       };
 
       // Call API
@@ -1223,7 +1294,8 @@ const AddBuyProduct = () => {
         throw new Error(response?.data?.message || 'Failed to create product');
       }
     } catch (error) {
-      console.error('Error creating product:', error);      const message = error?.response?.data?.error || error?.message || 'Failed to create product';
+      console.error('Error creating product:', error);
+      const message = error?.response?.data?.error || error?.message || 'Failed to create product';
       setErrors(prev => ({ ...prev, submit: message }));
     } finally {
       setLoading(false);
@@ -1278,12 +1350,16 @@ const AddBuyProduct = () => {
                   required
                 >
                   <option value="">Select Category</option>
-                  {categories.map(c => (                    <option key={c._id} value={c._id}>                      {c.name}
+                  {categories.map(c => (
+                    <option key={c._id} value={c._id}>
+                      {c.name}
                     </option>
                   ))}
-                </Select>                {errors.categoryId && (
+                </Select>
+                {errors.categoryId && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors.categoryId}
+                    <AlertCircle size={16} />
+                    {errors.categoryId}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1321,9 +1397,11 @@ const AddBuyProduct = () => {
                       ) : null}
                     </SearchDropdown>
                   )}
-                </SearchContainer>                {errors.name && (
+                </SearchContainer>
+                {errors.name && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors.name}
+                    <AlertCircle size={16} />
+                    {errors.name}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1335,9 +1413,11 @@ const AddBuyProduct = () => {
                   onChange={handleInputChange}
                   placeholder="Apple"
                   required
-                />                {errors.brand && (
+                />
+                {errors.brand && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors.brand}
+                    <AlertCircle size={16} />
+                    {errors.brand}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1373,9 +1453,11 @@ const AddBuyProduct = () => {
                 onChange={handleInputChange}
                 placeholder="Product description"
                 required
-              />              {errors.description && (
+              />
+              {errors.description && (
                 <ErrorMessage>
-                  <AlertCircle size={16} />                  {errors.description}
+                  <AlertCircle size={16} />
+                  {errors.description}
                 </ErrorMessage>
               )}
             </FormGroup>
@@ -1410,16 +1492,19 @@ const AddBuyProduct = () => {
               {formData.images.length > 0 && (
                 <ImagePreview>
                   {formData.images.map((img, i) => (
-                    <ImageItem key={i}>                      <PreviewImage src={img.url || img} alt={`Product ${i}`} />
+                    <ImageItem key={i}>
+                      <PreviewImage src={img.url || img} alt={`Product ${i}`} />
                       <RemoveImageButton type="button" onClick={() => removeImage(i)}>
                         <X size={12} />
                       </RemoveImageButton>
                     </ImageItem>
                   ))}
                 </ImagePreview>
-              )}              {errors.images && (
+              )}
+              {errors.images && (
                 <ErrorMessage>
-                  <AlertCircle size={16} />                  {errors.images}
+                  <AlertCircle size={16} />
+                  {errors.images}
                 </ErrorMessage>
               )}
             </FormGroup>
@@ -1441,9 +1526,11 @@ const AddBuyProduct = () => {
                   onChange={handleInputChange}
                   placeholder="129900"
                   required
-                />                {errors['pricing.mrp'] && (
+                />
+                {errors['pricing.mrp'] && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors['pricing.mrp']}
+                    <AlertCircle size={16} />
+                    {errors['pricing.mrp']}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1455,9 +1542,11 @@ const AddBuyProduct = () => {
                   value={formData.pricing.discountedPrice}
                   onChange={handleInputChange}
                   placeholder="119900"
-                />                {errors['pricing.discountedPrice'] && (
+                />
+                {errors['pricing.discountedPrice'] && (
                   <ErrorMessage>
-                    <AlertCircle size={16} />                    {errors['pricing.discountedPrice']}
+                    <AlertCircle size={16} />
+                    {errors['pricing.discountedPrice']}
                   </ErrorMessage>
                 )}
               </FormGroup>
@@ -1504,8 +1593,10 @@ const AddBuyProduct = () => {
                   <FormGrid>
                     <FormGroup>
                       <Label>Label</Label>
-                      <Select                        value={c.label}
-                        onChange={(e: any) => handleArrayUpdate('conditionOptions', idx, {                          ...c,
+                      <Select
+                        value={c.label}
+                        onChange={(e: any) => handleArrayUpdate('conditionOptions', idx, {
+                          ...c,
                           label: e.target.value,
                         })
                         }
@@ -1519,8 +1610,10 @@ const AddBuyProduct = () => {
                     <FormGroup>
                       <Label>Price</Label>
                       <Input
-                        type="number"                        value={c.price}
-                        onChange={(e: any) => handleArrayUpdate('conditionOptions', idx, {                          ...c,
+                        type="number"
+                        value={c.price}
+                        onChange={(e: any) => handleArrayUpdate('conditionOptions', idx, {
+                          ...c,
                           price: e.target.value,
                         })
                         }
@@ -1537,9 +1630,11 @@ const AddBuyProduct = () => {
                   </RemoveButton>
                 </div>
               ))}
-            </DynamicFieldContainer>            {errors.conditionOptions && (
+            </DynamicFieldContainer>
+            {errors.conditionOptions && (
               <ErrorMessage>
-                <AlertCircle size={16} />                {errors.conditionOptions}
+                <AlertCircle size={16} />
+                {errors.conditionOptions}
               </ErrorMessage>
             )}
           </FormSection>
@@ -1582,20 +1677,26 @@ const AddBuyProduct = () => {
                   <FormGrid>
                     <FormGroup>
                       <Label>Variant ID</Label>
-                      <Input                        value={v.variantId}                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, variantId: e.target.value })
+                      <Input
+                        value={v.variantId}
+                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, variantId: e.target.value })
                         }
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>Storage</Label>
-                      <Input                        value={v.storage}                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, storage: e.target.value })
+                      <Input
+                        value={v.storage}
+                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, storage: e.target.value })
                         }
                         placeholder="128GB"
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>Color</Label>
-                      <Input                        value={v.color}                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, color: e.target.value })
+                      <Input
+                        value={v.color}
+                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, color: e.target.value })
                         }
                         placeholder="Deep Purple"
                       />
@@ -1603,15 +1704,19 @@ const AddBuyProduct = () => {
                     <FormGroup>
                       <Label>Price</Label>
                       <Input
-                        type="number"                        value={v.price}                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, price: e.target.value })
+                        type="number"
+                        value={v.price}
+                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, price: e.target.value })
                         }
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>
                         <input
-                          type="checkbox"                          checked={!!v.stock}
-                          onChange={e =>                            handleArrayUpdate('variants', i, { ...v, stock: e.target.checked })
+                          type="checkbox"
+                          checked={!!v.stock}
+                          onChange={e =>
+                            handleArrayUpdate('variants', i, { ...v, stock: e.target.checked })
                           }
                           style={{ marginRight: 8 }}
                         />
@@ -1661,21 +1766,27 @@ const AddBuyProduct = () => {
                   <FormGrid>
                     <FormGroup>
                       <Label>Name</Label>
-                      <Input                        value={a.name}                        onChange={(e: any) => handleArrayUpdate('addOns', i, { ...a, name: e.target.value })
+                      <Input
+                        value={a.name}
+                        onChange={(e: any) => handleArrayUpdate('addOns', i, { ...a, name: e.target.value })
                         }
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>Cost</Label>
                       <Input
-                        type="number"                        value={a.cost}                        onChange={(e: any) => handleArrayUpdate('addOns', i, { ...a, cost: e.target.value })
+                        type="number"
+                        value={a.cost}
+                        onChange={(e: any) => handleArrayUpdate('addOns', i, { ...a, cost: e.target.value })
                         }
                       />
                     </FormGroup>
                   </FormGrid>
                   <FormGroup>
                     <Label>Description</Label>
-                    <TextArea                      value={a.description}                      onChange={(e: any) => handleArrayUpdate('addOns', i, { ...a, description: e.target.value })
+                    <TextArea
+                      value={a.description}
+                      onChange={(e: any) => handleArrayUpdate('addOns', i, { ...a, description: e.target.value })
                       }
                       rows={2}
                     />
@@ -1722,19 +1833,25 @@ const AddBuyProduct = () => {
                   <FormGrid>
                     <FormGroup>
                       <Label>Type</Label>
-                      <Input                        value={o.type}                        onChange={(e: any) => handleArrayUpdate('offers', i, { ...o, type: e.target.value })
+                      <Input
+                        value={o.type}
+                        onChange={(e: any) => handleArrayUpdate('offers', i, { ...o, type: e.target.value })
                         }
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>Value</Label>
-                      <Input                        value={o.value}                        onChange={(e: any) => handleArrayUpdate('offers', i, { ...o, value: e.target.value })
+                      <Input
+                        value={o.value}
+                        onChange={(e: any) => handleArrayUpdate('offers', i, { ...o, value: e.target.value })
                         }
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>Conditions</Label>
-                      <Input                        value={o.conditions}                        onChange={(e: any) => handleArrayUpdate('offers', i, { ...o, conditions: e.target.value })
+                      <Input
+                        value={o.conditions}
+                        onChange={(e: any) => handleArrayUpdate('offers', i, { ...o, conditions: e.target.value })
                         }
                       />
                     </FormGroup>
@@ -1783,7 +1900,8 @@ const AddBuyProduct = () => {
                 <FormGroup key={k}>
                   <Label>{k.toUpperCase()}</Label>
                   <Input
-                    type="number"                    value={formData.rating.breakdown[k]}
+                    type="number"
+                    value={formData.rating.breakdown[k]}
                     onChange={(e: any) => setFormData(prev => ({
                       ...prev,
                       rating: {
@@ -1823,21 +1941,27 @@ const AddBuyProduct = () => {
                   <FormGrid>
                     <FormGroup>
                       <Label>Reviewer</Label>
-                      <Input                        value={r.reviewer}                        onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, reviewer: e.target.value })
+                      <Input
+                        value={r.reviewer}
+                        onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, reviewer: e.target.value })
                         }
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>Rating</Label>
                       <Input
-                        type="number"                        value={r.rating}                        onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, rating: e.target.value })
+                        type="number"
+                        value={r.rating}
+                        onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, rating: e.target.value })
                         }
                       />
                     </FormGroup>
                     <FormGroup>
                       <Label>Date</Label>
                       <Input
-                        type="date"                        value={r.date}                        onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, date: e.target.value })
+                        type="date"
+                        value={r.date}
+                        onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, date: e.target.value })
                         }
                       />
                     </FormGroup>
@@ -1845,7 +1969,9 @@ const AddBuyProduct = () => {
                   <FormGroup>
                     <Label>Comment</Label>
                     <TextArea
-                      rows={2}                      value={r.comment}                      onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, comment: e.target.value })
+                      rows={2}
+                      value={r.comment}
+                      onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, comment: e.target.value })
                       }
                     />
                   </FormGroup>
@@ -1908,8 +2034,10 @@ const AddBuyProduct = () => {
                   <FormGroup>
                     <Label>Months</Label>
                     <Input
-                      type="number"                      value={p.months}
-                      onChange={(e: any) => handleArrayUpdate('paymentOptions.emiPlans', i, {                        ...p,
+                      type="number"
+                      value={p.months}
+                      onChange={(e: any) => handleArrayUpdate('paymentOptions.emiPlans', i, {
+                        ...p,
                         months: e.target.value,
                       })
                       }
@@ -1918,8 +2046,10 @@ const AddBuyProduct = () => {
                   <FormGroup>
                     <Label>Amount / Month</Label>
                     <Input
-                      type="number"                      value={p.amountPerMonth}
-                      onChange={(e: any) => handleArrayUpdate('paymentOptions.emiPlans', i, {                        ...p,
+                      type="number"
+                      value={p.amountPerMonth}
+                      onChange={(e: any) => handleArrayUpdate('paymentOptions.emiPlans', i, {
+                        ...p,
                         amountPerMonth: e.target.value,
                       })
                       }
@@ -2701,10 +2831,12 @@ const AddBuyProduct = () => {
             <X size={20} />
             Cancel
           </CancelButton>
-        </ActionButtons>        {errors.submit && (
+        </ActionButtons>
+        {errors.submit && (
           <div style={{ padding: '1rem 2rem' }}>
             <ErrorMessage>
-              <AlertCircle size={16} />              {errors.submit}
+              <AlertCircle size={16} />
+              {errors.submit}
             </ErrorMessage>
           </div>
         )}

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 import {
   Search,
   Filter,
@@ -19,7 +20,6 @@ import {
 const InventoryContainer = styled.div`
   min-height: 100vh;
   background: ${(props: any) => props.theme.colors.background};
-  padding: 2rem;
 `;
 
 const Header = styled.div`
@@ -42,8 +42,9 @@ const HeaderActions = styled.div`
 `;
 
 const Button = styled.button`
-  background: ${(props: any) => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${(props: any) => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
+  background: ${(props: any) =>
+    props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
+  color: ${(props: any) => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
   border: 1px solid ${(props: any) => props.theme.colors.primary};
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -55,7 +56,8 @@ const Button = styled.button`
   gap: 0.5rem;
 
   &:hover {
-    background: ${(props: any) => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
+    background: ${(props: any) =>
+      props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
     color: white;
   }
 `;
@@ -286,7 +288,7 @@ const Price = styled.span`
 
 const Stock = styled.span`
   font-weight: 500;
-  color: ${(props: any) => props.low ? '#EF4444' : props.theme.colors.text};
+  color: ${(props: any) => (props.low ? '#EF4444' : props.theme.colors.text)};
 `;
 
 const ActionsMenu = styled.div`
@@ -319,7 +321,7 @@ const ActionsDropdown = styled.div`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 10;
   min-width: 150px;
-  display: ${(props: any) => props.show ? 'block' : 'none'};
+  display: ${(props: any) => (props.show ? 'block' : 'none')};
 `;
 
 const ActionItem = styled.button`
@@ -532,7 +534,10 @@ function Inventory() {
             <option value="out-of-stock">Out of Stock</option>
           </FilterSelect>
 
-          <FilterSelect value={categoryFilter} onChange={(e: any) => setCategoryFilter(e.target.value)}>
+          <FilterSelect
+            value={categoryFilter}
+            onChange={(e: any) => setCategoryFilter(e.target.value)}
+          >
             <option value="all">All Categories</option>
             <option value="Smartphones">Smartphones</option>
             <option value="Tablets">Tablets</option>
@@ -576,7 +581,8 @@ function Inventory() {
 
               <ActionsMenu>
                 <ActionsButton
-                  onClick={() =>                    setActiveDropdown(activeDropdown === product.id ? null : product.id)
+                  onClick={() =>
+                    setActiveDropdown(activeDropdown === product.id ? null : product.id)
                   }
                 >
                   <MoreVertical size={16} />

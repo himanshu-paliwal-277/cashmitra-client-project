@@ -1,4 +1,5 @@
-import React, { useState } from 'react';import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 import {
   DollarSign,
   TrendingUp,
@@ -20,7 +21,6 @@ import {
 const PayoutsContainer = styled.div`
   min-height: 100vh;
   background: ${(props: any) => props.theme.colors.background};
-  padding: 2rem;
 `;
 
 const Header = styled.div`

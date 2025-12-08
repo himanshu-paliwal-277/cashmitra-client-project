@@ -57,7 +57,7 @@ const SavedAddresses = lazy(() => import('./pages/customer/account/SavedAddresse
 const PartnerLogin = lazy(() => import('./pages/partner/Login'));
 const PartnerKYC = lazy(() => import('./pages/partner/KYC'));
 const PartnerProtectedRoute = lazy(() => import('./components/partner/PartnerProtectedRoute'));
-const PartnerLayout = lazy(() => import('./components/partner/PartnerLayout'));
+const PartnerLayout = lazy(() => import('./components/partner/layout/PartnerLayout'));
 const PartnerDashboard = lazy(() => import('./pages/partner/Dashboard'));
 const PartnerInventory = lazy(() => import('./pages/partner/Inventory'));
 const PartnerOrders = lazy(() => import('./pages/partner/Orders'));

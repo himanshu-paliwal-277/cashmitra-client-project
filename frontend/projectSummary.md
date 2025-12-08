@@ -1,4 +1,4 @@
-# 📘 **Project Documentation – ReCommerce Platform (Cashify/OLX Style)**
+# 📘 **Project Documentation – ReCommerce Platform (Cashmitra/OLX Style)**
 
 A full-stack marketplace platform where users can **Sell used devices**, **Buy refurbished devices**, and where **Partners & Admins** manage catalog, pricing, orders, and logistics.
 
@@ -66,7 +66,7 @@ This project contains **3 major flows:**
 
 ## ⭐ **A. SELL FLOW (User Sells Their Device)**
 
-Sell flow is a _multi-step guided evaluation_ similar to Cashify.
+Sell flow is a _multi-step guided evaluation_ similar to Cashmitra.
 
 ### **Sell Steps (Sequential)**
 
@@ -112,7 +112,7 @@ defects, accessories, conditionAnswers, priceQuote, bookingData`
 - Checkout → `/buy/checkout`
 - Order Confirmation → `/buy/order-confirmation`
 
-This is similar to OLX/Cashify store.
+This is similar to OLX/Cashmitra store.
 
 ---
 
@@ -362,7 +362,7 @@ Has full system control:
 
 # 📄 **8. Final Summary (One-Line Project Description)**
 
-> **A full recommerce platform like Cashify + OLX, with complete Buy/Sell flows, multi-role dashboards (Admin, Partner, Customer, Agent), catalog management, pricing engine, and order workflow system.**
+> **A full recommerce platform like Cashmitra + OLX, with complete Buy/Sell flows, multi-role dashboards (Admin, Partner, Customer, Agent), catalog management, pricing engine, and order workflow system.**
 
 ---
 

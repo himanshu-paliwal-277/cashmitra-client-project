@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAgentAuth } from '../../contexts/AgentAuthContext';
-import { Mail, Lock, LogIn, Loader } from 'lucide-react';import styled from 'styled-components';
+import { Mail, Lock, LogIn, Loader } from 'lucide-react';
+import styled from 'styled-components';
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -139,7 +140,8 @@ const AgentLogin = () => {
     password: '',
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');  const { login } = useAgentAuth();
+  const [error, setError] = useState('');
+  const { login } = useAgentAuth();
   const navigate = useNavigate();
 
   const handleChange = (e: any) => {
@@ -164,7 +166,8 @@ const AgentLogin = () => {
     try {
       await login(formData.email, formData.password);
       navigate('/agent/dashboard');
-    } catch (err) {      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -174,7 +177,7 @@ const AgentLogin = () => {
     <LoginContainer>
       <LoginCard>
         <Logo>
-          <h1>🚗 Cashify Agent</h1>
+          <h1>🚗 Cashmitra Agent</h1>
           <p>Welcome back! Please login to continue</p>
         </Logo>
 

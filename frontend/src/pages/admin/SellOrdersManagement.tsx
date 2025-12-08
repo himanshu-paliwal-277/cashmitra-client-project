@@ -1,7 +1,7 @@
 /**
  * @fileoverview Sell Orders Management Component
  * @description Admin interface for managing sell orders with comprehensive functionality
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 1.0.0
  */
 

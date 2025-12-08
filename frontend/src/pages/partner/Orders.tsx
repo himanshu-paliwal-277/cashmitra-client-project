@@ -1,4 +1,5 @@
-import React, { useState } from 'react';import styled from 'styled-components';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 import {
   Search,
   Filter,
@@ -21,7 +22,6 @@ import {
 const OrdersContainer = styled.div`
   min-height: 100vh;
   background: ${(props: any) => props.theme.colors.background};
-  padding: 2rem;
 `;
 
 const Header = styled.div`

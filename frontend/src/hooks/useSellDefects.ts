@@ -1,7 +1,7 @@
 /**
  * @fileoverview Sell Defects Hook
  * @description React hook for managing sell defects
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 1.0.0
  */
 
@@ -44,7 +44,8 @@ const useSellDefects = () => {
         total: response.data.total || 0,
         totalPages: response.data.totalPages || 0,
       });
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch defects');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch defects');
     } finally {
       setLoading(false);
     }
@@ -62,7 +63,8 @@ const useSellDefects = () => {
         },
       });
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch defect');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch defect');
       throw err;
     } finally {
       setLoading(false);
@@ -86,7 +88,8 @@ const useSellDefects = () => {
         // Refresh defects list
         await fetchDefects();
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to create defect');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create defect');
         throw err;
       } finally {
         setLoading(false);
@@ -112,7 +115,8 @@ const useSellDefects = () => {
         // Refresh defects list
         await fetchDefects();
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to update defect');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update defect');
         throw err;
       } finally {
         setLoading(false);
@@ -136,7 +140,8 @@ const useSellDefects = () => {
 
         // Refresh defects list
         await fetchDefects();
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to delete defect');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete defect');
         throw err;
       } finally {
         setLoading(false);
@@ -162,7 +167,8 @@ const useSellDefects = () => {
         // Refresh defects list
         await fetchDefects();
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to create defects');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create defects');
         throw err;
       } finally {
         setLoading(false);
@@ -188,7 +194,8 @@ const useSellDefects = () => {
         // Refresh defects list
         await fetchDefects();
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to reorder defects');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to reorder defects');
         throw err;
       } finally {
         setLoading(false);
@@ -217,7 +224,8 @@ const useSellDefects = () => {
         // Refresh defects list
         await fetchDefects();
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to toggle defect status');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to toggle defect status');
         throw err;
       } finally {
         setLoading(false);
@@ -233,7 +241,8 @@ const useSellDefects = () => {
     try {
       const response = await api.get(`/sell-defects/category/${categoryId}`);
       return response.data.data || [];
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch defects');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch defects');
       throw err;
     } finally {
       setLoading(false);
@@ -246,7 +255,8 @@ const useSellDefects = () => {
     try {
       const response = await api.get(`/sell-defects/public/defect/${defectId}`);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch defect');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch defect');
       throw err;
     } finally {
       setLoading(false);

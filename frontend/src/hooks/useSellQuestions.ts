@@ -1,7 +1,7 @@
 /**
  * @fileoverview Sell Questions Hook
  * @description React hook for managing sell questions and options
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 1.0.0
  */
 
@@ -49,7 +49,8 @@ const useSellQuestions = () => {
         total: response.data?.total ?? list?.length ?? 0,
         totalPages: response.data?.totalPages ?? 1,
       });
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch questions');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch questions');
     } finally {
       setLoading(false);
     }
@@ -67,7 +68,8 @@ const useSellQuestions = () => {
         },
       });
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch question');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch question');
       throw err;
     } finally {
       setLoading(false);
@@ -91,7 +93,8 @@ const useSellQuestions = () => {
         // Refresh questions list
         await fetchQuestions();
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to create question');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create question');
         throw err;
       } finally {
         setLoading(false);
@@ -117,7 +120,8 @@ const useSellQuestions = () => {
         // Refresh questions list
         await fetchQuestions();
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to update question');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update question');
         throw err;
       } finally {
         setLoading(false);
@@ -141,7 +145,8 @@ const useSellQuestions = () => {
 
         // Refresh questions list
         await fetchQuestions();
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to delete question');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete question');
         throw err;
       } finally {
         setLoading(false);
@@ -167,7 +172,8 @@ const useSellQuestions = () => {
         // Refresh questions list
         await fetchQuestions();
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to reorder questions');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to reorder questions');
         throw err;
       } finally {
         setLoading(false);
@@ -189,7 +195,8 @@ const useSellQuestions = () => {
       });
       setOptions(response.data.options || []);
       return response.data.options || [];
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch options');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch options');
       throw err;
     } finally {
       setLoading(false);
@@ -213,7 +220,8 @@ const useSellQuestions = () => {
         // Refresh options list
         await fetchOptions(questionId);
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to create option');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to create option');
         throw err;
       } finally {
         setLoading(false);
@@ -243,7 +251,8 @@ const useSellQuestions = () => {
         // Refresh options list
         await fetchOptions(questionId);
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to update option');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to update option');
         throw err;
       } finally {
         setLoading(false);
@@ -267,7 +276,8 @@ const useSellQuestions = () => {
 
         // Refresh options list
         await fetchOptions(questionId);
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to delete option');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete option');
         throw err;
       } finally {
         setLoading(false);
@@ -297,7 +307,8 @@ const useSellQuestions = () => {
         // Refresh options list
         await fetchOptions(questionId);
         return response.data;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to reorder options');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to reorder options');
         throw err;
       } finally {
         setLoading(false);
@@ -313,7 +324,8 @@ const useSellQuestions = () => {
     try {
       const response = await api.get(`/sell-questions/public/${productId}`);
       return response.data.questions || [];
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch questions');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch questions');
       throw err;
     } finally {
       setLoading(false);
@@ -326,7 +338,8 @@ const useSellQuestions = () => {
     try {
       const response = await api.get(`/sell-questions/public/question/${questionId}`);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch question');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch question');
       throw err;
     } finally {
       setLoading(false);

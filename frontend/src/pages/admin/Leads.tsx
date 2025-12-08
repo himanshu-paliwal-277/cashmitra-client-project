@@ -1,7 +1,7 @@
 /**
  * @fileoverview Leads Management Component
  * @description Admin interface for viewing all buy and sell orders as leads
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 3.0.0
  */
 

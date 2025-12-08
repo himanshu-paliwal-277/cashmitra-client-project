@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';import styled from 'styled-components';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   TrendingUp,
   Package,
@@ -7,505 +7,42 @@ import {
   DollarSign,
   Eye,
   Plus,
-  Calendar,
-  Users,
-  Star,
+  Settings,
   ArrowUpRight,
   ArrowDownRight,
-  Bell,
-  Settings,
-  LogOut,
-  Menu,
-  X,
 } from 'lucide-react';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
 
-const DashboardContainer = styled.div`
-  min-height: 100vh;
-  background: #f8fafc;
-  display: flex;
-`;
-
-const Sidebar = styled.aside`
-  width: ${(props: any) => props.isOpen ? '280px' : '0'};
-  background: white;
-  border-right: 1px solid #e2e8f0;
-  transition: width 0.3s ease;
-  overflow: hidden;
-  position: fixed;
-  height: 100vh;
-  z-index: 1000;
-
-  @media (min-width: 1024px) {
-    position: relative;
-    width: 280px;
-  }
-`;
-
-const SidebarHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const SidebarLogo = styled.div`
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #1e293b;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  cursor: pointer;
-  color: #64748b;
-
-  @media (min-width: 1024px) {
-    display: none;
-  }
-`;
-
-const SidebarNav = styled.nav`
-  padding: 1rem 0;
-`;
-
-const NavSection = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0 1.5rem;
-  margin-bottom: 0.5rem;
-`;
-
-const NavItem = styled.div`
-  padding: 0.75rem 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: ${(props: any) => props.active ? '#3b82f6' : '#64748b'};
-  background: ${(props: any) => props.active ? '#eff6ff' : 'transparent'};
-  border-right: ${(props: any) => props.active ? '3px solid #3b82f6' : '3px solid transparent'};
-  cursor: pointer;
-  transition: all 0.2s ease;
-  opacity: ${(props: any) => props.disabled ? 0.5 : 1};
-  pointer-events: ${(props: any) => props.disabled ? 'none' : 'auto'};
-
-  &:hover {
-    background: ${(props: any) => props.active ? '#eff6ff' : '#f1f5f9'};
-    color: ${(props: any) => props.active ? '#3b82f6' : '#1e293b'};
-  }
-`;
-
-const NavIcon = styled.div`
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const NavText = styled.span`
-  font-weight: 500;
-`;
-
-const MainArea = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin-left: ${(props: any) => props.sidebarOpen ? '280px' : '0'};
-  transition: margin-left 0.3s ease;
-
-  @media (min-width: 1024px) {
-    margin-left: 280px;
-  }
-`;
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  display: ${(props: any) => props.show ? 'block' : 'none'};
-
-  @media (min-width: 1024px) {
-    display: none;
-  }
-`;
-
-const Header = styled.header`
-  background: white;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const MenuButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  cursor: pointer;
-  color: #64748b;
-
-  @media (min-width: 1024px) {
-    display: none;
-  }
-`;
-
-const Logo = styled.div`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme.colors.primary};
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const IconButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 50%;
-  cursor: pointer;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${(props: any) => props.theme.colors.background};
-    color: ${(props: any) => props.theme.colors.primary};
-  }
-`;
-
-const UserProfile = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-
-  &:hover {
-    background: ${(props: any) => props.theme.colors.background};
-  }
-`;
-
-const Avatar = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: ${(props: any) => props.theme.colors.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-`;
-
-const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const UserName = styled.span`
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const UserRole = styled.span`
-  font-size: 0.875rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
-const MainContent = styled.main`
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-`;
-
-const WelcomeSection = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const WelcomeTitle = styled.h1`
-  font-size: 2rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme.colors.text};
-  margin-bottom: 0.5rem;
-`;
-
-const WelcomeSubtitle = styled.p`
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  font-size: 1.125rem;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const StatHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-`;
-
-const StatIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: ${(props: any) => props.color || props.theme.colors.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const StatInfo = styled.div`
-  flex: 1;
-  margin-left: 1rem;
-`;
-
-const StatLabel = styled.p`
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  font-size: 0.875rem;
-  margin-bottom: 0.25rem;
-`;
-
-const StatValue = styled.h3`
-  font-size: 1.75rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme.colors.text};
-  margin-bottom: 0.25rem;
-`;
-
-const StatChange = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-  color: ${(props: any) => props.positive ? '#10B981' : '#EF4444'};
-`;
-
-const ContentGrid = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Card = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-`;
-
-const CardHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid ${(props: any) => props.theme.colors.border};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const CardTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const CardContent = styled.div`
-  padding: 1.5rem;
-`;
-
-const Button = styled.button`
-  background: ${(props: any) => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${(props: any) => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
-  border: 1px solid ${(props: any) => props.theme.colors.primary};
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  &:hover {
-    background: ${(props: any) => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
-    color: white;
-  }
-`;
-
-const OrderItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 0;
-  border-bottom: 1px solid ${(props: any) => props.theme.colors.border};
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const OrderInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const OrderId = styled.span`
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const OrderDetails = styled.span`
-  font-size: 0.875rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
-const OrderStatus = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  background: ${(props: any) => {
-    switch (props.status) {
-      case 'pending':
-        return '#FEF3C7';
-      case 'processing':
-        return '#DBEAFE';
-      case 'completed':
-        return '#D1FAE5';
-      case 'cancelled':
-        return '#FEE2E2';
-      default:
-        return '#F3F4F6';
-    }
-  }};
-  color: ${(props: any) => {
-    switch (props.status) {
-      case 'pending':
-        return '#92400E';
-      case 'processing':
-        return '#1E40AF';
-      case 'completed':
-        return '#065F46';
-      case 'cancelled':
-        return '#991B1B';
-      default:
-        return '#374151';
-    }
-  }};
-`;
-
-const QuickAction = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: ${(props: any) => props.theme.colors.primary};
-    background: ${(props: any) => props.theme.colors.background};
-  }
-`;
-
-const ActionIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: ${(props: any) => props.color || props.theme.colors.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const ActionInfo = styled.div`
-  flex: 1;
-`;
-
-const ActionTitle = styled.h4`
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-  margin-bottom: 0.25rem;
-`;
-
-const ActionDescription = styled.p`
-  font-size: 0.875rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
 function Dashboard() {
   const navigate = useNavigate();
-  const {    partner,    logout,    getAvailableMenuItems,    hasMenuPermission,    getBusinessLimits,    getAvailableFeatures,
+  const {
+    partner,
+    hasMenuPermission,
+    getBusinessLimits,
   } = usePartnerAuth();
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [currentPath, setCurrentPath] = useState('/partner/dashboard');
-
-  // Get available menu items based on partner's role and permissions
-  const availableMenuItems = getAvailableMenuItems();
   const businessLimits = getBusinessLimits();
-  const availableFeatures = getAvailableFeatures();
+
+  // Debug: Log partner data
+  console.log('Partner data in Dashboard:', partner);
+  console.log('hasMenuPermission function:', hasMenuPermission);
+
+  // Get partner name safely
+  const getPartnerName = () => {
+    if (!partner) return 'Partner';
+    if (partner.businessName) return partner.businessName;
+    if (partner.name) return partner.name;
+    if (partner.firstName && partner.lastName) return `${partner.firstName} ${partner.lastName}`;
+    if (partner.firstName) return partner.firstName;
+    if (partner.email) return partner.email.split('@')[0];
+    return 'Partner';
+  };
 
   // Mock data - in real app, this would come from API based on partner's permissions
   const [user] = useState({
-    name: partner?.businessName || partner?.firstName + ' ' + partner?.lastName || 'Partner',
+    name: getPartnerName(),
     role: partner?.role || 'Basic Partner',
-    avatar: partner?.businessName?.charAt(0) || partner?.firstName?.charAt(0) || 'P',
+    avatar: getPartnerName().charAt(0).toUpperCase(),
   });
 
   const stats = [
@@ -514,7 +51,7 @@ function Dashboard() {
       value: '₹45,231',
       change: '+12.5%',
       positive: true,
-      color: '#10b981',
+      color: 'bg-green-500',
       icon: <DollarSign size={24} />,
       visible: hasMenuPermission('finance.revenue'),
     },
@@ -523,7 +60,7 @@ function Dashboard() {
       value: businessLimits?.maxProducts ? `${Math.min(156, businessLimits.maxProducts)}` : '156',
       change: '+8.2%',
       positive: true,
-      color: '#3b82f6',
+      color: 'bg-blue-500',
       icon: <Package size={24} />,
       visible: hasMenuPermission('inventory.products'),
     },
@@ -532,7 +69,7 @@ function Dashboard() {
       value: '89',
       change: '+23.1%',
       positive: true,
-      color: '#f59e0b',
+      color: 'bg-amber-500',
       icon: <ShoppingCart size={24} />,
       visible: hasMenuPermission('sales.orders'),
     },
@@ -541,7 +78,7 @@ function Dashboard() {
       value: '2,847',
       change: '-3.2%',
       positive: false,
-      color: '#8b5cf6',
+      color: 'bg-purple-500',
       icon: <Eye size={24} />,
       visible: hasMenuPermission('analytics.views'),
     },
@@ -583,7 +120,7 @@ function Dashboard() {
       title: 'Add New Product',
       description: 'List a new device for sale',
       icon: <Plus size={20} />,
-      color: '#10b981',
+      color: 'bg-green-500',
       action: () => navigate('/partner/inventory/add'),
       visible: hasMenuPermission('inventory.create'),
     },
@@ -591,7 +128,7 @@ function Dashboard() {
       title: 'View Orders',
       description: 'Check recent customer orders',
       icon: <ShoppingCart size={20} />,
-      color: '#3b82f6',
+      color: 'bg-blue-500',
       action: () => navigate('/partner/orders'),
       visible: hasMenuPermission('sales.orders'),
     },
@@ -599,7 +136,7 @@ function Dashboard() {
       title: 'Analytics Dashboard',
       description: 'View sales and performance metrics',
       icon: <TrendingUp size={20} />,
-      color: '#f59e0b',
+      color: 'bg-amber-500',
       action: () => navigate('/partner/analytics'),
       visible: hasMenuPermission('analytics.dashboard'),
     },
@@ -607,168 +144,154 @@ function Dashboard() {
       title: 'Manage Profile',
       description: 'Update business information',
       icon: <Settings size={20} />,
-      color: '#8b5cf6',
+      color: 'bg-purple-500',
       action: () => navigate('/partner/profile'),
       visible: hasMenuPermission('settings.profile'),
     },
   ].filter(action => action.visible);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/partner/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
+  const getStatusStyles = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-amber-100 text-amber-800';
+      case 'processing':
+        return 'bg-blue-100 text-blue-800';
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      case 'shipped':
+        return 'bg-indigo-100 text-indigo-800';
+      default:
+        return 'bg-slate-100 text-slate-800';
     }
   };
 
-  const handleNavigation = (path: any) => {
-    setCurrentPath(path);
-    navigate(path);
-    setSidebarOpen(false); // Close sidebar on mobile after navigation
-  };
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
   return (
-    <DashboardContainer>
-      <Overlay show={sidebarOpen} onClick={() => setSidebarOpen(false)} />
+    <div className="max-w-7xl mx-auto">
+      {/* Welcome Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">
+          Welcome back, {user.name}!
+        </h1>
+        <p className="text-lg text-slate-600">
+          Here's what's happening with your business today.
+        </p>
+      </div>
 
-      <Sidebar isOpen={sidebarOpen}>
-        <SidebarHeader>
-          <SidebarLogo>Cashify Partner</SidebarLogo>
-          <CloseButton onClick={() => setSidebarOpen(false)}>
-            <X size={20} />
-          </CloseButton>
-        </SidebarHeader>
-
-        <SidebarNav>
-          {availableMenuItems.map((section: any, sectionIndex: any) => (
-            <NavSection key={sectionIndex}>
-              <SectionTitle>{section.title}</SectionTitle>
-              {section.items.map((item: any, itemIndex: any) => (
-                <NavItem
-                  key={itemIndex}
-                  active={currentPath === item.path}
-                  disabled={item.disabled}
-                  onClick={() => !item.disabled && handleNavigation(item.path)}
-                >
-                  <NavIcon>{item.icon}</NavIcon>
-                  <NavText>{item.label}</NavText>
-                </NavItem>
-              ))}
-            </NavSection>
+      {/* Stats Grid */}
+      {stats.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stats.map((stat, index) => (
+            <div
+              key={index}
+              className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center text-white`}>
+                  {stat.icon}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-slate-600 mb-1">{stat.label}</p>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                  {stat.value}
+                </h3>
+                <div className={`flex items-center gap-1 text-sm ${stat.positive ? 'text-green-600' : 'text-red-600'}`}>
+                  {stat.positive ? (
+                    <ArrowUpRight size={16} />
+                  ) : (
+                    <ArrowDownRight size={16} />
+                  )}
+                  <span>{stat.change}</span>
+                </div>
+              </div>
+            </div>
           ))}
-        </SidebarNav>
-      </Sidebar>
+        </div>
+      )}
 
-      <MainArea sidebarOpen={sidebarOpen}>
-        <Header>
-          <HeaderLeft>
-            <MenuButton onClick={toggleSidebar}>
-              <Menu size={20} />
-            </MenuButton>
-            <Logo>Partner Dashboard</Logo>
-          </HeaderLeft>
-          <HeaderActions>
-            <IconButton>
-              <Bell size={20} />
-            </IconButton>
-            <UserProfile>
-              <Avatar>{user.avatar}</Avatar>
-              <UserInfo>
-                <UserName>{user.name}</UserName>
-                <UserRole>{user.role}</UserRole>
-              </UserInfo>
-            </UserProfile>
-            <IconButton onClick={handleLogout}>
-              <LogOut size={20} />
-            </IconButton>
-          </HeaderActions>
-        </Header>
-
-        <MainContent>
-          <WelcomeSection>
-            <WelcomeTitle>Welcome back, {user.name}!</WelcomeTitle>
-            <WelcomeSubtitle>Here's what's happening with your business today.</WelcomeSubtitle>
-          </WelcomeSection>
-
-          {stats.length > 0 && (
-            <StatsGrid>
-              {stats.map((stat, index) => (
-                <StatCard key={index}>
-                  <StatHeader>
-                    <StatIcon color={stat.color}>{stat.icon}</StatIcon>
-                    <StatInfo>
-                      <StatLabel>{stat.label}</StatLabel>
-                      <StatValue>{stat.value}</StatValue>
-                      <StatChange positive={stat.positive}>
-                        {stat.positive ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-                        {stat.change}
-                      </StatChange>
-                    </StatInfo>
-                  </StatHeader>
-                </StatCard>
-              ))}
-            </StatsGrid>
-          )}
-
-          <ContentGrid>
-            {hasMenuPermission('sales.orders') && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Orders</CardTitle>
-                  <Button variant="outline" onClick={() => navigate('/partner/orders')}>
-                    View All
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  {recentOrders.map((order, index) => (
-                    <OrderItem key={index}>
-                      <OrderInfo>
-                        <OrderId>{order.id}</OrderId>
-                        <OrderDetails>
-                          {order.customer} • {order.product}
-                        </OrderDetails>
-                      </OrderInfo>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <span style={{ fontWeight: '600' }}>{order.amount}</span>
-                        <OrderStatus status={order.status}>
-                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                        </OrderStatus>
-                      </div>
-                    </OrderItem>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
-
-            {quickActions.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {quickActions.map((action, index) => (
-                      <QuickAction key={index} onClick={action.action}>
-                        <ActionIcon color={action.color}>{action.icon}</ActionIcon>
-                        <ActionInfo>
-                          <ActionTitle>{action.title}</ActionTitle>
-                          <ActionDescription>{action.description}</ActionDescription>
-                        </ActionInfo>
-                      </QuickAction>
-                    ))}
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Orders */}
+        {hasMenuPermission('sales.orders') && (
+          <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm">
+            <div className="p-6 border-b border-slate-200 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-slate-900">
+                Recent Orders
+              </h3>
+              <button
+                onClick={() => navigate('/partner/orders')}
+                className="px-4 py-2 border border-blue-500 text-blue-500 rounded-lg font-medium hover:bg-blue-500 hover:text-white transition-all duration-200"
+              >
+                View All
+              </button>
+            </div>
+            <div className="p-6">
+              {recentOrders.map((order, index) => (
+                <div
+                  key={index}
+                  className={`flex justify-between items-center py-4 ${
+                    index !== recentOrders.length - 1 ? 'border-b border-slate-200' : ''
+                  }`}
+                >
+                  <div className="flex flex-col gap-1">
+                    <span className="font-semibold text-slate-900">
+                      {order.id}
+                    </span>
+                    <span className="text-sm text-slate-600">
+                      {order.customer} • {order.product}
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
-            )}
-          </ContentGrid>
-        </MainContent>
-      </MainArea>
-    </DashboardContainer>
+                  <div className="flex items-center gap-4">
+                    <span className="font-semibold text-slate-900">
+                      {order.amount}
+                    </span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyles(order.status)}`}
+                    >
+                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Quick Actions */}
+        {quickActions.length > 0 && (
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+            <div className="p-6 border-b border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900">
+                Quick Actions
+              </h3>
+            </div>
+            <div className="p-6 flex flex-col gap-4">
+              {quickActions.map((action, index) => (
+                <div
+                  key={index}
+                  onClick={action.action}
+                  className="flex items-center gap-4 p-4 border border-slate-200 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-slate-50 transition-all duration-200"
+                >
+                  <div className={`w-10 h-10 rounded-lg ${action.color} flex items-center justify-center text-white flex-shrink-0`}>
+                    {action.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-slate-900 mb-1">
+                      {action.title}
+                    </h4>
+                    <p className="text-sm text-slate-600">
+                      {action.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 

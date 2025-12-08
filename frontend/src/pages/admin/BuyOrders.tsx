@@ -1,7 +1,7 @@
 /**
  * @fileoverview Buy Orders Management Component
  * @description Admin interface for managing buy orders
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 2.0.0
  */
 

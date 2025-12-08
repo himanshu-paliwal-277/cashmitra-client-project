@@ -1,7 +1,7 @@
 /**
  * @fileoverview Question Modal Component
  * @description Modal for adding and editing sell questions
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 1.0.0
  */
 

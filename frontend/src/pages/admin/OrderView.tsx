@@ -1,7 +1,7 @@
 /**
  * @fileoverview Order View Component
  * @description Detailed view of a single order with status management
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 2.0.0
  */
 

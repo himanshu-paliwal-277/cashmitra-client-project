@@ -1,7 +1,7 @@
 /**
  * @fileoverview Sell Defects Management Component
  * @description Admin interface for managing device defects and their impact on pricing
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 2.0.0
  */
 

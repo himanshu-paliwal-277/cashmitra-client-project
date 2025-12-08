@@ -1,7 +1,7 @@
 /**
  * @fileoverview Sell Sessions Management Component
  * @description Admin interface for managing sell offer sessions and their lifecycle
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 2.0.0
  */
 

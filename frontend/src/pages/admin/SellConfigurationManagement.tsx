@@ -1,7 +1,7 @@
 /**
  * @fileoverview Sell Configuration Management Component
  * @description Admin interface for managing sell module configuration and settings
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 1.0.0
  */
 
