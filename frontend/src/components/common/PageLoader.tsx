@@ -14,7 +14,7 @@ export function PageLoader({ size = 'lg', text }: PageLoaderProps) {
   };
 
   return (
-    <div className="flex items-center justify-center py-12 h-[600px]">
+    <div className="flex items-center justify-center py-12 h-[600px] w-full">
       <div className="flex flex-col items-center gap-3">
         <Loader2 className={`${sizeClasses[size]} animate-spin text-primary-600`} strokeWidth={2} />
         {text && <p className="text-xs text-gray-600">{text}</p>}

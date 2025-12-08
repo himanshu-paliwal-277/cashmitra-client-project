@@ -22,7 +22,8 @@ import {
 } from '../../styles/AuthStyles';
 
 const PartnerLogin = () => {
-  const navigate = useNavigate();  const { login, loading, isAuthenticated } = usePartnerAuth();
+  const navigate = useNavigate();
+  const { login, loading, isAuthenticated } = usePartnerAuth();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -45,7 +46,8 @@ const PartnerLogin = () => {
       [name]: value,
     }));
 
-    // Clear error when user starts typing    if (errors[name]) {
+    // Clear error when user starts typing
+    if (errors[name]) {
       setErrors(prev => ({
         ...prev,
         [name]: '',
@@ -56,12 +58,16 @@ const PartnerLogin = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.email) {      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {      newErrors.email = 'Please enter a valid email address';
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
     }
 
-    if (!formData.password) {      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {      newErrors.password = 'Password must be at least 6 characters';
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
 
     setErrors(newErrors);
@@ -119,7 +125,8 @@ const PartnerLogin = () => {
           <p>Sign in to access your partner dashboard</p>
         </LoginHeader>
 
-        <LoginForm onSubmit={handleSubmit}>          {errors.general && <ErrorMessage>{errors.general}</ErrorMessage>}
+        <LoginForm onSubmit={handleSubmit}>
+          {errors.general && <ErrorMessage>{errors.general}</ErrorMessage>}
 
           <FormGroup>
             <Label htmlFor="email">Email Address</Label>
@@ -129,9 +136,11 @@ const PartnerLogin = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter your email address"              hasError={!!errors.email}
+              placeholder="Enter your email address"
+              hasError={!!errors.email}
               autoComplete="email"
-            />            {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
+            />
+            {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
           </FormGroup>
 
           <FormGroup>
@@ -142,9 +151,11 @@ const PartnerLogin = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Enter your password"              hasError={!!errors.password}
+              placeholder="Enter your password"
+              hasError={!!errors.password}
               autoComplete="current-password"
-            />            {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+            />
+            {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
           </FormGroup>
 
           <Button type="submit" disabled={isSubmitting} isLoading={isSubmitting}>
