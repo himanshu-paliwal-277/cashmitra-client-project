@@ -57,7 +57,7 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
         { to: '/admin/sell-orders', icon: ShoppingCart, label: 'Sell Orders' },
         { to: '/admin/buy-orders', icon: ShoppingBag, label: 'Buy Orders' },
         { to: '/admin/pickup-management', icon: Truck, label: 'Pickup Management' },
-        { to: '/admin/returns', icon: RotateCcw, label: 'Returns' },
+        // { to: '/admin/returns', icon: RotateCcw, label: 'Returns' }, // TODO: Implement returns backend API
       ],
     },
     {
@@ -99,10 +99,9 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
       items: [
         { to: '/admin/partners', icon: Users, label: 'Partners' },
         { to: '/admin/partner-applications', icon: UserCheck, label: 'Partner Applications (KYC)' },
-        { to: '/admin/partner-list', icon: ClipboardList, label: 'Partner List' },
-        { to: '/admin/partner-permissions', icon: Settings, label: 'Partner Permissions' },
+        // { to: '/admin/partner-permissions', icon: Settings, label: 'Partner Permissions' },
         { to: '/admin/users', icon: Users, label: 'User Management' },
-        { to: '/admin/inventory-approval', icon: CheckSquare, label: 'Inventory Approval' },
+        // { to: '/admin/inventory-approval', icon: CheckSquare, label: 'Inventory Approval' },
       ],
     },
     {

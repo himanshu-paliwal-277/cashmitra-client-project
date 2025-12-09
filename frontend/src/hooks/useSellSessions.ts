@@ -230,17 +230,77 @@ const useSellSessions = () => {
     [currentSession]
   );
 
+  // Admin method: Get all sessions
+  const getAllSessions = useCallback(async (params: any = {}) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const queryParams = new URLSearchParams();
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, String(value));
+        }
+      });
+
+      const response = await api.get(`/sell-sessions/admin/all?${queryParams.toString()}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setSessions(response.data.data || []);
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch all sessions');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Admin method: Update session status
+  const updateSessionStatus = useCallback(async (sessionId: any, isActive: boolean) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await api.patch(
+        `/sell-sessions/admin/${sessionId}/status`,
+        { isActive },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update session status');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // Admin method: Clean expired sessions
   const cleanExpiredSessions = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.delete('/sell-sessions/admin/cleanup', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const token = localStorage.getItem('token');
+      const response = await api.post(
+        '/sell-sessions/admin/cleanup',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       return response.data;
     } catch (err) {
@@ -314,6 +374,8 @@ const useSellSessions = () => {
     calculatePrice,
 
     // Admin methods
+    getAllSessions,
+    updateSessionStatus,
     cleanExpiredSessions,
 
     // Utilities

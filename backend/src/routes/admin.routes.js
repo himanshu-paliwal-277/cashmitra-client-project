@@ -133,8 +133,10 @@ router.post(
     // check('bankDetails.ifscCode').optional().matches(/^[A-Z]{4}0[A-Z0-9]{6}$/).withMessage('Invalid IFSC code'),
     check("upiId")
       .optional()
-      .isEmail()
-      .withMessage("UPI ID must be in email format"),
+      .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/)
+      .withMessage(
+        "UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)"
+      ),
   ],
   protect,
   authorize("admin"),
@@ -177,8 +179,10 @@ router.put(
     // check('bankDetails.ifscCode').optional().matches(/^[A-Z]{4}0[A-Z0-9]{6}$/).withMessage('Invalid IFSC code'),
     check("upiId")
       .optional()
-      .isEmail()
-      .withMessage("UPI ID must be in email format"),
+      .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/)
+      .withMessage(
+        "UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)"
+      ),
     check("verificationStatus")
       .optional()
       .isIn(["pending", "approved", "rejected"])

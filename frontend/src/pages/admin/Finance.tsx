@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import LoadingSpinner from '../../components/customer/common/LoadingSpinner';
+import { useState, useEffect } from 'react';
+import { adminService } from '../../services/adminService';
 import {
   CreditCard,
   DollarSign,
@@ -15,585 +14,569 @@ import {
   ArrowDownLeft,
   Eye,
   FileText,
+  RefreshCw,
+  X,
+  CheckCircle,
+  AlertCircle,
+  Clock,
 } from 'lucide-react';
 
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
+interface DashboardStats {
+  totalRevenue: number;
+  totalCommission: number;
+  totalPayouts: number;
+  pendingPayouts: number;
+  revenueGrowth?: number;
+  commissionGrowth?: number;
+}
 
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
+interface Transaction {
+  _id: string;
+  transactionType: string;
+  amount: number;
+  status: string;
+  order?: any;
+  partner?: any;
+  user?: any;
+  description?: string;
+  createdAt: string;
+  metadata?: any;
+  commission?: {
+    amount: number;
+    rate: number;
+  };
+}
 
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const StatHeader = styled.div`
-  display: flex;
-  justify-content: between;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-
-const StatIcon = styled.div`
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.75rem;
-  background: ${(props: any) => props.color || '#f3f4f6'};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const StatContent = styled.div`
-  flex: 1;
-  margin-left: 1rem;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
-`;
-
-const StatChange = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: ${(props: any) => (props.positive ? '#10b981' : '#ef4444')};
-  margin-top: 0.5rem;
-`;
-
-const TabsContainer = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-  overflow: hidden;
-`;
-
-const TabsList = styled.div`
-  display: flex;
-  border-bottom: 1px solid #e5e7eb;
-`;
-
-const Tab = styled.button`
-  flex: 1;
-  padding: 1rem 1.5rem;
-  background: ${(props: any) => (props.active ? '#f9fafb' : 'white')};
-  border: none;
-  border-bottom: 2px solid ${(props: any) => (props.active ? '#10b981' : 'transparent')};
-  font-weight: ${(props: any) => (props.active ? '600' : '500')};
-  color: ${(props: any) => (props.active ? '#10b981' : '#6b7280')};
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f9fafb;
-  }
-`;
-
-const TabContent = styled.div`
-  padding: 2rem;
-`;
-
-const FilterSection = styled.div`
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  min-width: 300px;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
-`;
-
-const FilterButton = styled.button`
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #e5e7eb;
-  }
-`;
-
-const TableContainer = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHeader = styled.thead`
-  background: #f9fafb;
-`;
-
-const TableRow = styled.tr`
-  border-bottom: 1px solid #e5e7eb;
-
-  &:hover {
-    background: #f9fafb;
-  }
-`;
-
-const TableCell = styled.td`
-  padding: 1rem;
-  text-align: left;
-  font-size: 0.875rem;
-  color: #374151;
-`;
-
-const TableHeaderCell = styled.th`
-  padding: 1rem;
-  text-align: left;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: ${(props: any) => {
-    switch (props.status) {
-      case 'completed':
-        return '#d1fae5';
-      case 'pending':
-        return '#fef3c7';
-      case 'failed':
-        return '#fee2e2';
-      default:
-        return '#f3f4f6';
-    }
-  }};
-  color: ${(props: any) => {
-    switch (props.status) {
-      case 'completed':
-        return '#065f46';
-      case 'pending':
-        return '#92400e';
-      case 'failed':
-        return '#991b1b';
-      default:
-        return '#374151';
-    }
-  }};
-`;
-
-const IconButton = styled.button`
-  background: #f3f4f6;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #e5e7eb;
-  }
-`;
+interface CommissionSummary {
+  totalCommission: number;
+  totalOrders: number;
+  averageCommission: number;
+  commissionByPartner: Array<{
+    partner: any;
+    totalCommission: number;
+    orderCount: number;
+  }>;
+}
 
 const Finance = () => {
-  const [activeTab, setActiveTab] = useState('commission');
+  const [activeTab, setActiveTab] = useState('transactions');
   const [searchTerm, setSearchTerm] = useState('');
-  const [commissionData, setCommissionData] = useState([]);
-  const [walletData, setWalletData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<DashboardStats>({
+    totalRevenue: 0,
+    totalCommission: 0,
+    totalPayouts: 0,
+    pendingPayouts: 0,
+  });
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [commissionSummary, setCommissionSummary] = useState<CommissionSummary | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
 
   useEffect(() => {
-    // Mock data - replace with actual API call
-    const mockCommissionData = [
-      {
-        id: 1,
-        orderId: 'ORD-2024-001',
-        partner: 'TechMart Electronics',
-        amount: 2500,
-        commission: 250,
-        rate: '10%',
-        status: 'completed',
-        date: '2024-01-15',
-      },
-      {
-        id: 2,
-        orderId: 'ORD-2024-002',
-        partner: 'Mobile World',
-        amount: 1800,
-        commission: 180,
-        rate: '10%',
-        status: 'pending',
-        date: '2024-01-14',
-      },
-      {
-        id: 3,
-        orderId: 'ORD-2024-003',
-        partner: 'Gadget Hub',
-        amount: 3200,
-        commission: 320,
-        rate: '10%',
-        status: 'failed',
-        date: '2024-01-13',
-      },
-    ];
-
-    const mockWalletData = [
-      {
-        id: 1,
-        partner: 'TechMart Electronics',
-        balance: 15000,
-        pendingAmount: 2500,
-        lastPayout: '2024-01-10',
-        payoutAmount: 12000,
-        status: 'active',
-      },
-      {
-        id: 2,
-        partner: 'Mobile World',
-        balance: 8500,
-        pendingAmount: 1800,
-        lastPayout: '2024-01-08',
-        payoutAmount: 7500,
-        status: 'active',
-      },
-      {
-        id: 3,
-        partner: 'Gadget Hub',
-        balance: 22000,
-        pendingAmount: 3200,
-        lastPayout: '2024-01-12',
-        payoutAmount: 18000,
-        status: 'suspended',
-      },
-    ];
-
-    setTimeout(() => {
-      setCommissionData(mockCommissionData);
-      setWalletData(mockWalletData);
-      setLoading(false);
-    }, 1000);
+    fetchDashboardData();
   }, []);
 
-  const filteredCommissionData = commissionData.filter(
-    item =>
-      item.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.partner.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    if (activeTab === 'transactions') {
+      fetchTransactions();
+    } else if (activeTab === 'commission') {
+      fetchCommissionSummary();
+    }
+  }, [activeTab, currentPage, statusFilter, typeFilter, searchTerm]);
 
-  const filteredWalletData = walletData.filter(item =>
-    item.partner.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const totalCommission = commissionData.reduce((sum, item) => sum + item.commission, 0);
-  const totalWalletBalance = walletData.reduce((sum, item) => sum + item.balance, 0);
-  const totalPendingPayouts = walletData.reduce((sum, item) => sum + item.pendingAmount, 0);
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const response = await adminService.getFinancialDashboard();
+      // Map backend response to frontend stats
+      const overview = response.overview || {};
+      setStats({
+        totalRevenue: overview.totalRevenue || 0,
+        totalCommission: overview.totalCommission || 0,
+        totalPayouts: overview.processedAmount || 0,
+        pendingPayouts: overview.pendingAmount || 0,
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        page: currentPage,
+        limit: 10,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        type: typeFilter !== 'all' ? typeFilter : undefined,
+        search: searchTerm || undefined,
+      };
+      const response = await adminService.getFinancialTransactions(params);
+      setTransactions(response.transactions || response.data || []);
+      setTotalPages(response.pagination?.pages || 1);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCommissionSummary = async () => {
+    try {
+      setLoading(true);
+      const response = await adminService.getCommissionSummary();
+      // Map backend response to frontend format
+      const totals = response.totals || {};
+      const categoryBreakdown = response.categoryBreakdown || [];
+
+      setCommissionSummary({
+        totalCommission: totals.totalCommission || 0,
+        totalOrders: totals.transactionCount || 0,
+        averageCommission: totals.avgCommissionRate || 0,
+        commissionByPartner: categoryBreakdown.map((item: any) => ({
+          partner: item.partnerInfo || { shopName: 'Unknown' },
+          totalCommission: item.totalCommission || 0,
+          orderCount: item.count || 0,
+        })),
+      });
+    } catch (error) {
+      console.error('Error fetching commission summary:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'processed':
+      case 'completed':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'failed':
+        return 'bg-red-100 text-red-700 border-red-200';
+      case 'cancelled':
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'processed':
+      case 'completed':
+        return <CheckCircle className="w-3 h-3" />;
+      case 'pending':
+        return <Clock className="w-3 h-3" />;
+      case 'failed':
+        return <AlertCircle className="w-3 h-3" />;
+      default:
+        return <AlertCircle className="w-3 h-3" />;
+    }
+  };
 
   return (
-    <Container>
-      <Header>
-        <Title>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <CreditCard size={32} />
           Finance Management
-        </Title>
-        <ActionButton>
+        </h1>
+        <button className="bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5 transition-all">
           <Download size={20} />
           Export Report
-        </ActionButton>
-      </Header>
+        </button>
+      </div>
 
-      <StatsGrid>
-        <StatCard>
-          <StatHeader>
-            <StatIcon color="#10b981">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-xl shadow-sm hover:-translate-y-1 transition-all">
+          <div className="flex items-center gap-4">
+            <div className="bg-green-500 text-white p-4 rounded-xl">
               <DollarSign size={24} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>₹{totalCommission.toLocaleString()}</StatValue>
-              <StatLabel>Total Commission</StatLabel>
-              <StatChange positive>
-                <TrendingUp size={12} />
-                +12.5% from last month
-              </StatChange>
-            </StatContent>
-          </StatHeader>
-        </StatCard>
+            </div>
+            <div className="flex-1">
+              <div className="text-3xl font-bold text-gray-900">
+                {formatCurrency(stats.totalRevenue)}
+              </div>
+              <div className="text-sm text-gray-600">Total Revenue</div>
+              {stats.revenueGrowth !== undefined && (
+                <div className="flex items-center gap-1 text-xs font-semibold text-green-600 mt-1">
+                  <TrendingUp size={12} />+{stats.revenueGrowth}% from last month
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatHeader>
-            <StatIcon color="#8b5cf6">
+        <div className="bg-white p-6 rounded-xl shadow-sm hover:-translate-y-1 transition-all">
+          <div className="flex items-center gap-4">
+            <div className="bg-purple-500 text-white p-4 rounded-xl">
               <Wallet size={24} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>₹{totalWalletBalance.toLocaleString()}</StatValue>
-              <StatLabel>Total Wallet Balance</StatLabel>
-              <StatChange positive>
-                <TrendingUp size={12} />
-                +8.3% from last month
-              </StatChange>
-            </StatContent>
-          </StatHeader>
-        </StatCard>
+            </div>
+            <div className="flex-1">
+              <div className="text-3xl font-bold text-gray-900">
+                {formatCurrency(stats.totalCommission)}
+              </div>
+              <div className="text-sm text-gray-600">Total Commission</div>
+              {stats.commissionGrowth !== undefined && (
+                <div className="flex items-center gap-1 text-xs font-semibold text-green-600 mt-1">
+                  <TrendingUp size={12} />+{stats.commissionGrowth}% from last month
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatHeader>
-            <StatIcon color="#f59e0b">
+        <div className="bg-white p-6 rounded-xl shadow-sm hover:-translate-y-1 transition-all">
+          <div className="flex items-center gap-4">
+            <div className="bg-amber-500 text-white p-4 rounded-xl">
               <ArrowUpRight size={24} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>₹{totalPendingPayouts.toLocaleString()}</StatValue>
-              <StatLabel>Pending Payouts</StatLabel>
-              <StatChange>
-                <TrendingDown size={12} />
-                -5.2% from last month
-              </StatChange>
-            </StatContent>
-          </StatHeader>
-        </StatCard>
+            </div>
+            <div className="flex-1">
+              <div className="text-3xl font-bold text-gray-900">
+                {formatCurrency(stats.pendingPayouts)}
+              </div>
+              <div className="text-sm text-gray-600">Pending Payouts</div>
+            </div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatHeader>
-            <StatIcon color="#ef4444">
+        <div className="bg-white p-6 rounded-xl shadow-sm hover:-translate-y-1 transition-all">
+          <div className="flex items-center gap-4">
+            <div className="bg-red-500 text-white p-4 rounded-xl">
               <ArrowDownLeft size={24} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>₹45,000</StatValue>
-              <StatLabel>Monthly Payouts</StatLabel>
-              <StatChange positive>
-                <TrendingUp size={12} />
-                +15.7% from last month
-              </StatChange>
-            </StatContent>
-          </StatHeader>
-        </StatCard>
-      </StatsGrid>
+            </div>
+            <div className="flex-1">
+              <div className="text-3xl font-bold text-gray-900">
+                {formatCurrency(stats.totalPayouts)}
+              </div>
+              <div className="text-sm text-gray-600">Total Payouts</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <TabsContainer>
-        <TabsList>
-          <Tab active={activeTab === 'commission'} onClick={() => setActiveTab('commission')}>
-            Commission Rules
-          </Tab>
-          <Tab active={activeTab === 'wallet'} onClick={() => setActiveTab('wallet')}>
-            Wallet & Payouts
-          </Tab>
-        </TabsList>
+      {/* Tabs */}
+      <div className="bg-white rounded-xl shadow-sm mb-8 overflow-hidden">
+        <div className="flex border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('transactions')}
+            className={`flex-1 px-6 py-4 font-semibold transition-all ${
+              activeTab === 'transactions'
+                ? 'bg-gray-50 text-green-600 border-b-2 border-green-600'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Transactions
+          </button>
+          <button
+            onClick={() => setActiveTab('commission')}
+            className={`flex-1 px-6 py-4 font-semibold transition-all ${
+              activeTab === 'commission'
+                ? 'bg-gray-50 text-green-600 border-b-2 border-green-600'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Commission Summary
+          </button>
+        </div>
 
-        <TabContent>
-          <FilterSection>
-            <SearchInput
-              type="text"
-              placeholder={
-                activeTab === 'commission'
-                  ? 'Search by order ID or partner...'
-                  : 'Search by partner...'
-              }
-              value={searchTerm}
-              onChange={(e: any) => setSearchTerm(e.target.value)}
-            />
-            <FilterButton>
-              <Filter size={16} />
-              Filters
-            </FilterButton>
-            <FilterButton>
-              <Calendar size={16} />
-              Date Range
-            </FilterButton>
-          </FilterSection>
+        <div className="p-6">
+          {/* Filters */}
+          {activeTab === 'transactions' && (
+            <div className="flex gap-4 flex-wrap items-center mb-6">
+              <div className="relative flex-1 min-w-[300px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search transactions..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
 
-          {loading ? (
-            <LoadingSpinner size="lg" text="Loading financial data..." />
-          ) : (
-            <TableContainer>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    {activeTab === 'commission' ? (
-                      <>
-                        <TableHeaderCell>Order ID</TableHeaderCell>
-                        <TableHeaderCell>Partner</TableHeaderCell>
-                        <TableHeaderCell>Order Amount</TableHeaderCell>
-                        <TableHeaderCell>Commission</TableHeaderCell>
-                        <TableHeaderCell>Rate</TableHeaderCell>
-                        <TableHeaderCell>Status</TableHeaderCell>
-                        <TableHeaderCell>Date</TableHeaderCell>
-                        <TableHeaderCell>Actions</TableHeaderCell>
-                      </>
-                    ) : (
-                      <>
-                        <TableHeaderCell>Partner</TableHeaderCell>
-                        <TableHeaderCell>Wallet Balance</TableHeaderCell>
-                        <TableHeaderCell>Pending Amount</TableHeaderCell>
-                        <TableHeaderCell>Last Payout</TableHeaderCell>
-                        <TableHeaderCell>Payout Amount</TableHeaderCell>
-                        <TableHeaderCell>Status</TableHeaderCell>
-                        <TableHeaderCell>Actions</TableHeaderCell>
-                      </>
-                    )}
-                  </TableRow>
-                </TableHeader>
-                <tbody>
-                  {activeTab === 'commission' ? (
-                    filteredCommissionData.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan="8" style={{ textAlign: 'center', padding: '2rem' }}>
-                          No commission data found
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredCommissionData.map(item => (
-                        <TableRow key={item.id}>
-                          <TableCell>{item.orderId}</TableCell>
-                          <TableCell>{item.partner}</TableCell>
-                          <TableCell>₹{item.amount.toLocaleString()}</TableCell>
-                          <TableCell>₹{item.commission.toLocaleString()}</TableCell>
-                          <TableCell>{item.rate}</TableCell>
-                          <TableCell>
-                            <StatusBadge status={item.status}>
-                              {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                            </StatusBadge>
-                          </TableCell>
-                          <TableCell>{item.date}</TableCell>
-                          <TableCell>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                              <IconButton>
-                                <Eye size={14} />
-                              </IconButton>
-                              <IconButton>
-                                <FileText size={14} />
-                              </IconButton>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )
-                  ) : filteredWalletData.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
-                        No wallet data found
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredWalletData.map(item => (
-                      <TableRow key={item.id}>
-                        <TableCell>{item.partner}</TableCell>
-                        <TableCell>₹{item.balance.toLocaleString()}</TableCell>
-                        <TableCell>₹{item.pendingAmount.toLocaleString()}</TableCell>
-                        <TableCell>{item.lastPayout}</TableCell>
-                        <TableCell>₹{item.payoutAmount.toLocaleString()}</TableCell>
-                        <TableCell>
-                          <StatusBadge status={item.status}>
-                            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                          </StatusBadge>
-                        </TableCell>
-                        <TableCell>
-                          <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <IconButton>
-                              <Eye size={14} />
-                            </IconButton>
-                            <IconButton>
-                              <ArrowUpRight size={14} />
-                            </IconButton>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </tbody>
-              </Table>
-            </TableContainer>
+              <select
+                value={typeFilter}
+                onChange={e => setTypeFilter(e.target.value)}
+                className="px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white min-w-[150px] focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="all">All Types</option>
+                <option value="commission">Commission</option>
+                <option value="payment">Payment</option>
+                <option value="refund">Refund</option>
+                <option value="adjustment">Adjustment</option>
+                <option value="withdrawal">Withdrawal</option>
+              </select>
+
+              <select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+                className="px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white min-w-[150px] focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="processed">Processed</option>
+                <option value="failed">Failed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+
+              <button
+                onClick={fetchTransactions}
+                className="px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white hover:bg-gray-50 transition-colors flex items-center gap-2"
+              >
+                <RefreshCw size={16} />
+                Refresh
+              </button>
+            </div>
           )}
-        </TabContent>
-      </TabsContainer>
-    </Container>
+
+          {/* Content */}
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <RefreshCw className="w-12 h-12 animate-spin text-green-600 mb-4" />
+              <p className="text-gray-600">Loading financial data...</p>
+            </div>
+          ) : activeTab === 'transactions' ? (
+            <>
+              <div className="overflow-x-auto">
+                {transactions.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16">
+                    <FileText size={48} className="text-gray-400 mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      No transactions found
+                    </h3>
+                    <p className="text-sm text-gray-500">Try adjusting your search criteria.</p>
+                  </div>
+                ) : (
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Type
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Amount
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Partner/User
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Description
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {transactions.map(transaction => (
+                        <tr key={transaction._id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 capitalize">
+                              {transaction.transactionType}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="font-semibold text-gray-900">
+                              {formatCurrency(transaction.amount)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900">
+                              {transaction.partner?.businessName ||
+                                transaction.partner?.shopName ||
+                                transaction.user?.name ||
+                                'N/A'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-600 max-w-xs truncate">
+                              {transaction.description || 'No description'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(
+                                transaction.status
+                              )}`}
+                            >
+                              {getStatusIcon(transaction.status)}
+                              {transaction.status.charAt(0).toUpperCase() +
+                                transaction.status.slice(1)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-600">
+                              {formatDate(transaction.createdAt)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <button className="p-2 rounded-lg hover:bg-blue-100 text-blue-600 transition-colors">
+                                <Eye className="w-4 h-4" />
+                              </button>
+                              <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
+                                <FileText className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+
+              {/* Pagination */}
+              {transactions.length > 0 && (
+                <div className="mt-6 flex items-center justify-between">
+                  <div className="text-sm text-gray-600">
+                    Page {currentPage} of {totalPages}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(prev => prev - 1)}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(prev => prev + 1)}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="space-y-6">
+              {commissionSummary ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
+                      <div className="text-sm text-green-700 font-medium mb-2">
+                        Total Commission
+                      </div>
+                      <div className="text-3xl font-bold text-green-900">
+                        {formatCurrency(commissionSummary.totalCommission)}
+                      </div>
+                    </div>
+                    <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                      <div className="text-sm text-blue-700 font-medium mb-2">Total Orders</div>
+                      <div className="text-3xl font-bold text-blue-900">
+                        {commissionSummary.totalOrders}
+                      </div>
+                    </div>
+                    <div className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+                      <div className="text-sm text-purple-700 font-medium mb-2">
+                        Average Commission
+                      </div>
+                      <div className="text-3xl font-bold text-purple-900">
+                        {formatCurrency(commissionSummary.averageCommission)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      Commission by Partner
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              Partner
+                            </th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              Total Commission
+                            </th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              Order Count
+                            </th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                              Avg per Order
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {commissionSummary.commissionByPartner.map((item, index) => (
+                            <tr key={index} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-6 py-4">
+                                <div className="font-medium text-gray-900">
+                                  {item.partner?.businessName || item.partner?.shopName || 'N/A'}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="font-semibold text-green-600">
+                                  {formatCurrency(item.totalCommission)}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="text-gray-900">{item.orderCount}</div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="text-gray-600">
+                                  {formatCurrency(item.totalCommission / item.orderCount)}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16">
+                  <FileText size={48} className="text-gray-400 mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    No commission data available
+                  </h3>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

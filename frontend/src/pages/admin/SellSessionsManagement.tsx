@@ -44,9 +44,10 @@ const SellSessionsManagement = () => {
     sessions: hookSessions,
     loading: hookLoading,
     createSession,
-    getUserSessions,
+    getAllSessions,
     deleteSession,
     extendSession,
+    updateSessionStatus,
     cleanExpiredSessions,
   } = useSellSessions();
 
@@ -62,6 +63,7 @@ const SellSessionsManagement = () => {
   const { accessories, loading: accessoriesLoading, fetchAccessories } = useSellAccessories();
 
   const [sessions, setSessions] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, pages: 0 });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -69,6 +71,7 @@ const SellSessionsManagement = () => {
   const [dateFilter, setDateFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [viewingSession, setViewingSession] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createFormData, setCreateFormData] = useState({
     productId: '',
@@ -78,132 +81,81 @@ const SellSessionsManagement = () => {
     accessories: [],
   });
 
+  // Fetch sessions from API
+  const fetchSessions = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm,
+        status: statusFilter,
+        deviceType: deviceFilter !== 'all' ? deviceFilter : undefined,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+      };
+
+      const response = await getAllSessions(params);
+      setSessions(response.data || []);
+      setPagination(response.pagination || { page: 1, limit: 10, total: 0, pages: 0 });
+    } catch (error) {
+      console.error('Error fetching sessions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    getUserSessions();
+    fetchSessions();
+  }, [currentPage, itemsPerPage, statusFilter, deviceFilter]);
+
+  useEffect(() => {
     fetchProducts();
     fetchDefects();
     fetchAccessories();
   }, []);
 
-  const mockSessions = [
-    {
-      id: 'SES001',
-      userId: 'USR123',
-      userName: 'John Doe',
-      userPhone: '+91 9876543210',
-      userEmail: 'john@example.com',
-      deviceType: 'Mobile',
-      deviceBrand: 'Apple',
-      deviceModel: 'iPhone 13 Pro',
-      deviceCondition: 'Good',
-      offerPrice: 45000,
-      finalPrice: 42000,
-      status: 'active',
-      createdAt: '2024-01-20T10:30:00Z',
-      expiresAt: '2024-01-27T10:30:00Z',
-      updatedAt: '2024-01-22T14:20:00Z',
-      sessionDuration: '2 days',
-      pickupScheduled: true,
-      pickupDate: '2024-01-25',
-      notes: 'Customer interested, follow up required',
-    },
-    {
-      id: 'SES002',
-      userId: 'USR124',
-      userName: 'Jane Smith',
-      userPhone: '+91 9876543211',
-      userEmail: 'jane@example.com',
-      deviceType: 'Laptop',
-      deviceBrand: 'Dell',
-      deviceModel: 'XPS 13',
-      deviceCondition: 'Excellent',
-      offerPrice: 55000,
-      finalPrice: 55000,
-      status: 'completed',
-      createdAt: '2024-01-18T09:15:00Z',
-      expiresAt: '2024-01-25T09:15:00Z',
-      updatedAt: '2024-01-24T16:45:00Z',
-      sessionDuration: '6 days',
-      pickupScheduled: true,
-      pickupDate: '2024-01-24',
-      notes: 'Deal completed successfully',
-    },
-    {
-      id: 'SES003',
-      userId: 'USR125',
-      userName: 'Mike Johnson',
-      userPhone: '+91 9876543212',
-      userEmail: 'mike@example.com',
-      deviceType: 'Tablet',
-      deviceBrand: 'Samsung',
-      deviceModel: 'Galaxy Tab S8',
-      deviceCondition: 'Fair',
-      offerPrice: 25000,
-      finalPrice: 0,
-      status: 'expired',
-      createdAt: '2024-01-15T14:20:00Z',
-      expiresAt: '2024-01-22T14:20:00Z',
-      updatedAt: '2024-01-22T14:20:00Z',
-      sessionDuration: '7 days',
-      pickupScheduled: false,
-      pickupDate: null,
-      notes: 'Customer did not respond',
-    },
-    {
-      id: 'SES004',
-      userId: 'USR126',
-      userName: 'Sarah Wilson',
-      userPhone: '+91 9876543213',
-      userEmail: 'sarah@example.com',
-      deviceType: 'Mobile',
-      deviceBrand: 'Samsung',
-      deviceModel: 'Galaxy S22',
-      deviceCondition: 'Good',
-      offerPrice: 35000,
-      finalPrice: 33000,
-      status: 'pending',
-      createdAt: '2024-01-21T11:45:00Z',
-      expiresAt: '2024-01-28T11:45:00Z',
-      updatedAt: '2024-01-23T09:30:00Z',
-      sessionDuration: '1 day',
-      pickupScheduled: false,
-      pickupDate: null,
-      notes: 'Waiting for customer confirmation',
-    },
-  ];
-
+  // Debounced search
   useEffect(() => {
-    setTimeout(() => {
-      setSessions(mockSessions);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const timer = setTimeout(() => {
+      if (currentPage === 1) {
+        fetchSessions();
+      } else {
+        setCurrentPage(1);
+      }
+    }, 500);
 
-  const filteredSessions = sessions.filter(session => {
-    const matchesSearch =
-      session.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      session.deviceModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      session.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || session.status === statusFilter;
-    const matchesDevice = deviceFilter === 'all' || session.deviceType === deviceFilter;
-    return matchesSearch && matchesStatus && matchesDevice;
-  });
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  const totalPages = Math.ceil(filteredSessions.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedSessions = filteredSessions.slice(startIndex, endIndex);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, statusFilter, deviceFilter, dateFilter]);
-
+  // Calculate stats from sessions
   const stats = {
-    totalSessions: sessions.length,
-    activeSessions: sessions.filter(s => s.status === 'active').length,
-    completedSessions: sessions.filter(s => s.status === 'completed').length,
-    expiredSessions: sessions.filter(s => s.status === 'expired').length,
+    totalSessions: pagination.total || sessions.length,
+    activeSessions: sessions.filter(s => {
+      const now = new Date();
+      const expiresAt = new Date(s.expiresAt);
+      return s.isActive && expiresAt > now;
+    }).length,
+    completedSessions: sessions.filter(s => !s.isActive).length,
+    expiredSessions: sessions.filter(s => {
+      const now = new Date();
+      const expiresAt = new Date(s.expiresAt);
+      return expiresAt < now;
+    }).length,
   };
+
+  const getSessionStatus = (session: any) => {
+    const now = new Date();
+    const expiresAt = new Date(session.expiresAt);
+
+    if (!session.isActive) return 'completed';
+    if (expiresAt < now) return 'expired';
+    return 'active';
+  };
+
+  const totalPages = pagination.pages || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, pagination.total || sessions.length);
 
   const getStatusIcon = (status: any) => {
     switch (status) {
@@ -300,7 +252,7 @@ const SellSessionsManagement = () => {
       if (result) {
         alert('Session created successfully!');
         handleCloseCreateModal();
-        getUserSessions();
+        fetchSessions();
       }
     } catch (error) {
       console.error('Error creating session:', error);
@@ -339,11 +291,28 @@ const SellSessionsManagement = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm">
-              <Download size={18} />
-              <span className="hidden sm:inline">Export</span>
+            <button
+              onClick={async () => {
+                if (confirm('Clean up all expired sessions?')) {
+                  try {
+                    const result = await cleanExpiredSessions();
+                    alert(result.message);
+                    fetchSessions();
+                  } catch (error) {
+                    console.error('Error cleaning sessions:', error);
+                    alert('Failed to clean expired sessions');
+                  }
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm"
+            >
+              <Settings size={18} />
+              <span className="hidden sm:inline">Cleanup</span>
             </button>
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm">
+            <button
+              onClick={fetchSessions}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm"
+            >
               <RefreshCw size={18} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
@@ -494,11 +463,10 @@ const SellSessionsManagement = () => {
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                Sessions ({filteredSessions.length})
+                Sessions ({pagination.total || sessions.length})
               </h2>
               <p className="text-sm text-gray-600 mt-1">
-                {filteredSessions.length !== sessions.length &&
-                  `Filtered from ${sessions.length} total sessions`}
+                Showing {sessions.length} sessions on this page
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -547,85 +515,130 @@ const SellSessionsManagement = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {paginatedSessions.map(session => (
-                  <tr
-                    key={session.id}
-                    className="hover:bg-blue-50/50 transition-colors duration-150"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-gray-900">{session.id}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
-                          {session.userName.charAt(0)}
+                {sessions.map(session => {
+                  const status = getSessionStatus(session);
+                  const userName = session.userId?.name || 'Guest User';
+                  const userPhone = session.userId?.phone || 'N/A';
+                  const productName = session.productId?.name || 'Unknown Product';
+                  const variantLabel = session.variant?.label || 'Unknown Variant';
+
+                  return (
+                    <tr
+                      key={session._id}
+                      className="hover:bg-blue-50/50 transition-colors duration-150"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="font-semibold text-gray-900 font-mono text-xs">
+                          {session._id.slice(-8)}
                         </div>
-                        <div>
-                          <div className="font-semibold text-gray-900">{session.userName}</div>
-                          <div className="text-sm text-gray-500 flex items-center gap-1">
-                            <Phone size={12} />
-                            {session.userPhone}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                            {userName.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-900">{userName}</div>
+                            <div className="text-sm text-gray-500 flex items-center gap-1">
+                              <Phone size={12} />
+                              {userPhone}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
-                          <Package size={20} className="text-gray-600" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {session.deviceBrand} {session.deviceModel}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+                            <Package size={20} className="text-gray-600" />
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {session.deviceType} • {session.deviceCondition}
+                          <div>
+                            <div className="font-semibold text-gray-900">{productName}</div>
+                            <div className="text-sm text-gray-500">{variantLabel}</div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                        <DollarSign size={16} />₹{session.offerPrice.toLocaleString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 text-lg font-bold text-gray-900">
-                        {session.finalPrice > 0 ? (
-                          <>
-                            <DollarSign size={16} />₹{session.finalPrice.toLocaleString()}
-                          </>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(session.status)}`}
-                      >
-                        {getStatusIcon(session.status)}
-                        {session.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
-                        <Calendar size={14} />
-                        {session.sessionDuration}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-600">
-                        {new Date(session.expiresAt).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-150 text-gray-600 hover:text-gray-900">
-                        <MoreVertical size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1 text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                          ₹{session.basePrice?.toLocaleString() || 0}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1 text-lg font-bold text-gray-900">
+                          ₹{session.finalPrice?.toLocaleString() || 0}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(status)}`}
+                        >
+                          {getStatusIcon(status)}
+                          {status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1 text-sm text-gray-600">
+                          <Calendar size={14} />
+                          {Math.ceil(
+                            (new Date(session.expiresAt).getTime() -
+                              new Date(session.createdAt).getTime()) /
+                              (1000 * 60 * 60 * 24)
+                          )}{' '}
+                          days
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-600">
+                          {new Date(session.expiresAt).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setViewingSession(session)}
+                            className="p-2 hover:bg-blue-100 rounded-lg transition-colors duration-150 text-blue-600 hover:text-blue-700"
+                            title="View Details"
+                          >
+                            <Activity size={16} />
+                          </button>
+                          {status === 'active' && (
+                            <button
+                              onClick={async () => {
+                                if (confirm('Mark this session as completed?')) {
+                                  try {
+                                    await updateSessionStatus(session._id, false);
+                                    fetchSessions();
+                                  } catch (error) {
+                                    console.error('Error updating status:', error);
+                                  }
+                                }
+                              }}
+                              className="p-2 hover:bg-green-100 rounded-lg transition-colors duration-150 text-green-600 hover:text-green-700"
+                              title="Mark as Completed"
+                            >
+                              <CheckCircle size={16} />
+                            </button>
+                          )}
+                          <button
+                            onClick={async () => {
+                              if (confirm('Delete this session?')) {
+                                try {
+                                  await deleteSession(session._id);
+                                  fetchSessions();
+                                } catch (error) {
+                                  console.error('Error deleting session:', error);
+                                }
+                              }
+                            }}
+                            className="p-2 hover:bg-red-100 rounded-lg transition-colors duration-150 text-red-600 hover:text-red-700"
+                            title="Delete Session"
+                          >
+                            <XCircle size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -633,8 +646,8 @@ const SellSessionsManagement = () => {
           {/* Pagination */}
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="text-sm text-gray-600">
-              Showing {startIndex + 1} to {Math.min(endIndex, filteredSessions.length)} of{' '}
-              {filteredSessions.length} sessions
+              Showing {startIndex + 1} to {endIndex} of {pagination.total || sessions.length}{' '}
+              sessions
             </div>
 
             <div className="flex items-center gap-3">
@@ -806,7 +819,7 @@ const SellSessionsManagement = () => {
                     }
                   }}
                   placeholder='{"condition": "excellent", "accessories": ["charger", "box"]}'
-                  rows="4"
+                  rows={4}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 font-mono text-sm"
                 />
                 <p className="text-xs text-gray-500">Enter answers as JSON object (optional)</p>
@@ -946,6 +959,199 @@ const SellSessionsManagement = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* View Session Modal */}
+      {viewingSession && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setViewingSession(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <Activity className="text-blue-600" size={24} />
+                  Session Details
+                </h2>
+                <p className="text-sm text-gray-600 mt-1 font-mono">ID: {viewingSession._id}</p>
+              </div>
+              <button
+                onClick={() => setViewingSession(null)}
+                className="p-2 hover:bg-white rounded-lg transition-colors duration-150 text-gray-600 hover:text-gray-900"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Customer Info */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <User size={20} className="text-blue-600" />
+                  Customer Information
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Name</p>
+                    <p className="font-semibold text-gray-900">
+                      {viewingSession.userId?.name || 'Guest User'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Email</p>
+                    <p className="font-semibold text-gray-900">
+                      {viewingSession.userId?.email || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Phone</p>
+                    <p className="font-semibold text-gray-900">
+                      {viewingSession.userId?.phone || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Status</p>
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(getSessionStatus(viewingSession))}`}
+                    >
+                      {getStatusIcon(getSessionStatus(viewingSession))}
+                      {getSessionStatus(viewingSession)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Info */}
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-100">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <ShoppingBag size={20} className="text-emerald-600" />
+                  Product Information
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Product</p>
+                    <p className="font-semibold text-gray-900">
+                      {viewingSession.productId?.name || 'Unknown'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Variant</p>
+                    <p className="font-semibold text-gray-900">
+                      {viewingSession.variant?.label || 'Unknown'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Base Price</p>
+                    <p className="font-semibold text-gray-900">
+                      ₹{viewingSession.basePrice?.toLocaleString() || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Final Price</p>
+                    <p className="font-bold text-xl text-emerald-600">
+                      ₹{viewingSession.finalPrice?.toLocaleString() || 0}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Price Breakdown */}
+              {viewingSession.breakdown && viewingSession.breakdown.length > 0 && (
+                <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-100">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <DollarSign size={20} className="text-amber-600" />
+                    Price Breakdown
+                  </h3>
+                  <div className="space-y-2">
+                    {viewingSession.breakdown.map((item: any, index: number) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between py-2 border-b border-amber-200 last:border-0"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-700">{item.label}</span>
+                          <span className="text-xs px-2 py-0.5 bg-white rounded-full text-gray-600">
+                            {item.type}
+                          </span>
+                        </div>
+                        <span
+                          className={`font-semibold ${item.delta >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
+                        >
+                          {item.delta >= 0 ? '+' : ''}₹{item.delta.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Session Timeline */}
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Clock size={20} className="text-purple-600" />
+                  Timeline
+                </h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Created</p>
+                    <p className="font-semibold text-gray-900">
+                      {new Date(viewingSession.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Last Updated</p>
+                    <p className="font-semibold text-gray-900">
+                      {new Date(viewingSession.updatedAt).toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Expires</p>
+                    <p className="font-semibold text-gray-900">
+                      {new Date(viewingSession.expiresAt).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Assessment Data */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                  <p className="text-sm text-gray-600 mb-2">Answers</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {viewingSession.answers instanceof Map
+                      ? viewingSession.answers.size
+                      : Object.keys(viewingSession.answers || {}).length}
+                  </p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                  <p className="text-sm text-gray-600 mb-2">Defects</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {viewingSession.defects?.length || 0}
+                  </p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                  <p className="text-sm text-gray-600 mb-2">Accessories</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {viewingSession.accessories?.length || 0}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setViewingSession(null)}
+                className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-white transition-all duration-200 font-medium"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

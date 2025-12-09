@@ -44,13 +44,17 @@ const SellQuestionsManagement = () => {
   const [selectedType, setSelectedType] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedSection, setSelectedSection] = useState('');
   const [sortBy, setSortBy] = useState('order');
   const [sortOrder, setSortOrder] = useState('asc');
   const [viewMode, setViewMode] = useState('grid');
   const [currentPage, setCurrentPage] = useState(1);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'create' | 'edit' | 'view'>('create');
+  const [showModal, setShowModal] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
 
   // Question types aligned with schema
   const questionTypes = [
@@ -62,13 +66,33 @@ const SellQuestionsManagement = () => {
     { id: 'toggle', name: 'Toggle' },
   ];
 
-  // Fetch categories
+  // Fetch categories (flatten from super categories)
   const fetchCategories = async () => {
     try {
-      const response = await adminService.getCategories();
-      setCategories(response.data || []);
+      const response = await adminService.getSellSuperCategories();
+      const superCategories = response.data || [];
+
+      // Flatten all categories from all super categories
+      const allCategories: any[] = [];
+      superCategories.forEach((superCat: any) => {
+        if (superCat.categories && Array.isArray(superCat.categories)) {
+          allCategories.push(...superCat.categories);
+        }
+      });
+
+      setCategories(allCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
+    }
+  };
+
+  // Fetch products
+  const fetchProducts = async () => {
+    try {
+      const response = await adminService.getSellProducts({ limit: 1000 });
+      setProducts(response.data || response.products || []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
     }
   };
 
@@ -106,6 +130,7 @@ const SellQuestionsManagement = () => {
 
   useEffect(() => {
     fetchCategories();
+    fetchProducts();
     fetchQuestions();
   }, [currentPage, sortBy, sortOrder]);
 
@@ -116,6 +141,7 @@ const SellQuestionsManagement = () => {
         uiType: selectedType,
         isActive: selectedStatus ? selectedStatus === 'active' : undefined,
         categoryId: selectedCategory,
+        section: selectedSection,
         sortBy,
         sortOrder,
       };
@@ -131,13 +157,17 @@ const SellQuestionsManagement = () => {
   };
 
   const handleAddQuestion = () => {
+    setModalType('create');
     setSelectedQuestion(null);
     setIsQuestionModalOpen(true);
+    setShowModal(true);
   };
 
   const handleEditQuestion = (question: any) => {
+    setModalType('edit');
     setSelectedQuestion(question);
     setIsQuestionModalOpen(true);
+    setShowModal(true);
   };
 
   const handleSaveQuestion = async (questionData: any) => {
@@ -148,6 +178,7 @@ const SellQuestionsManagement = () => {
         await createQuestion(questionData);
       }
       setIsQuestionModalOpen(false);
+      setShowModal(false);
       setSelectedQuestion(null);
       fetchQuestions();
     } catch (error) {
@@ -158,6 +189,7 @@ const SellQuestionsManagement = () => {
 
   const handleCloseModal = () => {
     setIsQuestionModalOpen(false);
+    setShowModal(false);
     setSelectedQuestion(null);
   };
 
@@ -186,27 +218,56 @@ const SellQuestionsManagement = () => {
   const handleReorder = async (questionId: any, direction: any) => {
     try {
       const currentIndex = questions.findIndex(q => q._id === questionId);
-      const newOrder =
-        direction === 'up' ? questions[currentIndex].order - 1 : questions[currentIndex].order + 1;
+      if (currentIndex === -1) return;
 
-      if (newOrder >= 1 && newOrder <= questions.length) {
-        const otherQuestion = questions.find(
-          q =>
-            q.order === newOrder &&
-            q.section === questions[currentIndex].section &&
-            (q.categoryId?._id || q.categoryId) ===
-              (questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId)
-        );
-        if (otherQuestion) {
-          await reorderQuestions({
-            categoryId:
-              questions[currentIndex].categoryId?._id || questions[currentIndex].categoryId,
-            section: questions[currentIndex].section,
-            questionIds: [questionId, otherQuestion._id],
-          });
+      const currentQuestion = questions[currentIndex];
+      const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+      // Check bounds
+      if (targetIndex < 0 || targetIndex >= questions.length) return;
+
+      const targetQuestion = questions[targetIndex];
+
+      // Extract category IDs for comparison
+      const extractCategoryId = (q: any) => {
+        if (!q.categoryId) return null;
+        if (typeof q.categoryId === 'object' && q.categoryId._id) {
+          return q.categoryId._id;
         }
-        fetchQuestions();
+        return q.categoryId;
+      };
+
+      const currentCategoryId = extractCategoryId(currentQuestion);
+      const targetCategoryId = extractCategoryId(targetQuestion);
+
+      // Verify both questions are in the same section and category
+      if (
+        currentQuestion.section !== targetQuestion.section ||
+        currentCategoryId !== targetCategoryId
+      ) {
+        console.log('Cannot reorder: questions are in different sections or categories', {
+          current: {
+            section: currentQuestion.section,
+            categoryId: currentCategoryId,
+            title: currentQuestion.title,
+          },
+          target: {
+            section: targetQuestion.section,
+            categoryId: targetCategoryId,
+            title: targetQuestion.title,
+          },
+        });
+        return;
       }
+
+      // Swap the two questions
+      await reorderQuestions({
+        categoryId: currentCategoryId,
+        section: currentQuestion.section,
+        questionIds: [currentQuestion._id, targetQuestion._id],
+      });
+
+      fetchQuestions();
     } catch (error) {
       console.error('Error reordering questions:', error);
     }
@@ -224,8 +285,8 @@ const SellQuestionsManagement = () => {
     return colors[type] || 'bg-gray-100 text-gray-800';
   };
   const renderQuestionCard = (question: any) => (
-    <Card key={question._id} hoverable className="flex flex-col h-full transition-all duration-200">
-      <Card.Header divider className="bg-gray-50">
+    <Card key={question._id} className="flex flex-col h-full transition-all duration-200">
+      <Card.Header className="bg-gray-50">
         <div className="flex justify-between items-start gap-4">
           <div className="flex-1 min-w-0">
             <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
@@ -235,8 +296,10 @@ const SellQuestionsManagement = () => {
               <span className="font-medium">Order: {question.order}</span>
               <span>•</span>
               <span className="truncate">
-                {question.categoryId?.name || question.categoryId || 'Unknown'}
+                {question.categoryId?.displayName || question.categoryId?.name || 'No Category'}
               </span>
+              <span>•</span>
+              <span className="font-medium capitalize">{question.section || 'No Section'}</span>
               <span>•</span>
               <span>{getDisplayOptions(question).length} options</span>
             </div>
@@ -305,10 +368,15 @@ const SellQuestionsManagement = () => {
           </div>
         )}
       </Card.Body>
-      <Card.Footer divider className="bg-gray-50">
+      <Card.Footer className="bg-gray-50">
         <div className="flex gap-2">
           <button
-            onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
+            onClick={() => {
+              setModalType('view');
+              setSelectedQuestion(question);
+              setIsQuestionModalOpen(true);
+              setShowModal(true);
+            }}
             className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
           >
             <Eye size={14} />
@@ -432,8 +500,13 @@ const SellQuestionsManagement = () => {
                     deriveType(question)}
                 </span>
               </td>
-              <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
-                {question.categoryId?.name || question.categoryId || 'Unknown'}
+              <td className="px-4 py-3 border-b border-gray-200">
+                <div className="text-gray-700">
+                  {question.categoryId?.displayName || question.categoryId?.name || 'No Category'}
+                </div>
+                <div className="text-xs text-gray-500 capitalize mt-1">
+                  {question.section || 'No Section'}
+                </div>
               </td>
               <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
                 {getDisplayOptions(question).length}
@@ -453,7 +526,12 @@ const SellQuestionsManagement = () => {
               <td className="px-4 py-3 border-b border-gray-200">
                 <div className="flex gap-2">
                   <button
-                    onClick={() => window.open(`/admin/sell-questions/${question._id}`, '_blank')}
+                    onClick={() => {
+                      setModalType('view');
+                      setSelectedQuestion(question);
+                      setIsQuestionModalOpen(true);
+                      setShowModal(true);
+                    }}
                     className="p-2 border border-gray-300 rounded bg-white hover:bg-gray-50 hover:border-amber-500 hover:text-amber-600 transition-colors"
                     title="View"
                   >
@@ -645,9 +723,25 @@ const SellQuestionsManagement = () => {
             <option value="">All Categories</option>
             {categories.map(category => (
               <option key={category._id} value={category._id}>
-                {category.name}
+                {category.displayName || category.name}
               </option>
             ))}
+          </select>
+
+          {/* Section Filter */}
+          <select
+            value={selectedSection}
+            onChange={e => setSelectedSection(e.target.value)}
+            className="px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+          >
+            <option value="">All Sections</option>
+            <option value="Physical Condition">Physical Condition</option>
+            <option value="Performance">Performance</option>
+            <option value="Damage History">Damage History</option>
+            <option value="screen">Screen</option>
+            <option value="functionality">Functionality</option>
+            <option value="accessories">Accessories</option>
+            <option value="warranty">Warranty</option>
           </select>
 
           {/* Status Filter */}
@@ -736,7 +830,9 @@ const SellQuestionsManagement = () => {
         onSave={handleSaveQuestion}
         loading={loading}
         categories={categories}
+        products={products}
         selectedCategoryId={selectedCategory}
+        mode={modalType}
       />
     </div>
   );

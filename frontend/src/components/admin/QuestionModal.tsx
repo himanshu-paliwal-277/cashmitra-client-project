@@ -310,9 +310,14 @@ const QuestionModal = ({
   loading = false,
   categories = [],
   selectedCategoryId = null,
+  products = [],
+  mode = 'edit',
 }: any) => {
+  const isViewMode = mode === 'view';
   const [formData, setFormData] = useState({
     categoryId: '',
+    productId: '',
+    variantIds: [],
     section: '',
     order: 1,
     key: '',
@@ -328,12 +333,23 @@ const QuestionModal = ({
     options: [],
     isActive: true,
   });
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [error, setError] = useState('');
+
+  // Filter products by selected category
+  const filteredProducts = formData.categoryId
+    ? products.filter((p: any) => {
+        const productCategoryId = p.categoryId?._id || p.categoryId;
+        return productCategoryId === formData.categoryId;
+      })
+    : products;
 
   useEffect(() => {
     if (question) {
       setFormData({
-        categoryId: question.categoryId || selectedCategoryId || '',
+        categoryId: question.categoryId?._id || question.categoryId || selectedCategoryId || '',
+        productId: question.productId?._id || question.productId || '',
+        variantIds: question.variantIds || [],
         section: question.section || '',
         order: question.order || 1,
         key: question.key || '',
@@ -346,17 +362,24 @@ const QuestionModal = ({
         options:
           question.options?.map((opt: any) => ({
             ...opt,
-
-            // Use tempId instead of id
             tempId: opt._id || Date.now(),
-
             showIf: opt.showIf || { questionKey: '', value: '' },
           })) || [],
         isActive: question.isActive !== false,
       });
+      // Set selected product if productId exists
+      if (question.productId) {
+        const productIdToFind = question.productId?._id || question.productId;
+        const prod = products.find((p: any) => p._id === productIdToFind);
+        setSelectedProduct(prod || null);
+      } else {
+        setSelectedProduct(null);
+      }
     } else {
       setFormData({
         categoryId: selectedCategoryId || '',
+        productId: '',
+        variantIds: [],
         section: '',
         order: 1,
         key: '',
@@ -369,9 +392,10 @@ const QuestionModal = ({
         options: [],
         isActive: true,
       });
+      setSelectedProduct(null);
     }
     setError('');
-  }, [question, isOpen, selectedCategoryId]);
+  }, [question, isOpen, selectedCategoryId, products]);
 
   const handleInputChange = (field: any, value: any) => {
     setFormData(prev => ({
@@ -478,10 +502,23 @@ const QuestionModal = ({
       }
     }
 
-    // Prepare data for backend, excluding tempId
+    // Prepare data for backend, excluding tempId and cleaning up showIf
     const submitData = {
       ...formData,
-      options: formData.options.map(({ tempId, ...opt }) => opt), // Exclude tempId from options
+      // Clean up question-level showIf
+      showIf:
+        formData.showIf?.questionKey?.trim() && formData.showIf?.value
+          ? formData.showIf
+          : undefined,
+      // Clean up options
+      options: formData.options.map(({ tempId, showIf, ...opt }) => ({
+        ...opt,
+        // Only include showIf if both questionKey and value are provided
+        showIf:
+          showIf?.questionKey?.trim() && showIf?.value !== undefined && showIf?.value !== ''
+            ? showIf
+            : undefined,
+      })),
     };
 
     try {
@@ -500,7 +537,7 @@ const QuestionModal = ({
         <ModalHeader>
           <ModalTitle>
             <HelpCircle size={20} />
-            {question ? 'Edit Question' : 'Add New Question'}
+            {isViewMode ? 'View Question' : question ? 'Edit Question' : 'Add New Question'}
           </ModalTitle>
           <CloseButton onClick={onClose}>
             <X size={20} />
@@ -520,17 +557,104 @@ const QuestionModal = ({
               <Label>Category *</Label>
               <Select
                 value={formData.categoryId}
-                onChange={(e: any) => handleInputChange('categoryId', e.target.value)}
+                onChange={(e: any) => {
+                  const newCategoryId = e.target.value;
+                  handleInputChange('categoryId', newCategoryId);
+                  // Clear product and variants when category changes
+                  handleInputChange('productId', '');
+                  handleInputChange('variantIds', []);
+                  setSelectedProduct(null);
+                }}
                 required
+                disabled={isViewMode}
               >
                 <option value="">Select category</option>
                 {categories.map(category => (
                   <option key={category._id} value={category._id}>
-                    {category.name}
+                    {category.displayName || category.name}
                   </option>
                 ))}
               </Select>
             </FormGroup>
+
+            <FormGroup>
+              <Label>Product (Optional)</Label>
+              <Select
+                value={formData.productId}
+                onChange={(e: any) => {
+                  const productId = e.target.value;
+                  handleInputChange('productId', productId);
+                  const prod = filteredProducts.find((p: any) => p._id === productId);
+                  setSelectedProduct(prod || null);
+                  handleInputChange('variantIds', []);
+                }}
+                disabled={isViewMode || !formData.categoryId}
+              >
+                <option value="">All Products (General Question)</option>
+                {filteredProducts.map((product: any) => (
+                  <option key={product._id} value={product._id}>
+                    {product.name}
+                  </option>
+                ))}
+              </Select>
+              <small style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                {!formData.categoryId
+                  ? 'Select a category first to see products'
+                  : 'Leave empty to apply this question to all products in the category'}
+              </small>
+            </FormGroup>
+
+            {selectedProduct && selectedProduct.variants && selectedProduct.variants.length > 0 && (
+              <FormGroup>
+                <Label>Variants (Optional)</Label>
+                <div
+                  style={{
+                    maxHeight: '150px',
+                    overflowY: 'auto',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '0.5rem',
+                    padding: '0.5rem',
+                  }}
+                >
+                  {selectedProduct.variants.map((variant: any) => (
+                    <label
+                      key={variant._id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '0.5rem',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.variantIds.includes(variant._id)}
+                        onChange={(e: any) => {
+                          if (e.target.checked) {
+                            handleInputChange('variantIds', [...formData.variantIds, variant._id]);
+                          } else {
+                            handleInputChange(
+                              'variantIds',
+                              formData.variantIds.filter((id: any) => id !== variant._id)
+                            );
+                          }
+                        }}
+                        style={{ marginRight: '0.5rem' }}
+                        disabled={isViewMode}
+                      />
+                      <span style={{ fontSize: '0.875rem' }}>
+                        {variant.label ||
+                          `${variant.ram ? variant.ram + ' RAM' : ''}${variant.storage ? ' / ' + variant.storage + ' Storage' : ''}${variant.color ? ' / ' + variant.color : ''}`.trim() ||
+                          'Unnamed Variant'}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                <small style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                  Leave empty to apply to all variants of this product
+                </small>
+              </FormGroup>
+            )}
 
             <FormGroup>
               <Label>Question Key *</Label>
@@ -540,6 +664,7 @@ const QuestionModal = ({
                 onChange={(e: any) => handleInputChange('key', e.target.value)}
                 placeholder="e.g., screen_condition"
                 required
+                disabled={isViewMode}
               />
             </FormGroup>
 
@@ -551,6 +676,7 @@ const QuestionModal = ({
                 onChange={(e: any) => handleInputChange('title', e.target.value)}
                 placeholder="What is the condition of your screen?"
                 required
+                disabled={isViewMode}
               />
             </FormGroup>
 
@@ -560,6 +686,7 @@ const QuestionModal = ({
                 value={formData.description}
                 onChange={(e: any) => handleInputChange('description', e.target.value)}
                 placeholder="Please select the current condition of your device screen"
+                disabled={isViewMode}
               />
             </FormGroup>
 
@@ -569,14 +696,14 @@ const QuestionModal = ({
                 value={formData.uiType}
                 onChange={(e: any) => handleInputChange('uiType', e.target.value)}
                 required
+                disabled={isViewMode}
               >
                 <option value="radio">Radio Button</option>
                 <option value="checkbox">Checkbox</option>
                 <option value="select">Select Dropdown</option>
-                <option value="text">Text Input</option>
-                <option value="textarea">Text Area</option>
-                <option value="number">Number Input</option>
-                <option value="boolean">Yes/No</option>
+                <option value="multiselect">Multi-Select</option>
+                <option value="slider">Slider</option>
+                <option value="toggle">Toggle (Yes/No)</option>
               </Select>
             </FormGroup>
 
@@ -586,12 +713,17 @@ const QuestionModal = ({
                 value={formData.section}
                 onChange={(e: any) => handleInputChange('section', e.target.value)}
                 required
+                disabled={isViewMode}
               >
                 <option value="">Select section</option>
+                <option value="Physical Condition">Physical Condition</option>
+                <option value="Performance">Performance</option>
+                <option value="Damage History">Damage History</option>
                 <option value="screen">Screen</option>
                 <option value="body">Body</option>
                 <option value="functionality">Functionality</option>
                 <option value="accessories">Accessories</option>
+                <option value="warranty">Warranty</option>
                 <option value="general">General</option>
               </Select>
             </FormGroup>
@@ -604,28 +736,31 @@ const QuestionModal = ({
                   value={formData.order}
                   onChange={(e: any) => handleInputChange('order', parseInt(e.target.value) || 1)}
                   min="1"
+                  disabled={isViewMode}
                 />
               </FormGroup>
 
               <FormGroup>
                 <Label>Required Question</Label>
                 <Select
-                  value={formData.required}
+                  value={formData.required ? 'true' : 'false'}
                   onChange={(e: any) => handleInputChange('required', e.target.value === 'true')}
+                  disabled={isViewMode}
                 >
-                  <option value={true}>Yes</option>
-                  <option value={false}>No</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
                 </Select>
               </FormGroup>
 
               <FormGroup>
                 <Label>Multi Select</Label>
                 <Select
-                  value={formData.multiSelect}
+                  value={formData.multiSelect ? 'true' : 'false'}
                   onChange={(e: any) => handleInputChange('multiSelect', e.target.value === 'true')}
+                  disabled={isViewMode}
                 >
-                  <option value={false}>No</option>
-                  <option value={true}>Yes</option>
+                  <option value="false">No</option>
+                  <option value="true">Yes</option>
                 </Select>
               </FormGroup>
             </div>
@@ -640,6 +775,7 @@ const QuestionModal = ({
                     handleInputChange('showIf', { ...formData.showIf, questionKey: e.target.value })
                   }
                   placeholder="Question key"
+                  disabled={isViewMode}
                 />
                 <Input
                   type="text"
@@ -648,6 +784,7 @@ const QuestionModal = ({
                     handleInputChange('showIf', { ...formData.showIf, value: e.target.value })
                   }
                   placeholder="Expected value"
+                  disabled={isViewMode}
                 />
               </div>
             </FormGroup>
@@ -668,10 +805,12 @@ const QuestionModal = ({
                     <CheckCircle size={18} />
                     Answer Options
                   </SectionTitle>
-                  <AddOptionButton type="button" onClick={addOption}>
-                    <Plus size={16} />
-                    Add Option
-                  </AddOptionButton>
+                  {!isViewMode && (
+                    <AddOptionButton type="button" onClick={addOption}>
+                      <Plus size={16} />
+                      Add Option
+                    </AddOptionButton>
+                  )}
                 </div>
 
                 {formData.options.map((option, index) => (
@@ -680,10 +819,15 @@ const QuestionModal = ({
                       <span style={{ fontWeight: '600', color: '#374151' }}>
                         Option {index + 1}
                       </span>
-                      <RemoveOptionButton type="button" onClick={() => removeOption(option.tempId)}>
-                        <Trash2 size={12} />
-                        Remove
-                      </RemoveOptionButton>
+                      {!isViewMode && (
+                        <RemoveOptionButton
+                          type="button"
+                          onClick={() => removeOption(option.tempId)}
+                        >
+                          <Trash2 size={12} />
+                          Remove
+                        </RemoveOptionButton>
+                      )}
                     </OptionHeader>
 
                     <div
@@ -701,6 +845,7 @@ const QuestionModal = ({
                           value={option.key}
                           onChange={(e: any) => updateOption(option.tempId, 'key', e.target.value)}
                           placeholder="excellent"
+                          disabled={isViewMode}
                         />
                       </FormGroup>
 
@@ -713,6 +858,7 @@ const QuestionModal = ({
                             updateOption(option.tempId, 'value', e.target.value)
                           }
                           placeholder="excellent"
+                          disabled={isViewMode}
                         />
                       </FormGroup>
                     </div>
@@ -724,6 +870,7 @@ const QuestionModal = ({
                         value={option.label}
                         onChange={(e: any) => updateOption(option.tempId, 'label', e.target.value)}
                         placeholder="Excellent - No scratches or damage"
+                        disabled={isViewMode}
                       />
                     </FormGroup>
 
@@ -750,6 +897,7 @@ const QuestionModal = ({
                           onChange={(e: any) =>
                             updateOptionDelta(option.tempId, 'type', e.target.value)
                           }
+                          disabled={isViewMode}
                         >
                           <option value="percent">Percentage</option>
                           <option value="abs">Absolute</option>
@@ -760,6 +908,7 @@ const QuestionModal = ({
                           onChange={(e: any) =>
                             updateOptionDelta(option.tempId, 'sign', e.target.value)
                           }
+                          disabled={isViewMode}
                         >
                           <option value="+">+ (Add)</option>
                           <option value="-">- (Subtract)</option>
@@ -777,6 +926,7 @@ const QuestionModal = ({
                           }
                           placeholder="0"
                           min="0"
+                          disabled={isViewMode}
                         />
                       </div>
                     </div>
@@ -801,13 +951,21 @@ const QuestionModal = ({
           </ModalBody>
 
           <ModalFooter>
-            <Button type="button" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" disabled={loading}>
-              <Save size={16} />
-              {loading ? 'Saving...' : question ? 'Update Question' : 'Create Question'}
-            </Button>
+            {isViewMode ? (
+              <Button type="button" onClick={onClose} variant="primary">
+                Close
+              </Button>
+            ) : (
+              <>
+                <Button type="button" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="submit" variant="primary" disabled={loading}>
+                  <Save size={16} />
+                  {loading ? 'Saving...' : question ? 'Update Question' : 'Create Question'}
+                </Button>
+              </>
+            )}
           </ModalFooter>
         </form>
       </ModalContent>

@@ -13,45 +13,86 @@ const useAdminPartnerApplications = () => {
   const [filters, setFilters] = useState({
     status: '',
     page: 1,
-    limit: 10,
+    limit: 100, // Get all partners for now
   });
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
     approved: 0,
     rejected: 0,
-    underReview: 0,
+    under_review: 0,
   });
 
   // Fetch partner applications with pagination and filters
-  const fetchApplications = useCallback(async (page = 1, limit = 10, status = '') => {
+  const fetchApplications = useCallback(async (page = 1, limit = 100, status = '') => {
     setLoading(true);
     setError(null);
     try {
-      const response = await adminService.getPartnerApplications(page, limit, status);
-      if (response.applications) {
-        setApplications(response.applications);
+      // Use getPartners API which returns partners with verificationStatus
+      const response = await adminService.getPartners(page, limit, status);
+
+      if (response.partners) {
+        // Transform partner data to application format
+        const transformedApplications = response.partners.map((partner: any) => ({
+          _id: partner._id,
+          applicantName: partner.user?.name || 'N/A',
+          email: partner.shopEmail || partner.user?.email || 'N/A',
+          phone: partner.shopPhone || partner.user?.phone || 'N/A',
+          businessName: partner.shopName || 'N/A',
+          businessType: 'Retail Shop', // Default value
+          gstNumber: partner.gstNumber || 'N/A',
+          address: partner.shopAddress?.street || 'N/A',
+          city: partner.shopAddress?.city || 'N/A',
+          state: partner.shopAddress?.state || 'N/A',
+          status: partner.verificationStatus || 'pending',
+          priority: 'medium', // Default priority
+          createdAt: partner.createdAt,
+          documents: partner.documents
+            ? [
+                partner.documents.gstCertificate && {
+                  name: 'GST Certificate',
+                  filename: partner.documents.gstCertificate,
+                  verified: partner.isVerified,
+                },
+                partner.documents.shopLicense && {
+                  name: 'Shop License',
+                  filename: partner.documents.shopLicense,
+                  verified: partner.isVerified,
+                },
+                partner.documents.ownerIdProof && {
+                  name: 'Owner ID Proof',
+                  filename: partner.documents.ownerIdProof,
+                  verified: partner.isVerified,
+                },
+              ].filter(Boolean)
+            : [],
+          experience: partner.verificationNotes || '',
+          comments: [],
+        }));
+
+        setApplications(transformedApplications);
         setPagination({
           currentPage: response.currentPage || page,
           totalPages: response.totalPages || 1,
-          totalApplications: response.totalApplications || response.applications.length,
+          totalApplications: response.total || transformedApplications.length,
         });
 
         // Calculate stats from all applications
-        const statusCounts = response.applications.reduce((acc: any, app: any) => {
+        const statusCounts = transformedApplications.reduce((acc: any, app: any) => {
           acc[app.status] = (acc[app.status] || 0) + 1;
           return acc;
         }, {});
 
         setStats({
-          total: response.applications.length,
+          total: transformedApplications.length,
           pending: statusCounts.pending || 0,
           approved: statusCounts.approved || 0,
           rejected: statusCounts.rejected || 0,
-          underReview: statusCounts.underReview || 0,
+          under_review: statusCounts.under_review || 0,
         });
       }
-    } catch (err) {      setError(err.message || 'Failed to fetch partner applications');
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch partner applications');
       console.error('Error fetching partner applications:', err);
     } finally {
       setLoading(false);
@@ -64,31 +105,42 @@ const useAdminPartnerApplications = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await adminService.updatePartnerApplicationStatus(
-          applicationId,
+        // Use verifyPartner API to update status
+        const response = await adminService.verifyPartner(applicationId, {
           status,
-          notes
-        );
-        if (response.success) {          setApplications(prev =>
-            prev.map(app =>              app.id === applicationId                ? { ...app, status, notes, updatedAt: new Date().toISOString() }
+          notes,
+        });
+
+        if (response.success) {
+          // Update local state
+          setApplications((prev: any) =>
+            prev.map((app: any) =>
+              app._id === applicationId
+                ? { ...app, status, experience: notes, updatedAt: new Date().toISOString() }
                 : app
             )
           );
 
           // Update stats
-          setStats(prev => {            const oldApp = applications.find(app => app.id === applicationId);            if (oldApp && oldApp.status !== status) {
+          setStats((prev: any) => {
+            const oldApp: any = applications.find((app: any) => app._id === applicationId);
+            if (oldApp && oldApp.status !== status) {
               return {
-                ...prev,                [oldApp.status]: Math.max(0, prev[oldApp.status] - 1),                [status]: prev[status] + 1,
+                ...prev,
+                [oldApp.status]: Math.max(0, prev[oldApp.status] - 1),
+                [status]: (prev[status] || 0) + 1,
               };
             }
             return prev;
           });
 
-          return { success: true, message: response.message };
+          return { success: true, message: response.message || 'Status updated successfully' };
         }
         throw new Error('Failed to update application status');
-      } catch (err) {        setError(err.message || 'Failed to update application status');
-        console.error('Error updating application status:', err);        return { success: false, error: err.message };
+      } catch (err: any) {
+        setError(err.message || 'Failed to update application status');
+        console.error('Error updating application status:', err);
+        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -147,9 +199,22 @@ const useAdminPartnerApplications = () => {
     [fetchApplications, filters.status]
   );
 
+  // Download document (placeholder - needs backend implementation)
+  const downloadDocument = useCallback(async (documentId: any, filename: any) => {
+    try {
+      console.log('Downloading document:', documentId, filename);
+      // TODO: Implement document download when backend endpoint is available
+      alert('Document download feature coming soon');
+    } catch (err: any) {
+      console.error('Error downloading document:', err);
+      throw err;
+    }
+  }, []);
+
   // Get application by ID
   const getApplicationById = useCallback(
-    (applicationId: any) => {      return applications.find(app => app.id === applicationId);
+    (applicationId: any) => {
+      return applications.find((app: any) => app._id === applicationId);
     },
     [applications]
   );
@@ -160,7 +225,10 @@ const useAdminPartnerApplications = () => {
       if (!searchTerm) return applications;
 
       return applications.filter(
-        app =>          app.shopName.toLowerCase().includes(searchTerm.toLowerCase()) ||          app.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||          app.email.toLowerCase().includes(searchTerm.toLowerCase())
+        (app: any) =>
+          app.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.applicantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.email?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     },
     [applications]
@@ -188,6 +256,7 @@ const useAdminPartnerApplications = () => {
     changePageSize,
     getApplicationById,
     searchApplications,
+    downloadDocument,
   };
 };
 

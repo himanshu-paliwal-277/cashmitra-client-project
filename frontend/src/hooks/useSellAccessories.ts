@@ -25,10 +25,22 @@ const useSellAccessories = () => {
     setError(null);
     try {
       const token = localStorage.getItem('adminToken');
+
+      // Filter out undefined values
+      const cleanFilters = Object.entries(filters).reduce(
+        (acc, [key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {} as Record<string, any>
+      );
+
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
-        ...filters,
+        ...cleanFilters,
       });
 
       const response = await api.get(`/sell-accessories?${queryParams}`, {
@@ -104,83 +116,71 @@ const useSellAccessories = () => {
   }, []);
 
   // Create new accessory
-  const createAccessory = useCallback(
-    async (accessoryData: any) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = localStorage.getItem('adminToken');
-        const response = await api.post('/sell-accessories', accessoryData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+  const createAccessory = useCallback(async (accessoryData: any) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await api.post('/sell-accessories', accessoryData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-        // Refresh accessories list
-        await fetchAccessories();
-        return response.data;
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to create accessory');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchAccessories]
-  );
+      // Don't auto-refresh - let the component handle it with proper filters
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create accessory');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // Update accessory
-  const updateAccessory = useCallback(
-    async (accessoryId: any, accessoryData: any) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = localStorage.getItem('adminToken');
-        const response = await api.put(`/sell-accessories/${accessoryId}`, accessoryData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+  const updateAccessory = useCallback(async (accessoryId: any, accessoryData: any) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await api.put(`/sell-accessories/${accessoryId}`, accessoryData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-        // Refresh accessories list
-        await fetchAccessories();
-        return response.data;
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to update accessory');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchAccessories]
-  );
+      // Don't auto-refresh - let the component handle it with proper filters
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update accessory');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // Delete accessory
-  const deleteAccessory = useCallback(
-    async (accessoryId: any) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = localStorage.getItem('adminToken');
-        await api.delete(`/sell-accessories/${accessoryId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  const deleteAccessory = useCallback(async (accessoryId: any) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('adminToken');
+      await api.delete(`/sell-accessories/${accessoryId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        // Refresh accessories list
-        await fetchAccessories();
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to delete accessory');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchAccessories]
-  );
+      // Don't auto-refresh - let the component handle it with proper filters
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete accessory');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // Bulk create accessories
   const bulkCreateAccessories = useCallback(

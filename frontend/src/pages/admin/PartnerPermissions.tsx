@@ -173,12 +173,6 @@ const PartnerPermissions = () => {
           path: '/admin/partner-applications',
         },
         {
-          name: 'partnerList',
-          label: 'Partner List',
-          description: 'View partner list',
-          path: '/admin/partner-list',
-        },
-        {
           name: 'partnerPermissions',
           label: 'Partner Permissions',
           description: 'Manage partner permissions',
@@ -190,12 +184,12 @@ const PartnerPermissions = () => {
           description: 'Manage users',
           path: '/admin/users',
         },
-        {
-          name: 'inventoryApproval',
-          label: 'Inventory Approval',
-          description: 'Approve inventory',
-          path: '/admin/inventory-approval',
-        },
+        // {
+        //   name: 'inventoryApproval',
+        //   label: 'Inventory Approval',
+        //   description: 'Approve inventory',
+        //   path: '/admin/inventory-approval',
+        // },
       ],
       'Pricing & Finance': [
         {
@@ -285,13 +279,20 @@ const PartnerPermissions = () => {
     if (template) {
       // Edit existing template
       setEditingTemplate(template);
-      setFormData({        name: template.name || '',        displayName: template.displayName || template.label || '',        description: template.description || '',        color: template.color || '#3b82f6',        permissions: template.permissions || [],        features: template.features || {
+      setFormData({
+        name: template.name || '',
+        displayName: template.displayName || template.label || '',
+        description: template.description || '',
+        color: template.color || '#3b82f6',
+        permissions: template.permissions || [],
+        features: template.features || {
           bulkUpload: false,
           advancedAnalytics: false,
           prioritySupport: false,
           customBranding: false,
           apiAccess: false,
-        },        limits: template.limits || {
+        },
+        limits: template.limits || {
           maxInventoryItems: 100,
           maxMonthlyTransactions: 50,
           maxPayoutAmount: 50000,
@@ -337,8 +338,10 @@ const PartnerPermissions = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePermissionToggle = (permission: any) => {    setFormData(prev => ({
-      ...prev,      permissions: prev.permissions.includes(permission)
+  const handlePermissionToggle = (permission: any) => {
+    setFormData(prev => ({
+      ...prev,
+      permissions: prev.permissions.includes(permission)
         ? prev.permissions.filter(p => p !== permission)
         : [...prev.permissions, permission],
     }));
@@ -348,7 +351,8 @@ const PartnerPermissions = () => {
     setFormData(prev => ({
       ...prev,
       features: {
-        ...prev.features,        [feature]: !prev.features[feature],
+        ...prev.features,
+        [feature]: !prev.features[feature],
       },
     }));
   };
@@ -394,7 +398,8 @@ const PartnerPermissions = () => {
 
       if (editingTemplate) {
         // Update existing template
-        await partnerPermissionService.updateRoleTemplate(          editingTemplate.id || editingTemplate.name,
+        await partnerPermissionService.updateRoleTemplate(
+          editingTemplate.id || editingTemplate.name,
           templateData
         );
         setSuccess('Role template updated successfully!');
@@ -412,7 +417,8 @@ const PartnerPermissions = () => {
         handleCloseModal();
       }, 1000);
     } catch (err) {
-      console.error('Error saving role template:', err);      setError(err.response?.data?.message || 'Failed to save role template');
+      console.error('Error saving role template:', err);
+      setError(err.response?.data?.message || 'Failed to save role template');
     } finally {
       setLoading(false);
     }
@@ -440,7 +446,8 @@ const PartnerPermissions = () => {
       setSuccess('Role template deleted successfully!');
       await loadRoleTemplates();
     } catch (err) {
-      console.error('Error deleting role template:', err);      setError(err.response?.data?.message || 'Failed to delete role template');
+      console.error('Error deleting role template:', err);
+      setError(err.response?.data?.message || 'Failed to delete role template');
     } finally {
       setLoading(false);
     }
@@ -496,24 +503,31 @@ const PartnerPermissions = () => {
             </div>
           ) : (
             roleTemplates.map(template => (
-              <div                key={template.id || template.name}
-                className="template-card"                style={{ borderLeft: `4px solid ${template.color || '#3b82f6'}` }}
+              <div
+                key={template.id || template.name}
+                className="template-card"
+                style={{ borderLeft: `4px solid ${template.color || '#3b82f6'}` }}
               >
                 <div className="template-header">
                   <div
-                    className="template-icon"                    style={{ background: template.color || '#3b82f6' }}
+                    className="template-icon"
+                    style={{ background: template.color || '#3b82f6' }}
                   >
                     <Crown size={20} />
                   </div>
-                  <div className="template-info">                    <h3>{template.displayName || template.label}</h3>                    <p>{template.description}</p>
+                  <div className="template-info">
+                    <h3>{template.displayName || template.label}</h3>
+                    <p>{template.description}</p>
                   </div>
                 </div>
 
                 <div className="template-stats">
-                  <div className="stat">                    <strong>{(template.permissions || []).length}</strong>
+                  <div className="stat">
+                    <strong>{(template.permissions || []).length}</strong>
                     <span>Permissions</span>
                   </div>
-                  <div className="stat">                    <strong>{Object.values(template.features || {}).filter(Boolean).length}</strong>
+                  <div className="stat">
+                    <strong>{Object.values(template.features || {}).filter(Boolean).length}</strong>
                     <span>Features</span>
                   </div>
                 </div>
@@ -600,7 +614,8 @@ const PartnerPermissions = () => {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Brief description of this role"                  rows="3"
+                  placeholder="Brief description of this role"
+                  rows={3}
                 />
               </div>
 
@@ -624,7 +639,8 @@ const PartnerPermissions = () => {
                   <div key={category} className="permission-category">
                     <h4>{category}</h4>
                     <div className="permission-checkboxes">
-                      {permissions.map(permission => {                        const isChecked = formData.permissions.includes(permission.name);
+                      {permissions.map(permission => {
+                        const isChecked = formData.permissions.includes(permission.name);
                         return (
                           <div
                             key={permission.name}

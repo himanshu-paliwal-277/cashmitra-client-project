@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import {
   Calendar,
   Clock,
@@ -17,368 +16,734 @@ import {
   Plus,
   Trash2,
   Truck,
+  RefreshCw,
+  Download,
+  TrendingUp,
+  Users,
+  Activity,
 } from 'lucide-react';
 import pickupService from '../../services/pickupService';
 import productService from '../../services/productService';
 import adminService from '../../services/adminService';
 
-const Container = styled.div`
-  background: #f8f9fa;
-  min-height: 100vh;
-`;
+interface Pickup {
+  _id: string;
+  orderNumber: string;
+  orderType: string;
+  customer: {
+    name: string;
+    phone: string;
+    email?: string;
+  };
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    pincode?: string;
+    zipCode?: string;
+  };
+  scheduledDate: string;
+  scheduledTimeSlot?: string;
+  timeSlot?: string;
+  status: string;
+  assignedTo?: any;
+  items?: any[];
+  priority?: string;
+  specialInstructions?: string;
+  createdAt: string;
+}
 
-const Header = styled.div`
-  display: flex;
-  justify-content: between;
-  align-items: center;
-  margin-bottom: 24px;
-`;
+const PickupManagement: React.FC = () => {
+  // State management
+  const [pickups, setPickups] = useState<Pickup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [showModal, setShowModal] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [modalType, setModalType] = useState<'create' | 'edit' | 'view'>('create');
+  const [selectedPickup, setSelectedPickup] = useState<Pickup | null>(null);
+  const [agents, setAgents] = useState<any[]>([]);
+  const [loadingAgents, setLoadingAgents] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
 
-const Title = styled.h1`
-  font-size: 28px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-`;
+  // Fetch data on mount and when filters change
+  useEffect(() => {
+    fetchPickups();
+  }, [currentPage, searchTerm, statusFilter, priorityFilter]);
 
-const Controls = styled.div`
-  display: flex;
-  gap: 12px;
-  align-items: center;
-`;
+  useEffect(() => {
+    fetchAgents();
+    fetchProducts();
+    fetchOrders('sell');
+  }, []);
 
-const SearchBox = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-`;
+  // Fetch pickups with filters
+  const fetchPickups = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-const SearchInput = styled.input`
-  padding: 8px 12px 8px 36px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  width: 250px;
+      const params: any = {
+        page: currentPage,
+        limit: 10,
+        search: searchTerm || undefined,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        priority: priorityFilter !== 'all' ? priorityFilter : undefined,
+      };
 
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-  }
-`;
+      const response = await pickupService.getAllPickups(params);
+      const pickupData = response.data || response;
+      const pickupsArray = pickupData.docs || pickupData.pickups || pickupData || [];
 
-const SearchIcon = styled(Search)`
-  position: absolute;
-  left: 10px;
-  color: #666;
-  size: 16px;
-`;
-
-const FilterButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-
-  &:hover {
-    background: #f8f9fa;
-  }
-`;
-
-const CreateButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-
-  &:hover {
-    background: #0056b3;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-`;
-
-const StatValue = styled.div`
-  font-size: 24px;
-  font-weight: 600;
-  color: ${(props: any) => props.color || '#333'};
-  margin-bottom: 4px;
-`;
-
-const StatLabel = styled.div`
-  font-size: 14px;
-  color: #666;
-`;
-
-const TableContainer = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-`;
-
-const TableHeader = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 120px;
-  gap: 16px;
-  padding: 16px 20px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
-  font-weight: 600;
-  font-size: 14px;
-  color: #333;
-`;
-
-const TableRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 120px;
-  gap: 16px;
-  padding: 16px 20px;
-  border-bottom: 1px solid #f0f0f0;
-  align-items: center;
-
-  &:hover {
-    background: #f8f9fa;
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const StatusBadge = styled.span`
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-
-  ${(props: any) => {
-    switch (props.status) {
-      case 'scheduled':
-        return 'background: #fff3cd; color: #856404;';
-      case 'confirmed':
-        return 'background: #d4edda; color: #155724;';
-      case 'in_transit':
-        return 'background: #cce5ff; color: #004085;';
-      case 'completed':
-        return 'background: #d1ecf1; color: #0c5460;';
-      case 'cancelled':
-        return 'background: #f8d7da; color: #721c24;';
-      case 'rescheduled':
-        return 'background: #f5f5f5; color: #383d41;';
-      default:
-        return 'background: #e2e3e5; color: #383d41;';
+      setPickups(pickupsArray);
+      setTotalPages(pickupData.totalPages || pickupData.pages || 1);
+    } catch (error: any) {
+      console.error('Error fetching pickups:', error);
+      setError('Failed to fetch pickups. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  }}
-`;
+  };
 
-const ActionButton = styled.button`
-  padding: 6px 8px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  // Fetch analytics
+  const fetchAnalytics = async () => {
+    try {
+      const params: any = {};
+      if (dateRange.startDate) params.startDate = dateRange.startDate;
+      if (dateRange.endDate) params.endDate = dateRange.endDate;
 
-  &:hover {
-    background: #f0f0f0;
+      const response = await pickupService.getPickupAnalytics(params);
+      setAnalytics(response.data);
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    }
+  };
+
+  // Fetch agents
+  const fetchAgents = async () => {
+    try {
+      setLoadingAgents(true);
+      const response = await adminService.getAllUsers({ limit: 100 });
+      const allUsers = response.users || response.data || [];
+      const agentsList = allUsers.filter(
+        (user: any) =>
+          user.role === 'agent' ||
+          user.role === 'driver' ||
+          user.role === 'pickup_agent' ||
+          user.type === 'agent' ||
+          user.type === 'driver'
+      );
+      setAgents(agentsList);
+    } catch (error) {
+      console.error('Error fetching agents:', error);
+    } finally {
+      setLoadingAgents(false);
+    }
+  };
+
+  // Fetch products
+  const fetchProducts = async () => {
+    try {
+      setLoadingProducts(true);
+      const response = await productService.getProducts({ limit: 100 });
+      const productsData = response.products || [];
+      setProducts(Array.isArray(productsData) ? productsData : []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
+  // Fetch orders
+  const fetchOrders = async (orderType = 'sell') => {
+    try {
+      setLoadingOrders(true);
+      let response;
+      if (orderType === 'buy') {
+        response = await adminService.getBuyOrdersForPickup();
+        setOrders(response?.orders || response?.data || []);
+      } else {
+        response = await adminService.getOrdersForPickup();
+        // For sell orders, the response structure is { success: true, data: [...] }
+        setOrders(response?.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      setOrders([]);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  // CRUD operations
+  const handleCreatePickup = async (pickupData: any) => {
+    try {
+      setLoading(true);
+      await pickupService.createPickup(pickupData);
+      setShowModal(false);
+      fetchPickups();
+    } catch (error: any) {
+      console.error('Error creating pickup:', error);
+      setError(error.message || 'Failed to create pickup');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditPickup = async (pickupData: any) => {
+    try {
+      setLoading(true);
+      await pickupService.updatePickup(selectedPickup?._id, pickupData);
+      setShowModal(false);
+      setSelectedPickup(null);
+      fetchPickups();
+    } catch (error: any) {
+      console.error('Error updating pickup:', error);
+      setError(error.message || 'Failed to update pickup');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAssignPickup = async (pickupId: string, agentId: string) => {
+    try {
+      await pickupService.assignPickup(pickupId, agentId);
+      fetchPickups();
+    } catch (error: any) {
+      console.error('Error assigning pickup:', error);
+      setError(error.message || 'Failed to assign pickup');
+    }
+  };
+
+  const handleStatusUpdate = async (pickupId: string, newStatus: string) => {
+    try {
+      await pickupService.updatePickupStatus(pickupId, { status: newStatus });
+      fetchPickups();
+    } catch (error: any) {
+      console.error('Error updating status:', error);
+      setError(error.message || 'Failed to update status');
+    }
+  };
+
+  const handleReschedule = async (pickupId: string, data: any) => {
+    try {
+      await pickupService.reschedulePickup(pickupId, data);
+      fetchPickups();
+    } catch (error: any) {
+      console.error('Error rescheduling:', error);
+      setError(error.message || 'Failed to reschedule');
+    }
+  };
+
+  const handleCancel = async (pickupId: string, reason: string) => {
+    try {
+      await pickupService.cancelPickup(pickupId, { reason });
+      fetchPickups();
+    } catch (error: any) {
+      console.error('Error cancelling:', error);
+      setError(error.message || 'Failed to cancel');
+    }
+  };
+
+  // Helper function for priority color
+  const getPriorityColor = (priority: string) => {
+    const colors: any = {
+      low: 'bg-gray-100 text-gray-600',
+      medium: 'bg-blue-100 text-blue-600',
+      high: 'bg-orange-100 text-orange-600',
+      urgent: 'bg-red-100 text-red-600',
+    };
+    return colors[priority] || 'bg-gray-100 text-gray-600';
+  };
+
+  // Calculate stats
+  const stats = {
+    total: pickups.length,
+    assigned: pickups.filter(p => p.status === 'assigned').length,
+    confirmed: pickups.filter(p => p.status === 'confirmed').length,
+    in_transit: pickups.filter(p => p.status === 'in_transit').length,
+    completed: pickups.filter(p => p.status === 'completed').length,
+    pending: pickups.filter(p =>
+      ['assigned', 'confirmed', 'in_transit', 'arrived'].includes(p.status)
+    ).length,
+  };
+
+  if (loading && pickups.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading pickup data...</p>
+        </div>
+      </div>
+    );
   }
-`;
 
-const Actions = styled.div`
-  display: flex;
-  gap: 4px;
-`;
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Pickup Management</h1>
+            <p className="text-gray-600 mt-1">Manage and track all pickup operations</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                fetchAnalytics();
+                setShowAnalytics(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <TrendingUp className="w-4 h-4" />
+              Analytics
+            </button>
+            <button
+              onClick={fetchPickups}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+            <button
+              onClick={() => {
+                setModalType('create');
+                setSelectedPickup(null);
+                setShowModal(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Create Pickup
+            </button>
+          </div>
+        </div>
 
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600" />
+              <span className="text-red-800">{error}</span>
+            </div>
+            <button onClick={() => setError(null)} className="text-red-600 hover:text-red-800">
+              <XCircle className="w-5 h-5" />
+            </button>
+          </div>
+        )}
 
-const ModalContent = styled.div`
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-`;
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Total</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+              <Package className="w-8 h-8 text-gray-400" />
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Assigned</p>
+                <p className="text-2xl font-bold text-yellow-600">{stats.assigned}</p>
+              </div>
+              <User className="w-8 h-8 text-yellow-400" />
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Confirmed</p>
+                <p className="text-2xl font-bold text-green-600">{stats.confirmed}</p>
+              </div>
+              <CheckCircle className="w-8 h-8 text-green-400" />
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">In Transit</p>
+                <p className="text-2xl font-bold text-blue-600">{stats.in_transit}</p>
+              </div>
+              <Truck className="w-8 h-8 text-blue-400" />
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Completed</p>
+                <p className="text-2xl font-bold text-teal-600">{stats.completed}</p>
+              </div>
+              <CheckCircle className="w-8 h-8 text-teal-400" />
+            </div>
+          </div>
+          <div className="bg-white p-4 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Pending</p>
+                <p className="text-2xl font-bold text-orange-600">{stats.pending}</p>
+              </div>
+              <Clock className="w-8 h-8 text-orange-400" />
+            </div>
+          </div>
+        </div>
 
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-`;
+        {/* Filters */}
+        <div className="bg-white p-4 rounded-lg border border-gray-200 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by customer, order, phone..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Status</option>
+              <option value="assigned">Assigned</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="in_transit">In Transit</option>
+              <option value="arrived">Arrived</option>
+              <option value="picked_up">Picked Up</option>
+              <option value="completed">Completed</option>
+              <option value="failed">Failed</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="rescheduled">Rescheduled</option>
+            </select>
+            <select
+              value={priorityFilter}
+              onChange={e => setPriorityFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Priority</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setStatusFilter('all');
+                setPriorityFilter('all');
+              }}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
 
-const ModalTitle = styled.h2`
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-`;
+      {/* Pickups Table */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Order Details
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Customer
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Address
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Schedule
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Agent/Partner
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Priority
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {pickups.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-6 py-12 text-center">
+                    <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">No pickups found</p>
+                    <button
+                      onClick={() => {
+                        setModalType('create');
+                        setShowModal(true);
+                      }}
+                      className="mt-4 text-blue-600 hover:text-blue-700"
+                    >
+                      Create your first pickup
+                    </button>
+                  </td>
+                </tr>
+              ) : (
+                pickups.map(pickup => (
+                  <tr key={pickup._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <Package className="w-5 h-5 text-gray-400" />
+                        <div>
+                          <p className="font-medium text-gray-900">{pickup.orderNumber}</p>
+                          <p className="text-sm text-gray-500">
+                            {pickup.items?.length || 0} item(s)
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <User className="w-5 h-5 text-gray-400" />
+                        <div>
+                          <p className="font-medium text-gray-900">{pickup.customer?.name}</p>
+                          <p className="text-sm text-gray-500 flex items-center gap-1">
+                            <Phone className="w-3 h-3" />
+                            {pickup.customer?.phone}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-start gap-2">
+                        <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
+                        <div className="text-sm">
+                          <p className="text-gray-900">{pickup.address?.street}</p>
+                          <p className="text-gray-500">
+                            {pickup.address?.city}, {pickup.address?.state}{' '}
+                            {pickup.address?.pincode || pickup.address?.zipCode}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-gray-400" />
+                        <div className="text-sm">
+                          <p className="font-medium text-gray-900">
+                            {formatDate(pickup.scheduledDate)}
+                          </p>
+                          <p className="text-gray-500 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {formatTimeSlot(pickup.scheduledTimeSlot || pickup.timeSlot || '')}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {pickup.assignedTo ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <User className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <div className="text-sm">
+                            <p className="font-medium text-gray-900">
+                              {pickup.assignedTo.name || 'Unknown'}
+                            </p>
+                            <p className="text-gray-500">{pickup.assignedTo.phone || ''}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <select
+                          onChange={e => {
+                            if (e.target.value) {
+                              handleAssignPickup(pickup._id, e.target.value);
+                            }
+                          }}
+                          defaultValue=""
+                          className="text-sm px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="">Assign Agent</option>
+                          {agents.map(agent => (
+                            <option key={agent._id} value={agent._id}>
+                              {agent.name} ({(agent.type || agent.role).toUpperCase()})
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(pickup.status)}`}
+                      >
+                        {pickup.status.replace('_', ' ').toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(pickup.priority || 'medium')}`}
+                      >
+                        {(pickup.priority || 'medium').toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            setModalType('view');
+                            setSelectedPickup(pickup);
+                            setShowModal(true);
+                          }}
+                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="View Details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setModalType('edit');
+                            setSelectedPickup(pickup);
+                            setShowModal(true);
+                          }}
+                          className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          title="Edit"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
-`;
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
-const FormGroup = styled.div`
-  margin-bottom: 16px;
-`;
+      {/* Modals */}
+      {showModal && (
+        <PickupModal
+          type={modalType}
+          pickup={selectedPickup}
+          agents={agents}
+          loadingAgents={loadingAgents}
+          products={products}
+          loadingProducts={loadingProducts}
+          orders={orders}
+          loadingOrders={loadingOrders}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedPickup(null);
+          }}
+          onSubmit={modalType === 'create' ? handleCreatePickup : handleEditPickup}
+          onOrderTypeChange={fetchOrders}
+        />
+      )}
 
-const Label = styled.label`
-  display: block;
-  margin-bottom: 4px;
-  font-weight: 500;
-  color: #333;
-`;
+      {showAnalytics && analytics && (
+        <AnalyticsModal analytics={analytics} onClose={() => setShowAnalytics(false)} />
+      )}
+    </div>
+  );
+};
 
-const Input = styled.input`
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
+// Helper functions (defined outside component for reuse)
+const getStatusColor = (status: string) => {
+  const colors: any = {
+    assigned: 'bg-yellow-100 text-yellow-800',
+    confirmed: 'bg-green-100 text-green-800',
+    in_transit: 'bg-blue-100 text-blue-800',
+    arrived: 'bg-purple-100 text-purple-800',
+    picked_up: 'bg-indigo-100 text-indigo-800',
+    completed: 'bg-teal-100 text-teal-800',
+    failed: 'bg-red-100 text-red-800',
+    cancelled: 'bg-gray-100 text-gray-800',
+    rescheduled: 'bg-orange-100 text-orange-800',
+  };
+  return colors[status] || 'bg-gray-100 text-gray-800';
+};
 
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-`;
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('en-IN', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
 
-const Select = styled.select`
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
+const formatTimeSlot = (slot: string) => {
+  const slots: any = {
+    morning: '9:00 AM - 12:00 PM',
+    afternoon: '12:00 PM - 3:00 PM',
+    evening: '3:00 PM - 6:00 PM',
+    night: '6:00 PM - 9:00 PM',
+    '09:00-12:00': '9:00 AM - 12:00 PM',
+    '12:00-15:00': '12:00 PM - 3:00 PM',
+    '15:00-18:00': '3:00 PM - 6:00 PM',
+    '18:00-21:00': '6:00 PM - 9:00 PM',
+  };
+  return slots[slot] || slot;
+};
 
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-`;
+// Pickup Modal Component
+interface PickupModalProps {
+  type: 'create' | 'edit' | 'view';
+  pickup: Pickup | null;
+  agents: any[];
+  loadingAgents: boolean;
+  products: any[];
+  loadingProducts: boolean;
+  orders: any[];
+  loadingOrders: boolean;
+  onClose: () => void;
+  onSubmit: (data: any) => void;
+  onOrderTypeChange: (type: string) => void;
+}
 
-const TextArea = styled.textarea`
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  min-height: 80px;
-  resize: vertical;
-
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 20px;
-`;
-
-const Button = styled.button`
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-
-  ${(props: any) =>
-    props.variant === 'primary'
-      ? `
-background: #007bff;
-color: white;
-&:hover { background: #0056b3; }
-`
-      : `
-background: #f8f9fa;
-color: #333;
-border: 1px solid #ddd;
-&:hover { background: #e9ecef; }
-`}
-`;
-
-const ModalActions = styled.div`
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 20px;
-`;
-
-const CancelButton = styled.button`
-  padding: 8px 16px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #f8f9fa;
-  color: #333;
-  cursor: pointer;
-  font-size: 14px;
-
-  &:hover {
-    background: #e9ecef;
-  }
-`;
-
-const SubmitButton = styled.button`
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  background: #007bff;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-
-  &:hover {
-    background: #0056b3;
-  }
-`;
-
-// Form component for create/edit pickup
-const PickupForm = ({
+const PickupModal: React.FC<PickupModalProps> = ({
+  type,
   pickup,
   agents,
   loadingAgents,
@@ -386,41 +751,65 @@ const PickupForm = ({
   loadingProducts,
   orders,
   loadingOrders,
+  onClose,
   onSubmit,
-  onCancel,
   onOrderTypeChange,
-}: any) => {
+}) => {
   const [formData, setFormData] = useState({
-    orderType: pickup?.orderType || 'sell', // New field for order type
+    orderType:
+      pickup?.orderType === 'Order' ? 'buy' : pickup?.orderType === 'SellOrder' ? 'sell' : 'sell',
     orderNumber: pickup?.orderNumber || '',
-    selectedOrderId: pickup?.selectedOrderId || '',
+    selectedOrderId: '',
     customer: {
       name: pickup?.customer?.name || '',
       phone: pickup?.customer?.phone || '',
+      email: pickup?.customer?.email || '',
     },
     address: {
       street: pickup?.address?.street || '',
       city: pickup?.address?.city || '',
       state: pickup?.address?.state || '',
-      pincode: pickup?.address?.pincode || '',
+      pincode: pickup?.address?.pincode || pickup?.address?.zipCode || '',
     },
-    scheduledDate: pickup?.scheduledDate || '',
-    timeSlot: pickup?.timeSlot || 'morning',
+    scheduledDate: pickup?.scheduledDate?.split('T')[0] || '',
+    timeSlot: (() => {
+      const slot = pickup?.scheduledTimeSlot || pickup?.timeSlot || 'morning';
+      // Map backend time slots to frontend options
+      if (slot.includes('09:00') || slot.includes('12:00') || slot === 'morning') return 'morning';
+      if (slot.includes('12:00') || slot.includes('15:00') || slot === 'afternoon')
+        return 'afternoon';
+      if (slot.includes('15:00') || slot.includes('18:00') || slot === 'evening') return 'evening';
+      if (slot.includes('18:00') || slot.includes('21:00') || slot === 'night') return 'night';
+      return 'morning';
+    })(),
     assignedTo: pickup?.assignedTo?._id || '',
-    status: pickup?.status || 'scheduled',
-    items: pickup?.items?.join(', ') || '',
-    instructions: pickup?.instructions || '',
-    selectedProduct: pickup?.selectedProduct || '',
-    productNumber: pickup?.productNumber || '',
+    status: pickup?.status || 'assigned',
+    items: pickup?.items
+      ? pickup.items
+          .map((i: any) => {
+            if (typeof i === 'string') return i;
+            if (i.name) {
+              return i.quantity && i.quantity > 1 ? `${i.name} (Qty: ${i.quantity})` : i.name;
+            }
+            if (i.description) return i.description;
+            return '';
+          })
+          .filter(Boolean)
+          .join(', ')
+      : '',
+    priority: pickup?.priority || 'medium',
+    specialInstructions: pickup?.specialInstructions || '',
+    selectedProduct: '',
+    productNumber: '',
   });
 
-  const handleInputChange = (field: any, value: any) => {
+  const handleInputChange = (field: string, value: any) => {
     if (field.includes('.')) {
       const [parent, child] = field.split('.');
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent],
+          ...(prev as any)[parent],
           [child]: value,
         },
       }));
@@ -432,54 +821,30 @@ const PickupForm = ({
     }
   };
 
-  const handleOrderTypeChange = (orderType: any) => {
+  const handleOrderTypeChange = (orderType: string) => {
     handleInputChange('orderType', orderType);
-    // Clear selected order when order type changes
     handleInputChange('selectedOrderId', '');
     handleInputChange('orderNumber', '');
-    handleInputChange('customer.name', '');
-    handleInputChange('customer.phone', '');
-    // Trigger refetch of orders for the new order type
-    if (onOrderTypeChange) {
-      onOrderTypeChange(orderType);
-    }
+    onOrderTypeChange(orderType);
   };
 
-  const handleProductChange = (productId: any) => {
-    const selectedProduct = products.find((p: any) => p._id === productId);
-    if (selectedProduct) {
-      setFormData(prev => ({
-        ...prev,
-        selectedProduct: productId,
-        productNumber:
-          selectedProduct.model ||
-          selectedProduct.sku ||
-          `${selectedProduct.brand}-${selectedProduct.name}`,
-        items: selectedProduct.name, // Auto-populate items with product name
-      }));
-    }
-  };
-
-  const handleOrderChange = (orderId: any) => {
-    const selectedOrder = orders.find((order: any) => order._id === orderId);
+  const handleOrderChange = async (orderId: string) => {
+    const selectedOrder = orders.find((order: any) => (order._id || order.orderId) === orderId);
     if (selectedOrder) {
       if (formData.orderType === 'buy') {
-        // For buy orders, use the order data directly since it contains all needed information
         const items =
           selectedOrder.items
-            ?.map(
-              (item: any) =>
-                `${item.product?.name || 'Unknown Product'} (Qty: ${item.quantity || 1})`
-            )
+            ?.map((item: any) => `${item.product?.name || 'Unknown'} (Qty: ${item.quantity || 1})`)
             .join(', ') || '';
 
         setFormData(prev => ({
           ...prev,
           selectedOrderId: orderId,
-          orderNumber: selectedOrder._id, // Use order ID as order number for buy orders
+          orderNumber: selectedOrder._id,
           customer: {
             name: selectedOrder.user?.name || '',
             phone: selectedOrder.user?.phone || '',
+            email: selectedOrder.user?.email || '',
           },
           address: {
             street: selectedOrder.shippingDetails?.address?.street || '',
@@ -490,84 +855,57 @@ const PickupForm = ({
           items: items,
         }));
       } else {
-        // For sell orders, use the existing API call
-        adminService
-          .getOrderPickupDetails(orderId)
-          .then(response => {
-            const orderDetails = response.data;
-            setFormData(prev => ({
-              ...prev,
-              selectedOrderId: orderId,
-              orderNumber: orderDetails.orderNumber,
-              customer: {
-                name: orderDetails.customer?.name || '',
-                phone: orderDetails.customer?.phone || '',
-              },
-              address: {
-                street: orderDetails.address?.street || '',
-                city: orderDetails.address?.city || '',
-                state: orderDetails.address?.state || '',
-                pincode: orderDetails.address?.pincode || '',
-              },
-            }));
-          })
-          .catch(error => {
-            console.error('Error fetching order details:', error);
-            // Fallback to existing order data
-            setFormData(prev => ({
-              ...prev,
-              selectedOrderId: orderId,
-              orderNumber: selectedOrder.orderNumber,
-              customer: {
-                name: selectedOrder.customer?.name || '',
-                phone: selectedOrder.customer?.phone || '',
-              },
-              address: {
-                street: selectedOrder.address?.street || '',
-                city: selectedOrder.address?.city || '',
-                state: selectedOrder.address?.state || '',
-                pincode: selectedOrder.address?.pincode || '',
-              },
-            }));
-          });
+        try {
+          const response = await adminService.getOrderPickupDetails(orderId);
+          const orderDetails = response.data;
+          setFormData(prev => ({
+            ...prev,
+            selectedOrderId: orderId,
+            orderNumber: orderDetails.orderNumber,
+            customer: {
+              name: orderDetails.customer?.name || '',
+              phone: orderDetails.customer?.phone || '',
+              email: orderDetails.customer?.email || '',
+            },
+            address: {
+              street: orderDetails.address?.street || '',
+              city: orderDetails.address?.city || '',
+              state: orderDetails.address?.state || '',
+              pincode: orderDetails.address?.pincode || '',
+            },
+          }));
+        } catch (error) {
+          console.error('Error fetching order details:', error);
+        }
       }
     }
   };
 
   const handleSubmit = () => {
-    // Debug: Log form data to check address fields
-    console.log('Form data before submit:', formData);
-    console.log('Address data:', formData.address);
-
-    // Validate required address fields
-    const requiredAddressFields = ['street', 'city', 'state', 'pincode'];
-    const missingFields = requiredAddressFields.filter(
-      field => !formData.address[field] || formData.address[field].trim() === ''
-    );
-
-    if (missingFields.length > 0) {
-      alert(`Please fill in the following required address fields: ${missingFields.join(', ')}`);
+    // Validate required fields
+    if (!formData.customer.name || !formData.customer.phone) {
+      alert('Customer name and phone are required');
       return;
     }
-
-    // Validate required customer fields
-    if (!formData.customer.name || formData.customer.name.trim() === '') {
-      alert('Customer name is required');
+    if (
+      !formData.address.street ||
+      !formData.address.city ||
+      !formData.address.state ||
+      !formData.address.pincode
+    ) {
+      alert('Complete address is required');
       return;
     }
-
-    if (!formData.customer.phone || formData.customer.phone.trim() === '') {
-      alert('Customer phone is required');
+    if (!formData.scheduledDate) {
+      alert('Scheduled date is required');
       return;
     }
 
     const submitData = {
-      // Fix orderType enum - backend expects 'Order' or 'SellOrder', not 'buy' or 'sell'
       orderType: formData.orderType === 'buy' ? 'Order' : 'SellOrder',
       orderNumber: formData.orderNumber,
       assignedTo: formData.assignedTo,
       scheduledDate: formData.scheduledDate,
-      // Fix scheduledTimeSlot enum - backend expects specific time ranges
       scheduledTimeSlot:
         formData.timeSlot === 'morning'
           ? '09:00-12:00'
@@ -575,894 +913,554 @@ const PickupForm = ({
             ? '12:00-15:00'
             : formData.timeSlot === 'evening'
               ? '15:00-18:00'
-              : formData.timeSlot === 'night'
-                ? '18:00-21:00'
-                : '09:00-12:00', // default to morning if not recognized
+              : '18:00-21:00',
       status: formData.status,
-      specialInstructions: formData.instructions,
-      // Fix priority enum - backend expects 'low', 'medium', 'high', 'urgent', not 'normal'
-      priority: 'medium', // changed from 'normal' to 'medium'
-
-      // Fix items format - backend expects array of objects, not strings
+      specialInstructions: formData.specialInstructions,
+      priority: formData.priority,
       items: formData.items
-        ? formData.items
-            .split(',')
-            .map((item: any) => {
-              const trimmedItem = item.trim();
-              // Extract quantity if present in format "Item Name (Qty: 2)"
-              const qtyMatch = trimmedItem.match(/^(.+?)\s*\(Qty:\s*(\d+)\)$/);
-              if (qtyMatch) {
-                return {
-                  name: qtyMatch[1].trim(),
-                  quantity: parseInt(qtyMatch[2]),
-                  description: '',
-                  estimatedValue: 0,
-                };
-              }
+        ? formData.items.split(',').map((item: string) => {
+            const trimmedItem = item.trim();
+            const qtyMatch = trimmedItem.match(/^(.+?)\s*\(Qty:\s*(\d+)\)$/);
+            if (qtyMatch) {
               return {
-                name: trimmedItem,
-                quantity: 1,
+                name: qtyMatch[1].trim(),
+                quantity: parseInt(qtyMatch[2]),
                 description: '',
                 estimatedValue: 0,
               };
-            })
-            .filter((item: any) => item.name)
+            }
+            return {
+              name: trimmedItem,
+              quantity: 1,
+              description: '',
+              estimatedValue: 0,
+            };
+          })
         : [],
-
-      // Nested customer structure for backend processing
       customer: {
         name: formData.customer.name.trim(),
         phone: formData.customer.phone.trim(),
         email: formData.customer.email || '',
       },
-
-      // Nested address structure with zipCode (not pincode) - ensure all fields are populated
       address: {
         street: formData.address.street.trim(),
         city: formData.address.city.trim(),
         state: formData.address.state.trim(),
-        zipCode: formData.address.pincode.trim(), // backend expects zipCode, not pincode
-        landmark: formData.address.landmark || '',
+        zipCode: formData.address.pincode.trim(),
+        landmark: '',
       },
-
-      // Include product information if selected
-      ...(formData.selectedProduct && {
-        productId: formData.selectedProduct,
-        productNumber: formData.productNumber,
-      }),
-      // Include order information if selected
-      ...(formData.selectedOrderId && {
-        orderId: formData.selectedOrderId,
-      }),
+      ...(formData.selectedOrderId && { orderId: formData.selectedOrderId }),
     };
 
-    // Debug: Log submit data to verify structure
-    console.log('Submit data:', submitData);
     onSubmit(submitData);
   };
 
-  return (
-    <div>
-      <FormGroup>
-        <Label>Order Type</Label>
-        <Select
-          value={formData.orderType}
-          onChange={(e: any) => handleOrderTypeChange(e.target.value)}
-        >
-          <option value="sell">Sell Order</option>
-          <option value="buy">Buy Order</option>
-        </Select>
-      </FormGroup>
-
-      {/* Only show Product Selection for sell orders */}
-      {formData.orderType === 'sell' && (
-        <>
-          <FormGroup>
-            <Label>Product Selection</Label>
-            <Select
-              value={formData.selectedProduct}
-              onChange={(e: any) => handleProductChange(e.target.value)}
-              disabled={loadingProducts}
-            >
-              <option value="">Select Product</option>
-              {products.map((product: any) => (
-                <option key={product._id} value={product._id}>
-                  {product.name} - {product.brand} ({product.model || 'No Model'})
-                </option>
-              ))}
-            </Select>
-            {loadingProducts && (
-              <div style={{ fontSize: '12px', color: '#666' }}>Loading products...</div>
-            )}
-          </FormGroup>
-          <FormGroup>
-            <Label>Product Number</Label>
-            <Input
-              type="text"
-              value={formData.productNumber}
-              onChange={(e: any) => handleInputChange('productNumber', e.target.value)}
-              placeholder="Product number (auto-filled when product selected)"
-              readOnly={!!formData.selectedProduct}
-            />
-          </FormGroup>
-        </>
-      )}
-      <FormGroup>
-        <Label>Select Order ({formData.orderType === 'sell' ? 'Sell Orders' : 'Buy Orders'})</Label>
-        <Select
-          value={formData.selectedOrderId}
-          onChange={(e: any) => handleOrderChange(e.target.value)}
-          disabled={loadingOrders}
-        >
-          <option value="">Select Order</option>
-          {orders.map((order: any) => (
-            <option key={order._id} value={order._id}>
-              {order.user?.name || 'Unknown Customer'} -{' '}
-              {order.items?.[0]?.product?.name || 'Unknown Product'}
-            </option>
-          ))}
-        </Select>
-        {loadingOrders && <div style={{ fontSize: '12px', color: '#666' }}>Loading orders...</div>}
-      </FormGroup>
-      <FormGroup>
-        <Label>Order Number</Label>
-        <Input
-          type="text"
-          value={formData.orderNumber}
-          onChange={(e: any) => handleInputChange('orderNumber', e.target.value)}
-          placeholder="Order number (auto-filled when order selected)"
-          readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Customer Name</Label>
-        <Input
-          type="text"
-          value={formData.customer.name}
-          onChange={(e: any) => handleInputChange('customer.name', e.target.value)}
-          placeholder="Customer name (auto-filled when order selected)"
-          readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Customer Phone</Label>
-        <Input
-          type="tel"
-          value={formData.customer.phone}
-          onChange={(e: any) => handleInputChange('customer.phone', e.target.value)}
-          placeholder="Phone number (auto-filled when order selected)"
-          readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Street Address</Label>
-        <Input
-          type="text"
-          value={formData.address.street}
-          onChange={(e: any) => handleInputChange('address.street', e.target.value)}
-          placeholder="Street address (auto-filled when order selected)"
-          readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>City</Label>
-        <Input
-          type="text"
-          value={formData.address.city}
-          onChange={(e: any) => handleInputChange('address.city', e.target.value)}
-          placeholder="City (auto-filled when order selected)"
-          readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>State</Label>
-        <Input
-          type="text"
-          value={formData.address.state}
-          onChange={(e: any) => handleInputChange('address.state', e.target.value)}
-          placeholder="State (auto-filled when order selected)"
-          readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Pincode</Label>
-        <Input
-          type="text"
-          value={formData.address.pincode}
-          onChange={(e: any) => handleInputChange('address.pincode', e.target.value)}
-          placeholder="Pincode (auto-filled when order selected)"
-          readOnly={!!formData.selectedOrderId || formData.orderType === 'buy'}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Scheduled Date</Label>
-        <Input
-          type="date"
-          value={formData.scheduledDate}
-          onChange={(e: any) => handleInputChange('scheduledDate', e.target.value)}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Time Slot</Label>
-        <Select
-          value={formData.timeSlot}
-          onChange={(e: any) => handleInputChange('timeSlot', e.target.value)}
-        >
-          <option value="morning">Morning (10:00 AM - 3:00 PM)</option>
-          <option value="afternoon">Afternoon (3:00 PM - 6:00 PM)</option>
-        </Select>
-      </FormGroup>
-      <FormGroup>
-        <Label>Assign Agent</Label>
-        <Select
-          value={formData.assignedTo}
-          onChange={(e: any) => handleInputChange('assignedTo', e.target.value)}
-          disabled={loadingAgents}
-        >
-          <option value="">{loadingAgents ? 'Loading agents...' : 'Select Agent'}</option>
-          {agents.map((agent: any) => (
-            <option key={agent._id} value={agent._id}>
-              {agent.name} - {agent.type} {agent.email && `(${agent.email})`}
-            </option>
-          ))}
-        </Select>
-        {loadingAgents && (
-          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>Loading agents...</div>
-        )}
-        {!loadingAgents && agents.length === 0 && (
-          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-            No agents available. Please add agents first.
-          </div>
-        )}
-        {!loadingAgents && agents.length > 0 && (
-          <div style={{ fontSize: '12px', color: '#28a745', marginTop: '4px' }}>
-            {agents.length} agent(s) available
-          </div>
-        )}
-      </FormGroup>
-      <FormGroup>
-        <Label>Status</Label>
-        <Select
-          value={formData.status}
-          onChange={(e: any) => handleInputChange('status', e.target.value)}
-        >
-          <option value="scheduled">Scheduled</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="in_transit">In Transit</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="rescheduled">Rescheduled</option>
-        </Select>
-      </FormGroup>
-      <FormGroup>
-        <Label>Items (comma separated)</Label>
-        <Input
-          type="text"
-          value={formData.items}
-          onChange={(e: any) => handleInputChange('items', e.target.value)}
-          placeholder="Enter items to pickup"
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Special Instructions</Label>
-        <TextArea
-          value={formData.instructions}
-          onChange={(e: any) => handleInputChange('instructions', e.target.value)}
-          placeholder="Any special instructions for the pickup..."
-        />
-      </FormGroup>
-      <ModalActions>
-        <CancelButton onClick={onCancel}>Cancel</CancelButton>
-        <SubmitButton onClick={handleSubmit}>
-          {pickup ? 'Update Pickup' : 'Create Pickup'}
-        </SubmitButton>
-      </ModalActions>
-    </div>
-  );
-};
-
-const PickupManagement = () => {
-  const [pickups, setPickups] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState('create'); // 'create', 'edit', 'view'
-  const [selectedPickup, setSelectedPickup] = useState(null);
-  const [agents, setAgents] = useState([]);
-  const [loadingAgents, setLoadingAgents] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [loadingProducts, setLoadingProducts] = useState(false);
-  const [orders, setOrders] = useState([]);
-  const [loadingOrders, setLoadingOrders] = useState(false);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
-  // Fetch pickups from API
-  useEffect(() => {
-    fetchPickups();
-  }, [currentPage, searchTerm, statusFilter]);
-
-  // Fetch agents/drivers for assignment
-  useEffect(() => {
-    fetchAgents();
-    fetchProducts();
-    fetchOrders('sell'); // Default to sell orders
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      setLoadingProducts(true);
-      const response = await productService.getProducts({ limit: 100 });
-      const productsData = response.data || response.products || response || [];
-      setProducts(productsData);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      // Fallback to mock data if API fails
-      setProducts([
-        { _id: '1', name: 'iPhone 13', brand: 'Apple', model: 'A2482' },
-        { _id: '2', name: 'Samsung Galaxy S21', brand: 'Samsung', model: 'SM-G991B' },
-        { _id: '3', name: 'MacBook Pro', brand: 'Apple', model: 'MBP16' },
-      ]);
-    } finally {
-      setLoadingProducts(false);
-    }
-  };
-
-  const fetchOrders = async (orderType = 'sell') => {
-    try {
-      setLoadingOrders(true);
-      let response;
-
-      if (orderType === 'buy') {
-        response = await adminService.getBuyOrdersForPickup();
-      } else {
-        response = await adminService.getOrdersForPickup();
-      }
-
-      if (response) {
-        setOrders(response.orders);
-      } else if (response && Array.isArray(response)) {
-        setOrders(response);
-      } else {
-        // Fallback to existing getAllOrders if new endpoint not available
-        const fallbackResponse = await adminService.getAllOrders();
-        setOrders(fallbackResponse.data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      // Fallback to mock data based on order type
-      const mockData =
-        orderType === 'buy'
-          ? [
-              {
-                _id: '1',
-                orderNumber: 'BUY-001',
-                customer: { name: 'John Doe' },
-                address: {
-                  street: '123 Main St',
-                  city: 'Mumbai',
-                  state: 'Maharashtra',
-                  pincode: '400001',
-                },
-              },
-              {
-                _id: '2',
-                orderNumber: 'BUY-002',
-                customer: { name: 'Jane Smith' },
-                address: {
-                  street: '456 Oak Ave',
-                  city: 'Delhi',
-                  state: 'Delhi',
-                  pincode: '110001',
-                },
-              },
-            ]
-          : [
-              {
-                _id: '1',
-                orderNumber: 'ORD-001',
-                customer: { name: 'John Doe' },
-                address: {
-                  street: '123 Main St',
-                  city: 'Mumbai',
-                  state: 'Maharashtra',
-                  pincode: '400001',
-                },
-              },
-              {
-                _id: '2',
-                orderNumber: 'ORD-002',
-                customer: { name: 'Jane Smith' },
-                address: {
-                  street: '456 Oak Ave',
-                  city: 'Delhi',
-                  state: 'Delhi',
-                  pincode: '110001',
-                },
-              },
-            ];
-      setOrders(mockData);
-    } finally {
-      setLoadingOrders(false);
-    }
-  };
-
-  const fetchPickups = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const params = {
-        page: currentPage,
-        limit: 10,
-        search: searchTerm,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-      };
-
-      const response = await pickupService.getAllPickups(params);
-
-      // Handle response structure
-      const pickupData = response.data || response;
-      const pickupsArray = pickupData.docs || pickupData.pickups || pickupData || [];
-
-      setPickups(pickupsArray);
-      setTotalPages(pickupData.totalPages || pickupData.pages || 1);
-    } catch (error) {
-      console.error('Error fetching pickups:', error);
-      setError('Failed to fetch pickups. Please try again.');
-
-      // Fallback to mock data if API fails
-      setPickups([
-        {
-          _id: '1',
-          orderNumber: 'ORD001',
-          customer: {
-            name: 'John Doe',
-            phone: '+91 9876543210',
-          },
-          address: {
-            street: '123 Main St',
-            city: 'Mumbai',
-            state: 'Maharashtra',
-            pincode: '400001',
-          },
-          scheduledDate: '2024-01-25',
-          timeSlot: 'morning',
-          status: 'scheduled',
-          assignedTo: null,
-          items: ['iPhone 14 Pro'],
-          priority: 'normal',
-          createdAt: '2024-01-20T10:00:00Z',
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchAgents = async () => {
-    try {
-      setLoadingAgents(true);
-      console.log('Fetching agents...');
-
-      // Try to fetch users with admin service first
-      const usersResponse = await adminService.getAllUsers({ limit: 100 });
-      console.log('Users response:', usersResponse);
-
-      const allUsers = usersResponse.users || usersResponse.data || [];
-      console.log('All users:', allUsers);
-
-      // Filter for agents and drivers
-      const agents = allUsers.filter(
-        (user: any) =>
-          user.role === 'agent' ||
-          user.role === 'driver' ||
-          user.role === 'pickup_agent' ||
-          user.type === 'agent' ||
-          user.type === 'driver'
-      );
-
-      console.log('Filtered agents:', agents);
-
-      // If no specific agents found, try pickup service
-      if (agents.length === 0) {
-        console.log('No agents found in users, trying pickup service...');
-        const [driversResponse, agentsResponse] = await Promise.all([
-          pickupService.getDrivers({ limit: 100 }).catch(err => {
-            console.log('Error fetching drivers:', err);
-            return { users: [] };
-          }),
-          pickupService.getPickupAgents({ limit: 100 }).catch(err => {
-            console.log('Error fetching pickup agents:', err);
-            return { users: [] };
-          }),
-        ]);
-
-        const drivers = driversResponse.users || driversResponse.data || [];
-        const pickupAgents = agentsResponse.users || agentsResponse.data || [];
-
-        console.log('Drivers:', drivers);
-        console.log('Pickup agents:', pickupAgents);
-
-        // Combine and format agents
-        const combinedAgents = [
-          ...drivers.map((driver: any) => ({
-            ...driver,
-            type: 'driver',
-          })),
-          ...pickupAgents.map((agent: any) => ({
-            ...agent,
-            type: 'pickup_agent',
-          })),
-        ];
-
-        console.log('Combined agents:', combinedAgents);
-        setAgents(combinedAgents);
-      } else {
-        const formattedAgents = agents.map((agent: any) => ({
-          ...agent,
-          type: agent.role || agent.type || 'agent',
-        }));
-        console.log('Setting agents:', formattedAgents);
-        setAgents(formattedAgents);
-      }
-    } catch (error) {
-      console.error('Error fetching agents:', error);
-      console.error('Error details:', error.response?.data || error.message);
-
-      // Fallback to mock agents
-      const mockAgents = [
-        { _id: '1', name: 'Agent A', email: 'agent.a@example.com', type: 'driver' },
-        { _id: '2', name: 'Agent B', email: 'agent.b@example.com', type: 'pickup_agent' },
-        { _id: '3', name: 'Driver C', email: 'driver.c@example.com', type: 'driver' },
-      ];
-      console.log('Using mock agents:', mockAgents);
-      setAgents(mockAgents);
-    } finally {
-      setLoadingAgents(false);
-      console.log('Finished fetching agents');
-    }
-  };
-
-  const stats = {
-    total: pickups.length,
-    scheduled: pickups.filter(p => p.status === 'scheduled').length,
-    confirmed: pickups.filter(p => p.status === 'confirmed').length,
-    in_transit: pickups.filter(p => p.status === 'in_transit').length,
-    completed: pickups.filter(p => p.status === 'completed').length,
-  };
-
-  const filteredPickups = pickups.filter(pickup => {
-    const matchesSearch =
-      pickup.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pickup.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pickup.customer?.phone?.includes(searchTerm);
-    const matchesStatus = statusFilter === 'all' || pickup.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const handleCreatePickup = async (pickupData: any) => {
-    try {
-      setLoading(true);
-      await pickupService.createPickup(pickupData);
-      setShowModal(false);
-      fetchPickups(); // Refresh the list
-    } catch (error) {
-      console.error('Error creating pickup:', error);
-      setError('Failed to create pickup. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEditPickup = async (pickupData: any) => {
-    try {
-      setLoading(true);
-      await pickupService.updatePickup(selectedPickup._id, pickupData);
-      setShowModal(false);
-      setSelectedPickup(null);
-      fetchPickups(); // Refresh the list
-    } catch (error) {
-      console.error('Error updating pickup:', error);
-      setError('Failed to update pickup. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAssignPickup = async (pickupId: any, agentId: any) => {
-    try {
-      setLoading(true);
-      await pickupService.assignPickup(pickupId, agentId);
-      fetchPickups(); // Refresh the list
-    } catch (error) {
-      console.error('Error assigning pickup:', error);
-      setError('Failed to assign pickup. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleStatusUpdate = async (pickupId: any, newStatus: any) => {
-    try {
-      setLoading(true);
-      await pickupService.updatePickupStatus(pickupId, newStatus);
-      fetchPickups(); // Refresh the list
-    } catch (error) {
-      console.error('Error updating status:', error);
-      setError('Failed to update status. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleViewPickup = (pickup: any) => {
-    setModalType('view');
-    setSelectedPickup(pickup);
-    setShowModal(true);
-  };
-
-  const formatDate = (dateString: any) => {
-    return new Date(dateString).toLocaleDateString('en-IN');
-  };
-
-  const formatTimeSlot = (slot: any) => {
-    return slot === 'morning' ? '10:00 AM - 3:00 PM' : '3:00 PM - 6:00 PM';
-  };
-
-  if (loading) {
-    return <Container>Loading pickup data...</Container>;
-  }
-
-  if (error) {
+  if (type === 'view' && pickup) {
     return (
-      <Container>
-        <div style={{ color: 'red', textAlign: 'center', padding: '20px' }}>
-          {error}
-          <button onClick={fetchPickups} style={{ marginLeft: '10px' }}>
-            Retry
-          </button>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-900">Pickup Details</h2>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+              <XCircle className="w-6 h-6" />
+            </button>
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">Order Number</label>
+                <p className="mt-1 text-gray-900">{pickup.orderNumber}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Status</label>
+                <p className="mt-1">
+                  <span
+                    className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(pickup.status)}`}
+                  >
+                    {pickup.status.replace('_', ' ').toUpperCase()}
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Customer</label>
+              <p className="mt-1 text-gray-900">{pickup.customer?.name}</p>
+              <p className="text-sm text-gray-500">{pickup.customer?.phone}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Address</label>
+              <p className="mt-1 text-gray-900">
+                {pickup.address?.street}, {pickup.address?.city}, {pickup.address?.state}{' '}
+                {pickup.address?.pincode || pickup.address?.zipCode}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">Scheduled Date</label>
+                <p className="mt-1 text-gray-900">{formatDate(pickup.scheduledDate)}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">Time Slot</label>
+                <p className="mt-1 text-gray-900">
+                  {formatTimeSlot(pickup.scheduledTimeSlot || pickup.timeSlot || '')}
+                </p>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Assigned Agent</label>
+              <p className="mt-1 text-gray-900">{pickup.assignedTo?.name || 'Not assigned'}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Items</label>
+              <p className="mt-1 text-gray-900">
+                {pickup.items
+                  ?.map((i: any) => {
+                    if (typeof i === 'string') return i;
+                    if (i.name) {
+                      return i.quantity && i.quantity > 1
+                        ? `${i.name} (Qty: ${i.quantity})`
+                        : i.name;
+                    }
+                    if (i.description) return i.description;
+                    return '';
+                  })
+                  .filter(Boolean)
+                  .join(', ') || 'No items'}
+              </p>
+            </div>
+            {pickup.specialInstructions && (
+              <div>
+                <label className="text-sm font-medium text-gray-700">Special Instructions</label>
+                <p className="mt-1 text-gray-900">{pickup.specialInstructions}</p>
+              </div>
+            )}
+          </div>
+          <div className="p-6 border-t border-gray-200 flex justify-end">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Close
+            </button>
+          </div>
         </div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <Title>Pickup Management</Title>
-        <Controls>
-          <SearchBox>
-            <SearchIcon size={16} />
-            <SearchInput
-              placeholder="Search by customer, order number, or phone..."
-              value={searchTerm}
-              onChange={(e: any) => setSearchTerm(e.target.value)}
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {type === 'create' ? 'Create New Pickup' : 'Edit Pickup'}
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <XCircle className="w-6 h-6" />
+          </button>
+        </div>
+        <div className="p-6 space-y-6">
+          {/* Order Type */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Order Type</label>
+            <select
+              value={formData.orderType}
+              onChange={e => handleOrderTypeChange(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="sell">Sell Order</option>
+              <option value="buy">Buy Order</option>
+            </select>
+          </div>
+
+          {/* Select Order */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Order ({formData.orderType === 'sell' ? 'Sell Orders' : 'Buy Orders'})
+            </label>
+            <select
+              value={formData.selectedOrderId}
+              onChange={e => handleOrderChange(e.target.value)}
+              disabled={loadingOrders}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+            >
+              <option value="">Select Order</option>
+              {orders.map((order: any) => (
+                <option key={order._id || order.orderId} value={order._id || order.orderId}>
+                  {formData.orderType === 'sell'
+                    ? `${order.customerName || 'Unknown'} - ${order.productName || 'Unknown Product'}`
+                    : `${order.user?.name || 'Unknown'} - ${order.items?.[0]?.product?.name || 'Unknown Product'}`}
+                </option>
+              ))}
+            </select>
+            {loadingOrders && <p className="text-sm text-gray-500 mt-1">Loading orders...</p>}
+          </div>
+
+          {/* Order Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Order Number</label>
+            <input
+              type="text"
+              value={formData.orderNumber}
+              onChange={e => handleInputChange('orderNumber', e.target.value)}
+              placeholder="Order number"
+              readOnly={!!formData.selectedOrderId}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-          </SearchBox>
-          <FilterButton onClick={() => {}}>
-            <Filter size={16} />
-            Filter
-          </FilterButton>
-          <CreateButton
-            onClick={() => {
-              setModalType('create');
-              setSelectedPickup(null);
-              setShowModal(true);
-            }}
-          >
-            <Plus size={16} />
-            Create Pickup
-          </CreateButton>
-        </Controls>
-      </Header>
+          </div>
 
-      <StatsGrid>
-        <StatCard>
-          <StatValue color="#333">{stats.total}</StatValue>
-          <StatLabel>Total Pickups</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatValue color="#856404">{stats.scheduled}</StatValue>
-          <StatLabel>Scheduled</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatValue color="#155724">{stats.confirmed}</StatValue>
-          <StatLabel>Confirmed</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatValue color="#004085">{stats.in_transit}</StatValue>
-          <StatLabel>In Transit</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatValue color="#0c5460">{stats.completed}</StatValue>
-          <StatLabel>Completed</StatLabel>
-        </StatCard>
-      </StatsGrid>
-
-      <TableContainer>
-        <TableHeader>
-          <div>Order Details</div>
-          <div>Customer</div>
-          <div>Address</div>
-          <div>Scheduled</div>
-          <div>Agent</div>
-          <div>Status</div>
-          <div>Actions</div>
-        </TableHeader>
-
-        {filteredPickups.map(pickup => (
-          <TableRow key={pickup._id}>
+          {/* Customer Details */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <div style={{ fontWeight: '500' }}>{pickup.orderNumber}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                {pickup.items?.join(', ') || 'No items listed'}
-              </div>
-            </div>
-            <div>
-              <div style={{ fontWeight: '500' }}>{pickup.customer?.name || 'N/A'}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                {pickup.customer?.phone || 'N/A'}
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: '12px' }}>
-                {pickup.address?.street || ''} {pickup.address?.city || ''}
-              </div>
-              <div style={{ fontSize: '11px', color: '#666' }}>
-                {pickup.address?.state || ''} {pickup.address?.pincode || ''}
-              </div>
-            </div>
-            <div>
-              <div style={{ fontWeight: '500' }}>{formatDate(pickup.scheduledDate)}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                {formatTimeSlot(pickup.timeSlot)}
-              </div>
-            </div>
-            <div>
-              {pickup.assignedTo ? (
-                <div>
-                  <div style={{ fontWeight: '500' }}>
-                    {pickup.assignedTo.name || pickup.assignedTo}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#666' }}>
-                    {pickup.assignedTo.phone || ''}
-                  </div>
-                </div>
-              ) : (
-                <select
-                  onChange={e => {
-                    if (e.target.value) {
-                      handleAssignPickup(pickup._id, e.target.value);
-                    }
-                  }}
-                  defaultValue=""
-                  style={{
-                    padding: '4px 8px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                  }}
-                >
-                  <option value="">Assign Agent</option>
-                  {agents.map(agent => (
-                    <option key={agent._id} value={agent._id}>
-                      {agent.name} ({agent.type})
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-            <div>
-              <StatusBadge status={pickup.status}>
-                {pickup.status.replace('_', ' ').toUpperCase()}
-              </StatusBadge>
-            </div>
-            <Actions>
-              <ActionButton onClick={() => handleViewPickup(pickup)}>
-                <Eye size={16} />
-              </ActionButton>
-              <ActionButton
-                onClick={() => {
-                  setModalType('edit');
-                  setSelectedPickup(pickup);
-                  setShowModal(true);
-                }}
-              >
-                <Edit size={16} />
-              </ActionButton>
-              {pickup.status === 'pending' && (
-                <ActionButton
-                  onClick={() => handleStatusUpdate(pickup._id, 'assigned')}
-                  style={{ color: '#28a745' }}
-                >
-                  <CheckCircle size={16} />
-                </ActionButton>
-              )}
-            </Actions>
-          </TableRow>
-        ))}
-      </TableContainer>
-
-      {showModal && (
-        <Modal onClick={() => setShowModal(false)}>
-          <ModalContent onClick={(e: any) => e.stopPropagation()}>
-            <ModalHeader>
-              <ModalTitle>
-                {modalType === 'create'
-                  ? 'Create New Pickup'
-                  : modalType === 'edit'
-                    ? 'Edit Pickup'
-                    : 'Pickup Details'}
-              </ModalTitle>
-              <CloseButton onClick={() => setShowModal(false)}>×</CloseButton>
-            </ModalHeader>
-
-            {modalType === 'view' && selectedPickup && (
-              <div>
-                <FormGroup>
-                  <Label>Order Number</Label>
-                  <div>{selectedPickup.orderNumber}</div>
-                </FormGroup>
-                <FormGroup>
-                  <Label>Customer</Label>
-                  <div>
-                    {selectedPickup.customer?.name || 'N/A'} -{' '}
-                    {selectedPickup.customer?.phone || 'N/A'}
-                  </div>
-                </FormGroup>
-                <FormGroup>
-                  <Label>Address</Label>
-                  <div>
-                    {selectedPickup.address?.street || ''} {selectedPickup.address?.city || ''}
-                    <br />
-                    {selectedPickup.address?.state || ''} {selectedPickup.address?.pincode || ''}
-                  </div>
-                </FormGroup>
-                <FormGroup>
-                  <Label>Scheduled Date & Time</Label>
-                  <div>
-                    {formatDate(selectedPickup.scheduledDate)} -{' '}
-                    {formatTimeSlot(selectedPickup.timeSlot)}
-                  </div>
-                </FormGroup>
-                <FormGroup>
-                  <Label>Items</Label>
-                  <div>{selectedPickup.items?.join(', ') || 'No items listed'}</div>
-                </FormGroup>
-                <FormGroup>
-                  <Label>Assigned Agent</Label>
-                  <div>{selectedPickup.assignedTo?.name || 'Not assigned'}</div>
-                </FormGroup>
-                <FormGroup>
-                  <Label>Status</Label>
-                  <StatusBadge status={selectedPickup.status}>
-                    {selectedPickup.status.replace('_', ' ').toUpperCase()}
-                  </StatusBadge>
-                </FormGroup>
-              </div>
-            )}
-
-            {(modalType === 'create' || modalType === 'edit') && (
-              <PickupForm
-                pickup={selectedPickup}
-                agents={agents}
-                loadingAgents={loadingAgents}
-                products={products}
-                loadingProducts={loadingProducts}
-                orders={orders}
-                loadingOrders={loadingOrders}
-                onSubmit={modalType === 'create' ? handleCreatePickup : handleEditPickup}
-                onCancel={() => setShowModal(false)}
-                onOrderTypeChange={(orderType: any) => fetchOrders(orderType)}
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Customer Name *
+              </label>
+              <input
+                type="text"
+                value={formData.customer.name}
+                onChange={e => handleInputChange('customer.name', e.target.value)}
+                placeholder="Customer name"
+                readOnly={!!formData.selectedOrderId}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-            )}
-          </ModalContent>
-        </Modal>
-      )}
-    </Container>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Customer Phone *
+              </label>
+              <input
+                type="tel"
+                value={formData.customer.phone}
+                onChange={e => handleInputChange('customer.phone', e.target.value)}
+                placeholder="Phone number"
+                readOnly={!!formData.selectedOrderId}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Address */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Street Address *
+              </label>
+              <input
+                type="text"
+                value={formData.address.street}
+                onChange={e => handleInputChange('address.street', e.target.value)}
+                placeholder="Street address"
+                readOnly={!!formData.selectedOrderId}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                <input
+                  type="text"
+                  value={formData.address.city}
+                  onChange={e => handleInputChange('address.city', e.target.value)}
+                  placeholder="City"
+                  readOnly={!!formData.selectedOrderId}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                <input
+                  type="text"
+                  value={formData.address.state}
+                  onChange={e => handleInputChange('address.state', e.target.value)}
+                  placeholder="State"
+                  readOnly={!!formData.selectedOrderId}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
+                <input
+                  type="text"
+                  value={formData.address.pincode}
+                  onChange={e => handleInputChange('address.pincode', e.target.value)}
+                  placeholder="Pincode"
+                  readOnly={!!formData.selectedOrderId}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Schedule */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Scheduled Date *
+              </label>
+              <input
+                type="date"
+                value={formData.scheduledDate}
+                onChange={e => handleInputChange('scheduledDate', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Time Slot</label>
+              <select
+                value={formData.timeSlot}
+                onChange={e => handleInputChange('timeSlot', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="morning">Morning (9:00 AM - 12:00 PM)</option>
+                <option value="afternoon">Afternoon (12:00 PM - 3:00 PM)</option>
+                <option value="evening">Evening (3:00 PM - 6:00 PM)</option>
+                <option value="night">Night (6:00 PM - 9:00 PM)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Agent Assignment */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Assign Agent/Partner
+            </label>
+            <select
+              value={formData.assignedTo}
+              onChange={e => handleInputChange('assignedTo', e.target.value)}
+              disabled={loadingAgents}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+            >
+              <option value="">{loadingAgents ? 'Loading...' : 'Select Agent/Partner'}</option>
+              {agents.map((agent: any) => (
+                <option key={agent._id} value={agent._id}>
+                  {agent.name} - {(agent.type || agent.role).toUpperCase()}
+                  {agent.email ? ` (${agent.email})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status and Priority */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <select
+                value={formData.status}
+                onChange={e => handleInputChange('status', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="assigned">Assigned</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="in_transit">In Transit</option>
+                <option value="arrived">Arrived</option>
+                <option value="picked_up">Picked Up</option>
+                <option value="completed">Completed</option>
+                <option value="failed">Failed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="rescheduled">Rescheduled</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+              <select
+                value={formData.priority}
+                onChange={e => handleInputChange('priority', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Items */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Items (comma separated)
+            </label>
+            <input
+              type="text"
+              value={formData.items}
+              onChange={e => handleInputChange('items', e.target.value)}
+              placeholder="iPhone 14, MacBook Pro, etc."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Special Instructions */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Special Instructions
+            </label>
+            <textarea
+              value={formData.specialInstructions}
+              onChange={e => handleInputChange('specialInstructions', e.target.value)}
+              placeholder="Any special instructions for the pickup..."
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-gray-200 flex justify-end gap-3 sticky bottom-0 bg-white">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            {type === 'create' ? 'Create Pickup' : 'Update Pickup'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Analytics Modal Component
+interface AnalyticsModalProps {
+  analytics: any;
+  onClose: () => void;
+}
+
+const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ analytics, onClose }) => {
+  const { overview, statusDistribution, priorityDistribution, agentPerformance } = analytics;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white">
+          <h2 className="text-2xl font-bold text-gray-900">Pickup Analytics</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <XCircle className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* Overview Stats */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Overview</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-sm text-gray-600">Total Pickups</p>
+                <p className="text-2xl font-bold text-gray-900">{overview?.totalPickups || 0}</p>
+              </div>
+              <div className="bg-green-50 p-4 rounded-lg">
+                <p className="text-sm text-green-600">Completed</p>
+                <p className="text-2xl font-bold text-green-900">
+                  {overview?.completedPickups || 0}
+                </p>
+              </div>
+              <div className="bg-yellow-50 p-4 rounded-lg">
+                <p className="text-sm text-yellow-600">Pending</p>
+                <p className="text-2xl font-bold text-yellow-900">
+                  {overview?.pendingPickups || 0}
+                </p>
+              </div>
+              <div className="bg-red-50 p-4 rounded-lg">
+                <p className="text-sm text-red-600">Failed</p>
+                <p className="text-2xl font-bold text-red-900">{overview?.failedPickups || 0}</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-sm text-gray-600">Cancelled</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {overview?.cancelledPickups || 0}
+                </p>
+              </div>
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-sm text-blue-600">Success Rate</p>
+                <p className="text-2xl font-bold text-blue-900">{overview?.successRate || 0}%</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Distribution */}
+          {statusDistribution && statusDistribution.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Status Distribution</h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="space-y-2">
+                  {statusDistribution.map((item: any) => (
+                    <div key={item._id} className="flex items-center justify-between">
+                      <span className="text-gray-700 capitalize">{item._id.replace('_', ' ')}</span>
+                      <span className="font-semibold text-gray-900">{item.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Agent Performance */}
+          {agentPerformance && agentPerformance.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Agent Performance</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                        Agent
+                      </th>
+                      <th className="px-4 py-2 text-center text-sm font-medium text-gray-700">
+                        Total
+                      </th>
+                      <th className="px-4 py-2 text-center text-sm font-medium text-gray-700">
+                        Completed
+                      </th>
+                      <th className="px-4 py-2 text-center text-sm font-medium text-gray-700">
+                        Failed
+                      </th>
+                      <th className="px-4 py-2 text-center text-sm font-medium text-gray-700">
+                        Success Rate
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {agentPerformance.map((agent: any) => (
+                      <tr key={agent._id}>
+                        <td className="px-4 py-3">
+                          <div>
+                            <p className="font-medium text-gray-900">{agent.agentName}</p>
+                            <p className="text-sm text-gray-500">{agent.agentEmail}</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center text-gray-900">
+                          {agent.totalAssigned}
+                        </td>
+                        <td className="px-4 py-3 text-center text-green-600">{agent.completed}</td>
+                        <td className="px-4 py-3 text-center text-red-600">{agent.failed}</td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {agent.successRate?.toFixed(1)}%
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="p-6 border-t border-gray-200 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
