@@ -30,7 +30,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to create session');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create session');
       throw err;
     } finally {
       setLoading(false);
@@ -51,7 +52,8 @@ const useSellSessions = () => {
 
       setSessions(response.data.data || []);
       return response.data.data || [];
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch sessions');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch sessions');
       throw err;
     } finally {
       setLoading(false);
@@ -72,7 +74,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data.session;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch session');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch session');
       throw err;
     } finally {
       setLoading(false);
@@ -94,7 +97,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to update session answers');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update session answers');
       throw err;
     } finally {
       setLoading(false);
@@ -116,7 +120,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to update session defects');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update session defects');
       throw err;
     } finally {
       setLoading(false);
@@ -138,7 +143,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to update session accessories');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update session accessories');
       throw err;
     } finally {
       setLoading(false);
@@ -159,7 +165,8 @@ const useSellSessions = () => {
 
       setCurrentPrice(response.data.price);
       return response.data.price;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to get current price');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to get current price');
       throw err;
     } finally {
       setLoading(false);
@@ -184,7 +191,8 @@ const useSellSessions = () => {
 
       setCurrentSession(response.data.session);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to extend session');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to extend session');
       throw err;
     } finally {
       setLoading(false);
@@ -204,13 +212,16 @@ const useSellSessions = () => {
           },
         });
 
-        // Remove from sessions list        setSessions(prev => prev.filter(session => session._id !== sessionId));
+        // Remove from sessions list
+        setSessions(prev => prev.filter(session => session._id !== sessionId));
 
-        // Clear current session if it was deleted        if (currentSession?._id === sessionId) {
+        // Clear current session if it was deleted
+        if (currentSession?._id === sessionId) {
           setCurrentSession(null);
           setCurrentPrice(null);
         }
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to delete session');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to delete session');
         throw err;
       } finally {
         setLoading(false);
@@ -219,20 +230,81 @@ const useSellSessions = () => {
     [currentSession]
   );
 
-  // Admin method: Clean expired sessions
-  const cleanExpiredSessions = useCallback(async () => {
+  // Admin method: Get all sessions
+  const getAllSessions = useCallback(async (params: any = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
-      const response = await api.delete('/sell-sessions/admin/cleanup', {
+      const token = localStorage.getItem('token');
+      const queryParams = new URLSearchParams();
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, String(value));
+        }
+      });
+
+      const response = await api.get(`/sell-sessions/admin/all?${queryParams.toString()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
+      setSessions(response.data.data || []);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to clean expired sessions');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch all sessions');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Admin method: Update session status
+  const updateSessionStatus = useCallback(async (sessionId: any, isActive: boolean) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await api.patch(
+        `/sell-sessions/admin/${sessionId}/status`,
+        { isActive },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update session status');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Admin method: Clean expired sessions
+  const cleanExpiredSessions = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await api.post(
+        '/sell-sessions/admin/cleanup',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to clean expired sessions');
       throw err;
     } finally {
       setLoading(false);
@@ -251,7 +323,8 @@ const useSellSessions = () => {
       });
 
       return response.data.price;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to calculate price');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to calculate price');
       throw err;
     } finally {
       setLoading(false);
@@ -301,6 +374,8 @@ const useSellSessions = () => {
     calculatePrice,
 
     // Admin methods
+    getAllSessions,
+    updateSessionStatus,
     cleanExpiredSessions,
 
     // Utilities

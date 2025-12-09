@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
 import useAdminPartnerApplications from '../../hooks/useAdminPartnerApplications';
 import {
   UserCheck,
@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   FileText,
   Download,
-  Upload,
   Phone,
   Mail,
   MapPin,
@@ -18,559 +17,41 @@ import {
   CreditCard,
   Calendar,
   User,
-  Filter,
   RefreshCw,
   MessageSquare,
   Star,
-  Shield,
   Briefcase,
 } from 'lucide-react';
 
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-  }
-`;
-
-const FilterSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  min-width: 250px;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const FilterSelect = styled.select`
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  min-width: 150px;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const StatIcon = styled.div`
-  background: ${(props: any) => props.color || '#3b82f6'};
-  color: white;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatContent = styled.div`
-  flex: 1;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const ApplicationsContainer = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-
-const ApplicationsTable = styled.div`
-  overflow-x: auto;
-`;
-
-const TableHeader = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 150px;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-  font-weight: 600;
-  color: #374151;
-  font-size: 0.875rem;
-`;
-
-const ApplicationRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 150px;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  align-items: center;
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: #f9fafb;
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const ApplicantInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const ApplicantName = styled.div`
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 0.875rem;
-`;
-
-const ApplicantEmail = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const BusinessInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const BusinessName = styled.div`
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 0.875rem;
-`;
-
-const BusinessType = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const ContactInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const ContactPhone = styled.div`
-  font-size: 0.875rem;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-
-const ContactLocation = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-
-  ${(props: any) => {
-    switch (props.status) {
-      case 'pending':
-        return 'background: #fef3c7; color: #92400e;';
-      case 'under_review':
-        return 'background: #dbeafe; color: #1e40af;';
-      case 'approved':
-        return 'background: #dcfce7; color: #166534;';
-      case 'rejected':
-        return 'background: #fee2e2; color: #dc2626;';
-      case 'on_hold':
-        return 'background: #f3f4f6; color: #374151;';
-      default:
-        return 'background: #f3f4f6; color: #374151;';
-    }
-  }}
-`;
-
-const PriorityBadge = styled.span`
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-
-  ${(props: any) => {
-    switch (props.priority) {
-      case 'high':
-        return 'background: #fee2e2; color: #dc2626;';
-      case 'medium':
-        return 'background: #fef3c7; color: #92400e;';
-      case 'low':
-        return 'background: #dcfce7; color: #166534;';
-      default:
-        return 'background: #f3f4f6; color: #374151;';
-    }
-  }}
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const IconButton = styled.button`
-  background: ${(props: any) => props.primary
-  ? '#3b82f6'
-  : props.danger
-    ? '#ef4444'
-    : props.success
-      ? '#10b981'
-      : props.warning
-        ? '#f59e0b'
-        : '#6b7280'};
-  color: white;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: all 0.2s;
-
-  &:hover {
-    opacity: 0.9;
-    transform: scale(1.05);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  padding: 2rem;
-  max-width: 1000px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-
-  &:hover {
-    background: #f3f4f6;
-  }
-`;
-
-const DetailSection = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const DetailGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const DetailItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background: #f9fafb;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-`;
-
-const DetailLabel = styled.span`
-  color: #6b7280;
-  font-weight: 500;
-`;
-
-const DetailValue = styled.span`
-  color: #1f2937;
-  font-weight: 600;
-`;
-
-const DocumentsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-`;
-
-const DocumentCard = styled.div`
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  text-align: center;
-  transition: all 0.2s;
-
-  &:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const DocumentIcon = styled.div`
-  background: #f3f4f6;
-  color: #6b7280;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-`;
-
-const DocumentName = styled.div`
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-  font-size: 0.875rem;
-`;
-
-const DocumentStatus = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-  margin-bottom: 0.5rem;
-`;
-
-const DocumentActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-`;
-
-const ActionSection = styled.div`
-  background: #f9fafb;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  margin-top: 2rem;
-`;
-
-const ActionButtons2 = styled.div`
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-`;
-
-const Button = styled.button`
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  ${(props: any) => {
-    switch (props.variant) {
-      case 'success':
-        return 'background: #10b981; color: white; &:hover { background: #059669; }';
-      case 'danger':
-        return 'background: #ef4444; color: white; &:hover { background: #dc2626; }';
-      case 'warning':
-        return 'background: #f59e0b; color: white; &:hover { background: #d97706; }';
-      case 'primary':
-        return 'background: #3b82f6; color: white; &:hover { background: #2563eb; }';
-      default:
-        return 'background: #f3f4f6; color: #374151; &:hover { background: #e5e7eb; }';
-    }
-  }}
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const CommentSection = styled.div`
-  margin-top: 1rem;
-`;
-
-const CommentTextarea = styled.textarea`
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  resize: vertical;
-  min-height: 100px;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
 const PartnerApplications = () => {
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [selectedApplication, setSelectedApplication] = useState<any>(null);
   const [comment, setComment] = useState('');
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    under_review: 0,
-    approved: 0,
-    rejected: 0,
-  });
 
   const {
-    applications: hookApplications,
-    stats: hookStats,
-    loading: hookLoading,
-    error: hookError,
-    updateApplicationStatus,    downloadDocument,
+    applications,
+    stats,
+    loading,
+    error,
+    updateApplicationStatus,
+    downloadDocument,
     fetchApplications,
   } = useAdminPartnerApplications();
 
-  useEffect(() => {
-    setApplications(hookApplications);    setStats(hookStats);
-    setLoading(hookLoading);
-  }, [hookApplications, hookStats, hookLoading]);
-
   const handleStatusUpdate = async (applicationId: any, newStatus: any, comments = '') => {
     try {
-      await updateApplicationStatus(applicationId, newStatus, comments);      if (selectedApplication && selectedApplication._id === applicationId) {        setSelectedApplication({ ...selectedApplication, status: newStatus });
+      const result = await updateApplicationStatus(applicationId, newStatus, comments);
+      if (result.success) {
+        // Refetch applications to get updated data from backend
+        await fetchApplications();
+
+        // Update selected application if modal is open
+        if (selectedApplication && selectedApplication._id === applicationId) {
+          setSelectedApplication({ ...selectedApplication, status: newStatus });
+        }
       }
     } catch (error) {
       console.error('Error updating application status:', error);
@@ -595,142 +76,147 @@ const PartnerApplications = () => {
     switch (status) {
       case 'pending':
         return <Clock size={12} />;
-      case 'under_review':
-        return <Eye size={12} />;
       case 'approved':
         return <CheckCircle size={12} />;
       case 'rejected':
         return <XCircle size={12} />;
-      case 'on_hold':
-        return <AlertTriangle size={12} />;
       default:
         return <Clock size={12} />;
     }
   };
 
-  const getPriorityColor = (priority: any) => {
-    switch (priority) {
-      case 'high':
-        return '#ef4444';
-      case 'medium':
-        return '#f59e0b';
-      case 'low':
-        return '#10b981';
-      default:
-        return '#6b7280';
-    }
-  };
-
   const canUpdateStatus = (currentStatus: any, newStatus: any) => {
-    const statusFlow = {
-      pending: ['under_review', 'rejected'],
-      under_review: ['approved', 'rejected', 'on_hold'],
-      on_hold: ['under_review', 'rejected'],
+    // Simplified status flow: pending -> approved/rejected
+    const statusFlow: any = {
+      pending: ['approved', 'rejected'],
       approved: [],
       rejected: [],
-    };    return statusFlow[currentStatus]?.includes(newStatus) || false;
+    };
+    return statusFlow[currentStatus]?.includes(newStatus) || false;
   };
 
-  const filteredApplications = applications.filter(application => {
-    const matchesSearch =      application.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||      application.applicantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||      application.email?.toLowerCase().includes(searchTerm.toLowerCase());    const matchesStatus = !statusFilter || application.status === statusFilter;    const matchesPriority = !priorityFilter || application.priority === priorityFilter;
+  const filteredApplications = applications.filter((application: any) => {
+    const matchesSearch =
+      application.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.applicantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = !statusFilter || application.status === statusFilter;
+    const matchesPriority = !priorityFilter || application.priority === priorityFilter;
 
     return matchesSearch && matchesStatus && matchesPriority;
   });
 
   if (loading) {
     return (
-      <Container>
-        <div style={{ textAlign: 'center', padding: '4rem' }}>
-          <UserCheck size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
-          <p>Loading partner applications...</p>
+      <div className="p-8 bg-gray-50 min-h-screen">
+        <div className="text-center py-16">
+          <UserCheck size={48} className="text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600">Loading partner applications...</p>
         </div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <Title>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <UserCheck size={32} />
           Partner Applications (KYC)
-        </Title>
-        <ActionButton onClick={() => fetchApplications()}>
+        </h1>
+        <button
+          onClick={() => fetchApplications()}
+          className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+        >
           <RefreshCw size={20} />
           Refresh
-        </ActionButton>
-      </Header>
+        </button>
+      </div>
 
-      <StatsGrid>
-        <StatCard>
-          <StatIcon color="#3b82f6">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-blue-500 text-white p-4 rounded-xl">
             <FileText size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.total}</StatValue>
-            <StatLabel>Total Applications</StatLabel>
-          </StatContent>
-        </StatCard>
+          </div>
+          <div>
+            <div className="text-3xl font-bold text-gray-900">{stats.total}</div>
+            <div className="text-sm text-gray-600">Total Applications</div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatIcon color="#f59e0b">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-amber-500 text-white p-4 rounded-xl">
             <Clock size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.pending}</StatValue>
-            <StatLabel>Pending Review</StatLabel>
-          </StatContent>
-        </StatCard>
+          </div>
+          <div>
+            <div className="text-3xl font-bold text-gray-900">{stats.pending}</div>
+            <div className="text-sm text-gray-600">Pending Review</div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatIcon color="#3b82f6">
-            <Eye size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.under_review}</StatValue>
-            <StatLabel>Under Review</StatLabel>
-          </StatContent>
-        </StatCard>
-
-        <StatCard>
-          <StatIcon color="#10b981">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-green-500 text-white p-4 rounded-xl">
             <CheckCircle size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.approved}</StatValue>
-            <StatLabel>Approved</StatLabel>
-          </StatContent>
-        </StatCard>
-      </StatsGrid>
+          </div>
+          <div>
+            <div className="text-3xl font-bold text-gray-900">{stats.approved}</div>
+            <div className="text-sm text-gray-600">Approved</div>
+          </div>
+        </div>
 
-      <FilterSection>
-        <SearchInput
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-red-500 text-white p-4 rounded-xl">
+            <XCircle size={24} />
+          </div>
+          <div>
+            <div className="text-3xl font-bold text-gray-900">{stats.rejected}</div>
+            <div className="text-sm text-gray-600">Rejected</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter Section */}
+      <div className="bg-white p-6 rounded-xl shadow-sm mb-8 flex gap-4 flex-wrap items-center">
+        <input
           type="text"
           placeholder="Search by business name, applicant name, or email..."
           value={searchTerm}
-          onChange={(e: any) => setSearchTerm(e.target.value)}
+          onChange={e => setSearchTerm(e.target.value)}
+          className="flex-1 min-w-[250px] px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
 
-        <FilterSelect value={statusFilter} onChange={(e: any) => setStatusFilter(e.target.value)}>
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+          className="px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white min-w-[150px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
           <option value="">All Status</option>
           <option value="pending">Pending</option>
           <option value="under_review">Under Review</option>
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
           <option value="on_hold">On Hold</option>
-        </FilterSelect>
+        </select>
 
-        <FilterSelect value={priorityFilter} onChange={(e: any) => setPriorityFilter(e.target.value)}>
+        <select
+          value={priorityFilter}
+          onChange={e => setPriorityFilter(e.target.value)}
+          className="px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white min-w-[150px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
           <option value="">All Priority</option>
           <option value="high">High</option>
           <option value="medium">Medium</option>
           <option value="low">Low</option>
-        </FilterSelect>
-      </FilterSection>
+        </select>
+      </div>
 
-      <ApplicationsContainer>
-        <ApplicationsTable>
-          <TableHeader>
+      {/* Applications Table */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          {/* Table Header */}
+          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_150px] gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 font-semibold text-gray-700 text-sm">
             <div>Applicant</div>
             <div>Business</div>
             <div>Contact</div>
@@ -738,276 +224,366 @@ const PartnerApplications = () => {
             <div>Priority</div>
             <div>Status</div>
             <div>Actions</div>
-          </TableHeader>
+          </div>
 
+          {/* Table Body */}
           {filteredApplications.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '4rem' }}>
-              <UserCheck size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
-              <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+            <div className="text-center py-16">
+              <UserCheck size={48} className="text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 text-lg">
                 {searchTerm || statusFilter || priorityFilter
                   ? 'No applications match your filters'
                   : 'No applications found'}
               </p>
             </div>
           ) : (
-            filteredApplications.map(application => (              <ApplicationRow key={application._id}>
-                <ApplicantInfo>                  <ApplicantName>{application.applicantName || 'N/A'}</ApplicantName>                  <ApplicantEmail>{application.email || 'N/A'}</ApplicantEmail>
-                </ApplicantInfo>
+            filteredApplications.map((application: any) => (
+              <div
+                key={application._id}
+                className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_150px] gap-4 px-6 py-4 border-b border-gray-200 items-center hover:bg-gray-50 transition-colors"
+              >
+                {/* Applicant */}
+                <div className="flex flex-col gap-1">
+                  <div className="font-semibold text-gray-900 text-sm">
+                    {application.applicantName || 'N/A'}
+                  </div>
+                  <div className="text-xs text-gray-600">{application.email || 'N/A'}</div>
+                </div>
 
-                <BusinessInfo>                  <BusinessName>{application.businessName || 'N/A'}</BusinessName>                  <BusinessType>{application.businessType || 'N/A'}</BusinessType>
-                </BusinessInfo>
+                {/* Business */}
+                <div className="flex flex-col gap-1">
+                  <div className="font-semibold text-gray-900 text-sm">
+                    {application.businessName || 'N/A'}
+                  </div>
+                  <div className="text-xs text-gray-600">{application.businessType || 'N/A'}</div>
+                </div>
 
-                <ContactInfo>
-                  <ContactPhone>
-                    <Phone size={12} />                    {application.phone || 'N/A'}
-                  </ContactPhone>
-                  <ContactLocation>
-                    <MapPin size={12} style={{ display: 'inline', marginRight: '0.25rem' }} />                    {application.city || 'N/A'}, {application.state || 'N/A'}
-                  </ContactLocation>
-                </ContactInfo>
+                {/* Contact */}
+                <div className="flex flex-col gap-1">
+                  <div className="text-sm text-gray-900 flex items-center gap-1">
+                    <Phone size={12} />
+                    {application.phone || 'N/A'}
+                  </div>
+                  <div className="text-xs text-gray-600 flex items-center gap-1">
+                    <MapPin size={12} />
+                    {application.city || 'N/A'}, {application.state || 'N/A'}
+                  </div>
+                </div>
 
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>                  {new Date(application.createdAt).toLocaleDateString()}
-                </div>                <PriorityBadge priority={application.priority || 'medium'}>                  {application.priority?.charAt(0)?.toUpperCase() +                    application.priority?.slice(1) || 'Medium'}
-                </PriorityBadge>                <StatusBadge status={application.status}>                  {getStatusIcon(application.status)}                  {application.status?.charAt(0)?.toUpperCase() + application.status?.slice(1) ||
-                    'Pending'}
-                </StatusBadge>
+                {/* Applied Date */}
+                <div className="text-sm text-gray-600">
+                  {new Date(application.createdAt).toLocaleDateString()}
+                </div>
 
-                <ActionButtons>
-                  <IconButton primary onClick={() => handleViewDetails(application)}>
+                {/* Priority */}
+                <div>
+                  <span
+                    className={`px-3 py-1 rounded text-xs font-semibold ${
+                      application.priority === 'high'
+                        ? 'bg-red-100 text-red-700'
+                        : application.priority === 'medium'
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-green-100 text-green-700'
+                    }`}
+                  >
+                    {application.priority?.charAt(0)?.toUpperCase() +
+                      application.priority?.slice(1) || 'Medium'}
+                  </span>
+                </div>
+
+                {/* Status */}
+                <div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${
+                      application.status === 'pending'
+                        ? 'bg-amber-100 text-amber-800'
+                        : application.status === 'approved'
+                          ? 'bg-green-100 text-green-800'
+                          : application.status === 'rejected'
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    {getStatusIcon(application.status)}
+                    {application.status?.charAt(0)?.toUpperCase() + application.status?.slice(1) ||
+                      'Pending'}
+                  </span>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleViewDetails(application)}
+                    className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-all hover:scale-105"
+                    title="View Details"
+                  >
                     <Eye size={14} />
-                  </IconButton>                  {canUpdateStatus(application.status, 'under_review') && (
-                    <IconButton
-                      warning                      onClick={() => handleStatusUpdate(application._id, 'under_review')}
-                    >
-                      <Eye size={14} />
-                    </IconButton>
-                  )}                  {canUpdateStatus(application.status, 'approved') && (
-                    <IconButton
-                      success                      onClick={() => handleStatusUpdate(application._id, 'approved')}
+                  </button>
+                  {canUpdateStatus(application.status, 'approved') && (
+                    <button
+                      onClick={() => handleStatusUpdate(application._id, 'approved')}
+                      className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-all hover:scale-105"
+                      title="Approve"
                     >
                       <CheckCircle size={14} />
-                    </IconButton>
-                  )}                  {canUpdateStatus(application.status, 'rejected') && (
-                    <IconButton
-                      danger                      onClick={() => handleStatusUpdate(application._id, 'rejected')}
+                    </button>
+                  )}
+                  {canUpdateStatus(application.status, 'rejected') && (
+                    <button
+                      onClick={() => handleStatusUpdate(application._id, 'rejected')}
+                      className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-all hover:scale-105"
+                      title="Reject"
                     >
                       <XCircle size={14} />
-                    </IconButton>
+                    </button>
                   )}
-                </ActionButtons>
-              </ApplicationRow>
+                </div>
+              </div>
             ))
           )}
-        </ApplicationsTable>
-      </ApplicationsContainer>
+        </div>
+      </div>
 
+      {/* Detail Modal */}
       {showDetailModal && selectedApplication && (
-        <Modal>
-          <ModalContent>
-            <ModalHeader>
-              <ModalTitle>Partner Application Details</ModalTitle>
-              <CloseButton onClick={() => setShowDetailModal(false)}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Partner Application Details</h2>
+              <button
+                onClick={() => setShowDetailModal(false)}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
                 <XCircle size={20} />
-              </CloseButton>
-            </ModalHeader>
+              </button>
+            </div>
 
-            <DetailSection>
-              <SectionTitle>
+            {/* Applicant Information */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
                 <User size={20} />
                 Applicant Information
-              </SectionTitle>
-              <DetailGrid>
-                <DetailItem>
-                  <User size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Name:</DetailLabel>                  <DetailValue>{selectedApplication.applicantName || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <Mail size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Email:</DetailLabel>                  <DetailValue>{selectedApplication.email || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <Phone size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Phone:</DetailLabel>                  <DetailValue>{selectedApplication.phone || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <Calendar size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Applied Date:</DetailLabel>
-                  <DetailValue>                    {new Date(selectedApplication.createdAt).toLocaleDateString()}
-                  </DetailValue>
-                </DetailItem>
-              </DetailGrid>
-            </DetailSection>
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <User size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Name:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.applicantName || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Mail size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Email:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.email || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Phone size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Phone:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.phone || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Calendar size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Applied Date:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {new Date(selectedApplication.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-            <DetailSection>
-              <SectionTitle>
+            {/* Business Information */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
                 <Building size={20} />
                 Business Information
-              </SectionTitle>
-              <DetailGrid>
-                <DetailItem>
-                  <Building size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Business Name:</DetailLabel>                  <DetailValue>{selectedApplication.businessName || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <Briefcase size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Business Type:</DetailLabel>                  <DetailValue>{selectedApplication.businessType || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <CreditCard size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>GST Number:</DetailLabel>                  <DetailValue>{selectedApplication.gstNumber || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <MapPin size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Address:</DetailLabel>                  <DetailValue>{selectedApplication.address || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <MapPin size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>City:</DetailLabel>                  <DetailValue>{selectedApplication.city || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <MapPin size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>State:</DetailLabel>                  <DetailValue>{selectedApplication.state || 'N/A'}</DetailValue>
-                </DetailItem>
-              </DetailGrid>
-            </DetailSection>
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Building size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Business Name:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.businessName || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Briefcase size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Business Type:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.businessType || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <CreditCard size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">GST Number:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.gstNumber || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <MapPin size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Address:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.address || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <MapPin size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">City:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.city || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <MapPin size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">State:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.state || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-            <DetailSection>
-              <SectionTitle>
+            {/* Documents */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
                 <FileText size={20} />
                 Documents
-              </SectionTitle>
-              <DocumentsGrid>                {selectedApplication.documents?.map((doc: any, index: any) => (
-                  <DocumentCard key={index}>
-                    <DocumentIcon>
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {selectedApplication.documents?.map((doc: any, index: any) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 rounded-lg p-4 text-center hover:border-blue-500 hover:shadow-md transition-all"
+                  >
+                    <div className="bg-gray-100 text-gray-400 p-4 rounded-lg flex items-center justify-center mb-2">
                       <FileText size={24} />
-                    </DocumentIcon>
-                    <DocumentName>{doc.name || `Document ${index + 1}`}</DocumentName>
-                    <DocumentStatus>
+                    </div>
+                    <div className="font-semibold text-gray-900 mb-1 text-sm">
+                      {doc.name || `Document ${index + 1}`}
+                    </div>
+                    <div className="text-xs text-gray-600 mb-2">
                       {doc.verified ? 'Verified' : 'Pending Verification'}
-                    </DocumentStatus>
-                    <DocumentActions>
-                      <IconButton
-                        primary
+                    </div>
+                    <div className="flex gap-2 justify-center">
+                      <button
                         onClick={() => handleDocumentDownload(doc._id, doc.filename)}
+                        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-all"
                       >
                         <Download size={12} />
-                      </IconButton>
+                      </button>
                       {!doc.verified && (
-                        <IconButton success>
+                        <button className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-all">
                           <CheckCircle size={12} />
-                        </IconButton>
+                        </button>
                       )}
-                    </DocumentActions>
-                  </DocumentCard>
+                    </div>
+                  </div>
                 )) || (
-                  <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#6b7280' }}>
+                  <div className="col-span-3 text-center text-gray-600 py-8">
                     No documents uploaded
                   </div>
                 )}
-              </DocumentsGrid>
-            </DetailSection>            {selectedApplication.experience && (
-              <DetailSection>
-                <SectionTitle>
+              </div>
+            </div>
+
+            {/* Experience */}
+            {selectedApplication.experience && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
                   <Star size={20} />
                   Experience & Background
-                </SectionTitle>
-                <div
-                  style={{
-                    padding: '1rem',
-                    background: '#f9fafb',
-                    borderRadius: '0.5rem',
-                    color: '#374151',
-                  }}
-                >                  {selectedApplication.experience}
+                </h3>
+                <div className="p-4 bg-gray-50 rounded-lg text-gray-700">
+                  {selectedApplication.experience}
                 </div>
-              </DetailSection>
-            )}            {selectedApplication.comments && selectedApplication.comments.length > 0 && (
-              <DetailSection>
-                <SectionTitle>
-                  <MessageSquare size={20} />
-                  Review Comments
-                </SectionTitle>                {selectedApplication.comments.map((comment: any, index: any) => (
-                  <div
-                    key={index}
-                    style={{
-                      padding: '1rem',
-                      background: '#f9fafb',
-                      borderRadius: '0.5rem',
-                      marginBottom: '0.5rem',
-                      borderLeft: '4px solid #3b82f6',
-                    }}
-                  >
-                    <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>
-                      {comment.author} - {new Date(comment.createdAt).toLocaleDateString()}
-                    </div>
-                    <div style={{ color: '#374151' }}>{comment.text}</div>
-                  </div>
-                ))}
-              </DetailSection>
+              </div>
             )}
 
-            <ActionSection>
-              <h4 style={{ marginBottom: '1rem', color: '#374151' }}>Review Actions</h4>
-
-              <CommentSection>
-                <CommentTextarea
-                  placeholder="Add review comments..."
-                  value={comment}
-                  onChange={(e: any) => setComment(e.target.value)}
-                />
-              </CommentSection>
-
-              <ActionButtons2>                {canUpdateStatus(selectedApplication.status, 'under_review') && (
-                  <Button
-                    variant="warning"
-                    onClick={() => {                      handleStatusUpdate(selectedApplication._id, 'under_review', comment);
-                      setShowDetailModal(false);
-                    }}
+            {/* Review Comments */}
+            {selectedApplication.comments && selectedApplication.comments.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                  <MessageSquare size={20} />
+                  Review Comments
+                </h3>
+                {selectedApplication.comments.map((comment: any, index: any) => (
+                  <div
+                    key={index}
+                    className="p-4 bg-gray-50 rounded-lg mb-2 border-l-4 border-blue-500"
                   >
-                    <Eye size={16} />
-                    Start Review
-                  </Button>
-                )}                {canUpdateStatus(selectedApplication.status, 'approved') && (
-                  <Button
-                    variant="success"
-                    onClick={() => {                      handleStatusUpdate(selectedApplication._id, 'approved', comment);
+                    <div className="font-semibold mb-1">
+                      {comment.author} - {new Date(comment.createdAt).toLocaleDateString()}
+                    </div>
+                    <div className="text-gray-700">{comment.text}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Review Actions */}
+            <div className="bg-gray-50 rounded-lg p-6 mt-8">
+              <h4 className="font-semibold text-gray-700 mb-4">Review Actions</h4>
+
+              <textarea
+                placeholder="Add review comments..."
+                value={comment}
+                onChange={e => setComment(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm resize-vertical min-h-[100px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
+              />
+
+              <div className="flex gap-4 flex-wrap">
+                {canUpdateStatus(selectedApplication.status, 'approved') && (
+                  <button
+                    onClick={() => {
+                      handleStatusUpdate(selectedApplication._id, 'approved', comment);
                       setShowDetailModal(false);
                     }}
+                    className="px-6 py-3 bg-green-500 text-white rounded-lg font-semibold flex items-center gap-2 hover:bg-green-600 transition-all"
                   >
                     <CheckCircle size={16} />
                     Approve Application
-                  </Button>
-                )}                {canUpdateStatus(selectedApplication.status, 'rejected') && (
-                  <Button
-                    variant="danger"
+                  </button>
+                )}
+                {canUpdateStatus(selectedApplication.status, 'rejected') && (
+                  <button
                     onClick={() => {
-                      if (comment.trim()) {                        handleStatusUpdate(selectedApplication._id, 'rejected', comment);
+                      if (comment.trim()) {
+                        handleStatusUpdate(selectedApplication._id, 'rejected', comment);
                         setShowDetailModal(false);
                       } else {
                         alert('Please provide a reason for rejection');
                       }
                     }}
+                    className="px-6 py-3 bg-red-500 text-white rounded-lg font-semibold flex items-center gap-2 hover:bg-red-600 transition-all"
                   >
                     <XCircle size={16} />
                     Reject Application
-                  </Button>
-                )}                {canUpdateStatus(selectedApplication.status, 'on_hold') && (
-                  <Button
-                    variant="warning"
-                    onClick={() => {                      handleStatusUpdate(selectedApplication._id, 'on_hold', comment);
-                      setShowDetailModal(false);
-                    }}
-                  >
-                    <AlertTriangle size={16} />
-                    Put On Hold
-                  </Button>
+                  </button>
                 )}
-              </ActionButtons2>
-            </ActionSection>
-          </ModalContent>
-        </Modal>
+                {selectedApplication.status === 'approved' && (
+                  <div className="text-green-600 font-semibold flex items-center gap-2">
+                    <CheckCircle size={20} />
+                    Application Approved
+                  </div>
+                )}
+                {selectedApplication.status === 'rejected' && (
+                  <div className="text-red-600 font-semibold flex items-center gap-2">
+                    <XCircle size={20} />
+                    Application Rejected
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

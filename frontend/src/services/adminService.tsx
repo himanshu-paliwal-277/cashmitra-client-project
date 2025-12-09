@@ -10,7 +10,8 @@ class AdminService {
         api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       }
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -18,7 +19,8 @@ class AdminService {
     try {
       const response = await api.get('/admin/profile');
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -101,7 +103,10 @@ class AdminService {
 
   // Partner Management
   async getPartners(page = 1, limit = 10, status = '') {
-    try {      const params = new URLSearchParams({ page, limit });
+    try {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
       if (status) params.append('status', status);
 
       const response = await api.get(`/admin/partners?${params}`);
@@ -147,7 +152,8 @@ class AdminService {
     try {
       const response = await api.get(`/admin/partners/${partnerId}`);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -155,7 +161,8 @@ class AdminService {
     try {
       const response = await api.post('/admin/partners', partnerData);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -163,7 +170,8 @@ class AdminService {
     try {
       const response = await api.put(`/admin/partners/${partnerId}`, partnerData);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -171,7 +179,8 @@ class AdminService {
     try {
       const response = await api.delete(`/admin/partners/${partnerId}`);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -179,13 +188,17 @@ class AdminService {
     try {
       const response = await api.put(`/admin/partners/${partnerId}/verify`, verificationData);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
   // Order Management
   async getOrders(page = 1, limit = 10, status = '', type = '') {
-    try {      const params = new URLSearchParams({ page, limit });
+    try {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
       if (status) params.append('status', status);
       if (type) params.append('type', type);
 
@@ -236,7 +249,8 @@ class AdminService {
       const response = await api.get(`/admin/orders/${orderId}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching order by ID:', error);      throw error.response?.data || error;
+      console.error('Error fetching order by ID:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -248,16 +262,18 @@ class AdminService {
       });
       return response.data;
     } catch (error) {
-      console.error('Error updating order status:', error);      throw error.response?.data || error;
+      console.error('Error updating order status:', error);
+      throw error.response?.data || error;
     }
   }
 
   async getOrdersForPickup() {
     try {
-      const response = await api.get('/admin/sell-orders/pickup/orders-list');
+      const response = await api.get('/sell-orders/pickup/orders-list');
       return response.data;
     } catch (error) {
-      console.error('Error fetching orders for pickup:', error);      throw error.response?.data || error;
+      console.error('Error fetching orders for pickup:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -270,16 +286,18 @@ class AdminService {
       });
       return response.data;
     } catch (error) {
-      console.error('Error fetching buy orders for pickup:', error);      throw error.response?.data || error;
+      console.error('Error fetching buy orders for pickup:', error);
+      throw error.response?.data || error;
     }
   }
 
   async getOrderPickupDetails(orderId: any) {
     try {
-      const response = await api.get(`/admin/sell-orders/${orderId}/pickup-details`);
+      const response = await api.get(`/sell-orders/${orderId}/pickup-details`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching order pickup details:', error);      throw error.response?.data || error;
+      console.error('Error fetching order pickup details:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -288,13 +306,17 @@ class AdminService {
       const response = await api.get(`/admin/buy-orders/${orderId}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching buy order pickup details:', error);      throw error.response?.data || error;
+      console.error('Error fetching buy order pickup details:', error);
+      throw error.response?.data || error;
     }
   }
 
   // Product Catalog Management
   async getCatalog(page = 1, limit = 10, category = '', brand = '', model = '') {
-    try {      const params = new URLSearchParams({ page, limit });
+    try {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
       if (category && category !== 'all') params.append('category', category);
       if (brand && brand !== 'all') params.append('brand', brand);
       if (model && model !== 'all') params.append('model', model);
@@ -376,7 +398,8 @@ class AdminService {
     try {
       const response = await api.post('/admin/catalog', productData);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -384,7 +407,8 @@ class AdminService {
     try {
       const response = await api.put(`/admin/catalog/${productId}`, productData);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -392,7 +416,8 @@ class AdminService {
     try {
       const response = await api.delete(`/admin/catalog/${productId}`);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -417,19 +442,26 @@ class AdminService {
     try {
       const response = await api.put('/admin/commission', settings);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
   // User Management
-  async getAllUsers(params = {}) {
+  async getAllUsers(params: any = {}) {
     try {
-      const queryParams = new URLSearchParams();      if (params.page) queryParams.append('page', params.page);      if (params.limit) queryParams.append('limit', params.limit);      if (params.search) queryParams.append('search', params.search);      if (params.role) queryParams.append('role', params.role);      if (params.isVerified !== undefined) queryParams.append('isVerified', params.isVerified);
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.search) queryParams.append('search', params.search);
+      if (params.role) queryParams.append('role', params.role);
+      if (params.isVerified !== undefined) queryParams.append('isVerified', params.isVerified);
 
       const response = await api.get(`/admin/users?${queryParams}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching users:', error);      throw error.response?.data || error;
+      console.error('Error fetching users:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -437,7 +469,8 @@ class AdminService {
     try {
       const response = await api.get(`/admin/users/${userId}`);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -445,7 +478,8 @@ class AdminService {
     try {
       const response = await api.post('/admin/users', userData);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -453,7 +487,8 @@ class AdminService {
     try {
       const response = await api.put(`/admin/users/${userId}`, userData);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -461,7 +496,8 @@ class AdminService {
     try {
       const response = await api.delete(`/admin/users/${userId}`);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -469,7 +505,8 @@ class AdminService {
     try {
       const response = await api.put(`/admin/users/${userId}/password`, passwordData);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -482,7 +519,8 @@ class AdminService {
         },
       });
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -490,7 +528,8 @@ class AdminService {
     try {
       const response = await api.get(`/admin/catalog/${productId}`);
       return response.data;
-    } catch (error) {      throw error.response?.data || error;
+    } catch (error) {
+      throw error.response?.data || error;
     }
   }
 
@@ -697,7 +736,8 @@ class AdminService {
       const response = await api.get('/sell-super-categories');
       return response.data;
     } catch (error) {
-      console.error('Error fetching sell super categories:', error);      throw error.response?.data || error;
+      console.error('Error fetching sell super categories:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -706,7 +746,8 @@ class AdminService {
       const response = await api.get(`/sell-super-categories/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching sell super category:', error);      throw error.response?.data || error;
+      console.error('Error fetching sell super category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -715,7 +756,8 @@ class AdminService {
       const response = await api.post('/sell-super-categories', data);
       return response.data;
     } catch (error) {
-      console.error('Error creating sell super category:', error);      throw error.response?.data || error;
+      console.error('Error creating sell super category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -724,7 +766,8 @@ class AdminService {
       const response = await api.put(`/sell-super-categories/${id}`, data);
       return response.data;
     } catch (error) {
-      console.error('Error updating sell super category:', error);      throw error.response?.data || error;
+      console.error('Error updating sell super category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -733,7 +776,25 @@ class AdminService {
       const response = await api.delete(`/sell-super-categories/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error deleting sell super category:', error);      throw error.response?.data || error;
+      console.error('Error deleting sell super category:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  // Sell Products Management
+  async getSellProducts(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.category) queryParams.append('category', params.category);
+      if (params.search) queryParams.append('search', params.search);
+
+      const response = await api.get(`/sell-products?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching sell products:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -743,7 +804,8 @@ class AdminService {
       const response = await api.get('/buy-super-categories');
       return response.data;
     } catch (error) {
-      console.error('Error fetching buy super categories:', error);      throw error.response?.data || error;
+      console.error('Error fetching buy super categories:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -752,7 +814,8 @@ class AdminService {
       const response = await api.get(`/buy-super-categories/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching buy super category:', error);      throw error.response?.data || error;
+      console.error('Error fetching buy super category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -761,7 +824,8 @@ class AdminService {
       const response = await api.post('/buy-super-categories', data);
       return response.data;
     } catch (error) {
-      console.error('Error creating buy super category:', error);      throw error.response?.data || error;
+      console.error('Error creating buy super category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -770,7 +834,8 @@ class AdminService {
       const response = await api.put(`/buy-super-categories/${id}`, data);
       return response.data;
     } catch (error) {
-      console.error('Error updating buy super category:', error);      throw error.response?.data || error;
+      console.error('Error updating buy super category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -779,7 +844,8 @@ class AdminService {
       const response = await api.delete(`/buy-super-categories/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error deleting buy super category:', error);      throw error.response?.data || error;
+      console.error('Error deleting buy super category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -860,7 +926,9 @@ class AdminService {
       const response = await api.put(`/admin/brands/${brandName}`, requestData);
       return response.data;
     } catch (error) {
-      console.error('Error updating brand:', error);      console.error('Error details:', error.response?.data);      throw error.response?.data || error;
+      console.error('Error updating brand:', error);
+      console.error('Error details:', error.response?.data);
+      throw error.response?.data || error;
     }
   }
 
@@ -875,7 +943,8 @@ class AdminService {
       });
       return response.data;
     } catch (error) {
-      console.error('Error deleting brand:', error);      throw error.response?.data || error;
+      console.error('Error deleting brand:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -969,7 +1038,8 @@ class AdminService {
       const response = await api.put(`/admin/models/${modelName}`, requestData);
       return response.data;
     } catch (error) {
-      console.error('Error updating model:', error);      throw error.response?.data || error;
+      console.error('Error updating model:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -980,13 +1050,17 @@ class AdminService {
       const response = await api.delete(`/admin/models/${modelName}`);
       return response.data;
     } catch (error) {
-      console.error('Error deleting model:', error);      throw error.response?.data || error;
+      console.error('Error deleting model:', error);
+      throw error.response?.data || error;
     }
   }
 
   // Returns Management
   async getReturns(page = 1, limit = 10, status = '') {
-    try {      const params = new URLSearchParams({ page, limit });
+    try {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
       if (status) params.append('status', status);
 
       const response = await api.get(`/admin/returns?${params}`);
@@ -1038,7 +1112,10 @@ class AdminService {
 
   // Partner Applications Management
   async getPartnerApplications(page = 1, limit = 10, status = '') {
-    try {      const params = new URLSearchParams({ page, limit });
+    try {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
       if (status) params.append('status', status);
 
       const response = await api.get(`/admin/partner-applications?${params}`);
@@ -1093,7 +1170,10 @@ class AdminService {
 
   // Inventory Approval Management
   async getInventoryApprovals(page = 1, limit = 10, status = '') {
-    try {      const params = new URLSearchParams({ page, limit });
+    try {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
       if (status) params.append('status', status);
 
       const response = await api.get(`/admin/inventory-approvals?${params}`);
@@ -1149,7 +1229,8 @@ class AdminService {
       const response = await api.get('/admin/questionnaires');
       return response.data;
     } catch (error) {
-      console.error('Error fetching condition questionnaires:', error);      throw error.response?.data || error;
+      console.error('Error fetching condition questionnaires:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -1158,19 +1239,24 @@ class AdminService {
       const response = await api.post('/admin/questionnaires', questionnaireData);
       return response.data;
     } catch (error) {
-      console.error('Error creating condition questionnaire:', error);      throw error.response?.data || error;
+      console.error('Error creating condition questionnaire:', error);
+      throw error.response?.data || error;
     }
   }
 
   // Buy Categories Management
   async getBuyCategories(page = 1, limit = 10, search = '') {
-    try {      const params = new URLSearchParams({ page, limit });
+    try {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
       if (search) params.append('search', search);
 
       const response = await api.get(`/buy-categories?${params}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching buy categories:', error);      throw error.response?.data || error;
+      console.error('Error fetching buy categories:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -1179,7 +1265,8 @@ class AdminService {
       const response = await api.get(`/buy-categories/${categoryId}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching buy category:', error);      throw error.response?.data || error;
+      console.error('Error fetching buy category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -1188,7 +1275,8 @@ class AdminService {
       const response = await api.post('/buy-categories', categoryData);
       return response.data;
     } catch (error) {
-      console.error('Error creating buy category:', error);      throw error.response?.data || error;
+      console.error('Error creating buy category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -1197,7 +1285,8 @@ class AdminService {
       const response = await api.put(`/buy-categories/${categoryId}`, categoryData);
       return response.data;
     } catch (error) {
-      console.error('Error updating buy category:', error);      throw error.response?.data || error;
+      console.error('Error updating buy category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -1206,7 +1295,8 @@ class AdminService {
       const response = await api.delete(`/buy-categories/${categoryId}`);
       return response.data;
     } catch (error) {
-      console.error('Error deleting buy category:', error);      throw error.response?.data || error;
+      console.error('Error deleting buy category:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -1215,7 +1305,8 @@ class AdminService {
       const response = await api.get('/buy-categories/stats');
       return response.data;
     } catch (error) {
-      console.error('Error fetching buy category stats:', error);      throw error.response?.data || error;
+      console.error('Error fetching buy category stats:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -1224,7 +1315,8 @@ class AdminService {
       const response = await api.put(`/admin/questionnaires/${questionnaireId}`, questionnaireData);
       return response.data;
     } catch (error) {
-      console.error('Error updating condition questionnaire:', error);      throw error.response?.data || error;
+      console.error('Error updating condition questionnaire:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -1236,7 +1328,268 @@ class AdminService {
       const response = await api.delete(url);
       return response.data;
     } catch (error) {
-      console.error('Error deleting condition questionnaire:', error);      throw error.response?.data || error;
+      console.error('Error deleting condition questionnaire:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  // Pricing Management
+  async getPricingStats() {
+    try {
+      const response = await api.get('/admin/pricing/stats');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching pricing stats:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getPricingConfigs(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.isActive !== undefined) queryParams.append('isActive', params.isActive);
+      if (params.productId) queryParams.append('productId', params.productId);
+      if (params.search) queryParams.append('search', params.search);
+      if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+      if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+
+      const response = await api.get(`/admin/pricing?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching pricing configs:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getPricingConfig(id: any) {
+    try {
+      const response = await api.get(`/admin/pricing/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching pricing config:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getPricingByProduct(productId: any) {
+    try {
+      const response = await api.get(`/admin/pricing/product/${productId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching pricing by product:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async createPricingConfig(data: any) {
+    try {
+      const response = await api.post('/admin/pricing', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating pricing config:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async updatePricingConfig(id: any, data: any) {
+    try {
+      const response = await api.put(`/admin/pricing/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating pricing config:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async deletePricingConfig(id: any) {
+    try {
+      const response = await api.delete(`/admin/pricing/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting pricing config:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async bulkUpdatePricing(updates: any[]) {
+    try {
+      const response = await api.put('/admin/pricing/bulk', { updates });
+      return response.data;
+    } catch (error) {
+      console.error('Error bulk updating pricing:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async calculatePrice(id: any, condition: string, adjustments: any[] = []) {
+    try {
+      const response = await api.post(`/admin/pricing/${id}/calculate`, {
+        condition,
+        adjustments,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error calculating price:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  // Finance Management
+  async getFinancialDashboard() {
+    try {
+      const response = await api.get('/admin/finance/dashboard');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching financial dashboard:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getFinancialTransactions(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.type) queryParams.append('type', params.type);
+      if (params.status) queryParams.append('status', params.status);
+      if (params.search) queryParams.append('search', params.search);
+      if (params.startDate) queryParams.append('startDate', params.startDate);
+      if (params.endDate) queryParams.append('endDate', params.endDate);
+
+      const response = await api.get(`/admin/finance/transactions?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching financial transactions:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getCommissionSummary(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.startDate) queryParams.append('startDate', params.startDate);
+      if (params.endDate) queryParams.append('endDate', params.endDate);
+
+      const response = await api.get(`/admin/finance/commission-summary?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching commission summary:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getPartnerEarnings(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.startDate) queryParams.append('startDate', params.startDate);
+      if (params.endDate) queryParams.append('endDate', params.endDate);
+      if (params.partnerId) queryParams.append('partnerId', params.partnerId);
+
+      const response = await api.get(`/admin/finance/partner-earnings?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching partner earnings:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async exportFinancialData(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.format) queryParams.append('format', params.format);
+      if (params.type) queryParams.append('type', params.type);
+      if (params.startDate) queryParams.append('startDate', params.startDate);
+      if (params.endDate) queryParams.append('endDate', params.endDate);
+
+      const response = await api.get(`/admin/finance/export?${queryParams}`, {
+        responseType: 'blob',
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error exporting financial data:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async createFinancialTransaction(data: any) {
+    try {
+      const response = await api.post('/admin/finance/transactions', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating financial transaction:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async updateFinancialTransaction(id: any, data: any) {
+    try {
+      const response = await api.put(`/admin/finance/transactions/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating financial transaction:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async deleteFinancialTransaction(id: any) {
+    try {
+      const response = await api.delete(`/admin/finance/transactions/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting financial transaction:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getRevenueAnalytics(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.period) queryParams.append('period', params.period);
+      if (params.months) queryParams.append('months', params.months);
+      if (params.startDate) queryParams.append('startDate', params.startDate);
+      if (params.endDate) queryParams.append('endDate', params.endDate);
+
+      const response = await api.get(`/admin/finance/revenue-analytics?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching revenue analytics:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getCommissionTrends(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.period) queryParams.append('period', params.period);
+      if (params.days) queryParams.append('days', params.days);
+
+      const response = await api.get(`/admin/finance/commission-trends?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching commission trends:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getPendingPayments() {
+    try {
+      const response = await api.get('/admin/finance/pending-payments');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching pending payments:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async processPayment(data: any) {
+    try {
+      const response = await api.post('/admin/finance/process-payment', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error processing payment:', error);
+      throw error.response?.data || error;
     }
   }
 
@@ -1253,21 +1606,28 @@ export default adminService;
 // Legacy exports for backward compatibility
 export const loginAdmin = (credentials: any) => adminService.login(credentials);
 export const getAdminProfile = () => adminService.getProfile();
-export const getProducts = (params: any) => adminService.getCatalog(params?.page, params?.limit, params?.category);
-export const getProductById = (id: any) => adminService.getCatalog().then(data => data.products.find((p: any) => p._id === id));
-export const updateProduct = (id: any, productData: any) => adminService.updateProduct(id, productData);
+export const getProducts = (params: any) =>
+  adminService.getCatalog(params?.page, params?.limit, params?.category);
+export const getProductById = (id: any) =>
+  adminService.getCatalog().then(data => data.products.find((p: any) => p._id === id));
+export const updateProduct = (id: any, productData: any) =>
+  adminService.updateProduct(id, productData);
 export const createProduct = (productData: any) => adminService.addProduct(productData);
 export const deleteProduct = (id: any) => adminService.deleteProduct(id);
-export const getPartners = (params: any) => adminService.getPartners(params?.page, params?.limit, params?.status);
+export const getPartners = (params: any) =>
+  adminService.getPartners(params?.page, params?.limit, params?.status);
 export const getPartnerById = (id: any) => adminService.getPartnerById(id);
 export const createPartner = (partnerData: any) => adminService.createPartner(partnerData);
-export const updatePartner = (id: any, partnerData: any) => adminService.updatePartner(id, partnerData);
+export const updatePartner = (id: any, partnerData: any) =>
+  adminService.updatePartner(id, partnerData);
 export const deletePartner = (id: any) => adminService.deletePartner(id);
-export const updatePartnerStatus = (id: any, status: any) => adminService.verifyPartner(id, { status });
+export const updatePartnerStatus = (id: any, status: any) =>
+  adminService.verifyPartner(id, { status });
 export const getDashboardStats = () => adminService.getAnalytics();
 export const getRecentOrders = () => adminService.getOrders(1, 5);
 // export const getRecentPartners = () => adminService.getPartners(1, 5);
 // export const getSalesReport = (params) => adminService.getOrders(params?.page, params?.limit);
 // export const getInventoryReport = (params) => adminService.getCatalog(params?.page, params?.limit);export const getRecentPartners = () => adminService.getPartners(1, 5);
 export const getSalesReport = (params: any) => adminService.getOrders(params?.page, params?.limit);
-export const getInventoryReport = (params: any) => adminService.getCatalog(params?.page, params?.limit);
+export const getInventoryReport = (params: any) =>
+  adminService.getCatalog(params?.page, params?.limit);

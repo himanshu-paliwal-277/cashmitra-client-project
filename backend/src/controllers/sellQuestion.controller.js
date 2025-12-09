@@ -6,11 +6,15 @@
  * @version 1.0.0
  */
 
-const { validationResult } = require('express-validator');
-const SellQuestion = require('../models/sellQuestion.model');
-const SellProduct = require('../models/sellProduct.model');
-const Category = require('../models/category.model');
-const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middleware');
+const { validationResult } = require("express-validator");
+const SellQuestion = require("../models/sellQuestion.model");
+const SellProduct = require("../models/sellProduct.model");
+const Category = require("../models/category.model");
+const SellSuperCategory = require("../models/sellSuperCategory.model");
+const {
+  ApiError,
+  asyncHandler,
+} = require("../middlewares/errorHandler.middleware");
 
 /**
  * Create new sell question
@@ -20,25 +24,42 @@ const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middlewa
 exports.createQuestion = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
+    throw new ApiError(400, "Validation Error", errors.array());
   }
 
-  const { categoryId, section, key, title, description, uiType, multiSelect, options } = req.body;
+  const {
+    categoryId,
+    section,
+    key,
+    title,
+    description,
+    uiType,
+    multiSelect,
+    options,
+  } = req.body;
 
-  // Verify category exists
-  const category = await Category.findById(categoryId);
+  // Verify category exists (check both Category and SellSuperCategory)
+  let category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, 'Category not found');
+    category = await SellSuperCategory.findById(categoryId);
+  }
+  if (!category) {
+    throw new ApiError(404, "Category not found");
   }
 
   // Check if question with same key already exists for this category
   const existingQuestion = await SellQuestion.findOne({ categoryId, key });
   if (existingQuestion) {
-    throw new ApiError(400, 'Question with this key already exists for this category');
+    throw new ApiError(
+      400,
+      "Question with this key already exists for this category"
+    );
   }
 
   // Get next order number for this section
-  const lastQuestion = await SellQuestion.findOne({ categoryId, section }).sort({ order: -1 });
+  const lastQuestion = await SellQuestion.findOne({ categoryId, section }).sort(
+    { order: -1 }
+  );
   const order = lastQuestion ? lastQuestion.order + 1 : 1;
 
   const question = new SellQuestion({
@@ -51,15 +72,15 @@ exports.createQuestion = asyncHandler(async (req, res) => {
     uiType,
     multiSelect: multiSelect || false,
     options: options || [],
-    createdBy: req.user.id
+    createdBy: req.user.id,
   });
 
   await question.save();
 
   res.status(201).json({
     success: true,
-    message: 'Question created successfully',
-    data: question
+    message: "Question created successfully",
+    data: question,
   });
 });
 
@@ -71,7 +92,7 @@ exports.createQuestion = asyncHandler(async (req, res) => {
 exports.getQuestions = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
+    throw new ApiError(400, "Validation Error", errors.array());
   }
 
   const { categoryId, section } = req.query;
@@ -81,14 +102,36 @@ exports.getQuestions = asyncHandler(async (req, res) => {
   if (categoryId) query.categoryId = categoryId;
   if (section) query.section = section;
 
-  // Get questions
-  const questions = await SellQuestion.find(query)
-    .populate('categoryId', 'name')
-    .sort({ section: 1, order: 1 });
+  // Get questions - don't populate, just return raw data
+  const questions = await SellQuestion.find(query).sort({
+    section: 1,
+    order: 1,
+  });
+
+  // Manually populate categoryId from both Category and SellSuperCategory
+  const populatedQuestions = await Promise.all(
+    questions.map(async (question) => {
+      const questionObj = question.toObject();
+      if (questionObj.categoryId) {
+        // Try to find in Category first
+        let category = await Category.findById(questionObj.categoryId).select(
+          "_id name displayName"
+        );
+        // If not found, try SellSuperCategory
+        if (!category) {
+          category = await SellSuperCategory.findById(
+            questionObj.categoryId
+          ).select("_id name displayName");
+        }
+        questionObj.categoryId = category || questionObj.categoryId;
+      }
+      return questionObj;
+    })
+  );
 
   res.json({
     success: true,
-    data: questions
+    data: populatedQuestions,
   });
 });
 
@@ -103,7 +146,7 @@ exports.getQuestionsForCustomer = asyncHandler(async (req, res) => {
   // Verify category exists
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, 'Category not found');
+    throw new ApiError(404, "Category not found");
   }
 
   // Get questions for the category
@@ -119,13 +162,13 @@ exports.getQuestionsForCustomer = asyncHandler(async (req, res) => {
   }, {});
 
   // Sort questions within each section by order
-  Object.keys(groupedQuestions).forEach(section => {
+  Object.keys(groupedQuestions).forEach((section) => {
     groupedQuestions[section].sort((a, b) => a.order - b.order);
   });
 
   res.json({
     success: true,
-    data: groupedQuestions
+    data: groupedQuestions,
   });
 });
 
@@ -137,7 +180,7 @@ exports.getQuestionsForCustomer = asyncHandler(async (req, res) => {
 exports.getCustomerQuestions = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
+    throw new ApiError(400, "Validation Error", errors.array());
   }
 
   const { productId, variantId } = req.query;
@@ -145,7 +188,7 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
   // Get product to find categoryId
   const product = await SellProduct.findById(productId);
   if (!product) {
-    throw new ApiError(404, 'Product not found');
+    throw new ApiError(404, "Product not found");
   }
 
   const categoryId = product.categoryId;
@@ -153,7 +196,7 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
   // Verify category exists
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, 'Category not found');
+    throw new ApiError(404, "Category not found");
   }
 
   // Get questions for the category
@@ -169,13 +212,13 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
   }, {});
 
   // Sort questions within each section by order
-  Object.keys(groupedQuestions).forEach(section => {
+  Object.keys(groupedQuestions).forEach((section) => {
     groupedQuestions[section].sort((a, b) => a.order - b.order);
   });
 
   res.json({
     success: true,
-    data: groupedQuestions
+    data: groupedQuestions,
   });
 });
 
@@ -186,16 +229,16 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
  */
 exports.getQuestion = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id)
-    .populate('categoryId', 'name')
-    .populate('createdBy', 'name email');
+    .populate("categoryId", "name")
+    .populate("createdBy", "name email");
 
   if (!question) {
-    throw new ApiError(404, 'Question not found');
+    throw new ApiError(404, "Question not found");
   }
 
   res.json({
     success: true,
-    data: question
+    data: question,
   });
 });
 
@@ -207,39 +250,59 @@ exports.getQuestion = asyncHandler(async (req, res) => {
 exports.updateQuestion = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
+    throw new ApiError(400, "Validation Error", errors.array());
   }
 
-  const { categoryId, section, key, title, description, uiType, multiSelect, options, isActive, order, required, showIf } = req.body;
+  const {
+    categoryId,
+    section,
+    key,
+    title,
+    description,
+    uiType,
+    multiSelect,
+    options,
+    isActive,
+    order,
+    required,
+    showIf,
+  } = req.body;
 
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
-    throw new ApiError(404, 'Question not found');
+    throw new ApiError(404, "Question not found");
   }
 
   // Check if key is being changed and if it conflicts
   if (key && key !== question.key) {
-    const existingQuestion = await SellQuestion.findOne({ 
+    const existingQuestion = await SellQuestion.findOne({
       categoryId: question.categoryId,
       key,
-      _id: { $ne: req.params.id }
+      _id: { $ne: req.params.id },
     });
     if (existingQuestion) {
-      throw new ApiError(400, 'Question with this key already exists for this category');
+      throw new ApiError(
+        400,
+        "Question with this key already exists for this category"
+      );
     }
   }
 
   // Transform options to exclude tempId and handle showIf
   const transformedOptions = options?.map(({ tempId, ...opt }) => ({
     ...opt,
-    showIf: opt.showIf === null ? undefined : opt.showIf
+    showIf: opt.showIf === null ? undefined : opt.showIf,
   }));
 
   // Update fields
   if (categoryId !== undefined) {
-    const category = await Category.findById(categoryId);
+    // Verify category exists (check both Category and SellSuperCategory)
+    let category = await Category.findById(categoryId);
     if (!category) {
-      throw new ApiError(404, 'Category not found');
+      category = await SellSuperCategory.findById(categoryId);
+    }
+    if (!category) {
+      throw new ApiError(404, "Category not found");
     }
     question.categoryId = categoryId;
   }
@@ -253,14 +316,15 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
   if (isActive !== undefined) question.isActive = isActive;
   if (order !== undefined) question.order = order;
   if (required !== undefined) question.required = required;
-  if (showIf !== undefined) question.showIf = showIf === null ? undefined : showIf;
+  if (showIf !== undefined)
+    question.showIf = showIf === null ? undefined : showIf;
 
   await question.save();
 
   res.json({
     success: true,
-    message: 'Question updated successfully',
-    data: question
+    message: "Question updated successfully",
+    data: question,
   });
 });
 
@@ -272,14 +336,14 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
 exports.deleteQuestion = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
-    throw new ApiError(404, 'Question not found');
+    throw new ApiError(404, "Question not found");
   }
 
   await question.deleteOne();
 
   res.json({
     success: true,
-    message: 'Question deleted successfully'
+    message: "Question deleted successfully",
   });
 });
 
@@ -292,18 +356,18 @@ exports.addOption = asyncHandler(async (req, res) => {
   const { key, label, value, delta, showIf } = req.body;
 
   if (!key || !label || !value) {
-    throw new ApiError(400, 'Key, label, and value are required');
+    throw new ApiError(400, "Key, label, and value are required");
   }
 
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
-    throw new ApiError(404, 'Question not found');
+    throw new ApiError(404, "Question not found");
   }
 
   // Check if option key already exists
-  const existingOption = question.options.find(opt => opt.key === key);
+  const existingOption = question.options.find((opt) => opt.key === key);
   if (existingOption) {
-    throw new ApiError(400, 'Option with this key already exists');
+    throw new ApiError(400, "Option with this key already exists");
   }
 
   question.options.push({
@@ -311,15 +375,15 @@ exports.addOption = asyncHandler(async (req, res) => {
     label,
     value,
     delta,
-    showIf: showIf === null ? undefined : showIf
+    showIf: showIf === null ? undefined : showIf,
   });
 
   await question.save();
 
   res.json({
     success: true,
-    message: 'Option added successfully',
-    data: question
+    message: "Option added successfully",
+    data: question,
   });
 });
 
@@ -333,22 +397,24 @@ exports.updateOption = asyncHandler(async (req, res) => {
 
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
-    throw new ApiError(404, 'Question not found');
+    throw new ApiError(404, "Question not found");
   }
 
   // Find option by key (since _id is disabled)
-  const optionIndex = question.options.findIndex(opt => opt.key === req.params.optionId);
+  const optionIndex = question.options.findIndex(
+    (opt) => opt.key === req.params.optionId
+  );
   if (optionIndex === -1) {
-    throw new ApiError(404, 'Option not found');
+    throw new ApiError(404, "Option not found");
   }
 
   const option = question.options[optionIndex];
 
   // Check if key is being changed and if it conflicts
   if (key && key !== option.key) {
-    const existingOption = question.options.find(opt => opt.key === key);
+    const existingOption = question.options.find((opt) => opt.key === key);
     if (existingOption) {
-      throw new ApiError(400, 'Option with this key already exists');
+      throw new ApiError(400, "Option with this key already exists");
     }
   }
 
@@ -356,14 +422,15 @@ exports.updateOption = asyncHandler(async (req, res) => {
   if (label) option.label = label;
   if (value !== undefined) option.value = value;
   if (delta) option.delta = delta;
-  if (showIf !== undefined) option.showIf = showIf === null ? undefined : showIf;
+  if (showIf !== undefined)
+    option.showIf = showIf === null ? undefined : showIf;
 
   await question.save();
 
   res.json({
     success: true,
-    message: 'Option updated successfully',
-    data: question
+    message: "Option updated successfully",
+    data: question,
   });
 });
 
@@ -375,13 +442,15 @@ exports.updateOption = asyncHandler(async (req, res) => {
 exports.deleteOption = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
-    throw new ApiError(404, 'Question not found');
+    throw new ApiError(404, "Question not found");
   }
 
   // Find option by key (since _id is disabled)
-  const optionIndex = question.options.findIndex(opt => opt.key === req.params.optionId);
+  const optionIndex = question.options.findIndex(
+    (opt) => opt.key === req.params.optionId
+  );
   if (optionIndex === -1) {
-    throw new ApiError(404, 'Option not found');
+    throw new ApiError(404, "Option not found");
   }
 
   question.options.splice(optionIndex, 1);
@@ -389,8 +458,8 @@ exports.deleteOption = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Option deleted successfully',
-    data: question
+    message: "Option deleted successfully",
+    data: question,
   });
 });
 
@@ -402,31 +471,66 @@ exports.deleteOption = asyncHandler(async (req, res) => {
 exports.reorderQuestions = asyncHandler(async (req, res) => {
   const { categoryId, section, questionIds } = req.body;
 
-  if (!categoryId || !section || !Array.isArray(questionIds)) {
-    throw new ApiError(400, 'Category ID, section, and question IDs array are required');
+  if (!section || !Array.isArray(questionIds)) {
+    throw new ApiError(400, "Section and question IDs array are required");
   }
 
-  // Verify category exists
-  const category = await Category.findById(categoryId);
-  if (!category) {
-    throw new ApiError(404, 'Category not found');
+  // Verify category exists if categoryId is provided (optional check - don't fail if category is orphaned)
+  if (categoryId) {
+    let category = await Category.findById(categoryId);
+    if (!category) {
+      category = await SellSuperCategory.findById(categoryId);
+    }
+    // Log warning but don't fail - allow reordering even if category is orphaned
+    if (!category) {
+      console.warn(
+        `Warning: Category ${categoryId} not found in either Category or SellSuperCategory collections. Proceeding with reorder anyway.`
+      );
+    }
   }
 
-  // Verify all questions belong to the category and section
-  const questions = await SellQuestion.find({ _id: { $in: questionIds }, categoryId, section });
+  // First, verify all questions exist
+  const questions = await SellQuestion.find({
+    _id: { $in: questionIds },
+  });
+
   if (questions.length !== questionIds.length) {
-    throw new ApiError(400, 'Some question IDs are invalid or do not belong to the specified category and section');
+    throw new ApiError(400, "Some question IDs are invalid");
   }
 
-  // Update order for each question
-  const updatePromises = questionIds.map((questionId, index) => 
-    SellQuestion.findByIdAndUpdate(questionId, { order: index + 1 })
-  );
+  // Verify all questions belong to the same category and section
+  const allSameSection = questions.every((q) => q.section === section);
 
-  await Promise.all(updatePromises);
+  let allSameCategory = true;
+  if (categoryId !== null && categoryId !== undefined) {
+    allSameCategory = questions.every((q) => {
+      const qCategoryId = q.categoryId ? q.categoryId.toString() : null;
+      return qCategoryId === categoryId;
+    });
+  } else {
+    allSameCategory = questions.every((q) => q.categoryId === null);
+  }
+
+  if (!allSameSection || !allSameCategory) {
+    throw new ApiError(
+      400,
+      "All questions must belong to the same category and section"
+    );
+  }
+
+  // Swap the order values of the two questions
+  const [firstQuestion, secondQuestion] = questions;
+  const tempOrder = firstQuestion.order;
+
+  await SellQuestion.findByIdAndUpdate(firstQuestion._id, {
+    order: secondQuestion.order,
+  });
+  await SellQuestion.findByIdAndUpdate(secondQuestion._id, {
+    order: tempOrder,
+  });
 
   res.json({
     success: true,
-    message: 'Questions reordered successfully'
+    message: "Questions reordered successfully",
   });
 });

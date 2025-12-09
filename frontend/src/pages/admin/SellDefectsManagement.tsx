@@ -56,9 +56,7 @@ const SellDefectsManagement = () => {
 
   // Fetch defects on component mount and when filters change
   useEffect(() => {
-    const params = {
-      page: currentPage,
-      limit: itemsPerPage,
+    const filters = {
       sortBy,
       sortOrder,
       search: searchTerm,
@@ -66,7 +64,7 @@ const SellDefectsManagement = () => {
       category: categoryFilter !== 'all' ? categoryFilter : undefined,
       impact: impactFilter !== 'all' ? impactFilter : undefined,
     };
-    fetchDefects(params);
+    fetchDefects(currentPage, itemsPerPage, filters);
   }, [
     currentPage,
     sortBy,
@@ -539,7 +537,7 @@ const SellDefectsManagement = () => {
         }}
         onSave={
           editingDefect
-            ? (data: any) => handleUpdateDefect(editingDefect.id, data)
+            ? (data: any) => handleUpdateDefect(editingDefect._id || editingDefect.id, data)
             : handleCreateDefect
         }
         defect={editingDefect}

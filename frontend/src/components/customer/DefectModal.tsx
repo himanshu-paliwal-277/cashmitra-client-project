@@ -1,203 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect } from 'react';
 import { X, Save, AlertCircle } from 'lucide-react';
 import adminService from '../../services/adminService';
 
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
+interface DefectModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (data: any) => void;
+  defect?: any;
+  loading?: boolean;
+}
 
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #111827;
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
-  border-radius: 6px;
-  color: #6b7280;
-
-  &:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-  color: #374151;
-  font-size: 0.875rem;
-`;
-
-const Input = styled.input`
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const TextArea = styled.textarea`
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  min-height: 100px;
-  resize: vertical;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const Select = styled.select`
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  background: white;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const CheckboxGroup = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 8px;
-`;
-
-const CheckboxLabel = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.875rem;
-  color: #374151;
-  cursor: pointer;
-`;
-
-const Checkbox = styled.input`
-  width: 16px;
-  height: 16px;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #e5e7eb;
-`;
-
-const Button = styled.button`
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 0.875rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s;
-
-  &.secondary {
-    background: #f9fafb;
-    border: 1px solid #d1d5db;
-    color: #374151;
-
-    &:hover {
-      background: #f3f4f6;
-    }
-  }
-
-  &.primary {
-    background: #3b82f6;
-    border: 1px solid #3b82f6;
-    color: white;
-
-    &:hover {
-      background: #2563eb;
-    }
-
-    &:disabled {
-      background: #9ca3af;
-      border-color: #9ca3af;
-      cursor: not-allowed;
-    }
-  }
-`;
-
-const ErrorMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #dc2626;
-  font-size: 0.875rem;
-  margin-top: 4px;
-`;
-
-const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }: any) => {
+const DefectModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  defect = null,
+  loading = false,
+}: DefectModalProps) => {
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
-  const [categoriesError, setCategoriesError] = useState(null);
+  const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     categoryId: '',
@@ -214,7 +36,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
     isActive: true,
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const sections = [
     'screen',
@@ -227,7 +49,6 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
     'others',
   ];
 
-  // Fetch categories function
   const fetchCategories = async () => {
     try {
       setCategoriesLoading(true);
@@ -244,8 +65,14 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
 
   useEffect(() => {
     if (defect) {
+      // Handle categoryId - it might be populated as an object or just an ID string
+      const categoryIdValue =
+        typeof defect.categoryId === 'object'
+          ? defect.categoryId?._id || defect.categoryId?.id || ''
+          : defect.categoryId || '';
+
       setFormData({
-        categoryId: defect.categoryId || '',
+        categoryId: categoryIdValue,
         section: defect.section || '',
         key: defect.key || '',
         title: defect.title || '',
@@ -273,7 +100,6 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
     setErrors({});
   }, [defect, isOpen]);
 
-  // Fetch categories when modal opens
   useEffect(() => {
     if (isOpen && categories.length === 0) {
       fetchCategories();
@@ -281,31 +107,26 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
   }, [isOpen, categories.length]);
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: Record<string, string> = {};
 
-    // Category ID validation
     if (!formData.categoryId) {
       newErrors.categoryId = 'Please select a category';
     }
 
-    // Section validation
     if (!formData.section) {
       newErrors.section = 'Section is required';
     }
 
-    // Key validation
     if (!formData.key.trim()) {
       newErrors.key = 'Key is required';
     } else if (!/^[a-z0-9_]+$/.test(formData.key)) {
       newErrors.key = 'Key must contain only lowercase letters, numbers, and underscores';
     }
 
-    // Title validation
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
     }
 
-    // Delta validation
     if (!formData.delta.type || !['abs', 'percent'].includes(formData.delta.type)) {
       newErrors.deltaType = 'Delta type must be either abs or percent';
     }
@@ -320,7 +141,7 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -330,17 +151,16 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
     onSave(formData);
   };
 
-  const handleInputChange = (field: any, value: any) => {
+  const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
 
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
-        [field]: undefined,
+        [field]: '',
       }));
     }
   };
@@ -348,42 +168,55 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
   if (!isOpen) return null;
 
   return (
-    <ModalOverlay onClick={onClose}>
-      <ModalContent onClick={(e: any) => e.stopPropagation()}>
-        <ModalHeader>
-          <ModalTitle>{defect ? 'Edit Defect' : 'Add New Defect'}</ModalTitle>
-          <CloseButton onClick={onClose}>
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+          <h2 className="text-2xl font-semibold text-gray-900">
+            {defect ? 'Edit Defect' : 'Add New Defect'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-gray-900"
+          >
             <X size={20} />
-          </CloseButton>
-        </ModalHeader>
+          </button>
+        </div>
 
-        <Form onSubmit={handleSubmit}>
-          <FormGroup>
-            <Label>Category *</Label>
-            <Select
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">Category *</label>
+            <select
               value={formData.categoryId}
-              onChange={(e: any) => handleInputChange('categoryId', e.target.value)}
+              onChange={e => handleInputChange('categoryId', e.target.value)}
+              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             >
               <option value="">Select a category</option>
-              {categories.map(category => (
+              {categories.map((category: any) => (
                 <option key={category._id} value={category._id}>
                   {category.name}
                 </option>
               ))}
-            </Select>
+            </select>
             {errors.categoryId && (
-              <ErrorMessage>
+              <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
                 <AlertCircle size={16} />
                 {errors.categoryId}
-              </ErrorMessage>
+              </div>
             )}
-          </FormGroup>
+          </div>
 
-          <FormGroup>
-            <Label>Section *</Label>
-            <Select
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">Section *</label>
+            <select
               value={formData.section}
-              onChange={(e: any) => handleInputChange('section', e.target.value)}
+              onChange={e => handleInputChange('section', e.target.value)}
+              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             >
               <option value="">Select section</option>
               {sections.map(section => (
@@ -391,142 +224,158 @@ const DefectModal = ({ isOpen, onClose, onSave, defect = null, loading = false }
                   {section.charAt(0).toUpperCase() + section.slice(1)}
                 </option>
               ))}
-            </Select>
+            </select>
             {errors.section && (
-              <ErrorMessage>
+              <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
                 <AlertCircle size={16} />
                 {errors.section}
-              </ErrorMessage>
+              </div>
             )}
-          </FormGroup>
+          </div>
 
-          <FormGroup>
-            <Label>Key *</Label>
-            <Input
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">Key *</label>
+            <input
               type="text"
               value={formData.key}
-              onChange={(e: any) => handleInputChange('key', e.target.value.toLowerCase())}
+              onChange={e => handleInputChange('key', e.target.value.toLowerCase())}
               placeholder="Enter key (lowercase, numbers, underscores only)"
+              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
             {errors.key && (
-              <ErrorMessage>
+              <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
                 <AlertCircle size={16} />
                 {errors.key}
-              </ErrorMessage>
+              </div>
             )}
-          </FormGroup>
+          </div>
 
-          <FormGroup>
-            <Label>Title *</Label>
-            <Input
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">Title *</label>
+            <input
               type="text"
               value={formData.title}
-              onChange={(e: any) => handleInputChange('title', e.target.value)}
+              onChange={e => handleInputChange('title', e.target.value)}
               placeholder="Enter defect title"
+              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
             {errors.title && (
-              <ErrorMessage>
+              <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
                 <AlertCircle size={16} />
                 {errors.title}
-              </ErrorMessage>
+              </div>
             )}
-          </FormGroup>
+          </div>
 
-          <FormGroup>
-            <Label>Icon</Label>
-            <Input
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">Icon</label>
+            <input
               type="text"
               value={formData.icon}
-              onChange={(e: any) => handleInputChange('icon', e.target.value)}
-              placeholder="Enter icon name or URL"
+              onChange={e => handleInputChange('icon', e.target.value)}
+              placeholder="Enter icon emoji or name"
+              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
-          </FormGroup>
+          </div>
 
-          <FormGroup>
-            <Label>Delta Configuration *</Label>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
-              <div style={{ flex: 1 }}>
-                <Label style={{ fontSize: '0.75rem', marginBottom: '4px' }}>Type</Label>
-                <Select
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">Delta Configuration *</label>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs text-gray-600 mb-1 block">Type</label>
+                <select
                   value={formData.delta.type}
-                  onChange={(e: any) =>
+                  onChange={e =>
                     handleInputChange('delta', { ...formData.delta, type: e.target.value })
                   }
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   <option value="percent">Percentage</option>
                   <option value="abs">Absolute</option>
-                </Select>
+                </select>
               </div>
-              <div style={{ flex: 1 }}>
-                <Label style={{ fontSize: '0.75rem', marginBottom: '4px' }}>Sign</Label>
-                <Select
+              <div>
+                <label className="text-xs text-gray-600 mb-1 block">Sign</label>
+                <select
                   value={formData.delta.sign}
-                  onChange={(e: any) =>
+                  onChange={e =>
                     handleInputChange('delta', { ...formData.delta, sign: e.target.value })
                   }
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   <option value="-">- (Decrease)</option>
                   <option value="+">+ (Increase)</option>
-                </Select>
+                </select>
               </div>
-              <div style={{ flex: 2 }}>
-                <Label style={{ fontSize: '0.75rem', marginBottom: '4px' }}>Value</Label>
-                <Input
+              <div>
+                <label className="text-xs text-gray-600 mb-1 block">Value</label>
+                <input
                   type="number"
                   min="0"
                   step="0.01"
                   value={formData.delta.value}
-                  onChange={(e: any) =>
+                  onChange={e =>
                     handleInputChange('delta', {
                       ...formData.delta,
                       value: parseFloat(e.target.value) || 0,
                     })
                   }
                   placeholder="Enter value"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 />
               </div>
             </div>
             {(errors.deltaType || errors.deltaSign || errors.deltaValue) && (
-              <ErrorMessage>
+              <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
                 <AlertCircle size={16} />
                 {errors.deltaType || errors.deltaSign || errors.deltaValue}
-              </ErrorMessage>
+              </div>
             )}
-          </FormGroup>
+          </div>
 
-          <FormGroup>
-            <Label>Order</Label>
-            <Input
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">Order</label>
+            <input
               type="number"
               value={formData.order}
-              onChange={(e: any) => handleInputChange('order', parseInt(e.target.value) || 0)}
+              onChange={e => handleInputChange('order', parseInt(e.target.value) || 0)}
               placeholder="Display order (0 for default)"
+              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
-          </FormGroup>
+          </div>
 
-          <FormGroup>
-            <Label>Status</Label>
-            <Select
-              value={formData.isActive}
-              onChange={(e: any) => handleInputChange('isActive', e.target.value === 'true')}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">Status</label>
+            <select
+              value={formData.isActive.toString()}
+              onChange={e => handleInputChange('isActive', e.target.value === 'true')}
+              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             >
               <option value="true">Active</option>
               <option value="false">Inactive</option>
-            </Select>
-          </FormGroup>
+            </select>
+          </div>
 
-          <ButtonGroup>
-            <Button type="button" className="bg-green-500" onClick={onClose}>
+          <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
               Cancel
-            </Button>
-            <Button type="submit" className="bg-green-500" disabled={loading}>
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-2.5 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
               <Save size={16} />
               {loading ? 'Saving...' : 'Save Defect'}
-            </Button>
-          </ButtonGroup>
-        </Form>
-      </ModalContent>
-    </ModalOverlay>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
