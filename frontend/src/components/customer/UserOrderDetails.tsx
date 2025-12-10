@@ -103,7 +103,7 @@ const UserOrderDetails = () => {
 
   if (loading) {
     return (
-      <div className="user-order-container">
+      <div className="user-order-container min-h-screen">
         <div className="loading-spinner">
           <div className="spinner"></div>
           <p>Loading order details...</p>
@@ -152,15 +152,15 @@ const UserOrderDetails = () => {
   const progressPercentage = getProgressPercentage(order?.status);
 
   return (
-    <div className="user-order-container">
+    <div className="main-container py-10">
       {/* Header */}
       <div className="header">
         <button className="back-button" onClick={() => navigate('/account/orders')}>
           <ArrowLeft size={20} />
           Back to Orders
         </button>
-        <h1 className="title">Order Details</h1>
-        <span className="order-id">#{order?._id?.slice(-8) || 'N/A'}</span>
+        <h1 className="title py-4">Order Details</h1>
+        {/* <span className="order-id">#{order?._id?.slice(-8) || 'N/A'}</span> */}
       </div>
 
       {/* Order Status Banner */}

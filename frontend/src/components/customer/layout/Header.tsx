@@ -148,7 +148,7 @@ const Header = () => {
   return (
     <>
       {/* Top Bar - Sticky */}
-      <div className="bg-white w-full main-container shadow-sm flex justify-between items-center gap-4 py-3 lg:gap-6 lg:py-4 md:gap-3 sticky top-0 z-[2000] border-b border-gray-200">
+      <div className="bg-white w-full main-container shadow-sm flex justify-between items-center gap-4 py-3 lg:gap-6 lg:py-4 md:gap-3 sticky top-0 z-[10] border-b border-gray-200">
         {/* Logo */}
         <Link
           to="/"

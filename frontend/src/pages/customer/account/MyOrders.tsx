@@ -291,7 +291,7 @@ const MyOrders = () => {
                   {/* Top row */}
                   <div className="flex items-center justify-between px-3.5 pt-3.5 pb-2.5 border-b border-gray-200 gap-4">
                     <div>
-                      <h3 className="m-0 text-gray-900 text-[1.05rem] font-bold">#{order._id}</h3>
+                      {/* <h3 className="m-0 text-gray-900 text-[1.05rem] font-bold">#{order._id}</h3> */}
                       <div className="flex flex-wrap gap-2 mt-1.5">
                         <span className="inline-flex items-center gap-1.5 bg-white border border-gray-200 px-2 py-0.5 rounded-full text-[0.82rem] text-gray-600">
                           <Calendar size={14} /> {created}
@@ -497,7 +497,7 @@ const MyOrders = () => {
                       <span>View Order</span>
                     </Link>
 
-                    {order.orderType !== 'sell' && (
+                    {/* {order.orderType !== 'sell' && (
                       <button
                         className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50"
                         onClick={() => alert('Invoice download feature coming soon!')}
@@ -506,7 +506,7 @@ const MyOrders = () => {
                         <Download size={16} />
                         <span>Invoice</span>
                       </button>
-                    )}
+                    )} */}
 
                     {order.orderType === 'buy' && status === 'shipped' && (
                       <button
