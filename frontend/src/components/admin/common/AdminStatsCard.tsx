@@ -22,7 +22,7 @@ const AdminStatsCard: React.FC<AdminStatsCardProps> = ({
   trend,
 }) => {
   return (
-    <div className="bg-white rounded-xl p-5 sm:p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1 min-h-[140px] flex flex-col justify-between">
+    <div className="bg-white rounded-xl p-5 sm:p-6 shadow-lg border border-slate-200  min-h-[140px] flex flex-col justify-between">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div
           className={`w-11 h-11 sm:w-12 sm:h-12 rounded-lg ${bgColor} flex items-center justify-center flex-shrink-0`}

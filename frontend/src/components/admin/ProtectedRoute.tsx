@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
+import AdminDataLoader from './common/AdminDataLoader';
 
 /**
  * ProtectedRoute component that restricts access to authenticated admin users only
@@ -11,18 +12,7 @@ const ProtectedRoute = () => {
 
   // Show loading state while checking authentication
   if (isLoading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        Loading...
-      </div>
-    );
+    return <AdminDataLoader text="Verifying authentication..." fullScreen />;
   }
 
   // Redirect to login if not authenticated

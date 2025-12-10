@@ -11,8 +11,8 @@ const AdminDataLoader: React.FC<LoaderProps> = ({ text = 'Loading...', fullScree
   return (
     <div
       className={clsx(
-        'flex flex-col items-center justify-center gap-3',
-        fullScreen ? 'min-h-[calc(100vh-154px)]' : 'min-h-[200px]'
+        'flex flex-col items-center justify-center gap-3 bg-slate-50',
+        fullScreen ? 'min-h-screen w-full' : 'min-h-[200px]'
       )}
       role="status"
       aria-live="polite"
