@@ -165,14 +165,15 @@ const ProductDetails = () => {
 
   const getProductName = () => {
     if (!product) return '';
-    // Prioritize series, then model, then brand + model
+    // Prioritize series, then model, then brand + model, fallback to name
     if (product.series && product.series !== 'default-model') {
       return product.series;
     }
     if (product.model && product.model !== 'default-model') {
       return `${product.brand} ${product.model}`;
     }
-    return `${product.brand} ${product.model}`;
+    // Fallback to product name if model is undefined or default
+    return product.name || `${product.brand}`;
   };
 
   const getProductImage = () => {
@@ -276,6 +277,8 @@ const ProductDetails = () => {
   const mrp = product.pricing?.mrp || product.originalPrice || null;
   const discountPct = mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
   const productName = getProductName();
+
+  console.log('Product Title = ', productName);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
