@@ -141,7 +141,7 @@ const Header = () => {
 
   const mobileOnlyLinks = [
     { to: '/about', label: 'About Us', icon: <Info /> },
-    { to: '/orders', label: 'Track Orders', icon: <Package /> },
+    // { to: '/orders', label: 'Track Orders', icon: <Package /> },
     { to: '/help', label: 'Help & Support', icon: <HelpCircle /> },
   ];
 
@@ -345,8 +345,8 @@ const Header = () => {
             {isAuthenticated ? (
               <>
                 <Link
-                  to="/profile"
-                  onClick={() => handleLinkClick('/profile')}
+                  to="/account/profile"
+                  onClick={() => handleLinkClick('/account/profile')}
                   className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-gray-800 no-underline rounded-lg transition-colors hover:bg-gray-100 hover:text-green-600"
                 >
                   <Settings /> My Profile

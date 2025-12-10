@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   CheckCircle,
@@ -7,38 +7,24 @@ import {
   MapPin,
   CreditCard,
   Calendar,
-  Download,
-  Share2,
-  MessageCircle,
-  ArrowRight,
   Home,
   ShoppingBag,
-  Star,
-  Sparkles,
-  Gift,
-  Phone,
-  Mail,
-  HelpCircle,
+  ArrowRight,
 } from 'lucide-react';
-import Card from '../../../components/ui/Card';
 import Button from '../../../components/ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
-import './OrderConfirmation.css';
 
-const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }: any) => {
+const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentOrder, clearOrderData } = useAuth();
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Get order data from context first, then navigation state or props
   const orderResponse = currentOrder || location.state?.orderData || orderData;
   const order = orderResponse?.data?.order || orderResponse?.order || orderResponse;
   const currentDate = new Date();
-  const deliveryDate = new Date(currentDate.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 days from now
+  const deliveryDate = new Date(currentDate.getTime() + 3 * 24 * 60 * 60 * 1000);
 
-  // Helper function to format currency
-  const formatCurrency = (amount: any) => {
+  const formatCurrency = amount => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
@@ -47,17 +33,13 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }: any) => 
     }).format(amount);
   };
 
-  // Helper function to format address
-  const formatAddress = (address: any) => {
+  const formatAddress = address => {
     if (!address) return 'Address not provided';
     const { street, city, state, pincode, country } = address;
     return `${street || ''}\n${city || ''}, ${state || ''} ${pincode || ''}\n${country || ''}`.trim();
   };
 
   useEffect(() => {
-    setIsLoaded(true);
-
-    // Cleanup order data when component unmounts
     return () => {
       if (currentOrder) {
         clearOrderData();
@@ -101,45 +83,6 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }: any) => 
     },
   ];
 
-  const quickActions = [
-    {
-      icon: Download,
-      label: 'Download Invoice',
-      variant: 'ghost' as const,
-      onClick: () => {
-        alert('Invoice download feature coming soon!');
-      },
-    },
-    {
-      icon: Share2,
-      label: 'Share Order',
-      variant: 'ghost' as const,
-      onClick: () => {
-        if (navigator.share) {
-          navigator
-            .share({
-              title: 'My Order',
-              text: `Order #${order?._id || 'N/A'}`,
-              url: window.location.href,
-            })
-            .catch(() => {
-              alert('Share feature coming soon!');
-            });
-        } else {
-          alert('Share feature coming soon!');
-        }
-      },
-    },
-    {
-      icon: Package,
-      label: 'Track Package',
-      variant: 'primary' as const,
-      onClick: () => {
-        alert('Order tracking feature coming soon!');
-      },
-    },
-  ];
-
   const handleContinueShopping = () => {
     if (onContinueShopping) {
       onContinueShopping();
@@ -157,318 +100,264 @@ const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }: any) => 
   };
 
   return (
-    <div className="order-confirmation-container">
-      <header className="order-header">
-        <div className="header-container">
-          <div className="success-icon floating-element">
-            <CheckCircle size={60} className="success-checkmark" />
+    <div className="min-h-screen">
+      {/* Header Background */}
+      <div className="bg-gradient-to-b from-blue-600 to-indigo-600 py-16 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Success Icon */}
+          <div className="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-white shadow-lg">
+            <CheckCircle size={48} className="text-green-600" />
           </div>
-          <h1 className="header-title">Order Confirmed!</h1>
-          <p className="header-subtitle">
+
+          {/* Title */}
+          <h1 className="text-4xl md:text-5xl font-bold mb-3 text-white">Order Confirmed!</h1>
+
+          {/* Subtitle */}
+          <p className="text-lg md:text-xl text-blue-100 mb-6 max-w-2xl mx-auto">
             Thank you for your purchase. We'll send you updates about your order.
           </p>
-          <div className="order-number hover-lift bg-green-500">
-            <span className="order-label">Order Number</span>
-            <span className="order-id">{order?._id || order?.orderId || 'ORD1234567890'}</span>
+
+          {/* Order Number */}
+          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20">
+            <div className="text-left">
+              <span className="block text-xs text-blue-100 uppercase tracking-wide font-medium">
+                Order Number
+              </span>
+              <span className="block text-lg font-semibold font-mono text-white">
+                {order?._id || order?.orderId || 'ORD1234567890'}
+              </span>
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      <section className="content-section">
-        <div className="container">
-          <div className="content-grid">
-            <div className="main-content">
-              {/* Order Timeline */}
-              <div className="section-card hover-lift">
-                <h2 className="section-title">
-                  <Package size={24} />
-                  Order Status
-                </h2>
-                <div className="timeline-container">
-                  {timeline.map((item, index) => {
-                    const IconComponent = item.icon;
-                    return (
-                      <div
-                        key={index}
-                        className={`timeline-item ${item.completed ? 'completed' : ''}`}
-                        style={{ animationDelay: `${index * 0.1}s` }}
-                      >
-                        <div className={`timeline-icon ${item.completed ? 'completed' : ''}`}>
-                          <IconComponent size={20} />
-                        </div>
-                        <div className="timeline-content">
-                          <h3 className="timeline-title">{item.title}</h3>
-                          <p className="timeline-description">{item.description}</p>
-                          <span className="timeline-date">{item.date}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+      {/* Main Content */}
+      <section className="main-container py-12">
+        <div className="space-y-8">
+          {/* Order Timeline */}
+          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
+            <h2 className="flex items-center gap-3 text-xl font-semibold text-gray-900 mb-6">
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <Package size={20} className="text-blue-600" />
               </div>
+              Order Status
+            </h2>
 
-              {/* Order Items */}
-              <div className="section-card hover-lift">
-                <h2 className="section-title">
-                  <ShoppingBag size={24} />
-                  Order Items
-                </h2>
-                {order?.items?.map((item: any, index: any) => (
+            <div className="space-y-4">
+              {timeline.map((item, index) => {
+                const IconComponent = item.icon;
+                return (
                   <div
-                    key={item._id || index}
-                    className="order-item"
-                    style={{ animationDelay: `${index * 0.1}s` }}
+                    key={index}
+                    className={`flex items-start gap-4 p-5 rounded-xl border-2 ${
+                      item.completed ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
+                    }`}
                   >
-                    <div className="item-image">
-                      <img
-                        src={
-                          item.product?.images?.main ||
-                          item.product?.images?.gallery ||
-                          item.product?.images?.thumbnail ||
-                          (Array.isArray(item.product?.images) ? item.product.images[0] : null) ||
-                          '/placeholder-phone.jpg'
-                        }
-                        alt={item.product?.name || 'Product'}
-                        onError={(e: any) => {
-                          e.target.src = '/placeholder-phone.jpg';
-                        }}
-                      />
+                    {/* Icon */}
+                    <div
+                      className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${
+                        item.completed ? 'bg-green-600' : 'bg-gray-400'
+                      }`}
+                    >
+                      <IconComponent size={24} className="text-white" />
                     </div>
-                    <div className="item-info">
-                      <h3 className="item-title">{item.product?.name || 'Product Name'}</h3>
-                      <p className="item-specs">
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{item.title}</h3>
+                      <p className="text-gray-600 text-sm mb-2">{item.description}</p>
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Calendar size={14} />
+                        {item.date}
+                      </div>
+                    </div>
+
+                    {/* Status Badge */}
+                    {item.completed && (
+                      <div className="flex-shrink-0 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">✓</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Order Items */}
+          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
+            <h2 className="flex items-center gap-3 text-xl font-semibold text-gray-900 mb-6">
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <ShoppingBag size={20} className="text-blue-600" />
+              </div>
+              Order Items
+            </h2>
+
+            <div className="space-y-4">
+              {order?.items?.map((item, index) => (
+                <div
+                  key={item._id || index}
+                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200"
+                >
+                  {/* Product Image */}
+                  <div className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-white border border-gray-200">
+                    <img
+                      src={
+                        item.product?.images?.main ||
+                        item.product?.images?.gallery ||
+                        item.product?.images?.thumbnail ||
+                        (Array.isArray(item.product?.images) ? item.product.images[0] : null) ||
+                        '/placeholder-phone.jpg'
+                      }
+                      alt={item.product?.name || 'Product'}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Product Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-semibold text-gray-900 mb-1">
+                      {item.product?.name || 'Product Name'}
+                    </h3>
+                    {(item.product?.brand || item.product?.condition) && (
+                      <p className="text-sm text-gray-600 mb-3">
                         {item.product?.brand && `Brand: ${item.product.brand}`}
                         {item.product?.brand && item.product?.condition && ' • '}
                         {item.product?.condition && `Condition: ${item.product.condition}`}
                       </p>
-                      <div className="item-price">
-                        <span className="item-quantity">Qty: {item.quantity || 1}</span>
-                        <span className="item-total">
-                          {formatCurrency(
-                            item.price
-                              ? item.price * (item.quantity || 1)
-                              : order?.totalAmount
-                                ? order.totalAmount / (order.items?.length || 1)
-                                : 0
-                          )}
-                        </span>
+                    )}
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Package size={16} />
+                        <span>Qty: {item.quantity || 1}</span>
                       </div>
-                    </div>
-                  </div>
-                )) || (
-                  <div className="order-item">
-                    <div className="item-image">
-                      <img src="/placeholder-phone.jpg" alt="No items" />
-                    </div>
-                    <div className="item-info">
-                      <h3 className="item-title">No items found</h3>
-                      <p className="item-specs">Order details not available</p>
-                      <div className="item-price">
-                        <span className="item-quantity">Qty: 0</span>
-                        <span className="item-total">₹0</span>
+                      <div className="text-lg font-bold text-gray-900">
+                        {formatCurrency(
+                          item.price
+                            ? item.price * (item.quantity || 1)
+                            : order?.totalAmount
+                              ? order.totalAmount / (order.items?.length || 1)
+                              : 0
+                        )}
                       </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Order Information */}
-              <div className="section-card hover-lift">
-                <h2 className="section-title">Order Information</h2>
-                <div className="info-grid">
-                  <div className="info-card">
-                    <div className="info-header">
-                      <div className="info-icon">
-                        <MapPin size={16} />
-                      </div>
-                      <h3 className="info-title delivery">Delivery Address</h3>
-                    </div>
-                    <div className="info-content">
-                      {formatAddress(order?.shippingDetails?.address)}
-                    </div>
-                  </div>
-
-                  <div className="info-card">
-                    <div className="info-header">
-                      <div className="info-icon">
-                        <CreditCard size={16} />
-                      </div>
-                      <h3 className="info-title payment">Payment Method</h3>
-                    </div>
-                    <div className="info-content">
-                      {order?.paymentDetails?.method || 'Not specified'}
-                      <br />
-                      <span
-                        className={`status-badge ${
-                          order?.paymentDetails?.status === 'completed'
-                            ? 'success'
-                            : order?.paymentDetails?.status === 'pending'
-                              ? 'warning'
-                              : 'error'
-                        }`}
-                      >
-                        {order?.paymentDetails?.status || 'Pending'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="info-card">
-                    <div className="info-header">
-                      <div className="info-icon">
-                        <Truck size={16} />
-                      </div>
-                      <h3 className="info-title method">Order Type</h3>
-                    </div>
-                    <div className="info-content">
-                      {order?.orderType === 'buy' ? 'Purchase Order' : 'Sell Order'}
-                      <br />
-                      Standard Processing
-                    </div>
-                  </div>
-
-                  <div className="info-card">
-                    <div className="info-header">
-                      <div className="info-icon">
-                        <Calendar size={16} />
-                      </div>
-                      <h3 className="info-title date">Order Date</h3>
-                    </div>
-                    <div className="info-content">
-                      {order?.createdAt
-                        ? new Date(order.createdAt).toLocaleDateString('en-IN', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })
-                        : 'Date not available'}
                     </div>
                   </div>
                 </div>
-              </div>
+              )) || (
+                <div className="text-center py-12 text-gray-500">
+                  <Package size={48} className="mx-auto mb-4 opacity-50" />
+                  <p className="text-base font-medium">No items found</p>
+                </div>
+              )}
             </div>
+          </div>
 
-            <div className="sidebar">
-              {/* Quick Actions */}
-              <div className="quick-actions hover-lift">
-                <h3 className="action-title">Quick Actions</h3>
-                <div className="actions-list">
-                  {quickActions.map((action, index) => {
-                    const IconComponent = action.icon;
-                    return (
-                      <Button
-                        key={index}
-                        variant={action.variant}
-                        size="sm"
-                        className="action-button"
-                        onClick={action.onClick}
-                        style={{ animationDelay: `${index * 0.1}s` }}
-                      >
-                        <IconComponent size={16} />
-                        {action.label}
-                      </Button>
-                    );
-                  })}
-                </div>
+          {/* Order Information */}
+          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200">
+            <h2 className="flex items-center gap-3 text-xl font-semibold text-gray-900 mb-6">
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <MapPin size={20} className="text-blue-600" />
               </div>
+              Order Information
+            </h2>
 
-              {/* Order Summary */}
-              <div className="summary-card hover-lift">
-                <h3 className="action-title">Order Summary</h3>
-                <div className="summary-row">
-                  <span className="summary-label subtotal">Subtotal</span>
-                  <span className="summary-value">
-                    {formatCurrency(order?.totalAmount - (order?.commission?.amount || 0))}
-                  </span>
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Delivery Address */}
+              <div className="p-5 bg-blue-50 rounded-xl border border-blue-100">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-blue-600 rounded-lg">
+                    <MapPin size={16} className="text-white" />
+                  </div>
+                  <h3 className="text-base font-semibold text-gray-900">Delivery Address</h3>
                 </div>
-                <div className="summary-row">
-                  <span className="summary-label commission">
-                    Commission ({((order?.commission?.rate || 0) * 100).toFixed(1)}%)
-                  </span>
-                  <span className="summary-value">
-                    {formatCurrency(order?.commission?.amount || 0)}
-                  </span>
-                </div>
-                <div className="summary-row">
-                  <span className="summary-label">Delivery</span>
-                  <span className="summary-value">FREE</span>
-                </div>
-                <div className="summary-row total">
-                  <span className="summary-label total">Total Paid</span>
-                  <span className="summary-value total">
-                    {formatCurrency(order?.totalAmount || 0)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Support */}
-              <div className="support-card hover-lift">
-                <h3 className="support-title">Need Help?</h3>
-                <p className="support-text">
-                  Our customer support team is here to help you with any questions about your order.
+                <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                  {formatAddress(order?.shippingDetails?.address)}
                 </p>
-                <div className="support-content">
-                  <div className="support-item">
-                    <div className="support-icon">
-                      <Phone size={16} />
-                    </div>
-                    <div className="support-text">
-                      <span className="support-label">Call Support</span>
-                      <span className="support-value">+91 9999999999</span>
-                    </div>
-                  </div>
+              </div>
 
-                  <div className="support-item">
-                    <div className="support-icon">
-                      <Mail size={16} />
-                    </div>
-                    <div className="support-text">
-                      <span className="support-label">Email Support</span>
-                      <span className="support-value">support@cashify.com</span>
-                    </div>
+              {/* Payment Method */}
+              <div className="p-5 bg-green-50 rounded-xl border border-green-100">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-green-600 rounded-lg">
+                    <CreditCard size={16} className="text-white" />
                   </div>
-
-                  <div className="support-item">
-                    <div className="support-icon">
-                      <MessageCircle size={16} />
-                    </div>
-                    <div className="support-text">
-                      <span className="support-label">Live Chat</span>
-                      <span className="support-value">Available 24/7</span>
-                    </div>
-                  </div>
-
-                  <div className="support-item">
-                    <div className="support-icon">
-                      <HelpCircle size={16} />
-                    </div>
-                    <div className="support-text">
-                      <span className="support-label">Order ID</span>
-                      <span className="support-value">{order?._id || order?.orderId || 'N/A'}</span>
-                    </div>
-                  </div>
+                  <h3 className="text-base font-semibold text-gray-900">Payment Method</h3>
                 </div>
-                <div className="support-actions">
-                  <Button variant="primary" size="sm" className="action-button">
-                    <MessageCircle size={16} />
-                    Chat Support
-                  </Button>
+                <p className="text-sm text-gray-700 mb-2">
+                  {order?.paymentDetails?.method || 'Not specified'}
+                </p>
+                <span
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                    order?.paymentDetails?.status === 'completed'
+                      ? 'bg-green-100 text-green-800 border border-green-200'
+                      : order?.paymentDetails?.status === 'pending'
+                        ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                        : 'bg-red-100 text-red-800 border border-red-200'
+                  }`}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                  {order?.paymentDetails?.status || 'Pending'}
+                </span>
+              </div>
+
+              {/* Order Type */}
+              <div className="p-5 bg-purple-50 rounded-xl border border-purple-100">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-purple-600 rounded-lg">
+                    <Truck size={16} className="text-white" />
+                  </div>
+                  <h3 className="text-base font-semibold text-gray-900">Order Type</h3>
                 </div>
+                <p className="text-sm text-gray-700">
+                  {order?.orderType === 'buy' ? 'Purchase Order' : 'Sell Order'}
+                </p>
+                <p className="text-xs text-gray-600 mt-1">Standard Processing</p>
+              </div>
+
+              {/* Order Date */}
+              <div className="p-5 bg-orange-50 rounded-xl border border-orange-100">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-orange-600 rounded-lg">
+                    <Calendar size={16} className="text-white" />
+                  </div>
+                  <h3 className="text-base font-semibold text-gray-900">Order Date</h3>
+                </div>
+                <p className="text-sm text-gray-700">
+                  {order?.createdAt
+                    ? new Date(order.createdAt).toLocaleDateString('en-IN', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })
+                    : 'Date not available'}
+                </p>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="navigation-actions">
-            <Button variant="primary" size="lg" onClick={handleContinueShopping}>
-              <ShoppingBag size={20} />
-              Continue Shopping
-              <ArrowRight size={20} />
-            </Button>
-            <Button variant="ghost" size="lg" onClick={handleGoHome}>
-              <Home size={20} />
-              Go to Home
-            </Button>
-          </div>
+        {/* Navigation Actions */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={handleContinueShopping}
+            className="flex items-center gap-2"
+          >
+            <ShoppingBag size={20} />
+            Continue Shopping
+            <ArrowRight size={20} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="lg"
+            onClick={handleGoHome}
+            className="flex items-center gap-2"
+          >
+            <Home size={20} />
+            Go to Home
+          </Button>
         </div>
       </section>
     </div>
