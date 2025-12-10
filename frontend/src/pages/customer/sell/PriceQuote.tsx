@@ -201,18 +201,15 @@ const PriceQuote = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header Section */}
-      <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-8 px-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
-
-        <div className="main-container relative z-10 text-center">
+      <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-16 px-4 relative overflow-hidden">
+        <div className="main-container relative text-center">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">🎉 Your Price Quote is Ready!</h1>
           <p className="text-lg text-blue-100">Great news! Here&apos;s what your device is worth</p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="main-container">
+      <div className="main-container py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Product Section - Left Side */}
           <div className="lg:col-span-2 space-y-6">
@@ -309,7 +306,7 @@ const PriceQuote = () => {
           {/* Price Summary Section - Right Side */}
           <div className="lg:col-span-1 space-y-6">
             {/* Price Summary */}
-            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200 sticky top-8">
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200">
               <h3 className="text-xl font-bold text-slate-900 mb-6">Price Summary</h3>
 
               <div className="space-y-4 mb-6">

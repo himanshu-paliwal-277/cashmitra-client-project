@@ -338,7 +338,10 @@ const PickupBooking = () => {
             {currentStep === 1 && (
               <div className="booking-address-fields">
                 <div className="booking-input-group">
-                  <label className="booking-input-label">Enter Pincode</label>
+                  <label className="booking-input-label">
+                    Enter Pincode
+                    <span className="text-red-500 relative top-[-2px]">*</span>
+                  </label>
                   <input
                     className="booking-styled-input"
                     placeholder="Pincode"
@@ -348,7 +351,9 @@ const PickupBooking = () => {
                 </div>
 
                 <div className="booking-input-group">
-                  <label className="booking-input-label">Flat No/Office</label>
+                  <label className="booking-input-label">
+                    Flat No/Office <span className="text-red-500 relative top-[-2px]">*</span>
+                  </label>
                   <input
                     className="booking-styled-input"
                     placeholder="Flat No/Office"
@@ -358,7 +363,9 @@ const PickupBooking = () => {
                 </div>
 
                 <div className="booking-input-group">
-                  <label className="booking-input-label">Locality/Area/Street</label>
+                  <label className="booking-input-label">
+                    Locality/Area/Street <span className="text-red-500 relative top-[-2px]">*</span>
+                  </label>
                   <input
                     className="booking-styled-input"
                     placeholder="Locality/Area/Street"
