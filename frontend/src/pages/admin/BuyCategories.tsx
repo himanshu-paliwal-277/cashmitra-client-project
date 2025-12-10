@@ -221,8 +221,8 @@ const BuyCategories = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-emerald-50/30 to-teal-50/30 ">
-      <div className="main-container space-y-6">
+    <>
+      <div className="min-h-screen ">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -254,8 +254,8 @@ const BuyCategories = () => {
 
         {/* Categories List */}
         <div
-          className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden flex flex-col"
-          style={{ maxHeight: 'calc(100vh - 180px)' }}
+          className="bg-white rounded-xl mt-8 shadow-lg border border-gray-200 overflow-hidden flex flex-col"
+          // style={{ maxHeight: 'calc(100vh - 180px)' }}
         >
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h2 className="text-xl font-bold text-gray-900">Categories</h2>
@@ -533,7 +533,7 @@ const BuyCategories = () => {
           <span className="font-medium">{toast.message}</span>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

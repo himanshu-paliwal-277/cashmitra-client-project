@@ -268,7 +268,7 @@ const SellCategories = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-slate-50 min-h-screen">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 flex items-center gap-3">

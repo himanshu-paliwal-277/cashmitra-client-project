@@ -600,7 +600,7 @@ const SellAccessoriesManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 main-container">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
         <div>

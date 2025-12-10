@@ -426,8 +426,8 @@ const SellProducts = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-amber-50/30 to-orange-50/30 ">
-      <div className="main-container space-y-6">
+    <>
+      <div className="min-h-screen">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -567,9 +567,9 @@ const SellProducts = () => {
             )}
           </div>
         ) : (
-          <>
+          <div className="flex flex-col gap-6 mt-8">
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            <div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               {stats.map((stat, index) => (
                 <div
                   key={index}
@@ -579,7 +579,7 @@ const SellProducts = () => {
                   <div className="relative flex items-start justify-between">
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-600 mb-2">{stat.label}</p>
-                      <p className="text-4xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent">
+                      <p className="text-4xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text ">
                         {stat.value}
                       </p>
                     </div>
@@ -597,7 +597,7 @@ const SellProducts = () => {
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
               <div className="flex flex-col lg:flex-row gap-4">
                 {/* Search */}
-                <div className="relative flex-1">
+                <div className="relative flex-1 ">
                   <Search
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
                     size={18}
@@ -680,7 +680,7 @@ const SellProducts = () => {
             </div>
 
             {/* Products Section */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-2xl  shadow-xl border border-gray-200 overflow-hidden">
               <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">
@@ -734,7 +734,7 @@ const SellProducts = () => {
                 <div className="overflow-hidden">{renderProductTable()}</div>
               )}
             </div>
-          </>
+          </div>
         )}
       </div>
 
@@ -757,7 +757,7 @@ const SellProducts = () => {
         selectedProductId={selectedProductForQuestions?._id || selectedProductForQuestions?.id}
         loading={questionsLoading}
       />
-    </div>
+    </>
   );
 };
 

@@ -220,7 +220,6 @@ const SellSuperCategoryManagement = () => {
 
 // Styled Components
 const Container = styled.div`
-  padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
 `;

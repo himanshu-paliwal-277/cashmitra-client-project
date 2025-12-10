@@ -308,8 +308,8 @@ const Partners = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30">
-      <div className="main-container space-y-6">
+    <>
+      <div className="min-h-screen space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -1116,7 +1116,7 @@ const Partners = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
