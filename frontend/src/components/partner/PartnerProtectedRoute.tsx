@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
+import PartnerDataLoader from './common/PartnerDataLoader';
 
 /**
  * PartnerProtectedRoute component that restricts access to authenticated partner users only
@@ -11,18 +12,7 @@ const PartnerProtectedRoute = () => {
 
   // Show loading state while checking authentication
   if (isLoading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        Loading...
-      </div>
-    );
+    return <PartnerDataLoader text="Verifying authentication..." fullScreen />;
   }
 
   // Redirect to login if not authenticated
