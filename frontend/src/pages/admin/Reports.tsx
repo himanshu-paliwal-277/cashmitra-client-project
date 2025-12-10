@@ -323,14 +323,14 @@ function Reports() {
           >
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
-          <Button
+          {/* <Button
             variant="primary"
             size="md"
             leftIcon={<Download size={20} />}
             className="flex-1 sm:flex-initial"
           >
             Export Report
-          </Button>
+          </Button> */}
         </div>
       </div>
 

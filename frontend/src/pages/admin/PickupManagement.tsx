@@ -301,16 +301,6 @@ const PickupManagement: React.FC = () => {
           </div>
           <div className="flex gap-3">
             <button
-              onClick={() => {
-                fetchAnalytics();
-                setShowAnalytics(true);
-              }}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <TrendingUp className="w-4 h-4" />
-              Analytics
-            </button>
-            <button
               onClick={fetchPickups}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >

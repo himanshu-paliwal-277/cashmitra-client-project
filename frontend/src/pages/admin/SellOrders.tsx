@@ -265,22 +265,22 @@ const SellOrders = () => {
     {
       label: 'Total Orders',
       value: pagination.totalOrders || 0,
-      icon: <ShoppingCart size={26} />,
+      icon: ShoppingCart,
     },
     {
       label: 'Confirmed Orders',
       value: stats.confirmed,
-      icon: <Clock size={26} />,
+      icon: Clock,
     },
     {
       label: 'Completed & Paid',
       value: stats.paid,
-      icon: <CheckCircle size={26} />,
+      icon: CheckCircle,
     },
     {
       label: 'Total Revenue',
       value: formatCurrency(stats.totalRevenue),
-      icon: <DollarSign size={26} />,
+      icon: DollarSign,
     },
   ];
 
@@ -303,19 +303,13 @@ const SellOrders = () => {
           title="Sell Orders"
           subtitle="Manage and track sell orders"
           rightSection={
-            <div className="flex items-center gap-2 sm:gap-3">
-              <button className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm text-sm">
-                <Download size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden sm:inline">Export</span>
-              </button>
-              <button
-                onClick={() => fetchOrders(pagination.currentPage, statusFilter, searchTerm)}
-                className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm text-sm"
-              >
-                <RefreshCw size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden sm:inline">Refresh</span>
-              </button>
-            </div>
+            <button
+              onClick={() => fetchOrders(pagination.currentPage, statusFilter, searchTerm)}
+              className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium shadow-sm text-sm"
+            >
+              <RefreshCw size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
           }
         />
 

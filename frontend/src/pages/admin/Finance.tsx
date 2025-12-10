@@ -207,10 +207,10 @@ const Finance = () => {
           <CreditCard size={32} />
           Finance Management
         </h1>
-        <button className="bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+        {/* <button className="bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5 transition-all">
           <Download size={20} />
           Export Report
-        </button>
+        </button> */}
       </div>
 
       {/* Stats Grid */}

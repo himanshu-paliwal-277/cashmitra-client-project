@@ -187,10 +187,6 @@ const SellDefectsManagement = () => {
           <p className="text-gray-600 ml-14">Manage device defects and their impact on pricing</p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 hover:border-amber-500 transition-all">
-            <Download size={16} />
-            Export
-          </button>
           <button
             onClick={() => fetchDefects()}
             disabled={loading}
