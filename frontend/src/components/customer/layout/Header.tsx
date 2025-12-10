@@ -161,7 +161,7 @@ const Header = () => {
         </Link>
 
         {/* Search - Hidden on mobile */}
-        <div className="hidden lg:flex flex-1 max-w-[600px] min-w-[200px]">
+        {/* <div className="hidden lg:flex flex-1 max-w-[600px] min-w-[200px]">
           <div className="relative w-full">
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
               <Search size={18} />
@@ -172,7 +172,7 @@ const Header = () => {
               className="w-full py-3 pl-11 pr-4 border-[1.5px] border-gray-300 rounded-lg text-sm text-gray-800 bg-gray-50 transition-all focus:outline-none focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 placeholder:text-gray-500"
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0 lg:gap-4">
@@ -303,7 +303,7 @@ const Header = () => {
       {isMobileMenuOpen && (
         <div className="fixed top-[57px] lg:top-[73px] left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 p-4 max-h-[calc(100vh-57px)] lg:max-h-[calc(100vh-73px)] overflow-y-auto">
           {/* Mobile Search */}
-          <div className="mb-4 pb-4 border-b border-gray-200">
+          {/* <div className="mb-4 pb-4 border-b border-gray-200">
             <div className="relative w-full">
               <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
                 <Search size={18} />
@@ -314,7 +314,7 @@ const Header = () => {
                 className="w-full py-3 pl-11 pr-4 border-[1.5px] border-gray-300 rounded-lg text-sm text-gray-800 bg-gray-50 transition-all focus:outline-none focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 placeholder:text-gray-500"
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Mobile Nav Items */}
           <div className="flex flex-col gap-1 mb-4">

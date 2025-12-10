@@ -56,7 +56,7 @@ const SellScreenDefects = () => {
 
       try {
         setLoading(true);
-        const response = await sellService.getCustomerDefects(categoryId);
+        const response: any = await sellService.getCustomerDefects(categoryId);
 
         let defects = [];
         let groupedDefectsFromAPI = {};
@@ -423,11 +423,21 @@ const SellScreenDefects = () => {
                             >
                               {defect.label}
                             </p>
-                            {defect.delta !== 0 && (
-                              <p className="text-xs text-slate-600 mt-1">
-                                {defect.delta > 0 ? '+' : ''}₹{defect.delta}
-                              </p>
-                            )}
+                            {(() => {
+                              // Handle delta - it might be an object or a number
+                              let deltaValue = 0;
+                              if (defect.delta && typeof defect.delta === 'object') {
+                                deltaValue = defect.delta.value || 0;
+                              } else if (typeof defect.delta === 'number') {
+                                deltaValue = defect.delta;
+                              }
+
+                              return deltaValue !== 0 ? (
+                                <p className="text-xs text-slate-600 mt-1">
+                                  {deltaValue > 0 ? '+' : ''}₹{Math.abs(deltaValue)}
+                                </p>
+                              ) : null;
+                            })()}
                           </div>
                         );
                       })}
@@ -532,13 +542,23 @@ const SellScreenDefects = () => {
                         <p className="text-xs text-slate-600 mb-1">
                           {selectedDefects.length} defect(s) selected
                         </p>
-                        {selectedDefectsDetails.map(defect => (
-                          <p key={defect.id} className="text-xs text-slate-600">
-                            • {defect.label}
-                            {defect.delta !== 0 &&
-                              ` (${defect.delta > 0 ? '+' : ''}₹${defect.delta})`}
-                          </p>
-                        ))}
+                        {selectedDefectsDetails.map(defect => {
+                          // Handle delta - it might be an object or a number
+                          let deltaValue = 0;
+                          if (defect.delta && typeof defect.delta === 'object') {
+                            deltaValue = defect.delta.value || 0;
+                          } else if (typeof defect.delta === 'number') {
+                            deltaValue = defect.delta;
+                          }
+
+                          return (
+                            <p key={defect.id} className="text-xs text-slate-600">
+                              • {defect.label}
+                              {deltaValue !== 0 &&
+                                ` (${deltaValue > 0 ? '+' : ''}₹${Math.abs(deltaValue)})`}
+                            </p>
+                          );
+                        })}
                       </div>
                     )}
                   </div>

@@ -51,13 +51,13 @@ const Help: React.FC = () => {
   );
 
   const contactOptions = [
-    {
-      icon: <MessageCircle size={24} />,
-      title: 'Live Chat',
-      description: 'Talk to our support instantly',
-      action: 'Chat Now',
-      available: '24/7 Support',
-    },
+    // {
+    //   icon: <MessageCircle size={24} />,
+    //   title: 'Live Chat',
+    //   description: 'Talk to our support instantly',
+    //   action: 'Chat Now',
+    //   available: '24/7 Support',
+    // },
     {
       icon: <Phone size={24} />,
       title: 'Phone Support',

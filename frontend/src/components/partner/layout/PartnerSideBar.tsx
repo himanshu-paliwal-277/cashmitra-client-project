@@ -206,7 +206,7 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
                     label={item.label}
                     isOpen={isOpen}
                     isActive={location.pathname === item.to}
-                    onClick={onClose}
+                    // onClick={onClose}
                   />
                 ))}
               </div>

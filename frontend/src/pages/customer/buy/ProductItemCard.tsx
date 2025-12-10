@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Eye, ShoppingCart } from 'lucide-react';
+import { Eye, ShoppingCart } from 'lucide-react';
 
 interface Variant {
   storage?: string;
@@ -77,7 +77,7 @@ const ProductItemCard: React.FC<ProductItemCardProps> = ({
           </span>
         )}
 
-        <button
+        {/* <button
           onClick={e => {
             e.stopPropagation();
             toggleWishlist(productId);
@@ -90,7 +90,7 @@ const ProductItemCard: React.FC<ProductItemCardProps> = ({
             stroke={wishlist.has(productId) ? 'red' : 'currentColor'}
             strokeWidth={1}
           />
-        </button>
+        </button> */}
       </div>
 
       <div className="p-5">

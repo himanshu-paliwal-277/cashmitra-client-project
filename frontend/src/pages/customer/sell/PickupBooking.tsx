@@ -31,15 +31,15 @@ const PickupBooking = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [formData, setFormData] = useState({
-    pincode: '110008',
-    flatNo: '1000B/Office',
-    locality: 'Lorem ipsum dolor sit amet',
+    pincode: '',
+    flatNo: '',
+    locality: '',
     landmark: '',
-    city: 'Delhi',
-    state: 'Delhi',
+    city: '',
+    state: '',
     alternateNumber: '',
     fullName: '',
-    saveAs: 'Home',
+    saveAs: '',
     selectedDate: '',
     selectedTime: '',
     paymentType: 'bank_transfer',
@@ -397,10 +397,10 @@ const PickupBooking = () => {
                   />
                 </div>
 
-                <button className="booking-location-button">
+                {/* <button className="booking-location-button">
                   <MapPin size={18} />
                   Use my current location
-                </button>
+                </button> */}
 
                 <div className="booking-save-as-group">
                   <div className="booking-save-as-label">Save As</div>

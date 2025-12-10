@@ -5,8 +5,6 @@ import {
   Grid,
   List,
   Star,
-  Heart,
-  ShoppingCart,
   Smartphone,
   Tablet,
   Laptop,
