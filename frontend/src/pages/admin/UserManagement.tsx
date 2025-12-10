@@ -78,6 +78,7 @@ const UserManagement = () => {
     phone: '',
     password: '',
     role: 'user',
+    isVerified: false,
     dateOfBirth: '',
     address: {
       street: '',
@@ -143,6 +144,7 @@ const UserManagement = () => {
       phone: '',
       password: '',
       role: 'user',
+      isVerified: false,
       dateOfBirth: '',
       address: {
         street: '',
@@ -164,6 +166,7 @@ const UserManagement = () => {
       phone: user.phone || '',
       password: '',
       role: user.role,
+      isVerified: user.isVerified,
       dateOfBirth: user.dateOfBirth || '',
       address: {
         street: user.address?.street || '',
@@ -358,7 +361,6 @@ const UserManagement = () => {
           <option value="all">All Roles</option>
           <option value="user">Users</option>
           <option value="partner">Partners</option>
-          <option value="admin">Admins</option>
           <option value="agent">Agents</option>
         </select>
 
@@ -728,8 +730,24 @@ const UserManagement = () => {
                 >
                   <option value="user">User</option>
                   <option value="partner">Partner</option>
-                  <option value="admin">Admin</option>
                   <option value="agent">Agent</option>
+                </select>
+              </div>
+
+              {/* Verification Status */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Verification Status
+                </label>
+                <select
+                  value={formData.isVerified ? 'verified' : 'unverified'}
+                  onChange={e =>
+                    setFormData({ ...formData, isVerified: e.target.value === 'verified' })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="unverified">Unverified</option>
+                  <option value="verified">Verified</option>
                 </select>
               </div>
 

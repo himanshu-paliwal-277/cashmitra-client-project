@@ -16,6 +16,7 @@ import {
   Edit,
   Trash2,
   Eye,
+  EyeOff,
   X,
   Save,
   CheckCircle,
@@ -39,12 +40,18 @@ const Partners = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showWalletModal, setShowWalletModal] = useState(false);
   const [editingPartner, setEditingPartner] = useState(null);
   const [selectedPartner, setSelectedPartner] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [walletPartner, setWalletPartner] = useState(null);
+
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [walletAmount, setWalletAmount] = useState('');
+  const [walletAction, setWalletAction] = useState('add'); // 'add' or 'subtract'
+  const [walletReason, setWalletReason] = useState('');
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
@@ -53,6 +60,12 @@ const Partners = () => {
   });
 
   const [formData, setFormData] = useState({
+    // User details (for new partner creation)
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    // Partner details
     userId: '',
     shopName: '',
     shopAddress: {
@@ -74,7 +87,6 @@ const Partners = () => {
       accountHolderName: '',
     },
     upiId: '',
-    roleTemplate: 'basic',
   });
 
   const {
@@ -108,25 +120,6 @@ const Partners = () => {
     });
   }, [hookPartners, hookLoading]);
 
-  useEffect(() => {
-    if (showModal && !editingPartner) {
-      fetchUsers();
-    }
-  }, [showModal, editingPartner]);
-
-  const fetchUsers = async () => {
-    try {
-      setLoadingUsers(true);
-      const response = await adminService.getAllUsers({ limit: 100, role: 'partner' });
-      setUsers(response.users || []);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      setUsers([]);
-    } finally {
-      setLoadingUsers(false);
-    }
-  };
-
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setSubmitError('');
@@ -145,10 +138,22 @@ const Partners = () => {
         },
       };
 
+      // Remove userId if it's empty (for new partner creation)
+      if (!cleanedData.userId || !cleanedData.userId.trim()) {
+        delete cleanedData.userId;
+      }
+
       let result;
       if (editingPartner) {
-        result = await editPartner(editingPartner._id, cleanedData);
+        // For editing, only send partner data (user data is read-only)
+        const partnerData = { ...cleanedData };
+        delete partnerData.name;
+        delete partnerData.email;
+        delete partnerData.phone;
+        delete partnerData.password;
+        result = await editPartner(editingPartner._id, partnerData);
       } else {
+        // For new partner creation, send all data including user details
         result = await addPartner(cleanedData);
       }
 
@@ -201,6 +206,12 @@ const Partners = () => {
     setEditingPartner(partner);
     setSubmitError('');
     setFormData({
+      // User details (for editing, these are read-only)
+      name: partner.user?.name || '',
+      email: partner.user?.email || '',
+      phone: partner.user?.phone || '',
+      password: '', // Never populate password
+      // Partner details
       userId: partner.user?._id || '',
       shopName: partner.shopName || '',
       shopAddress: {
@@ -222,7 +233,6 @@ const Partners = () => {
         accountHolderName: partner.bankDetails?.accountHolderName || '',
       },
       upiId: partner.upiId || '',
-      roleTemplate: 'basic',
     });
     setShowModal(true);
   };
@@ -232,8 +242,59 @@ const Partners = () => {
     setShowDetailModal(true);
   };
 
+  const handleWalletUpdate = (partner: any) => {
+    setWalletPartner(partner);
+    setWalletAmount('');
+    setWalletAction('add');
+    setWalletReason('');
+    setShowWalletModal(true);
+  };
+
+  const handleWalletSubmit = async (e: any) => {
+    e.preventDefault();
+    if (!walletPartner || !walletAmount || !walletReason) return;
+
+    setWalletLoading(true);
+    try {
+      const amount = parseFloat(walletAmount);
+      const finalAmount = walletAction === 'subtract' ? -amount : amount;
+
+      // Call admin API to update wallet balance
+      const response = await adminService.updatePartnerWallet(walletPartner._id, {
+        amount: finalAmount,
+        reason: walletReason,
+        type: walletAction === 'add' ? 'credit' : 'debit',
+      });
+
+      if (response.success) {
+        // Update local state
+        setPartners(prev =>
+          prev.map((p: any) =>
+            p._id === walletPartner._id
+              ? { ...p, wallet: { ...p.wallet, balance: response.data.newBalance } }
+              : p
+          )
+        );
+
+        setShowWalletModal(false);
+        alert('Wallet balance updated successfully!');
+      }
+    } catch (error: any) {
+      console.error('Error updating wallet:', error);
+      alert(error.response?.data?.message || 'Failed to update wallet balance');
+    } finally {
+      setWalletLoading(false);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
+      // User details
+      name: '',
+      email: '',
+      phone: '',
+      password: '',
+      // Partner details
       userId: '',
       shopName: '',
       shopAddress: {
@@ -255,8 +316,8 @@ const Partners = () => {
         accountHolderName: '',
       },
       upiId: '',
-      roleTemplate: 'basic',
     });
+    setShowPassword(false);
   };
 
   const getStatusIcon = (status: any) => {
@@ -328,6 +389,7 @@ const Partners = () => {
             onClick={() => {
               resetForm();
               setSubmitError('');
+              setShowPassword(false);
               setShowModal(true);
             }}
             className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
@@ -428,16 +490,13 @@ const Partners = () => {
                     Partner Details
                   </th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Wallet Balance
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
                     Business Type
                   </th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                    Commission
-                  </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
                     Total Orders
-                  </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                    Revenue
                   </th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
                     Status
@@ -450,7 +509,7 @@ const Partners = () => {
               <tbody className="divide-y divide-gray-100">
                 {filteredPartners.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center">
+                    <td colSpan={6} className="px-6 py-12 text-center">
                       <Users size={48} className="mx-auto text-gray-400 mb-4" />
                       <p className="text-gray-600 text-lg">
                         {searchTerm || statusFilter
@@ -482,10 +541,22 @@ const Partners = () => {
                           </div>
                         </div>
                       </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-bold text-green-600">
+                            ₹{(partner.wallet?.balance || 0).toLocaleString()}
+                          </span>
+                          <button
+                            onClick={() => handleWalletUpdate(partner)}
+                            className="p-1.5 hover:bg-blue-100 rounded-lg transition-colors duration-150 text-blue-600 hover:text-blue-700"
+                            title="Update Wallet Balance"
+                          >
+                            <Edit size={14} />
+                          </button>
+                        </div>
+                      </td>
                       <td className="px-6 py-4 text-sm text-gray-600">Individual</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">Not set</td>
                       <td className="px-6 py-4 text-sm text-gray-600">0</td>
-                      <td className="px-6 py-4 text-sm font-semibold text-green-600">₹0</td>
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(partner.verificationStatus)}`}
@@ -594,31 +665,118 @@ const Partners = () => {
                 </div>
               )}
 
-              {!editingPartner && (
+              {!editingPartner ? (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Select User <span className="text-red-500">*</span>
-                  </label>
-                  {loadingUsers ? (
-                    <div className="p-4 text-center text-gray-600">
-                      <Loader2 className="animate-spin mx-auto mb-2" size={24} />
-                      Loading users...
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">User Details</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Full Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.name}
+                          onChange={e => setFormData({ ...formData, name: e.target.value })}
+                          required
+                          placeholder="Enter full name"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Email Address <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={e => setFormData({ ...formData, email: e.target.value })}
+                          required
+                          placeholder="Enter email address"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                        />
+                      </div>
                     </div>
-                  ) : (
-                    <select
-                      value={formData.userId}
-                      onChange={e => setFormData({ ...formData, userId: e.target.value })}
-                      required
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
-                    >
-                      <option value="">Select a user</option>
-                      {users.map((user: any) => (
-                        <option key={user._id} value={user._id}>
-                          {user.name} ({user.email})
-                        </option>
-                      ))}
-                    </select>
-                  )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Phone Number <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          value={formData.phone}
+                          onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                          required
+                          placeholder="Enter phone number"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Password <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? 'text' : 'password'}
+                            value={formData.password}
+                            onChange={e => setFormData({ ...formData, password: e.target.value })}
+                            required
+                            placeholder="Enter password (min 6 characters)"
+                            minLength={6}
+                            className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 transition-colors duration-150"
+                          >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">User Details (Read-only)</h3>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Full Name
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.name}
+                          readOnly
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-600 cursor-not-allowed"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Email Address
+                        </label>
+                        <input
+                          type="email"
+                          value={formData.email}
+                          readOnly
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-600 cursor-not-allowed"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        readOnly
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-600 cursor-not-allowed"
+                      />
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -868,23 +1026,6 @@ const Partners = () => {
                 </p>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Role Template <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={formData.roleTemplate}
-                  onChange={e => setFormData({ ...formData, roleTemplate: e.target.value })}
-                  required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
-                >
-                  <option value="basic">Basic Partner</option>
-                  <option value="advanced">Advanced Partner</option>
-                  <option value="premium">Premium Partner</option>
-                  <option value="custom">Custom Permissions</option>
-                </select>
-              </div>
-
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
                 <button
                   type="button"
@@ -1048,10 +1189,21 @@ const Partners = () => {
                 )}
               </div>
 
-              {/* Performance Metrics */}
+              {/* Wallet & Performance Metrics */}
               <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Performance Metrics</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Wallet & Performance</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">₹</span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-green-600">Wallet Balance</p>
+                      <p className="font-bold text-green-700 text-lg">
+                        ₹{(selectedPartner.wallet?.balance || 0).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
                   <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
                     <TrendingUp size={20} className="text-gray-600" />
                     <div>
@@ -1092,6 +1244,14 @@ const Partners = () => {
                       </span>
                     </div>
                   </div>
+                  <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div>
+                      <p className="text-sm text-blue-600">Total Transactions</p>
+                      <p className="font-semibold text-blue-700">
+                        {selectedPartner.wallet?.transactions?.length || 0}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1113,6 +1273,116 @@ const Partners = () => {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Wallet Update Modal */}
+      {showWalletModal && walletPartner && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setShowWalletModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-md"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">Update Wallet Balance</h2>
+              <button
+                onClick={() => setShowWalletModal(false)}
+                className="p-2 hover:bg-white rounded-lg transition-colors duration-150 text-gray-600 hover:text-gray-900"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleWalletSubmit} className="p-6 space-y-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-2">
+                  Partner: <span className="font-semibold">{walletPartner.shopName}</span>
+                </p>
+                <p className="text-sm text-gray-600">
+                  Current Balance:{' '}
+                  <span className="font-semibold text-green-600">
+                    ₹{(walletPartner.wallet?.balance || 0).toLocaleString()}
+                  </span>
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Action <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={walletAction}
+                  onChange={e => setWalletAction(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                >
+                  <option value="add">Add Money (Credit)</option>
+                  <option value="subtract">Deduct Money (Debit)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Amount <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  value={walletAmount}
+                  onChange={e => setWalletAmount(e.target.value)}
+                  required
+                  min="0"
+                  step="0.01"
+                  placeholder="Enter amount"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Reason <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={walletReason}
+                  onChange={e => setWalletReason(e.target.value)}
+                  required
+                  rows={3}
+                  placeholder="Enter reason for wallet update"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => setShowWalletModal(false)}
+                  disabled={walletLoading}
+                  className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={walletLoading || !walletAmount || !walletReason}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {walletLoading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={16} />
+                      Update Balance
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -137,10 +137,28 @@ const getAllPartners = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
+    // Fetch wallet data for each partner
+    const partnersWithWallet = await Promise.all(
+      partners.map(async (partner) => {
+        const wallet = await Wallet.findOne({ partner: partner._id });
+        const partnerObj = partner.toObject();
+
+        // Update wallet data with actual wallet from Wallet collection
+        if (wallet) {
+          partnerObj.wallet = {
+            balance: wallet.balance,
+            transactions: wallet.transactions,
+          };
+        }
+
+        return partnerObj;
+      })
+    );
+
     const total = await Partner.countDocuments(filter);
 
     res.json({
-      partners,
+      partners: partnersWithWallet,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
       total,
@@ -192,6 +210,12 @@ const getPartnerById = async (req, res) => {
 const createPartner = async (req, res) => {
   try {
     const {
+      // User details (for new partner creation)
+      name,
+      email,
+      phone,
+      password,
+      // Partner details
       userId,
       shopName,
       shopAddress,
@@ -204,18 +228,50 @@ const createPartner = async (req, res) => {
       upiId,
     } = req.body;
 
-    // Check if user exists
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    let user;
+    let isNewUser = false;
 
-    // Check if user already has a partner profile
-    const existingPartner = await Partner.findOne({ user: userId });
-    if (existingPartner) {
-      return res
-        .status(400)
-        .json({ message: "User already has a partner profile" });
+    // Check if this is a new partner creation (with user details) or existing user
+    if (userId) {
+      // Existing user flow
+      user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if user already has a partner profile
+      const existingPartner = await Partner.findOne({ user: userId });
+      if (existingPartner) {
+        return res
+          .status(400)
+          .json({ message: "User already has a partner profile" });
+      }
+    } else {
+      // New user creation flow
+      if (!name || !email || !phone || !password) {
+        return res.status(400).json({
+          message:
+            "Name, email, phone, and password are required for new partner creation",
+        });
+      }
+
+      // Check if user with email already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res
+          .status(400)
+          .json({ message: "User with this email already exists" });
+      }
+
+      // Create new user
+      user = await User.create({
+        name,
+        email,
+        phone,
+        password,
+        role: "partner",
+      });
+      isNewUser = true;
     }
 
     // Check if GST number is unique
@@ -226,7 +282,7 @@ const createPartner = async (req, res) => {
 
     // Create partner
     const partner = await Partner.create({
-      user: userId,
+      user: user._id,
       shopName,
       shopAddress,
       gstNumber,
@@ -240,8 +296,17 @@ const createPartner = async (req, res) => {
       isVerified: false,
     });
 
-    // Update user role to partner
-    await User.findByIdAndUpdate(userId, { role: "partner" });
+    // Update user role to partner (if not already set for new users)
+    if (!isNewUser) {
+      await User.findByIdAndUpdate(user._id, { role: "partner" });
+    }
+
+    // Create wallet for the new partner
+    await Wallet.create({
+      partner: partner._id,
+      balance: 0,
+      transactions: [],
+    });
 
     const populatedPartner = await Partner.findById(partner._id).populate(
       "user",
@@ -256,7 +321,14 @@ const createPartner = async (req, res) => {
   } catch (error) {
     console.error("Error creating partner:", error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: "GST number already exists" });
+      // Handle duplicate key errors
+      if (error.keyPattern?.email) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+      if (error.keyPattern?.gstNumber) {
+        return res.status(400).json({ message: "GST number already exists" });
+      }
+      return res.status(400).json({ message: "Duplicate entry found" });
     }
     res.status(500).json({ message: "Server error" });
   }
@@ -409,6 +481,107 @@ const verifyPartner = async (req, res) => {
     res.json({ message: `Partner ${status} successfully`, partner });
   } catch (error) {
     console.error("Error verifying partner:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// @desc    Update partner wallet balance
+// @route   POST /api/admin/partners/:id/wallet/update
+// @access  Private/Admin
+const updatePartnerWallet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount, reason, type } = req.body;
+
+    // Find partner
+    const partner = await Partner.findById(id);
+    if (!partner) {
+      return res.status(404).json({ message: "Partner not found" });
+    }
+
+    // Find or create wallet
+    let wallet = await Wallet.findOne({ partner: id });
+    if (!wallet) {
+      wallet = await Wallet.create({
+        partner: id,
+        balance: 0,
+        transactions: [],
+      });
+    }
+
+    // Update balance
+    const oldBalance = wallet.balance;
+    wallet.balance += amount;
+
+    // Ensure balance doesn't go negative
+    if (wallet.balance < 0) {
+      return res.status(400).json({
+        message:
+          "Insufficient balance. Cannot deduct more than available balance.",
+      });
+    }
+
+    // Also update the partner's embedded wallet balance
+    partner.wallet.balance = wallet.balance;
+
+    // Create transaction record
+    const transaction = await Transaction.create({
+      partner: id,
+      transactionType: amount > 0 ? "wallet_credit" : "wallet_debit",
+      amount: Math.abs(amount),
+      status: "completed",
+      paymentMethod: "System",
+      description: `Admin ${type}: ${reason}`,
+      metadata: {
+        adminAction: true,
+        reason: reason,
+        oldBalance: oldBalance,
+        newBalance: wallet.balance,
+      },
+    });
+
+    // Also create a finance record for the admin finance dashboard
+    const Finance = require("../models/finance.model");
+    await Finance.create({
+      transactionType: amount > 0 ? "deposit" : "withdrawal",
+      amount: Math.abs(amount),
+      partner: id,
+      status: "processed",
+      paymentMethod: "wallet",
+      category: "other",
+      description: `Admin wallet ${type}: ${reason || "Manual adjustment"}`,
+      processedBy: req.user?._id || req.user?.id, // Admin who performed the action
+      processedAt: new Date(),
+      metadata: {
+        originalAmount: Math.abs(amount),
+        adminAction: true,
+        reason: reason,
+        oldBalance: oldBalance,
+        newBalance: wallet.balance,
+        transactionId: transaction._id,
+      },
+    });
+
+    // Add transaction to wallet and partner
+    wallet.transactions.push(transaction._id);
+    wallet.lastUpdated = new Date();
+    partner.wallet.transactions.push(transaction._id);
+
+    // Save both wallet and partner
+    await Promise.all([wallet.save(), partner.save()]);
+
+    res.json({
+      success: true,
+      message: "Wallet balance updated successfully",
+      data: {
+        oldBalance: oldBalance,
+        newBalance: wallet.balance,
+        amount: amount,
+        transactionId: transaction._id,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating partner wallet:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -4049,6 +4222,7 @@ module.exports = {
   updatePartner,
   deletePartner,
   verifyPartner,
+  updatePartnerWallet,
   getAllOrders,
   getOrderById,
   getDashboardAnalytics,

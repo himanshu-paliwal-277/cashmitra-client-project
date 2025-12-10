@@ -1593,6 +1593,17 @@ class AdminService {
     }
   }
 
+  // Partner Wallet Management
+  async updatePartnerWallet(partnerId: string, walletData: any) {
+    try {
+      const response = await api.post(`/admin/partners/${partnerId}/wallet/update`, walletData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating partner wallet:', error);
+      throw error.response?.data || error;
+    }
+  }
+
   // Logout
   logout() {
     localStorage.removeItem('adminToken');

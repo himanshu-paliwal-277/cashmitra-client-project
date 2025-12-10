@@ -48,7 +48,7 @@ const getFinancialTransactions = async (req, res) => {
     const transactions = await Finance.find(filter)
       .populate("order", "orderType totalAmount")
       .populate("user", "name email")
-      .populate("partner", "businessName email")
+      .populate("partner", "shopName shopEmail businessName email")
       .populate("processedBy", "name email")
       .sort(sortOptions)
       .skip(skip)

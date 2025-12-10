@@ -38,8 +38,12 @@ interface Transaction {
   order?: any;
   partner?: any;
   user?: any;
+  processedBy?: any;
+  paymentMethod?: string;
+  category?: string;
   description?: string;
   createdAt: string;
+  processedAt?: string;
   metadata?: any;
   commission?: {
     amount: number;
@@ -74,6 +78,8 @@ const Finance = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -98,9 +104,18 @@ const Finance = () => {
         totalCommission: overview.totalCommission || 0,
         totalPayouts: overview.processedAmount || 0,
         pendingPayouts: overview.pendingAmount || 0,
+        revenueGrowth: undefined, // Could be calculated from dailyTrend if needed
+        commissionGrowth: undefined, // Could be calculated from dailyTrend if needed
       });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      // Set default values on error
+      setStats({
+        totalRevenue: 0,
+        totalCommission: 0,
+        totalPayouts: 0,
+        pendingPayouts: 0,
+      });
     } finally {
       setLoading(false);
     }
@@ -199,6 +214,11 @@ const Finance = () => {
     }
   };
 
+  const handleViewTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setShowViewModal(true);
+  };
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -224,7 +244,7 @@ const Finance = () => {
               <div className="text-3xl font-bold text-gray-900">
                 {formatCurrency(stats.totalRevenue)}
               </div>
-              <div className="text-sm text-gray-600">Total Revenue</div>
+              <div className="text-sm text-gray-600">Total Transaction Amount</div>
               {stats.revenueGrowth !== undefined && (
                 <div className="flex items-center gap-1 text-xs font-semibold text-green-600 mt-1">
                   <TrendingUp size={12} />+{stats.revenueGrowth}% from last month
@@ -256,27 +276,27 @@ const Finance = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm hover:-translate-y-1 transition-all">
           <div className="flex items-center gap-4">
             <div className="bg-amber-500 text-white p-4 rounded-xl">
-              <ArrowUpRight size={24} />
+              <Clock size={24} />
             </div>
             <div className="flex-1">
               <div className="text-3xl font-bold text-gray-900">
                 {formatCurrency(stats.pendingPayouts)}
               </div>
-              <div className="text-sm text-gray-600">Pending Payouts</div>
+              <div className="text-sm text-gray-600">Pending Transactions</div>
             </div>
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm hover:-translate-y-1 transition-all">
           <div className="flex items-center gap-4">
-            <div className="bg-red-500 text-white p-4 rounded-xl">
-              <ArrowDownLeft size={24} />
+            <div className="bg-blue-500 text-white p-4 rounded-xl">
+              <CheckCircle size={24} />
             </div>
             <div className="flex-1">
               <div className="text-3xl font-bold text-gray-900">
                 {formatCurrency(stats.totalPayouts)}
               </div>
-              <div className="text-sm text-gray-600">Total Payouts</div>
+              <div className="text-sm text-gray-600">Processed Transactions</div>
             </div>
           </div>
         </div>
@@ -416,10 +436,16 @@ const Finance = () => {
                           </td>
                           <td className="px-6 py-4">
                             <div className="text-sm text-gray-900">
-                              {transaction.partner?.businessName ||
-                                transaction.partner?.shopName ||
+                              {transaction.partner?.shopName ||
+                                transaction.partner?.businessName ||
                                 transaction.user?.name ||
-                                'N/A'}
+                                (transaction.processedBy?.name
+                                  ? `Admin: ${transaction.processedBy.name}`
+                                  : null) ||
+                                (transaction.partner?._id
+                                  ? `Partner: ${transaction.partner._id.slice(-6)}`
+                                  : null) ||
+                                'System'}
                             </div>
                           </td>
                           <td className="px-6 py-4">
@@ -445,11 +471,12 @@ const Finance = () => {
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
-                              <button className="p-2 rounded-lg hover:bg-blue-100 text-blue-600 transition-colors">
+                              <button
+                                onClick={() => handleViewTransaction(transaction)}
+                                className="p-2 rounded-lg hover:bg-blue-100 text-blue-600 transition-colors"
+                                title="View Details"
+                              >
                                 <Eye className="w-4 h-4" />
-                              </button>
-                              <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
-                                <FileText className="w-4 h-4" />
                               </button>
                             </div>
                           </td>
@@ -576,6 +603,186 @@ const Finance = () => {
           )}
         </div>
       </div>
+
+      {/* Transaction View Modal */}
+      {showViewModal && selectedTransaction && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setShowViewModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">Transaction Details</h2>
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="p-2 hover:bg-white rounded-lg transition-colors duration-150 text-gray-600 hover:text-gray-900"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Basic Information */}
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Basic Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="text-sm text-gray-600">Transaction ID</p>
+                      <p className="font-semibold text-gray-900 font-mono text-sm">
+                        {selectedTransaction._id}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="text-sm text-gray-600">Type</p>
+                      <p className="font-semibold text-gray-900 capitalize">
+                        {selectedTransaction.transactionType}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="text-sm text-gray-600">Amount</p>
+                      <p className="font-bold text-gray-900 text-lg">
+                        {formatCurrency(selectedTransaction.amount)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="text-sm text-gray-600">Status</p>
+                      <span
+                        className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(
+                          selectedTransaction.status
+                        )}`}
+                      >
+                        {getStatusIcon(selectedTransaction.status)}
+                        {selectedTransaction.status.charAt(0).toUpperCase() +
+                          selectedTransaction.status.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Partner/User Information */}
+              {(selectedTransaction.partner ||
+                selectedTransaction.user ||
+                selectedTransaction.processedBy) && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Related Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {selectedTransaction.partner && (
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="text-sm text-gray-600">Partner</p>
+                          <p className="font-semibold text-gray-900">
+                            {selectedTransaction.partner.shopName || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {selectedTransaction.user && (
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="text-sm text-gray-600">User</p>
+                          <p className="font-semibold text-gray-900">
+                            {selectedTransaction.user.name || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {selectedTransaction.processedBy && (
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="text-sm text-gray-600">Processed By</p>
+                          <p className="font-semibold text-gray-900">
+                            {selectedTransaction.processedBy.name || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {selectedTransaction.paymentMethod && (
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="text-sm text-gray-600">Payment Method</p>
+                          <p className="font-semibold text-gray-900 capitalize">
+                            {selectedTransaction.paymentMethod}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Description */}
+              {selectedTransaction.description && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Description</h3>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <p className="text-gray-700">{selectedTransaction.description}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Metadata */}
+              {selectedTransaction.metadata &&
+                Object.keys(selectedTransaction.metadata).length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">Additional Details</h3>
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <pre className="text-sm text-gray-700 whitespace-pre-wrap">
+                        {JSON.stringify(selectedTransaction.metadata, null, 2)}
+                      </pre>
+                    </div>
+                  </div>
+                )}
+
+              {/* Timestamps */}
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Timestamps</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <Calendar size={20} className="text-gray-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Created At</p>
+                      <p className="font-semibold text-gray-900">
+                        {formatDate(selectedTransaction.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                  {selectedTransaction.processedAt && (
+                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                      <Calendar size={20} className="text-gray-600" />
+                      <div>
+                        <p className="text-sm text-gray-600">Processed At</p>
+                        <p className="font-semibold text-gray-900">
+                          {formatDate(selectedTransaction.processedAt)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-end">
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-white transition-all duration-200 font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
