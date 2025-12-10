@@ -16,7 +16,6 @@ import {
   Eye,
   ShoppingCart,
   TrendingDown,
-  Filter,
   RefreshCw,
   DollarSign,
   Package,
@@ -24,15 +23,13 @@ import {
   ChevronRight,
   Calendar,
   User,
-  Phone,
   Mail,
-  MapPin,
-  X,
   ExternalLink,
-  ArrowRight,
 } from 'lucide-react';
 import AdminPageHeader from '../../components/admin/common/AdminPageHeader';
 import AdminStatsCard from '../../components/admin/common/AdminStatsCard';
+import LeadDetailsModal from '../../components/admin/Leads/LeadDetailsModal';
+import LeadCardSkeleton from '../../components/admin/Leads/LeadCardSkeleton';
 
 const Leads = () => {
   const navigate = useNavigate();
@@ -126,22 +123,22 @@ const Leads = () => {
     {
       label: 'Total Leads',
       value: pagination.total,
-      icon: <Users size={26} />,
+      icon: Users,
     },
     {
       label: 'Buy Orders',
       value: stats.buyOrders,
-      icon: <ShoppingCart size={26} />,
+      icon: ShoppingCart,
     },
     {
       label: 'Sell Orders',
       value: stats.sellOrders,
-      icon: <TrendingDown size={26} />,
+      icon: TrendingDown,
     },
     {
       label: 'Total Value',
       value: formatCurrency(stats.totalValue),
-      icon: <DollarSign size={26} />,
+      icon: DollarSign,
     },
   ];
 
@@ -184,17 +181,6 @@ const Leads = () => {
     );
   });
 
-  if (loading) {
-    return (
-      <div className="min-h-[100vh - 100px] bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 p-8">
-        <div className="flex flex-col items-center justify-center py-12 text-gray-600">
-          <RefreshCw size={48} className="animate-spin mb-4 text-blue-600" />
-          <p className="text-lg font-semibold">Loading leads...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 ">
       {/* Header */}
@@ -222,6 +208,7 @@ const Leads = () => {
             label={stat.label}
             value={stat.value}
             icon={stat.icon}
+            loading={loading}
           />
         ))}
       </div>
@@ -265,7 +252,13 @@ const Leads = () => {
       </Card>
 
       {/* Leads List */}
-      {filteredLeads.length === 0 ? (
+      {loading ? (
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <LeadCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : filteredLeads.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-12 text-center">
           <div className="flex flex-col items-center gap-4">
             <div className="p-6 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full">
@@ -286,108 +279,102 @@ const Leads = () => {
             const productImage = getProductImage(lead);
 
             return (
-              <Card
+              <div
                 key={lead._id}
-                className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-200"
+                className="flex flex-col lg:flex-row gap-4 bg-white p-5 shadow-xl rounded-xl border border-gray-200"
               >
-                <Card.Body>
-                  <div className="flex flex-col lg:flex-row gap-4">
-                    {/* Lead Info */}
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2 mb-4">
-                        <span
-                          className={cn(
-                            'px-3 py-1 rounded-full text-xs font-bold',
-                            lead.orderType === 'buy'
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
-                              : 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
-                          )}
-                        >
-                          {lead.orderType === 'buy' ? '🛒 BUY ORDER' : '💰 SELL ORDER'}
-                        </span>
-                        <span
-                          className={cn(
-                            'px-3 py-1 rounded-full text-xs font-semibold capitalize',
-                            getStatusColor(lead.status)
-                          )}
-                        >
-                          {lead.status}
-                        </span>
-                        <span className="text-xs text-gray-500 ml-auto">
-                          <Calendar size={12} className="inline mr-1" />
-                          {formatDate(lead.createdAt)}
-                        </span>
+                {/* Lead Info */}
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span
+                      className={cn(
+                        'px-3 py-1 rounded-full text-xs font-bold',
+                        lead.orderType === 'buy'
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                          : 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
+                      )}
+                    >
+                      {lead.orderType === 'buy' ? '🛒 BUY ORDER' : '💰 SELL ORDER'}
+                    </span>
+                    <span
+                      className={cn(
+                        'px-3 py-1 rounded-full text-xs font-semibold capitalize',
+                        getStatusColor(lead.status)
+                      )}
+                    >
+                      {lead.status}
+                    </span>
+                    <span className="text-xs text-gray-500 ml-auto">
+                      <Calendar size={12} className="inline mr-1" />
+                      {formatDate(lead.createdAt)}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
+                        <User size={12} />
+                        Customer
                       </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4">
-                          <div className="text-xs text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
-                            <User size={12} />
-                            Customer
-                          </div>
-                          <div className="font-bold text-gray-900">
-                            {lead.user?.name || 'Guest'}
-                          </div>
-                          <div className="text-xs text-gray-600 mt-1 flex items-center gap-1">
-                            <Mail size={10} />
-                            {lead.user?.email || 'N/A'}
-                          </div>
-                        </div>
-
-                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4">
-                          <div className="text-xs text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
-                            <Package size={12} />
-                            Product
-                          </div>
-                          <div className="font-bold text-gray-900">{productName}</div>
-                          {lead.items && lead.items.length > 1 && (
-                            <div className="text-xs text-gray-600 mt-1">
-                              +{lead.items.length - 1} more item(s)
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4">
-                          <div className="text-xs text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
-                            <DollarSign size={12} />
-                            Value
-                          </div>
-                          <div className="font-bold text-2xl text-emerald-600">
-                            {formatCurrency(lead.totalAmount || 0)}
-                          </div>
-                        </div>
+                      <div className="font-bold text-gray-900">{lead.user?.name || 'Guest'}</div>
+                      <div className="text-xs text-gray-600 mt-1 flex items-center gap-1">
+                        <Mail size={10} />
+                        {lead.user?.email || 'N/A'}
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex lg:flex-col gap-2 lg:justify-center">
-                      <button
-                        onClick={() => {
-                          setSelectedLead(lead);
-                          setShowDetailsModal(true);
-                        }}
-                        className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-md text-sm"
-                      >
-                        <Eye size={16} />
-                        View Details
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (lead.orderType === 'buy') {
-                            navigate('/admin/buy-orders');
-                          } else {
-                            navigate('/admin/sell-orders');
-                          }
-                        }}
-                        className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
-                      >
-                        <ExternalLink size={16} />
-                        Manage
-                      </button>
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
+                        <Package size={12} />
+                        Product
+                      </div>
+                      <div className="font-bold text-gray-900">{productName}</div>
+                      {lead.items && lead.items.length > 1 && (
+                        <div className="text-xs text-gray-600 mt-1">
+                          +{lead.items.length - 1} more item(s)
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-1">
+                        <DollarSign size={12} />
+                        Value
+                      </div>
+                      <div className="font-bold text-2xl text-emerald-600">
+                        {formatCurrency(lead.totalAmount || 0)}
+                      </div>
                     </div>
                   </div>
-                </Card.Body>
-              </Card>
+                </div>
+
+                {/* Actions */}
+                <div className="flex lg:flex-col gap-2 lg:justify-center">
+                  <button
+                    onClick={() => {
+                      setSelectedLead(lead);
+                      setShowDetailsModal(true);
+                    }}
+                    className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-md text-sm"
+                  >
+                    <Eye size={16} />
+                    View Details
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (lead.orderType === 'buy') {
+                        navigate('/admin/buy-orders');
+                      } else {
+                        navigate('/admin/sell-orders');
+                      }
+                    }}
+                    className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
+                  >
+                    <ExternalLink size={16} />
+                    Manage
+                  </button>
+                </div>
+              </div>
             );
           })}
         </div>
@@ -425,142 +412,21 @@ const Leads = () => {
       )}
 
       {/* Details Modal */}
-      {showDetailsModal && selectedLead && (
-        <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={() => setShowDetailsModal(false)}
-        >
-          <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200 flex items-center justify-between z-10">
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  <Package className="text-blue-600" size={24} />
-                  Lead Details
-                </h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  {selectedLead.orderType === 'buy' ? 'Buy Order' : 'Sell Order'} •{' '}
-                  {formatDate(selectedLead.createdAt)}
-                </p>
-              </div>
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className="p-2 hover:bg-white rounded-lg transition-colors text-gray-600 hover:text-gray-900"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 space-y-6">
-              {/* Order Type & Status */}
-              <section>
-                <div className="flex flex-wrap gap-3">
-                  <span
-                    className={cn(
-                      'px-4 py-2 rounded-lg text-sm font-bold',
-                      selectedLead.orderType === 'buy'
-                        ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
-                        : 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
-                    )}
-                  >
-                    {selectedLead.orderType === 'buy' ? '🛒 BUY ORDER' : '💰 SELL ORDER'}
-                  </span>
-                  <span
-                    className={cn(
-                      'px-4 py-2 rounded-lg text-sm font-semibold capitalize',
-                      getStatusColor(selectedLead.status)
-                    )}
-                  >
-                    Status: {selectedLead.status}
-                  </span>
-                </div>
-              </section>
-
-              {/* Customer Information */}
-              <section>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-gray-200">
-                  Customer Information
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <div className="text-xs text-gray-600 uppercase tracking-wide mb-2 flex items-center gap-1">
-                      <User size={12} />
-                      Name
-                    </div>
-                    <div className="font-semibold text-gray-900">
-                      {selectedLead.user?.name || 'Guest'}
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <div className="text-xs text-gray-600 uppercase tracking-wide mb-2 flex items-center gap-1">
-                      <Mail size={12} />
-                      Email
-                    </div>
-                    <div className="font-semibold text-gray-900 break-all">
-                      {selectedLead.user?.email || 'N/A'}
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <div className="text-xs text-gray-600 uppercase tracking-wide mb-2 flex items-center gap-1">
-                      <Phone size={12} />
-                      Phone
-                    </div>
-                    <div className="font-semibold text-gray-900">
-                      {selectedLead.user?.phone || 'N/A'}
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <div className="text-xs text-gray-600 uppercase tracking-wide mb-2 flex items-center gap-1">
-                      <Calendar size={12} />
-                      Order Date
-                    </div>
-                    <div className="font-semibold text-gray-900">
-                      {formatDate(selectedLead.createdAt)}
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* Order Value */}
-              <section>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b-2 border-gray-200">
-                  Order Value
-                </h3>
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border-l-4 border-emerald-500">
-                  <div className="text-sm text-gray-600 mb-2">Total Amount</div>
-                  <div className="text-4xl font-bold text-emerald-600">
-                    {formatCurrency(selectedLead.totalAmount || 0)}
-                  </div>
-                </div>
-              </section>
-
-              {/* Action Buttons */}
-              <section>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    onClick={() => {
-                      setShowDetailsModal(false);
-                      if (selectedLead.orderType === 'buy') {
-                        navigate('/admin/buy-orders');
-                      } else {
-                        navigate('/admin/sell-orders');
-                      }
-                    }}
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg"
-                  >
-                    <ArrowRight size={20} />
-                    Go to {selectedLead.orderType === 'buy' ? 'Buy' : 'Sell'} Orders Page
-                  </button>
-                </div>
-              </section>
-            </div>
-          </div>
-        </div>
-      )}
+      <LeadDetailsModal
+        lead={selectedLead}
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        onNavigateToOrders={orderType => {
+          if (orderType === 'buy') {
+            navigate('/admin/buy-orders');
+          } else {
+            navigate('/admin/sell-orders');
+          }
+        }}
+        formatCurrency={formatCurrency}
+        formatDate={formatDate}
+        getStatusColor={getStatusColor}
+      />
     </div>
   );
 };

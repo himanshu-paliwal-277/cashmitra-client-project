@@ -84,29 +84,21 @@ function AdminDashboard() {
               icon: Users,
               value: analytics?.overview?.totalUsers || 0,
               label: 'Total Users',
-              bgColor: 'bg-blue-50',
-              textColor: 'text-blue-600',
             },
             {
               icon: Store,
               value: analytics?.overview?.totalPartners || 0,
               label: 'Active Partners',
-              bgColor: 'bg-green-50',
-              textColor: 'text-green-600',
             },
             {
               icon: ShoppingBag,
               value: analytics?.overview?.totalOrders || 0,
               label: 'Total Orders',
-              bgColor: 'bg-amber-50',
-              textColor: 'text-amber-600',
             },
             {
               icon: DollarSign,
               value: `₹${(analytics?.revenue?.totalRevenue || 0).toLocaleString()}`,
               label: 'Total Revenue',
-              bgColor: 'bg-purple-50',
-              textColor: 'text-purple-600',
             },
           ].map((stat, index) => (
             <AdminStatsCard
@@ -114,8 +106,7 @@ function AdminDashboard() {
               icon={stat.icon}
               value={stat.value}
               label={stat.label}
-              bgColor={stat.bgColor}
-              textColor={stat.textColor}
+              index={index}
               loading={analyticsLoading}
             />
           ))}
@@ -134,8 +125,6 @@ function AdminDashboard() {
                   {analytics?.questionnaires?.completionRate || '0'}%
                 </>
               ),
-              bgColor: 'bg-red-50',
-              textColor: 'text-red-600',
             },
             {
               icon: Smartphone,
@@ -147,8 +136,6 @@ function AdminDashboard() {
                   {analytics?.devices?.laptop || 0} Laptops
                 </>
               ),
-              bgColor: 'bg-cyan-50',
-              textColor: 'text-cyan-600',
             },
             {
               icon: Activity,
@@ -160,8 +147,6 @@ function AdminDashboard() {
                   {analytics?.activity?.totalVisits || 0} Visits
                 </>
               ),
-              bgColor: 'bg-lime-50',
-              textColor: 'text-lime-600',
             },
             {
               icon: Target,
@@ -173,8 +158,6 @@ function AdminDashboard() {
                   {analytics?.performance?.completedOrders || 0} Completed
                 </>
               ),
-              bgColor: 'bg-orange-50',
-              textColor: 'text-orange-600',
             },
           ].map((stat, index) => (
             <AdminStatsCard
@@ -182,8 +165,7 @@ function AdminDashboard() {
               icon={stat.icon}
               value={stat.value}
               label={stat.label}
-              bgColor={stat.bgColor}
-              textColor={stat.textColor}
+              index={index + 4}
               trend={stat.trend}
               loading={analyticsLoading}
             />
