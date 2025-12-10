@@ -1,21 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  Camera,
-  Edit3,
-  Save,
-  X,
-  Shield,
-  Bell,
-  CreditCard,
-  Settings,
-  ChevronRight,
-} from 'lucide-react';
-import Card from '../../../components/ui/Card';
+import { User, Mail, Phone, MapPin, Calendar, Camera, Edit3, Save, X, Shield } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
 import useUserProfile from '../../../hooks/useUserProfile';
@@ -34,39 +18,45 @@ const MyProfile = () => {
     address: '',
   });
 
-  // hydrate edit data when we receive profile
+  const formatAddress = address => {
+    if (!address) return '';
+    if (typeof address === 'string') return address;
+
+    return `${address.street || ''}, ${address.city || ''}, ${address.state || ''} ${address.pincode || ''}, ${address.country || ''}`
+      .replace(/^,\s*|,\s*,/g, ',')
+      .replace(/^,\s*|,\s*$/g, '');
+  };
+
+  const formatDateForInput = date => {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   useEffect(() => {
     if (profileData) {
       setEditData({
         name: profileData.name || '',
         email: profileData.email || '',
         phone: profileData.phone || '',
-        dateOfBirth: profileData.dateOfBirth || '',
-        address:
-          profileData.address && typeof profileData.address === 'object'
-            ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
-                .replace(/^,\s*|,\s*,/g, ',')
-                .replace(/^,\s*|,\s*$/g, '')
-            : profileData.address || '',
+        dateOfBirth: formatDateForInput(profileData.dateOfBirth),
+        address: formatAddress(profileData.address),
       });
     }
   }, [profileData]);
 
   const handleEdit = () => {
     if (profileData) {
-      setEditData(prev => ({
-        ...prev,
+      setEditData({
         name: profileData.name || '',
         email: profileData.email || '',
         phone: profileData.phone || '',
-        dateOfBirth: profileData.dateOfBirth || '',
-        address:
-          profileData.address && typeof profileData.address === 'object'
-            ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
-                .replace(/^,\s*|,\s*,/g, ',')
-                .replace(/^,\s*|,\s*$/g, '')
-            : profileData.address || '',
-      }));
+        dateOfBirth: formatDateForInput(profileData.dateOfBirth),
+        address: formatAddress(profileData.address),
+      });
     }
     setIsEditing(true);
   };
@@ -76,7 +66,6 @@ const MyProfile = () => {
       setSaving(true);
       await updateProfile(editData);
       setIsEditing(false);
-      // optional: toast
     } catch (err) {
       console.error('Error updating profile:', err);
     } finally {
@@ -90,13 +79,8 @@ const MyProfile = () => {
         name: profileData.name || '',
         email: profileData.email || '',
         phone: profileData.phone || '',
-        dateOfBirth: profileData.dateOfBirth || '',
-        address:
-          profileData.address && typeof profileData.address === 'object'
-            ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
-                .replace(/^,\s*|,\s*,/g, ',')
-                .replace(/^,\s*|,\s*$/g, '')
-            : profileData.address || '',
+        dateOfBirth: formatDateForInput(profileData.dateOfBirth),
+        address: formatAddress(profileData.address),
       });
     }
     setIsEditing(false);
@@ -105,40 +89,6 @@ const MyProfile = () => {
   const handleInputChange = (field, value) => {
     setEditData(prev => ({ ...prev, [field]: value }));
   };
-
-  const quickActions = [
-    {
-      icon: CreditCard,
-      label: 'Payment Methods',
-      description: 'Manage cards & wallets',
-      onClick: () => console.log('Payment Methods'),
-    },
-    {
-      icon: Bell,
-      label: 'Notifications',
-      description: 'Manage preferences',
-      onClick: () => console.log('Notifications'),
-    },
-    {
-      icon: Shield,
-      label: 'Security',
-      description: 'Password & 2FA',
-      onClick: () => console.log('Security'),
-    },
-    {
-      icon: Settings,
-      label: 'Account Settings',
-      description: 'Privacy & preferences',
-      onClick: () => console.log('Account Settings'),
-    },
-  ];
-
-  const stats = [
-    { label: 'Orders Placed', value: '12' },
-    { label: 'Devices Sold', value: '8' },
-    { label: 'Total Savings', value: '₹45,000' },
-    { label: 'Member Since', value: '2023' },
-  ];
 
   const initials = loading
     ? 'L'
@@ -169,9 +119,7 @@ const MyProfile = () => {
         </header>
 
         <div className="grid lg:grid-cols-[380px_1fr] gap-8">
-          {/* Sidebar */}
           <aside className="flex flex-col gap-4">
-            {/* Profile card */}
             <div className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-xl p-5 shadow-[0_10px_25px_rgba(2,6,23,0.06)] animate-[fadeUp_0.4s_ease_both]">
               <div className="absolute top-0 left-[-100%] w-full h-0.5 bg-gradient-to-r from-transparent via-blue-600/35 to-transparent animate-[shimmer_2.4s_infinite]" />
 
@@ -205,54 +153,9 @@ const MyProfile = () => {
                 <Shield size={14} />
                 Verified Account
               </div>
-
-              <div className="flex flex-col gap-2.5">
-                {quickActions.map(({ icon: Icon, label, description, onClick }, idx) => (
-                  <button
-                    className="flex items-center justify-between gap-3 px-4 py-3.5 border border-gray-200 rounded-md bg-white text-gray-600 cursor-pointer transition-all duration-150 hover:translate-x-1.5 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50"
-                    key={idx}
-                    onClick={onClick}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Icon size={18} />
-                      <div className="flex flex-col">
-                        <div className="text-gray-900 font-bold">{label}</div>
-                        <div className="text-gray-600 text-xs">{description}</div>
-                      </div>
-                    </div>
-                    <ChevronRight size={16} />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-xl p-5 shadow-[0_10px_25px_rgba(2,6,23,0.06)]">
-              <div className="absolute top-0 left-[-100%] w-full h-0.5 bg-gradient-to-r from-transparent via-blue-600/28 to-transparent animate-[shimmer_3s_infinite]" />
-
-              <div className="flex items-center gap-2 text-lg font-extrabold text-blue-900 mb-2">
-                Account Overview
-              </div>
-              <div className="grid grid-cols-2 gap-4 mt-2">
-                {stats.map((s, i) => (
-                  <div
-                    className="relative overflow-hidden bg-white border border-gray-200 rounded-lg px-3 py-5 text-center shadow-[0_10px_25px_rgba(2,6,23,0.06)]"
-                    key={i}
-                  >
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-300 to-indigo-400 rounded-t-[20px]" />
-                    <div className="text-xl leading-none font-extrabold bg-gradient-to-br from-blue-600 to-blue-900 bg-clip-text text-transparent">
-                      {s.value}
-                    </div>
-                    <div className="text-gray-600 font-bold uppercase tracking-wide text-xs mt-1.5">
-                      {s.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </aside>
 
-          {/* Main content */}
           <main>
             <div className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-xl p-5 shadow-[0_10px_25px_rgba(2,6,23,0.06)]">
               <div className="absolute top-0 left-[-100%] w-full h-0.5 bg-gradient-to-r from-transparent via-blue-600/28 to-transparent animate-[shimmer_3s_infinite]" />
@@ -304,7 +207,6 @@ const MyProfile = () => {
                       className="h-11 px-3.5 border-2 border-gray-200 rounded-md bg-white text-gray-900 outline-none transition-all duration-150 text-[0.98rem] font-medium opacity-60 cursor-not-allowed"
                       type="email"
                       value={editData.email}
-                      onChange={e => handleInputChange('email', e.target.value)}
                       disabled
                       aria-disabled="true"
                       title="Email is verified and cannot be changed here"
@@ -382,11 +284,7 @@ const MyProfile = () => {
                     <div className="min-h-[44px] flex items-center gap-2 px-3.5 border-2 border-gray-100 rounded-md bg-gray-50 text-gray-600 transition-all duration-150 hover:border-gray-200">
                       {loading
                         ? 'Loading...'
-                        : profileData?.address && typeof profileData.address === 'object'
-                          ? `${profileData.address.street || ''}, ${profileData.address.city || ''}, ${profileData.address.state || ''} ${profileData.address.pincode || ''}, ${profileData.address.country || ''}`
-                              .replace(/^,\s*|,\s*,/g, ',')
-                              .replace(/^,\s*|,\s*$/g, '') || 'Not provided'
-                          : profileData?.address || 'Not provided'}
+                        : formatAddress(profileData?.address) || 'Not provided'}
                     </div>
                   )}
                 </div>
