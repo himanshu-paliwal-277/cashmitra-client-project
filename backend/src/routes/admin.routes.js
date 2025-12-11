@@ -622,6 +622,14 @@ router.put(
   asyncHandler(adminController.updateOrderStatus)
 );
 
+// Get Partner Suggestions for Order Assignment
+router.get(
+  "/orders/:id/partner-suggestions",
+  protect,
+  authorize("admin"),
+  asyncHandler(adminController.getPartnerSuggestionsForOrder)
+);
+
 // Assign Partner to Order
 router.put(
   "/orders/:id/assign-partner",

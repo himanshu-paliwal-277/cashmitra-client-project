@@ -37,6 +37,9 @@ const BuyOrders = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [partners, setPartners] = useState([]);
   const [loadingPartners, setLoadingPartners] = useState(false);
+  const [partnerSuggestions, setPartnerSuggestions] = useState([]);
+  const [showPartnerModal, setShowPartnerModal] = useState(false);
+  const [selectedOrderForAssignment, setSelectedOrderForAssignment] = useState<any>(null);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -134,17 +137,46 @@ const BuyOrders = () => {
     }
   };
 
+  const fetchPartnerSuggestions = async (orderId: string) => {
+    try {
+      setLoadingPartners(true);
+      const res = await api.get(`/admin/orders/${orderId}/partner-suggestions`);
+      if (res.data?.success) {
+        setPartnerSuggestions(res.data.data.partnerSuggestions || []);
+        return res.data.data.partnerSuggestions;
+      }
+      return [];
+    } catch (err) {
+      console.error('Error fetching partner suggestions:', err);
+      return [];
+    } finally {
+      setLoadingPartners(false);
+    }
+  };
+
+  const handleShowPartnerSuggestions = async (order: any) => {
+    setSelectedOrderForAssignment(order);
+    const suggestions = await fetchPartnerSuggestions(order._id);
+    setPartnerSuggestions(suggestions);
+    setShowPartnerModal(true);
+  };
+
   const handleAssignPartner = async (orderId: string, partnerId: string) => {
     if (!partnerId) return;
 
     try {
-      await api.put(`/admin/orders/${orderId}/assign-partner`, {
+      const res = await api.put(`/admin/orders/${orderId}/assign-partner`, {
         partner: partnerId,
       });
 
-      // Refresh orders after update
-      fetchOrders(pagination.currentPage, statusFilter, searchTerm);
-      alert('Partner assigned successfully!');
+      if (res.data?.success) {
+        // Refresh orders after update
+        fetchOrders(pagination.currentPage, statusFilter, searchTerm);
+        setShowPartnerModal(false);
+        alert(
+          'Partner assigned successfully! Partner will be notified to accept or reject the order.'
+        );
+      }
     } catch (err: any) {
       console.error('Failed to assign partner', err);
       alert(err.response?.data?.message || 'Failed to assign partner. Please try again.');
@@ -469,26 +501,14 @@ const BuyOrders = () => {
                       <option value="cancelled">Cancelled</option>
                       <option value="refunded">Refunded</option>
                     </select>
-                    <select
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors cursor-pointer"
-                      value={order.partner?._id || ''}
-                      onChange={e => {
-                        if (e.target.value) {
-                          handleAssignPartner(order._id, e.target.value);
-                        }
-                      }}
+                    <button
+                      onClick={() => handleShowPartnerSuggestions(order)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
                       disabled={loadingPartners}
                     >
-                      <option value="">{loadingPartners ? 'Loading...' : 'Assign Partner'}</option>
-                      {partners.map((partner: any) => (
-                        <option key={partner._id} value={partner._id}>
-                          {partner.shopName ||
-                            partner.businessName ||
-                            partner.user?.name ||
-                            `Partner (${partner._id.slice(-6)})`}
-                        </option>
-                      ))}
-                    </select>
+                      <Edit size={16} />
+                      {order.partner?._id ? 'Reassign Partner' : 'Assign Partner'}
+                    </button>
                   </div>
                 </Card.Body>
               </Card>
@@ -762,6 +782,165 @@ const BuyOrders = () => {
                   </div>
                 )}
               </section>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Partner Assignment Modal */}
+      {showPartnerModal && selectedOrderForAssignment && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setShowPartnerModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Assign Partner to Order</h2>
+                  <p className="text-gray-600 mt-1">
+                    Order #{selectedOrderForAssignment._id.slice(-8).toUpperCase()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowPartnerModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600 hover:text-gray-900"
+                >
+                  <XCircle size={24} />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {loadingPartners ? (
+                <div className="flex items-center justify-center py-12">
+                  <RefreshCw size={32} className="animate-spin text-green-500" />
+                  <span className="ml-3 text-gray-600">Loading partner suggestions...</span>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Partner Recommendations
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Partners are sorted by their ability to fulfill this order. Green indicates
+                      they have all products in inventory.
+                    </p>
+                  </div>
+
+                  {partnerSuggestions.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Package size={24} className="text-gray-400" />
+                      </div>
+                      <p className="text-gray-600">No partners available for assignment</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {partnerSuggestions.map((partner: any) => (
+                        <div
+                          key={partner._id}
+                          className={cn(
+                            'border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md',
+                            partner.fulfillmentStatus?.canFulfillAll
+                              ? 'border-green-200 bg-green-50 hover:bg-green-100'
+                              : partner.fulfillmentStatus?.hasPartialInventory
+                                ? 'border-amber-200 bg-amber-50 hover:bg-amber-100'
+                                : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+                          )}
+                          onClick={() =>
+                            handleAssignPartner(selectedOrderForAssignment._id, partner._id)
+                          }
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h4 className="font-semibold text-gray-900">
+                                  {partner.shopName || partner.businessName || 'Partner Shop'}
+                                </h4>
+                                {partner.fulfillmentStatus?.canFulfillAll && (
+                                  <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                                    ✅ Can Fulfill All
+                                  </span>
+                                )}
+                                {partner.fulfillmentStatus?.hasPartialInventory &&
+                                  !partner.fulfillmentStatus?.canFulfillAll && (
+                                    <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                                      ⚠️ Partial Inventory
+                                    </span>
+                                  )}
+                                {!partner.fulfillmentStatus?.hasPartialInventory && (
+                                  <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                                    ❌ No Inventory
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="text-sm text-gray-600 mb-3">
+                                <div>
+                                  📧 {partner.shopEmail || partner.user?.email || 'No email'}
+                                </div>
+                                <div>
+                                  📞 {partner.shopPhone || partner.user?.phone || 'No phone'}
+                                </div>
+                                {partner.user?.isActive === false && (
+                                  <div className="text-red-600 font-medium">
+                                    ⚠️ User account inactive
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="space-y-2">
+                                <h5 className="font-medium text-gray-800">Inventory Status:</h5>
+                                {partner.inventoryStatus?.map((item: any, index: number) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between text-sm"
+                                  >
+                                    <span className="text-gray-700">
+                                      {item.productName} (Need: {item.requiredQuantity})
+                                    </span>
+                                    {item.canFulfill ? (
+                                      <span className="text-green-600 font-medium">
+                                        ✅ Available ({item.availableQuantity}) - ₹
+                                        {item.partnerPrice?.toLocaleString()}
+                                      </span>
+                                    ) : item.hasInventory ? (
+                                      <span className="text-amber-600 font-medium">
+                                        ⚠️ Insufficient ({item.availableQuantity}/
+                                        {item.requiredQuantity})
+                                      </span>
+                                    ) : (
+                                      <span className="text-red-600 font-medium">
+                                        ❌ Not in inventory (needs to add with pricing)
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+
+                              {partner.fulfillmentStatus?.missingProducts > 0 && (
+                                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                  <p className="text-sm text-blue-800">
+                                    <strong>Note:</strong> This partner will need to add{' '}
+                                    {partner.fulfillmentStatus.missingProducts} product(s) to their
+                                    inventory with pricing before they can accept this order. This
+                                    ensures proper commission calculation.
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

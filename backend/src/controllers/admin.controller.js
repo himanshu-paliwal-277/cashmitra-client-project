@@ -2465,6 +2465,112 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+// @desc    Get partner suggestions for order assignment
+// @route   GET /api/admin/orders/:id/partner-suggestions
+// @access  Private/Admin
+const getPartnerSuggestionsForOrder = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+
+    const order = await Order.findById(orderId).populate("items.product");
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Get all verified partners
+    const partners = await Partner.find({
+      isVerified: true,
+      verificationStatus: "approved",
+    }).populate("user", "name email phone isActive");
+
+    // Check inventory status for each partner
+    const partnerSuggestions = await Promise.all(
+      partners.map(async (partner) => {
+        const partnerObj = partner.toObject();
+        partnerObj.inventoryStatus = [];
+
+        // Check each product in the order
+        for (const item of order.items) {
+          const inventory = await Inventory.findOne({
+            partner: partner._id,
+            product: item.product._id,
+            isAvailable: true,
+            quantity: { $gte: item.quantity },
+          }).populate("product", "model brand category");
+
+          partnerObj.inventoryStatus.push({
+            productId: item.product._id,
+            productName: item.product.model || item.product.name,
+            requiredQuantity: item.quantity,
+            hasInventory: !!inventory,
+            availableQuantity: inventory ? inventory.quantity : 0,
+            partnerPrice: inventory ? inventory.price : null,
+            condition: inventory ? inventory.condition : null,
+            canFulfill: inventory && inventory.quantity >= item.quantity,
+          });
+        }
+
+        // Calculate overall fulfillment capability
+        const canFulfillAll = partnerObj.inventoryStatus.every(
+          (item) => item.canFulfill
+        );
+        const hasPartialInventory = partnerObj.inventoryStatus.some(
+          (item) => item.hasInventory
+        );
+
+        partnerObj.fulfillmentStatus = {
+          canFulfillAll,
+          hasPartialInventory,
+          missingProducts: partnerObj.inventoryStatus.filter(
+            (item) => !item.hasInventory
+          ).length,
+        };
+
+        return partnerObj;
+      })
+    );
+
+    // Sort partners by fulfillment capability
+    partnerSuggestions.sort((a, b) => {
+      if (
+        a.fulfillmentStatus.canFulfillAll &&
+        !b.fulfillmentStatus.canFulfillAll
+      )
+        return -1;
+      if (
+        !a.fulfillmentStatus.canFulfillAll &&
+        b.fulfillmentStatus.canFulfillAll
+      )
+        return 1;
+      if (
+        a.fulfillmentStatus.hasPartialInventory &&
+        !b.fulfillmentStatus.hasPartialInventory
+      )
+        return -1;
+      if (
+        !a.fulfillmentStatus.hasPartialInventory &&
+        b.fulfillmentStatus.hasPartialInventory
+      )
+        return 1;
+      return (
+        a.fulfillmentStatus.missingProducts -
+        b.fulfillmentStatus.missingProducts
+      );
+    });
+
+    res.json({
+      success: true,
+      data: {
+        order,
+        partnerSuggestions,
+      },
+    });
+  } catch (error) {
+    console.error("Error getting partner suggestions:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // @desc    Assign partner to order
 // @route   PUT /api/admin/orders/:id/assign-partner
 // @access  Private/Admin
@@ -2486,9 +2592,22 @@ const assignPartnerToOrder = async (req, res) => {
       }
     }
 
-    // Update order partner
+    // Update order with partner assignment tracking
     order.partner = partner;
-    order.updatedAt = new Date();
+    order.partnerAssignment = {
+      assignedAt: new Date(),
+      assignedBy: req.user._id,
+      response: {
+        status: "pending",
+      },
+    };
+
+    // Add to status history
+    order.statusHistory.push({
+      status: "partner_assigned",
+      timestamp: new Date(),
+      note: `Order assigned to partner by admin`,
+    });
 
     await order.save();
 
@@ -2501,7 +2620,9 @@ const assignPartnerToOrder = async (req, res) => {
     ]);
 
     res.json({
-      message: "Partner assigned successfully",
+      success: true,
+      message:
+        "Partner assigned successfully. Partner will be notified to accept or reject the order.",
       order,
     });
   } catch (error) {
@@ -4411,6 +4532,7 @@ module.exports = {
   getSellOrders,
   getBuyOrders,
   updateOrderStatus,
+  getPartnerSuggestionsForOrder,
   assignPartnerToOrder,
   getBrands,
   createBrand,

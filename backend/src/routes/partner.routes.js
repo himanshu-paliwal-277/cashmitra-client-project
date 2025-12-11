@@ -123,6 +123,14 @@ router.post(
   asyncHandler(partnerController.addInventory)
 );
 
+// Products catalog (for inventory selection)
+router.get(
+  "/products",
+  protect,
+  authorize("partner"),
+  asyncHandler(partnerController.getProductsCatalog)
+);
+
 router.get(
   "/inventory",
   protect,
@@ -168,6 +176,34 @@ router.get(
   protect,
   authorize("partner"),
   asyncHandler(partnerController.getOrders)
+);
+
+// Check missing inventory for assigned order
+router.get(
+  "/orders/:id/missing-inventory",
+  protect,
+  authorize("partner"),
+  validateObjectId("id"),
+  asyncHandler(partnerController.checkMissingInventory)
+);
+
+// Respond to order assignment (accept/reject)
+router.put(
+  "/orders/:id/respond",
+  protect,
+  authorize("partner"),
+  validateObjectId("id"),
+  [
+    check("response")
+      .isIn(["accepted", "rejected"])
+      .withMessage("Response must be either 'accepted' or 'rejected'"),
+    check("reason")
+      .optional()
+      .isString()
+      .withMessage("Reason must be a string"),
+  ],
+  validateRequest,
+  asyncHandler(partnerController.respondToOrderAssignment)
 );
 
 router.put(

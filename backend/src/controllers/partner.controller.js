@@ -192,6 +192,123 @@ exports.uploadDocuments = async (req, res) => {
 };
 
 /**
+ * Get products catalog for inventory selection (Buy Products)
+ * @route GET /api/partner/products
+ * @access Private (Partner only)
+ */
+exports.getProductsCatalog = async (req, res) => {
+  const {
+    category,
+    brand,
+    name,
+    page = 1,
+    limit = 50, // Higher default limit for partners
+    search,
+    sortBy = "createdAt",
+    sortOrder = "desc",
+  } = req.query;
+
+  // Validate pagination parameters
+  const pageNum = Math.max(1, parseInt(page));
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit))); // Max 100 items per page for partners
+
+  // Build filter object for BuyProduct collection
+  const filter = { isActive: true }; // Only show active products
+
+  if (category && category !== "all") {
+    filter["categoryId.name"] = { $regex: category, $options: "i" };
+  }
+
+  if (brand && brand !== "all") {
+    filter.brand = { $regex: brand, $options: "i" };
+  }
+
+  if (name && name !== "all") {
+    const decodedName = decodeURIComponent(name);
+    filter.name = { $regex: decodedName.trim(), $options: "i" };
+  }
+
+  // Search filter
+  if (search && search.trim()) {
+    const searchRegex = { $regex: search.trim(), $options: "i" };
+    filter.$or = [
+      { brand: searchRegex },
+      { name: searchRegex },
+      { "categoryId.name": searchRegex },
+    ];
+  }
+
+  try {
+    // Build sort object
+    const sortObj = {};
+    sortObj[sortBy] = sortOrder === "desc" ? -1 : 1;
+
+    // Get BuyProducts with category population
+    const BuyProduct = require("../models/buyProduct.model");
+    const products = await BuyProduct.find(filter)
+      .populate("categoryId", "name")
+      .sort(sortObj)
+      .limit(limitNum)
+      .skip((pageNum - 1) * limitNum)
+      .lean();
+
+    // Get total count for pagination
+    const total = await BuyProduct.countDocuments(filter);
+
+    // Transform products to match expected structure
+    const transformedProducts = products.map((product) => ({
+      _id: product._id,
+      name: product.name,
+      brand: product.brand,
+      category: product.categoryId?.name || "Uncategorized",
+      model: product.name, // Use name as model for compatibility
+      images: product.images || {},
+      pricing: product.pricing || {},
+      basePrice: product.pricing?.mrp || product.pricing?.discountedPrice || 0,
+      minPrice:
+        product.conditionOptions?.length > 0
+          ? Math.min(...product.conditionOptions.map((c) => c.price))
+          : null,
+      maxPrice:
+        product.conditionOptions?.length > 0
+          ? Math.max(...product.conditionOptions.map((c) => c.price))
+          : null,
+      isActive: product.isActive,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+      // Include additional fields for better display
+      variants: product.variants || [],
+      conditionOptions: product.conditionOptions || [],
+      // Include original buy product fields
+      originalProduct: product,
+    }));
+
+    // Calculate pagination info
+    const totalPages = Math.ceil(total / limitNum);
+    const hasNextPage = pageNum < totalPages;
+    const hasPrevPage = pageNum > 1;
+
+    res.status(200).json({
+      success: true,
+      count: transformedProducts.length,
+      total,
+      page: pageNum,
+      pages: totalPages,
+      hasNextPage,
+      hasPrevPage,
+      data: transformedProducts,
+    });
+  } catch (error) {
+    console.error("Error fetching buy products catalog:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch products catalog",
+      error: error.message,
+    });
+  }
+};
+
+/**
  * Add inventory item
  * @route POST /api/partner/inventory
  * @access Private (Partner only)
@@ -408,10 +525,13 @@ exports.getOrders = async (req, res) => {
   // Get orders with regular MongoDB queries
   const orders = await Order.find(queryObj)
     .populate("user", "name email phone")
-    .populate("items.product", "model brand category images price")
+    .populate(
+      "items.product",
+      "name brand categoryId images pricing variants conditionOptions isActive"
+    )
     .populate({
       path: "items.inventory",
-      populate: { path: "product", select: "model brand category images" },
+      populate: { path: "product", select: "name brand categoryId images" },
     })
     .sort(sort)
     .skip(skip)
@@ -438,6 +558,198 @@ exports.getOrders = async (req, res) => {
 };
 
 /**
+ * Respond to order assignment (accept/reject)
+ * @route PUT /api/partner/orders/:id/respond
+ * @access Private (Partner only)
+ */
+exports.respondToOrderAssignment = async (req, res) => {
+  const partner = await Partner.findOne({ user: req.user.id });
+  if (!partner) {
+    throw new ApiError("Partner profile not found", 404);
+  }
+
+  const { response, reason } = req.body; // response: 'accepted' or 'rejected'
+
+  const order = await Order.findById(req.params.id).populate(
+    "items.product",
+    "name brand categoryId images pricing variants conditionOptions"
+  );
+  if (!order) {
+    throw new ApiError("Order not found", 404);
+  }
+
+  // Check if order is assigned to this partner
+  if (!order.partner || order.partner.toString() !== partner._id.toString()) {
+    throw new ApiError("Order is not assigned to your shop", 403);
+  }
+
+  // Check if response is still pending
+  if (order.partnerAssignment.response.status !== "pending") {
+    throw new ApiError("Order assignment has already been responded to", 400);
+  }
+
+  // If accepting, validate inventory availability
+  if (response === "accepted") {
+    const missingItems = [];
+
+    // Check each product in the order
+    for (const item of order.items) {
+      const inventory = await Inventory.findOne({
+        partner: partner._id,
+        product: item.product._id,
+        isAvailable: true,
+        quantity: { $gte: item.quantity },
+      });
+
+      if (!inventory) {
+        missingItems.push({
+          productId: item.product._id,
+          productName:
+            item.product.name ||
+            item.product.model ||
+            `${item.product.brand} Product`,
+          requiredQuantity: item.quantity,
+          hasInventory: false,
+        });
+      } else if (inventory.quantity < item.quantity) {
+        missingItems.push({
+          productId: item.product._id,
+          productName:
+            item.product.name ||
+            item.product.model ||
+            `${item.product.brand} Product`,
+          requiredQuantity: item.quantity,
+          availableQuantity: inventory.quantity,
+          hasInventory: true,
+          insufficient: true,
+        });
+      }
+    }
+
+    // If there are missing items, reject the acceptance
+    if (missingItems.length > 0) {
+      const missingProductNames = missingItems
+        .map((item) =>
+          item.insufficient
+            ? `${item.productName} (need ${item.requiredQuantity}, have ${item.availableQuantity})`
+            : `${item.productName} (not in inventory)`
+        )
+        .join(", ");
+
+      throw new ApiError(
+        `Cannot accept order. Missing or insufficient inventory for: ${missingProductNames}. Please add these products to your inventory with proper pricing first.`,
+        400
+      );
+    }
+  }
+
+  // Update partner response
+  order.partnerAssignment.response = {
+    status: response,
+    respondedAt: new Date(),
+    reason: reason || "",
+  };
+
+  // Update order status based on response
+  if (response === "accepted") {
+    order.status = "confirmed";
+    order.statusHistory.push({
+      status: "confirmed",
+      timestamp: new Date(),
+      note: `Order accepted by partner: ${reason || "No reason provided"}`,
+    });
+  } else if (response === "rejected") {
+    order.status = "pending"; // Back to pending for reassignment
+    order.statusHistory.push({
+      status: "partner_rejected",
+      timestamp: new Date(),
+      note: `Order rejected by partner: ${reason || "No reason provided"}`,
+    });
+  }
+
+  await order.save();
+
+  res.status(200).json({
+    success: true,
+    message: `Order ${response} successfully`,
+    data: order,
+  });
+};
+
+/**
+ * Check missing inventory for assigned order
+ * @route GET /api/partner/orders/:id/missing-inventory
+ * @access Private (Partner only)
+ */
+exports.checkMissingInventory = async (req, res) => {
+  const partner = await Partner.findOne({ user: req.user.id });
+  if (!partner) {
+    throw new ApiError("Partner profile not found", 404);
+  }
+
+  const order = await Order.findById(req.params.id).populate(
+    "items.product",
+    "name brand categoryId images pricing variants conditionOptions"
+  );
+  if (!order) {
+    throw new ApiError("Order not found", 404);
+  }
+
+  // Check if order is assigned to this partner
+  if (!order.partner || order.partner.toString() !== partner._id.toString()) {
+    throw new ApiError("Order is not assigned to your shop", 403);
+  }
+
+  const missingItems = [];
+  const availableItems = [];
+
+  // Check each product in the order
+  for (const item of order.items) {
+    const inventory = await Inventory.findOne({
+      partner: partner._id,
+      product: item.product._id,
+      isAvailable: true,
+      quantity: { $gte: item.quantity },
+    }).populate("product", "name brand categoryId images");
+
+    const itemStatus = {
+      productId: item.product._id,
+      productName: item.product.name || item.product.model,
+      productBrand: item.product.brand,
+      productCategory: item.product.category,
+      productImages: item.product.images,
+      requiredQuantity: item.quantity,
+      hasInventory: !!inventory,
+      availableQuantity: inventory ? inventory.quantity : 0,
+      partnerPrice: inventory ? inventory.price : null,
+      condition: inventory ? inventory.condition : null,
+      canFulfill: inventory && inventory.quantity >= item.quantity,
+    };
+
+    if (itemStatus.canFulfill) {
+      availableItems.push(itemStatus);
+    } else {
+      missingItems.push(itemStatus);
+    }
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      orderId: order._id,
+      canFulfillCompletely: missingItems.length === 0,
+      missingItems,
+      availableItems,
+      totalMissingProducts: missingItems.length,
+      message:
+        missingItems.length > 0
+          ? "You need to add missing products to your inventory before accepting this order"
+          : "You have all required products in inventory",
+    },
+  });
+};
+
+/**
  * Update order status
  * @route PUT /api/partner/orders/:id
  * @access Private (Partner only)
@@ -458,8 +770,30 @@ exports.updateOrderStatus = async (req, res) => {
     throw new ApiError("Order is not assigned to your shop", 403);
   }
 
+  // Check if order has been accepted by partner
+  if (
+    order.partnerAssignment &&
+    order.partnerAssignment.response.status !== "accepted"
+  ) {
+    throw new ApiError(
+      "You must accept the order assignment before updating status",
+      403
+    );
+  }
+
   // Update order status
+  const oldStatus = order.status;
   order.status = req.body.status;
+
+  // Add to status history
+  order.statusHistory.push({
+    status: req.body.status,
+    timestamp: new Date(),
+    note:
+      req.body.notes ||
+      `Status updated from ${oldStatus} to ${req.body.status}`,
+  });
+
   if (req.body.trackingInfo) {
     order.trackingInfo = req.body.trackingInfo;
   }

@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import {
   Search,
-  Filter,
   Plus,
   Edit3,
   Trash2,
-  Eye,
   MoreVertical,
   Package,
   AlertCircle,
@@ -15,7 +13,6 @@ import {
   Loader2,
   XCircle,
   Save,
-  Upload,
 } from 'lucide-react';
 import partnerService from '../../services/partnerService';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
@@ -41,22 +38,39 @@ interface InventoryItem {
 
 interface Product {
   _id: string;
-  model: string;
+  name: string;
+  model?: string; // For compatibility
   brand: string;
-  series?: string;
   category?: string;
-  variant?: {
-    ram: string;
+  variants?: Array<{
+    variantId: string;
     storage: string;
-    processor?: string;
-    screenSize?: string;
-    color?: string;
-  };
+    color: string;
+    price: number;
+    stock: boolean;
+  }>;
+  conditionOptions?: Array<{
+    label: string;
+    price: number;
+  }>;
   basePrice?: number;
   minPrice?: number;
   maxPrice?: number;
-  images: string[];
-  specifications?: any;
+  images:
+    | {
+        main?: string;
+        gallery?: string;
+        thumbnail?: string;
+      }
+    | string[];
+  pricing?: {
+    mrp?: number;
+    discountedPrice?: number;
+    discountPercent?: number;
+  };
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface AddInventoryForm {
@@ -70,7 +84,22 @@ interface AddInventoryForm {
 }
 
 function Inventory() {
-  const { partner } = usePartnerAuth() as any;
+  // Helper function to get image URL from different formats
+  const getImageUrl = (images: any): string | null => {
+    if (!images) return null;
+
+    // Handle object format with main property
+    if (typeof images === 'object' && !Array.isArray(images) && images.main) {
+      return images.main;
+    }
+
+    // Handle array format
+    if (Array.isArray(images) && images.length > 0) {
+      return images[0];
+    }
+
+    return null;
+  };
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -161,41 +190,38 @@ function Inventory() {
   const fetchProducts = async (search?: string) => {
     try {
       setLoadingProducts(true);
-      const params: any = { limit: 20 };
+      const params: any = { limit: 50 };
       if (search) params.search = search;
 
       console.log('Fetching products with params:', params);
       const response = await partnerService.getProducts(params);
       console.log('Full products response:', response);
+      console.log('Response success:', response.success);
       console.log('Response data:', response.data);
-      console.log('Products array:', response.data?.data);
 
-      // Handle different possible response structures
+      // Handle the response structure from the new partner products endpoint
       let productsArray = [];
 
-      if (response.success && response.data?.data) {
-        // Standard success response with data.data
-        productsArray = response.data.data;
-      } else if (response.success && Array.isArray(response.data)) {
-        // Success response with data as array
+      if (response.success && Array.isArray(response.data)) {
+        // New endpoint returns { success: true, data: [...] }
         productsArray = response.data;
       } else if (response.data && Array.isArray(response.data)) {
-        // Direct data array (no success wrapper)
+        // Fallback: direct data array
         productsArray = response.data;
-      } else if (response.data?.data && Array.isArray(response.data.data)) {
-        // Data nested in data.data (no success check)
-        productsArray = response.data.data;
-      } else if (response.success === undefined && response.data) {
-        // Response might be the raw API response
-        productsArray = response.data || [];
+      } else {
+        console.warn('Unexpected response structure:', response);
+        productsArray = [];
       }
 
       console.log('Final products array:', productsArray);
       console.log('Products array length:', productsArray.length);
+      console.log('Sample product:', productsArray[0]);
       setProducts(productsArray);
     } catch (err: any) {
       console.error('Error fetching products:', err);
       console.error('Error details:', err.response?.data);
+      // Set empty array on error to prevent UI issues
+      setProducts([]);
     } finally {
       setLoadingProducts(false);
     }
@@ -486,9 +512,9 @@ function Inventory() {
               >
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center border">
-                    {item.product.images?.[0] ? (
+                    {getImageUrl(item.product.images) ? (
                       <img
-                        src={item.product.images[0]}
+                        src={getImageUrl(item.product.images)!}
                         alt={item.product.model}
                         className="w-full h-full object-cover rounded-lg"
                       />
@@ -627,7 +653,10 @@ function Inventory() {
             <div className="flex-1 overflow-y-auto">
               {loadingProducts ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="text-blue-600 animate-spin" size={32} />
+                  <div className="flex flex-col items-center gap-3">
+                    <Loader2 className="text-blue-600 animate-spin" size={32} />
+                    <p className="text-slate-600">Loading products catalog...</p>
+                  </div>
                 </div>
               ) : products.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -639,10 +668,10 @@ function Inventory() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-16 h-16 rounded-lg bg-slate-100 flex items-center justify-center border">
-                          {product.images?.[0] ? (
+                          {getImageUrl(product.images) ? (
                             <img
-                              src={product.images[0]}
-                              alt={product.model}
+                              src={getImageUrl(product.images)!}
+                              alt={product.model || product.name}
                               className="w-full h-full object-cover rounded-lg"
                             />
                           ) : (
@@ -650,14 +679,16 @@ function Inventory() {
                           )}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-slate-900">{product.model}</h3>
+                          <h3 className="font-semibold text-slate-900">
+                            {product.model || product.name}
+                          </h3>
                           <p className="text-sm text-slate-600">{product.brand}</p>
-                          {product.series && (
-                            <p className="text-sm text-slate-500">{product.series}</p>
+                          {product.category && (
+                            <p className="text-sm text-slate-500">{product.category}</p>
                           )}
-                          {product.variant && (
+                          {product.variants && product.variants.length > 0 && (
                             <p className="text-sm text-slate-500">
-                              {product.variant.ram} • {product.variant.storage}
+                              {product.variants.map(v => `${v.storage} ${v.color}`).join(', ')}
                             </p>
                           )}
                           {product.basePrice && (
@@ -669,6 +700,11 @@ function Inventory() {
                             <p className="text-sm font-medium text-green-600">
                               Price Range: ₹{product.minPrice?.toLocaleString() || 'N/A'} - ₹
                               {product.maxPrice?.toLocaleString() || 'N/A'}
+                            </p>
+                          )}
+                          {product.conditionOptions && product.conditionOptions.length > 0 && (
+                            <p className="text-sm text-slate-500">
+                              Conditions: {product.conditionOptions.map(c => c.label).join(', ')}
                             </p>
                           )}
                         </div>
@@ -701,10 +737,10 @@ function Inventory() {
                   </label>
                   <div className="p-3 bg-slate-50 rounded-lg flex items-center gap-3">
                     <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center border">
-                      {selectedProduct.images?.[0] ? (
+                      {getImageUrl(selectedProduct.images) ? (
                         <img
-                          src={selectedProduct.images[0]}
-                          alt={selectedProduct.model}
+                          src={getImageUrl(selectedProduct.images)!}
+                          alt={selectedProduct.model || selectedProduct.name}
                           className="w-full h-full object-cover rounded-lg"
                         />
                       ) : (
@@ -712,7 +748,7 @@ function Inventory() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium">{selectedProduct.model}</p>
+                      <p className="font-medium">{selectedProduct.model || selectedProduct.name}</p>
                       <p className="text-sm text-slate-600">{selectedProduct.brand}</p>
                     </div>
                     <button

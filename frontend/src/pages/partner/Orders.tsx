@@ -23,12 +23,37 @@ interface OrderItem {
   _id: string;
   product?: {
     _id: string;
-    model?: string;
     name?: string;
+    model?: string; // For compatibility
     brand?: string;
-    category?: string;
-    images?: string[];
-    price?: number;
+    categoryId?: {
+      _id: string;
+      name: string;
+    };
+    images?:
+      | string[]
+      | {
+          main?: string;
+          gallery?: string;
+          thumbnail?: string;
+        };
+    pricing?: {
+      mrp?: number;
+      discountedPrice?: number;
+      discountPercent?: number;
+    };
+    variants?: Array<{
+      variantId: string;
+      storage: string;
+      color: string;
+      price: number;
+      stock: boolean;
+    }>;
+    conditionOptions?: Array<{
+      label: string;
+      price: number;
+    }>;
+    price?: number; // Legacy field
   };
   inventory?: {
     _id: string;
@@ -46,27 +71,72 @@ interface OrderItem {
 
 interface Order {
   _id: string;
+  orderType?: string;
   user: {
+    _id: string;
     name: string;
     email: string;
     phone: string;
   };
+  partner?: string;
   items: OrderItem[];
   totalAmount: number;
   status: string;
-  paymentMethod: string;
-  shippingAddress: {
+  commission?: {
+    rate: number;
+    amount: number;
+  };
+  paymentDetails?: {
+    method: string;
+    status: string;
+  };
+  shippingDetails?: {
+    address: {
+      street: string;
+      city: string;
+      state: string;
+      pincode: string;
+      country?: string;
+    };
+  };
+  // Legacy field for compatibility
+  paymentMethod?: string;
+  shippingAddress?: {
     street: string;
     city: string;
     state: string;
     pincode: string;
   };
+  partnerAssignment?: {
+    assignedAt: string;
+    assignedBy?: string;
+    response: {
+      status: 'pending' | 'accepted' | 'rejected';
+      respondedAt?: string;
+      reason?: string;
+    };
+    reassignmentHistory?: any[];
+  };
+  statusHistory?: Array<{
+    status: string;
+    timestamp: string;
+    note?: string;
+    _id?: string;
+  }>;
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 function Orders() {
   const {} = usePartnerAuth() as any;
+
+  const getProductImage = (images: any) => {
+    if (!images) return null;
+    if (typeof images === 'object' && images.main) return images.main;
+    if (Array.isArray(images) && images[0]) return images[0];
+    return null;
+  };
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +151,13 @@ function Orders() {
   });
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [showResponseModal, setShowResponseModal] = useState(false);
+  const [responseType, setResponseType] = useState<'accepted' | 'rejected'>('accepted');
+  const [responseReason, setResponseReason] = useState('');
+  const [missingInventory, setMissingInventory] = useState<any>(null);
+  const [showMissingInventoryModal, setShowMissingInventoryModal] = useState(false);
+  const [canAcceptOrder, setCanAcceptOrder] = useState(false);
+  const [checkingInventory, setCheckingInventory] = useState(false);
 
   // Fetch orders data
   useEffect(() => {
@@ -131,6 +208,80 @@ function Orders() {
   const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setShowDetailsModal(true);
+  };
+
+  const handleCheckMissingInventory = async (order: Order) => {
+    try {
+      const response = await partnerService.checkMissingInventory(order._id);
+      if (response.success) {
+        setMissingInventory(response.data);
+        setSelectedOrder(order);
+        setShowMissingInventoryModal(true);
+      }
+    } catch (error: any) {
+      console.error('Error checking missing inventory:', error);
+      alert(error.message || 'Failed to check inventory status');
+    }
+  };
+
+  const handleRespondToOrder = async () => {
+    if (!selectedOrder) return;
+
+    try {
+      const response = await partnerService.respondToOrderAssignment(
+        selectedOrder._id,
+        responseType,
+        responseReason
+      );
+
+      if (response.success) {
+        setShowResponseModal(false);
+        setResponseReason('');
+        fetchOrders(); // Refresh orders
+        alert(`Order ${responseType} successfully!`);
+      }
+    } catch (error: any) {
+      console.error('Error responding to order:', error);
+
+      // Handle inventory validation errors specifically
+      if (error.message && error.message.includes('Missing or insufficient inventory')) {
+        setShowResponseModal(false);
+        alert(
+          `${error.message}\n\nPlease check your inventory and add the missing products first.`
+        );
+        // Show inventory check modal to guide user
+        handleCheckMissingInventory(selectedOrder);
+      } else {
+        alert(error.message || 'Failed to respond to order assignment');
+      }
+    }
+  };
+
+  const handleShowResponseModal = async (order: Order, type: 'accepted' | 'rejected') => {
+    setSelectedOrder(order);
+    setResponseType(type);
+
+    // If accepting, check inventory first
+    if (type === 'accepted') {
+      setCheckingInventory(true);
+      try {
+        const response = await partnerService.checkMissingInventory(order._id);
+        if (response.success) {
+          setMissingInventory(response.data);
+          setCanAcceptOrder(response.data.canFulfillCompletely);
+        }
+      } catch (error) {
+        console.error('Error checking inventory:', error);
+        setCanAcceptOrder(false);
+        setMissingInventory(null);
+      } finally {
+        setCheckingInventory(false);
+      }
+    } else {
+      setCanAcceptOrder(true); // Always allow rejection
+    }
+
+    setShowResponseModal(true);
   };
 
   const filteredOrders = orders.filter(order => {
@@ -188,9 +339,87 @@ function Orders() {
     );
   };
 
+  const getAssignmentStatusBadge = (order: Order) => {
+    if (!order.partnerAssignment) {
+      return (
+        <span className="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit bg-gray-100 text-gray-800">
+          <AlertTriangle size={12} />
+          Not Assigned
+        </span>
+      );
+    }
+
+    const status = order.partnerAssignment.response.status;
+    const statusConfig = {
+      pending: {
+        color: 'bg-amber-100 text-amber-800',
+        icon: <Clock size={12} />,
+        text: 'Awaiting Response',
+      },
+      accepted: {
+        color: 'bg-green-100 text-green-800',
+        icon: <CheckCircle size={12} />,
+        text: 'Accepted',
+      },
+      rejected: { color: 'bg-red-100 text-red-800', icon: <X size={12} />, text: 'Rejected' },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+
+    return (
+      <span
+        className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${config.color}`}
+      >
+        {config.icon}
+        {config.text}
+      </span>
+    );
+  };
+
   const getActionButtons = (order: Order) => {
     const buttons = [];
 
+    // Check if order needs partner response first
+    if (order.partnerAssignment?.response?.status === 'pending') {
+      buttons.push(
+        <button
+          key="check-inventory"
+          onClick={() => handleCheckMissingInventory(order)}
+          className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors flex items-center gap-1"
+        >
+          <Package size={14} />
+          Check Inventory
+        </button>,
+        <button
+          key="accept"
+          onClick={() => handleShowResponseModal(order, 'accepted')}
+          className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors flex items-center gap-1"
+        >
+          <CheckCircle size={14} />
+          Accept Order
+        </button>,
+        <button
+          key="reject"
+          onClick={() => handleShowResponseModal(order, 'rejected')}
+          className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors flex items-center gap-1"
+        >
+          <X size={14} />
+          Reject Order
+        </button>
+      );
+      return buttons;
+    }
+
+    // If order was rejected, show status only
+    if (order.partnerAssignment?.response?.status === 'rejected') {
+      return [
+        <span key="rejected" className="px-3 py-1 bg-red-100 text-red-800 rounded text-sm">
+          Order Rejected
+        </span>,
+      ];
+    }
+
+    // Normal order processing buttons (only after acceptance)
     switch (order.status) {
       case 'pending':
         buttons.push(
@@ -300,6 +529,23 @@ function Orders() {
         </div>
       </div>
 
+      {/* Info Banner */}
+      {orders.some(order => order.partnerAssignment?.response?.status === 'pending') && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start gap-3">
+            <AlertTriangle size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-blue-900 mb-1">New Order Assignments</h3>
+              <p className="text-sm text-blue-800">
+                You have orders awaiting your response. Please check your inventory and accept or
+                reject each assignment. If you're missing products, add them to your inventory first
+                to ensure proper commission calculation.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
@@ -378,22 +624,40 @@ function Orders() {
                   <h3 className="text-lg font-semibold text-slate-900">
                     #{order._id.slice(-8).toUpperCase()}
                   </h3>
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <Calendar size={14} />
-                    {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                  <div className="flex flex-col gap-1 text-sm text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={14} />
+                      Order:{' '}
+                      {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </div>
+                    {order.partnerAssignment?.assignedAt && (
+                      <div className="flex items-center gap-2 text-amber-600">
+                        <Clock size={14} />
+                        Assigned:{' '}
+                        {new Date(order.partnerAssignment.assignedAt).toLocaleDateString('en-IN', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="text-right">
                   <h3 className="text-xl font-bold text-slate-900 mb-1">
                     ₹{order.totalAmount.toLocaleString()}
                   </h3>
-                  {getStatusBadge(order.status)}
+                  <div className="flex flex-col gap-2 items-end">
+                    {getStatusBadge(order.status)}
+                    {getAssignmentStatusBadge(order)}
+                  </div>
                 </div>
               </div>
 
@@ -428,13 +692,25 @@ function Orders() {
                       <div className="flex items-start gap-2">
                         <MapPin size={14} className="mt-0.5 flex-shrink-0" />
                         <div>
-                          {order.shippingAddress ? (
+                          {order.shippingDetails?.address || order.shippingAddress ? (
                             <>
-                              <div>{order.shippingAddress.street}</div>
                               <div>
-                                {order.shippingAddress.city}, {order.shippingAddress.state} -{' '}
-                                {order.shippingAddress.pincode}
+                                {order.shippingDetails?.address?.street ||
+                                  order.shippingAddress?.street}
                               </div>
+                              <div>
+                                {order.shippingDetails?.address?.city ||
+                                  order.shippingAddress?.city}
+                                ,{' '}
+                                {order.shippingDetails?.address?.state ||
+                                  order.shippingAddress?.state}{' '}
+                                -{' '}
+                                {order.shippingDetails?.address?.pincode ||
+                                  order.shippingAddress?.pincode}
+                              </div>
+                              {order.shippingDetails?.address?.country && (
+                                <div>{order.shippingDetails.address.country}</div>
+                              )}
                             </>
                           ) : (
                             <div className="text-slate-400">Address not provided</div>
@@ -455,10 +731,14 @@ function Orders() {
                         className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg"
                       >
                         <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center border border-slate-200">
-                          {item.product?.images?.[0] ? (
+                          {getProductImage(item.product?.images) ? (
                             <img
-                              src={item.product.images[0]}
-                              alt={item.product.model || item.product.name}
+                              src={getProductImage(item.product?.images)!}
+                              alt={
+                                item.product?.model ||
+                                item.product?.name ||
+                                `${item.product?.brand} Product`
+                              }
                               className="w-full h-full object-cover rounded-lg"
                             />
                           ) : (
@@ -467,19 +747,35 @@ function Orders() {
                         </div>
                         <div className="flex-1">
                           <h5 className="font-semibold text-slate-900">
-                            {item.product?.model || item.product?.name || 'Product'}
+                            {item.product?.name ||
+                              item.product?.model ||
+                              `${item.product?.brand || 'Unknown'} Product`}
                           </h5>
                           <p className="text-sm text-slate-600">
                             {item.product?.brand || 'Unknown Brand'}
                           </p>
+                          {item.product?.categoryId?.name && (
+                            <p className="text-sm text-slate-500">
+                              Category: {item.product.categoryId.name}
+                            </p>
+                          )}
                           <p className="text-sm text-slate-500">Quantity: {item.quantity}</p>
                         </div>
                         <div className="text-right">
                           <p className="font-semibold text-slate-900">
-                            {item.product?.price
-                              ? `₹${item.product.price.toLocaleString()}`
+                            {item.product?.pricing?.mrp ||
+                            item.product?.pricing?.discountedPrice ||
+                            item.product?.price
+                              ? `₹${(item.product.pricing?.mrp || item.product.pricing?.discountedPrice || item.product.price)?.toLocaleString()}`
                               : 'Price N/A'}
                           </p>
+                          {item.product?.pricing?.discountedPrice &&
+                            item.product?.pricing?.mrp &&
+                            item.product.pricing.discountedPrice < item.product.pricing.mrp && (
+                              <p className="text-sm text-slate-500 line-through">
+                                ₹{item.product.pricing.mrp.toLocaleString()}
+                              </p>
+                            )}
                           <p className="text-sm text-slate-600">Qty: {item.quantity}</p>
                         </div>
                       </div>
@@ -508,7 +804,7 @@ function Orders() {
             <h3 className="text-lg font-semibold text-slate-900 mb-2">No orders found</h3>
             <p className="text-slate-600">
               {orders.length === 0
-                ? "You haven't received any orders yet."
+                ? "You haven't received any orders yet. Orders assigned to you by admin will appear here."
                 : 'Try adjusting your search or filter criteria.'}
             </p>
           </div>
@@ -562,6 +858,28 @@ function Orders() {
                       ₹{selectedOrder.totalAmount.toLocaleString()}
                     </span>
                   </div>
+                  {selectedOrder.commission && (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Commission Rate:</span>
+                        <span className="font-medium">
+                          {(selectedOrder.commission.rate * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Commission Amount:</span>
+                        <span className="font-medium text-green-600">
+                          ₹{selectedOrder.commission.amount.toLocaleString()}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                  {selectedOrder.paymentDetails && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">Payment Method:</span>
+                      <span className="font-medium">{selectedOrder.paymentDetails.method}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-slate-600">Order Date:</span>
                     <span className="font-medium">
@@ -592,8 +910,26 @@ function Orders() {
               <h3 className="font-semibold text-slate-900 mb-3">Shipping Address</h3>
               <div className="bg-slate-50 p-4 rounded-lg">
                 <p className="text-sm text-slate-700">
-                  {selectedOrder.shippingAddress?.street}, {selectedOrder.shippingAddress?.city},{' '}
-                  {selectedOrder.shippingAddress?.state} - {selectedOrder.shippingAddress?.pincode}
+                  {selectedOrder.shippingDetails?.address || selectedOrder.shippingAddress ? (
+                    <>
+                      {selectedOrder.shippingDetails?.address?.street ||
+                        selectedOrder.shippingAddress?.street}
+                      ,{' '}
+                      {selectedOrder.shippingDetails?.address?.city ||
+                        selectedOrder.shippingAddress?.city}
+                      ,{' '}
+                      {selectedOrder.shippingDetails?.address?.state ||
+                        selectedOrder.shippingAddress?.state}{' '}
+                      -{' '}
+                      {selectedOrder.shippingDetails?.address?.pincode ||
+                        selectedOrder.shippingAddress?.pincode}
+                      {selectedOrder.shippingDetails?.address?.country && (
+                        <>, {selectedOrder.shippingDetails.address.country}</>
+                      )}
+                    </>
+                  ) : (
+                    'Address not provided'
+                  )}
                 </p>
               </div>
             </div>
@@ -605,10 +941,14 @@ function Orders() {
                 {selectedOrder.items.map((item, index) => (
                   <div key={index} className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
                     <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center border border-slate-200">
-                      {item.product?.images?.[0] ? (
+                      {getProductImage(item.product?.images) ? (
                         <img
-                          src={item.product.images[0]}
-                          alt={item.product.model || item.product.name}
+                          src={getProductImage(item.product?.images)!}
+                          alt={
+                            item.product?.model ||
+                            item.product?.name ||
+                            `${item.product?.brand} Product`
+                          }
                           className="w-full h-full object-cover rounded-lg"
                         />
                       ) : (
@@ -617,19 +957,41 @@ function Orders() {
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-slate-900">
-                        {item.product?.model || item.product?.name || 'Product'}
+                        {item.product?.name ||
+                          item.product?.model ||
+                          `${item.product?.brand || 'Unknown'} Product`}
                       </h4>
                       <p className="text-sm text-slate-600">
                         {item.product?.brand || 'Unknown Brand'}
                       </p>
+                      {item.product?.categoryId?.name && (
+                        <p className="text-sm text-slate-500">
+                          Category: {item.product.categoryId.name}
+                        </p>
+                      )}
+                      {item.product?.variants && item.product.variants.length > 0 && (
+                        <p className="text-sm text-slate-500">
+                          Variants:{' '}
+                          {item.product.variants.map(v => `${v.storage} ${v.color}`).join(', ')}
+                        </p>
+                      )}
                       <p className="text-sm text-slate-500">Quantity: {item.quantity}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-slate-900">
-                        {item.product?.price
-                          ? `₹${item.product.price.toLocaleString()}`
+                        {item.product?.pricing?.mrp ||
+                        item.product?.pricing?.discountedPrice ||
+                        item.product?.price
+                          ? `₹${(item.product.pricing?.mrp || item.product.pricing?.discountedPrice || item.product.price)?.toLocaleString()}`
                           : 'Price N/A'}
                       </p>
+                      {item.product?.pricing?.discountedPrice &&
+                        item.product?.pricing?.mrp &&
+                        item.product.pricing.discountedPrice < item.product.pricing.mrp && (
+                          <p className="text-sm text-slate-500 line-through">
+                            MRP: ₹{item.product.pricing.mrp.toLocaleString()}
+                          </p>
+                        )}
                     </div>
                   </div>
                 ))}
@@ -645,6 +1007,295 @@ function Orders() {
                 Close
               </button>
               {getActionButtons(selectedOrder)}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Response Modal */}
+      {showResponseModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-slate-900">
+                {responseType === 'accepted' ? 'Accept Order' : 'Reject Order'}
+              </h2>
+              <button
+                onClick={() => setShowResponseModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-slate-600 mb-4">
+                Order #{selectedOrder._id.slice(-8).toUpperCase()}
+              </p>
+              <p className="text-sm text-slate-500 mb-4">
+                {responseType === 'accepted'
+                  ? "Are you sure you want to accept this order? You must have all required products in your inventory with proper pricing. If you're missing any products, the system will prevent acceptance."
+                  : 'Are you sure you want to reject this order? Please provide a reason for rejection.'}
+              </p>
+
+              {responseType === 'accepted' && (
+                <div className="mb-4">
+                  {checkingInventory ? (
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Loader2 size={16} className="animate-spin text-blue-600" />
+                        <p className="text-sm text-blue-800">Checking your inventory...</p>
+                      </div>
+                    </div>
+                  ) : missingInventory ? (
+                    <div
+                      className={`p-3 border rounded-lg ${
+                        canAcceptOrder ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                      }`}
+                    >
+                      <p
+                        className={`text-sm font-medium mb-2 ${
+                          canAcceptOrder ? 'text-green-800' : 'text-red-800'
+                        }`}
+                      >
+                        {canAcceptOrder
+                          ? '✅ Inventory Check: All products available'
+                          : '❌ Inventory Check: Missing products detected'}
+                      </p>
+
+                      {missingInventory.missingItems.length > 0 && (
+                        <div className="text-sm text-red-700 mb-2">
+                          <strong>Missing products:</strong>
+                          <ul className="list-disc list-inside mt-1">
+                            {missingInventory.missingItems.map((item: any, index: number) => (
+                              <li key={index}>
+                                {item.productName} (Need: {item.requiredQuantity})
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {missingInventory.availableItems.length > 0 && (
+                        <div className="text-sm text-green-700">
+                          <strong>Available products:</strong>
+                          <ul className="list-disc list-inside mt-1">
+                            {missingInventory.availableItems.map((item: any, index: number) => (
+                              <li key={index}>
+                                {item.productName} (Available: {item.availableQuantity})
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <p className="text-sm text-amber-800">
+                        <strong>⚠️ Important:</strong> Before accepting, make sure you have added
+                        all required products to your inventory with proper pricing. This ensures
+                        commission calculations work correctly.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  {responseType === 'accepted' ? 'Acceptance Note (Optional)' : 'Rejection Reason'}
+                </label>
+                <textarea
+                  value={responseReason}
+                  onChange={e => setResponseReason(e.target.value)}
+                  placeholder={
+                    responseType === 'accepted'
+                      ? 'Add any notes about order acceptance...'
+                      : 'Please explain why you are rejecting this order...'
+                  }
+                  className="w-full p-3 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  rows={3}
+                  required={responseType === 'rejected'}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowResponseModal(false);
+                  setMissingInventory(null);
+                  setCanAcceptOrder(false);
+                  setCheckingInventory(false);
+                }}
+                className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              {responseType === 'accepted' && !canAcceptOrder && missingInventory && (
+                <button
+                  onClick={() => {
+                    setShowResponseModal(false);
+                    handleCheckMissingInventory(selectedOrder);
+                  }}
+                  className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  View Missing Products
+                </button>
+              )}
+              <button
+                onClick={handleRespondToOrder}
+                className={`flex-1 px-4 py-2 text-white rounded-lg transition-colors ${
+                  responseType === 'accepted'
+                    ? canAcceptOrder
+                      ? 'bg-green-500 hover:bg-green-600'
+                      : 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-red-500 hover:bg-red-600'
+                }`}
+                disabled={
+                  (responseType === 'rejected' && !responseReason.trim()) ||
+                  (responseType === 'accepted' && (!canAcceptOrder || checkingInventory))
+                }
+              >
+                {checkingInventory
+                  ? 'Checking...'
+                  : responseType === 'accepted'
+                    ? canAcceptOrder
+                      ? 'Accept Order'
+                      : 'Cannot Accept - Missing Inventory'
+                    : 'Reject Order'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Missing Inventory Modal */}
+      {showMissingInventoryModal && missingInventory && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-slate-900">Inventory Status Check</h2>
+              <button
+                onClick={() => setShowMissingInventoryModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <div
+                className={`p-4 rounded-lg mb-4 ${
+                  missingInventory.canFulfillCompletely
+                    ? 'bg-green-50 border border-green-200'
+                    : 'bg-amber-50 border border-amber-200'
+                }`}
+              >
+                <p
+                  className={`font-medium ${
+                    missingInventory.canFulfillCompletely ? 'text-green-800' : 'text-amber-800'
+                  }`}
+                >
+                  {missingInventory.message}
+                </p>
+              </div>
+
+              {missingInventory.availableItems.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-slate-900 mb-3">
+                    ✅ Available in Your Inventory
+                  </h3>
+                  <div className="space-y-2">
+                    {missingInventory.availableItems.map((item: any, index: number) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-green-50 rounded-lg"
+                      >
+                        <div>
+                          <p className="font-medium text-slate-900">{item.productName}</p>
+                          <p className="text-sm text-slate-600">{item.productBrand}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-green-600">
+                            Available: {item.availableQuantity} (Need: {item.requiredQuantity})
+                          </p>
+                          <p className="text-sm font-medium">
+                            ₹{item.partnerPrice?.toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {missingInventory.missingItems.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-slate-900 mb-3">
+                    ❌ Missing from Your Inventory
+                  </h3>
+                  <div className="space-y-2">
+                    {missingInventory.missingItems.map((item: any, index: number) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-red-50 rounded-lg"
+                      >
+                        <div>
+                          <p className="font-medium text-slate-900">{item.productName}</p>
+                          <p className="text-sm text-slate-600">{item.productBrand}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-red-600">
+                            Need: {item.requiredQuantity} (Have: {item.availableQuantity})
+                          </p>
+                          <p className="text-xs text-slate-500">Must add to inventory first</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>Action Required:</strong> You need to add the missing products to your
+                      inventory with proper pricing before you can accept this order. This ensures
+                      commission calculations work correctly.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowMissingInventoryModal(false)}
+                className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Close
+              </button>
+              {missingInventory.canFulfillCompletely && (
+                <button
+                  onClick={() => {
+                    setShowMissingInventoryModal(false);
+                    handleShowResponseModal(selectedOrder!, 'accepted');
+                  }}
+                  className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  Accept Order
+                </button>
+              )}
+              {!missingInventory.canFulfillCompletely && (
+                <button
+                  onClick={() => {
+                    setShowMissingInventoryModal(false);
+                    // Navigate to inventory page to add missing products
+                    window.location.href = '/partner/inventory';
+                  }}
+                  className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Add Missing Products
+                </button>
+              )}
             </div>
           </div>
         </div>

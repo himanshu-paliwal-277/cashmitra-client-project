@@ -98,6 +98,33 @@ class PartnerService {
     }
   }
 
+  async checkMissingInventory(orderId: string) {
+    try {
+      const response = await api.get(`/partner/orders/${orderId}/missing-inventory`);
+      return response.data;
+    } catch (error) {
+      console.error('Error checking missing inventory:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async respondToOrderAssignment(
+    orderId: string,
+    response: 'accepted' | 'rejected',
+    reason?: string
+  ) {
+    try {
+      const responseData = await api.put(`/partner/orders/${orderId}/respond`, {
+        response,
+        reason,
+      });
+      return responseData.data;
+    } catch (error) {
+      console.error('Error responding to order assignment:', error);
+      throw error.response?.data || error;
+    }
+  }
+
   async updateOrderStatus(orderId: string, statusData: any) {
     try {
       const response = await api.put(`/partner/orders/${orderId}`, statusData);
@@ -124,12 +151,13 @@ class PartnerService {
     try {
       const queryParams = new URLSearchParams();
       if (params.page) queryParams.append('page', params.page);
-      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.limit) queryParams.append('limit', params.limit || '50'); // Higher default limit
       if (params.search) queryParams.append('search', params.search);
       if (params.category) queryParams.append('category', params.category);
       if (params.brand) queryParams.append('brand', params.brand);
 
-      const response = await api.get(`/products?${queryParams}`);
+      // Use dedicated partner products endpoint for full catalog access
+      const response = await api.get(`/partner/products?${queryParams}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);

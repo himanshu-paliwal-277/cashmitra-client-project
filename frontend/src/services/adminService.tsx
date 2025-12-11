@@ -244,6 +244,28 @@ class AdminService {
     }
   }
 
+  async getPartnerSuggestionsForOrder(orderId: string) {
+    try {
+      const response = await api.get(`/admin/orders/${orderId}/partner-suggestions`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching partner suggestions:', error);
+      throw error;
+    }
+  }
+
+  async assignPartnerToOrder(orderId: string, partnerId: string) {
+    try {
+      const response = await api.put(`/admin/orders/${orderId}/assign-partner`, {
+        partner: partnerId,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error assigning partner to order:', error);
+      throw error;
+    }
+  }
+
   async getOrderById(orderId: any) {
     try {
       const response = await api.get(`/admin/orders/${orderId}`);
