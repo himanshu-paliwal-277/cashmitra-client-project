@@ -56,6 +56,7 @@ const SavedAddresses = lazy(() => import('./pages/customer/account/SavedAddresse
 // Partner Pages (Lazy)
 const PartnerLogin = lazy(() => import('./pages/partner/Login'));
 const PartnerKYC = lazy(() => import('./pages/partner/KYC'));
+const PartnerAgentManagement = lazy(() => import('./pages/partner/AgentManagement'));
 const PartnerProtectedRoute = lazy(() => import('./components/partner/PartnerProtectedRoute'));
 const PartnerLayout = lazy(() => import('./components/partner/layout/PartnerLayout'));
 const PartnerDashboard = lazy(() => import('./pages/partner/Dashboard'));
@@ -82,6 +83,8 @@ const SellOrders = lazy(() => import('./pages/admin/SellOrders'));
 const BuyOrders = lazy(() => import('./pages/admin/BuyOrders'));
 const Pricing = lazy(() => import('./pages/admin/Pricing'));
 const Finance = lazy(() => import('./pages/admin/Finance'));
+const PayoutManagement = lazy(() => import('./pages/admin/PayoutManagement'));
+const AdminAgentManagement = lazy(() => import('./pages/admin/AgentManagement'));
 const Products = lazy(() => import('./pages/admin/Products'));
 const Categories = lazy(() => import('./pages/admin/Categories'));
 const Brands = lazy(() => import('./pages/admin/Brands'));
@@ -159,6 +162,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="products/:id" element={<ProductDetail />} />
           <Route path="products/:productId/edit" element={<EditProduct />} />
           <Route path="partners" element={<Partners />} />
+          <Route path="agents" element={<AdminAgentManagement />} />
           <Route path="partner-applications" element={<PartnerApplications />} />
           {/* <Route path="partner-permissions" element={<PartnerPermissions />} /> */}
           {/* <Route path="inventory-approval" element={<InventoryApproval />} /> */}
@@ -171,7 +175,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="promotions" element={<Pricing />} />
           <Route path="finance" element={<Finance />} />
           <Route path="commission-rules" element={<Finance />} />
-          <Route path="wallet-payouts" element={<Finance />} />
+          <Route path="wallet-payouts" element={<PayoutManagement />} />
           <Route path="reports" element={<Reports />} />
         </Route>
       </Route>
@@ -185,6 +189,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="orders" element={<PartnerOrders />} />
           <Route path="payouts" element={<PartnerPayouts />} />
           <Route path="kyc" element={<PartnerKYC />} />
+          <Route path="agents" element={<PartnerAgentManagement />} />
         </Route>
       </Route>
 

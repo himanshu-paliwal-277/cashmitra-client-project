@@ -1,11 +1,13 @@
 const User = require("../models/user.model");
 const Partner = require("../models/partner.model");
 const Product = require("../models/product.model");
+const Agent = require("../models/agent.model");
 const { Order } = require("../models/order.model");
 const Transaction = require("../models/transaction.model");
 const Inventory = require("../models/inventory.model");
 const Wallet = require("../models/wallet.model");
 const ConditionQuestionnaire = require("../models/conditionQuestionnaire.model");
+const ApiError = require("../utils/apiError");
 const { generateToken } = require("../utils/jwt.utils");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
@@ -132,7 +134,7 @@ const getAllPartners = async (req, res) => {
     }
 
     const partners = await Partner.find(filter)
-      .populate("user", "name email phone")
+      .populate("user", "name email phone isActive")
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -177,7 +179,7 @@ const getPartnerById = async (req, res) => {
     const { id } = req.params;
 
     const partner = await Partner.findById(id)
-      .populate("user", "name email phone createdAt")
+      .populate("user", "name email phone createdAt isActive")
       .populate("wallet.transactions");
 
     if (!partner) {
@@ -362,7 +364,7 @@ const updatePartner = async (req, res) => {
     const partner = await Partner.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
-    }).populate("user", "name email phone");
+    }).populate("user", "name email phone isActive");
 
     if (!partner) {
       return res.status(404).json({ message: "Partner not found" });
@@ -464,7 +466,7 @@ const verifyPartner = async (req, res) => {
         verifiedAt: status === "approved" ? new Date() : undefined,
       },
       { new: true }
-    ).populate("user", "name email");
+    ).populate("user", "name email isActive");
 
     if (!partner) {
       return res.status(404).json({ message: "Partner not found" });
@@ -4212,6 +4214,171 @@ const deleteModelByName = async (req, res) => {
   }
 };
 
+/**
+ * Get all agents
+ * @route GET /api/admin/agents
+ * @access Private (Admin only)
+ */
+const getAgents = async (req, res) => {
+  const { page = 1, limit = 10, status, verified } = req.query;
+
+  const query = {};
+  if (status) {
+    query.isActive = status === "active";
+  }
+
+  const agents = await Agent.find(query)
+    .populate("user", "name email phone isVerified isActive")
+    .populate("assignedPartner", "shopName shopEmail user")
+    .populate({
+      path: "assignedPartner",
+      populate: {
+        path: "user",
+        select: "name email",
+      },
+    })
+    .sort({ createdAt: -1 })
+    .limit(limit * 1)
+    .skip((page - 1) * limit);
+
+  // Filter by verification status if specified
+  let filteredAgents = agents;
+  if (verified !== undefined) {
+    const isVerified = verified === "true";
+    filteredAgents = agents.filter(
+      (agent) => agent.user.isVerified === isVerified
+    );
+  }
+
+  const total = await Agent.countDocuments(query);
+
+  res.status(200).json({
+    success: true,
+    data: filteredAgents,
+    pagination: {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      total,
+      pages: Math.ceil(total / limit),
+    },
+  });
+};
+
+/**
+ * Approve agent
+ * @route PUT /api/admin/agents/:id/approve
+ * @access Private (Admin only)
+ */
+const approveAgent = async (req, res) => {
+  const agentId = req.params.id;
+
+  const agent = await Agent.findById(agentId).populate("user");
+  if (!agent) {
+    throw new ApiError("Agent not found", 404);
+  }
+
+  // Update user verification status
+  await User.findByIdAndUpdate(agent.user._id, {
+    isVerified: true,
+    isActive: true,
+  });
+
+  // Update agent status
+  agent.isActive = true;
+  await agent.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Agent approved successfully",
+    data: agent,
+  });
+};
+
+/**
+ * Reject agent
+ * @route PUT /api/admin/agents/:id/reject
+ * @access Private (Admin only)
+ */
+const rejectAgent = async (req, res) => {
+  const agentId = req.params.id;
+  const { reason } = req.body;
+
+  const agent = await Agent.findById(agentId).populate("user");
+  if (!agent) {
+    throw new ApiError("Agent not found", 404);
+  }
+
+  // Update user verification status
+  await User.findByIdAndUpdate(agent.user._id, {
+    isVerified: false,
+    isActive: false,
+  });
+
+  // Update agent status and add rejection reason
+  agent.isActive = false;
+  agent.rejectionReason = reason;
+  await agent.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Agent rejected successfully",
+    data: agent,
+  });
+};
+
+/**
+ * Toggle agent status
+ * @route PUT /api/admin/agents/:id/status
+ * @access Private (Admin only)
+ */
+const toggleAgentStatus = async (req, res) => {
+  const agentId = req.params.id;
+  const { isActive } = req.body;
+
+  const agent = await Agent.findById(agentId).populate("user");
+  if (!agent) {
+    throw new ApiError("Agent not found", 404);
+  }
+
+  // Update agent status
+  agent.isActive = isActive;
+  await agent.save();
+
+  // Also update user active status
+  await User.findByIdAndUpdate(agent.user._id, { isActive });
+
+  res.status(200).json({
+    success: true,
+    message: `Agent ${isActive ? "activated" : "deactivated"} successfully`,
+    data: agent,
+  });
+};
+
+/**
+ * Toggle user status
+ * @route PUT /api/admin/users/:id/status
+ * @access Private (Admin only)
+ */
+const toggleUserStatus = async (req, res) => {
+  const userId = req.params.id;
+  const { isActive } = req.body;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError("User not found", 404);
+  }
+
+  // Update user active status
+  user.isActive = isActive;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: `User ${isActive ? "activated" : "deactivated"} successfully`,
+    data: user,
+  });
+};
+
 module.exports = {
   loginAdmin,
   getAdminProfile,
@@ -4261,5 +4428,9 @@ module.exports = {
   createConditionQuestionnaire,
   updateConditionQuestionnaire,
   deleteConditionQuestionnaire,
-  getQuestionnairesByCategory,
+  getAgents,
+  approveAgent,
+  rejectAgent,
+  toggleAgentStatus,
+  toggleUserStatus,
 };

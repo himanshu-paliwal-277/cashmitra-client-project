@@ -353,6 +353,9 @@ const Finance = () => {
                 <option value="refund">Refund</option>
                 <option value="adjustment">Adjustment</option>
                 <option value="withdrawal">Withdrawal</option>
+                <option value="payout">Payout</option>
+                <option value="wallet_credit">Wallet Credit</option>
+                <option value="wallet_debit">Wallet Debit</option>
               </select>
 
               <select
@@ -363,6 +366,7 @@ const Finance = () => {
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
                 <option value="processed">Processed</option>
+                <option value="completed">Completed</option>
                 <option value="failed">Failed</option>
                 <option value="cancelled">Cancelled</option>
               </select>
@@ -425,9 +429,22 @@ const Finance = () => {
                       {transactions.map(transaction => (
                         <tr key={transaction._id} className="hover:bg-gray-50 transition-colors">
                           <td className="px-6 py-4">
-                            <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 capitalize">
-                              {transaction.transactionType}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 capitalize">
+                                {transaction.transactionType}
+                              </span>
+                              {transaction.source && (
+                                <span
+                                  className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded ${
+                                    transaction.source === 'wallet'
+                                      ? 'bg-green-100 text-green-700'
+                                      : 'bg-gray-100 text-gray-700'
+                                  }`}
+                                >
+                                  {transaction.source}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="px-6 py-4">
                             <div className="font-semibold text-gray-900">

@@ -1,48 +1,49 @@
-const Wallet = require('../models/wallet.model');
-const Transaction = require('../models/transaction.model');
-const Partner = require('../models/partner.model');
-const { Order } = require('../models/order.model');
-const { validationResult } = require('express-validator');
-const mongoose = require('mongoose');
+const Wallet = require("../models/wallet.model");
+const Transaction = require("../models/transaction.model");
+const Partner = require("../models/partner.model");
+const { Order } = require("../models/order.model");
+const { validationResult } = require("express-validator");
+const mongoose = require("mongoose");
 
 // Get wallet details
 exports.getWallet = async (req, res) => {
   try {
-    const partnerId = req.user.partner;
-    
-    if (!partnerId) {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
       return res.status(400).json({
         success: false,
-        message: 'Partner not found'
+        message: "Partner not found",
       });
     }
 
+    const partnerId = partner._id;
+
     let wallet = await Wallet.findOne({ partner: partnerId })
-      .populate('transactions')
-      .populate('partner', 'shopName user');
+      .populate("transactions")
+      .populate("partner", "shopName user");
 
     if (!wallet) {
       // Create wallet if it doesn't exist
       wallet = await Wallet.create({
         partner: partnerId,
-        balance: 0
+        balance: 0,
       });
-      
+
       wallet = await Wallet.findById(wallet._id)
-        .populate('transactions')
-        .populate('partner', 'shopName user');
+        .populate("transactions")
+        .populate("partner", "shopName user");
     }
 
     res.status(200).json({
       success: true,
-      data: wallet
+      data: wallet,
     });
   } catch (error) {
-    console.error('Get wallet error:', error);
+    console.error("Get wallet error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
-      error: error.message
+      message: "Server error",
+      error: error.message,
     });
   }
 };
@@ -50,15 +51,23 @@ exports.getWallet = async (req, res) => {
 // Get wallet transactions
 exports.getTransactions = async (req, res) => {
   try {
-    const partnerId = req.user.partner;
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: "Partner profile not found",
+      });
+    }
+
+    const partnerId = partner._id;
     const { page = 1, limit = 10, type, status } = req.query;
-    
+
     const query = { partner: partnerId };
     if (type) query.transactionType = type;
     if (status) query.status = status;
 
     const transactions = await Transaction.find(query)
-      .populate('order', 'orderType totalAmount')
+      .populate("order", "orderType totalAmount")
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -71,57 +80,71 @@ exports.getTransactions = async (req, res) => {
         transactions,
         totalPages: Math.ceil(totalTransactions / limit),
         currentPage: page,
-        totalTransactions
-      }
+        totalTransactions,
+      },
     });
   } catch (error) {
-    console.error('Get transactions error:', error);
+    console.error("Get transactions error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
-      error: error.message
+      message: "Server error",
+      error: error.message,
     });
   }
 };
 
 // Process commission for completed orders
-exports.processCommission = async (orderId, commissionAmount, commissionRate) => {
+exports.processCommission = async (
+  orderId,
+  commissionAmount,
+  commissionRate
+) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    const order = await Order.findById(orderId).populate('partner');
+    const order = await Order.findById(orderId).populate("partner");
     if (!order) {
-      throw new Error('Order not found');
+      throw new Error("Order not found");
     }
 
     const partnerId = order.partner._id;
-    
+
     // Find or create wallet
     let wallet = await Wallet.findOne({ partner: partnerId }).session(session);
     if (!wallet) {
-      wallet = await Wallet.create([{
-        partner: partnerId,
-        balance: 0
-      }], { session });
+      wallet = await Wallet.create(
+        [
+          {
+            partner: partnerId,
+            balance: 0,
+          },
+        ],
+        { session }
+      );
       wallet = wallet[0];
     }
 
     // Create commission transaction
-    const transaction = await Transaction.create([{
-      transactionType: 'commission',
-      amount: commissionAmount,
-      partner: partnerId,
-      order: orderId,
-      paymentMethod: 'System',
-      status: 'completed',
-      description: `Commission for ${order.orderType} order - ${commissionRate}%`,
-      metadata: {
-        commissionRate,
-        orderAmount: order.totalAmount,
-        orderType: order.orderType
-      }
-    }], { session });
+    const transaction = await Transaction.create(
+      [
+        {
+          transactionType: "commission",
+          amount: commissionAmount,
+          partner: partnerId,
+          order: orderId,
+          paymentMethod: "System",
+          status: "completed",
+          description: `Commission for ${order.orderType} order - ${commissionRate}%`,
+          metadata: {
+            commissionRate,
+            orderAmount: order.totalAmount,
+            orderType: order.orderType,
+          },
+        },
+      ],
+      { session }
+    );
 
     // Update wallet balance
     wallet.balance += commissionAmount;
@@ -146,33 +169,41 @@ exports.requestPayout = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: errors.array()
+        message: "Validation failed",
+        errors: errors.array(),
       });
     }
 
-    const partnerId = req.user.partner;
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: "Partner profile not found",
+      });
+    }
+
+    const partnerId = partner._id;
     const { amount, paymentMethod, bankDetails, upiId } = req.body;
 
     const wallet = await Wallet.findOne({ partner: partnerId });
     if (!wallet) {
       return res.status(404).json({
         success: false,
-        message: 'Wallet not found'
+        message: "Wallet not found",
       });
     }
 
     if (wallet.balance < amount) {
       return res.status(400).json({
         success: false,
-        message: 'Insufficient balance'
+        message: "Insufficient balance",
       });
     }
 
     if (amount < wallet.payoutSettings.minimumPayoutAmount) {
       return res.status(400).json({
         success: false,
-        message: `Minimum payout amount is ₹${wallet.payoutSettings.minimumPayoutAmount}`
+        message: `Minimum payout amount is ₹${wallet.payoutSettings.minimumPayoutAmount}`,
       });
     }
 
@@ -182,25 +213,30 @@ exports.requestPayout = async (req, res) => {
     try {
       // Create payout transaction
       const paymentDetails = {};
-      if (paymentMethod === 'Bank Transfer') {
+      if (paymentMethod === "Bank Transfer") {
         paymentDetails.bankDetails = bankDetails;
-      } else if (paymentMethod === 'UPI') {
+      } else if (paymentMethod === "UPI") {
         paymentDetails.upiDetails = { upiId };
       }
 
-      const transaction = await Transaction.create([{
-        transactionType: 'payout',
-        amount: -amount, // Negative for debit
-        partner: partnerId,
-        paymentMethod,
-        paymentDetails,
-        status: 'pending',
-        description: `Payout request via ${paymentMethod}`,
-        metadata: {
-          requestedAt: new Date(),
-          payoutMethod: paymentMethod
-        }
-      }], { session });
+      const transaction = await Transaction.create(
+        [
+          {
+            transactionType: "payout",
+            amount: -amount, // Negative for debit
+            partner: partnerId,
+            paymentMethod,
+            paymentDetails,
+            status: "pending",
+            description: `Payout request via ${paymentMethod}`,
+            metadata: {
+              requestedAt: new Date(),
+              payoutMethod: paymentMethod,
+            },
+          },
+        ],
+        { session }
+      );
 
       // Update wallet balance
       wallet.balance -= amount;
@@ -212,11 +248,11 @@ exports.requestPayout = async (req, res) => {
 
       res.status(201).json({
         success: true,
-        message: 'Payout request submitted successfully',
+        message: "Payout request submitted successfully",
         data: {
           transaction: transaction[0],
-          remainingBalance: wallet.balance
-        }
+          remainingBalance: wallet.balance,
+        },
       });
     } catch (error) {
       await session.abortTransaction();
@@ -225,11 +261,11 @@ exports.requestPayout = async (req, res) => {
       session.endSession();
     }
   } catch (error) {
-    console.error('Request payout error:', error);
+    console.error("Request payout error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
-      error: error.message
+      message: "Server error",
+      error: error.message,
     });
   }
 };
@@ -241,25 +277,33 @@ exports.updatePayoutSettings = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors: errors.array()
+        message: "Validation failed",
+        errors: errors.array(),
       });
     }
 
-    const partnerId = req.user.partner;
-    const { 
-      minimumPayoutAmount, 
-      autoPayoutEnabled, 
-      payoutSchedule, 
-      bankDetails, 
-      upiId 
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: "Partner profile not found",
+      });
+    }
+
+    const partnerId = partner._id;
+    const {
+      minimumPayoutAmount,
+      autoPayoutEnabled,
+      payoutSchedule,
+      bankDetails,
+      upiId,
     } = req.body;
 
     const wallet = await Wallet.findOne({ partner: partnerId });
     if (!wallet) {
       return res.status(404).json({
         success: false,
-        message: 'Wallet not found'
+        message: "Wallet not found",
       });
     }
 
@@ -285,15 +329,15 @@ exports.updatePayoutSettings = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Payout settings updated successfully',
-      data: wallet.payoutSettings
+      message: "Payout settings updated successfully",
+      data: wallet.payoutSettings,
     });
   } catch (error) {
-    console.error('Update payout settings error:', error);
+    console.error("Update payout settings error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
-      error: error.message
+      message: "Server error",
+      error: error.message,
     });
   }
 };
@@ -301,12 +345,20 @@ exports.updatePayoutSettings = async (req, res) => {
 // Get payout history
 exports.getPayoutHistory = async (req, res) => {
   try {
-    const partnerId = req.user.partner;
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: "Partner profile not found",
+      });
+    }
+
+    const partnerId = partner._id;
     const { page = 1, limit = 10, status } = req.query;
-    
-    const query = { 
-      partner: partnerId, 
-      transactionType: 'payout'
+
+    const query = {
+      partner: partnerId,
+      transactionType: "payout",
     };
     if (status) query.status = status;
 
@@ -323,15 +375,15 @@ exports.getPayoutHistory = async (req, res) => {
         payouts,
         totalPages: Math.ceil(totalPayouts / limit),
         currentPage: page,
-        totalPayouts
-      }
+        totalPayouts,
+      },
     });
   } catch (error) {
-    console.error('Get payout history error:', error);
+    console.error("Get payout history error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
-      error: error.message
+      message: "Server error",
+      error: error.message,
     });
   }
 };
@@ -339,17 +391,31 @@ exports.getPayoutHistory = async (req, res) => {
 // Get wallet analytics
 exports.getWalletAnalytics = async (req, res) => {
   try {
-    const partnerId = req.user.partner;
-    const { period = '30' } = req.query; // days
-    
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: "Partner profile not found",
+      });
+    }
+
+    const partnerId = partner._id;
+    const { period = "30" } = req.query; // days
+
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - parseInt(period));
 
-    const wallet = await Wallet.findOne({ partner: partnerId });
+    let wallet = await Wallet.findOne({ partner: partnerId });
     if (!wallet) {
-      return res.status(404).json({
-        success: false,
-        message: 'Wallet not found'
+      // Create wallet if it doesn't exist
+      wallet = await Wallet.create({
+        partner: partnerId,
+        balance: 0,
+        payoutSettings: {
+          minimumPayoutAmount: 1000,
+          autoPayoutEnabled: false,
+          payoutSchedule: "manual",
+        },
       });
     }
 
@@ -357,46 +423,51 @@ exports.getWalletAnalytics = async (req, res) => {
     const transactions = await Transaction.find({
       partner: partnerId,
       createdAt: { $gte: startDate },
-      status: 'completed'
+      status: "completed",
     });
 
     // Calculate analytics
     const totalEarnings = transactions
-      .filter(t => t.transactionType === 'commission')
+      .filter((t) => t.transactionType === "commission")
       .reduce((sum, t) => sum + t.amount, 0);
 
     const totalPayouts = transactions
-      .filter(t => t.transactionType === 'payout')
+      .filter((t) => t.transactionType === "payout")
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
     const pendingPayouts = await Transaction.find({
       partner: partnerId,
-      transactionType: 'payout',
-      status: 'pending'
+      transactionType: "payout",
+      status: "pending",
     });
 
-    const pendingAmount = pendingPayouts.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    const pendingAmount = pendingPayouts.reduce(
+      (sum, t) => sum + Math.abs(t.amount),
+      0
+    );
 
     // Group transactions by date for chart data
     const dailyData = {};
-    transactions.forEach(transaction => {
-      const date = transaction.createdAt.toISOString().split('T')[0];
+    transactions.forEach((transaction) => {
+      const date = transaction.createdAt.toISOString().split("T")[0];
       if (!dailyData[date]) {
         dailyData[date] = { earnings: 0, payouts: 0 };
       }
-      
-      if (transaction.transactionType === 'commission') {
+
+      if (transaction.transactionType === "commission") {
         dailyData[date].earnings += transaction.amount;
-      } else if (transaction.transactionType === 'payout') {
+      } else if (transaction.transactionType === "payout") {
         dailyData[date].payouts += Math.abs(transaction.amount);
       }
     });
 
-    const chartData = Object.keys(dailyData).map(date => ({
-      date,
-      earnings: dailyData[date].earnings,
-      payouts: dailyData[date].payouts
-    })).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const chartData = Object.keys(dailyData)
+      .map((date) => ({
+        date,
+        earnings: dailyData[date].earnings,
+        payouts: dailyData[date].payouts,
+      }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
 
     res.status(200).json({
       success: true,
@@ -407,15 +478,15 @@ exports.getWalletAnalytics = async (req, res) => {
         pendingAmount,
         pendingPayoutsCount: pendingPayouts.length,
         chartData,
-        payoutSettings: wallet.payoutSettings
-      }
+        payoutSettings: wallet.payoutSettings,
+      },
     });
   } catch (error) {
-    console.error('Get wallet analytics error:', error);
+    console.error("Get wallet analytics error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
-      error: error.message
+      message: "Server error",
+      error: error.message,
     });
   }
 };
@@ -426,34 +497,36 @@ exports.processPayout = async (req, res) => {
     const { transactionId } = req.params;
     const { status, notes } = req.body;
 
-    if (!['completed', 'failed'].includes(status)) {
+    if (!["completed", "failed"].includes(status)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid status. Must be completed or failed'
+        message: "Invalid status. Must be completed or failed",
       });
     }
 
-    const transaction = await Transaction.findById(transactionId)
-      .populate('partner', 'shopName user');
+    const transaction = await Transaction.findById(transactionId).populate(
+      "partner",
+      "shopName user"
+    );
 
     if (!transaction) {
       return res.status(404).json({
         success: false,
-        message: 'Transaction not found'
+        message: "Transaction not found",
       });
     }
 
-    if (transaction.transactionType !== 'payout') {
+    if (transaction.transactionType !== "payout") {
       return res.status(400).json({
         success: false,
-        message: 'Transaction is not a payout request'
+        message: "Transaction is not a payout request",
       });
     }
 
-    if (transaction.status !== 'pending') {
+    if (transaction.status !== "pending") {
       return res.status(400).json({
         success: false,
-        message: 'Transaction is not pending'
+        message: "Transaction is not pending",
       });
     }
 
@@ -463,13 +536,15 @@ exports.processPayout = async (req, res) => {
     try {
       // Update transaction status
       transaction.status = status;
-      transaction.metadata.set('processedAt', new Date());
-      transaction.metadata.set('processedBy', req.user._id);
-      if (notes) transaction.metadata.set('adminNotes', notes);
-      
+      transaction.metadata.set("processedAt", new Date());
+      transaction.metadata.set("processedBy", req.user._id);
+      if (notes) transaction.metadata.set("adminNotes", notes);
+
       // If failed, refund the amount to wallet
-      if (status === 'failed') {
-        const wallet = await Wallet.findOne({ partner: transaction.partner._id }).session(session);
+      if (status === "failed") {
+        const wallet = await Wallet.findOne({
+          partner: transaction.partner._id,
+        }).session(session);
         if (wallet) {
           wallet.balance += Math.abs(transaction.amount);
           wallet.lastUpdated = new Date();
@@ -482,8 +557,10 @@ exports.processPayout = async (req, res) => {
 
       res.status(200).json({
         success: true,
-        message: `Payout ${status === 'completed' ? 'approved' : 'rejected'} successfully`,
-        data: transaction
+        message: `Payout ${
+          status === "completed" ? "approved" : "rejected"
+        } successfully`,
+        data: transaction,
       });
     } catch (error) {
       await session.abortTransaction();
@@ -492,11 +569,55 @@ exports.processPayout = async (req, res) => {
       session.endSession();
     }
   } catch (error) {
-    console.error('Process payout error:', error);
+    console.error("Process payout error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
-      error: error.message
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+// Admin: Get all payouts with optional status filter
+exports.getAllPayouts = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, status } = req.query;
+
+    const query = {
+      transactionType: "payout",
+    };
+    if (status) query.status = status;
+
+    const payouts = await Transaction.find(query)
+      .populate({
+        path: "partner",
+        select: "shopName shopEmail user",
+        populate: {
+          path: "user",
+          select: "name email",
+        },
+      })
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const totalPayouts = await Transaction.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        payouts,
+        totalPages: Math.ceil(totalPayouts / limit),
+        currentPage: page,
+        totalPayouts,
+      },
+    });
+  } catch (error) {
+    console.error("Get all payouts error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 };
@@ -505,19 +626,26 @@ exports.processPayout = async (req, res) => {
 exports.getPendingPayouts = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
-    
+
     const payouts = await Transaction.find({
-      transactionType: 'payout',
-      status: 'pending'
+      transactionType: "payout",
+      status: "pending",
     })
-      .populate('partner', 'shopName user shopEmail')
+      .populate({
+        path: "partner",
+        select: "shopName shopEmail user",
+        populate: {
+          path: "user",
+          select: "name email",
+        },
+      })
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
     const totalPayouts = await Transaction.countDocuments({
-      transactionType: 'payout',
-      status: 'pending'
+      transactionType: "payout",
+      status: "pending",
     });
 
     res.status(200).json({
@@ -526,15 +654,15 @@ exports.getPendingPayouts = async (req, res) => {
         payouts,
         totalPages: Math.ceil(totalPayouts / limit),
         currentPage: page,
-        totalPayouts
-      }
+        totalPayouts,
+      },
     });
   } catch (error) {
-    console.error('Get pending payouts error:', error);
+    console.error("Get pending payouts error:", error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
-      error: error.message
+      message: "Server error",
+      error: error.message,
     });
   }
 };

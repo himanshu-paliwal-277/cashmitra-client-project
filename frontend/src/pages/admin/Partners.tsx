@@ -202,6 +202,23 @@ const Partners = () => {
     }
   };
 
+  const handleToggleActive = async (partner: any) => {
+    try {
+      // Check if partner has a user associated
+      if (!partner.user || !partner.user._id) {
+        alert('Cannot update status: Partner has no associated user account.');
+        return;
+      }
+
+      const newActiveStatus = !partner.user.isActive;
+      await adminService.toggleUserStatus(partner.user._id, newActiveStatus);
+      await fetchPartners(); // Refresh the list
+    } catch (error) {
+      console.error('Error toggling partner active status:', error);
+      alert('Failed to update partner active status. Please try again.');
+    }
+  };
+
   const handleEdit = (partner: any) => {
     setEditingPartner(partner);
     setSubmitError('');
@@ -502,6 +519,9 @@ const Partners = () => {
                     Status
                   </th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
+                    Active
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
                     Actions
                   </th>
                 </tr>
@@ -509,7 +529,7 @@ const Partners = () => {
               <tbody className="divide-y divide-gray-100">
                 {filteredPartners.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center">
+                    <td colSpan={7} className="px-6 py-12 text-center">
                       <Users size={48} className="mx-auto text-gray-400 mb-4" />
                       <p className="text-gray-600 text-lg">
                         {searchTerm || statusFilter
@@ -565,6 +585,21 @@ const Partners = () => {
                           {partner.verificationStatus?.charAt(0)?.toUpperCase() +
                             partner.verificationStatus?.slice(1) || 'Pending'}
                         </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {partner.user ? (
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={partner.user.isActive !== false}
+                              onChange={() => handleToggleActive(partner)}
+                              className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                          </label>
+                        ) : (
+                          <span className="text-xs text-gray-400 italic">No user account</span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">

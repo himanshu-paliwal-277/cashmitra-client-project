@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, ShoppingCart, UserCheck, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, UserCheck, CreditCard, Users } from 'lucide-react';
 // Unused imports kept for future use when pages are created:
 // Users, BarChart3, Settings, FolderTree, ShoppingBag, RotateCcw,
 // Smartphone, HelpCircle, ClipboardList, CheckSquare, DollarSign,
@@ -31,6 +31,7 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
     '/partner/orders': 'orders',
     '/partner/payouts': 'payouts',
     '/partner/kyc': 'kyc',
+    '/partner/agents': 'agents',
     // Commented out - for future use when pages are created
     // '/partner/buy/categories': 'buyCategories',
     // '/partner/buy/products': 'buyProducts',
@@ -87,6 +88,10 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
         // { to: '/partner/pricing', icon: DollarSign, label: 'Pricing' },
         // { to: '/partner/finance', icon: Calculator, label: 'Finance' },
       ],
+    },
+    {
+      title: 'Team Management',
+      items: [{ to: '/partner/agents', icon: Users, label: 'Agent Management' }],
     },
     {
       title: 'Settings',
@@ -156,7 +161,7 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
     <aside
       className={`bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ease-out overflow-hidden ${
         isOpen
-          ? 'w-80 fixed lg:relative translate-x-0 z-[1000] shadow-xl lg:shadow-none h-full'
+          ? 'w-80 fixed lg:relative translate-x-0 z-[1] shadow-xl lg:shadow-none h-full'
           : 'w-0 lg:w-0 fixed lg:relative -translate-x-full lg:translate-x-0 z-[1000] h-full border-0'
       }`}
     >

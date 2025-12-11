@@ -1,585 +1,851 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect } from 'react';
 import {
   DollarSign,
   TrendingUp,
-  Calendar,
-  Download,
-  Eye,
   CreditCard,
   Building2,
   Wallet,
   CheckCircle,
   Clock,
   AlertCircle,
-  Filter,
   Plus,
-  ArrowUpRight,
-  ArrowDownRight,
+  Loader2,
+  XCircle,
+  RefreshCw,
+  Settings,
+  Save,
+  X,
 } from 'lucide-react';
+import partnerService from '../../services/partnerService';
+import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
 
-const PayoutsContainer = styled.div`
-  min-height: 100vh;
-  background: ${(props: any) => props.theme.colors.background};
-`;
+interface Transaction {
+  _id: string;
+  transactionType: string;
+  amount: number;
+  status: string;
+  paymentMethod: string;
+  description: string;
+  createdAt: string;
+  metadata?: any;
+}
 
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
+interface WalletAnalytics {
+  currentBalance: number;
+  totalEarnings: number;
+  totalPayouts: number;
+  pendingAmount: number;
+  pendingPayoutsCount: number;
+  chartData: Array<{
+    date: string;
+    earnings: number;
+    payouts: number;
+  }>;
+  payoutSettings: {
+    minimumPayoutAmount: number;
+    autoPayoutEnabled: boolean;
+    payoutSchedule: string;
+    bankDetails?: any;
+    upiId?: string;
+  };
+}
 
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-`;
-
-const Button = styled.button`
-  background: ${(props: any) => props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${(props: any) => props.variant === 'outline' ? props.theme.colors.primary : 'white'};
-  border: 1px solid ${(props: any) => props.theme.colors.primary};
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  &:hover {
-    background: ${(props: any) => props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
-    color: white;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  position: relative;
-  overflow: hidden;
-`;
-
-const StatHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-`;
-
-const StatIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: ${(props: any) => props.color || props.theme.colors.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const StatInfo = styled.div`
-  text-align: right;
-`;
-
-const StatValue = styled.h3`
-  font-size: 1.75rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme.colors.text};
-  margin-bottom: 0.25rem;
-`;
-
-const StatLabel = styled.p`
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-`;
-
-const StatChange = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-  color: ${(props: any) => props.positive ? '#10B981' : '#EF4444'};
-  justify-content: flex-end;
-`;
-
-const ContentGrid = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
-  margin-bottom: 2rem;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Card = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-`;
-
-const CardHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid ${(props: any) => props.theme.colors.border};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const CardTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const CardContent = styled.div`
-  padding: 1.5rem;
-`;
-
-const FilterSection = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-`;
-
-const FilterSelect = styled.select`
-  padding: 0.5rem 1rem;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 6px;
-  background: white;
-  cursor: pointer;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => props.theme.colors.primary};
-  }
-`;
-
-const PayoutItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 0;
-  border-bottom: 1px solid ${(props: any) => props.theme.colors.border};
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const PayoutInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const PayoutDate = styled.span`
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const PayoutDetails = styled.span`
-  font-size: 0.875rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
-const PayoutAmount = styled.div`
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  align-items: flex-end;
-`;
-
-const Amount = styled.span`
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-  font-size: 1.125rem;
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  background: ${(props: any) => {
-    switch (props.status) {
-      case 'completed':
-        return '#D1FAE5';
-      case 'pending':
-        return '#FEF3C7';
-      case 'processing':
-        return '#DBEAFE';
-      case 'failed':
-        return '#FEE2E2';
-      default:
-        return '#F3F4F6';
-    }
-  }};
-  color: ${(props: any) => {
-    switch (props.status) {
-      case 'completed':
-        return '#065F46';
-      case 'pending':
-        return '#92400E';
-      case 'processing':
-        return '#1E40AF';
-      case 'failed':
-        return '#991B1B';
-      default:
-        return '#374151';
-    }
-  }};
-`;
-
-const PaymentMethod = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: ${(props: any) => props.theme.colors.primary};
-    background: ${(props: any) => props.theme.colors.background};
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const MethodIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: ${(props: any) => props.color || props.theme.colors.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const MethodInfo = styled.div`
-  flex: 1;
-`;
-
-const MethodTitle = styled.h4`
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-  margin: 0 0 0.25rem 0;
-`;
-
-const MethodDetails = styled.p`
-  font-size: 0.875rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  margin: 0;
-`;
-
-const DefaultBadge = styled.span`
-  padding: 0.25rem 0.5rem;
-  background: ${(props: any) => props.theme.colors.primary};
-  color: white;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 2rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
-const EmptyIcon = styled.div`
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: ${(props: any) => props.theme.colors.background};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
+interface PayoutRequest {
+  amount: number;
+  paymentMethod: string;
+  bankDetails?: {
+    accountHolderName: string;
+    accountNumber: string;
+    ifscCode: string;
+    bankName: string;
+  };
+  upiId?: string;
+}
 
 function Payouts() {
-  const [timeFilter, setTimeFilter] = useState('all');
+  const [analytics, setAnalytics] = useState<WalletAnalytics | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [timeFilter, setTimeFilter] = useState('30');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
 
-  const stats = [
-    {
-      label: 'Total Earnings',
-      value: '₹2,45,680',
-      change: '+12.5%',
-      positive: true,
-      icon: <DollarSign size={24} />,
-      color: '#10B981',
-    },
-    {
-      label: 'This Month',
-      value: '₹45,230',
-      change: '+8.3%',
-      positive: true,
-      icon: <TrendingUp size={24} />,
-      color: '#3B82F6',
-    },
-    {
-      label: 'Pending Payouts',
-      value: '₹12,450',
-      change: '-2.1%',
-      positive: false,
-      icon: <Clock size={24} />,
-      color: '#F59E0B',
-    },
-    {
-      label: 'Available Balance',
-      value: '₹8,920',
-      change: '+15.2%',
-      positive: true,
-      icon: <Wallet size={24} />,
-      color: '#8B5CF6',
-    },
-  ];
+  // Initialize payout form with saved settings
+  const initializePayoutForm = () => {
+    if (analytics?.payoutSettings) {
+      const { bankDetails, upiId } = analytics.payoutSettings;
 
-  const payouts = [
-    {
-      id: 'PAY-001',
-      date: '2024-01-15',
-      amount: '₹25,680',
-      method: 'Bank Transfer',
-      status: 'completed',
-      transactionId: 'TXN123456789',
-    },
-    {
-      id: 'PAY-002',
-      date: '2024-01-10',
-      amount: '₹18,450',
-      method: 'UPI',
-      status: 'completed',
-      transactionId: 'TXN123456788',
-    },
-    {
-      id: 'PAY-003',
-      date: '2024-01-08',
-      amount: '₹32,100',
-      method: 'Bank Transfer',
-      status: 'processing',
-      transactionId: 'TXN123456787',
-    },
-    {
-      id: 'PAY-004',
-      date: '2024-01-05',
-      amount: '₹12,450',
-      method: 'Wallet',
-      status: 'pending',
-      transactionId: 'TXN123456786',
-    },
-    {
-      id: 'PAY-005',
-      date: '2024-01-01',
-      amount: '₹8,920',
-      method: 'Bank Transfer',
-      status: 'failed',
-      transactionId: 'TXN123456785',
-    },
-  ];
+      // Determine default payment method based on available data
+      let defaultMethod = 'Bank Transfer';
+      if (!bankDetails?.accountHolderName && upiId) {
+        defaultMethod = 'UPI';
+      }
 
-  const paymentMethods = [
-    {
-      type: 'Bank Account',
-      details: 'HDFC Bank ****1234',
-      icon: <Building2 size={20} />,
-      color: '#3B82F6',
-      isDefault: true,
+      setPayoutForm({
+        amount: 0,
+        paymentMethod: defaultMethod,
+        bankDetails: bankDetails
+          ? {
+              accountHolderName: bankDetails.accountHolderName || '',
+              accountNumber: bankDetails.accountNumber || '',
+              ifscCode: bankDetails.ifscCode || '',
+              bankName: bankDetails.bankName || '',
+            }
+          : {
+              accountHolderName: '',
+              accountNumber: '',
+              ifscCode: '',
+              bankName: '',
+            },
+        upiId: upiId || '',
+      });
+    }
+  };
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [payoutForm, setPayoutForm] = useState<PayoutRequest>({
+    amount: 0,
+    paymentMethod: 'Bank Transfer',
+    bankDetails: {
+      accountHolderName: '',
+      accountNumber: '',
+      ifscCode: '',
+      bankName: '',
     },
-    {
-      type: 'UPI',
-      details: 'partner@paytm',
-      icon: <CreditCard size={20} />,
-      color: '#10B981',
-      isDefault: false,
-    },
-    {
-      type: 'Digital Wallet',
-      details: 'Paytm Wallet',
-      icon: <Wallet size={20} />,
-      color: '#8B5CF6',
-      isDefault: false,
-    },
-  ];
-
-  const filteredPayouts = payouts.filter(payout => {
-    const matchesStatus = statusFilter === 'all' || payout.status === statusFilter;
-    return matchesStatus;
   });
 
-  const getStatusIcon = (status: any) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle size={12} />;
-      case 'pending':
-        return <Clock size={12} />;
-      case 'processing':
-        return <Clock size={12} />;
-      case 'failed':
-        return <AlertCircle size={12} />;
-      default:
-        return null;
+  const [settingsForm, setSettingsForm] = useState({
+    minimumPayoutAmount: 1000,
+    autoPayoutEnabled: false,
+    payoutSchedule: 'manual',
+    bankDetails: {
+      accountHolderName: '',
+      accountNumber: '',
+      ifscCode: '',
+      bankName: '',
+    },
+    upiId: '',
+  });
+
+  // Fetch data
+  useEffect(() => {
+    fetchAnalytics();
+    fetchTransactions();
+  }, [timeFilter]);
+
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await partnerService.getWalletAnalytics(timeFilter);
+      console.log('Analytics response:', response);
+
+      if (response.success) {
+        setAnalytics(response.data);
+      }
+    } catch (err: any) {
+      console.error('Error fetching analytics:', err);
+      setError(err.message || 'Failed to load analytics');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const fetchTransactions = async () => {
+    try {
+      const params: any = { limit: 20 };
+      if (statusFilter !== 'all') params.status = statusFilter;
+
+      const response = await partnerService.getPayoutHistory(params);
+      console.log('Transactions response:', response);
+
+      if (response.success) {
+        setTransactions(response.data.payouts || []);
+      }
+    } catch (err: any) {
+      console.error('Error fetching transactions:', err);
+    }
+  };
+
+  const handlePayoutRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!analytics || payoutForm.amount > analytics.currentBalance) {
+      alert('Insufficient balance');
+      return;
+    }
+
+    if (payoutForm.amount < (analytics.payoutSettings?.minimumPayoutAmount || 1000)) {
+      alert(`Minimum payout amount is ₹${analytics.payoutSettings?.minimumPayoutAmount || 1000}`);
+      return;
+    }
+
+    try {
+      const response = await partnerService.requestPayout(payoutForm);
+      if (response.success) {
+        setShowPayoutModal(false);
+        // Reset form to initial state
+        initializePayoutForm();
+        fetchAnalytics();
+        fetchTransactions();
+      }
+    } catch (err: any) {
+      console.error('Error requesting payout:', err);
+      alert(err.message || 'Failed to request payout');
+    }
+  };
+
+  const handleSettingsUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await partnerService.updatePayoutSettings(settingsForm);
+      if (response.success) {
+        setShowSettingsModal(false);
+        fetchAnalytics(); // Refresh to get updated settings
+      }
+    } catch (err: any) {
+      console.error('Error updating settings:', err);
+      alert(err.message || 'Failed to update settings');
+    }
+  };
+
+  // Initialize settings form when analytics loads
+  useEffect(() => {
+    if (analytics?.payoutSettings) {
+      setSettingsForm({
+        minimumPayoutAmount: analytics.payoutSettings.minimumPayoutAmount || 1000,
+        autoPayoutEnabled: analytics.payoutSettings.autoPayoutEnabled || false,
+        payoutSchedule: analytics.payoutSettings.payoutSchedule || 'manual',
+        bankDetails: analytics.payoutSettings.bankDetails || {
+          accountHolderName: '',
+          accountNumber: '',
+          ifscCode: '',
+          bankName: '',
+        },
+        upiId: analytics.payoutSettings.upiId || '',
+      });
+    }
+  }, [analytics]);
+
+  const filteredTransactions = transactions.filter(transaction => {
+    if (statusFilter === 'all') return true;
+    return transaction.status === statusFilter;
+  });
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      completed: { color: 'bg-green-100 text-green-800', icon: <CheckCircle size={12} /> },
+      pending: { color: 'bg-yellow-100 text-yellow-800', icon: <Clock size={12} /> },
+      processing: { color: 'bg-blue-100 text-blue-800', icon: <Clock size={12} /> },
+      failed: { color: 'bg-red-100 text-red-800', icon: <AlertCircle size={12} /> },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+
+    return (
+      <span
+        className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${config.color}`}
+      >
+        {config.icon}
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="text-blue-600 animate-spin" size={48} />
+          <p className="text-gray-700 font-semibold text-lg">Loading payouts...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <PayoutsContainer>
-      <Header>
-        <Title>Payouts & Earnings</Title>
-        <HeaderActions>
-          <Button variant="outline">
-            <Download size={20} />
-            Export Report
-          </Button>
-          <Button>
+    <div className="max-w-7xl mx-auto">
+      {/* Error Banner */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center gap-3">
+            <XCircle size={20} className="text-red-500 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-red-800 font-medium">Unable to load payouts</p>
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+            <button
+              onClick={fetchAnalytics}
+              className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200 transition-colors flex items-center gap-1"
+            >
+              <RefreshCw size={14} />
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-slate-900">Payouts & Earnings</h1>
+        <div className="flex gap-4">
+          <button
+            onClick={() => {
+              initializePayoutForm();
+              setShowPayoutModal(true);
+            }}
+            disabled={
+              !analytics ||
+              analytics.currentBalance < (analytics.payoutSettings?.minimumPayoutAmount || 1000)
+            }
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Plus size={20} />
             Request Payout
-          </Button>
-        </HeaderActions>
-      </Header>
+          </button>
+        </div>
+      </div>
 
-      <StatsGrid>
-        {stats.map((stat, index) => (
-          <StatCard key={index}>
-            <StatHeader>
-              <StatIcon color={stat.color}>{stat.icon}</StatIcon>
-              <StatInfo>
-                <StatValue>{stat.value}</StatValue>
-                <StatLabel>{stat.label}</StatLabel>
-                <StatChange positive={stat.positive}>
-                  {stat.positive ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-                  {stat.change}
-                </StatChange>
-              </StatInfo>
-            </StatHeader>
-          </StatCard>
-        ))}
-      </StatsGrid>
+      {/* Stats Grid */}
+      {analytics && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div className="flex justify-between items-start mb-4">
+              <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center text-white">
+                <DollarSign size={24} />
+              </div>
+            </div>
+            <div>
+              <p className="text-sm text-slate-600 mb-1">Total Earnings</p>
+              <h3 className="text-2xl font-bold text-slate-900">
+                ₹{analytics.totalEarnings.toLocaleString()}
+              </h3>
+            </div>
+          </div>
 
-      <ContentGrid>
-        <Card>
-          <CardHeader>
-            <CardTitle>Payout History</CardTitle>
-            <Button variant="outline" style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}>
-              <Eye size={16} />
-              View All
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <FilterSection>
-              <FilterSelect value={timeFilter} onChange={(e: any) => setTimeFilter(e.target.value)}>
-                <option value="all">All Time</option>
-                <option value="month">This Month</option>
-                <option value="quarter">This Quarter</option>
-                <option value="year">This Year</option>
-              </FilterSelect>
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div className="flex justify-between items-start mb-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center text-white">
+                <TrendingUp size={24} />
+              </div>
+            </div>
+            <div>
+              <p className="text-sm text-slate-600 mb-1">Available Balance</p>
+              <h3 className="text-2xl font-bold text-slate-900">
+                ₹{analytics.currentBalance.toLocaleString()}
+              </h3>
+            </div>
+          </div>
 
-              <FilterSelect value={statusFilter} onChange={(e: any) => setStatusFilter(e.target.value)}>
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div className="flex justify-between items-start mb-4">
+              <div className="w-12 h-12 rounded-xl bg-yellow-500 flex items-center justify-center text-white">
+                <Clock size={24} />
+              </div>
+            </div>
+            <div>
+              <p className="text-sm text-slate-600 mb-1">Pending Payouts</p>
+              <h3 className="text-2xl font-bold text-slate-900">
+                ₹{analytics.pendingAmount.toLocaleString()}
+              </h3>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <div className="flex justify-between items-start mb-4">
+              <div className="w-12 h-12 rounded-xl bg-purple-500 flex items-center justify-center text-white">
+                <Wallet size={24} />
+              </div>
+            </div>
+            <div>
+              <p className="text-sm text-slate-600 mb-1">Total Payouts</p>
+              <h3 className="text-2xl font-bold text-slate-900">
+                ₹{analytics.totalPayouts.toLocaleString()}
+              </h3>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Payout History */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div className="p-6 border-b border-slate-200 flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-slate-900">Payout History</h3>
+          </div>
+
+          <div className="p-6">
+            {/* Filters */}
+            <div className="flex gap-4 mb-6">
+              <select
+                value={timeFilter}
+                onChange={e => setTimeFilter(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+              >
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="90">Last 3 months</option>
+                <option value="365">Last year</option>
+              </select>
+
+              <select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+              >
                 <option value="all">All Status</option>
                 <option value="completed">Completed</option>
                 <option value="pending">Pending</option>
                 <option value="processing">Processing</option>
                 <option value="failed">Failed</option>
-              </FilterSelect>
-            </FilterSection>
+              </select>
+            </div>
 
-            {filteredPayouts.length > 0 ? (
-              filteredPayouts.map(payout => (
-                <PayoutItem key={payout.id}>
-                  <PayoutInfo>
-                    <PayoutDate>
-                      {new Date(payout.date).toLocaleDateString('en-IN', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </PayoutDate>
-                    <PayoutDetails>
-                      {payout.method} • {payout.transactionId}
-                    </PayoutDetails>
-                  </PayoutInfo>
-                  <PayoutAmount>
-                    <Amount>{payout.amount}</Amount>
-                    <StatusBadge status={payout.status}>
-                      {getStatusIcon(payout.status)}
-                      {payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
-                    </StatusBadge>
-                  </PayoutAmount>
-                </PayoutItem>
-              ))
+            {/* Transactions List */}
+            {filteredTransactions.length > 0 ? (
+              <div className="space-y-4">
+                {filteredTransactions.map(transaction => (
+                  <div
+                    key={transaction._id}
+                    className="flex justify-between items-center py-4 border-b border-slate-200 last:border-b-0"
+                  >
+                    <div className="flex flex-col gap-1">
+                      <span className="font-semibold text-slate-900">
+                        {new Date(transaction.createdAt).toLocaleDateString('en-IN', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </span>
+                      <span className="text-sm text-slate-600">
+                        {transaction.paymentMethod} • {transaction.description}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="font-semibold text-slate-900 text-lg">
+                        ₹{Math.abs(transaction.amount).toLocaleString()}
+                      </span>
+                      {getStatusBadge(transaction.status)}
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : (
-              <EmptyState>
-                <EmptyIcon>
-                  <DollarSign size={30} />
-                </EmptyIcon>
-                <h4>No payouts found</h4>
-                <p>Try adjusting your filter criteria</p>
-              </EmptyState>
+              <div className="text-center py-12">
+                <DollarSign size={48} className="mx-auto text-slate-400 mb-4" />
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No payouts found</h3>
+                <p className="text-slate-600">
+                  {transactions.length === 0
+                    ? "You haven't requested any payouts yet."
+                    : 'Try adjusting your filter criteria.'}
+                </p>
+              </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Payment Methods</CardTitle>
-            <Button variant="outline" style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}>
-              <Plus size={16} />
-              Add New
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {paymentMethods.map((method, index) => (
-              <PaymentMethod key={index}>
-                <MethodIcon color={method.color}>{method.icon}</MethodIcon>
-                <MethodInfo>
-                  <MethodTitle>{method.type}</MethodTitle>
-                  <MethodDetails>{method.details}</MethodDetails>
-                </MethodInfo>
-                {method.isDefault && <DefaultBadge>Default</DefaultBadge>}
-              </PaymentMethod>
-            ))}
-          </CardContent>
-        </Card>
-      </ContentGrid>
-    </PayoutsContainer>
+        {/* Payment Methods & Settings */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div className="p-6 border-b border-slate-200 flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-slate-900">Payout Settings</h3>
+            <button
+              onClick={() => setShowSettingsModal(true)}
+              className="px-3 py-1 border border-slate-200 text-slate-700 rounded text-sm hover:bg-slate-50 transition-colors flex items-center gap-1"
+            >
+              <Settings size={14} />
+              Edit
+            </button>
+          </div>
+
+          <div className="p-6">
+            {analytics?.payoutSettings && (
+              <div className="space-y-4">
+                <div className="p-4 border border-slate-200 rounded-lg">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Building2 size={20} className="text-blue-500" />
+                    <h4 className="font-semibold text-slate-900">Bank Transfer</h4>
+                  </div>
+                  <p className="text-sm text-slate-600">
+                    {analytics.payoutSettings.bankDetails?.accountHolderName || 'Not configured'}
+                  </p>
+                  {analytics.payoutSettings.bankDetails?.accountNumber && (
+                    <p className="text-sm text-slate-500">
+                      ****{analytics.payoutSettings.bankDetails.accountNumber.slice(-4)}
+                    </p>
+                  )}
+                </div>
+
+                {analytics.payoutSettings.upiId && (
+                  <div className="p-4 border border-slate-200 rounded-lg">
+                    <div className="flex items-center gap-3 mb-2">
+                      <CreditCard size={20} className="text-green-500" />
+                      <h4 className="font-semibold text-slate-900">UPI</h4>
+                    </div>
+                    <p className="text-sm text-slate-600">{analytics.payoutSettings.upiId}</p>
+                  </div>
+                )}
+
+                <div className="pt-4 border-t border-slate-200">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">Minimum Payout:</span>
+                      <span className="font-medium">
+                        ₹{analytics.payoutSettings.minimumPayoutAmount}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">Auto Payout:</span>
+                      <span className="font-medium">
+                        {analytics.payoutSettings.autoPayoutEnabled ? 'Enabled' : 'Disabled'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Payout Request Modal */}
+      {showPayoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-slate-900">Request Payout</h2>
+              <button
+                onClick={() => setShowPayoutModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {analytics?.payoutSettings &&
+              (analytics.payoutSettings.bankDetails?.accountHolderName ||
+                analytics.payoutSettings.upiId) && (
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <CheckCircle size={16} className="inline mr-1" />
+                    Form pre-filled with your saved payment details
+                  </p>
+                </div>
+              )}
+
+            <form onSubmit={handlePayoutRequest} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Amount (₹)</label>
+                <input
+                  type="number"
+                  required
+                  min={analytics?.payoutSettings?.minimumPayoutAmount || 1000}
+                  max={analytics?.currentBalance || 0}
+                  value={payoutForm.amount}
+                  onChange={e => setPayoutForm({ ...payoutForm, amount: Number(e.target.value) })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  placeholder="Enter amount"
+                />
+                <p className="text-xs text-slate-500 mt-1">
+                  Available: ₹{analytics?.currentBalance.toLocaleString() || 0}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Payment Method
+                </label>
+                <select
+                  value={payoutForm.paymentMethod}
+                  onChange={e => setPayoutForm({ ...payoutForm, paymentMethod: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                >
+                  <option value="Bank Transfer">
+                    Bank Transfer{' '}
+                    {analytics?.payoutSettings?.bankDetails?.accountHolderName ? '✓' : ''}
+                  </option>
+                  <option value="UPI">UPI {analytics?.payoutSettings?.upiId ? '✓' : ''}</option>
+                </select>
+                {analytics?.payoutSettings && (
+                  <p className="text-xs text-slate-500 mt-1">
+                    ✓ indicates saved payment method details are available
+                  </p>
+                )}
+              </div>
+
+              {payoutForm.paymentMethod === 'Bank Transfer' && (
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Account Holder Name"
+                    value={payoutForm.bankDetails?.accountHolderName || ''}
+                    onChange={e =>
+                      setPayoutForm({
+                        ...payoutForm,
+                        bankDetails: {
+                          ...payoutForm.bankDetails!,
+                          accountHolderName: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Account Number"
+                    value={payoutForm.bankDetails?.accountNumber || ''}
+                    onChange={e =>
+                      setPayoutForm({
+                        ...payoutForm,
+                        bankDetails: { ...payoutForm.bankDetails!, accountNumber: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                  <input
+                    type="text"
+                    required
+                    placeholder="IFSC Code"
+                    value={payoutForm.bankDetails?.ifscCode || ''}
+                    onChange={e =>
+                      setPayoutForm({
+                        ...payoutForm,
+                        bankDetails: { ...payoutForm.bankDetails!, ifscCode: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Bank Name"
+                    value={payoutForm.bankDetails?.bankName || ''}
+                    onChange={e =>
+                      setPayoutForm({
+                        ...payoutForm,
+                        bankDetails: { ...payoutForm.bankDetails!, bankName: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              )}
+
+              {payoutForm.paymentMethod === 'UPI' && (
+                <div>
+                  <input
+                    type="text"
+                    required
+                    placeholder="UPI ID (e.g., user@paytm)"
+                    value={payoutForm.upiId || ''}
+                    onChange={e => setPayoutForm({ ...payoutForm, upiId: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowPayoutModal(false)}
+                  className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Save size={16} />
+                  Request Payout
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettingsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-slate-900">Payout Settings</h2>
+              <button
+                onClick={() => setShowSettingsModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSettingsUpdate} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Minimum Payout Amount (₹)
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="1000"
+                  value={settingsForm.minimumPayoutAmount}
+                  onChange={e =>
+                    setSettingsForm({
+                      ...settingsForm,
+                      minimumPayoutAmount: Number(e.target.value),
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="autoPayoutEnabled"
+                  checked={settingsForm.autoPayoutEnabled}
+                  onChange={e =>
+                    setSettingsForm({
+                      ...settingsForm,
+                      autoPayoutEnabled: e.target.checked,
+                    })
+                  }
+                  className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="autoPayoutEnabled" className="text-sm font-medium text-slate-700">
+                  Enable Auto Payout
+                </label>
+              </div>
+
+              {settingsForm.autoPayoutEnabled && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Payout Schedule
+                  </label>
+                  <select
+                    value={settingsForm.payoutSchedule}
+                    onChange={e =>
+                      setSettingsForm({
+                        ...settingsForm,
+                        payoutSchedule: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="manual">Manual</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                  </select>
+                </div>
+              )}
+
+              <div className="border-t border-slate-200 pt-4">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Bank Details</h3>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Account Holder Name"
+                    value={settingsForm.bankDetails.accountHolderName}
+                    onChange={e =>
+                      setSettingsForm({
+                        ...settingsForm,
+                        bankDetails: {
+                          ...settingsForm.bankDetails,
+                          accountHolderName: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Account Number"
+                    value={settingsForm.bankDetails.accountNumber}
+                    onChange={e =>
+                      setSettingsForm({
+                        ...settingsForm,
+                        bankDetails: {
+                          ...settingsForm.bankDetails,
+                          accountNumber: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                  <input
+                    type="text"
+                    placeholder="IFSC Code"
+                    value={settingsForm.bankDetails.ifscCode}
+                    onChange={e =>
+                      setSettingsForm({
+                        ...settingsForm,
+                        bankDetails: {
+                          ...settingsForm.bankDetails,
+                          ifscCode: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Bank Name"
+                    value={settingsForm.bankDetails.bankName}
+                    onChange={e =>
+                      setSettingsForm({
+                        ...settingsForm,
+                        bankDetails: {
+                          ...settingsForm.bankDetails,
+                          bankName: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t border-slate-200 pt-4">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">UPI Details</h3>
+                <input
+                  type="text"
+                  placeholder="UPI ID (e.g., user@paytm)"
+                  value={settingsForm.upiId}
+                  onChange={e =>
+                    setSettingsForm({
+                      ...settingsForm,
+                      upiId: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowSettingsModal(false)}
+                  className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Save size={16} />
+                  Save Settings
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -1604,6 +1604,106 @@ class AdminService {
     }
   }
 
+  // Payout Management
+  async getPendingPayouts(page = 1, limit = 10) {
+    try {
+      const response = await api.get(`/wallet/admin/payouts/pending?page=${page}&limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching pending payouts:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async processPayoutRequest(
+    transactionId: string,
+    status: 'completed' | 'failed',
+    notes?: string
+  ) {
+    try {
+      const response = await api.put(`/wallet/admin/payouts/${transactionId}`, {
+        status,
+        notes,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error processing payout:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getAllPayouts(page = 1, limit = 10, status?: string) {
+    try {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      if (status && status !== 'all') params.append('status', status);
+
+      const response = await api.get(`/wallet/admin/payouts/all?${params}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching all payouts:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  // Agent Management
+  async getAgents(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.status) queryParams.append('status', params.status);
+      if (params.verified !== undefined) queryParams.append('verified', params.verified);
+
+      const response = await api.get(`/admin/agents?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching agents:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async approveAgent(agentId: string) {
+    try {
+      const response = await api.put(`/admin/agents/${agentId}/approve`);
+      return response.data;
+    } catch (error) {
+      console.error('Error approving agent:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async rejectAgent(agentId: string, data: { reason: string }) {
+    try {
+      const response = await api.put(`/admin/agents/${agentId}/reject`, data);
+      return response.data;
+    } catch (error) {
+      console.error('Error rejecting agent:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async toggleAgentStatus(agentId: string, isActive: boolean) {
+    try {
+      const response = await api.put(`/admin/agents/${agentId}/status`, { isActive });
+      return response.data;
+    } catch (error) {
+      console.error('Error toggling agent status:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async toggleUserStatus(userId: string, isActive: boolean) {
+    try {
+      const response = await api.put(`/admin/users/${userId}/status`, { isActive });
+      return response.data;
+    } catch (error) {
+      console.error('Error toggling user status:', error);
+      throw error.response?.data || error;
+    }
+  }
+
   // Logout
   logout() {
     localStorage.removeItem('adminToken');

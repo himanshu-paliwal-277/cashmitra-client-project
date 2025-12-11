@@ -1,11 +1,12 @@
 const Finance = require("../models/finance.model");
+const Transaction = require("../models/transaction.model");
 const { Order } = require("../models/order.model");
 const User = require("../models/user.model");
 const Partner = require("../models/partner.model");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 
-// @desc    Get all financial transactions
+// @desc    Get all financial transactions (Finance + Wallet Transactions)
 // @route   GET /api/admin/finance
 // @access  Private/Admin
 const getFinancialTransactions = async (req, res) => {
@@ -24,62 +25,134 @@ const getFinancialTransactions = async (req, res) => {
       sortOrder = "desc",
     } = req.query;
 
-    // Build filter object
-    const filter = {};
-    if (transactionType) filter.transactionType = transactionType;
-    if (status) filter.status = status;
-    if (category) filter.category = category;
-    if (userId) filter.user = userId;
-    if (partnerId) filter.partner = partnerId;
+    // Build filter object for Finance transactions
+    const financeFilter = {};
+    if (
+      transactionType &&
+      ["commission", "refund", "adjustment", "withdrawal", "deposit"].includes(
+        transactionType
+      )
+    ) {
+      financeFilter.transactionType = transactionType;
+    }
+    if (status) financeFilter.status = status;
+    if (category) financeFilter.category = category;
+    if (userId) financeFilter.user = userId;
+    if (partnerId) financeFilter.partner = partnerId;
+
+    // Build filter object for Wallet transactions
+    const walletFilter = {};
+    if (
+      transactionType &&
+      ["payout", "commission", "wallet_credit", "wallet_debit"].includes(
+        transactionType
+      )
+    ) {
+      walletFilter.transactionType = transactionType;
+    }
+    if (status) walletFilter.status = status;
+    if (userId) walletFilter.user = userId;
+    if (partnerId) walletFilter.partner = partnerId;
 
     // Date range filter
     if (startDate && endDate) {
-      filter.createdAt = {
+      const dateFilter = {
         $gte: new Date(startDate),
         $lte: new Date(endDate),
       };
+      financeFilter.createdAt = dateFilter;
+      walletFilter.createdAt = dateFilter;
     }
 
-    // Calculate pagination
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
-
-    // Get transactions with population
-    const transactions = await Finance.find(filter)
+    // Get Finance transactions
+    const financeTransactions = await Finance.find(financeFilter)
       .populate("order", "orderType totalAmount")
       .populate("user", "name email")
       .populate("partner", "shopName shopEmail businessName email")
       .populate("processedBy", "name email")
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(parseInt(limit));
+      .lean();
 
-    // Get total count
-    const total = await Finance.countDocuments(filter);
+    // Get Wallet transactions
+    const walletTransactions = await Transaction.find(walletFilter)
+      .populate("order", "orderType totalAmount")
+      .populate("user", "name email")
+      .populate("partner", "shopName shopEmail businessName email")
+      .lean();
 
-    // Calculate summary stats
-    const summaryStats = await Finance.aggregate([
-      { $match: filter },
-      {
-        $group: {
-          _id: null,
-          totalAmount: { $sum: "$amount" },
-          totalCommission: { $sum: "$commission.amount" },
-          avgAmount: { $avg: "$amount" },
-          transactionCount: { $sum: 1 },
-        },
+    // Merge and normalize transactions
+    const allTransactions = [
+      ...financeTransactions.map((t) => ({
+        ...t,
+        source: "finance",
+        // Normalize fields for consistent display
+        paymentMethod: t.paymentMethod || "N/A",
+        description: t.description || `${t.transactionType} transaction`,
+      })),
+      ...walletTransactions.map((t) => ({
+        ...t,
+        source: "wallet",
+        // Normalize fields for consistent display
+        category: t.transactionType,
+        description: t.description || `${t.transactionType} transaction`,
+      })),
+    ];
+
+    // Sort merged transactions
+    const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
+    allTransactions.sort((a, b) => {
+      const aValue = a[sortBy];
+      const bValue = b[sortBy];
+
+      if (sortBy === "createdAt") {
+        return sortOrder === "desc"
+          ? new Date(bValue) - new Date(aValue)
+          : new Date(aValue) - new Date(bValue);
+      }
+
+      if (sortOrder === "desc") {
+        return bValue > aValue ? 1 : -1;
+      } else {
+        return aValue > bValue ? 1 : -1;
+      }
+    });
+
+    // Apply pagination to merged results
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const paginatedTransactions = allTransactions.slice(
+      skip,
+      skip + parseInt(limit)
+    );
+    const total = allTransactions.length;
+
+    // Calculate summary stats from merged transactions
+    const summaryStats = allTransactions.reduce(
+      (acc, transaction) => {
+        acc.totalAmount += transaction.amount || 0;
+        acc.totalCommission += transaction.commission?.amount || 0;
+        acc.transactionCount += 1;
+        return acc;
       },
-    ]);
+      {
+        totalAmount: 0,
+        totalCommission: 0,
+        transactionCount: 0,
+      }
+    );
+
+    summaryStats.avgAmount =
+      summaryStats.transactionCount > 0
+        ? summaryStats.totalAmount / summaryStats.transactionCount
+        : 0;
 
     res.json({
-      transactions,
+      transactions: paginatedTransactions,
       pagination: {
         current: parseInt(page),
         pages: Math.ceil(total / parseInt(limit)),
         total,
         limit: parseInt(limit),
       },
-      summary: summaryStats[0] || {
+      summary: summaryStats || {
         totalAmount: 0,
         totalCommission: 0,
         avgAmount: 0,

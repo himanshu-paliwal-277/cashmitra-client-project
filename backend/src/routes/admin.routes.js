@@ -497,6 +497,16 @@ router.delete(
   asyncHandler(adminController.deleteUser)
 );
 
+// Toggle user active status
+router.put(
+  "/users/:id/status",
+  [check("isActive").isBoolean().withMessage("isActive must be a boolean")],
+  protect,
+  authorize("admin"),
+  validateRequest,
+  asyncHandler(adminController.toggleUserStatus)
+);
+
 // Category Management Routes
 router.get("/categories", asyncHandler(categoryController.getCategories));
 
@@ -987,6 +997,43 @@ router.delete(
   authorize("admin"),
   validateRequest,
   asyncHandler(adminController.deleteConditionQuestionnaire)
+);
+
+// Agent Management Routes
+// Get all agents
+router.get(
+  "/agents",
+  protect,
+  authorize("admin"),
+  asyncHandler(adminController.getAgents)
+);
+
+// Approve agent
+router.put(
+  "/agents/:id/approve",
+  protect,
+  authorize("admin"),
+  asyncHandler(adminController.approveAgent)
+);
+
+// Reject agent
+router.put(
+  "/agents/:id/reject",
+  [check("reason").notEmpty().withMessage("Rejection reason is required")],
+  protect,
+  authorize("admin"),
+  validateRequest,
+  asyncHandler(adminController.rejectAgent)
+);
+
+// Toggle agent status
+router.put(
+  "/agents/:id/status",
+  [check("isActive").isBoolean().withMessage("isActive must be a boolean")],
+  protect,
+  authorize("admin"),
+  validateRequest,
+  asyncHandler(adminController.toggleAgentStatus)
 );
 
 // Use sub-routes

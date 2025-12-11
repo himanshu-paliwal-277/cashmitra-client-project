@@ -230,6 +230,16 @@ const UserManagement = () => {
     }
   };
 
+  const handleToggleUserStatus = async (userId: string, newActiveStatus: boolean) => {
+    try {
+      await adminService.toggleUserStatus(userId, newActiveStatus);
+      fetchUsers(); // Refresh the list
+    } catch (error) {
+      console.error('Error toggling user active status:', error);
+      alert('Failed to update user active status. Please try again.');
+    }
+  };
+
   const getUserInitials = (name: string) => {
     return name
       .split(' ')
@@ -413,6 +423,9 @@ const UserManagement = () => {
                     Status
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Active
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Phone
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -465,6 +478,17 @@ const UserManagement = () => {
                           </>
                         )}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={user.isActive !== false}
+                          onChange={() => handleToggleUserStatus(user._id, !user.isActive)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">{user.phone || 'N/A'}</td>
                     <td className="px-6 py-4 text-sm text-gray-500">
