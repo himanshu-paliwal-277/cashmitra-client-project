@@ -113,7 +113,69 @@ router.get(
 router.post(
   "/partners",
   [
-    check("userId").isMongoId().withMessage("Valid user ID is required"),
+    // Custom validation to ensure either userId OR user details are provided
+    check("userId").custom((value, { req }) => {
+      // If userId is provided, it must be a valid MongoDB ID
+      if (value && value.trim()) {
+        if (!value.match(/^[0-9a-fA-F]{24}$/)) {
+          throw new Error("Valid user ID is required");
+        }
+        return true;
+      }
+
+      // If no userId, then user details are required
+      const { name, email, phone, password } = req.body;
+      if (!name || !email || !phone || !password) {
+        throw new Error(
+          "Either userId or complete user details (name, email, phone, password) are required"
+        );
+      }
+
+      return true;
+    }),
+
+    // User details (required when userId is not provided)
+    check("name").custom((value, { req }) => {
+      // Only validate if userId is not provided
+      if (!req.body.userId || !req.body.userId.trim()) {
+        if (!value || value.trim().length < 2 || value.trim().length > 100) {
+          throw new Error("Name must be between 2 and 100 characters");
+        }
+      }
+      return true;
+    }),
+
+    check("email").custom((value, { req }) => {
+      // Only validate if userId is not provided
+      if (!req.body.userId || !req.body.userId.trim()) {
+        if (!value || !/\S+@\S+\.\S+/.test(value)) {
+          throw new Error("Valid email is required");
+        }
+      }
+      return true;
+    }),
+
+    check("phone").custom((value, { req }) => {
+      // Only validate if userId is not provided
+      if (!req.body.userId || !req.body.userId.trim()) {
+        if (!value || value.length < 10) {
+          throw new Error("Valid phone number is required");
+        }
+      }
+      return true;
+    }),
+
+    check("password").custom((value, { req }) => {
+      // Only validate if userId is not provided
+      if (!req.body.userId || !req.body.userId.trim()) {
+        if (!value || value.length < 6) {
+          throw new Error("Password must be at least 6 characters long");
+        }
+      }
+      return true;
+    }),
+
+    // Partner details (always required)
     check("shopName")
       .trim()
       .isLength({ min: 2, max: 100 })
@@ -126,11 +188,7 @@ router.post(
     check("shopAddress.pincode")
       .isLength({ min: 6, max: 6 })
       .withMessage("Pincode must be 6 digits"),
-    // check('gstNumber').matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).withMessage('Invalid GST number format'),
-    // check('shopPhone').isMobilePhone('en-IN').withMessage('Valid Indian phone number is required'),
-    check("shopEmail").isEmail().withMessage("Valid email is required"),
-    // check('bankDetails.accountNumber').optional().isLength({ min: 9, max: 18 }).withMessage('Invalid account number'),
-    // check('bankDetails.ifscCode').optional().matches(/^[A-Z]{4}0[A-Z0-9]{6}$/).withMessage('Invalid IFSC code'),
+    check("shopEmail").isEmail().withMessage("Valid shop email is required"),
     check("upiId")
       .optional()
       .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/)
@@ -219,6 +277,22 @@ router.put(
   authorize("admin"),
   validateRequest,
   asyncHandler(adminController.verifyPartner)
+);
+
+// Update partner wallet balance
+router.post(
+  "/partners/:id/wallet/update",
+  [
+    check("amount").isNumeric().withMessage("Amount must be a number"),
+    check("reason").notEmpty().withMessage("Reason is required"),
+    check("type")
+      .isIn(["credit", "debit"])
+      .withMessage("Type must be credit or debit"),
+  ],
+  protect,
+  authorize("admin"),
+  validateRequest,
+  asyncHandler(adminController.updatePartnerWallet)
 );
 
 // Order Management Routes
@@ -423,6 +497,16 @@ router.delete(
   asyncHandler(adminController.deleteUser)
 );
 
+// Toggle user active status
+router.put(
+  "/users/:id/status",
+  [check("isActive").isBoolean().withMessage("isActive must be a boolean")],
+  protect,
+  authorize("admin"),
+  validateRequest,
+  asyncHandler(adminController.toggleUserStatus)
+);
+
 // Category Management Routes
 router.get("/categories", asyncHandler(categoryController.getCategories));
 
@@ -536,6 +620,14 @@ router.put(
   authorize("admin"),
   validateRequest,
   asyncHandler(adminController.updateOrderStatus)
+);
+
+// Get Partner Suggestions for Order Assignment
+router.get(
+  "/orders/:id/partner-suggestions",
+  protect,
+  authorize("admin"),
+  asyncHandler(adminController.getPartnerSuggestionsForOrder)
 );
 
 // Assign Partner to Order
@@ -913,6 +1005,43 @@ router.delete(
   authorize("admin"),
   validateRequest,
   asyncHandler(adminController.deleteConditionQuestionnaire)
+);
+
+// Agent Management Routes
+// Get all agents
+router.get(
+  "/agents",
+  protect,
+  authorize("admin"),
+  asyncHandler(adminController.getAgents)
+);
+
+// Approve agent
+router.put(
+  "/agents/:id/approve",
+  protect,
+  authorize("admin"),
+  asyncHandler(adminController.approveAgent)
+);
+
+// Reject agent
+router.put(
+  "/agents/:id/reject",
+  [check("reason").notEmpty().withMessage("Rejection reason is required")],
+  protect,
+  authorize("admin"),
+  validateRequest,
+  asyncHandler(adminController.rejectAgent)
+);
+
+// Toggle agent status
+router.put(
+  "/agents/:id/status",
+  [check("isActive").isBoolean().withMessage("isActive must be a boolean")],
+  protect,
+  authorize("admin"),
+  validateRequest,
+  asyncHandler(adminController.toggleAgentStatus)
 );
 
 // Use sub-routes

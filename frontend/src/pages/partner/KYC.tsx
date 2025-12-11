@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect } from 'react';
 import {
   Shield,
   CheckCircle,
@@ -9,725 +8,494 @@ import {
   Eye,
   Download,
   User,
-  Building,
   FileText,
-  Camera,
-  Phone,
-  Mail,
-  MapPin,
-  Calendar,
-  CreditCard,
-  Briefcase,
-  Star,
   ArrowRight,
   X,
+  Loader2,
+  RefreshCw,
 } from 'lucide-react';
+import partnerService from '../../services/partnerService';
+import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
 
-const KYCContainer = styled.div`
-  min-height: 100vh;
-  background: ${(props: any) => props.theme.colors.background};
-`;
+interface DocumentData {
+  gstCertificate: string;
+  shopLicense: string;
+  ownerIdProof: string;
+  additionalDocuments: string[];
+}
 
-const Header = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme.colors.text};
-  margin-bottom: 0.5rem;
-`;
-
-const Subtitle = styled.p`
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  font-size: 1rem;
-`;
-
-const StatusCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 2rem;
-  margin-bottom: 2rem;
-  text-align: center;
-`;
-
-const StatusIcon = styled.div`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  margin: 0 auto 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: ${(props: any) => {
-    switch (props.status) {
-      case 'verified':
-        return '#D1FAE5';
-      case 'pending':
-        return '#FEF3C7';
-      case 'rejected':
-        return '#FEE2E2';
-      default:
-        return '#F3F4F6';
-    }
-  }};
-  color: ${(props: any) => {
-    switch (props.status) {
-      case 'verified':
-        return '#065F46';
-      case 'pending':
-        return '#92400E';
-      case 'rejected':
-        return '#991B1B';
-      default:
-        return '#374151';
-    }
-  }};
-`;
-
-const StatusTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme.colors.text};
-  margin-bottom: 0.5rem;
-`;
-
-const StatusDescription = styled.p`
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  margin-bottom: 1.5rem;
-`;
-
-const Button = styled.button`
-  background: ${(props: any) =>
-    props.variant === 'outline' ? 'transparent' : props.theme.colors.primary};
-  color: ${(props: any) => (props.variant === 'outline' ? props.theme.colors.primary : 'white')};
-  border: 1px solid ${(props: any) => props.theme.colors.primary};
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  &:hover {
-    background: ${(props: any) =>
-      props.variant === 'outline' ? props.theme.colors.primary : props.theme.colors.primaryDark};
-    color: white;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const ProgressSection = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 2rem;
-  margin-bottom: 2rem;
-`;
-
-const ProgressHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
-
-const ProgressTitle = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const ProgressBar = styled.div`
-  width: 100%;
-  height: 8px;
-  background: ${(props: any) => props.theme.colors.background};
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 2rem;
-`;
-
-const ProgressFill = styled.div`
-  height: 100%;
-  background: ${(props: any) => props.theme.colors.primary};
-  width: ${(props: any) => props.progress}%;
-  transition: width 0.3s ease;
-`;
-
-const StepsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-`;
-
-const StepCard = styled.div`
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 8px;
-  padding: 1.5rem;
-  position: relative;
-  background: ${(props: any) => (props.completed ? '#F0FDF4' : 'white')};
-  border-color: ${(props: any) => (props.completed ? '#10B981' : props.theme.colors.border)};
-`;
-
-const StepHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const StepIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: ${(props: any) => (props.completed ? '#10B981' : props.theme.colors.primary)};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const StepInfo = styled.div`
-  flex: 1;
-`;
-
-const StepTitle = styled.h4`
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-  margin: 0 0 0.25rem 0;
-`;
-
-const StepDescription = styled.p`
-  font-size: 0.875rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  margin: 0;
-`;
-
-const StepStatus = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: ${(props: any) => {
-    switch (props.status) {
-      case 'completed':
-        return '#10B981';
-      case 'pending':
-        return '#F59E0B';
-      case 'rejected':
-        return '#EF4444';
-      default:
-        return props.theme.colors.textSecondary;
-    }
-  }};
-`;
-
-const FormSection = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
-`;
-
-const FormHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid ${(props: any) => props.theme.colors.border};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const FormTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const FormContent = styled.div`
-  padding: 1.5rem;
-`;
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-  color: ${(props: any) => props.theme.colors.text};
-  font-size: 0.875rem;
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 6px;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => props.theme.colors.primary};
-  }
-
-  &:disabled {
-    background: ${(props: any) => props.theme.colors.background};
-    cursor: not-allowed;
-  }
-`;
-
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 6px;
-  font-size: 0.875rem;
-  background: white;
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => props.theme.colors.primary};
-  }
-
-  &:disabled {
-    background: ${(props: any) => props.theme.colors.background};
-    cursor: not-allowed;
-  }
-`;
-
-const UploadArea = styled.div`
-  border: 2px dashed ${(props: any) => props.theme.colors.border};
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: ${(props: any) => props.theme.colors.primary};
-    background: ${(props: any) => props.theme.colors.background};
-  }
-`;
-
-const UploadIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: ${(props: any) => props.theme.colors.background};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
-const UploadText = styled.p`
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  margin: 0;
-`;
-
-const DocumentList = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-`;
-
-const DocumentItem = styled.div`
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 8px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  text-align: center;
-`;
-
-const DocumentIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: ${(props: any) => props.theme.colors.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const DocumentName = styled.span`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const DocumentActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const IconButton = styled.button`
-  background: none;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 4px;
-  padding: 0.25rem;
-  cursor: pointer;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: ${(props: any) => props.theme.colors.primary};
-    color: ${(props: any) => props.theme.colors.primary};
-  }
-`;
+interface PartnerProfile {
+  _id: string;
+  shopName: string;
+  shopEmail: string;
+  isVerified: boolean;
+  verificationStatus: 'pending' | 'approved' | 'rejected' | 'submitted';
+  documents: DocumentData;
+}
 
 function PartnerKYC() {
+  const { partner } = usePartnerAuth() as any;
+  const [profile, setProfile] = useState<PartnerProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
-  const [kycStatus, setKycStatus] = useState('pending'); // 'not_started', 'pending', 'verified', 'rejected'
 
-  const [personalInfo, setPersonalInfo] = useState({
-    fullName: 'Rajesh Kumar',
-    email: 'rajesh@example.com',
-    phone: '+91 9876543210',
-    dateOfBirth: '1985-06-15',
-    gender: 'male',
-    address: '123 MG Road, Bangalore',
-    city: 'Bangalore',
-    state: 'Karnataka',
-    pincode: '560001',
+  const [documents, setDocuments] = useState<DocumentData>({
+    gstCertificate: '',
+    shopLicense: '',
+    ownerIdProof: '',
+    additionalDocuments: [],
   });
 
-  const [businessInfo, setBusinessInfo] = useState({
-    businessName: 'Kumar Electronics',
-    businessType: 'retail',
-    gstNumber: '29ABCDE1234F1Z5',
-    panNumber: 'ABCDE1234F',
-    businessAddress: '456 Commercial Street, Bangalore',
-    yearsInBusiness: '5',
-  });
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await partnerService.getProfile();
+
+      if (response.success) {
+        setProfile(response.data);
+        setDocuments(
+          response.data.documents || {
+            gstCertificate: '',
+            shopLicense: '',
+            ownerIdProof: '',
+            additionalDocuments: [],
+          }
+        );
+      }
+    } catch (err: any) {
+      console.error('Error fetching profile:', err);
+      setError(err.message || 'Failed to load profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDocumentUpload = async (documentType: keyof DocumentData, file: File) => {
+    try {
+      setUploading(true);
+
+      // Upload file to server
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const uploadResponse = await fetch('/api/upload/image', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('partnerToken')}`,
+        },
+        body: formData,
+      });
+
+      const uploadResult = await uploadResponse.json();
+
+      if (!uploadResult.success) {
+        throw new Error(uploadResult.message || 'Failed to upload file');
+      }
+
+      const fileUrl = uploadResult.data.url;
+
+      const updatedDocuments = {
+        ...documents,
+        [documentType]: fileUrl,
+      };
+
+      const response = await partnerService.uploadDocuments(updatedDocuments);
+
+      if (response.success) {
+        setDocuments(updatedDocuments);
+        setProfile(response.data);
+      }
+    } catch (err: any) {
+      console.error('Error uploading document:', err);
+      alert(err.message || 'Failed to upload document');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const getVerificationStatus = () => {
+    if (!profile) return 'not_started';
+    return profile.verificationStatus;
+  };
+
+  const getStatusInfo = () => {
+    const status = getVerificationStatus();
+    switch (status) {
+      case 'approved':
+        return {
+          icon: <CheckCircle size={48} className="text-green-500" />,
+          title: 'KYC Verified',
+          description:
+            'Your account has been successfully verified. You can now access all partner features.',
+          bgColor: 'bg-green-50',
+          borderColor: 'border-green-200',
+        };
+      case 'submitted':
+        return {
+          icon: <Clock size={48} className="text-yellow-500" />,
+          title: 'KYC Under Review',
+          description:
+            'Your documents are being reviewed. This process usually takes 2-3 business days.',
+          bgColor: 'bg-yellow-50',
+          borderColor: 'border-yellow-200',
+        };
+      case 'rejected':
+        return {
+          icon: <AlertCircle size={48} className="text-red-500" />,
+          title: 'KYC Rejected',
+          description:
+            'Some documents need to be resubmitted. Please check the requirements and try again.',
+          bgColor: 'bg-red-50',
+          borderColor: 'border-red-200',
+        };
+      default:
+        return {
+          icon: <Shield size={48} className="text-blue-500" />,
+          title: 'Complete Your KYC',
+          description: 'Please complete your KYC verification to access all partner features.',
+          bgColor: 'bg-blue-50',
+          borderColor: 'border-blue-200',
+        };
+    }
+  };
 
   const steps = [
     {
       id: 1,
-      title: 'Personal Information',
-      description: 'Basic personal details and contact information',
+      title: 'Profile Review',
+      description: 'Review your profile information',
       icon: <User size={20} />,
-      status: 'completed',
-      completed: true,
+      completed: !!profile?.shopName,
     },
     {
       id: 2,
-      title: 'Business Information',
-      description: 'Business details and registration information',
-      icon: <Building size={20} />,
-      status: 'completed',
-      completed: true,
+      title: 'Document Upload',
+      description: 'Upload required documents',
+      icon: <FileText size={20} />,
+      completed: !!(documents.gstCertificate && documents.shopLicense && documents.ownerIdProof),
     },
     {
       id: 3,
-      title: 'Document Upload',
-      description: 'Upload required documents for verification',
-      icon: <FileText size={20} />,
-      status: 'pending',
-      completed: false,
-    },
-    {
-      id: 4,
       title: 'Verification',
-      description: 'Final verification and approval process',
+      description: 'Submit for verification',
       icon: <Shield size={20} />,
-      status: 'not_started',
-      completed: false,
+      completed: getVerificationStatus() === 'approved',
     },
   ];
 
-  const documents = [
-    {
-      name: 'Aadhar Card',
-      uploaded: true,
-      status: 'verified',
-    },
-    {
-      name: 'PAN Card',
-      uploaded: true,
-      status: 'verified',
-    },
-    {
-      name: 'GST Certificate',
-      uploaded: true,
-      status: 'pending',
-    },
-    {
-      name: 'Bank Statement',
-      uploaded: false,
-      status: 'not_uploaded',
-    },
-    {
-      name: 'Business License',
-      uploaded: false,
-      status: 'not_uploaded',
-    },
-    {
-      name: 'Profile Photo',
-      uploaded: true,
-      status: 'verified',
-    },
-  ];
+  const DocumentUploadCard = ({
+    title,
+    documentType,
+    currentUrl,
+    description,
+  }: {
+    title: string;
+    documentType: keyof DocumentData;
+    currentUrl: string;
+    description: string;
+  }) => (
+    <div className="border border-slate-200 rounded-lg p-6">
+      <h4 className="font-semibold text-slate-900 mb-2">{title}</h4>
+      <p className="text-sm text-slate-600 mb-4">{description}</p>
 
-  const getStatusIcon = (status: any) => {
-    switch (status) {
-      case 'verified':
-        return <CheckCircle size={40} />;
-      case 'pending':
-        return <Clock size={40} />;
-      case 'rejected':
-        return <AlertCircle size={40} />;
-      default:
-        return <Shield size={40} />;
-    }
-  };
+      {currentUrl ? (
+        <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center gap-3">
+            <CheckCircle size={20} className="text-green-500" />
+            <span className="text-sm font-medium text-green-700">Document uploaded</span>
+          </div>
+          <div className="flex gap-2">
+            <button className="p-1 text-green-600 hover:text-green-800">
+              <Eye size={16} />
+            </button>
+            <button className="p-1 text-green-600 hover:text-green-800">
+              <Download size={16} />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+          <input
+            type="file"
+            id={documentType}
+            className="hidden"
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={e => {
+              const file = e.target.files?.[0];
+              if (file) {
+                handleDocumentUpload(documentType, file);
+              }
+            }}
+          />
+          <label htmlFor={documentType} className="cursor-pointer">
+            <Upload size={32} className="mx-auto text-slate-400 mb-2" />
+            <p className="text-sm font-medium text-slate-700">Click to upload</p>
+            <p className="text-xs text-slate-500">PDF, JPG, PNG up to 5MB</p>
+          </label>
+        </div>
+      )}
+    </div>
+  );
 
-  const getStatusText = (status: any) => {
-    switch (status) {
-      case 'verified':
-        return {
-          title: 'KYC Verified',
-          description:
-            'Your account has been successfully verified. You can now access all partner features.',
-        };
-      case 'pending':
-        return {
-          title: 'KYC Under Review',
-          description:
-            'Your documents are being reviewed. This process usually takes 2-3 business days.',
-        };
-      case 'rejected':
-        return {
-          title: 'KYC Rejected',
-          description:
-            'Some documents need to be resubmitted. Please check the requirements and try again.',
-        };
-      default:
-        return {
-          title: 'Complete Your KYC',
-          description: 'Please complete your KYC verification to access all partner features.',
-        };
-    }
-  };
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="text-blue-600 animate-spin" size={48} />
+          <p className="text-gray-700 font-semibold text-lg">Loading KYC information...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const completedSteps = steps.filter(step => step.completed).length;
-  const progress = (completedSteps / steps.length) * 100;
+  const statusInfo = getStatusInfo();
 
   return (
-    <KYCContainer>
-      <Header>
-        <Title>KYC Verification</Title>
-        <Subtitle>Complete your verification to unlock all partner features</Subtitle>
-      </Header>
+    <div className="max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">KYC Verification</h1>
+        <p className="text-slate-600">Complete your verification to unlock all partner features</p>
+      </div>
 
-      <StatusCard>
-        <StatusIcon status={kycStatus}>{getStatusIcon(kycStatus)}</StatusIcon>
-        <StatusTitle>{getStatusText(kycStatus).title}</StatusTitle>
-        <StatusDescription>{getStatusText(kycStatus).description}</StatusDescription>
-        {kycStatus === 'rejected' && (
-          <Button>
-            <ArrowRight size={20} />
+      {/* Status Card */}
+      <div
+        className={`${statusInfo.bgColor} ${statusInfo.borderColor} border rounded-xl p-8 mb-8 text-center`}
+      >
+        <div className="mb-4 flex justify-center items-center">{statusInfo.icon}</div>
+        <h2 className="text-2xl font-bold text-slate-900 mb-2">{statusInfo.title}</h2>
+        <p className="text-slate-600 mb-4">{statusInfo.description}</p>
+
+        {getVerificationStatus() === 'rejected' && (
+          <button
+            onClick={() => setCurrentStep(2)}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            <RefreshCw size={20} />
             Resubmit Documents
-          </Button>
+          </button>
         )}
-      </StatusCard>
+      </div>
 
-      <ProgressSection>
-        <ProgressHeader>
-          <ProgressTitle>Verification Progress</ProgressTitle>
-          <span style={{ color: '#6B7280', fontSize: '0.875rem' }}>
-            {completedSteps} of {steps.length} completed
-          </span>
-        </ProgressHeader>
-
-        <ProgressBar>
-          <ProgressFill progress={progress} />
-        </ProgressBar>
-
-        <StepsContainer>
-          {steps.map(step => (
-            <StepCard key={step.id} completed={step.completed}>
-              <StepHeader>
-                <StepIcon completed={step.completed}>
+      {/* Progress Steps */}
+      {(getVerificationStatus() === 'pending' || getVerificationStatus() === 'rejected') && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between relative">
+            <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-200 -z-10"></div>
+            {steps.map((step, index) => (
+              <div
+                key={step.id}
+                className={`flex flex-col items-center cursor-pointer ${
+                  currentStep === step.id
+                    ? 'text-blue-600'
+                    : step.completed
+                      ? 'text-green-600'
+                      : 'text-slate-400'
+                }`}
+                onClick={() => setCurrentStep(step.id)}
+              >
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+                    currentStep === step.id
+                      ? 'bg-blue-500 text-white'
+                      : step.completed
+                        ? 'bg-green-500 text-white'
+                        : 'bg-slate-200 text-slate-500'
+                  }`}
+                >
                   {step.completed ? <CheckCircle size={20} /> : step.icon}
-                </StepIcon>
-                <StepInfo>
-                  <StepTitle>{step.title}</StepTitle>
-                  <StepDescription>{step.description}</StepDescription>
-                </StepInfo>
-              </StepHeader>
-              <StepStatus status={step.status}>
-                {step.status === 'completed' && <CheckCircle size={16} />}
-                {step.status === 'pending' && <Clock size={16} />}
-                {step.status === 'rejected' && <AlertCircle size={16} />}
-                {step.status.charAt(0).toUpperCase() + step.status.slice(1).replace('_', ' ')}
-              </StepStatus>
-            </StepCard>
-          ))}
-        </StepsContainer>
-      </ProgressSection>
-
-      <FormSection>
-        <FormHeader>
-          <FormTitle>Personal Information</FormTitle>
-          <Button variant="outline" style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}>
-            Edit
-          </Button>
-        </FormHeader>
-        <FormContent>
-          <FormGrid>
-            <FormGroup>
-              <Label>Full Name</Label>
-              <Input type="text" value={personalInfo.fullName} disabled />
-            </FormGroup>
-            <FormGroup>
-              <Label>Email Address</Label>
-              <Input type="email" value={personalInfo.email} disabled />
-            </FormGroup>
-            <FormGroup>
-              <Label>Phone Number</Label>
-              <Input type="tel" value={personalInfo.phone} disabled />
-            </FormGroup>
-            <FormGroup>
-              <Label>Date of Birth</Label>
-              <Input type="date" value={personalInfo.dateOfBirth} disabled />
-            </FormGroup>
-            <FormGroup>
-              <Label>Gender</Label>
-              <Select value={personalInfo.gender} disabled>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </Select>
-            </FormGroup>
-            <FormGroup>
-              <Label>City</Label>
-              <Input type="text" value={personalInfo.city} disabled />
-            </FormGroup>
-          </FormGrid>
-        </FormContent>
-      </FormSection>
-
-      <FormSection>
-        <FormHeader>
-          <FormTitle>Business Information</FormTitle>
-          <Button variant="outline" style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}>
-            Edit
-          </Button>
-        </FormHeader>
-        <FormContent>
-          <FormGrid>
-            <FormGroup>
-              <Label>Business Name</Label>
-              <Input type="text" value={businessInfo.businessName} disabled />
-            </FormGroup>
-            <FormGroup>
-              <Label>Business Type</Label>
-              <Select value={businessInfo.businessType} disabled>
-                <option value="retail">Retail</option>
-                <option value="wholesale">Wholesale</option>
-                <option value="manufacturer">Manufacturer</option>
-                <option value="service">Service Provider</option>
-              </Select>
-            </FormGroup>
-            <FormGroup>
-              <Label>GST Number</Label>
-              <Input type="text" value={businessInfo.gstNumber} disabled />
-            </FormGroup>
-            <FormGroup>
-              <Label>PAN Number</Label>
-              <Input type="text" value={businessInfo.panNumber} disabled />
-            </FormGroup>
-            <FormGroup>
-              <Label>Years in Business</Label>
-              <Input type="text" value={businessInfo.yearsInBusiness} disabled />
-            </FormGroup>
-          </FormGrid>
-        </FormContent>
-      </FormSection>
-
-      <FormSection>
-        <FormHeader>
-          <FormTitle>Document Upload</FormTitle>
-          <Button variant="outline" style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}>
-            <Upload size={16} />
-            Upload New
-          </Button>
-        </FormHeader>
-        <FormContent>
-          <DocumentList>
-            {documents.map((doc, index) => (
-              <DocumentItem key={index}>
-                <DocumentIcon>
-                  {doc.uploaded ? <FileText size={20} /> : <Upload size={20} />}
-                </DocumentIcon>
-                <DocumentName>{doc.name}</DocumentName>
-                <StepStatus status={doc.status}>
-                  {doc.status === 'verified' && <CheckCircle size={12} />}
-                  {doc.status === 'pending' && <Clock size={12} />}
-                  {doc.status === 'not_uploaded' && <Upload size={12} />}
-                  {doc.status === 'verified'
-                    ? 'Verified'
-                    : doc.status === 'pending'
-                      ? 'Pending'
-                      : 'Upload'}
-                </StepStatus>
-                {doc.uploaded && (
-                  <DocumentActions>
-                    <IconButton>
-                      <Eye size={14} />
-                    </IconButton>
-                    <IconButton>
-                      <Download size={14} />
-                    </IconButton>
-                    <IconButton>
-                      <X size={14} />
-                    </IconButton>
-                  </DocumentActions>
-                )}
-              </DocumentItem>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium">{step.title}</p>
+                  <p className="text-xs text-slate-500">{step.description}</p>
+                </div>
+              </div>
             ))}
-          </DocumentList>
+          </div>
+        </div>
+      )}
 
-          {!documents.every(doc => doc.uploaded) && (
-            <UploadArea style={{ marginTop: '2rem' }}>
-              <UploadIcon>
-                <Upload size={24} />
-              </UploadIcon>
-              <UploadText>
-                <strong>Click to upload</strong> or drag and drop
-                <br />
-                PDF, JPG, PNG up to 10MB
-              </UploadText>
-            </UploadArea>
+      {/* Step Content */}
+      {(getVerificationStatus() === 'pending' || getVerificationStatus() === 'rejected') && (
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+          {currentStep === 1 && (
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Profile Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Shop Name</label>
+                  <input
+                    type="text"
+                    value={profile?.shopName || ''}
+                    disabled
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Shop Email
+                  </label>
+                  <input
+                    type="email"
+                    value={profile?.shopEmail || ''}
+                    disabled
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-600"
+                  />
+                </div>
+              </div>
+              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  <strong>Note:</strong> Your profile information is automatically populated from
+                  your registration. If you need to make changes, please contact support.
+                </p>
+              </div>
+            </div>
           )}
-        </FormContent>
-      </FormSection>
-    </KYCContainer>
+
+          {currentStep === 2 && (
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Document Upload</h3>
+              <div className="grid gap-6">
+                <DocumentUploadCard
+                  title="GST Certificate"
+                  documentType="gstCertificate"
+                  currentUrl={documents.gstCertificate}
+                  description="Upload your valid GST registration certificate"
+                />
+                <DocumentUploadCard
+                  title="Shop License"
+                  documentType="shopLicense"
+                  currentUrl={documents.shopLicense}
+                  description="Upload your shop/trade license or establishment certificate"
+                />
+                <DocumentUploadCard
+                  title="Owner ID Proof"
+                  documentType="ownerIdProof"
+                  currentUrl={documents.ownerIdProof}
+                  description="Upload Aadhar Card, PAN Card, or Passport"
+                />
+              </div>
+            </div>
+          )}
+
+          {currentStep === 3 && (
+            <div className="p-6 text-center">
+              <Shield size={64} className="mx-auto text-blue-500 mb-4" />
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">Ready for Verification</h3>
+              <p className="text-slate-600 mb-6">
+                Review your information and submit for verification. Our team will review your
+                documents within 2-3 business days.
+              </p>
+
+              <div className="bg-slate-50 rounded-lg p-4 mb-6">
+                <h4 className="font-medium text-slate-900 mb-2">Documents Submitted:</h4>
+                <div className="space-y-2 text-sm text-slate-600">
+                  <div className="flex items-center gap-2">
+                    {documents.gstCertificate ? (
+                      <CheckCircle size={16} className="text-green-500" />
+                    ) : (
+                      <X size={16} className="text-red-500" />
+                    )}
+                    GST Certificate
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {documents.shopLicense ? (
+                      <CheckCircle size={16} className="text-green-500" />
+                    ) : (
+                      <X size={16} className="text-red-500" />
+                    )}
+                    Shop License
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {documents.ownerIdProof ? (
+                      <CheckCircle size={16} className="text-green-500" />
+                    ) : (
+                      <X size={16} className="text-red-500" />
+                    )}
+                    Owner ID Proof
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={async () => {
+                  try {
+                    setUploading(true);
+                    const response = await partnerService.uploadDocuments({
+                      ...documents,
+                      verificationStatus: 'submitted',
+                    });
+                    if (response.success) {
+                      setProfile(response.data);
+                      alert('Documents submitted successfully for verification!');
+                    }
+                  } catch (err: any) {
+                    alert(err.message || 'Failed to submit documents');
+                  } finally {
+                    setUploading(false);
+                  }
+                }}
+                disabled={
+                  uploading ||
+                  !documents.gstCertificate ||
+                  !documents.shopLicense ||
+                  !documents.ownerIdProof
+                }
+                className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Shield size={20} />
+                    Submit for Verification
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Navigation */}
+          {currentStep < 3 && (
+            <div className="px-6 py-4 border-t border-slate-200 flex justify-between">
+              <button
+                onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+                disabled={currentStep === 1}
+                className="px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentStep(Math.min(3, currentStep + 1))}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+              >
+                Next
+                <ArrowRight size={16} />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {uploading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 flex items-center gap-4">
+            <Loader2 className="animate-spin text-blue-500" size={24} />
+            <span className="text-slate-700">Uploading document...</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

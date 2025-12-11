@@ -1,73 +1,73 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const sellOrderSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       // Optional for guest users
     },
     sessionId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'SellOfferSession',
-      required: [true, 'Session ID is required'],
+      ref: "SellOfferSession",
+      required: [true, "Session ID is required"],
     },
     partnerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Partner',
+      ref: "Partner",
       required: false, // Will be populated from session/product
     },
     orderNumber: {
       type: String,
       unique: true,
-      required: [true, 'Order number is required'],
+      required: [true, "Order number is required"],
     },
     status: {
       type: String,
-      enum: ['draft', 'confirmed', 'cancelled', 'picked', 'paid'],
-      default: 'draft',
+      enum: ["draft", "confirmed", "cancelled", "picked", "paid"],
+      default: "draft",
     },
     pickup: {
       address: {
         fullName: {
           type: String,
-          required: [true, 'Full name is required'],
+          required: [true, "Full name is required"],
           trim: true,
         },
         phone: {
           type: String,
-          required: [true, 'Phone number is required'],
+          required: [true, "Phone number is required"],
           trim: true,
         },
         street: {
           type: String,
-          required: [true, 'Street address is required'],
+          required: [true, "Street address is required"],
           trim: true,
         },
         city: {
           type: String,
-          required: [true, 'City is required'],
+          required: [true, "City is required"],
           trim: true,
         },
         state: {
           type: String,
-          required: [true, 'State is required'],
+          required: [true, "State is required"],
           trim: true,
         },
         pincode: {
           type: String,
-          required: [true, 'Pincode is required'],
+          required: [true, "Pincode is required"],
           trim: true,
         },
       },
       slot: {
         date: {
           type: Date,
-          required: [true, 'Pickup date is required'],
+          required: [true, "Pickup date is required"],
         },
         window: {
           type: String,
-          required: [true, 'Pickup time window is required'],
+          required: [true, "Pickup time window is required"],
           trim: true,
         },
       },
@@ -75,13 +75,13 @@ const sellOrderSchema = new mongoose.Schema(
     payment: {
       method: {
         type: String,
-        enum: ['upi', 'bank_transfer', 'wallet', 'cash'],
-        required: [true, 'Payment method is required'],
+        enum: ["upi", "bank_transfer", "wallet", "cash"],
+        required: [true, "Payment method is required"],
       },
       status: {
         type: String,
-        enum: ['pending', 'success', 'failed'],
-        default: 'pending',
+        enum: ["pending", "success", "failed"],
+        default: "pending",
       },
       transactionId: {
         type: String,
@@ -93,12 +93,12 @@ const sellOrderSchema = new mongoose.Schema(
     },
     quoteAmount: {
       type: Number,
-      required: [true, 'Quote amount is required'],
-      min: [0, 'Quote amount cannot be negative'],
+      required: [true, "Quote amount is required"],
+      min: [0, "Quote amount cannot be negative"],
     },
     actualAmount: {
       type: Number,
-      min: [0, 'Actual amount cannot be negative'],
+      min: [0, "Actual amount cannot be negative"],
     },
     notes: {
       type: String,
@@ -106,7 +106,7 @@ const sellOrderSchema = new mongoose.Schema(
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // Pickup agent
+      ref: "Partner", // Assigned partner
     },
     pickedAt: {
       type: Date,
@@ -119,10 +119,10 @@ const sellOrderSchema = new mongoose.Schema(
       trim: true,
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
   }
 );
 
@@ -130,64 +130,66 @@ const sellOrderSchema = new mongoose.Schema(
 sellOrderSchema.index({ userId: 1, createdAt: -1 });
 sellOrderSchema.index({ orderNumber: 1 }, { unique: true });
 sellOrderSchema.index({ status: 1, createdAt: -1 });
-sellOrderSchema.index({ 'pickup.slot.date': 1, status: 1 });
+sellOrderSchema.index({ "pickup.slot.date": 1, status: 1 });
 sellOrderSchema.index({ assignedTo: 1, status: 1 });
 
 // Virtual for formatted address
-sellOrderSchema.virtual('formattedAddress').get(function() {
+sellOrderSchema.virtual("formattedAddress").get(function () {
   const addr = this.pickup.address;
   return `${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode}`;
 });
 
 // Virtual for pickup slot display
-sellOrderSchema.virtual('pickupSlotDisplay').get(function() {
+sellOrderSchema.virtual("pickupSlotDisplay").get(function () {
   const slot = this.pickup.slot;
-  const date = new Date(slot.date).toLocaleDateString('en-IN');
+  const date = new Date(slot.date).toLocaleDateString("en-IN");
   return `${date} (${slot.window})`;
 });
 
 // Pre-save middleware to generate order number
-sellOrderSchema.pre('save', async function(next) {
+sellOrderSchema.pre("save", async function (next) {
   if (this.isNew && !this.orderNumber) {
     const date = new Date();
     const year = date.getFullYear().toString().slice(-2);
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+
     // Find the last order number for today
     const prefix = `SO${year}${month}${day}`;
-    const lastOrder = await this.constructor.findOne({
-      orderNumber: new RegExp(`^${prefix}`)
-    }).sort({ orderNumber: -1 });
-    
+    const lastOrder = await this.constructor
+      .findOne({
+        orderNumber: new RegExp(`^${prefix}`),
+      })
+      .sort({ orderNumber: -1 });
+
     let sequence = 1;
     if (lastOrder) {
       const lastSequence = parseInt(lastOrder.orderNumber.slice(-4));
       sequence = lastSequence + 1;
     }
-    
-    this.orderNumber = `${prefix}${sequence.toString().padStart(4, '0')}`;
+
+    this.orderNumber = `${prefix}${sequence.toString().padStart(4, "0")}`;
   }
   next();
 });
 
 // Method to confirm order
-sellOrderSchema.methods.confirm = function() {
-  this.status = 'confirmed';
+sellOrderSchema.methods.confirm = function () {
+  this.status = "confirmed";
   return this.save();
 };
 
 // Method to cancel order
-sellOrderSchema.methods.cancel = function(reason) {
-  this.status = 'cancelled';
+sellOrderSchema.methods.cancel = function (reason) {
+  this.status = "cancelled";
   this.cancelledAt = new Date();
   this.cancellationReason = reason;
   return this.save();
 };
 
 // Method to mark as picked
-sellOrderSchema.methods.markPicked = function(actualAmount, assignedTo) {
-  this.status = 'picked';
+sellOrderSchema.methods.markPicked = function (actualAmount, assignedTo) {
+  this.status = "picked";
   this.pickedAt = new Date();
   if (actualAmount !== undefined) this.actualAmount = actualAmount;
   if (assignedTo) this.assignedTo = assignedTo;
@@ -195,25 +197,32 @@ sellOrderSchema.methods.markPicked = function(actualAmount, assignedTo) {
 };
 
 // Method to mark payment as successful
-sellOrderSchema.methods.markPaid = function(transactionId) {
-  this.payment.status = 'success';
+sellOrderSchema.methods.markPaid = function (transactionId) {
+  this.payment.status = "success";
   this.payment.paidAt = new Date();
   this.payment.transactionId = transactionId;
-  this.status = 'paid';
+  this.status = "paid";
   return this.save();
 };
 
 // Static method to get orders by status
-sellOrderSchema.statics.getByStatus = function(status, limit = 50, skip = 0) {
+sellOrderSchema.statics.getByStatus = function (status, limit = 50, skip = 0) {
   return this.find({ status })
-    .populate('userId', 'name email phone')
-    .populate('sessionId')
-    .populate('assignedTo', 'name email')
+    .populate("userId", "name email phone")
+    .populate("sessionId")
+    .populate({
+      path: "assignedTo",
+      populate: {
+        path: "user",
+        select: "name email phone",
+      },
+      select: "businessName shopName email phone user",
+    })
     .sort({ createdAt: -1 })
     .limit(limit)
     .skip(skip);
 };
 
-const SellOrder = mongoose.model('SellOrder', sellOrderSchema);
+const SellOrder = mongoose.model("SellOrder", sellOrderSchema);
 
 module.exports = SellOrder;

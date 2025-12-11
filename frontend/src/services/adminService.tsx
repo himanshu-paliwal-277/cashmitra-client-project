@@ -193,6 +193,22 @@ class AdminService {
     }
   }
 
+  async getAllPartners(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.status) queryParams.append('status', params.status);
+      if (params.search) queryParams.append('search', params.search);
+
+      const response = await api.get(`/admin/partners?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching all partners:', error);
+      throw error.response?.data || error;
+    }
+  }
+
   // Order Management
   async getOrders(page = 1, limit = 10, status = '', type = '') {
     try {
@@ -241,6 +257,28 @@ class AdminService {
         currentPage: 1,
         totalOrders: 3,
       };
+    }
+  }
+
+  async getPartnerSuggestionsForOrder(orderId: string) {
+    try {
+      const response = await api.get(`/admin/orders/${orderId}/partner-suggestions`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching partner suggestions:', error);
+      throw error;
+    }
+  }
+
+  async assignPartnerToOrder(orderId: string, partnerId: string) {
+    try {
+      const response = await api.put(`/admin/orders/${orderId}/assign-partner`, {
+        partner: partnerId,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error assigning partner to order:', error);
+      throw error;
     }
   }
 
@@ -1589,6 +1627,117 @@ class AdminService {
       return response.data;
     } catch (error) {
       console.error('Error processing payment:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  // Partner Wallet Management
+  async updatePartnerWallet(partnerId: string, walletData: any) {
+    try {
+      const response = await api.post(`/admin/partners/${partnerId}/wallet/update`, walletData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating partner wallet:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  // Payout Management
+  async getPendingPayouts(page = 1, limit = 10) {
+    try {
+      const response = await api.get(`/wallet/admin/payouts/pending?page=${page}&limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching pending payouts:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async processPayoutRequest(
+    transactionId: string,
+    status: 'completed' | 'failed',
+    notes?: string
+  ) {
+    try {
+      const response = await api.put(`/wallet/admin/payouts/${transactionId}`, {
+        status,
+        notes,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error processing payout:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getAllPayouts(page = 1, limit = 10, status?: string) {
+    try {
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      if (status && status !== 'all') params.append('status', status);
+
+      const response = await api.get(`/wallet/admin/payouts/all?${params}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching all payouts:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  // Agent Management
+  async getAgents(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.status) queryParams.append('status', params.status);
+      if (params.verified !== undefined) queryParams.append('verified', params.verified);
+
+      const response = await api.get(`/admin/agents?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching agents:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async approveAgent(agentId: string) {
+    try {
+      const response = await api.put(`/admin/agents/${agentId}/approve`);
+      return response.data;
+    } catch (error) {
+      console.error('Error approving agent:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async rejectAgent(agentId: string, data: { reason: string }) {
+    try {
+      const response = await api.put(`/admin/agents/${agentId}/reject`, data);
+      return response.data;
+    } catch (error) {
+      console.error('Error rejecting agent:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async toggleAgentStatus(agentId: string, isActive: boolean) {
+    try {
+      const response = await api.put(`/admin/agents/${agentId}/status`, { isActive });
+      return response.data;
+    } catch (error) {
+      console.error('Error toggling agent status:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async toggleUserStatus(userId: string, isActive: boolean) {
+    try {
+      const response = await api.put(`/admin/users/${userId}/status`, { isActive });
+      return response.data;
+    } catch (error) {
+      console.error('Error toggling user status:', error);
       throw error.response?.data || error;
     }
   }

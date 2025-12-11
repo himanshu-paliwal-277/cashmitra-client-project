@@ -1,11 +1,13 @@
 const User = require("../models/user.model");
 const Partner = require("../models/partner.model");
 const Product = require("../models/product.model");
+const Agent = require("../models/agent.model");
 const { Order } = require("../models/order.model");
 const Transaction = require("../models/transaction.model");
 const Inventory = require("../models/inventory.model");
 const Wallet = require("../models/wallet.model");
 const ConditionQuestionnaire = require("../models/conditionQuestionnaire.model");
+const ApiError = require("../utils/apiError");
 const { generateToken } = require("../utils/jwt.utils");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
@@ -132,15 +134,33 @@ const getAllPartners = async (req, res) => {
     }
 
     const partners = await Partner.find(filter)
-      .populate("user", "name email phone")
+      .populate("user", "name email phone isActive")
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
+    // Fetch wallet data for each partner
+    const partnersWithWallet = await Promise.all(
+      partners.map(async (partner) => {
+        const wallet = await Wallet.findOne({ partner: partner._id });
+        const partnerObj = partner.toObject();
+
+        // Update wallet data with actual wallet from Wallet collection
+        if (wallet) {
+          partnerObj.wallet = {
+            balance: wallet.balance,
+            transactions: wallet.transactions,
+          };
+        }
+
+        return partnerObj;
+      })
+    );
+
     const total = await Partner.countDocuments(filter);
 
     res.json({
-      partners,
+      partners: partnersWithWallet,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
       total,
@@ -159,7 +179,7 @@ const getPartnerById = async (req, res) => {
     const { id } = req.params;
 
     const partner = await Partner.findById(id)
-      .populate("user", "name email phone createdAt")
+      .populate("user", "name email phone createdAt isActive")
       .populate("wallet.transactions");
 
     if (!partner) {
@@ -192,6 +212,12 @@ const getPartnerById = async (req, res) => {
 const createPartner = async (req, res) => {
   try {
     const {
+      // User details (for new partner creation)
+      name,
+      email,
+      phone,
+      password,
+      // Partner details
       userId,
       shopName,
       shopAddress,
@@ -204,18 +230,50 @@ const createPartner = async (req, res) => {
       upiId,
     } = req.body;
 
-    // Check if user exists
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    let user;
+    let isNewUser = false;
 
-    // Check if user already has a partner profile
-    const existingPartner = await Partner.findOne({ user: userId });
-    if (existingPartner) {
-      return res
-        .status(400)
-        .json({ message: "User already has a partner profile" });
+    // Check if this is a new partner creation (with user details) or existing user
+    if (userId) {
+      // Existing user flow
+      user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if user already has a partner profile
+      const existingPartner = await Partner.findOne({ user: userId });
+      if (existingPartner) {
+        return res
+          .status(400)
+          .json({ message: "User already has a partner profile" });
+      }
+    } else {
+      // New user creation flow
+      if (!name || !email || !phone || !password) {
+        return res.status(400).json({
+          message:
+            "Name, email, phone, and password are required for new partner creation",
+        });
+      }
+
+      // Check if user with email already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res
+          .status(400)
+          .json({ message: "User with this email already exists" });
+      }
+
+      // Create new user
+      user = await User.create({
+        name,
+        email,
+        phone,
+        password,
+        role: "partner",
+      });
+      isNewUser = true;
     }
 
     // Check if GST number is unique
@@ -226,7 +284,7 @@ const createPartner = async (req, res) => {
 
     // Create partner
     const partner = await Partner.create({
-      user: userId,
+      user: user._id,
       shopName,
       shopAddress,
       gstNumber,
@@ -240,8 +298,17 @@ const createPartner = async (req, res) => {
       isVerified: false,
     });
 
-    // Update user role to partner
-    await User.findByIdAndUpdate(userId, { role: "partner" });
+    // Update user role to partner (if not already set for new users)
+    if (!isNewUser) {
+      await User.findByIdAndUpdate(user._id, { role: "partner" });
+    }
+
+    // Create wallet for the new partner
+    await Wallet.create({
+      partner: partner._id,
+      balance: 0,
+      transactions: [],
+    });
 
     const populatedPartner = await Partner.findById(partner._id).populate(
       "user",
@@ -256,7 +323,14 @@ const createPartner = async (req, res) => {
   } catch (error) {
     console.error("Error creating partner:", error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: "GST number already exists" });
+      // Handle duplicate key errors
+      if (error.keyPattern?.email) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+      if (error.keyPattern?.gstNumber) {
+        return res.status(400).json({ message: "GST number already exists" });
+      }
+      return res.status(400).json({ message: "Duplicate entry found" });
     }
     res.status(500).json({ message: "Server error" });
   }
@@ -290,7 +364,7 @@ const updatePartner = async (req, res) => {
     const partner = await Partner.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
-    }).populate("user", "name email phone");
+    }).populate("user", "name email phone isActive");
 
     if (!partner) {
       return res.status(404).json({ message: "Partner not found" });
@@ -392,7 +466,7 @@ const verifyPartner = async (req, res) => {
         verifiedAt: status === "approved" ? new Date() : undefined,
       },
       { new: true }
-    ).populate("user", "name email");
+    ).populate("user", "name email isActive");
 
     if (!partner) {
       return res.status(404).json({ message: "Partner not found" });
@@ -409,6 +483,107 @@ const verifyPartner = async (req, res) => {
     res.json({ message: `Partner ${status} successfully`, partner });
   } catch (error) {
     console.error("Error verifying partner:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// @desc    Update partner wallet balance
+// @route   POST /api/admin/partners/:id/wallet/update
+// @access  Private/Admin
+const updatePartnerWallet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount, reason, type } = req.body;
+
+    // Find partner
+    const partner = await Partner.findById(id);
+    if (!partner) {
+      return res.status(404).json({ message: "Partner not found" });
+    }
+
+    // Find or create wallet
+    let wallet = await Wallet.findOne({ partner: id });
+    if (!wallet) {
+      wallet = await Wallet.create({
+        partner: id,
+        balance: 0,
+        transactions: [],
+      });
+    }
+
+    // Update balance
+    const oldBalance = wallet.balance;
+    wallet.balance += amount;
+
+    // Ensure balance doesn't go negative
+    if (wallet.balance < 0) {
+      return res.status(400).json({
+        message:
+          "Insufficient balance. Cannot deduct more than available balance.",
+      });
+    }
+
+    // Also update the partner's embedded wallet balance
+    partner.wallet.balance = wallet.balance;
+
+    // Create transaction record
+    const transaction = await Transaction.create({
+      partner: id,
+      transactionType: amount > 0 ? "wallet_credit" : "wallet_debit",
+      amount: Math.abs(amount),
+      status: "completed",
+      paymentMethod: "System",
+      description: `Admin ${type}: ${reason}`,
+      metadata: {
+        adminAction: true,
+        reason: reason,
+        oldBalance: oldBalance,
+        newBalance: wallet.balance,
+      },
+    });
+
+    // Also create a finance record for the admin finance dashboard
+    const Finance = require("../models/finance.model");
+    await Finance.create({
+      transactionType: amount > 0 ? "deposit" : "withdrawal",
+      amount: Math.abs(amount),
+      partner: id,
+      status: "processed",
+      paymentMethod: "wallet",
+      category: "other",
+      description: `Admin wallet ${type}: ${reason || "Manual adjustment"}`,
+      processedBy: req.user?._id || req.user?.id, // Admin who performed the action
+      processedAt: new Date(),
+      metadata: {
+        originalAmount: Math.abs(amount),
+        adminAction: true,
+        reason: reason,
+        oldBalance: oldBalance,
+        newBalance: wallet.balance,
+        transactionId: transaction._id,
+      },
+    });
+
+    // Add transaction to wallet and partner
+    wallet.transactions.push(transaction._id);
+    wallet.lastUpdated = new Date();
+    partner.wallet.transactions.push(transaction._id);
+
+    // Save both wallet and partner
+    await Promise.all([wallet.save(), partner.save()]);
+
+    res.json({
+      success: true,
+      message: "Wallet balance updated successfully",
+      data: {
+        oldBalance: oldBalance,
+        newBalance: wallet.balance,
+        amount: amount,
+        transactionId: transaction._id,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating partner wallet:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -2139,54 +2314,76 @@ const getSellOrders = async (req, res) => {
       page = 1,
       limit = 10,
       status,
-      userId,
-      partnerId,
+      search,
       startDate,
       endDate,
       sortBy = "createdAt",
       sortOrder = "desc",
     } = req.query;
 
-    const query = { orderType: "sell" };
+    const SellOrder = require("../models/sellOrder.model");
+    const query = {};
 
     // Apply filters
     if (status) query.status = status;
-    if (userId) query.user = userId;
-    if (partnerId) query.partner = partnerId;
     if (startDate || endDate) {
       query.createdAt = {};
       if (startDate) query.createdAt.$gte = new Date(startDate);
       if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
+    // Search functionality
+    if (search) {
+      query.$or = [
+        { orderNumber: { $regex: search, $options: "i" } },
+        { "pickup.address.fullName": { $regex: search, $options: "i" } },
+        { "pickup.address.phone": { $regex: search, $options: "i" } },
+      ];
+    }
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
 
     const [orders, total] = await Promise.all([
-      Order.find(query)
-        .populate("user", "name email phone")
-        .populate("partner", "businessName email phone")
-        .populate("items.inventory", "product condition")
-        .populate("items.product", "name brand model")
+      SellOrder.find(query)
+        .populate({
+          path: "sessionId",
+          populate: {
+            path: "productId",
+            select: "name brand model images",
+          },
+        })
+        .populate("userId", "name email phone")
+        .populate({
+          path: "assignedTo",
+          populate: {
+            path: "user",
+            select: "name email phone",
+          },
+          select: "businessName shopName email phone user",
+        })
         .sort(sortOptions)
         .skip(skip)
         .limit(parseInt(limit)),
-      Order.countDocuments(query),
+      SellOrder.countDocuments(query),
     ]);
 
     res.json({
-      orders,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(total / parseInt(limit)),
-        totalOrders: total,
-        hasNext: skip + orders.length < total,
-        hasPrev: parseInt(page) > 1,
+      success: true,
+      data: {
+        orders,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(total / parseInt(limit)),
+          totalOrders: total,
+          hasNext: skip + orders.length < total,
+          hasPrev: parseInt(page) > 1,
+        },
       },
     });
   } catch (error) {
     console.error("Error fetching sell orders:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -2290,6 +2487,112 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+// @desc    Get partner suggestions for order assignment
+// @route   GET /api/admin/orders/:id/partner-suggestions
+// @access  Private/Admin
+const getPartnerSuggestionsForOrder = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+
+    const order = await Order.findById(orderId).populate("items.product");
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Get all verified partners
+    const partners = await Partner.find({
+      isVerified: true,
+      verificationStatus: "approved",
+    }).populate("user", "name email phone isActive");
+
+    // Check inventory status for each partner
+    const partnerSuggestions = await Promise.all(
+      partners.map(async (partner) => {
+        const partnerObj = partner.toObject();
+        partnerObj.inventoryStatus = [];
+
+        // Check each product in the order
+        for (const item of order.items) {
+          const inventory = await Inventory.findOne({
+            partner: partner._id,
+            product: item.product._id,
+            isAvailable: true,
+            quantity: { $gte: item.quantity },
+          }).populate("product", "model brand category");
+
+          partnerObj.inventoryStatus.push({
+            productId: item.product._id,
+            productName: item.product.model || item.product.name,
+            requiredQuantity: item.quantity,
+            hasInventory: !!inventory,
+            availableQuantity: inventory ? inventory.quantity : 0,
+            partnerPrice: inventory ? inventory.price : null,
+            condition: inventory ? inventory.condition : null,
+            canFulfill: inventory && inventory.quantity >= item.quantity,
+          });
+        }
+
+        // Calculate overall fulfillment capability
+        const canFulfillAll = partnerObj.inventoryStatus.every(
+          (item) => item.canFulfill
+        );
+        const hasPartialInventory = partnerObj.inventoryStatus.some(
+          (item) => item.hasInventory
+        );
+
+        partnerObj.fulfillmentStatus = {
+          canFulfillAll,
+          hasPartialInventory,
+          missingProducts: partnerObj.inventoryStatus.filter(
+            (item) => !item.hasInventory
+          ).length,
+        };
+
+        return partnerObj;
+      })
+    );
+
+    // Sort partners by fulfillment capability
+    partnerSuggestions.sort((a, b) => {
+      if (
+        a.fulfillmentStatus.canFulfillAll &&
+        !b.fulfillmentStatus.canFulfillAll
+      )
+        return -1;
+      if (
+        !a.fulfillmentStatus.canFulfillAll &&
+        b.fulfillmentStatus.canFulfillAll
+      )
+        return 1;
+      if (
+        a.fulfillmentStatus.hasPartialInventory &&
+        !b.fulfillmentStatus.hasPartialInventory
+      )
+        return -1;
+      if (
+        !a.fulfillmentStatus.hasPartialInventory &&
+        b.fulfillmentStatus.hasPartialInventory
+      )
+        return 1;
+      return (
+        a.fulfillmentStatus.missingProducts -
+        b.fulfillmentStatus.missingProducts
+      );
+    });
+
+    res.json({
+      success: true,
+      data: {
+        order,
+        partnerSuggestions,
+      },
+    });
+  } catch (error) {
+    console.error("Error getting partner suggestions:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // @desc    Assign partner to order
 // @route   PUT /api/admin/orders/:id/assign-partner
 // @access  Private/Admin
@@ -2311,9 +2614,22 @@ const assignPartnerToOrder = async (req, res) => {
       }
     }
 
-    // Update order partner
+    // Update order with partner assignment tracking
     order.partner = partner;
-    order.updatedAt = new Date();
+    order.partnerAssignment = {
+      assignedAt: new Date(),
+      assignedBy: req.user._id,
+      response: {
+        status: "pending",
+      },
+    };
+
+    // Add to status history
+    order.statusHistory.push({
+      status: "partner_assigned",
+      timestamp: new Date(),
+      note: `Order assigned to partner by admin`,
+    });
 
     await order.save();
 
@@ -2326,7 +2642,9 @@ const assignPartnerToOrder = async (req, res) => {
     ]);
 
     res.json({
-      message: "Partner assigned successfully",
+      success: true,
+      message:
+        "Partner assigned successfully. Partner will be notified to accept or reject the order.",
       order,
     });
   } catch (error) {
@@ -4039,6 +4357,171 @@ const deleteModelByName = async (req, res) => {
   }
 };
 
+/**
+ * Get all agents
+ * @route GET /api/admin/agents
+ * @access Private (Admin only)
+ */
+const getAgents = async (req, res) => {
+  const { page = 1, limit = 10, status, verified } = req.query;
+
+  const query = {};
+  if (status) {
+    query.isActive = status === "active";
+  }
+
+  const agents = await Agent.find(query)
+    .populate("user", "name email phone isVerified isActive")
+    .populate("assignedPartner", "shopName shopEmail user")
+    .populate({
+      path: "assignedPartner",
+      populate: {
+        path: "user",
+        select: "name email",
+      },
+    })
+    .sort({ createdAt: -1 })
+    .limit(limit * 1)
+    .skip((page - 1) * limit);
+
+  // Filter by verification status if specified
+  let filteredAgents = agents;
+  if (verified !== undefined) {
+    const isVerified = verified === "true";
+    filteredAgents = agents.filter(
+      (agent) => agent.user.isVerified === isVerified
+    );
+  }
+
+  const total = await Agent.countDocuments(query);
+
+  res.status(200).json({
+    success: true,
+    data: filteredAgents,
+    pagination: {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      total,
+      pages: Math.ceil(total / limit),
+    },
+  });
+};
+
+/**
+ * Approve agent
+ * @route PUT /api/admin/agents/:id/approve
+ * @access Private (Admin only)
+ */
+const approveAgent = async (req, res) => {
+  const agentId = req.params.id;
+
+  const agent = await Agent.findById(agentId).populate("user");
+  if (!agent) {
+    throw new ApiError("Agent not found", 404);
+  }
+
+  // Update user verification status
+  await User.findByIdAndUpdate(agent.user._id, {
+    isVerified: true,
+    isActive: true,
+  });
+
+  // Update agent status
+  agent.isActive = true;
+  await agent.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Agent approved successfully",
+    data: agent,
+  });
+};
+
+/**
+ * Reject agent
+ * @route PUT /api/admin/agents/:id/reject
+ * @access Private (Admin only)
+ */
+const rejectAgent = async (req, res) => {
+  const agentId = req.params.id;
+  const { reason } = req.body;
+
+  const agent = await Agent.findById(agentId).populate("user");
+  if (!agent) {
+    throw new ApiError("Agent not found", 404);
+  }
+
+  // Update user verification status
+  await User.findByIdAndUpdate(agent.user._id, {
+    isVerified: false,
+    isActive: false,
+  });
+
+  // Update agent status and add rejection reason
+  agent.isActive = false;
+  agent.rejectionReason = reason;
+  await agent.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Agent rejected successfully",
+    data: agent,
+  });
+};
+
+/**
+ * Toggle agent status
+ * @route PUT /api/admin/agents/:id/status
+ * @access Private (Admin only)
+ */
+const toggleAgentStatus = async (req, res) => {
+  const agentId = req.params.id;
+  const { isActive } = req.body;
+
+  const agent = await Agent.findById(agentId).populate("user");
+  if (!agent) {
+    throw new ApiError("Agent not found", 404);
+  }
+
+  // Update agent status
+  agent.isActive = isActive;
+  await agent.save();
+
+  // Also update user active status
+  await User.findByIdAndUpdate(agent.user._id, { isActive });
+
+  res.status(200).json({
+    success: true,
+    message: `Agent ${isActive ? "activated" : "deactivated"} successfully`,
+    data: agent,
+  });
+};
+
+/**
+ * Toggle user status
+ * @route PUT /api/admin/users/:id/status
+ * @access Private (Admin only)
+ */
+const toggleUserStatus = async (req, res) => {
+  const userId = req.params.id;
+  const { isActive } = req.body;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError("User not found", 404);
+  }
+
+  // Update user active status
+  user.isActive = isActive;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: `User ${isActive ? "activated" : "deactivated"} successfully`,
+    data: user,
+  });
+};
+
 module.exports = {
   loginAdmin,
   getAdminProfile,
@@ -4049,6 +4532,7 @@ module.exports = {
   updatePartner,
   deletePartner,
   verifyPartner,
+  updatePartnerWallet,
   getAllOrders,
   getOrderById,
   getDashboardAnalytics,
@@ -4070,6 +4554,7 @@ module.exports = {
   getSellOrders,
   getBuyOrders,
   updateOrderStatus,
+  getPartnerSuggestionsForOrder,
   assignPartnerToOrder,
   getBrands,
   createBrand,
@@ -4087,5 +4572,9 @@ module.exports = {
   createConditionQuestionnaire,
   updateConditionQuestionnaire,
   deleteConditionQuestionnaire,
-  getQuestionnairesByCategory,
+  getAgents,
+  approveAgent,
+  rejectAgent,
+  toggleAgentStatus,
+  toggleUserStatus,
 };

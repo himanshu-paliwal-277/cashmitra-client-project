@@ -99,6 +99,7 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
       items: [
         { to: '/admin/partners', icon: Users, label: 'Partners' },
         { to: '/admin/partner-applications', icon: UserCheck, label: 'Partner Applications (KYC)' },
+        { to: '/admin/agents', icon: Truck, label: 'Agent Management' },
         // { to: '/admin/partner-permissions', icon: Settings, label: 'Partner Permissions' },
         { to: '/admin/users', icon: Users, label: 'User Management' },
         // { to: '/admin/inventory-approval', icon: CheckSquare, label: 'Inventory Approval' },
@@ -113,7 +114,7 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
         // { to: '/admin/promotions', icon: Gift, label: 'Promotions/Coupons' },
         { to: '/admin/finance', icon: Calculator, label: 'Finance' },
         // { to: '/admin/commission-rules', icon: CreditCard, label: 'Commission Rules' },
-        // { to: '/admin/wallet-payouts', icon: Wallet, label: 'Wallet & Payouts' },
+        { to: '/admin/wallet-payouts', icon: Wallet, label: 'Wallet & Payouts' },
       ],
     },
     {
