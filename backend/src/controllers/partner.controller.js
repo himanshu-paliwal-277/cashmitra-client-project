@@ -621,7 +621,7 @@ exports.getOrders = async (req, res) => {
   if (!orderType || orderType === "sell") {
     const SellOrder = require("../models/sellOrder.model");
 
-    const sellQueryObj = { partnerId: partner._id };
+    const sellQueryObj = { assignedTo: partner._id };
 
     // Apply filters
     if (status) sellQueryObj.status = status;
@@ -1051,14 +1051,14 @@ exports.getDashboardStats = async (req, res) => {
     // Get sell order stats
     const SellOrder = require("../models/sellOrder.model");
     const sellOrders = await SellOrder.countDocuments({
-      partnerId: partner._id,
+      assignedTo: partner._id,
     });
     const pendingSellOrders = await SellOrder.countDocuments({
-      partnerId: partner._id,
+      assignedTo: partner._id,
       status: { $in: ["draft", "confirmed"] },
     });
     const completedSellOrders = await SellOrder.countDocuments({
-      partnerId: partner._id,
+      assignedTo: partner._id,
       status: "paid",
     });
 
@@ -1092,7 +1092,7 @@ exports.getDashboardStats = async (req, res) => {
 
     // Add revenue from sell orders
     const completedSellOrdersData = await SellOrder.find({
-      partnerId: partner._id,
+      assignedTo: partner._id,
       status: "paid",
     });
 
@@ -1113,7 +1113,7 @@ exports.getDashboardStats = async (req, res) => {
       .populate("items.product", "name brand categoryId images pricing")
       .lean();
 
-    const recentSellOrders = await SellOrder.find({ partnerId: partner._id })
+    const recentSellOrders = await SellOrder.find({ assignedTo: partner._id })
       .sort("-createdAt")
       .limit(3)
       .populate("userId", "name")
@@ -1208,13 +1208,13 @@ exports.getDashboardSellBuy = async (req, res) => {
   const buyProductCount = await BuyProduct.countDocuments({ partnerId });
 
   // Get order counts
-  const totalOrders = await SellOrder.countDocuments({ partnerId });
+  const totalOrders = await SellOrder.countDocuments({ assignedTo: partnerId });
   const pendingOrders = await SellOrder.countDocuments({
-    partnerId,
+    assignedTo: partnerId,
     status: { $in: ["draft", "confirmed"] },
   });
   const completedOrders = await SellOrder.countDocuments({
-    partnerId,
+    assignedTo: partnerId,
     status: "paid",
   });
 
@@ -1222,7 +1222,7 @@ exports.getDashboardSellBuy = async (req, res) => {
   const revenueData = await SellOrder.aggregate([
     {
       $match: {
-        partnerId: partnerId,
+        assignedTo: partnerId,
         status: "paid",
       },
     },
@@ -1237,7 +1237,7 @@ exports.getDashboardSellBuy = async (req, res) => {
   const totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
 
   // Get recent orders
-  const recentOrders = await SellOrder.find({ partnerId })
+  const recentOrders = await SellOrder.find({ assignedTo: partnerId })
     .sort({ createdAt: -1 })
     .limit(10)
     .populate("sessionId")
@@ -1371,7 +1371,7 @@ exports.getPartnerSellOrders = async (req, res) => {
   const { status, page = 1, limit = 10 } = req.query;
   const partnerId = partner._id;
 
-  const filter = { partnerId };
+  const filter = { assignedTo: partnerId };
 
   if (status) {
     filter.status = status;
@@ -1414,7 +1414,7 @@ exports.getPartnerSellOrderDetails = async (req, res) => {
   const partnerId = partner._id;
   const orderId = req.params.id;
 
-  const order = await SellOrder.findOne({ _id: orderId, partnerId })
+  const order = await SellOrder.findOne({ _id: orderId, assignedTo: partnerId })
     .populate("sessionId")
     .populate("userId", "name email phone address");
 
@@ -1443,7 +1443,10 @@ exports.updatePartnerSellOrderStatus = async (req, res) => {
   const partnerId = partner._id;
   const orderId = req.params.id;
 
-  const order = await SellOrder.findOne({ _id: orderId, partnerId });
+  const order = await SellOrder.findOne({
+    _id: orderId,
+    assignedTo: partnerId,
+  });
 
   if (!order) {
     throw new ApiError("Order not found or access denied", 404);

@@ -2314,54 +2314,76 @@ const getSellOrders = async (req, res) => {
       page = 1,
       limit = 10,
       status,
-      userId,
-      partnerId,
+      search,
       startDate,
       endDate,
       sortBy = "createdAt",
       sortOrder = "desc",
     } = req.query;
 
-    const query = { orderType: "sell" };
+    const SellOrder = require("../models/sellOrder.model");
+    const query = {};
 
     // Apply filters
     if (status) query.status = status;
-    if (userId) query.user = userId;
-    if (partnerId) query.partner = partnerId;
     if (startDate || endDate) {
       query.createdAt = {};
       if (startDate) query.createdAt.$gte = new Date(startDate);
       if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
+    // Search functionality
+    if (search) {
+      query.$or = [
+        { orderNumber: { $regex: search, $options: "i" } },
+        { "pickup.address.fullName": { $regex: search, $options: "i" } },
+        { "pickup.address.phone": { $regex: search, $options: "i" } },
+      ];
+    }
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
 
     const [orders, total] = await Promise.all([
-      Order.find(query)
-        .populate("user", "name email phone")
-        .populate("partner", "businessName email phone")
-        .populate("items.inventory", "product condition")
-        .populate("items.product", "name brand model")
+      SellOrder.find(query)
+        .populate({
+          path: "sessionId",
+          populate: {
+            path: "productId",
+            select: "name brand model images",
+          },
+        })
+        .populate("userId", "name email phone")
+        .populate({
+          path: "assignedTo",
+          populate: {
+            path: "user",
+            select: "name email phone",
+          },
+          select: "businessName shopName email phone user",
+        })
         .sort(sortOptions)
         .skip(skip)
         .limit(parseInt(limit)),
-      Order.countDocuments(query),
+      SellOrder.countDocuments(query),
     ]);
 
     res.json({
-      orders,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(total / parseInt(limit)),
-        totalOrders: total,
-        hasNext: skip + orders.length < total,
-        hasPrev: parseInt(page) > 1,
+      success: true,
+      data: {
+        orders,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(total / parseInt(limit)),
+          totalOrders: total,
+          hasNext: skip + orders.length < total,
+          hasPrev: parseInt(page) > 1,
+        },
       },
     });
   } catch (error) {
     console.error("Error fetching sell orders:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 

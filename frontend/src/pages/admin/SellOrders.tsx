@@ -52,8 +52,8 @@ const SellOrders = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [agents, setAgents] = useState([]);
-  const [loadingAgents, setLoadingAgents] = useState(false);
+  const [partners, setPartners] = useState([]);
+  const [loadingPartners, setLoadingPartners] = useState(false);
 
   const fetchOrders = useCallback(async (page = 1, status = '', search = '') => {
     try {
@@ -93,84 +93,52 @@ const SellOrders = () => {
     });
   };
 
-  const fetchAgents = async () => {
+  const fetchPartners = async () => {
     try {
-      setLoadingAgents(true);
+      setLoadingPartners(true);
 
-      // Try to fetch users with agent/driver roles
-      const usersResponse = await adminService.getAllUsers({ limit: 100 });
-      const allUsers = usersResponse.users || usersResponse.data || [];
-      const agentUsers = allUsers.filter(
-        (user: any) =>
-          user.role === 'agent' ||
-          user.role === 'driver' ||
-          user.role === 'pickup_agent' ||
-          user.type === 'agent' ||
-          user.type === 'driver'
-      );
+      // Fetch partners from admin service
+      const partnersResponse = await adminService.getAllPartners({ limit: 100 });
+      console.log('Partners response:', partnersResponse);
 
-      if (agentUsers.length > 0) {
-        const formattedAgents = agentUsers.map((agent: any) => ({
-          _id: agent._id,
-          name: agent.name || 'Unknown Agent',
-          phone: agent.phone || '',
-          email: agent.email || '',
-          type: agent.role || agent.type || 'agent',
+      const allPartners = partnersResponse.partners || [];
+      console.log('All partners:', allPartners);
+
+      if (allPartners.length > 0) {
+        const formattedPartners = allPartners.map((partner: any) => ({
+          _id: partner._id,
+          name: partner.businessName || partner.shopName || partner.user?.name || 'Unknown Partner',
+          phone: partner.phone || partner.shopPhone || partner.user?.phone || '',
+          email: partner.email || partner.shopEmail || partner.user?.email || '',
+          type: 'partner',
+          businessName: partner.businessName || partner.shopName,
         }));
-        setAgents(formattedAgents);
+        console.log('Formatted partners:', formattedPartners);
+        setPartners(formattedPartners);
       } else {
-        // Try pickup service as fallback
-        try {
-          const [driversResponse, agentsResponse] = await Promise.all([
-            pickupService.getDrivers({ limit: 100 }).catch(() => ({ users: [] })),
-            pickupService.getPickupAgents({ limit: 100 }).catch(() => ({ users: [] })),
-          ]);
-
-          const drivers = driversResponse.users || driversResponse.data || [];
-          const pickupAgents = agentsResponse.users || agentsResponse.data || [];
-
-          const combinedAgents = [
-            ...drivers.map((driver: any) => ({
-              _id: driver._id,
-              name: driver.name || 'Unknown Driver',
-              phone: driver.phone || '',
-              email: driver.email || '',
-              type: 'driver',
-            })),
-            ...pickupAgents.map((agent: any) => ({
-              _id: agent._id,
-              name: agent.name || 'Unknown Agent',
-              phone: agent.phone || '',
-              email: agent.email || '',
-              type: 'pickup_agent',
-            })),
-          ];
-          setAgents(combinedAgents);
-        } catch (pickupErr) {
-          console.error('Error fetching from pickup service:', pickupErr);
-          setAgents([]);
-        }
+        console.log('No partners found');
+        setPartners([]);
       }
     } catch (err: any) {
-      console.error('Error fetching agents:', err);
-      setAgents([]);
+      console.error('Error fetching partners:', err);
+      setPartners([]);
     } finally {
-      setLoadingAgents(false);
+      setLoadingPartners(false);
     }
   };
 
-  const handleAssignOrder = async (orderId: any, agentId: any) => {
-    if (!agentId) return;
+  const handleAssignOrder = async (orderId: any, partnerId: any) => {
+    if (!partnerId) return;
 
     try {
       await api.put(`/sell-orders/${orderId}/assign-staff`, {
-        assignedTo: agentId,
+        assignedTo: partnerId,
       });
       fetchOrders(pagination.currentPage, statusFilter, searchTerm);
-      alert('Agent assigned successfully!');
+      alert('Partner assigned successfully!');
     } catch (err) {
-      console.error('Failed to assign agent to order', err);
-      alert('Failed to assign agent. Please try again.');
+      console.error('Failed to assign partner to order', err);
+      alert('Failed to assign partner. Please try again.');
     }
   };
 
@@ -207,7 +175,7 @@ const SellOrders = () => {
 
   useEffect(() => {
     fetchOrders();
-    fetchAgents();
+    fetchPartners();
   }, []);
 
   useEffect(() => {
@@ -224,7 +192,70 @@ const SellOrders = () => {
   const formatDate = (d: any) =>
     new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
-  const getProductName = (o: any) => o.sessionId?.productId?.name || 'N/A';
+  const getProductName = (o: any) => {
+    // Try to get product name from session
+    if (o.sessionId?.productId?.name) {
+      return o.sessionId.productId.name;
+    }
+
+    // Try to get from session product details
+    if (o.sessionId?.productDetails?.name) {
+      return o.sessionId.productDetails.name;
+    }
+
+    // Try to get from session device info
+    if (o.sessionId?.deviceInfo?.name) {
+      return o.sessionId.deviceInfo.name;
+    }
+
+    // Fallback to generic device name
+    return 'Device for Sell';
+  };
+
+  const getDeviceDetails = (o: any) => {
+    const details = {
+      name: 'Device for Sell',
+      brand: 'Unknown',
+      model: 'Unknown',
+      condition: 'Unknown',
+      storage: 'Unknown',
+      color: 'Unknown',
+      images: [],
+    };
+
+    // Try to get details from sessionId
+    if (o.sessionId) {
+      if (o.sessionId.productId) {
+        details.name = o.sessionId.productId.name || details.name;
+        details.images = o.sessionId.productId.images || [];
+      }
+
+      if (o.sessionId.productDetails) {
+        details.name = o.sessionId.productDetails.name || details.name;
+        details.brand = o.sessionId.productDetails.brand || details.brand;
+        details.model = o.sessionId.productDetails.model || details.model;
+        details.images = o.sessionId.productDetails.images || details.images;
+      }
+
+      if (o.sessionId.deviceInfo) {
+        details.name = o.sessionId.deviceInfo.name || details.name;
+        details.brand = o.sessionId.deviceInfo.brand || details.brand;
+        details.model = o.sessionId.deviceInfo.model || details.model;
+      }
+
+      if (o.sessionId.selectedVariant) {
+        details.storage = o.sessionId.selectedVariant.storage || details.storage;
+        details.color = o.sessionId.selectedVariant.color || details.color;
+      }
+
+      if (o.sessionId.selectedCondition) {
+        details.condition =
+          o.sessionId.selectedCondition.label || o.sessionId.selectedCondition || details.condition;
+      }
+    }
+
+    return details;
+  };
   const getCustomerName = (o: any) => o.pickup?.address?.fullName || o.userId?.name || 'Guest';
 
   const calculatePriceReduction = (o: any) => {
@@ -402,7 +433,22 @@ const SellOrders = () => {
                   key={order._id}
                   className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 >
-                  <div className="flex flex-col gap-3 sm:gap-4 mb-3 sm:mb-4">
+                  <div className="flex gap-3 sm:gap-4 mb-3 sm:mb-4">
+                    {/* Device Image */}
+                    <div className="flex-shrink-0">
+                      {getDeviceDetails(order).images.length > 0 ? (
+                        <img
+                          src={getDeviceDetails(order).images[0]}
+                          alt="Device"
+                          className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-gray-200"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg border border-gray-200 flex items-center justify-center">
+                          <Package size={24} className="text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                         <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 break-all">
@@ -431,10 +477,25 @@ const SellOrders = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4">
                     <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg sm:rounded-xl p-3 sm:p-4">
                       <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                        Device
+                        Device Details
                       </div>
-                      <div className="font-semibold text-gray-900 text-sm sm:text-base break-words">
-                        {productName}
+                      <div className="space-y-1">
+                        <div className="font-semibold text-gray-900 text-sm sm:text-base break-words">
+                          {getDeviceDetails(order).name}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          {getDeviceDetails(order).brand} • {getDeviceDetails(order).model}
+                        </div>
+                        {getDeviceDetails(order).storage !== 'Unknown' && (
+                          <div className="text-xs text-gray-500">
+                            {getDeviceDetails(order).storage} • {getDeviceDetails(order).color}
+                          </div>
+                        )}
+                        {getDeviceDetails(order).condition !== 'Unknown' && (
+                          <div className="text-xs text-blue-600 font-medium">
+                            Condition: {getDeviceDetails(order).condition}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -486,14 +547,19 @@ const SellOrders = () => {
 
                     <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg sm:rounded-xl p-3 sm:p-4 sm:col-span-2 lg:col-span-1">
                       <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                        Assigned Agent
+                        Assigned Partner
                       </div>
                       {order.assignedTo ? (
                         <div className="font-semibold text-emerald-600 text-sm sm:text-base">
-                          <div className="truncate">{order.assignedTo.name}</div>
-                          {order.assignedTo.phone && (
+                          <div className="truncate">
+                            {order.assignedTo.businessName ||
+                              order.assignedTo.shopName ||
+                              order.assignedTo.user?.name ||
+                              'Unknown Partner'}
+                          </div>
+                          {(order.assignedTo.phone || order.assignedTo.user?.phone) && (
                             <div className="text-xs text-gray-500 mt-1 truncate">
-                              {order.assignedTo.phone}
+                              {order.assignedTo.phone || order.assignedTo.user?.phone}
                             </div>
                           )}
                         </div>
@@ -502,12 +568,14 @@ const SellOrders = () => {
                           className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-xs sm:text-sm"
                           onChange={e => handleAssignOrder(order._id, e.target.value)}
                           defaultValue=""
-                          disabled={loadingAgents}
+                          disabled={loadingPartners}
                         >
-                          <option value="">{loadingAgents ? 'Loading...' : 'Assign Agent'}</option>
-                          {agents.map(a => (
+                          <option value="">
+                            {loadingPartners ? 'Loading...' : 'Assign Partner'}
+                          </option>
+                          {partners.map(a => (
                             <option key={a._id} value={a._id}>
-                              {a.name} {a.phone && `(${a.phone})`}
+                              {a.businessName || a.name} {a.phone && `(${a.phone})`}
                             </option>
                           ))}
                         </select>
@@ -653,13 +721,70 @@ const SellOrders = () => {
                   Device & Status
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                    <div className="flex items-center gap-2 text-gray-600 mb-2">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:col-span-2">
+                    <div className="flex items-center gap-2 text-gray-600 mb-3">
                       <Package size={14} className="sm:w-4 sm:h-4" />
-                      <span className="text-xs uppercase tracking-wide">Product</span>
+                      <span className="text-xs uppercase tracking-wide">Device Information</span>
                     </div>
-                    <div className="font-semibold text-gray-900 text-sm sm:text-base break-words">
-                      {getProductName(selectedOrder)}
+                    <div className="space-y-2">
+                      <div className="font-semibold text-gray-900 text-sm sm:text-base break-words">
+                        {getDeviceDetails(selectedOrder).name}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-gray-500">Brand:</span>
+                          <span className="ml-1 font-medium">
+                            {getDeviceDetails(selectedOrder).brand}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Model:</span>
+                          <span className="ml-1 font-medium">
+                            {getDeviceDetails(selectedOrder).model}
+                          </span>
+                        </div>
+                        {getDeviceDetails(selectedOrder).storage !== 'Unknown' && (
+                          <>
+                            <div>
+                              <span className="text-gray-500">Storage:</span>
+                              <span className="ml-1 font-medium">
+                                {getDeviceDetails(selectedOrder).storage}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Color:</span>
+                              <span className="ml-1 font-medium">
+                                {getDeviceDetails(selectedOrder).color}
+                              </span>
+                            </div>
+                          </>
+                        )}
+                        {getDeviceDetails(selectedOrder).condition !== 'Unknown' && (
+                          <div className="col-span-2">
+                            <span className="text-gray-500">Condition:</span>
+                            <span className="ml-1 font-medium text-blue-600">
+                              {getDeviceDetails(selectedOrder).condition}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      {getDeviceDetails(selectedOrder).images.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-blue-200">
+                          <div className="text-xs text-gray-500 mb-2">Device Images:</div>
+                          <div className="flex gap-2 overflow-x-auto">
+                            {getDeviceDetails(selectedOrder)
+                              .images.slice(0, 3)
+                              .map((image: string, index: number) => (
+                                <img
+                                  key={index}
+                                  src={image}
+                                  alt={`Device ${index + 1}`}
+                                  className="w-12 h-12 object-cover rounded border border-gray-200 flex-shrink-0"
+                                />
+                              ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
@@ -676,11 +801,16 @@ const SellOrders = () => {
                   <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:col-span-2">
                     <div className="flex items-center gap-2 text-gray-600 mb-2">
                       <User size={14} className="sm:w-4 sm:h-4" />
-                      <span className="text-xs uppercase tracking-wide">Assigned Agent</span>
+                      <span className="text-xs uppercase tracking-wide">Assigned Partner</span>
                     </div>
                     {selectedOrder.assignedTo ? (
                       <div className="font-semibold text-emerald-600 text-sm sm:text-base break-words">
-                        {selectedOrder.assignedTo.name} ({selectedOrder.assignedTo.phone})
+                        {selectedOrder.assignedTo.businessName ||
+                          selectedOrder.assignedTo.shopName ||
+                          selectedOrder.assignedTo.user?.name ||
+                          'Unknown Partner'}
+                        {(selectedOrder.assignedTo.phone || selectedOrder.assignedTo.user?.phone) &&
+                          ` (${selectedOrder.assignedTo.phone || selectedOrder.assignedTo.user?.phone})`}
                       </div>
                     ) : (
                       <select
@@ -689,12 +819,12 @@ const SellOrders = () => {
                           handleAssignOrder(selectedOrder._id, e.target.value);
                           setShowDetailsModal(false);
                         }}
-                        disabled={loadingAgents}
+                        disabled={loadingPartners}
                       >
-                        <option>{loadingAgents ? 'Loading...' : 'Assign Agent'}</option>
-                        {agents.map(a => (
+                        <option>{loadingPartners ? 'Loading...' : 'Assign Partner'}</option>
+                        {partners.map(a => (
                           <option key={a._id} value={a._id}>
-                            {a.name} {a.phone && `(${a.phone})`}
+                            {a.businessName || a.name} {a.phone && `(${a.phone})`}
                           </option>
                         ))}
                       </select>
@@ -702,6 +832,49 @@ const SellOrders = () => {
                   </div>
                 </div>
               </section>
+
+              {/* Session Details Section */}
+              {selectedOrder.sessionId && (
+                <section>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4 pb-2 border-b-2 border-gray-200">
+                    Session Information
+                  </h3>
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-gray-600">Session ID:</span>
+                        <div className="font-mono text-xs break-all">
+                          {selectedOrder.sessionId._id || selectedOrder.sessionId}
+                        </div>
+                      </div>
+                      {selectedOrder.sessionId.finalPrice && (
+                        <div>
+                          <span className="text-gray-600">Session Final Price:</span>
+                          <div className="font-semibold text-green-600">
+                            {formatCurrency(selectedOrder.sessionId.finalPrice)}
+                          </div>
+                        </div>
+                      )}
+                      {selectedOrder.sessionId.createdAt && (
+                        <div>
+                          <span className="text-gray-600">Session Created:</span>
+                          <div className="font-medium">
+                            {formatDate(selectedOrder.sessionId.createdAt)}
+                          </div>
+                        </div>
+                      )}
+                      {selectedOrder.sessionId.expiresAt && (
+                        <div>
+                          <span className="text-gray-600">Session Expires:</span>
+                          <div className="font-medium">
+                            {formatDate(selectedOrder.sessionId.expiresAt)}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </section>
+              )}
 
               <section>
                 <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4 pb-2 border-b-2 border-gray-200">

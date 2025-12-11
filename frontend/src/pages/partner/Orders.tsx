@@ -17,6 +17,7 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronRight,
+  TrendingDown,
 } from 'lucide-react';
 import partnerService from '../../services/partnerService';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
@@ -89,6 +90,11 @@ interface Order {
     amount: number;
   };
   paymentDetails?: {
+    method: string;
+    status: string;
+  };
+  // Sell order payment field
+  payment?: {
     method: string;
     status: string;
   };
@@ -766,13 +772,23 @@ function Orders() {
                       #{order.orderNumber || order._id.slice(-8).toUpperCase()}
                     </h3>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${
                         order.orderType === 'buy'
                           ? 'bg-blue-100 text-blue-800'
                           : 'bg-orange-100 text-orange-800'
                       }`}
                     >
-                      {order.orderType === 'buy' ? 'Buy Order' : 'Sell Order'}
+                      {order.orderType === 'buy' ? (
+                        <>
+                          <Package size={10} />
+                          Buy Order
+                        </>
+                      ) : (
+                        <>
+                          <TrendingDown size={10} />
+                          Sell Order
+                        </>
+                      )}
                     </span>
                   </div>
                   <div className="flex flex-col gap-1 text-sm text-slate-600">
@@ -897,6 +913,49 @@ function Orders() {
                   </div>
                 </div>
 
+                {/* Sell Order Specific Information */}
+                {order.orderType === 'sell' && (
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-slate-900 mb-3">Sell Order Details</h4>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="font-medium text-blue-900">Quote Amount:</span>
+                          <div className="text-lg font-bold text-blue-600">
+                            ₹{order.totalAmount?.toLocaleString()}
+                          </div>
+                        </div>
+                        {order.pickupDetails?.slot && (
+                          <div>
+                            <span className="font-medium text-blue-900">Pickup Slot:</span>
+                            <div className="text-blue-800">
+                              {new Date(order.pickupDetails.slot.date).toLocaleDateString('en-IN')}(
+                              {order.pickupDetails.slot.window})
+                            </div>
+                          </div>
+                        )}
+                        <div>
+                          <span className="font-medium text-blue-900">Payment Method:</span>
+                          <div className="text-blue-800 capitalize">
+                            {order.paymentMethod || order.payment?.method}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-blue-900">Order Type:</span>
+                          <div className="text-blue-800">Customer selling device to you</div>
+                        </div>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-blue-200">
+                        <p className="text-xs text-blue-700">
+                          <strong>Note:</strong> This is a sell order where the customer is selling
+                          their device to you. Confirm the order, arrange pickup, and process
+                          payment upon device collection.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Products List */}
                 <div className="mb-6">
                   <h4 className="font-semibold text-slate-900 mb-3">Order Items</h4>
@@ -935,15 +994,26 @@ function Orders() {
                               Category: {item.product.categoryId.name}
                             </p>
                           )}
-                          <p className="text-sm text-slate-500">Quantity: {item.quantity}</p>
+                          <p className="text-sm text-slate-500">
+                            {order.orderType === 'sell'
+                              ? 'Device to Purchase'
+                              : `Quantity: ${item.quantity}`}
+                          </p>
+                          {order.orderType === 'sell' && (
+                            <p className="text-xs text-blue-600 font-medium">
+                              Customer selling device to you
+                            </p>
+                          )}
                         </div>
                         <div className="text-right">
                           <p className="font-semibold text-slate-900">
-                            {item.product?.pricing?.mrp ||
-                            item.product?.pricing?.discountedPrice ||
-                            item.product?.price
-                              ? `₹${(item.product.pricing?.mrp || item.product.pricing?.discountedPrice || item.product.price)?.toLocaleString()}`
-                              : 'Price N/A'}
+                            {order.orderType === 'sell'
+                              ? `₹${item.price?.toLocaleString() || order.totalAmount?.toLocaleString()}`
+                              : item.product?.pricing?.mrp ||
+                                  item.product?.pricing?.discountedPrice ||
+                                  item.product?.price
+                                ? `₹${(item.product.pricing?.mrp || item.product.pricing?.discountedPrice || item.product.price)?.toLocaleString()}`
+                                : 'Price N/A'}
                           </p>
                           {item.product?.pricing?.discountedPrice &&
                             item.product?.pricing?.mrp &&

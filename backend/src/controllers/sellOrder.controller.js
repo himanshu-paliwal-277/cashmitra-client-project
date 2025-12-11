@@ -194,7 +194,14 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
       },
     })
     .populate("userId", "name email phone")
-    .populate("assignedTo", "name email")
+    .populate({
+      path: "assignedTo",
+      populate: {
+        path: "user",
+        select: "name email phone",
+      },
+      select: "businessName shopName email phone user",
+    })
     .sort(sortOptions)
     .limit(limit * 1)
     .skip((page - 1) * limit);
@@ -285,28 +292,35 @@ exports.assignOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Order not found");
   }
 
-  // Verify the staff/agent exists
-  const User = require("../models/user.model");
-  const staff = await User.findById(staffId);
-  if (!staff) {
-    throw new ApiError(404, "Staff/Agent not found");
+  // Verify the partner exists
+  const Partner = require("../models/partner.model");
+  const partner = await Partner.findById(staffId).populate(
+    "user",
+    "name email phone"
+  );
+  if (!partner) {
+    throw new ApiError(404, "Partner not found");
   }
 
-  console.log("=== ASSIGNING ORDER TO STAFF ===");
+  console.log("=== ASSIGNING ORDER TO PARTNER ===");
   console.log("Order ID:", orderId);
-  console.log("Staff ID:", staffId);
-  console.log("Staff Name:", staff.name);
-  console.log("Staff Role:", staff.role);
+  console.log("Partner ID:", staffId);
+  console.log("Partner Name:", partner.businessName || partner.shopName);
+  console.log("Partner User:", partner.user?.name);
 
   order.assignedTo = staffId;
   await order.save();
 
-  const updatedOrder = await SellOrder.findById(orderId).populate(
-    "assignedTo",
-    "name email phone"
-  );
+  const updatedOrder = await SellOrder.findById(orderId).populate({
+    path: "assignedTo",
+    populate: {
+      path: "user",
+      select: "name email phone",
+    },
+    select: "businessName shopName email phone user",
+  });
 
-  console.log("✅ Order assigned successfully");
+  console.log("✅ Order assigned to partner successfully");
   console.log("Updated Order assignedTo:", updatedOrder.assignedTo);
   console.log("================================");
 

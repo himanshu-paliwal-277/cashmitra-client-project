@@ -193,6 +193,22 @@ class AdminService {
     }
   }
 
+  async getAllPartners(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.status) queryParams.append('status', params.status);
+      if (params.search) queryParams.append('search', params.search);
+
+      const response = await api.get(`/admin/partners?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching all partners:', error);
+      throw error.response?.data || error;
+    }
+  }
+
   // Order Management
   async getOrders(page = 1, limit = 10, status = '', type = '') {
     try {
