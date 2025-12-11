@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Search,
   Eye,
@@ -15,6 +15,8 @@ import {
   Loader2,
   XCircle,
   RefreshCw,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import partnerService from '../../services/partnerService';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
@@ -71,7 +73,7 @@ interface OrderItem {
 
 interface Order {
   _id: string;
-  orderType?: string;
+  orderType: 'buy' | 'sell';
   user: {
     _id: string;
     name: string;
@@ -107,6 +109,7 @@ interface Order {
     state: string;
     pincode: string;
   };
+  // Buy order specific fields
   partnerAssignment?: {
     assignedAt: string;
     assignedBy?: string;
@@ -123,6 +126,30 @@ interface Order {
     note?: string;
     _id?: string;
   }>;
+  // Sell order specific fields
+  pickupDetails?: {
+    address?: {
+      fullName?: string;
+      phone?: string;
+      street: string;
+      city: string;
+      state: string;
+      pincode: string;
+    };
+    slot?: {
+      date: string;
+      window: string;
+    };
+    assignedTo?: {
+      _id: string;
+      name: string;
+      email: string;
+      phone: string;
+    };
+  };
+  orderNumber?: string;
+  quoteAmount?: number;
+  actualAmount?: number;
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -143,8 +170,14 @@ function Orders() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
+  const [orderTypeFilter, setOrderTypeFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
   const [stats, setStats] = useState({
     total: 0,
+    buyOrders: 0,
+    sellOrders: 0,
     pending: 0,
     processing: 0,
     delivered: 0,
@@ -158,49 +191,124 @@ function Orders() {
   const [showMissingInventoryModal, setShowMissingInventoryModal] = useState(false);
   const [canAcceptOrder, setCanAcceptOrder] = useState(false);
   const [checkingInventory, setCheckingInventory] = useState(false);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
-  // Fetch orders data
+  // Debounce search term
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500); // 500ms delay for search
 
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await partnerService.getOrders();
-      console.log('Orders response:', response);
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
 
-      if (response.success) {
-        const ordersList = response.data.docs || [];
-        setOrders(ordersList);
+  const fetchOrders = useCallback(
+    async (page = 1, searchQuery = debouncedSearchTerm) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-        // Calculate stats
-        const total = ordersList.length;
-        const pending = ordersList.filter((order: Order) => order.status === 'pending').length;
-        const processing = ordersList.filter(
-          (order: Order) => order.status === 'processing'
-        ).length;
-        const delivered = ordersList.filter((order: Order) => order.status === 'delivered').length;
+        const params: any = {
+          page,
+          limit: 10,
+        };
 
-        setStats({ total, pending, processing, delivered });
+        // Add filters
+        if (orderTypeFilter !== 'all') {
+          params.orderType = orderTypeFilter;
+        }
+        if (statusFilter !== 'all') {
+          params.status = statusFilter;
+        }
+        if (searchQuery.trim()) {
+          params.search = searchQuery.trim();
+        }
+
+        // Add date filters
+        if (dateFilter !== 'all') {
+          const now = new Date();
+          switch (dateFilter) {
+            case 'today':
+              params.startDate = new Date(now.setHours(0, 0, 0, 0)).toISOString();
+              params.endDate = new Date(now.setHours(23, 59, 59, 999)).toISOString();
+              break;
+            case 'week':
+              const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+              params.startDate = weekAgo.toISOString();
+              break;
+            case 'month':
+              const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+              params.startDate = monthAgo.toISOString();
+              break;
+          }
+        }
+
+        const response = await partnerService.getOrders(params);
+        console.log('Orders response:', response);
+
+        if (response.success) {
+          const ordersList = response.data.docs || [];
+          setOrders(ordersList);
+
+          // Update pagination state
+          setCurrentPage(response.data.page || 1);
+          setTotalPages(response.data.totalPages || 1);
+          setTotalOrders(response.data.totalDocs || 0);
+
+          // Calculate stats from current page (for display purposes)
+          // Note: These are just for the current page, not total stats
+          const total = ordersList.length;
+          const buyOrders = ordersList.filter((order: Order) => order.orderType === 'buy').length;
+          const sellOrders = ordersList.filter((order: Order) => order.orderType === 'sell').length;
+          const pending = ordersList.filter(
+            (order: Order) => order.status === 'pending' || order.status === 'draft'
+          ).length;
+          const processing = ordersList.filter(
+            (order: Order) => order.status === 'processing' || order.status === 'confirmed'
+          ).length;
+          const delivered = ordersList.filter(
+            (order: Order) => order.status === 'delivered' || order.status === 'paid'
+          ).length;
+
+          setStats({ total: totalOrders, buyOrders, sellOrders, pending, processing, delivered });
+        }
+      } catch (err: any) {
+        console.error('Error fetching orders:', err);
+        setError(err.message || 'Failed to load orders');
+      } finally {
+        setLoading(false);
       }
-    } catch (err: any) {
-      console.error('Error fetching orders:', err);
-      setError(err.message || 'Failed to load orders');
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [orderTypeFilter, statusFilter, dateFilter, debouncedSearchTerm]
+  );
+
+  // Fetch orders data when filters change (including debounced search)
+  useEffect(() => {
+    fetchOrders(1); // Reset to page 1 when filters change
+    setCurrentPage(1);
+  }, [fetchOrders]);
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     try {
       const response = await partnerService.updateOrderStatus(orderId, { status: newStatus });
       if (response.success) {
-        fetchOrders(); // Refresh the list
+        fetchOrders(currentPage, debouncedSearchTerm); // Refresh the list
       }
     } catch (err: any) {
       console.error('Error updating order status:', err);
+      alert(err.message || 'Failed to update order status');
+    }
+  };
+
+  const handleSellOrderStatusUpdate = async (orderId: string, newStatus: string) => {
+    try {
+      const response = await partnerService.updateSellOrderStatus(orderId, { status: newStatus });
+      if (response.success) {
+        fetchOrders(currentPage, debouncedSearchTerm); // Refresh the list
+        alert(`Order status updated to ${newStatus}!`);
+      }
+    } catch (err: any) {
+      console.error('Error updating sell order status:', err);
       alert(err.message || 'Failed to update order status');
     }
   };
@@ -237,7 +345,7 @@ function Orders() {
       if (response.success) {
         setShowResponseModal(false);
         setResponseReason('');
-        fetchOrders(); // Refresh orders
+        fetchOrders(currentPage, debouncedSearchTerm); // Refresh orders
         alert(`Order ${responseType} successfully!`);
       }
     } catch (error: any) {
@@ -284,37 +392,8 @@ function Orders() {
     setShowResponseModal(true);
   };
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch =
-      order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.user.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-
-    // Date filtering logic
-    let matchesDate = true;
-    if (dateFilter !== 'all') {
-      const orderDate = new Date(order.createdAt);
-      const now = new Date();
-
-      switch (dateFilter) {
-        case 'today':
-          matchesDate = orderDate.toDateString() === now.toDateString();
-          break;
-        case 'week':
-          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          matchesDate = orderDate >= weekAgo;
-          break;
-        case 'month':
-          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-          matchesDate = orderDate >= monthAgo;
-          break;
-      }
-    }
-
-    return matchesSearch && matchesStatus && matchesDate;
-  });
+  // Orders are already filtered server-side, no need for client-side filtering
+  const filteredOrders = orders;
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -379,7 +458,50 @@ function Orders() {
   const getActionButtons = (order: Order) => {
     const buttons = [];
 
-    // Check if order needs partner response first
+    // Sell orders have different workflow - no assignment response needed
+    if (order.orderType === 'sell') {
+      switch (order.status) {
+        case 'draft':
+          buttons.push(
+            <button
+              key="confirm"
+              onClick={() => handleSellOrderStatusUpdate(order._id, 'confirmed')}
+              className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors flex items-center gap-1"
+            >
+              <CheckCircle size={14} />
+              Confirm Order
+            </button>
+          );
+          break;
+        case 'confirmed':
+          buttons.push(
+            <button
+              key="pickup"
+              onClick={() => handleSellOrderStatusUpdate(order._id, 'picked')}
+              className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors flex items-center gap-1"
+            >
+              <Truck size={14} />
+              Mark Picked Up
+            </button>
+          );
+          break;
+        case 'picked':
+          buttons.push(
+            <button
+              key="pay"
+              onClick={() => handleSellOrderStatusUpdate(order._id, 'paid')}
+              className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors flex items-center gap-1"
+            >
+              <CheckCircle size={14} />
+              Mark Paid
+            </button>
+          );
+          break;
+      }
+      return buttons;
+    }
+
+    // Buy order workflow - check if order needs partner response first
     if (order.partnerAssignment?.response?.status === 'pending') {
       buttons.push(
         <button
@@ -505,7 +627,7 @@ function Orders() {
               <p className="text-red-600 text-sm">{error}</p>
             </div>
             <button
-              onClick={fetchOrders}
+              onClick={() => fetchOrders(currentPage, debouncedSearchTerm)}
               className="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200 transition-colors flex items-center gap-1"
             >
               <RefreshCw size={14} />
@@ -520,7 +642,7 @@ function Orders() {
         <h1 className="text-3xl font-bold text-slate-900">Order Management</h1>
         <div className="flex gap-4">
           <button
-            onClick={fetchOrders}
+            onClick={() => fetchOrders(currentPage, debouncedSearchTerm)}
             className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-all duration-200 flex items-center gap-2"
           >
             <RefreshCw size={20} />
@@ -547,22 +669,30 @@ function Orders() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
-          <h3 className="text-2xl font-bold text-slate-900 mb-1">{stats.total}</h3>
-          <p className="text-sm text-slate-600">Total Orders</p>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <h3 className="text-xl font-bold text-slate-900 mb-1">{stats.total}</h3>
+          <p className="text-xs text-slate-600">Total Orders</p>
         </div>
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
-          <h3 className="text-2xl font-bold text-yellow-600 mb-1">{stats.pending}</h3>
-          <p className="text-sm text-slate-600">Pending</p>
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <h3 className="text-xl font-bold text-blue-600 mb-1">{stats.buyOrders}</h3>
+          <p className="text-xs text-slate-600">Buy Orders</p>
         </div>
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
-          <h3 className="text-2xl font-bold text-purple-600 mb-1">{stats.processing}</h3>
-          <p className="text-sm text-slate-600">Processing</p>
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <h3 className="text-xl font-bold text-orange-600 mb-1">{stats.sellOrders}</h3>
+          <p className="text-xs text-slate-600">Sell Orders</p>
         </div>
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-center">
-          <h3 className="text-2xl font-bold text-green-600 mb-1">{stats.delivered}</h3>
-          <p className="text-sm text-slate-600">Delivered</p>
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <h3 className="text-xl font-bold text-yellow-600 mb-1">{stats.pending}</h3>
+          <p className="text-xs text-slate-600">Pending</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <h3 className="text-xl font-bold text-purple-600 mb-1">{stats.processing}</h3>
+          <p className="text-xs text-slate-600">Processing</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <h3 className="text-xl font-bold text-green-600 mb-1">{stats.delivered}</h3>
+          <p className="text-xs text-slate-600">Completed</p>
         </div>
       </div>
 
@@ -607,6 +737,16 @@ function Orders() {
             <option value="week">This Week</option>
             <option value="month">This Month</option>
           </select>
+
+          <select
+            value={orderTypeFilter}
+            onChange={e => setOrderTypeFilter(e.target.value)}
+            className="px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+          >
+            <option value="all">All Types</option>
+            <option value="buy">Buy Orders</option>
+            <option value="sell">Sell Orders</option>
+          </select>
         </div>
       </div>
 
@@ -621,9 +761,20 @@ function Orders() {
               {/* Order Header */}
               <div className="p-6 border-b border-slate-200 flex justify-between items-start">
                 <div className="flex flex-col gap-1">
-                  <h3 className="text-lg font-semibold text-slate-900">
-                    #{order._id.slice(-8).toUpperCase()}
-                  </h3>
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-lg font-semibold text-slate-900">
+                      #{order.orderNumber || order._id.slice(-8).toUpperCase()}
+                    </h3>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        order.orderType === 'buy'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-orange-100 text-orange-800'
+                      }`}
+                    >
+                      {order.orderType === 'buy' ? 'Buy Order' : 'Sell Order'}
+                    </span>
+                  </div>
                   <div className="flex flex-col gap-1 text-sm text-slate-600">
                     <div className="flex items-center gap-2">
                       <Calendar size={14} />
@@ -646,6 +797,17 @@ function Orders() {
                           hour: '2-digit',
                           minute: '2-digit',
                         })}
+                      </div>
+                    )}
+                    {order.pickupDetails?.slot && (
+                      <div className="flex items-center gap-2 text-green-600">
+                        <Truck size={14} />
+                        Pickup:{' '}
+                        {new Date(order.pickupDetails.slot.date).toLocaleDateString('en-IN', {
+                          month: 'short',
+                          day: 'numeric',
+                        })}{' '}
+                        ({order.pickupDetails.slot.window})
                       </div>
                     )}
                   </div>
@@ -686,27 +848,41 @@ function Orders() {
                   <div>
                     <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
                       <MapPin size={16} />
-                      Delivery Address
+                      {order.orderType === 'buy' ? 'Delivery Address' : 'Pickup Address'}
                     </h4>
                     <div className="space-y-1 text-sm text-slate-600">
                       <div className="flex items-start gap-2">
                         <MapPin size={14} className="mt-0.5 flex-shrink-0" />
                         <div>
-                          {order.shippingDetails?.address || order.shippingAddress ? (
+                          {order.shippingDetails?.address ||
+                          order.shippingAddress ||
+                          order.pickupDetails?.address ? (
                             <>
+                              {order.pickupDetails?.address?.fullName && (
+                                <div className="font-medium">
+                                  {order.pickupDetails.address.fullName}
+                                </div>
+                              )}
+                              {order.pickupDetails?.address?.phone && (
+                                <div>{order.pickupDetails.address.phone}</div>
+                              )}
                               <div>
                                 {order.shippingDetails?.address?.street ||
-                                  order.shippingAddress?.street}
+                                  order.shippingAddress?.street ||
+                                  order.pickupDetails?.address?.street}
                               </div>
                               <div>
                                 {order.shippingDetails?.address?.city ||
-                                  order.shippingAddress?.city}
+                                  order.shippingAddress?.city ||
+                                  order.pickupDetails?.address?.city}
                                 ,{' '}
                                 {order.shippingDetails?.address?.state ||
-                                  order.shippingAddress?.state}{' '}
+                                  order.shippingAddress?.state ||
+                                  order.pickupDetails?.address?.state}{' '}
                                 -{' '}
                                 {order.shippingDetails?.address?.pincode ||
-                                  order.shippingAddress?.pincode}
+                                  order.shippingAddress?.pincode ||
+                                  order.pickupDetails?.address?.pincode}
                               </div>
                               {order.shippingDetails?.address?.country && (
                                 <div>{order.shippingDetails.address.country}</div>
@@ -810,6 +986,69 @@ function Orders() {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-8">
+          <div className="text-sm text-slate-600">
+            Showing {(currentPage - 1) * 10 + 1} to {Math.min(currentPage * 10, totalOrders)} of{' '}
+            {totalOrders} orders
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => fetchOrders(currentPage - 1, debouncedSearchTerm)}
+              disabled={currentPage === 1}
+              className="px-3 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            >
+              <ChevronLeft size={16} />
+              Previous
+            </button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const pageNum = i + 1;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => fetchOrders(pageNum, debouncedSearchTerm)}
+                    className={`px-3 py-2 rounded-lg transition-colors ${
+                      currentPage === pageNum
+                        ? 'bg-blue-500 text-white'
+                        : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              {totalPages > 5 && (
+                <>
+                  <span className="px-2 text-slate-500">...</span>
+                  <button
+                    onClick={() => fetchOrders(totalPages, debouncedSearchTerm)}
+                    className={`px-3 py-2 rounded-lg transition-colors ${
+                      currentPage === totalPages
+                        ? 'bg-blue-500 text-white'
+                        : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    {totalPages}
+                  </button>
+                </>
+              )}
+            </div>
+
+            <button
+              onClick={() => fetchOrders(currentPage + 1, debouncedSearchTerm)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            >
+              Next
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Order Details Modal */}
       {showDetailsModal && selectedOrder && (

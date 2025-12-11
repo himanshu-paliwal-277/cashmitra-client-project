@@ -513,45 +513,245 @@ exports.getOrders = async (req, res) => {
     throw new ApiError("Partner profile not found", 404);
   }
 
-  const { page = 1, limit = 10, sort = "-createdAt", status } = req.query;
-
-  const queryObj = { partner: partner._id };
-  if (status) queryObj.status = status;
+  const {
+    page = 1,
+    limit = 10,
+    sort = "-createdAt",
+    status,
+    orderType,
+    search,
+    startDate,
+    endDate,
+  } = req.query;
 
   const pageNum = parseInt(page, 10);
   const limitNum = parseInt(limit, 10);
   const skip = (pageNum - 1) * limitNum;
 
-  // Get orders with regular MongoDB queries
-  const orders = await Order.find(queryObj)
-    .populate("user", "name email phone")
-    .populate(
-      "items.product",
-      "name brand categoryId images pricing variants conditionOptions isActive"
-    )
-    .populate({
-      path: "items.inventory",
-      populate: { path: "product", select: "name brand categoryId images" },
-    })
-    .sort(sort)
-    .skip(skip)
-    .limit(limitNum);
+  // Parse sort parameter
+  const sortField = sort.startsWith("-") ? sort.substring(1) : sort;
+  const sortOrder = sort.startsWith("-") ? -1 : 1;
+  const sortObj = { [sortField]: sortOrder };
 
-  // Get total count for pagination
-  const totalOrders = await Order.countDocuments(queryObj);
+  let allOrders = [];
+  let totalCount = 0;
 
-  // Convert orders to plain objects for response
-  const filteredOrders = orders.map((order) => order.toObject());
+  // Build date filter if provided
+  const dateFilter = {};
+  if (startDate || endDate) {
+    if (startDate) dateFilter.$gte = new Date(startDate);
+    if (endDate) dateFilter.$lte = new Date(endDate);
+  }
+
+  // Fetch buy orders (from Order model)
+  if (!orderType || orderType === "buy") {
+    const buyQueryObj = { partner: partner._id };
+
+    // Apply filters
+    if (status) buyQueryObj.status = status;
+    if (Object.keys(dateFilter).length > 0) buyQueryObj.createdAt = dateFilter;
+
+    // Search filter for buy orders
+    if (search) {
+      const searchConditions = [];
+
+      // Search by order ID (exact match if it's a valid ObjectId)
+      if (search.match(/^[0-9a-fA-F]{24}$/)) {
+        searchConditions.push({ _id: search });
+      }
+
+      // Search in user fields - we'll need to find users first
+      const User = require("../models/user.model");
+      const matchingUsers = await User.find({
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
+        ],
+      }).select("_id");
+
+      if (matchingUsers.length > 0) {
+        searchConditions.push({
+          user: { $in: matchingUsers.map((u) => u._id) },
+        });
+      }
+
+      if (searchConditions.length > 0) {
+        buyQueryObj.$or = searchConditions;
+      } else {
+        // If no valid search conditions, return empty results
+        buyQueryObj._id = null;
+      }
+    }
+
+    // Get total count for buy orders
+    const buyOrdersCount = await Order.countDocuments(buyQueryObj);
+    totalCount += buyOrdersCount;
+
+    // If we need buy orders for this page
+    if (orderType === "buy" || !orderType) {
+      const buyOrders = await Order.find(buyQueryObj)
+        .populate("user", "name email phone")
+        .populate(
+          "items.product",
+          "name brand categoryId images pricing variants conditionOptions isActive"
+        )
+        .populate({
+          path: "items.inventory",
+          populate: { path: "product", select: "name brand categoryId images" },
+        })
+        .sort(sortObj)
+        .lean();
+
+      // Add orderType field to buy orders
+      const buyOrdersWithType = buyOrders.map((order) => ({
+        ...order,
+        orderType: "buy",
+        // Normalize address structure
+        shippingAddress:
+          order.shippingDetails?.address || order.shippingAddress,
+        paymentMethod: order.paymentDetails?.method || order.paymentMethod,
+      }));
+
+      allOrders = [...allOrders, ...buyOrdersWithType];
+    }
+  }
+
+  // Fetch sell orders (from SellOrder model)
+  if (!orderType || orderType === "sell") {
+    const SellOrder = require("../models/sellOrder.model");
+
+    const sellQueryObj = { partnerId: partner._id };
+
+    // Apply filters
+    if (status) sellQueryObj.status = status;
+    if (Object.keys(dateFilter).length > 0) sellQueryObj.createdAt = dateFilter;
+
+    // Search filter for sell orders
+    if (search) {
+      const searchConditions = [];
+
+      // Search by order ID (exact match if it's a valid ObjectId)
+      if (search.match(/^[0-9a-fA-F]{24}$/)) {
+        searchConditions.push({ _id: search });
+      }
+
+      // Search by order number (if it exists)
+      if (search.length >= 3) {
+        searchConditions.push({
+          orderNumber: { $regex: search, $options: "i" },
+        });
+      }
+
+      // Search in pickup address fields
+      searchConditions.push({
+        "pickup.address.fullName": { $regex: search, $options: "i" },
+      });
+      searchConditions.push({
+        "pickup.address.phone": { $regex: search, $options: "i" },
+      });
+
+      // Search in user fields - we'll need to find users first
+      const User = require("../models/user.model");
+      const matchingUsers = await User.find({
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
+        ],
+      }).select("_id");
+
+      if (matchingUsers.length > 0) {
+        searchConditions.push({
+          userId: { $in: matchingUsers.map((u) => u._id) },
+        });
+      }
+
+      if (searchConditions.length > 0) {
+        sellQueryObj.$or = searchConditions;
+      } else {
+        // If no valid search conditions, return empty results
+        sellQueryObj._id = null;
+      }
+    }
+
+    // Get total count for sell orders
+    const sellOrdersCount = await SellOrder.countDocuments(sellQueryObj);
+    totalCount += sellOrdersCount;
+
+    // If we need sell orders for this page
+    if (orderType === "sell" || !orderType) {
+      const sellOrders = await SellOrder.find(sellQueryObj)
+        .populate("userId", "name email phone")
+        .populate("sessionId")
+        .populate("assignedTo", "name email phone")
+        .sort(sortObj)
+        .lean();
+
+      // Transform sell orders to match buy order structure
+      const sellOrdersWithType = sellOrders.map((order) => ({
+        ...order,
+        _id: order._id,
+        orderType: "sell",
+        user: order.userId || { name: "Guest User", email: "", phone: "" },
+        totalAmount: order.actualAmount || order.quoteAmount,
+        // Transform pickup address to shipping address format
+        shippingAddress: order.pickup?.address
+          ? {
+              street: order.pickup.address.street,
+              city: order.pickup.address.city,
+              state: order.pickup.address.state,
+              pincode: order.pickup.address.pincode,
+            }
+          : null,
+        paymentMethod: order.payment?.method,
+        // Create items array for consistency (sell orders don't have items like buy orders)
+        items: [
+          {
+            _id: `${order._id}_item`,
+            product: {
+              _id: order.sessionId?._id || "unknown",
+              name: order.sessionId?.productDetails?.name || "Device for Sell",
+              brand: order.sessionId?.productDetails?.brand || "Unknown",
+              images: order.sessionId?.productDetails?.images || {},
+            },
+            quantity: 1,
+            price: order.actualAmount || order.quoteAmount,
+          },
+        ],
+        // Add pickup-specific fields
+        pickupDetails: {
+          address: order.pickup?.address,
+          slot: order.pickup?.slot,
+          assignedTo: order.assignedTo,
+        },
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+      }));
+
+      allOrders = [...allOrders, ...sellOrdersWithType];
+    }
+  }
+
+  // Sort all orders together by creation date
+  allOrders.sort((a, b) => {
+    const aValue = new Date(a.createdAt);
+    const bValue = new Date(b.createdAt);
+    return sortOrder * (aValue - bValue);
+  });
+
+  // Apply pagination to combined results
+  const paginatedOrders = allOrders.slice(skip, skip + limitNum);
 
   res.status(200).json({
     success: true,
     data: {
-      docs: filteredOrders,
-      totalDocs: totalOrders,
+      docs: paginatedOrders,
+      totalDocs: totalCount,
       limit: limitNum,
       page: pageNum,
-      totalPages: Math.ceil(totalOrders / limitNum),
-      hasNextPage: pageNum < Math.ceil(totalOrders / limitNum),
+      totalPages: Math.ceil(totalCount / limitNum),
+      hasNextPage: pageNum < Math.ceil(totalCount / limitNum),
       hasPrevPage: pageNum > 1,
     },
   });
@@ -835,20 +1035,39 @@ exports.getDashboardStats = async (req, res) => {
       quantity: { $gt: 0 },
     });
 
-    // Get order stats
-    const totalOrders = await Order.countDocuments({
+    // Get buy order stats
+    const buyOrders = await Order.countDocuments({
       partner: partner._id,
     });
-    const pendingOrders = await Order.countDocuments({
+    const pendingBuyOrders = await Order.countDocuments({
       partner: partner._id,
       status: { $in: ["pending", "processing"] },
     });
-    const completedOrders = await Order.countDocuments({
+    const completedBuyOrders = await Order.countDocuments({
       partner: partner._id,
       status: "delivered",
     });
 
-    // Get revenue stats
+    // Get sell order stats
+    const SellOrder = require("../models/sellOrder.model");
+    const sellOrders = await SellOrder.countDocuments({
+      partnerId: partner._id,
+    });
+    const pendingSellOrders = await SellOrder.countDocuments({
+      partnerId: partner._id,
+      status: { $in: ["draft", "confirmed"] },
+    });
+    const completedSellOrders = await SellOrder.countDocuments({
+      partnerId: partner._id,
+      status: "paid",
+    });
+
+    // Combined order stats
+    const totalOrders = buyOrders + sellOrders;
+    const pendingOrders = pendingBuyOrders + pendingSellOrders;
+    const completedOrders = completedBuyOrders + completedSellOrders;
+
+    // Get revenue stats from buy orders
     const orders = await Order.find({
       partner: partner._id,
       status: "delivered",
@@ -871,13 +1090,64 @@ exports.getDashboardStats = async (req, res) => {
       });
     });
 
-    // Get recent orders
-    const recentOrders = await Order.find({ partner: partner._id })
+    // Add revenue from sell orders
+    const completedSellOrdersData = await SellOrder.find({
+      partnerId: partner._id,
+      status: "paid",
+    });
+
+    completedSellOrdersData.forEach((order) => {
+      totalRevenue += order.actualAmount || order.quoteAmount || 0;
+      // Sell orders might have different commission structure
+      // For now, we'll assume a 10% commission on sell orders
+      const sellCommission =
+        (order.actualAmount || order.quoteAmount || 0) * 0.1;
+      totalCommission += sellCommission;
+    });
+
+    // Get recent orders (both buy and sell)
+    const recentBuyOrders = await Order.find({ partner: partner._id })
       .sort("-createdAt")
-      .limit(5)
+      .limit(3)
       .populate("user", "name")
-      .populate("items.product", "model brand category images price")
-      .populate("items.inventory", "product");
+      .populate("items.product", "name brand categoryId images pricing")
+      .lean();
+
+    const recentSellOrders = await SellOrder.find({ partnerId: partner._id })
+      .sort("-createdAt")
+      .limit(3)
+      .populate("userId", "name")
+      .populate("sessionId")
+      .lean();
+
+    // Transform sell orders to match buy order structure for frontend
+    const transformedSellOrders = recentSellOrders.map((order) => ({
+      ...order,
+      orderType: "sell",
+      user: order.userId || { name: "Guest User" },
+      totalAmount: order.actualAmount || order.quoteAmount,
+      items: [
+        {
+          product: {
+            name: order.sessionId?.productDetails?.name || "Device for Sell",
+            brand: order.sessionId?.productDetails?.brand || "Unknown",
+            images: order.sessionId?.productDetails?.images || {},
+          },
+          quantity: 1,
+          price: order.actualAmount || order.quoteAmount,
+        },
+      ],
+    }));
+
+    const transformedBuyOrders = recentBuyOrders.map((order) => ({
+      ...order,
+      orderType: "buy",
+    }));
+
+    // Combine and sort by creation date
+    const allRecentOrders = [...transformedBuyOrders, ...transformedSellOrders]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5);
 
     console.log("Dashboard stats calculated successfully");
 
@@ -891,6 +1161,8 @@ exports.getDashboardStats = async (req, res) => {
         },
         orders: {
           total: totalOrders,
+          buy: buyOrders,
+          sell: sellOrders,
           pending: pendingOrders,
           completed: completedOrders,
         },
@@ -899,7 +1171,7 @@ exports.getDashboardStats = async (req, res) => {
           commission: totalCommission,
           net: totalRevenue - totalCommission,
         },
-        recentOrders,
+        recentOrders: allRecentOrders,
       },
     });
   } catch (error) {

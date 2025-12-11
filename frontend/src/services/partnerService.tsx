@@ -89,6 +89,9 @@ class PartnerService {
       if (params.limit) queryParams.append('limit', params.limit);
       if (params.status) queryParams.append('status', params.status);
       if (params.search) queryParams.append('search', params.search);
+      if (params.orderType) queryParams.append('orderType', params.orderType);
+      if (params.startDate) queryParams.append('startDate', params.startDate);
+      if (params.endDate) queryParams.append('endDate', params.endDate);
 
       const response = await api.get(`/partner/orders?${queryParams}`);
       return response.data;
