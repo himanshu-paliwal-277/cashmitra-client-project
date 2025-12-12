@@ -4,6 +4,7 @@ const Agent = require("../models/agent.model");
 const Inventory = require("../models/inventory.model");
 const { Order } = require("../models/order.model");
 const Product = require("../models/product.model");
+const BuyProduct = require("../models/buyProduct.model");
 const ApiError = require("../utils/apiError");
 const { sanitizeData } = require("../utils/security.utils");
 
@@ -244,7 +245,6 @@ exports.getProductsCatalog = async (req, res) => {
     sortObj[sortBy] = sortOrder === "desc" ? -1 : 1;
 
     // Get BuyProducts with category population
-    const BuyProduct = require("../models/buyProduct.model");
     const products = await BuyProduct.find(filter)
       .populate("categoryId", "name")
       .sort(sortObj)
@@ -324,8 +324,11 @@ exports.addInventory = async (req, res) => {
     throw new ApiError("Your partner account is not verified yet", 403);
   }
 
-  // Check if product exists
-  const product = await Product.findById(req.body.productId);
+  // Check if product exists (check both Product and BuyProduct models)
+  let product = await Product.findById(req.body.productId);
+  if (!product) {
+    product = await BuyProduct.findById(req.body.productId);
+  }
   if (!product) {
     throw new ApiError("Product not found", 404);
   }
@@ -1187,7 +1190,6 @@ exports.getDashboardStats = async (req, res) => {
 // ==================== NEW METHODS FOR SELL/BUY PRODUCTS CRM ====================
 
 const SellProduct = require("../models/sellProduct.model");
-const BuyProduct = require("../models/buyProduct.model");
 const SellOrder = require("../models/sellOrder.model");
 
 /**
