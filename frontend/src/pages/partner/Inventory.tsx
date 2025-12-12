@@ -21,12 +21,13 @@ interface InventoryItem {
   _id: string;
   product: {
     _id: string;
-    model: string;
+    model?: string;
+    name?: string; // BuyProduct uses 'name' instead of 'model'
     brand: string;
     series?: string;
     category?: string;
-    images: string[];
-  };
+    images: string[] | { main?: string; gallery?: string; thumbnail?: string };
+  } | null;
   condition: string;
   price: number;
   originalPrice: number;
@@ -311,8 +312,12 @@ function Inventory() {
   };
 
   const filteredInventory = inventory.filter(item => {
+    // Skip items with null product
+    if (!item.product) return false;
+
     const matchesSearch =
       (item.product.model?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (item.product.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
       (item.product.brand?.toLowerCase() || '').includes(searchTerm.toLowerCase());
 
     const matchesStatus =
@@ -515,7 +520,7 @@ function Inventory() {
                     {getImageUrl(item.product.images) ? (
                       <img
                         src={getImageUrl(item.product.images)!}
-                        alt={item.product.model}
+                        alt={item.product.model || item.product.name}
                         className="w-full h-full object-cover rounded-lg"
                       />
                     ) : (
@@ -523,7 +528,9 @@ function Inventory() {
                     )}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-slate-900">{item.product.model}</h4>
+                    <h4 className="font-semibold text-slate-900">
+                      {item.product.model || item.product.name}
+                    </h4>
                     <p className="text-sm text-slate-600">{item.product.brand}</p>
                   </div>
                 </div>

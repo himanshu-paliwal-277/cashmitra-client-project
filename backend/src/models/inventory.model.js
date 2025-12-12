@@ -7,9 +7,15 @@ const inventorySchema = new mongoose.Schema(
       ref: 'Partner',
       required: true,
     },
+    productModel: {
+      type: String,
+      required: true,
+      enum: ['Product', 'BuyProduct'],
+      default: 'Product',
+    },
     product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
+      refPath: 'productModel',
       required: true,
     },
     condition: {

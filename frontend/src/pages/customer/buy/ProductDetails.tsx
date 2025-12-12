@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Star,
@@ -13,7 +13,6 @@ import {
   ChevronRight,
   Check,
   X,
-  Users,
   Award,
   Phone,
   Wifi,
@@ -37,7 +36,6 @@ import {
   Minus,
 } from 'lucide-react';
 import { useCart } from '../../../contexts/CartContext';
-import adminService from '../../../services/adminService';
 import { useAuth } from '../../../contexts/AuthContext';
 import productService from '../../../services/productService';
 

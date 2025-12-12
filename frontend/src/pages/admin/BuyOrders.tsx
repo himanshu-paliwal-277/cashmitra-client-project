@@ -1,18 +1,9 @@
-/**
- * @fileoverview Buy Orders Management Component
- * @description Admin interface for managing buy orders
- * @author Cashmitra Development Team
- * @version 2.0.0
- */
-
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '../../utils/utils';
-import Card from '../../components/ui/Card';
 import api from '../../utils/api';
 import {
   Package,
   Search,
-  Filter,
   Eye,
   Edit,
   Truck,
@@ -22,7 +13,6 @@ import {
   RefreshCw,
   DollarSign,
   ShoppingBag,
-  TrendingUp,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -292,9 +282,9 @@ const BuyOrders = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {statsData.map((stat, index) => (
-          <Card
+          <div
             key={index}
-            className="p-6 border-l-4"
+            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 border-l-4 hover:shadow-md transition-shadow"
             style={{ borderLeftColor: stat.color.replace('bg-', '#').replace('500', '') }}
           >
             <div className="flex items-center justify-between mb-4">
@@ -304,12 +294,12 @@ const BuyOrders = () => {
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
             <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
-          </Card>
+          </div>
         ))}
       </div>
 
       {/* Filters Section */}
-      <Card className="mb-6 p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 p-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -342,7 +332,7 @@ const BuyOrders = () => {
             Refresh
           </button>
         </div>
-      </Card>
+      </div>
 
       {/* Orders Grid */}
       {orders.length === 0 ? (
@@ -366,152 +356,153 @@ const BuyOrders = () => {
             const customerEmail = getCustomerEmail(order);
 
             return (
-              <Card key={order._id} className="hover:shadow-xl transition-shadow duration-300">
-                <Card.Body>
-                  {/* Order Header */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <div className="flex gap-4 flex-1">
-                      {productImage && (
-                        <img
-                          src={productImage}
-                          alt={productName}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                      )}
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                          Order #{order._id.slice(-8).toUpperCase()}
-                        </h3>
-                        <p className="text-sm text-gray-600 mb-1">{customerName}</p>
-                        <p className="text-xs text-gray-500">{formatDate(order.createdAt)}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(order.status)}
-                      <span
-                        className={cn(
-                          'px-3 py-1 rounded-full text-xs font-semibold capitalize',
-                          getStatusColor(order.status)
-                        )}
-                      >
-                        {order.status}
-                      </span>
+              <div
+                key={order._id}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-xl transition-shadow duration-300 p-6"
+              >
+                {/* Order Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                  <div className="flex gap-4 flex-1">
+                    {productImage && (
+                      <img
+                        src={productImage}
+                        alt={productName}
+                        className="w-16 h-16 object-contain rounded-lg"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                        Order #{order._id.slice(-8).toUpperCase()}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-1">{customerName}</p>
+                      <p className="text-xs text-gray-500">{formatDate(order.createdAt)}</p>
                     </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(order.status)}
+                    <span
+                      className={cn(
+                        'px-3 py-1 rounded-full text-xs font-semibold capitalize',
+                        getStatusColor(order.status)
+                      )}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
 
-                  {/* Order Details Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
-                        Product
-                      </div>
-                      <div className="text-sm font-semibold text-gray-900">{productName}</div>
-                      {order.items && order.items.length > 1 && (
-                        <div className="text-xs text-gray-500 mt-1">
-                          +{order.items.length - 1} more item(s)
-                        </div>
-                      )}
+                {/* Order Details Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Product
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
-                        Quantity
+                    <div className="text-sm font-semibold text-gray-900">{productName}</div>
+                    {order.items && order.items.length > 1 && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        +{order.items.length - 1} more item(s)
                       </div>
-                      <div className="text-sm font-semibold text-gray-900">
-                        {order.items?.[0]?.quantity || 1}
-                      </div>
+                    )}
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Quantity
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
-                        Total Amount
-                      </div>
-                      <div className="text-sm font-semibold text-gray-900">
-                        {formatCurrency(order.totalAmount)}
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
-                        Payment Method
-                      </div>
-                      <div className="text-sm font-semibold text-gray-900">
-                        {order.paymentDetails?.method || 'N/A'}
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
-                        Delivery Address
-                      </div>
-                      <div className="text-sm font-semibold text-gray-900">
-                        {order.shippingDetails?.address?.city},{' '}
-                        {order.shippingDetails?.address?.state}
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
-                        Customer Email
-                      </div>
-                      <div className="text-sm font-semibold text-gray-900 truncate">
-                        {customerEmail}
-                      </div>
-                    </div>
-                    <div className="bg-amber-50 p-4 rounded-lg">
-                      <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
-                        Assigned Partner
-                      </div>
-                      {order.partner && order.partner._id ? (
-                        <div className="text-sm font-semibold text-emerald-600">
-                          {order.partner.shopName ||
-                            order.partner.businessName ||
-                            order.partner.shopEmail ||
-                            order.partner.email ||
-                            `Partner (${order.partner._id.slice(-6)})`}
-                        </div>
-                      ) : (
-                        <div className="text-sm text-gray-500">Not assigned</div>
-                      )}
+                    <div className="text-sm font-semibold text-gray-900">
+                      {order.items?.[0]?.quantity || 1}
                     </div>
                   </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Total Amount
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      {formatCurrency(order.totalAmount)}
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Payment Method
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      {order.paymentDetails?.method || 'N/A'}
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Delivery Address
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      {order.shippingDetails?.address?.city},{' '}
+                      {order.shippingDetails?.address?.state}
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Customer Email
+                    </div>
+                    <div className="text-sm font-semibold text-gray-900 truncate">
+                      {customerEmail}
+                    </div>
+                  </div>
+                  <div className="bg-amber-50 p-4 rounded-lg">
+                    <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                      Assigned Partner
+                    </div>
+                    {order.partner && order.partner._id ? (
+                      <div className="text-sm font-semibold text-emerald-600">
+                        {order.partner.shopName ||
+                          order.partner.businessName ||
+                          order.partner.shopEmail ||
+                          order.partner.email ||
+                          `Partner (${order.partner._id.slice(-6)})`}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-500">Not assigned</div>
+                    )}
+                  </div>
+                </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setShowDetailsModal(true);
-                      }}
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
-                    >
-                      <Eye size={16} />
-                      View Details
-                    </button>
-                    <select
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors cursor-pointer"
-                      value=""
-                      onChange={e => {
-                        if (e.target.value) {
-                          handleUpdateStatus(order._id, e.target.value);
-                        }
-                      }}
-                    >
-                      <option value="">Update Status</option>
-                      <option value="pending">Pending</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="processing">Processing</option>
-                      <option value="shipped">Shipped</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="cancelled">Cancelled</option>
-                      <option value="refunded">Refunded</option>
-                    </select>
-                    <button
-                      onClick={() => handleShowPartnerSuggestions(order)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
-                      disabled={loadingPartners}
-                    >
-                      <Edit size={16} />
-                      {order.partner?._id ? 'Reassign Partner' : 'Assign Partner'}
-                    </button>
-                  </div>
-                </Card.Body>
-              </Card>
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      setSelectedOrder(order);
+                      setShowDetailsModal(true);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
+                  >
+                    <Eye size={16} />
+                    View Details
+                  </button>
+                  <select
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors cursor-pointer"
+                    value=""
+                    onChange={e => {
+                      if (e.target.value) {
+                        handleUpdateStatus(order._id, e.target.value);
+                      }
+                    }}
+                  >
+                    <option value="">Update Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="refunded">Refunded</option>
+                  </select>
+                  <button
+                    onClick={() => handleShowPartnerSuggestions(order)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors"
+                    disabled={loadingPartners}
+                  >
+                    <Edit size={16} />
+                    {order.partner?._id ? 'Reassign Partner' : 'Assign Partner'}
+                  </button>
+                </div>
+              </div>
             );
           })}
         </div>
@@ -519,7 +510,7 @@ const BuyOrders = () => {
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (
-        <Card className="mt-6 p-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 mt-6 p-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-sm text-gray-600 font-medium">
               Page {pagination.currentPage} of {pagination.totalPages} ({pagination.totalOrders}{' '}
@@ -545,7 +536,7 @@ const BuyOrders = () => {
               </button>
             </div>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Order Details Modal */}
@@ -624,7 +615,7 @@ const BuyOrders = () => {
                         <img
                           src={item.product.images.main}
                           alt={item.product?.name}
-                          className="w-20 h-20 object-cover rounded-lg"
+                          className="w-20 h-20 object-contain rounded-lg"
                         />
                       )}
                       <div className="flex-1">

@@ -326,9 +326,13 @@ exports.addInventory = async (req, res) => {
 
   // Check if product exists (check both Product and BuyProduct models)
   let product = await Product.findById(req.body.productId);
+  let productModel = 'Product';
+
   if (!product) {
     product = await BuyProduct.findById(req.body.productId);
+    productModel = 'BuyProduct';
   }
+
   if (!product) {
     throw new ApiError('Product not found', 404);
   }
@@ -350,6 +354,7 @@ exports.addInventory = async (req, res) => {
   // Create inventory item
   const inventory = await Inventory.create({
     partner: partnerId._id,
+    productModel: productModel,
     product: req.body.productId,
     condition: req.body.condition,
     price: req.body.price,
@@ -398,9 +403,12 @@ exports.getInventory = async (req, res) => {
   // Get total count for pagination
   const total = await Inventory.countDocuments(queryObj);
 
-  // Get inventory items
+  // Get inventory items with dynamic population based on productModel
   const inventory = await Inventory.find(queryObj)
-    .populate('product', 'name brand category images')
+    .populate({
+      path: 'product',
+      select: 'name brand model series category images',
+    })
     .sort(sort)
     .skip(skip)
     .limit(limitNum);
