@@ -965,7 +965,7 @@ function Orders() {
                         key={index}
                         className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg"
                       >
-                        <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center border border-slate-200">
+                        <div className="w-20 h-20 rounded-lg bg-white flex items-center justify-center ">
                           {getProductImage(item.product?.images) ? (
                             <img
                               src={getProductImage(item.product?.images)!}
@@ -974,7 +974,7 @@ function Orders() {
                                 item.product?.name ||
                                 `${item.product?.brand} Product`
                               }
-                              className="w-full h-full object-cover rounded-lg"
+                              className="w-full h-full object-contain rounded-lg"
                             />
                           ) : (
                             <Package size={24} className="text-slate-400" />
@@ -1249,7 +1249,7 @@ function Orders() {
               <div className="space-y-3">
                 {selectedOrder.items.map((item, index) => (
                   <div key={index} className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
-                    <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center border border-slate-200">
+                    <div className="w-16 h-16 flex items-center justify-center">
                       {getProductImage(item.product?.images) ? (
                         <img
                           src={getProductImage(item.product?.images)!}
@@ -1258,7 +1258,7 @@ function Orders() {
                             item.product?.name ||
                             `${item.product?.brand} Product`
                           }
-                          className="w-full h-full object-cover rounded-lg"
+                          className="w-full h-full object-contain rounded-lg"
                         />
                       ) : (
                         <Package size={24} className="text-slate-400" />

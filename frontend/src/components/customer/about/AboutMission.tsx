@@ -12,7 +12,7 @@ const AboutMission = () => {
         ></div>
       </div>
 
-      <div className="main-container relative z-10">
+      <div className="main-container relative ">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full border border-primary-100 mb-4">
@@ -44,7 +44,7 @@ const AboutMission = () => {
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-br from-primary-300 to-primary-500 rounded-full transform -translate-x-24 translate-y-24 group-hover:scale-150 transition-transform duration-1000"></div>
               </div>
 
-              <div className="relative z-10">
+              <div className="relative ">
                 {/* Icon with 3D Effect */}
                 <div className="relative inline-block mb-6">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl blur-lg opacity-50"></div>
@@ -103,7 +103,7 @@ const AboutMission = () => {
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-br from-accent-300 to-accent-500 rounded-full transform -translate-x-24 translate-y-24 group-hover:scale-150 transition-transform duration-1000"></div>
               </div>
 
-              <div className="relative z-10">
+              <div className="relative ">
                 {/* Icon with 3D Effect */}
                 <div className="relative inline-block mb-6">
                   <div className="absolute inset-0 bg-gradient-to-br from-accent-500 to-accent-700 rounded-2xl blur-lg opacity-50"></div>

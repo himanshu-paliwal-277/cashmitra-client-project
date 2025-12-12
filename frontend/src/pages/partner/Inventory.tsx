@@ -521,7 +521,7 @@ function Inventory() {
                       <img
                         src={getImageUrl(item.product.images)!}
                         alt={item.product.model || item.product.name}
-                        className="w-full h-full object-cover rounded-lg"
+                        className="w-full h-full object-contain rounded-lg"
                       />
                     ) : (
                       <Package size={24} className="text-slate-400" />

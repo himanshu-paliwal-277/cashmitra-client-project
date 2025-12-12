@@ -74,7 +74,7 @@ const AboutStats = () => {
         <div className="absolute bottom-10 right-10 w-64 h-64 bg-accent-200 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
       </div>
 
-      <div className="main-container relative z-10">
+      <div className="main-container relative ">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full border border-primary-100 mb-4">
@@ -110,7 +110,7 @@ const AboutStats = () => {
                   {/* Floating Icon Background */}
                   <div className="absolute -right-8 -top-8 w-32 h-32 bg-gradient-to-br ${stat.gradient} rounded-full opacity-5 group-hover:opacity-10 group-hover:scale-150 transition-all duration-700"></div>
 
-                  <div className="relative z-10">
+                  <div className="relative ">
                     {/* Icon with Pulse Effect */}
                     <div
                       className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${stat.gradient} mb-6 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 relative`}
@@ -148,7 +148,7 @@ const AboutStats = () => {
 
                 {/* Glow Effect */}
                 <div
-                  className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 -z-10`}
+                  className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500`}
                 ></div>
               </div>
             );
@@ -171,7 +171,7 @@ const AboutStats = () => {
               ></div>
             </div>
 
-            <div className="relative z-10">
+            <div className="relative ">
               <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
                 {/* Shield Icon */}
                 <div className="flex-shrink-0">

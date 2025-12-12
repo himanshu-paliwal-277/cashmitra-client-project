@@ -303,7 +303,7 @@ const ConditionQuestionnaire = () => {
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-2xl"></div>
 
-        <div className="max-w-4xl mx-auto relative z-10">
+        <div className="max-w-4xl mx-auto relative ">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm mb-6 text-blue-100 flex-wrap">
             <a href="/" className="flex items-center gap-1 text-white transition-colors group">
@@ -402,7 +402,7 @@ const ConditionQuestionnaire = () => {
                       <h3 className="text-xl font-bold text-slate-900">{question.title}</h3>
                       <div className="group relative">
                         <HelpCircle className="w-5 h-5 text-slate-400 cursor-help" />
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-10">
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap ">
                           Be honest for accurate pricing
                           <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
                         </div>

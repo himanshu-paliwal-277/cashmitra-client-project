@@ -664,7 +664,7 @@ const SellOrders = () => {
             className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200 flex items-center justify-between ">
               <div className="flex-1 min-w-0 pr-2">
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2 flex-wrap">
                   <Sparkles className="text-blue-600 flex-shrink-0" size={20} />

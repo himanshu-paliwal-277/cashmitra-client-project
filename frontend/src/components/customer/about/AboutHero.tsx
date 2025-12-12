@@ -44,7 +44,7 @@ const AboutHero = () => {
         <div className="absolute bottom-1/4 right-1/3 w-5 h-5 bg-info-400 rounded-full animate-float animation-delay-2000"></div>
       </div>
 
-      <div className="main-container relative z-10">
+      <div className="main-container relative ">
         <div className="max-w-5xl mx-auto text-center">
           {/* Animated Badge */}
           <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-primary-100 mb-8 hover:scale-105 transition-transform duration-300 cursor-pointer group">
@@ -75,13 +75,13 @@ const AboutHero = () => {
           {/* Enhanced CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-up animation-delay-400">
             <button className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-2xl overflow-hidden transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105">
-              <span className="relative z-10">Start Selling Now</span>
-              <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-2 transition-transform duration-300" />
+              <span className="relative ">Start Selling Now</span>
+              <ArrowRight className="w-5 h-5 relative  group-hover:translate-x-2 transition-transform duration-300" />
               <div className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
 
             <button className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-primary-600 font-bold rounded-2xl border-2 border-primary-600 overflow-hidden transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
-              <span className="relative z-10 group-hover:text-white transition-colors duration-300">
+              <span className="relative  group-hover:text-white transition-colors duration-300">
                 Explore Marketplace
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>

@@ -218,7 +218,7 @@ const Brands: React.FC = () => {
     if (file) {
       setFormData({ ...formData, logo: file });
       const reader = new FileReader();
-      reader.onload = (e) => setLogoPreview(e.target?.result as string);
+      reader.onload = e => setLogoPreview(e.target?.result as string);
       reader.readAsDataURL(file);
     }
   };
@@ -246,7 +246,7 @@ const Brands: React.FC = () => {
   };
 
   const filteredAndSortedBrands = React.useMemo(() => {
-    let filtered = brands.filter((brand) => {
+    let filtered = brands.filter(brand => {
       const matchesSearch =
         brand.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         brand.description?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -292,7 +292,9 @@ const Brands: React.FC = () => {
       }
 
       if (typeof aValue === 'string') {
-        return sortOrder === 'asc' ? aValue.localeCompare(bValue as string) : (bValue as string).localeCompare(aValue);
+        return sortOrder === 'asc'
+          ? aValue.localeCompare(bValue as string)
+          : (bValue as string).localeCompare(aValue);
       } else {
         return sortOrder === 'asc' ? aValue - (bValue as number) : (bValue as number) - aValue;
       }
@@ -302,7 +304,7 @@ const Brands: React.FC = () => {
   }, [brands, searchTerm, statusFilter, categoryFilter, sortBy, sortOrder]);
 
   const availableCategories = React.useMemo(() => {
-    const categories = [...new Set(brands.map((brand) => brand.category).filter(Boolean))];
+    const categories = [...new Set(brands.map(brand => brand.category).filter(Boolean))];
     return categories.sort();
   }, [brands]);
 
@@ -349,7 +351,7 @@ const Brands: React.FC = () => {
                   type="text"
                   placeholder="Search brands..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
@@ -358,7 +360,7 @@ const Brands: React.FC = () => {
             {/* Status Filter */}
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={e => setStatusFilter(e.target.value)}
               className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
               <option value="">All Status</option>
@@ -369,11 +371,11 @@ const Brands: React.FC = () => {
             {/* Category Filter */}
             <select
               value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
+              onChange={e => setCategoryFilter(e.target.value)}
               className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
               <option value="">All Categories</option>
-              {availableCategories.map((category) => (
+              {availableCategories.map(category => (
                 <option key={category} value={category}>
                   {category.charAt(0).toUpperCase() + category.slice(1)}
                 </option>
@@ -383,7 +385,7 @@ const Brands: React.FC = () => {
             {/* Sort By */}
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={e => setSortBy(e.target.value)}
               className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
               <option value="name">Sort by Name</option>
@@ -396,7 +398,7 @@ const Brands: React.FC = () => {
             {/* Sort Order */}
             <select
               value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
+              onChange={e => setSortOrder(e.target.value)}
               className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
               <option value="asc">Ascending</option>
@@ -430,7 +432,7 @@ const Brands: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          {filteredAndSortedBrands.map((brand) => (
+          {filteredAndSortedBrands.map(brand => (
             <Card
               key={brand._id}
               className="group hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
@@ -439,7 +441,11 @@ const Brands: React.FC = () => {
                 {/* Brand Logo */}
                 <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4 overflow-hidden">
                   {brand.logo ? (
-                    <img src={brand.logo} alt={brand.brand} className="w-full h-full object-contain" />
+                    <img
+                      src={brand.logo}
+                      alt={brand.brand}
+                      className="w-full h-full object-contain"
+                    />
                   ) : (
                     <Tag className="w-8 h-8 text-gray-400" />
                   )}
@@ -534,7 +540,7 @@ const Brands: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+            <div className="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white ">
               <h2 className="text-2xl font-bold text-gray-900">
                 {editingBrand ? 'Edit Brand' : 'Add New Brand'}
               </h2>
@@ -565,7 +571,7 @@ const Brands: React.FC = () => {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={e => handleInputChange('name', e.target.value)}
                   required
                   className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                     errors.name ? 'border-red-500' : 'border-gray-300'
@@ -582,7 +588,7 @@ const Brands: React.FC = () => {
                 </label>
                 <select
                   value={formData.category}
-                  onChange={(e) => handleInputChange('category', e.target.value)}
+                  onChange={e => handleInputChange('category', e.target.value)}
                   required
                   className={`w-full px-4 py-3 border rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                     errors.category ? 'border-red-500' : 'border-gray-300'
@@ -592,7 +598,7 @@ const Brands: React.FC = () => {
                   {categoriesLoading ? (
                     <option disabled>Loading categories...</option>
                   ) : (
-                    categories.map((category) => (
+                    categories.map(category => (
                       <option key={category} value={category}>
                         {category?.charAt(0)?.toUpperCase() + category?.slice(1)}
                       </option>
@@ -609,7 +615,7 @@ const Brands: React.FC = () => {
                 </label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={e => handleInputChange('description', e.target.value)}
                   placeholder="Brand description..."
                   rows={4}
                   className={`w-full px-4 py-3 border rounded-lg text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
@@ -632,7 +638,7 @@ const Brands: React.FC = () => {
                 <input
                   type="url"
                   value={formData.website}
-                  onChange={(e) => handleInputChange('website', e.target.value)}
+                  onChange={e => handleInputChange('website', e.target.value)}
                   placeholder="https://example.com"
                   className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                     errors.website ? 'border-red-500' : 'border-gray-300'
@@ -643,9 +649,7 @@ const Brands: React.FC = () => {
 
               {/* Brand Logo */}
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Brand Logo
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Brand Logo</label>
                 <input
                   id="logo-upload"
                   type="file"
@@ -665,7 +669,11 @@ const Brands: React.FC = () => {
 
                 {logoPreview && (
                   <div className="mt-4 w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center mx-auto overflow-hidden">
-                    <img src={logoPreview} alt="Logo preview" className="w-full h-full object-contain" />
+                    <img
+                      src={logoPreview}
+                      alt="Logo preview"
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                 )}
               </div>
@@ -675,7 +683,7 @@ const Brands: React.FC = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
                 <select
                   value={String(formData.isActive)}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'true' })}
+                  onChange={e => setFormData({ ...formData, isActive: e.target.value === 'true' })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 >
                   <option value="true">Active</option>

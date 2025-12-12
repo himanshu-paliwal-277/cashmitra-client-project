@@ -132,7 +132,7 @@ const CategorySelection = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         {/* Header */}
         <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-16 px-4">
-          <div className="main-container mx-auto relative z-10 text-center">
+          <div className="main-container mx-auto relative  text-center">
             <h1 className="text-4xl sm:text-5xl font-bold mb-2 text-white">Sell Your Device</h1>
             <p className="text-lg sm:text-xl text-blue-100">
               Choose your device category to get started

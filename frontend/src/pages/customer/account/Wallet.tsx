@@ -168,7 +168,7 @@ const Wallet = () => {
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/20 rounded-full -ml-24 -mb-24 blur-2xl"></div>
 
-            <div className="relative z-10">
+            <div className="relative ">
               <div className="flex justify-between items-start mb-8">
                 <div className="flex-1">
                   <p className="text-blue-100 text-sm font-medium mb-2 flex items-center gap-2">

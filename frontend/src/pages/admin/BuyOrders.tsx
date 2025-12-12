@@ -550,7 +550,7 @@ const BuyOrders = () => {
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-5 border-b border-gray-200 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-5 border-b border-gray-200 flex items-center justify-between ">
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                   <Package className="text-green-600" size={24} />

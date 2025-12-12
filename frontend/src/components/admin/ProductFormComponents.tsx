@@ -163,7 +163,7 @@ export const DynamicFieldItem = ({ onRemove, children }: any) => (
 
 // Action Buttons
 export const ActionButtons = ({ onSave, onCancel, loading, saveText = 'Save Product' }: any) => (
-  <div className="sticky bottom-0 z-10 bg-white border-t border-gray-200 p-4 md:p-6 shadow-lg flex flex-col sm:flex-row gap-3 justify-end">
+  <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 md:p-6 shadow-lg flex flex-col sm:flex-row gap-3 justify-end">
     <button
       type="button"
       onClick={onCancel}

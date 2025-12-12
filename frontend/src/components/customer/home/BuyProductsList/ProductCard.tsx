@@ -28,7 +28,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
     >
       {/* Assured Badge */}
       {assuredChipVisible && (
-        <div className="absolute top-2 left-2 bg-gradient-to-br from-sky-500 to-sky-600 text-white flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold tracking-wide shadow-md shadow-sky-500/30 z-10 backdrop-blur-sm">
+        <div className="absolute top-2 left-2 bg-gradient-to-br from-sky-500 to-sky-600 text-white flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-bold tracking-wide shadow-md shadow-sky-500/30 backdrop-blur-sm">
           <Shield size={14} strokeWidth={2.5} />
           <span>ASSURED</span>
         </div>
@@ -36,7 +36,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
 
       {/* Discount Badge */}
       {percent > 0 && (
-        <div className="absolute top-2 right-2 bg-gradient-to-br from-red-500 to-red-600 text-white flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold shadow-lg shadow-red-500/30 z-10">
+        <div className="absolute top-2 right-2 bg-gradient-to-br from-red-500 to-red-600 text-white flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold shadow-lg shadow-red-500/30">
           <Tag size={12} />
           <span>{percent}% OFF</span>
         </div>

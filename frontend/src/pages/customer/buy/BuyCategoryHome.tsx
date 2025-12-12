@@ -127,7 +127,7 @@ const BuyCategoryHome = () => {
 
       <div className="main-container">
         {/* Features Bar */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 -mt-12 relative z-10 border border-slate-200">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 -mt-12 relative  border border-slate-200">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: <Award className="w-6 h-6" />, text: 'Quality Certified', color: 'blue' },

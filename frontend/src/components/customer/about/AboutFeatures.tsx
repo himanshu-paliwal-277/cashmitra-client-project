@@ -101,7 +101,7 @@ const AboutFeatures = () => {
         <div className="absolute top-1/4 right-0 w-96 h-96 bg-gradient-to-br from-primary-200 to-accent-200 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
       </div>
 
-      <div className="main-container relative z-10">
+      <div className="main-container relative ">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full border border-primary-100 mb-4 hover:scale-105 transition-transform duration-300">
@@ -157,7 +157,7 @@ const AboutFeatures = () => {
                     ></div>
                   </div>
 
-                  <div className="relative z-10">
+                  <div className="relative ">
                     {/* Icon */}
                     <div className="relative mb-5">
                       <div
@@ -235,7 +235,7 @@ const AboutFeatures = () => {
             {/* Background Decoration */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary-100 to-accent-100 rounded-full blur-3xl opacity-30"></div>
 
-            <div className="relative z-10">
+            <div className="relative ">
               <div className="text-center mb-8">
                 <h3 className="text-2xl md:text-3xl font-bold text-grey-900 mb-3">
                   Join Thousands of Satisfied Customers
@@ -251,7 +251,7 @@ const AboutFeatures = () => {
                   {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                     <div
                       key={i}
-                      className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-accent-500 border-4 border-white flex items-center justify-center text-white text-xs font-bold shadow-lg hover:scale-125 hover:z-10 transition-transform duration-300"
+                      className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-accent-500 border-4 border-white flex items-center justify-center text-white text-xs font-bold shadow-lg hover:scale-125 transition-transform duration-300"
                     >
                       {i === 8 ? '50K+' : ''}
                     </div>

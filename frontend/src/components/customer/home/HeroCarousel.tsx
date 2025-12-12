@@ -69,7 +69,7 @@ const HeroCarousel = () => {
 
                 {/* Overlay with gradient and text */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70 flex items-center justify-center p-8 md:p-6 sm:p-4">
-                  <div className="text-white text-center max-w-3xl z-10">
+                  <div className="text-white text-center max-w-3xl">
                     <h2 className=" text-white lg:text-4xl md:text-3xl sm:text-2xl font-bold mb-4 sm:mb-2 leading-tight drop-shadow-[2px_2px_8px_rgba(0,0,0,0.5)]">
                       {image.title}
                     </h2>

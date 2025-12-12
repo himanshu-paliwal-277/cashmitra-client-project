@@ -63,7 +63,7 @@ const ContactForm = () => {
       {/* Background Decoration */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary-100 to-accent-100 rounded-full blur-3xl opacity-20 -z-10"></div>
 
-      <div className="relative z-10">
+      <div className="relative">
         {/* Header */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-grey-900 mb-3">Send us a Message</h2>
@@ -180,9 +180,9 @@ const ContactForm = () => {
             disabled={isSubmitting}
             className="group relative w-full inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-xl overflow-hidden transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            <span className="relative z-10">{isSubmitting ? 'Sending...' : 'Send Message'}</span>
+            <span className="relative">{isSubmitting ? 'Sending...' : 'Send Message'}</span>
             {!isSubmitting && (
-              <Send className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
+              <Send className="w-5 h-5 relative group-hover:translate-x-1 transition-transform duration-300" />
             )}
             {isSubmitting && (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
