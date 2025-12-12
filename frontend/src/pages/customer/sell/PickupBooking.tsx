@@ -1,7 +1,7 @@
 // PickupBooking.jsx - Updated with booking- prefixed classNames and no navbar
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './PickupBooking.css'; // Import separate CSS
+import './PickupBooking.css'; 
 import sellService from '../../../services/sellService';
 import {
   MapPin,

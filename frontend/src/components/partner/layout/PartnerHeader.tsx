@@ -8,7 +8,7 @@ interface PartnerHeaderProps {
 
 const PartnerHeader = ({ partner, onToggleSidebar, onLogout }: PartnerHeaderProps) => {
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm shrink-0">
+    <header className="sticky top-0 z-[10] bg-white border-b border-slate-200 shadow-sm shrink-0">
       <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex justify-between items-center gap-2 sm:gap-4">
         {/* Left Section */}
         <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0">

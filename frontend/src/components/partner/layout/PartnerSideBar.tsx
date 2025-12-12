@@ -161,8 +161,8 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
     <aside
       className={`bg-white border-r border-slate-200 flex flex-col transition-all duration-300 ease-out overflow-hidden ${
         isOpen
-          ? 'w-80 fixed lg:relative translate-x-0 z-[1] shadow-xl lg:shadow-none h-full'
-          : 'w-0 lg:w-0 fixed lg:relative -translate-x-full lg:translate-x-0 z-[1000] h-full border-0'
+          ? 'w-80 fixed lg:relative translate-x-0 z-[10] shadow-xl lg:shadow-none h-full'
+          : 'w-0 lg:w-0 fixed lg:relative -translate-x-full lg:translate-x-0 z-[10] h-full border-0'
       }`}
     >
       {/* Sidebar Header */}
