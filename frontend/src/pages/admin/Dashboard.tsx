@@ -60,7 +60,7 @@ function AdminDashboard() {
         <div className="bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 rounded-xl p-6 sm:p-8 lg:p-10 mb-6 sm:mb-8 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 sm:w-64 sm:h-64 bg-white/10 rounded-full transform translate-x-1/3 -translate-y-1/3" />
               <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-48 sm:h-48 bg-white/5 rounded-full transform -translate-x-1/4 translate-y-1/4" />
-              <div className="relative z-10">
+              <div className="relative">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                   <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
                     <Home className="w-6 h-6 sm:w-8 sm:h-8 text-white" />

@@ -111,7 +111,7 @@ const Marketplace = () => {
         setIsLoading(true);
         setError(null);
 
-        const params = {
+        const params: any = {
           page: 1,
           limit: 20,
         };
@@ -326,19 +326,19 @@ const Marketplace = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-16 ">
+      <div className="bg-gradient-to-br  from-blue-600 via-indigo-600 to-purple-700 text-white py-16 px-4">
         <div className="main-container text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 text-white">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-2 text-white">
             Buy Refurbished Devices
           </h1>
-          <p className="text-xl sm:text-2xl text-blue-100 mb-8">
+          <p className="text-lg sm:text-xl text-blue-100">
             Premium quality certified devices at unbeatable prices
           </p>
 
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto relative">
+          {/* <div className="max-w-2xl mx-auto relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
               type="text"
@@ -347,9 +347,9 @@ const Marketplace = () => {
               onChange={e => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-4 rounded-2xl text-slate-900 text-lg focus:outline-none focus:ring-4 focus:ring-white/30 shadow-xl"
             />
-          </div>
+          </div> */}
         </div>
-      </section>
+      </div>
 
       {/* Features Bar */}
       <div className="bg-white border-b border-slate-200 py-6">

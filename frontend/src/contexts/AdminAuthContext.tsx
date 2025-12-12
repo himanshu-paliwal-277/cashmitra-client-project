@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginAdmin, getAdminProfile } from '../services/adminService';
 
-// Create the contextconst AdminAuthContext = createContext();
+// Create the context
+const AdminAuthContext = createContext();
 
 // Custom hook to use the admin auth context
 export const useAdminAuth = () => {
@@ -14,9 +15,7 @@ export const useAdminAuth = () => {
 };
 
 // Provider component
-export const AdminAuthProvider = ({
-  children
-}: any) => {
+export const AdminAuthProvider = ({ children }: any) => {
   const [adminUser, setAdminUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,17 +55,25 @@ export const AdminAuthProvider = ({
       // Call login API using the service
       const data = await loginAdmin({ email, password });
 
+      const adminDetails = {
+        _id: data._id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+      };
+
       // Store auth data
       localStorage.setItem('adminToken', data.token);
-      localStorage.setItem('adminUser', JSON.stringify(data.admin));
+      localStorage.setItem('adminUser', JSON.stringify(adminDetails));
 
       // Update state
-      setAdminUser(data.admin);
+      setAdminUser(adminDetails);
       setIsAuthenticated(true);
       navigate('/admin/dashboard');
 
       return data;
-    } catch (error) {      setError(error.response?.data?.message || 'Login failed');
+    } catch (error) {
+      setError(error.response?.data?.message || 'Login failed');
       throw error;
     } finally {
       setIsLoading(false);
@@ -100,7 +107,8 @@ export const AdminAuthProvider = ({
       setAdminUser(profileData.admin);
       return profileData.admin;
     } catch (error) {
-      console.error('Error refreshing profile:', error);      if (error.response?.status === 401) {
+      console.error('Error refreshing profile:', error);
+      if (error.response?.status === 401) {
         logout();
       }
       throw error;
