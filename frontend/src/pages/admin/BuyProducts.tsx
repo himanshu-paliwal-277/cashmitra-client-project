@@ -39,6 +39,10 @@ const BuyProducts = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   // Debounce search term
   useEffect(() => {
@@ -63,8 +67,12 @@ const BuyProducts = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await adminService.getBuyProducts();
+      const response = await adminService.getBuyProducts({ limit, page });
+
       setProducts(response.data || []);
+
+      setTotalPages(response.pagination?.pages || 1);
+      setTotalItems(response.pagination?.total || 0);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -136,6 +144,10 @@ const BuyProducts = () => {
   const handleModalSave = () => {
     fetchProducts();
   };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [page, limit]);
 
   const filteredProducts = products.filter(product => {
     const matchesSearch =
@@ -501,6 +513,53 @@ const BuyProducts = () => {
           <div className="overflow-x-auto">{renderProductTable()}</div>
         )}
       </div>
+
+      {/* Pagination */}
+      {!loading && (
+        <div className="flex items-center justify-between mt-6 mb-12">
+          {/* Limit Selector */}
+          <select
+            value={limit}
+            onChange={e => {
+              setLimit(Number(e.target.value));
+              setPage(1); // reset page when limit changes
+            }}
+            className="px-3 py-2 border rounded-lg bg-white"
+          >
+            <option value={6}>6</option>
+            <option value={12}>12</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
+
+          {/* Page Navigation */}
+          <div className="flex items-center gap-2">
+            <button
+              disabled={page === 1}
+              onClick={() => setPage(page - 1)}
+              className={`px-4 py-2 border rounded-lg ${
+                page === 1 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100'
+              }`}
+            >
+              Previous
+            </button>
+
+            <span className="font-medium text-gray-700">
+              Page {page} of {totalPages}
+            </span>
+
+            <button
+              disabled={page === totalPages}
+              onClick={() => setPage(page + 1)}
+              className={`px-4 py-2 border rounded-lg ${
+                page === totalPages ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-100'
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       <ProductModal
         isOpen={isModalOpen}
