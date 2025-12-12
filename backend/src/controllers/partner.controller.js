@@ -1,12 +1,12 @@
-const Partner = require("../models/partner.model");
-const User = require("../models/user.model");
-const Agent = require("../models/agent.model");
-const Inventory = require("../models/inventory.model");
-const { Order } = require("../models/order.model");
-const Product = require("../models/product.model");
-const BuyProduct = require("../models/buyProduct.model");
-const ApiError = require("../utils/apiError");
-const { sanitizeData } = require("../utils/security.utils");
+const Partner = require('../models/partner.model');
+const User = require('../models/user.model');
+const Agent = require('../models/agent.model');
+const Inventory = require('../models/inventory.model');
+const { Order } = require('../models/order.model');
+const Product = require('../models/product.model');
+const BuyProduct = require('../models/buyProduct.model');
+const ApiError = require('../utils/apiError');
+const { sanitizeData } = require('../utils/security.utils');
 
 /**
  * Register a new partner shop
@@ -19,7 +19,7 @@ exports.registerPartnerShop = async (req, res) => {
   // Check if user already has a partner shop
   const existingPartner = await Partner.findOne({ user: userId });
   if (existingPartner) {
-    throw new ApiError("You already have a registered partner shop", 400);
+    throw new ApiError('You already have a registered partner shop', 400);
   }
 
   // Sanitize inputs
@@ -41,17 +41,17 @@ exports.registerPartnerShop = async (req, res) => {
     user: userId,
     ...sanitizedData,
     isVerified: false, // Requires admin verification
-    verificationStatus: "pending",
+    verificationStatus: 'pending',
     wallet: { balance: 0 },
   });
 
   // Update user role to include partner
-  await User.findByIdAndUpdate(userId, { $addToSet: { role: "partner" } });
+  await User.findByIdAndUpdate(userId, { $addToSet: { role: 'partner' } });
 
   res.status(201).json({
     success: true,
     data: partner,
-    message: "Partner shop registered successfully. Verification pending.",
+    message: 'Partner shop registered successfully. Verification pending.',
   });
 };
 
@@ -64,12 +64,12 @@ exports.getPartnerProfile = async (req, res) => {
   const userId = req.user.id;
 
   const partner = await Partner.findOne({ user: userId }).populate(
-    "user",
-    "name email phone"
+    'user',
+    'name email phone'
   );
 
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   res.status(200).json({
@@ -135,13 +135,13 @@ exports.updatePartnerProfile = async (req, res) => {
   );
 
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   res.status(200).json({
     success: true,
     data: partner,
-    message: "Partner profile updated successfully",
+    message: 'Partner profile updated successfully',
   });
 };
 
@@ -172,7 +172,7 @@ exports.uploadDocuments = async (req, res) => {
 
   // Update verification status if documents are being uploaded
   if (Object.keys(updateData).length > 0) {
-    updateData.verificationStatus = "submitted";
+    updateData.verificationStatus = 'submitted';
   }
 
   const partner = await Partner.findOneAndUpdate(
@@ -182,13 +182,13 @@ exports.uploadDocuments = async (req, res) => {
   );
 
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   res.status(200).json({
     success: true,
     data: partner,
-    message: "Documents uploaded successfully",
+    message: 'Documents uploaded successfully',
   });
 };
 
@@ -205,8 +205,8 @@ exports.getProductsCatalog = async (req, res) => {
     page = 1,
     limit = 50, // Higher default limit for partners
     search,
-    sortBy = "createdAt",
-    sortOrder = "desc",
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
   } = req.query;
 
   // Validate pagination parameters
@@ -216,37 +216,37 @@ exports.getProductsCatalog = async (req, res) => {
   // Build filter object for BuyProduct collection
   const filter = { isActive: true }; // Only show active products
 
-  if (category && category !== "all") {
-    filter["categoryId.name"] = { $regex: category, $options: "i" };
+  if (category && category !== 'all') {
+    filter['categoryId.name'] = { $regex: category, $options: 'i' };
   }
 
-  if (brand && brand !== "all") {
-    filter.brand = { $regex: brand, $options: "i" };
+  if (brand && brand !== 'all') {
+    filter.brand = { $regex: brand, $options: 'i' };
   }
 
-  if (name && name !== "all") {
+  if (name && name !== 'all') {
     const decodedName = decodeURIComponent(name);
-    filter.name = { $regex: decodedName.trim(), $options: "i" };
+    filter.name = { $regex: decodedName.trim(), $options: 'i' };
   }
 
   // Search filter
   if (search && search.trim()) {
-    const searchRegex = { $regex: search.trim(), $options: "i" };
+    const searchRegex = { $regex: search.trim(), $options: 'i' };
     filter.$or = [
       { brand: searchRegex },
       { name: searchRegex },
-      { "categoryId.name": searchRegex },
+      { 'categoryId.name': searchRegex },
     ];
   }
 
   try {
     // Build sort object
     const sortObj = {};
-    sortObj[sortBy] = sortOrder === "desc" ? -1 : 1;
+    sortObj[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
     // Get BuyProducts with category population
     const products = await BuyProduct.find(filter)
-      .populate("categoryId", "name")
+      .populate('categoryId', 'name')
       .sort(sortObj)
       .limit(limitNum)
       .skip((pageNum - 1) * limitNum)
@@ -260,7 +260,7 @@ exports.getProductsCatalog = async (req, res) => {
       _id: product._id,
       name: product.name,
       brand: product.brand,
-      category: product.categoryId?.name || "Uncategorized",
+      category: product.categoryId?.name || 'Uncategorized',
       model: product.name, // Use name as model for compatibility
       images: product.images || {},
       pricing: product.pricing || {},
@@ -299,10 +299,10 @@ exports.getProductsCatalog = async (req, res) => {
       data: transformedProducts,
     });
   } catch (error) {
-    console.error("Error fetching buy products catalog:", error);
+    console.error('Error fetching buy products catalog:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch products catalog",
+      message: 'Failed to fetch products catalog',
       error: error.message,
     });
   }
@@ -316,12 +316,12 @@ exports.getProductsCatalog = async (req, res) => {
 exports.addInventory = async (req, res) => {
   const partnerId = await Partner.findOne({ user: req.user.id });
   if (!partnerId) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   // Check if partner is verified
   if (!partnerId.isVerified) {
-    throw new ApiError("Your partner account is not verified yet", 403);
+    throw new ApiError('Your partner account is not verified yet', 403);
   }
 
   // Check if product exists (check both Product and BuyProduct models)
@@ -330,7 +330,7 @@ exports.addInventory = async (req, res) => {
     product = await BuyProduct.findById(req.body.productId);
   }
   if (!product) {
-    throw new ApiError("Product not found", 404);
+    throw new ApiError('Product not found', 404);
   }
 
   // Check if inventory already exists for this product
@@ -342,7 +342,7 @@ exports.addInventory = async (req, res) => {
 
   if (existingInventory) {
     throw new ApiError(
-      "You already have this product in your inventory with the same condition",
+      'You already have this product in your inventory with the same condition',
       400
     );
   }
@@ -364,7 +364,7 @@ exports.addInventory = async (req, res) => {
   res.status(201).json({
     success: true,
     data: inventory,
-    message: "Inventory item added successfully",
+    message: 'Inventory item added successfully',
   });
 };
 
@@ -376,20 +376,20 @@ exports.addInventory = async (req, res) => {
 exports.getInventory = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const {
     page = 1,
     limit = 10,
-    sort = "-createdAt",
+    sort = '-createdAt',
     condition,
     isAvailable,
   } = req.query;
 
   const queryObj = { partner: partner._id };
   if (condition) queryObj.condition = condition;
-  if (isAvailable !== undefined) queryObj.isAvailable = isAvailable === "true";
+  if (isAvailable !== undefined) queryObj.isAvailable = isAvailable === 'true';
 
   const pageNum = parseInt(page, 10);
   const limitNum = parseInt(limit, 10);
@@ -400,7 +400,7 @@ exports.getInventory = async (req, res) => {
 
   // Get inventory items
   const inventory = await Inventory.find(queryObj)
-    .populate("product", "name brand category images")
+    .populate('product', 'name brand category images')
     .sort(sort)
     .skip(skip)
     .limit(limitNum);
@@ -427,7 +427,7 @@ exports.getInventory = async (req, res) => {
 exports.updateInventory = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   // Find inventory and check ownership
@@ -437,7 +437,7 @@ exports.updateInventory = async (req, res) => {
   });
 
   if (!inventory) {
-    throw new ApiError("Inventory item not found or not owned by you", 404);
+    throw new ApiError('Inventory item not found or not owned by you', 404);
   }
 
   // Update fields
@@ -457,12 +457,12 @@ exports.updateInventory = async (req, res) => {
     req.params.id,
     { $set: updateData },
     { new: true, runValidators: true }
-  ).populate("product", "name brand category images");
+  ).populate('product', 'name brand category images');
 
   res.status(200).json({
     success: true,
     data: updatedInventory,
-    message: "Inventory item updated successfully",
+    message: 'Inventory item updated successfully',
   });
 };
 
@@ -474,7 +474,7 @@ exports.updateInventory = async (req, res) => {
 exports.deleteInventory = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   // Find inventory and check ownership
@@ -484,24 +484,24 @@ exports.deleteInventory = async (req, res) => {
   });
 
   if (!inventory) {
-    throw new ApiError("Inventory item not found or not owned by you", 404);
+    throw new ApiError('Inventory item not found or not owned by you', 404);
   }
 
   // Check if there are any active orders for this inventory
   const activeOrders = await Order.countDocuments({
-    "items.inventory": req.params.id,
-    status: { $nin: ["delivered", "cancelled"] },
+    'items.inventory': req.params.id,
+    status: { $nin: ['delivered', 'cancelled'] },
   });
 
   if (activeOrders > 0) {
-    throw new ApiError("Cannot delete inventory with active orders", 400);
+    throw new ApiError('Cannot delete inventory with active orders', 400);
   }
 
   await Inventory.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
     success: true,
-    message: "Inventory item deleted successfully",
+    message: 'Inventory item deleted successfully',
   });
 };
 
@@ -513,13 +513,13 @@ exports.deleteInventory = async (req, res) => {
 exports.getOrders = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const {
     page = 1,
     limit = 10,
-    sort = "-createdAt",
+    sort = '-createdAt',
     status,
     orderType,
     search,
@@ -532,8 +532,8 @@ exports.getOrders = async (req, res) => {
   const skip = (pageNum - 1) * limitNum;
 
   // Parse sort parameter
-  const sortField = sort.startsWith("-") ? sort.substring(1) : sort;
-  const sortOrder = sort.startsWith("-") ? -1 : 1;
+  const sortField = sort.startsWith('-') ? sort.substring(1) : sort;
+  const sortOrder = sort.startsWith('-') ? -1 : 1;
   const sortObj = { [sortField]: sortOrder };
 
   let allOrders = [];
@@ -547,7 +547,7 @@ exports.getOrders = async (req, res) => {
   }
 
   // Fetch buy orders (from Order model)
-  if (!orderType || orderType === "buy") {
+  if (!orderType || orderType === 'buy') {
     const buyQueryObj = { partner: partner._id };
 
     // Apply filters
@@ -564,14 +564,14 @@ exports.getOrders = async (req, res) => {
       }
 
       // Search in user fields - we'll need to find users first
-      const User = require("../models/user.model");
+      const User = require('../models/user.model');
       const matchingUsers = await User.find({
         $or: [
-          { name: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
-          { phone: { $regex: search, $options: "i" } },
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { phone: { $regex: search, $options: 'i' } },
         ],
-      }).select("_id");
+      }).select('_id');
 
       if (matchingUsers.length > 0) {
         searchConditions.push({
@@ -592,16 +592,16 @@ exports.getOrders = async (req, res) => {
     totalCount += buyOrdersCount;
 
     // If we need buy orders for this page
-    if (orderType === "buy" || !orderType) {
+    if (orderType === 'buy' || !orderType) {
       const buyOrders = await Order.find(buyQueryObj)
-        .populate("user", "name email phone")
+        .populate('user', 'name email phone')
         .populate(
-          "items.product",
-          "name brand categoryId images pricing variants conditionOptions isActive"
+          'items.product',
+          'name brand categoryId images pricing variants conditionOptions isActive'
         )
         .populate({
-          path: "items.inventory",
-          populate: { path: "product", select: "name brand categoryId images" },
+          path: 'items.inventory',
+          populate: { path: 'product', select: 'name brand categoryId images' },
         })
         .sort(sortObj)
         .lean();
@@ -609,7 +609,7 @@ exports.getOrders = async (req, res) => {
       // Add orderType field to buy orders
       const buyOrdersWithType = buyOrders.map((order) => ({
         ...order,
-        orderType: "buy",
+        orderType: 'buy',
         // Normalize address structure
         shippingAddress:
           order.shippingDetails?.address || order.shippingAddress,
@@ -621,8 +621,8 @@ exports.getOrders = async (req, res) => {
   }
 
   // Fetch sell orders (from SellOrder model)
-  if (!orderType || orderType === "sell") {
-    const SellOrder = require("../models/sellOrder.model");
+  if (!orderType || orderType === 'sell') {
+    const SellOrder = require('../models/sellOrder.model');
 
     const sellQueryObj = { assignedTo: partner._id };
 
@@ -642,27 +642,27 @@ exports.getOrders = async (req, res) => {
       // Search by order number (if it exists)
       if (search.length >= 3) {
         searchConditions.push({
-          orderNumber: { $regex: search, $options: "i" },
+          orderNumber: { $regex: search, $options: 'i' },
         });
       }
 
       // Search in pickup address fields
       searchConditions.push({
-        "pickup.address.fullName": { $regex: search, $options: "i" },
+        'pickup.address.fullName': { $regex: search, $options: 'i' },
       });
       searchConditions.push({
-        "pickup.address.phone": { $regex: search, $options: "i" },
+        'pickup.address.phone': { $regex: search, $options: 'i' },
       });
 
       // Search in user fields - we'll need to find users first
-      const User = require("../models/user.model");
+      const User = require('../models/user.model');
       const matchingUsers = await User.find({
         $or: [
-          { name: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
-          { phone: { $regex: search, $options: "i" } },
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { phone: { $regex: search, $options: 'i' } },
         ],
-      }).select("_id");
+      }).select('_id');
 
       if (matchingUsers.length > 0) {
         searchConditions.push({
@@ -683,11 +683,11 @@ exports.getOrders = async (req, res) => {
     totalCount += sellOrdersCount;
 
     // If we need sell orders for this page
-    if (orderType === "sell" || !orderType) {
+    if (orderType === 'sell' || !orderType) {
       const sellOrders = await SellOrder.find(sellQueryObj)
-        .populate("userId", "name email phone")
-        .populate("sessionId")
-        .populate("assignedTo", "name email phone")
+        .populate('userId', 'name email phone')
+        .populate('sessionId')
+        .populate('assignedTo', 'name email phone')
         .sort(sortObj)
         .lean();
 
@@ -695,8 +695,8 @@ exports.getOrders = async (req, res) => {
       const sellOrdersWithType = sellOrders.map((order) => ({
         ...order,
         _id: order._id,
-        orderType: "sell",
-        user: order.userId || { name: "Guest User", email: "", phone: "" },
+        orderType: 'sell',
+        user: order.userId || { name: 'Guest User', email: '', phone: '' },
         totalAmount: order.actualAmount || order.quoteAmount,
         // Transform pickup address to shipping address format
         shippingAddress: order.pickup?.address
@@ -713,9 +713,9 @@ exports.getOrders = async (req, res) => {
           {
             _id: `${order._id}_item`,
             product: {
-              _id: order.sessionId?._id || "unknown",
-              name: order.sessionId?.productDetails?.name || "Device for Sell",
-              brand: order.sessionId?.productDetails?.brand || "Unknown",
+              _id: order.sessionId?._id || 'unknown',
+              name: order.sessionId?.productDetails?.name || 'Device for Sell',
+              brand: order.sessionId?.productDetails?.brand || 'Unknown',
               images: order.sessionId?.productDetails?.images || {},
             },
             quantity: 1,
@@ -768,31 +768,31 @@ exports.getOrders = async (req, res) => {
 exports.respondToOrderAssignment = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const { response, reason } = req.body; // response: 'accepted' or 'rejected'
 
   const order = await Order.findById(req.params.id).populate(
-    "items.product",
-    "name brand categoryId images pricing variants conditionOptions"
+    'items.product',
+    'name brand categoryId images pricing variants conditionOptions'
   );
   if (!order) {
-    throw new ApiError("Order not found", 404);
+    throw new ApiError('Order not found', 404);
   }
 
   // Check if order is assigned to this partner
   if (!order.partner || order.partner.toString() !== partner._id.toString()) {
-    throw new ApiError("Order is not assigned to your shop", 403);
+    throw new ApiError('Order is not assigned to your shop', 403);
   }
 
   // Check if response is still pending
-  if (order.partnerAssignment.response.status !== "pending") {
-    throw new ApiError("Order assignment has already been responded to", 400);
+  if (order.partnerAssignment.response.status !== 'pending') {
+    throw new ApiError('Order assignment has already been responded to', 400);
   }
 
   // If accepting, validate inventory availability
-  if (response === "accepted") {
+  if (response === 'accepted') {
     const missingItems = [];
 
     // Check each product in the order
@@ -837,7 +837,7 @@ exports.respondToOrderAssignment = async (req, res) => {
             ? `${item.productName} (need ${item.requiredQuantity}, have ${item.availableQuantity})`
             : `${item.productName} (not in inventory)`
         )
-        .join(", ");
+        .join(', ');
 
       throw new ApiError(
         `Cannot accept order. Missing or insufficient inventory for: ${missingProductNames}. Please add these products to your inventory with proper pricing first.`,
@@ -850,23 +850,23 @@ exports.respondToOrderAssignment = async (req, res) => {
   order.partnerAssignment.response = {
     status: response,
     respondedAt: new Date(),
-    reason: reason || "",
+    reason: reason || '',
   };
 
   // Update order status based on response
-  if (response === "accepted") {
-    order.status = "confirmed";
+  if (response === 'accepted') {
+    order.status = 'confirmed';
     order.statusHistory.push({
-      status: "confirmed",
+      status: 'confirmed',
       timestamp: new Date(),
-      note: `Order accepted by partner: ${reason || "No reason provided"}`,
+      note: `Order accepted by partner: ${reason || 'No reason provided'}`,
     });
-  } else if (response === "rejected") {
-    order.status = "pending"; // Back to pending for reassignment
+  } else if (response === 'rejected') {
+    order.status = 'pending'; // Back to pending for reassignment
     order.statusHistory.push({
-      status: "partner_rejected",
+      status: 'partner_rejected',
       timestamp: new Date(),
-      note: `Order rejected by partner: ${reason || "No reason provided"}`,
+      note: `Order rejected by partner: ${reason || 'No reason provided'}`,
     });
   }
 
@@ -887,20 +887,20 @@ exports.respondToOrderAssignment = async (req, res) => {
 exports.checkMissingInventory = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const order = await Order.findById(req.params.id).populate(
-    "items.product",
-    "name brand categoryId images pricing variants conditionOptions"
+    'items.product',
+    'name brand categoryId images pricing variants conditionOptions'
   );
   if (!order) {
-    throw new ApiError("Order not found", 404);
+    throw new ApiError('Order not found', 404);
   }
 
   // Check if order is assigned to this partner
   if (!order.partner || order.partner.toString() !== partner._id.toString()) {
-    throw new ApiError("Order is not assigned to your shop", 403);
+    throw new ApiError('Order is not assigned to your shop', 403);
   }
 
   const missingItems = [];
@@ -913,7 +913,7 @@ exports.checkMissingInventory = async (req, res) => {
       product: item.product._id,
       isAvailable: true,
       quantity: { $gte: item.quantity },
-    }).populate("product", "name brand categoryId images");
+    }).populate('product', 'name brand categoryId images');
 
     const itemStatus = {
       productId: item.product._id,
@@ -946,8 +946,8 @@ exports.checkMissingInventory = async (req, res) => {
       totalMissingProducts: missingItems.length,
       message:
         missingItems.length > 0
-          ? "You need to add missing products to your inventory before accepting this order"
-          : "You have all required products in inventory",
+          ? 'You need to add missing products to your inventory before accepting this order'
+          : 'You have all required products in inventory',
     },
   });
 };
@@ -960,26 +960,26 @@ exports.checkMissingInventory = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const order = await Order.findById(req.params.id);
   if (!order) {
-    throw new ApiError("Order not found", 404);
+    throw new ApiError('Order not found', 404);
   }
 
   // Check if order is assigned to this partner
   if (!order.partner || order.partner.toString() !== partner._id.toString()) {
-    throw new ApiError("Order is not assigned to your shop", 403);
+    throw new ApiError('Order is not assigned to your shop', 403);
   }
 
   // Check if order has been accepted by partner
   if (
     order.partnerAssignment &&
-    order.partnerAssignment.response.status !== "accepted"
+    order.partnerAssignment.response.status !== 'accepted'
   ) {
     throw new ApiError(
-      "You must accept the order assignment before updating status",
+      'You must accept the order assignment before updating status',
       403
     );
   }
@@ -1005,7 +1005,7 @@ exports.updateOrderStatus = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: "Order status updated successfully",
+    message: 'Order status updated successfully',
   });
 };
 
@@ -1016,15 +1016,15 @@ exports.updateOrderStatus = async (req, res) => {
  */
 exports.getDashboardStats = async (req, res) => {
   try {
-    console.log("Dashboard request from user:", req.user.id);
+    console.log('Dashboard request from user:', req.user.id);
 
     const partner = await Partner.findOne({ user: req.user.id });
-    console.log("Found partner:", partner ? partner._id : "No partner found");
+    console.log('Found partner:', partner ? partner._id : 'No partner found');
 
     if (!partner) {
       return res.status(404).json({
         success: false,
-        message: "Partner profile not found",
+        message: 'Partner profile not found',
       });
     }
 
@@ -1044,25 +1044,25 @@ exports.getDashboardStats = async (req, res) => {
     });
     const pendingBuyOrders = await Order.countDocuments({
       partner: partner._id,
-      status: { $in: ["pending", "processing"] },
+      status: { $in: ['pending', 'processing'] },
     });
     const completedBuyOrders = await Order.countDocuments({
       partner: partner._id,
-      status: "delivered",
+      status: 'delivered',
     });
 
     // Get sell order stats
-    const SellOrder = require("../models/sellOrder.model");
+    const SellOrder = require('../models/sellOrder.model');
     const sellOrders = await SellOrder.countDocuments({
       assignedTo: partner._id,
     });
     const pendingSellOrders = await SellOrder.countDocuments({
       assignedTo: partner._id,
-      status: { $in: ["draft", "confirmed"] },
+      status: { $in: ['draft', 'confirmed'] },
     });
     const completedSellOrders = await SellOrder.countDocuments({
       assignedTo: partner._id,
-      status: "paid",
+      status: 'paid',
     });
 
     // Combined order stats
@@ -1073,7 +1073,7 @@ exports.getDashboardStats = async (req, res) => {
     // Get revenue stats from buy orders
     const orders = await Order.find({
       partner: partner._id,
-      status: "delivered",
+      status: 'delivered',
     });
 
     let totalRevenue = 0;
@@ -1084,7 +1084,7 @@ exports.getDashboardStats = async (req, res) => {
         (item) =>
           item.partner &&
           item.partner.toString() === partner._id.toString() &&
-          item.status === "delivered"
+          item.status === 'delivered'
       );
 
       partnerItems.forEach((item) => {
@@ -1096,7 +1096,7 @@ exports.getDashboardStats = async (req, res) => {
     // Add revenue from sell orders
     const completedSellOrdersData = await SellOrder.find({
       assignedTo: partner._id,
-      status: "paid",
+      status: 'paid',
     });
 
     completedSellOrdersData.forEach((order) => {
@@ -1110,30 +1110,30 @@ exports.getDashboardStats = async (req, res) => {
 
     // Get recent orders (both buy and sell)
     const recentBuyOrders = await Order.find({ partner: partner._id })
-      .sort("-createdAt")
+      .sort('-createdAt')
       .limit(3)
-      .populate("user", "name")
-      .populate("items.product", "name brand categoryId images pricing")
+      .populate('user', 'name')
+      .populate('items.product', 'name brand categoryId images pricing')
       .lean();
 
     const recentSellOrders = await SellOrder.find({ assignedTo: partner._id })
-      .sort("-createdAt")
+      .sort('-createdAt')
       .limit(3)
-      .populate("userId", "name")
-      .populate("sessionId")
+      .populate('userId', 'name')
+      .populate('sessionId')
       .lean();
 
     // Transform sell orders to match buy order structure for frontend
     const transformedSellOrders = recentSellOrders.map((order) => ({
       ...order,
-      orderType: "sell",
-      user: order.userId || { name: "Guest User" },
+      orderType: 'sell',
+      user: order.userId || { name: 'Guest User' },
       totalAmount: order.actualAmount || order.quoteAmount,
       items: [
         {
           product: {
-            name: order.sessionId?.productDetails?.name || "Device for Sell",
-            brand: order.sessionId?.productDetails?.brand || "Unknown",
+            name: order.sessionId?.productDetails?.name || 'Device for Sell',
+            brand: order.sessionId?.productDetails?.brand || 'Unknown',
             images: order.sessionId?.productDetails?.images || {},
           },
           quantity: 1,
@@ -1144,7 +1144,7 @@ exports.getDashboardStats = async (req, res) => {
 
     const transformedBuyOrders = recentBuyOrders.map((order) => ({
       ...order,
-      orderType: "buy",
+      orderType: 'buy',
     }));
 
     // Combine and sort by creation date
@@ -1152,7 +1152,7 @@ exports.getDashboardStats = async (req, res) => {
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 5);
 
-    console.log("Dashboard stats calculated successfully");
+    console.log('Dashboard stats calculated successfully');
 
     res.status(200).json({
       success: true,
@@ -1178,10 +1178,10 @@ exports.getDashboardStats = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error in getDashboardStats:", error);
+    console.error('Error in getDashboardStats:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch dashboard statistics",
+      message: 'Failed to fetch dashboard statistics',
       error: error.message,
     });
   }
@@ -1189,8 +1189,8 @@ exports.getDashboardStats = async (req, res) => {
 
 // ==================== NEW METHODS FOR SELL/BUY PRODUCTS CRM ====================
 
-const SellProduct = require("../models/sellProduct.model");
-const SellOrder = require("../models/sellOrder.model");
+const SellProduct = require('../models/sellProduct.model');
+const SellOrder = require('../models/sellOrder.model');
 
 /**
  * Get partner dashboard for sell/buy products
@@ -1200,7 +1200,7 @@ const SellOrder = require("../models/sellOrder.model");
 exports.getDashboardSellBuy = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const partnerId = partner._id;
@@ -1213,11 +1213,11 @@ exports.getDashboardSellBuy = async (req, res) => {
   const totalOrders = await SellOrder.countDocuments({ assignedTo: partnerId });
   const pendingOrders = await SellOrder.countDocuments({
     assignedTo: partnerId,
-    status: { $in: ["draft", "confirmed"] },
+    status: { $in: ['draft', 'confirmed'] },
   });
   const completedOrders = await SellOrder.countDocuments({
     assignedTo: partnerId,
-    status: "paid",
+    status: 'paid',
   });
 
   // Calculate revenue
@@ -1225,13 +1225,13 @@ exports.getDashboardSellBuy = async (req, res) => {
     {
       $match: {
         assignedTo: partnerId,
-        status: "paid",
+        status: 'paid',
       },
     },
     {
       $group: {
         _id: null,
-        total: { $sum: "$quoteAmount" },
+        total: { $sum: '$quoteAmount' },
       },
     },
   ]);
@@ -1242,8 +1242,8 @@ exports.getDashboardSellBuy = async (req, res) => {
   const recentOrders = await SellOrder.find({ assignedTo: partnerId })
     .sort({ createdAt: -1 })
     .limit(10)
-    .populate("sessionId")
-    .populate("userId", "name email phone");
+    .populate('sessionId')
+    .populate('userId', 'name email phone');
 
   res.status(200).json({
     success: true,
@@ -1269,7 +1269,7 @@ exports.getDashboardSellBuy = async (req, res) => {
 exports.getPartnerSellProducts = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const { status, search, page = 1, limit = 10 } = req.query;
@@ -1283,15 +1283,15 @@ exports.getPartnerSellProducts = async (req, res) => {
 
   if (search) {
     filter.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { tags: { $regex: search, $options: "i" } },
+      { name: { $regex: search, $options: 'i' } },
+      { tags: { $regex: search, $options: 'i' } },
     ];
   }
 
   const skip = (page - 1) * limit;
 
   const products = await SellProduct.find(filter)
-    .populate("categoryId", "name image")
+    .populate('categoryId', 'name image')
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(parseInt(limit));
@@ -1318,7 +1318,7 @@ exports.getPartnerSellProducts = async (req, res) => {
 exports.getPartnerBuyProducts = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const { isActive, search, page = 1, limit = 10 } = req.query;
@@ -1327,20 +1327,20 @@ exports.getPartnerBuyProducts = async (req, res) => {
   const filter = { partnerId };
 
   if (isActive !== undefined) {
-    filter.isActive = isActive === "true";
+    filter.isActive = isActive === 'true';
   }
 
   if (search) {
     filter.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { brand: { $regex: search, $options: "i" } },
+      { name: { $regex: search, $options: 'i' } },
+      { brand: { $regex: search, $options: 'i' } },
     ];
   }
 
   const skip = (page - 1) * limit;
 
   const products = await BuyProduct.find(filter)
-    .populate("categoryId", "name image")
+    .populate('categoryId', 'name image')
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(parseInt(limit));
@@ -1367,7 +1367,7 @@ exports.getPartnerBuyProducts = async (req, res) => {
 exports.getPartnerSellOrders = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const { status, page = 1, limit = 10 } = req.query;
@@ -1382,8 +1382,8 @@ exports.getPartnerSellOrders = async (req, res) => {
   const skip = (page - 1) * limit;
 
   const orders = await SellOrder.find(filter)
-    .populate("sessionId")
-    .populate("userId", "name email phone")
+    .populate('sessionId')
+    .populate('userId', 'name email phone')
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(parseInt(limit));
@@ -1410,18 +1410,18 @@ exports.getPartnerSellOrders = async (req, res) => {
 exports.getPartnerSellOrderDetails = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const partnerId = partner._id;
   const orderId = req.params.id;
 
   const order = await SellOrder.findOne({ _id: orderId, assignedTo: partnerId })
-    .populate("sessionId")
-    .populate("userId", "name email phone address");
+    .populate('sessionId')
+    .populate('userId', 'name email phone address');
 
   if (!order) {
-    throw new ApiError("Order not found or access denied", 404);
+    throw new ApiError('Order not found or access denied', 404);
   }
 
   res.status(200).json({
@@ -1438,7 +1438,7 @@ exports.getPartnerSellOrderDetails = async (req, res) => {
 exports.updatePartnerSellOrderStatus = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const { status, notes } = req.body;
@@ -1451,7 +1451,7 @@ exports.updatePartnerSellOrderStatus = async (req, res) => {
   });
 
   if (!order) {
-    throw new ApiError("Order not found or access denied", 404);
+    throw new ApiError('Order not found or access denied', 404);
   }
 
   order.status = status;
@@ -1463,7 +1463,7 @@ exports.updatePartnerSellOrderStatus = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: "Order status updated successfully",
+    message: 'Order status updated successfully',
     data: order,
   });
 };
@@ -1476,18 +1476,18 @@ exports.updatePartnerSellOrderStatus = async (req, res) => {
 exports.getPartnerAgents = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const { page = 1, limit = 10, status } = req.query;
 
   const query = { assignedPartner: partner._id };
   if (status) {
-    query.isActive = status === "active";
+    query.isActive = status === 'active';
   }
 
   const agents = await Agent.find(query)
-    .populate("user", "name email phone isVerified")
+    .populate('user', 'name email phone isVerified')
     .sort({ createdAt: -1 })
     .limit(limit * 1)
     .skip((page - 1) * limit);
@@ -1514,7 +1514,7 @@ exports.getPartnerAgents = async (req, res) => {
 exports.createAgent = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const {
@@ -1533,7 +1533,7 @@ exports.createAgent = async (req, res) => {
   // Check if user with email already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new ApiError("User with this email already exists", 400);
+    throw new ApiError('User with this email already exists', 400);
   }
 
   // Create user account for agent
@@ -1541,7 +1541,7 @@ exports.createAgent = async (req, res) => {
     name: sanitizeData(name),
     email: sanitizeData(email),
     phone: sanitizeData(phone),
-    role: "agent", // Agents have agent role
+    role: 'agent', // Agents have agent role
     password: password, // Use password provided by partner
     isVerified: false, // Will be verified by admin
   });
@@ -1553,10 +1553,10 @@ exports.createAgent = async (req, res) => {
   const generateEmployeeId = () => {
     const date = new Date();
     const year = date.getFullYear().toString().slice(-2);
-    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const random = Math.floor(Math.random() * 9999)
       .toString()
-      .padStart(4, "0");
+      .padStart(4, '0');
     return `EMP${year}${month}${random}`;
   };
 
@@ -1580,11 +1580,11 @@ exports.createAgent = async (req, res) => {
   });
 
   // Populate user data for response
-  await agent.populate("user", "name email phone isVerified");
+  await agent.populate('user', 'name email phone isVerified');
 
   res.status(201).json({
     success: true,
-    message: "Agent created successfully. Awaiting admin approval.",
+    message: 'Agent created successfully. Awaiting admin approval.',
     data: agent,
   });
 };
@@ -1597,7 +1597,7 @@ exports.createAgent = async (req, res) => {
 exports.updateAgent = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const agentId = req.params.agentId;
@@ -1607,10 +1607,10 @@ exports.updateAgent = async (req, res) => {
   const agent = await Agent.findOne({
     _id: agentId,
     assignedPartner: partner._id,
-  }).populate("user");
+  }).populate('user');
 
   if (!agent) {
-    throw new ApiError("Agent not found or access denied", 404);
+    throw new ApiError('Agent not found or access denied', 404);
   }
 
   // Update user data if provided
@@ -1637,11 +1637,11 @@ exports.updateAgent = async (req, res) => {
 
   const updatedAgent = await Agent.findByIdAndUpdate(agentId, agentUpdateData, {
     new: true,
-  }).populate("user", "name email phone isVerified");
+  }).populate('user', 'name email phone isVerified');
 
   res.status(200).json({
     success: true,
-    message: "Agent updated successfully",
+    message: 'Agent updated successfully',
     data: updatedAgent,
   });
 };
@@ -1654,7 +1654,7 @@ exports.updateAgent = async (req, res) => {
 exports.deleteAgent = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
-    throw new ApiError("Partner profile not found", 404);
+    throw new ApiError('Partner profile not found', 404);
   }
 
   const agentId = req.params.agentId;
@@ -1666,7 +1666,7 @@ exports.deleteAgent = async (req, res) => {
   });
 
   if (!agent) {
-    throw new ApiError("Agent not found or access denied", 404);
+    throw new ApiError('Agent not found or access denied', 404);
   }
 
   // Soft delete - deactivate instead of removing
@@ -1678,6 +1678,6 @@ exports.deleteAgent = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: "Agent deactivated successfully",
+    message: 'Agent deactivated successfully',
   });
 };

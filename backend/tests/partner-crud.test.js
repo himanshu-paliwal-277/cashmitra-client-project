@@ -20,13 +20,13 @@ describe('Partner CRUD Operations', () => {
 
   beforeAll(async () => {
     adminToken = generateAdminToken();
-    
+
     // Create a test user for partner creation
     const testUser = new User({
       name: 'Test Partner User',
       email: 'testpartner@example.com',
       phone: '+91 9876543210',
-      role: 'user'
+      role: 'user',
     });
     const savedUser = await testUser.save();
     testUserId = savedUser._id;
@@ -52,7 +52,7 @@ describe('Partner CRUD Operations', () => {
           city: 'Test City',
           state: 'Test State',
           pincode: '123456',
-          country: 'India'
+          country: 'India',
         },
         shopEmail: 'shop@testelectronics.com',
         shopPhone: '+91 9876543211',
@@ -62,8 +62,8 @@ describe('Partner CRUD Operations', () => {
           accountNumber: '1234567890',
           ifscCode: 'TEST0001234',
           bankName: 'Test Bank',
-          accountHolderName: 'Test Partner User'
-        }
+          accountHolderName: 'Test Partner User',
+        },
       };
 
       const response = await request(app)
@@ -75,13 +75,13 @@ describe('Partner CRUD Operations', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.data.shopName).toBe(partnerData.shopName);
       expect(response.body.data.shopEmail).toBe(partnerData.shopEmail);
-      
+
       testPartnerId = response.body.data._id;
     });
 
     it('should return validation error for missing required fields', async () => {
       const invalidData = {
-        shopName: 'Incomplete Store'
+        shopName: 'Incomplete Store',
         // Missing required fields
       };
 
@@ -111,7 +111,7 @@ describe('Partner CRUD Operations', () => {
 
     it('should return 404 for non-existent partner', async () => {
       const fakeId = '507f1f77bcf86cd799439011';
-      
+
       const response = await request(app)
         .get(`/api/admin/partners/${fakeId}`)
         .set('Authorization', `Bearer ${adminToken}`)
@@ -131,8 +131,8 @@ describe('Partner CRUD Operations', () => {
           city: 'Updated City',
           state: 'Updated State',
           pincode: '654321',
-          country: 'India'
-        }
+          country: 'India',
+        },
       };
 
       const response = await request(app)
@@ -149,7 +149,7 @@ describe('Partner CRUD Operations', () => {
     it('should return 404 for non-existent partner update', async () => {
       const fakeId = '507f1f77bcf86cd799439011';
       const updateData = { shopName: 'Non-existent Store' };
-      
+
       const response = await request(app)
         .put(`/api/admin/partners/${fakeId}`)
         .set('Authorization', `Bearer ${adminToken}`)
@@ -164,14 +164,14 @@ describe('Partner CRUD Operations', () => {
     it('should prevent deletion of partner with active inventory', async () => {
       // This test assumes there might be active inventory
       // In a real scenario, you would create test inventory first
-      
+
       const response = await request(app)
         .delete(`/api/admin/partners/${testPartnerId}`)
         .set('Authorization', `Bearer ${adminToken}`);
 
       // Could be either 200 (successful deletion) or 400 (has active inventory)
       expect([200, 400]).toContain(response.status);
-      
+
       if (response.status === 400) {
         expect(response.body.message).toContain('active inventory');
       } else {
@@ -183,7 +183,7 @@ describe('Partner CRUD Operations', () => {
 
     it('should return 404 for non-existent partner deletion', async () => {
       const fakeId = '507f1f77bcf86cd799439011';
-      
+
       const response = await request(app)
         .delete(`/api/admin/partners/${fakeId}`)
         .set('Authorization', `Bearer ${adminToken}`)
@@ -196,26 +196,27 @@ describe('Partner CRUD Operations', () => {
   describe('Authorization Tests', () => {
     it('should require authentication for all endpoints', async () => {
       // Test without token
+      await request(app).get('/api/admin/partners').expect(401);
+
+      await request(app).post('/api/admin/partners').send({}).expect(401);
+
       await request(app)
-        .get('/api/admin/partners')
+        .get(
+          `/api/admin/partners/${testPartnerId || '507f1f77bcf86cd799439011'}`
+        )
         .expect(401);
 
       await request(app)
-        .post('/api/admin/partners')
+        .put(
+          `/api/admin/partners/${testPartnerId || '507f1f77bcf86cd799439011'}`
+        )
         .send({})
         .expect(401);
 
       await request(app)
-        .get(`/api/admin/partners/${testPartnerId || '507f1f77bcf86cd799439011'}`)
-        .expect(401);
-
-      await request(app)
-        .put(`/api/admin/partners/${testPartnerId || '507f1f77bcf86cd799439011'}`)
-        .send({})
-        .expect(401);
-
-      await request(app)
-        .delete(`/api/admin/partners/${testPartnerId || '507f1f77bcf86cd799439011'}`)
+        .delete(
+          `/api/admin/partners/${testPartnerId || '507f1f77bcf86cd799439011'}`
+        )
         .expect(401);
     });
   });
@@ -247,9 +248,9 @@ describe('Partner CRUD Integration Test', () => {
       name: 'Integration Test User',
       email: 'integration@test.com',
       phone: '+91 9999999999',
-      role: 'user'
+      role: 'user',
     };
-    
+
     const user = new User(userData);
     const savedUser = await user.save();
     userId = savedUser._id;
@@ -263,12 +264,12 @@ describe('Partner CRUD Integration Test', () => {
         city: 'Integration City',
         state: 'Integration State',
         pincode: '789012',
-        country: 'India'
+        country: 'India',
       },
       shopEmail: 'integration@teststore.com',
       shopPhone: '+91 9999999998',
       gstNumber: '29INTEG1234F1Z5',
-      panNumber: 'INTEG1234F'
+      panNumber: 'INTEG1234F',
     };
 
     const createResponse = await request(app)
@@ -291,7 +292,7 @@ describe('Partner CRUD Integration Test', () => {
     // 4. Update partner
     const updateData = {
       shopName: 'Updated Integration Store',
-      shopPhone: '+91 8888888888'
+      shopPhone: '+91 8888888888',
     };
 
     const updateResponse = await request(app)
@@ -308,7 +309,7 @@ describe('Partner CRUD Integration Test', () => {
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect([200, 400]).toContain(deleteResponse.status);
-    
+
     if (deleteResponse.status === 200) {
       partnerId = null; // Mark as deleted
     }

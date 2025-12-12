@@ -37,10 +37,12 @@ const categorySchema = new mongoose.Schema(
       ref: 'Category',
       default: null,
     },
-    subcategories: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
-    }],
+    subcategories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,
@@ -68,7 +70,7 @@ const categorySchema = new mongoose.Schema(
       ref: 'User',
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -76,12 +78,12 @@ const categorySchema = new mongoose.Schema(
 );
 
 // Virtual for display purposes
-categorySchema.virtual('displayName').get(function() {
+categorySchema.virtual('displayName').get(function () {
   return this.name;
 });
 
 // Pre-save middleware to generate slug
-categorySchema.pre('save', function(next) {
+categorySchema.pre('save', function (next) {
   if (this.isModified('name') || !this.slug) {
     this.slug = this.name
       .toLowerCase()

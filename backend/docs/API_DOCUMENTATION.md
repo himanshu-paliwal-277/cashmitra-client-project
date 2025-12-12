@@ -5,6 +5,7 @@
 The Cashify Backend API provides comprehensive endpoints for managing a marketplace platform for buying and selling electronic devices. The API follows RESTful conventions and includes proper authentication, validation, and error handling.
 
 ## Base URL
+
 ```
 http://localhost:5000/api
 ```
@@ -68,11 +69,13 @@ Error responses include appropriate HTTP status codes and detailed error informa
 ## Endpoints
 
 ### Get All Categories
+
 ```http
 GET /api/categories
 ```
 
 **Query Parameters:**
+
 - `page` (optional): Page number (default: 1)
 - `limit` (optional): Items per page (default: 20, max: 100)
 - `search` (optional): Search term for category names
@@ -81,6 +84,7 @@ GET /api/categories
 - `sortOrder` (optional): Sort order (asc, desc)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -104,17 +108,21 @@ GET /api/categories
 ```
 
 ### Get Category by ID
+
 ```http
 GET /api/categories/:id
 ```
 
 ### Create Category
+
 ```http
 POST /api/categories
 ```
+
 **Authentication:** Required (Admin)
 
 **Request Body:**
+
 ```json
 {
   "name": "Smartphones",
@@ -128,23 +136,29 @@ POST /api/categories
 ```
 
 ### Update Category
+
 ```http
 PUT /api/categories/:id
 ```
+
 **Authentication:** Required (Admin)
 
 ### Delete Category
+
 ```http
 DELETE /api/categories/:id
 ```
+
 **Authentication:** Required (Admin)
 
 ### Get Category Hierarchy
+
 ```http
 GET /api/categories/:id/hierarchy
 ```
 
 ### Get Category Tree
+
 ```http
 GET /api/categories/tree
 ```
@@ -156,11 +170,13 @@ GET /api/categories/tree
 ## Endpoints
 
 ### Search Products
+
 ```http
 GET /api/products/search
 ```
 
 **Query Parameters:**
+
 - `q` (optional): Search query
 - `category` (optional): Category ID
 - `brand` (optional): Brand name
@@ -174,6 +190,7 @@ GET /api/products/search
 - `limit` (optional): Items per page
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -211,26 +228,31 @@ GET /api/products/search
 ```
 
 ### Get Product Details
+
 ```http
 GET /api/products/:id
 ```
 
 ### Get Product Suggestions
+
 ```http
 GET /api/products/suggestions
 ```
 
 ### Get Categories
+
 ```http
 GET /api/products/categories
 ```
 
 ### Get Brands
+
 ```http
 GET /api/products/brands
 ```
 
 ### Get Filters
+
 ```http
 GET /api/products/filters
 ```
@@ -242,12 +264,15 @@ GET /api/products/filters
 ## Endpoints
 
 ### Create Order
+
 ```http
 POST /api/sales/orders
 ```
+
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "items": [
@@ -269,6 +294,7 @@ POST /api/sales/orders
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -297,12 +323,15 @@ POST /api/sales/orders
 ```
 
 ### Process Payment
+
 ```http
 POST /api/sales/orders/:orderId/payment
 ```
+
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "paymentDetails": {
@@ -317,18 +346,23 @@ POST /api/sales/orders/:orderId/payment
 ```
 
 ### Get Order Details
+
 ```http
 GET /api/sales/orders/:orderId
 ```
+
 **Authentication:** Required
 
 ### Get User Orders
+
 ```http
 GET /api/sales/orders
 ```
+
 **Authentication:** Required
 
 **Query Parameters:**
+
 - `page` (optional): Page number
 - `limit` (optional): Items per page
 - `status` (optional): Order status
@@ -337,12 +371,15 @@ GET /api/sales/orders
 - `sortOrder` (optional): Sort order
 
 ### Cancel Order
+
 ```http
 PATCH /api/sales/orders/:orderId/cancel
 ```
+
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "reason": "Changed my mind"
@@ -350,12 +387,15 @@ PATCH /api/sales/orders/:orderId/cancel
 ```
 
 ### Update Shipping Status
+
 ```http
 PATCH /api/sales/orders/:orderId/shipping
 ```
+
 **Authentication:** Required (Partner/Admin)
 
 **Request Body:**
+
 ```json
 {
   "status": "shipped",
@@ -365,12 +405,15 @@ PATCH /api/sales/orders/:orderId/shipping
 ```
 
 ### Get Sales Analytics
+
 ```http
 GET /api/sales/analytics
 ```
+
 **Authentication:** Required (Admin)
 
 **Query Parameters:**
+
 - `startDate` (optional): Start date for analytics
 - `endDate` (optional): End date for analytics
 - `groupBy` (optional): Group by day/week/month
@@ -382,11 +425,13 @@ GET /api/sales/analytics
 ## Endpoints
 
 ### Get Inventory Items
+
 ```http
 GET /api/inventory
 ```
 
 **Query Parameters:**
+
 - `page` (optional): Page number
 - `limit` (optional): Items per page
 - `partner` (optional): Partner ID
@@ -401,6 +446,7 @@ GET /api/inventory
 - `sortOrder` (optional): Sort order
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -437,17 +483,21 @@ GET /api/inventory
 ```
 
 ### Get Inventory Item
+
 ```http
 GET /api/inventory/:id
 ```
 
 ### Add Inventory Item
+
 ```http
 POST /api/inventory
 ```
+
 **Authentication:** Required (Partner/Admin)
 
 **Request Body:**
+
 ```json
 {
   "product": "product_id",
@@ -469,24 +519,31 @@ POST /api/inventory
 ```
 
 ### Update Inventory Item
+
 ```http
 PUT /api/inventory/:id
 ```
+
 **Authentication:** Required (Partner/Admin)
 
 ### Delete Inventory Item
+
 ```http
 DELETE /api/inventory/:id
 ```
+
 **Authentication:** Required (Partner/Admin)
 
 ### Update Stock
+
 ```http
 PATCH /api/inventory/:id/stock
 ```
+
 **Authentication:** Required (Partner/Admin)
 
 **Request Body:**
+
 ```json
 {
   "quantity": 10,
@@ -495,12 +552,15 @@ PATCH /api/inventory/:id/stock
 ```
 
 ### Bulk Update Inventory
+
 ```http
 PATCH /api/inventory/bulk-update
 ```
+
 **Authentication:** Required (Partner/Admin)
 
 **Request Body:**
+
 ```json
 {
   "updates": [
@@ -518,17 +578,21 @@ PATCH /api/inventory/bulk-update
 ```
 
 ### Get Inventory Analytics
+
 ```http
 GET /api/inventory/analytics/overview
 ```
+
 **Authentication:** Required (Partner/Admin)
 
 **Query Parameters:**
+
 - `partnerId` (optional): Partner ID (Admin only)
 - `startDate` (optional): Start date
 - `endDate` (optional): End date
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -559,6 +623,7 @@ GET /api/inventory/analytics/overview
 # Data Models
 
 ## Category Model
+
 ```javascript
 {
   name: String, // required, unique
@@ -574,6 +639,7 @@ GET /api/inventory/analytics/overview
 ```
 
 ## Product Model
+
 ```javascript
 {
   category: ObjectId, // reference to Category, required
@@ -593,6 +659,7 @@ GET /api/inventory/analytics/overview
 ```
 
 ## Inventory Model
+
 ```javascript
 {
   partner: ObjectId, // reference to Partner, required
@@ -616,6 +683,7 @@ GET /api/inventory/analytics/overview
 ```
 
 ## Order Model
+
 ```javascript
 {
   orderNumber: String, // auto-generated
@@ -661,28 +729,33 @@ GET /api/inventory/analytics/overview
 # Error Codes
 
 ## Validation Errors (400)
+
 - `VALIDATION_ERROR`: Request validation failed
 - `INVALID_CREDENTIALS`: Invalid login credentials
 - `INSUFFICIENT_STOCK`: Not enough inventory
 - `ORDER_CANNOT_BE_CANCELLED`: Order status doesn't allow cancellation
 
 ## Authentication Errors (401)
+
 - `TOKEN_MISSING`: JWT token not provided
 - `TOKEN_INVALID`: JWT token is invalid or expired
 - `USER_NOT_FOUND`: User account not found
 
 ## Authorization Errors (403)
+
 - `ACCESS_DENIED`: Insufficient permissions
 - `PARTNER_ONLY`: Endpoint requires partner access
 - `ADMIN_ONLY`: Endpoint requires admin access
 
 ## Resource Errors (404)
+
 - `CATEGORY_NOT_FOUND`: Category not found
 - `PRODUCT_NOT_FOUND`: Product not found
 - `INVENTORY_NOT_FOUND`: Inventory item not found
 - `ORDER_NOT_FOUND`: Order not found
 
 ## Business Logic Errors (422)
+
 - `DUPLICATE_CATEGORY`: Category name already exists
 - `PARENT_CATEGORY_INVALID`: Invalid parent category
 - `PAYMENT_FAILED`: Payment processing failed
@@ -699,6 +772,7 @@ API endpoints are rate limited to prevent abuse:
 - **Search endpoints**: 50 requests per 15 minutes
 
 Rate limit headers are included in responses:
+
 ```
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
@@ -715,6 +789,7 @@ All list endpoints support pagination with the following parameters:
 - `limit`: Items per page (default: 20, max: 100)
 
 Pagination information is included in the response:
+
 ```json
 {
   "count": 20,
@@ -731,10 +806,12 @@ Pagination information is included in the response:
 Most list endpoints support sorting and filtering:
 
 **Sorting:**
+
 - `sortBy`: Field to sort by
 - `sortOrder`: `asc` or `desc`
 
 **Common Filters:**
+
 - `search`: Text search
 - `status`: Status filter
 - `dateRange`: Date range filters
@@ -747,6 +824,7 @@ Most list endpoints support sorting and filtering:
 The API supports webhooks for real-time notifications:
 
 ## Supported Events
+
 - `order.created`
 - `order.paid`
 - `order.shipped`
@@ -756,6 +834,7 @@ The API supports webhooks for real-time notifications:
 - `inventory.out_of_stock`
 
 ## Webhook Payload
+
 ```json
 {
   "event": "order.created",
@@ -773,18 +852,22 @@ The API supports webhooks for real-time notifications:
 Use the following test credentials for API testing:
 
 **Admin User:**
+
 - Email: `admin@cashify.com`
 - Password: `admin123`
 
 **Partner User:**
+
 - Email: `partner@techstore.com`
 - Password: `partner123`
 
 **Regular User:**
+
 - Email: `user@example.com`
 - Password: `user123`
 
 **Test Environment:**
+
 ```
 Base URL: http://localhost:5000/api
 Database: cashify_test
@@ -795,6 +878,7 @@ Database: cashify_test
 # Support
 
 For API support and questions:
+
 - Email: api-support@cashify.com
 - Documentation: https://docs.cashify.com
 - Status Page: https://status.cashify.com

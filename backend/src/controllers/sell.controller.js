@@ -1,12 +1,12 @@
-const { validationResult } = require("express-validator");
-const Product = require("../models/product.model");
-const SellProduct = require("../models/sellProduct.model");
-const Category = require("../models/category.model");
-const SellSuperCategory = require("../models/sellSuperCategory.model");
-const Partner = require("../models/partner.model");
-const { Order } = require("../models/order.model");
-const Transaction = require("../models/transaction.model");
-const Wallet = require("../models/wallet.model");
+const { validationResult } = require('express-validator');
+const Product = require('../models/product.model');
+const SellProduct = require('../models/sellProduct.model');
+const Category = require('../models/category.model');
+const SellSuperCategory = require('../models/sellSuperCategory.model');
+const Partner = require('../models/partner.model');
+const { Order } = require('../models/order.model');
+const Transaction = require('../models/transaction.model');
+const Wallet = require('../models/wallet.model');
 
 /**
  * @desc    Get all categories (public endpoint for sell flow)
@@ -17,11 +17,11 @@ const getProductCategories = async (req, res) => {
   try {
     // Get all active categories with their super categories
     const categories = await Category.find({ isActive: true })
-      .populate("superCategory", "name displayName image")
-      .populate("parentCategory", "name")
+      .populate('superCategory', 'name displayName image')
+      .populate('parentCategory', 'name')
       .sort({ sortOrder: 1, name: 1 })
       .select(
-        "name displayName description image icon superCategory parentCategory isActive sortOrder"
+        'name displayName description image icon superCategory parentCategory isActive sortOrder'
       );
 
     res.json({
@@ -30,8 +30,8 @@ const getProductCategories = async (req, res) => {
       count: categories.length,
     });
   } catch (error) {
-    console.error("Error fetching categories:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching categories:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -46,12 +46,12 @@ const getBrandsByCategory = async (req, res) => {
 
     // Find the super category by name (case-insensitive)
     const superCategory = await SellSuperCategory.findOne({
-      name: { $regex: new RegExp(`^${category}$`, "i") },
+      name: { $regex: new RegExp(`^${category}$`, 'i') },
       isActive: true,
     });
 
     if (!superCategory) {
-      return res.status(404).json({ message: "Category not found" });
+      return res.status(404).json({ message: 'Category not found' });
     }
 
     // Find all categories (brands) that belong to this super category
@@ -59,7 +59,7 @@ const getBrandsByCategory = async (req, res) => {
       superCategory: superCategory._id,
       isActive: true,
     })
-      .select("name")
+      .select('name')
       .sort({ name: 1 });
 
     // Extract brand names
@@ -67,8 +67,8 @@ const getBrandsByCategory = async (req, res) => {
 
     res.json({ brands });
   } catch (error) {
-    console.error("Error fetching brands:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching brands:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -82,12 +82,12 @@ const getSeriesByBrand = async (req, res) => {
     const { category, brand } = req.params;
 
     // Find distinct series for the given category and brand
-    const series = await Product.distinct("series", { category, brand });
+    const series = await Product.distinct('series', { category, brand });
 
     res.json({ series });
   } catch (error) {
-    console.error("Error fetching series:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching series:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -101,12 +101,12 @@ const getModelsBySeries = async (req, res) => {
     const { category, brand, series } = req.params;
 
     // Find distinct models for the given category, brand, and series
-    const models = await Product.distinct("model", { category, brand, series });
+    const models = await Product.distinct('model', { category, brand, series });
 
     res.json({ models });
   } catch (error) {
-    console.error("Error fetching models:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching models:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -122,7 +122,7 @@ const getVariantsByModel = async (req, res) => {
     // Find products with the given category, brand, series, and model
     const products = await Product.find(
       { category, brand, series, model },
-      "variant.ram variant.storage"
+      'variant.ram variant.storage'
     );
 
     // Extract unique variants
@@ -134,8 +134,8 @@ const getVariantsByModel = async (req, res) => {
 
     res.json({ variants });
   } catch (error) {
-    console.error("Error fetching variants:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching variants:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -162,13 +162,13 @@ const calculatePrice = async (req, res) => {
       batteryHealth,
       functionalIssues,
       accessories = [], // charger, box, earphones, etc.
-      warrantyStatus = "expired",
+      warrantyStatus = 'expired',
     } = req.body;
 
     // Find the product
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     // Calculate age in months with more precise calculation
@@ -250,11 +250,11 @@ const calculatePrice = async (req, res) => {
     const accessoryBonus = accessories.length * 0.02; // 2% per accessory
 
     // Warranty bonus
-    const warrantyBonus = warrantyStatus === "active" ? 0.05 : 0;
+    const warrantyBonus = warrantyStatus === 'active' ? 0.05 : 0;
 
     // Storage variant factor (higher storage = better resale)
     const storageValue = parseInt(
-      product.variant.storage.replace(/[^0-9]/g, "")
+      product.variant.storage.replace(/[^0-9]/g, '')
     );
     let storageFactor = 1.0;
     if (storageValue >= 512) storageFactor = 1.05;
@@ -289,9 +289,9 @@ const calculatePrice = async (req, res) => {
     const confidenceScore = Math.min(
       95,
       70 +
-        (screenCondition !== "unknown" ? 5 : 0) +
-        (batteryHealth !== "unknown" ? 5 : 0) +
-        (functionalIssues !== "unknown" ? 5 : 0) +
+        (screenCondition !== 'unknown' ? 5 : 0) +
+        (batteryHealth !== 'unknown' ? 5 : 0) +
+        (functionalIssues !== 'unknown' ? 5 : 0) +
         (accessories.length > 0 ? 5 : 0) +
         (ageInMonths < 36 ? 5 : 0)
     );
@@ -339,8 +339,8 @@ const calculatePrice = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error calculating price:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error calculating price:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -351,40 +351,40 @@ const generatePriceRecommendations = (product, condition) => {
   const recommendations = [];
 
   if (
-    condition.screenCondition === "cracked" ||
-    condition.screenCondition === "majorScratches"
+    condition.screenCondition === 'cracked' ||
+    condition.screenCondition === 'majorScratches'
   ) {
     recommendations.push({
-      type: "repair",
-      message: "Consider screen repair to increase value by 15-25%",
-      impact: "high",
+      type: 'repair',
+      message: 'Consider screen repair to increase value by 15-25%',
+      impact: 'high',
     });
   }
 
-  if (condition.batteryHealth === "below50") {
+  if (condition.batteryHealth === 'below50') {
     recommendations.push({
-      type: "repair",
-      message: "Battery replacement could increase value by 10-15%",
-      impact: "medium",
+      type: 'repair',
+      message: 'Battery replacement could increase value by 10-15%',
+      impact: 'medium',
     });
   }
 
   if (condition.accessories.length === 0) {
     recommendations.push({
-      type: "accessories",
-      message: "Include original charger and box to increase value by 5-10%",
-      impact: "low",
+      type: 'accessories',
+      message: 'Include original charger and box to increase value by 5-10%',
+      impact: 'low',
     });
   }
 
   if (
-    condition.functionalIssues === "major" ||
-    condition.functionalIssues === "notWorking"
+    condition.functionalIssues === 'major' ||
+    condition.functionalIssues === 'notWorking'
   ) {
     recommendations.push({
-      type: "repair",
-      message: "Functional repairs are essential for better pricing",
-      impact: "critical",
+      type: 'repair',
+      message: 'Functional repairs are essential for better pricing',
+      impact: 'critical',
     });
   }
 
@@ -409,19 +409,19 @@ const createSellOrder = async (req, res) => {
     // Find the product
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     // Find nearest partner shop based on pincode
     const partnerShop = await Partner.findOne({
-      "address.pincode": pickupAddress.pincode,
+      'address.pincode': pickupAddress.pincode,
       isVerified: true,
     });
 
     if (!partnerShop) {
       return res
         .status(404)
-        .json({ message: "No partner shop available in your area" });
+        .json({ message: 'No partner shop available in your area' });
     }
 
     // Calculate commission (10% of the price)
@@ -430,7 +430,7 @@ const createSellOrder = async (req, res) => {
 
     // Create a new order
     const order = new Order({
-      orderType: "sell",
+      orderType: 'sell',
       user: req.user._id,
       partner: partnerShop._id,
       items: [
@@ -448,18 +448,18 @@ const createSellOrder = async (req, res) => {
       },
       paymentDetails: {
         method: paymentMethod,
-        status: "pending",
+        status: 'pending',
       },
       shippingDetails: {
         address: pickupAddress,
         contactPhone: req.user.phone,
-        deliveryMethod: "Pickup",
+        deliveryMethod: 'Pickup',
       },
-      status: "pending",
+      status: 'pending',
       statusHistory: [
         {
-          status: "pending",
-          note: "Order created and assigned to partner shop",
+          status: 'pending',
+          note: 'Order created and assigned to partner shop',
         },
       ],
     });
@@ -468,14 +468,14 @@ const createSellOrder = async (req, res) => {
 
     // Create transaction record
     const transaction = new Transaction({
-      type: "sell_order",
+      type: 'sell_order',
       amount: price,
-      currency: "INR",
+      currency: 'INR',
       user: req.user._id,
       partner: partnerShop._id,
       order: order._id,
       paymentMethod,
-      status: "pending",
+      status: 'pending',
       metadata: {
         commission: {
           rate: commissionRate,
@@ -493,7 +493,7 @@ const createSellOrder = async (req, res) => {
     await transaction.save();
 
     res.status(201).json({
-      message: "Sell order created successfully",
+      message: 'Sell order created successfully',
       order: {
         _id: order._id,
         status: order.status,
@@ -510,8 +510,8 @@ const createSellOrder = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error creating sell order:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error creating sell order:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -525,13 +525,13 @@ const getSellOrderStatus = async (req, res) => {
     const order = await Order.findOne({
       _id: req.params.id,
       user: req.user._id,
-      orderType: "sell",
+      orderType: 'sell',
     })
-      .populate("partner", "shopName address phone")
-      .populate("items.product", "category brand series model variant");
+      .populate('partner', 'shopName address phone')
+      .populate('items.product', 'category brand series model variant');
 
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ message: 'Order not found' });
     }
 
     res.json({
@@ -548,8 +548,8 @@ const getSellOrderStatus = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching sell order:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching sell order:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -563,9 +563,9 @@ const updateSellOrderStatus = async (req, res) => {
     const { id } = req.params;
     const { status, note } = req.body;
 
-    const order = await Order.findById(id).populate("partner user");
+    const order = await Order.findById(id).populate('partner user');
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ message: 'Order not found' });
     }
 
     // Update order status
@@ -577,7 +577,7 @@ const updateSellOrderStatus = async (req, res) => {
     });
 
     // If order is completed, process commission
-    if (status === "completed") {
+    if (status === 'completed') {
       const commissionAmount = order.commission.amount;
 
       // Find or create partner wallet
@@ -588,7 +588,7 @@ const updateSellOrderStatus = async (req, res) => {
           balance: 0,
           transactions: [],
           payoutSettings: {
-            method: "bank_transfer",
+            method: 'bank_transfer',
             minimumAmount: 500,
           },
         });
@@ -597,7 +597,7 @@ const updateSellOrderStatus = async (req, res) => {
       // Add commission to wallet
       wallet.balance += commissionAmount;
       wallet.transactions.push({
-        type: "commission_earned",
+        type: 'commission_earned',
         amount: commissionAmount,
         description: `Commission from sell order #${order._id}`,
         order: order._id,
@@ -608,12 +608,12 @@ const updateSellOrderStatus = async (req, res) => {
 
       // Create commission transaction record
       const commissionTransaction = new Transaction({
-        type: "commission",
+        type: 'commission',
         amount: commissionAmount,
-        currency: "INR",
+        currency: 'INR',
         partner: order.partner._id,
         order: order._id,
-        status: "completed",
+        status: 'completed',
         metadata: {
           commissionRate: order.commission.rate,
           originalAmount: order.totalAmount,
@@ -624,13 +624,13 @@ const updateSellOrderStatus = async (req, res) => {
       await commissionTransaction.save();
 
       // Update payment status
-      order.paymentDetails.status = "completed";
+      order.paymentDetails.status = 'completed';
     }
 
     await order.save();
 
     res.json({
-      message: "Order status updated successfully",
+      message: 'Order status updated successfully',
       order: {
         _id: order._id,
         status: order.status,
@@ -638,8 +638,8 @@ const updateSellOrderStatus = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error updating sell order status:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error updating sell order status:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -651,7 +651,7 @@ const getPriceQuote = async (req, res) => {
     let order;
 
     // Check if assessmentId is a custom format (assessment_timestamp_randomstring)
-    if (assessmentId.startsWith("assessment_")) {
+    if (assessmentId.startsWith('assessment_')) {
       // For custom assessment IDs, we need to find by the assessmentId field
       order = await Order.findOne({ assessmentId: assessmentId });
     } else {
@@ -660,7 +660,7 @@ const getPriceQuote = async (req, res) => {
     }
 
     if (!order) {
-      return res.status(404).json({ message: "Assessment not found" });
+      return res.status(404).json({ message: 'Assessment not found' });
     }
 
     // Return the price quote information
@@ -671,36 +671,36 @@ const getPriceQuote = async (req, res) => {
         confidence: 95,
         validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
         conditionSummary: {
-          screen_condition: order.screenCondition || "good",
-          body_condition: order.bodyCondition || "good",
-          battery_health: order.batteryHealth || "good",
-          functional_issues: order.functionalIssues || "none",
+          screen_condition: order.screenCondition || 'good',
+          body_condition: order.bodyCondition || 'good',
+          battery_health: order.batteryHealth || 'good',
+          functional_issues: order.functionalIssues || 'none',
         },
         marketInsights: {
-          demand: "high",
-          brandRetention: "excellent",
-          expectedSaleDays: "2-3",
+          demand: 'high',
+          brandRetention: 'excellent',
+          expectedSaleDays: '2-3',
         },
       },
       productDetails: {
         brand: {
           name: order.brand,
           logo: order.brand?.charAt(0).toUpperCase(),
-          bgColor: "#007bff",
-          textColor: "#ffffff",
+          bgColor: '#007bff',
+          textColor: '#ffffff',
         },
         model: {
           name: order.productName || order.model,
           year: new Date().getFullYear() - 1,
           specs: {
-            storage: "128GB",
+            storage: '128GB',
           },
         },
       },
     });
   } catch (error) {
-    console.error("Error fetching price quote:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching price quote:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -712,7 +712,7 @@ const refreshPriceQuote = async (req, res) => {
     let order;
 
     // Check if assessmentId is a custom format (assessment_timestamp_randomstring)
-    if (assessmentId.startsWith("assessment_")) {
+    if (assessmentId.startsWith('assessment_')) {
       // For custom assessment IDs, we need to find by the assessmentId field
       order = await Order.findOne({ assessmentId: assessmentId });
     } else {
@@ -721,7 +721,7 @@ const refreshPriceQuote = async (req, res) => {
     }
 
     if (!order) {
-      return res.status(404).json({ message: "Assessment not found" });
+      return res.status(404).json({ message: 'Assessment not found' });
     }
 
     // Simulate price recalculation (in real app, this would involve market analysis)
@@ -741,21 +741,21 @@ const refreshPriceQuote = async (req, res) => {
         confidence: 95,
         validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000),
         conditionSummary: {
-          screen_condition: order.screenCondition || "good",
-          body_condition: order.bodyCondition || "good",
-          battery_health: order.batteryHealth || "good",
-          functional_issues: order.functionalIssues || "none",
+          screen_condition: order.screenCondition || 'good',
+          body_condition: order.bodyCondition || 'good',
+          battery_health: order.batteryHealth || 'good',
+          functional_issues: order.functionalIssues || 'none',
         },
         marketInsights: {
-          demand: "high",
-          brandRetention: "excellent",
-          expectedSaleDays: "2-3",
+          demand: 'high',
+          brandRetention: 'excellent',
+          expectedSaleDays: '2-3',
         },
       },
     });
   } catch (error) {
-    console.error("Error refreshing price quote:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error refreshing price quote:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -769,7 +769,7 @@ const submitAssessment = async (req, res) => {
     let { category, brand, model, answers, productDetails } = req.body;
 
     // Handle nested category object structure
-    if (typeof category === "object" && category.category) {
+    if (typeof category === 'object' && category.category) {
       // Extract values from nested structure
       const categoryObj = category;
       category = categoryObj.category;
@@ -856,7 +856,7 @@ const submitAssessment = async (req, res) => {
     // Create an Order record with the assessment data
     const order = new Order({
       assessmentId,
-      orderType: "sell",
+      orderType: 'sell',
       user: req.user ? req.user._id : null, // Use authenticated user if available
       partner: null, // Will be assigned later when order is processed
       items: [
@@ -865,7 +865,7 @@ const submitAssessment = async (req, res) => {
           condition: {
             screenCondition: answers.screen_condition,
             bodyCondition: answers.body_condition,
-            batteryHealth: answers.battery_health || "good",
+            batteryHealth: answers.battery_health || 'good',
             functionalIssues: answers.functionality,
           },
           price: finalPrice,
@@ -878,15 +878,15 @@ const submitAssessment = async (req, res) => {
         amount: Math.round(finalPrice * 0.05),
       },
       paymentDetails: {
-        method: "UPI", // Default method
-        status: "pending",
+        method: 'UPI', // Default method
+        status: 'pending',
       },
-      status: "pending",
+      status: 'pending',
       statusHistory: [
         {
-          status: "pending",
+          status: 'pending',
           timestamp: new Date(),
-          note: "Assessment completed, awaiting confirmation",
+          note: 'Assessment completed, awaiting confirmation',
         },
       ],
       notes: `Assessment for ${brand} ${model} - Category: ${category}`,
@@ -911,10 +911,10 @@ const submitAssessment = async (req, res) => {
         },
         validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
         marketInsights: {
-          demand: "high",
+          demand: 'high',
           brandRetention:
-            brandKey && brandMultipliers[brandKey] > 1.2 ? "excellent" : "good",
-          expectedSaleDays: "2-3",
+            brandKey && brandMultipliers[brandKey] > 1.2 ? 'excellent' : 'good',
+          expectedSaleDays: '2-3',
         },
       },
       deviceInfo: {
@@ -925,8 +925,8 @@ const submitAssessment = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error submitting assessment:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error submitting assessment:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -940,12 +940,12 @@ const findProductsByModel = async (req, res) => {
     const { category, brand, model } = req.query;
 
     // Build query
-    const query = { status: "active" };
+    const query = { status: 'active' };
 
     // If category is provided, find the super category and then categories
     if (category) {
       const superCategory = await SellSuperCategory.findOne({
-        name: { $regex: new RegExp(`^${category}$`, "i") },
+        name: { $regex: new RegExp(`^${category}$`, 'i') },
         isActive: true,
       });
 
@@ -964,7 +964,7 @@ const findProductsByModel = async (req, res) => {
     // If brand is provided, find the category with that name
     if (brand) {
       const brandCategory = await Category.findOne({
-        name: { $regex: new RegExp(`^${brand}$`, "i") },
+        name: { $regex: new RegExp(`^${brand}$`, 'i') },
         isActive: true,
       });
 
@@ -975,13 +975,13 @@ const findProductsByModel = async (req, res) => {
 
     // If model is provided, search by name
     if (model) {
-      query.name = { $regex: model, $options: "i" };
+      query.name = { $regex: model, $options: 'i' };
     }
 
     // Search for sell products
     const products = await SellProduct.find(query)
-      .populate("categoryId", "name")
-      .select("_id name images variants categoryId")
+      .populate('categoryId', 'name')
+      .select('_id name images variants categoryId')
       .sort({ name: 1 });
 
     res.json({
@@ -990,10 +990,10 @@ const findProductsByModel = async (req, res) => {
       count: products.length,
     });
   } catch (error) {
-    console.error("Error finding products:", error);
+    console.error('Error finding products:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
     });
   }
 };

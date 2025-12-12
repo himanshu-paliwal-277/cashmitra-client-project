@@ -26,7 +26,10 @@ const sellQuestionSchema = new mongoose.Schema(
       trim: true,
       minlength: [1, 'Key must be at least 1 character'],
       maxlength: [100, 'Key cannot exceed 100 characters'],
-      match: [/^[a-z0-9_]+$/, 'Key must contain only lowercase letters, numbers, and underscores'],
+      match: [
+        /^[a-z0-9_]+$/,
+        'Key must contain only lowercase letters, numbers, and underscores',
+      ],
     },
     title: {
       type: String,
@@ -43,8 +46,16 @@ const sellQuestionSchema = new mongoose.Schema(
     uiType: {
       type: String,
       enum: {
-        values: ['radio', 'checkbox', 'select', 'multiselect', 'slider', 'toggle'],
-        message: 'UI type must be one of: radio, checkbox, select, multiselect, slider, toggle'
+        values: [
+          'radio',
+          'checkbox',
+          'select',
+          'multiselect',
+          'slider',
+          'toggle',
+        ],
+        message:
+          'UI type must be one of: radio, checkbox, select, multiselect, slider, toggle',
       },
       required: [true, 'UI type is required'],
     },
@@ -66,58 +77,63 @@ const sellQuestionSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.Mixed,
       },
     },
-    options: [{
-      _id: false, // Disable automatic _id field for options
-      key: {
-        type: String,
-        required: [true, 'Option key is required'],
-        trim: true,
-        minlength: [1, 'Option key must be at least 1 character'],
-        maxlength: [100, 'Option key cannot exceed 100 characters'],
-      },
-      label: {
-        type: String,
-        required: [true, 'Option label is required'],
-        trim: true,
-        minlength: [1, 'Option label must be at least 1 character'],
-        maxlength: [200, 'Option label cannot exceed 200 characters'],
-      },
-      value: {
-        type: mongoose.Schema.Types.Mixed,
-        required: [true, 'Option value is required'],
-      },
-      delta: {
-        type: {
+    options: [
+      {
+        _id: false, // Disable automatic _id field for options
+        key: {
           type: String,
-          enum: {
-            values: ['abs', 'percent'],
-            message: 'Delta type must be either abs or percent'
-          },
+          required: [true, 'Option key is required'],
+          trim: true,
+          minlength: [1, 'Option key must be at least 1 character'],
+          maxlength: [100, 'Option key cannot exceed 100 characters'],
         },
-        sign: {
+        label: {
           type: String,
-          enum: {
-            values: ['+', '-'],
-            message: 'Delta sign must be either + or -'
-          },
+          required: [true, 'Option label is required'],
+          trim: true,
+          minlength: [1, 'Option label must be at least 1 character'],
+          maxlength: [200, 'Option label cannot exceed 200 characters'],
         },
         value: {
-          type: Number,
-          min: [0, 'Delta value cannot be negative'],
+          type: mongoose.Schema.Types.Mixed,
+          required: [true, 'Option value is required'],
         },
-      },
-      showIf: {
-        type: mongoose.Schema.Types.Mixed,
-        validate: {
-          validator: function(v) {
-            if (v === undefined || v === null) return true;
-            return typeof v === 'object' && 'questionKey' in v && 'value' in v;
+        delta: {
+          type: {
+            type: String,
+            enum: {
+              values: ['abs', 'percent'],
+              message: 'Delta type must be either abs or percent',
+            },
           },
-          message: 'Option showIf must be an object with questionKey and value or undefined'
+          sign: {
+            type: String,
+            enum: {
+              values: ['+', '-'],
+              message: 'Delta sign must be either + or -',
+            },
+          },
+          value: {
+            type: Number,
+            min: [0, 'Delta value cannot be negative'],
+          },
         },
-        default: undefined
+        showIf: {
+          type: mongoose.Schema.Types.Mixed,
+          validate: {
+            validator: function (v) {
+              if (v === undefined || v === null) return true;
+              return (
+                typeof v === 'object' && 'questionKey' in v && 'value' in v
+              );
+            },
+            message:
+              'Option showIf must be an object with questionKey and value or undefined',
+          },
+          default: undefined,
+        },
       },
-    }],
+    ],
     isActive: {
       type: Boolean,
       default: true,
@@ -128,18 +144,18 @@ const sellQuestionSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
   }
 );
 
 // Pre-save middleware to transform null showIf to undefined
-sellQuestionSchema.pre('save', function(next) {
-  this.options = this.options.map(opt => ({
+sellQuestionSchema.pre('save', function (next) {
+  this.options = this.options.map((opt) => ({
     ...opt,
-    showIf: opt.showIf === null ? undefined : opt.showIf
+    showIf: opt.showIf === null ? undefined : opt.showIf,
   }));
   next();
 });
@@ -154,31 +170,34 @@ sellQuestionSchema.index({ categoryId: 1, section: 1, order: 1 });
 sellQuestionSchema.index({ categoryId: 1, isActive: 1 });
 
 // Virtual for active options
-sellQuestionSchema.virtual('activeOptions').get(function() {
-  return this.options.filter(option => option.isActive !== false);
+sellQuestionSchema.virtual('activeOptions').get(function () {
+  return this.options.filter((option) => option.isActive !== false);
 });
 
 // Method to get questions for specific category
-sellQuestionSchema.statics.getForCategory = function(categoryId) {
+sellQuestionSchema.statics.getForCategory = function (categoryId) {
   const query = {
     categoryId,
-    isActive: true
+    isActive: true,
   };
-  
+
   return this.find(query).sort({ section: 1, order: 1 });
 };
 
 // Method to get questions for specific product variants
 // Since questions are linked to categories, we need to get the product's category first
-sellQuestionSchema.statics.getForVariants = async function(productId, variantIds = []) {
+sellQuestionSchema.statics.getForVariants = async function (
+  productId,
+  variantIds = []
+) {
   const SellProduct = require('./sellProduct.model');
-  
+
   // Get the product to find its categoryId
   const product = await SellProduct.findById(productId).select('categoryId');
   if (!product) {
     return [];
   }
-  
+
   // Get questions for the product's category
   return this.getForCategory(product.categoryId);
 };

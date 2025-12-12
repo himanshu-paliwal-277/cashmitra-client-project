@@ -8,7 +8,10 @@
 
 const { validationResult } = require('express-validator');
 const BuyCategory = require('../models/buyCategory.model');
-const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middleware');
+const {
+  ApiError,
+  asyncHandler,
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * Create new buy category
@@ -48,20 +51,20 @@ exports.createBuyCategory = asyncHandler(async (req, res) => {
     name: name.trim(),
     image,
     superCategory,
-    createdBy: req.user.id
+    createdBy: req.user.id,
   });
 
   await category.save();
 
   await category.populate([
     { path: 'createdBy', select: 'name email' },
-    { path: 'superCategory', select: 'name image' }
+    { path: 'superCategory', select: 'name image' },
   ]);
 
   res.status(201).json({
     success: true,
     message: 'Buy category created successfully',
-    data: category
+    data: category,
   });
 });
 
@@ -77,22 +80,22 @@ exports.createBuyCategory = asyncHandler(async (req, res) => {
  */
 exports.getBuyCategories = asyncHandler(async (req, res) => {
   const { includeInactive, superCategory } = req.query;
-  
+
   const filter = includeInactive === 'true' ? {} : { isActive: true };
-  
+
   if (superCategory) {
     filter.superCategory = superCategory;
   }
-  
+
   const categories = await BuyCategory.find(filter)
     .populate('createdBy', 'name')
     .populate('superCategory', 'name image')
     .sort({ sortOrder: 1, name: 1 });
-  
+
   res.json({
     success: true,
     count: categories.length,
-    data: categories
+    data: categories,
   });
 });
 
@@ -119,7 +122,7 @@ exports.getBuyCategory = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: category
+    data: category,
   });
 });
 
@@ -151,9 +154,9 @@ exports.updateBuyCategory = asyncHandler(async (req, res) => {
 
   // Check if name is being updated and if it conflicts with existing category
   if (name && name.trim() !== category.name) {
-    const existingCategory = await BuyCategory.findOne({ 
+    const existingCategory = await BuyCategory.findOne({
       name: name.trim(),
-      _id: { $ne: id }
+      _id: { $ne: id },
     });
     if (existingCategory) {
       throw new ApiError(400, 'Buy category with this name already exists');
@@ -183,13 +186,13 @@ exports.updateBuyCategory = asyncHandler(async (req, res) => {
   await category.populate([
     { path: 'createdBy', select: 'name email' },
     { path: 'updatedBy', select: 'name email' },
-    { path: 'superCategory', select: 'name image' }
+    { path: 'superCategory', select: 'name image' },
   ]);
 
   res.json({
     success: true,
     message: 'Buy category updated successfully',
-    data: category
+    data: category,
   });
 });
 
@@ -214,7 +217,7 @@ exports.deleteBuyCategory = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Buy category deleted successfully'
+    message: 'Buy category deleted successfully',
   });
 });
 
@@ -236,7 +239,7 @@ exports.getBuyCategoryStats = asyncHandler(async (req, res) => {
     data: {
       total: totalCategories,
       active: activeCategories,
-      inactive: inactiveCategories
-    }
+      inactive: inactiveCategories,
+    },
   });
 });

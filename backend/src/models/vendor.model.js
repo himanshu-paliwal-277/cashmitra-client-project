@@ -56,7 +56,13 @@ const vendorSchema = new mongoose.Schema(
       },
       businessType: {
         type: String,
-        enum: ['retailer', 'distributor', 'manufacturer', 'service_provider', 'other'],
+        enum: [
+          'retailer',
+          'distributor',
+          'manufacturer',
+          'service_provider',
+          'other',
+        ],
         default: 'retailer',
       },
       yearEstablished: {
@@ -96,10 +102,10 @@ const vendorSchema = new mongoose.Schema(
       of: mongoose.Schema.Types.Mixed,
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
   }
 );
 
@@ -112,26 +118,29 @@ vendorSchema.index({ 'businessDetails.gstNumber': 1 });
 vendorSchema.index({ createdAt: -1 });
 
 // Virtual for vendor age in days
-vendorSchema.virtual('ageInDays').get(function() {
+vendorSchema.virtual('ageInDays').get(function () {
   return Math.floor((Date.now() - this.createdAt) / (1000 * 60 * 60 * 24));
 });
 
 // Method to check if vendor is fully verified
-vendorSchema.methods.isFullyVerified = function() {
+vendorSchema.methods.isFullyVerified = function () {
   return this.isVerified && this.verificationStatus === 'approved';
 };
 
 // Static method to get active vendors
-vendorSchema.statics.getActiveVendors = function() {
-  return this.find({ 
-    isActive: true, 
-    verificationStatus: 'approved' 
+vendorSchema.statics.getActiveVendors = function () {
+  return this.find({
+    isActive: true,
+    verificationStatus: 'approved',
   }).populate('user', 'name email');
 };
 
 // Static method to get vendors by status
-vendorSchema.statics.getByStatus = function(status) {
-  return this.find({ verificationStatus: status }).populate('user', 'name email');
+vendorSchema.statics.getByStatus = function (status) {
+  return this.find({ verificationStatus: status }).populate(
+    'user',
+    'name email'
+  );
 };
 
 const Vendor = mongoose.model('Vendor', vendorSchema);

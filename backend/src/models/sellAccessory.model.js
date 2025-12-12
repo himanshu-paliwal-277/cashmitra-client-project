@@ -49,10 +49,10 @@ const sellAccessorySchema = new mongoose.Schema(
       required: true,
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
   }
 );
 
@@ -66,10 +66,10 @@ sellAccessorySchema.index({ categoryId: 1, order: 1 });
 sellAccessorySchema.index({ categoryId: 1, isActive: 1 });
 
 // Method to get active accessories for a category
-sellAccessorySchema.statics.getActiveForCategory = function(categoryId) {
+sellAccessorySchema.statics.getActiveForCategory = function (categoryId) {
   return this.find({
     categoryId,
-    isActive: true
+    isActive: true,
   }).sort({ order: 1 });
 };
 

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema(
   {
@@ -9,28 +9,28 @@ const orderSchema = new mongoose.Schema(
     },
     orderType: {
       type: String,
-      enum: ["sell", "buy"],
+      enum: ['sell', 'buy'],
       required: true,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: false, // Make user optional for assessment orders
     },
     partner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Partner",
+      ref: 'Partner',
       required: false, // Make partner optional for assessment orders
     },
     items: [
       {
         inventory: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Inventory",
+          ref: 'Inventory',
         },
         product: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "BuyProduct",
+          ref: 'BuyProduct',
         },
         condition: {
           screenCondition: String,
@@ -62,14 +62,14 @@ const orderSchema = new mongoose.Schema(
     paymentDetails: {
       method: {
         type: String,
-        enum: ["UPI", "netbanking", "Wallet", "Cash", "card"],
+        enum: ['UPI', 'netbanking', 'Wallet', 'Cash', 'card'],
         required: true,
       },
       transactionId: String,
       status: {
         type: String,
-        enum: ["pending", "completed", "failed", "refunded", "confirmed"],
-        default: "pending",
+        enum: ['pending', 'completed', 'failed', 'refunded', 'confirmed'],
+        default: 'pending',
       },
       paidAt: Date,
     },
@@ -81,14 +81,14 @@ const orderSchema = new mongoose.Schema(
         pincode: String,
         country: {
           type: String,
-          default: "India",
+          default: 'India',
         },
       },
       contactPhone: String,
       trackingId: String,
       deliveryMethod: {
         type: String,
-        enum: ["Cashmitra Logistics", "Shop Delivery", "Pickup"],
+        enum: ['Cashmitra Logistics', 'Shop Delivery', 'Pickup'],
       },
       estimatedDelivery: Date,
       deliveredAt: Date,
@@ -96,17 +96,17 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: [
-        "pending",
-        "confirmed",
-        "processing",
-        "verified",
-        "shipped",
-        "delivered",
-        "completed",
-        "cancelled",
-        "refunded",
+        'pending',
+        'confirmed',
+        'processing',
+        'verified',
+        'shipped',
+        'delivered',
+        'completed',
+        'cancelled',
+        'refunded',
       ],
-      default: "pending",
+      default: 'pending',
     },
     statusHistory: [
       {
@@ -122,13 +122,13 @@ const orderSchema = new mongoose.Schema(
       assignedAt: Date,
       assignedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
       response: {
         status: {
           type: String,
-          enum: ["pending", "accepted", "rejected"],
-          default: "pending",
+          enum: ['pending', 'accepted', 'rejected'],
+          default: 'pending',
         },
         respondedAt: Date,
         reason: String,
@@ -137,7 +137,7 @@ const orderSchema = new mongoose.Schema(
         {
           previousPartner: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Partner",
+            ref: 'Partner',
           },
           reason: String,
           reassignedAt: {
@@ -160,6 +160,6 @@ orderSchema.index({ status: 1 });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ assessmentId: 1 });
 
-const Order = mongoose.model("Order", orderSchema);
+const Order = mongoose.model('Order', orderSchema);
 
 module.exports = { Order };

@@ -1,53 +1,53 @@
-const express = require("express");
-const { check } = require("express-validator");
-const walletController = require("../controllers/wallet.controller");
-const { protect, authorize } = require("../middlewares/auth.middleware");
+const express = require('express');
+const { check } = require('express-validator');
+const walletController = require('../controllers/wallet.controller');
+const { protect, authorize } = require('../middlewares/auth.middleware');
 const {
   validateRequest,
   validateObjectId,
-} = require("../middlewares/validation.middleware");
-const { asyncHandler } = require("../middlewares/errorHandler.middleware");
+} = require('../middlewares/validation.middleware');
+const { asyncHandler } = require('../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
 // Partner wallet routes
 // Get wallet details
 router.get(
-  "/",
+  '/',
   protect,
-  authorize("partner"),
+  authorize('partner'),
   asyncHandler(walletController.getWallet)
 );
 
 // Get wallet transactions
 router.get(
-  "/transactions",
+  '/transactions',
   protect,
-  authorize("partner"),
+  authorize('partner'),
   [
-    check("page")
+    check('page')
       .optional()
       .isInt({ min: 1 })
-      .withMessage("Page must be a positive integer"),
-    check("limit")
+      .withMessage('Page must be a positive integer'),
+    check('limit')
       .optional()
       .isInt({ min: 1, max: 50 })
-      .withMessage("Limit must be between 1 and 50"),
-    check("type")
+      .withMessage('Limit must be between 1 and 50'),
+    check('type')
       .optional()
       .isIn([
-        "order_payment",
-        "commission",
-        "payout",
-        "refund",
-        "wallet_credit",
-        "wallet_debit",
+        'order_payment',
+        'commission',
+        'payout',
+        'refund',
+        'wallet_credit',
+        'wallet_debit',
       ])
-      .withMessage("Invalid transaction type"),
-    check("status")
+      .withMessage('Invalid transaction type'),
+    check('status')
       .optional()
-      .isIn(["pending", "completed", "failed", "cancelled"])
-      .withMessage("Invalid status"),
+      .isIn(['pending', 'completed', 'failed', 'cancelled'])
+      .withMessage('Invalid status'),
   ],
   validateRequest,
   asyncHandler(walletController.getTransactions)
@@ -55,42 +55,42 @@ router.get(
 
 // Request payout
 router.post(
-  "/payout",
+  '/payout',
   protect,
-  authorize("partner"),
+  authorize('partner'),
   [
-    check("amount")
+    check('amount')
       .isNumeric()
-      .withMessage("Amount must be a number")
+      .withMessage('Amount must be a number')
       .custom((value) => {
         if (value <= 0) {
-          throw new Error("Amount must be greater than 0");
+          throw new Error('Amount must be greater than 0');
         }
         return true;
       }),
-    check("paymentMethod")
-      .isIn(["Bank Transfer", "UPI"])
-      .withMessage("Payment method must be Bank Transfer or UPI"),
-    check("bankDetails")
+    check('paymentMethod')
+      .isIn(['Bank Transfer', 'UPI'])
+      .withMessage('Payment method must be Bank Transfer or UPI'),
+    check('bankDetails')
       .optional()
       .isObject()
-      .withMessage("Bank details must be an object"),
-    check("bankDetails.accountNumber")
-      .if(check("paymentMethod").equals("Bank Transfer"))
+      .withMessage('Bank details must be an object'),
+    check('bankDetails.accountNumber')
+      .if(check('paymentMethod').equals('Bank Transfer'))
       .notEmpty()
-      .withMessage("Account number is required for bank transfer"),
-    check("bankDetails.ifscCode")
-      .if(check("paymentMethod").equals("Bank Transfer"))
+      .withMessage('Account number is required for bank transfer'),
+    check('bankDetails.ifscCode')
+      .if(check('paymentMethod').equals('Bank Transfer'))
       .notEmpty()
-      .withMessage("IFSC code is required for bank transfer"),
-    check("bankDetails.accountHolderName")
-      .if(check("paymentMethod").equals("Bank Transfer"))
+      .withMessage('IFSC code is required for bank transfer'),
+    check('bankDetails.accountHolderName')
+      .if(check('paymentMethod').equals('Bank Transfer'))
       .notEmpty()
-      .withMessage("Account holder name is required for bank transfer"),
-    check("upiId")
-      .if(check("paymentMethod").equals("UPI"))
+      .withMessage('Account holder name is required for bank transfer'),
+    check('upiId')
+      .if(check('paymentMethod').equals('UPI'))
       .notEmpty()
-      .withMessage("UPI ID is required for UPI transfer"),
+      .withMessage('UPI ID is required for UPI transfer'),
   ],
   validateRequest,
   asyncHandler(walletController.requestPayout)
@@ -98,27 +98,27 @@ router.post(
 
 // Update payout settings
 router.put(
-  "/settings",
+  '/settings',
   protect,
-  authorize("partner"),
+  authorize('partner'),
   [
-    check("minimumPayoutAmount")
+    check('minimumPayoutAmount')
       .optional()
       .isNumeric()
-      .withMessage("Minimum payout amount must be a number"),
-    check("autoPayoutEnabled")
+      .withMessage('Minimum payout amount must be a number'),
+    check('autoPayoutEnabled')
       .optional()
       .isBoolean()
-      .withMessage("Auto payout enabled must be a boolean"),
-    check("payoutSchedule")
+      .withMessage('Auto payout enabled must be a boolean'),
+    check('payoutSchedule')
       .optional()
-      .isIn(["manual", "weekly", "biweekly", "monthly"])
-      .withMessage("Invalid payout schedule"),
-    check("bankDetails")
+      .isIn(['manual', 'weekly', 'biweekly', 'monthly'])
+      .withMessage('Invalid payout schedule'),
+    check('bankDetails')
       .optional()
       .isObject()
-      .withMessage("Bank details must be an object"),
-    check("upiId").optional().isString().withMessage("UPI ID must be a string"),
+      .withMessage('Bank details must be an object'),
+    check('upiId').optional().isString().withMessage('UPI ID must be a string'),
   ],
   validateRequest,
   asyncHandler(walletController.updatePayoutSettings)
@@ -126,22 +126,22 @@ router.put(
 
 // Get payout history
 router.get(
-  "/payouts",
+  '/payouts',
   protect,
-  authorize("partner"),
+  authorize('partner'),
   [
-    check("page")
+    check('page')
       .optional()
       .isInt({ min: 1 })
-      .withMessage("Page must be a positive integer"),
-    check("limit")
+      .withMessage('Page must be a positive integer'),
+    check('limit')
       .optional()
       .isInt({ min: 1, max: 50 })
-      .withMessage("Limit must be between 1 and 50"),
-    check("status")
+      .withMessage('Limit must be between 1 and 50'),
+    check('status')
       .optional()
-      .isIn(["pending", "completed", "failed", "cancelled"])
-      .withMessage("Invalid status"),
+      .isIn(['pending', 'completed', 'failed', 'cancelled'])
+      .withMessage('Invalid status'),
   ],
   validateRequest,
   asyncHandler(walletController.getPayoutHistory)
@@ -149,14 +149,14 @@ router.get(
 
 // Get wallet analytics
 router.get(
-  "/analytics",
+  '/analytics',
   protect,
-  authorize("partner"),
+  authorize('partner'),
   [
-    check("period")
+    check('period')
       .optional()
       .isInt({ min: 1, max: 365 })
-      .withMessage("Period must be between 1 and 365 days"),
+      .withMessage('Period must be between 1 and 365 days'),
   ],
   validateRequest,
   asyncHandler(walletController.getWalletAnalytics)
@@ -165,18 +165,18 @@ router.get(
 // Admin routes for payout management
 // Get all pending payouts (Admin only)
 router.get(
-  "/admin/payouts/pending",
+  '/admin/payouts/pending',
   protect,
-  authorize("admin"),
+  authorize('admin'),
   [
-    check("page")
+    check('page')
       .optional()
       .isInt({ min: 1 })
-      .withMessage("Page must be a positive integer"),
-    check("limit")
+      .withMessage('Page must be a positive integer'),
+    check('limit')
       .optional()
       .isInt({ min: 1, max: 50 })
-      .withMessage("Limit must be between 1 and 50"),
+      .withMessage('Limit must be between 1 and 50'),
   ],
   validateRequest,
   asyncHandler(walletController.getPendingPayouts)
@@ -184,22 +184,22 @@ router.get(
 
 // Get all payouts with optional status filter (Admin only)
 router.get(
-  "/admin/payouts/all",
+  '/admin/payouts/all',
   protect,
-  authorize("admin"),
+  authorize('admin'),
   [
-    check("page")
+    check('page')
       .optional()
       .isInt({ min: 1 })
-      .withMessage("Page must be a positive integer"),
-    check("limit")
+      .withMessage('Page must be a positive integer'),
+    check('limit')
       .optional()
       .isInt({ min: 1, max: 50 })
-      .withMessage("Limit must be between 1 and 50"),
-    check("status")
+      .withMessage('Limit must be between 1 and 50'),
+    check('status')
       .optional()
-      .isIn(["pending", "completed", "failed", "cancelled"])
-      .withMessage("Invalid status"),
+      .isIn(['pending', 'completed', 'failed', 'cancelled'])
+      .withMessage('Invalid status'),
   ],
   validateRequest,
   asyncHandler(walletController.getAllPayouts)
@@ -207,15 +207,15 @@ router.get(
 
 // Process payout (approve/reject) - Admin only
 router.put(
-  "/admin/payouts/:transactionId",
+  '/admin/payouts/:transactionId',
   protect,
-  authorize("admin"),
-  validateObjectId("transactionId"),
+  authorize('admin'),
+  validateObjectId('transactionId'),
   [
-    check("status")
-      .isIn(["completed", "failed"])
-      .withMessage("Status must be completed or failed"),
-    check("notes").optional().isString().withMessage("Notes must be a string"),
+    check('status')
+      .isIn(['completed', 'failed'])
+      .withMessage('Status must be completed or failed'),
+    check('notes').optional().isString().withMessage('Notes must be a string'),
   ],
   validateRequest,
   asyncHandler(walletController.processPayout)

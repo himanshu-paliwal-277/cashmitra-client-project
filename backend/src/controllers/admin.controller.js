@@ -1,16 +1,16 @@
-const User = require("../models/user.model");
-const Partner = require("../models/partner.model");
-const Product = require("../models/product.model");
-const Agent = require("../models/agent.model");
-const { Order } = require("../models/order.model");
-const Transaction = require("../models/transaction.model");
-const Inventory = require("../models/inventory.model");
-const Wallet = require("../models/wallet.model");
-const ConditionQuestionnaire = require("../models/conditionQuestionnaire.model");
-const ApiError = require("../utils/apiError");
-const { generateToken } = require("../utils/jwt.utils");
-const { validationResult } = require("express-validator");
-const mongoose = require("mongoose");
+const User = require('../models/user.model');
+const Partner = require('../models/partner.model');
+const Product = require('../models/product.model');
+const Agent = require('../models/agent.model');
+const { Order } = require('../models/order.model');
+const Transaction = require('../models/transaction.model');
+const Inventory = require('../models/inventory.model');
+const Wallet = require('../models/wallet.model');
+const ConditionQuestionnaire = require('../models/conditionQuestionnaire.model');
+const ApiError = require('../utils/apiError');
+const { generateToken } = require('../utils/jwt.utils');
+const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 // @desc    Admin login
 // @route   POST /api/admin/login
@@ -26,8 +26,8 @@ const loginAdmin = async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email
-    const user = await User.findOne({ email, role: "admin" }).select(
-      "+password"
+    const user = await User.findOne({ email, role: 'admin' }).select(
+      '+password'
     );
 
     // Check if user exists and password matches
@@ -40,11 +40,11 @@ const loginAdmin = async (req, res) => {
         token: generateToken(user._id, user.role),
       });
     } else {
-      res.status(401).json({ message: "Invalid admin credentials" });
+      res.status(401).json({ message: 'Invalid admin credentials' });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -55,7 +55,7 @@ const getAdminProfile = async (req, res) => {
   try {
     const admin = await User.findById(req.user._id);
 
-    if (admin && admin.role === "admin") {
+    if (admin && admin.role === 'admin') {
       res.json({
         _id: admin._id,
         name: admin.name,
@@ -63,11 +63,11 @@ const getAdminProfile = async (req, res) => {
         role: admin.role,
       });
     } else {
-      res.status(404).json({ message: "Admin not found" });
+      res.status(404).json({ message: 'Admin not found' });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -87,7 +87,7 @@ const createAdmin = async (req, res) => {
     // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: 'User already exists' });
     }
 
     // Create new admin user
@@ -96,7 +96,7 @@ const createAdmin = async (req, res) => {
       email,
       password,
       phone,
-      role: "admin",
+      role: 'admin',
     });
 
     if (admin) {
@@ -107,11 +107,11 @@ const createAdmin = async (req, res) => {
         role: admin.role,
       });
     } else {
-      res.status(400).json({ message: "Invalid admin data" });
+      res.status(400).json({ message: 'Invalid admin data' });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -127,14 +127,14 @@ const getAllPartners = async (req, res) => {
 
     if (search) {
       filter.$or = [
-        { shopName: { $regex: search, $options: "i" } },
-        { shopEmail: { $regex: search, $options: "i" } },
-        { gstNumber: { $regex: search, $options: "i" } },
+        { shopName: { $regex: search, $options: 'i' } },
+        { shopEmail: { $regex: search, $options: 'i' } },
+        { gstNumber: { $regex: search, $options: 'i' } },
       ];
     }
 
     const partners = await Partner.find(filter)
-      .populate("user", "name email phone isActive")
+      .populate('user', 'name email phone isActive')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -166,8 +166,8 @@ const getAllPartners = async (req, res) => {
       total,
     });
   } catch (error) {
-    console.error("Error fetching partners:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching partners:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -179,16 +179,16 @@ const getPartnerById = async (req, res) => {
     const { id } = req.params;
 
     const partner = await Partner.findById(id)
-      .populate("user", "name email phone createdAt isActive")
-      .populate("wallet.transactions");
+      .populate('user', 'name email phone createdAt isActive')
+      .populate('wallet.transactions');
 
     if (!partner) {
-      return res.status(404).json({ message: "Partner not found" });
+      return res.status(404).json({ message: 'Partner not found' });
     }
 
     // Get additional stats
     const inventoryCount = await Inventory.countDocuments({ partner: id });
-    const orderCount = await Order.countDocuments({ "items.partner": id });
+    const orderCount = await Order.countDocuments({ 'items.partner': id });
 
     res.json({
       success: true,
@@ -201,8 +201,8 @@ const getPartnerById = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching partner:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching partner:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -238,7 +238,7 @@ const createPartner = async (req, res) => {
       // Existing user flow
       user = await User.findById(userId);
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: 'User not found' });
       }
 
       // Check if user already has a partner profile
@@ -246,14 +246,14 @@ const createPartner = async (req, res) => {
       if (existingPartner) {
         return res
           .status(400)
-          .json({ message: "User already has a partner profile" });
+          .json({ message: 'User already has a partner profile' });
       }
     } else {
       // New user creation flow
       if (!name || !email || !phone || !password) {
         return res.status(400).json({
           message:
-            "Name, email, phone, and password are required for new partner creation",
+            'Name, email, phone, and password are required for new partner creation',
         });
       }
 
@@ -262,7 +262,7 @@ const createPartner = async (req, res) => {
       if (existingUser) {
         return res
           .status(400)
-          .json({ message: "User with this email already exists" });
+          .json({ message: 'User with this email already exists' });
       }
 
       // Create new user
@@ -271,7 +271,7 @@ const createPartner = async (req, res) => {
         email,
         phone,
         password,
-        role: "partner",
+        role: 'partner',
       });
       isNewUser = true;
     }
@@ -279,7 +279,7 @@ const createPartner = async (req, res) => {
     // Check if GST number is unique
     const existingGST = await Partner.findOne({ gstNumber });
     if (existingGST) {
-      return res.status(400).json({ message: "GST number already exists" });
+      return res.status(400).json({ message: 'GST number already exists' });
     }
 
     // Create partner
@@ -294,13 +294,13 @@ const createPartner = async (req, res) => {
       shopImages,
       bankDetails,
       upiId,
-      verificationStatus: "pending",
+      verificationStatus: 'pending',
       isVerified: false,
     });
 
     // Update user role to partner (if not already set for new users)
     if (!isNewUser) {
-      await User.findByIdAndUpdate(user._id, { role: "partner" });
+      await User.findByIdAndUpdate(user._id, { role: 'partner' });
     }
 
     // Create wallet for the new partner
@@ -311,28 +311,28 @@ const createPartner = async (req, res) => {
     });
 
     const populatedPartner = await Partner.findById(partner._id).populate(
-      "user",
-      "name email phone"
+      'user',
+      'name email phone'
     );
 
     res.status(201).json({
       success: true,
-      message: "Partner created successfully",
+      message: 'Partner created successfully',
       data: populatedPartner,
     });
   } catch (error) {
-    console.error("Error creating partner:", error);
+    console.error('Error creating partner:', error);
     if (error.code === 11000) {
       // Handle duplicate key errors
       if (error.keyPattern?.email) {
-        return res.status(400).json({ message: "Email already exists" });
+        return res.status(400).json({ message: 'Email already exists' });
       }
       if (error.keyPattern?.gstNumber) {
-        return res.status(400).json({ message: "GST number already exists" });
+        return res.status(400).json({ message: 'GST number already exists' });
       }
-      return res.status(400).json({ message: "Duplicate entry found" });
+      return res.status(400).json({ message: 'Duplicate entry found' });
     }
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -357,30 +357,30 @@ const updatePartner = async (req, res) => {
         _id: { $ne: id },
       });
       if (existingGST) {
-        return res.status(400).json({ message: "GST number already exists" });
+        return res.status(400).json({ message: 'GST number already exists' });
       }
     }
 
     const partner = await Partner.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
-    }).populate("user", "name email phone isActive");
+    }).populate('user', 'name email phone isActive');
 
     if (!partner) {
-      return res.status(404).json({ message: "Partner not found" });
+      return res.status(404).json({ message: 'Partner not found' });
     }
 
     res.json({
       success: true,
-      message: "Partner updated successfully",
+      message: 'Partner updated successfully',
       data: partner,
     });
   } catch (error) {
-    console.error("Error updating partner:", error);
+    console.error('Error updating partner:', error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: "GST number already exists" });
+      return res.status(400).json({ message: 'GST number already exists' });
     }
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -393,7 +393,7 @@ const deletePartner = async (req, res) => {
 
     const partner = await Partner.findById(id);
     if (!partner) {
-      return res.status(404).json({ message: "Partner not found" });
+      return res.status(404).json({ message: 'Partner not found' });
     }
 
     // Check for active inventory
@@ -406,20 +406,20 @@ const deletePartner = async (req, res) => {
     if (activeInventory > 0) {
       return res.status(400).json({
         message:
-          "Cannot delete partner with active inventory. Please remove all inventory first.",
+          'Cannot delete partner with active inventory. Please remove all inventory first.',
       });
     }
 
     // Check for pending orders
     const pendingOrders = await Order.countDocuments({
-      "items.partner": id,
-      "items.status": { $in: ["pending", "processing", "shipped"] },
+      'items.partner': id,
+      'items.status': { $in: ['pending', 'processing', 'shipped'] },
     });
 
     if (pendingOrders > 0) {
       return res.status(400).json({
         message:
-          "Cannot delete partner with pending orders. Please complete all orders first.",
+          'Cannot delete partner with pending orders. Please complete all orders first.',
       });
     }
 
@@ -430,18 +430,18 @@ const deletePartner = async (req, res) => {
     ]);
 
     // Update user role back to 'user'
-    await User.findByIdAndUpdate(partner.user, { role: "user" });
+    await User.findByIdAndUpdate(partner.user, { role: 'user' });
 
     // Delete partner
     await Partner.findByIdAndDelete(id);
 
     res.json({
       success: true,
-      message: "Partner deleted successfully",
+      message: 'Partner deleted successfully',
     });
   } catch (error) {
-    console.error("Error deleting partner:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error deleting partner:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -453,27 +453,27 @@ const verifyPartner = async (req, res) => {
     const { id } = req.params;
     const { status, notes } = req.body;
 
-    if (!["approved", "rejected"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status" });
+    if (!['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
     }
 
     const partner = await Partner.findByIdAndUpdate(
       id,
       {
         verificationStatus: status,
-        isVerified: status === "approved",
+        isVerified: status === 'approved',
         verificationNotes: notes,
-        verifiedAt: status === "approved" ? new Date() : undefined,
+        verifiedAt: status === 'approved' ? new Date() : undefined,
       },
       { new: true }
-    ).populate("user", "name email isActive");
+    ).populate('user', 'name email isActive');
 
     if (!partner) {
-      return res.status(404).json({ message: "Partner not found" });
+      return res.status(404).json({ message: 'Partner not found' });
     }
 
     // Create wallet for approved partner
-    if (status === "approved") {
+    if (status === 'approved') {
       const existingWallet = await Wallet.findOne({ partner: partner._id });
       if (!existingWallet) {
         await Wallet.create({ partner: partner._id });
@@ -482,8 +482,8 @@ const verifyPartner = async (req, res) => {
 
     res.json({ message: `Partner ${status} successfully`, partner });
   } catch (error) {
-    console.error("Error verifying partner:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error verifying partner:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -498,7 +498,7 @@ const updatePartnerWallet = async (req, res) => {
     // Find partner
     const partner = await Partner.findById(id);
     if (!partner) {
-      return res.status(404).json({ message: "Partner not found" });
+      return res.status(404).json({ message: 'Partner not found' });
     }
 
     // Find or create wallet
@@ -519,7 +519,7 @@ const updatePartnerWallet = async (req, res) => {
     if (wallet.balance < 0) {
       return res.status(400).json({
         message:
-          "Insufficient balance. Cannot deduct more than available balance.",
+          'Insufficient balance. Cannot deduct more than available balance.',
       });
     }
 
@@ -529,10 +529,10 @@ const updatePartnerWallet = async (req, res) => {
     // Create transaction record
     const transaction = await Transaction.create({
       partner: id,
-      transactionType: amount > 0 ? "wallet_credit" : "wallet_debit",
+      transactionType: amount > 0 ? 'wallet_credit' : 'wallet_debit',
       amount: Math.abs(amount),
-      status: "completed",
-      paymentMethod: "System",
+      status: 'completed',
+      paymentMethod: 'System',
       description: `Admin ${type}: ${reason}`,
       metadata: {
         adminAction: true,
@@ -543,15 +543,15 @@ const updatePartnerWallet = async (req, res) => {
     });
 
     // Also create a finance record for the admin finance dashboard
-    const Finance = require("../models/finance.model");
+    const Finance = require('../models/finance.model');
     await Finance.create({
-      transactionType: amount > 0 ? "deposit" : "withdrawal",
+      transactionType: amount > 0 ? 'deposit' : 'withdrawal',
       amount: Math.abs(amount),
       partner: id,
-      status: "processed",
-      paymentMethod: "wallet",
-      category: "other",
-      description: `Admin wallet ${type}: ${reason || "Manual adjustment"}`,
+      status: 'processed',
+      paymentMethod: 'wallet',
+      category: 'other',
+      description: `Admin wallet ${type}: ${reason || 'Manual adjustment'}`,
       processedBy: req.user?._id || req.user?.id, // Admin who performed the action
       processedAt: new Date(),
       metadata: {
@@ -574,7 +574,7 @@ const updatePartnerWallet = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Wallet balance updated successfully",
+      message: 'Wallet balance updated successfully',
       data: {
         oldBalance: oldBalance,
         newBalance: wallet.balance,
@@ -583,8 +583,8 @@ const updatePartnerWallet = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error updating partner wallet:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error updating partner wallet:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -617,9 +617,9 @@ const getAllOrders = async (req, res) => {
     }
 
     const orders = await Order.find(filter)
-      .populate("user", "name email phone")
-      .populate("partner", "shopName shopEmail")
-      .populate("items.product", "category brand model")
+      .populate('user', 'name email phone')
+      .populate('partner', 'shopName shopEmail')
+      .populate('items.product', 'category brand model')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -633,8 +633,8 @@ const getAllOrders = async (req, res) => {
       total,
     });
   } catch (error) {
-    console.error("Error fetching orders:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -644,13 +644,13 @@ const getAllOrders = async (req, res) => {
 const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
-      .populate("user", "name email phone")
-      .populate("partner", "shopName shopEmail shopPhone shopAddress")
-      .populate("items.product", "category brand model images specifications")
-      .populate("items.inventory", "condition price");
+      .populate('user', 'name email phone')
+      .populate('partner', 'shopName shopEmail shopPhone shopAddress')
+      .populate('items.product', 'category brand model images specifications')
+      .populate('items.inventory', 'condition price');
 
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ message: 'Order not found' });
     }
 
     // Enhanced order response with complete tracking details
@@ -712,8 +712,8 @@ const getOrderById = async (req, res) => {
 
     res.json(orderResponse);
   } catch (error) {
-    console.error("Get order by ID error:", error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    console.error('Get order by ID error:', error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -723,9 +723,9 @@ const generateOrderTimeline = (order) => {
 
   // Add creation event
   timeline.push({
-    status: "created",
+    status: 'created',
     timestamp: order.createdAt,
-    title: "Order Created",
+    title: 'Order Created',
     description: `Order ${order.assessmentId || order._id} was created`,
     completed: true,
   });
@@ -767,15 +767,15 @@ const generateOrderTimeline = (order) => {
 // Helper function to get status title
 const getStatusTitle = (status) => {
   const statusTitles = {
-    pending: "Order Pending",
-    confirmed: "Order Confirmed",
-    processing: "Processing Order",
-    verified: "Order Verified",
-    shipped: "Order Shipped",
-    delivered: "Order Delivered",
-    completed: "Order Completed",
-    cancelled: "Order Cancelled",
-    refunded: "Order Refunded",
+    pending: 'Order Pending',
+    confirmed: 'Order Confirmed',
+    processing: 'Processing Order',
+    verified: 'Order Verified',
+    shipped: 'Order Shipped',
+    delivered: 'Order Delivered',
+    completed: 'Order Completed',
+    cancelled: 'Order Cancelled',
+    refunded: 'Order Refunded',
   };
   return (
     statusTitles[status] || status.charAt(0).toUpperCase() + status.slice(1)
@@ -785,15 +785,15 @@ const getStatusTitle = (status) => {
 // Helper function to get status description
 const getStatusDescription = (status) => {
   const statusDescriptions = {
-    pending: "Order is awaiting confirmation",
-    confirmed: "Order has been confirmed and is being prepared",
-    processing: "Order is being processed by our team",
-    verified: "Order details have been verified",
-    shipped: "Order has been shipped and is on its way",
-    delivered: "Order has been successfully delivered",
-    completed: "Order has been completed successfully",
-    cancelled: "Order has been cancelled",
-    refunded: "Order amount has been refunded",
+    pending: 'Order is awaiting confirmation',
+    confirmed: 'Order has been confirmed and is being prepared',
+    processing: 'Order is being processed by our team',
+    verified: 'Order details have been verified',
+    shipped: 'Order has been shipped and is on its way',
+    delivered: 'Order has been successfully delivered',
+    completed: 'Order has been completed successfully',
+    cancelled: 'Order has been cancelled',
+    refunded: 'Order amount has been refunded',
   };
   return statusDescriptions[status] || `Order status updated to ${status}`;
 };
@@ -803,109 +803,109 @@ const getFutureSteps = (currentStatus) => {
   const statusFlow = {
     pending: [
       {
-        status: "confirmed",
-        title: "Confirm Order",
-        description: "Order will be confirmed",
+        status: 'confirmed',
+        title: 'Confirm Order',
+        description: 'Order will be confirmed',
       },
       {
-        status: "processing",
-        title: "Process Order",
-        description: "Order will be processed",
+        status: 'processing',
+        title: 'Process Order',
+        description: 'Order will be processed',
       },
       {
-        status: "shipped",
-        title: "Ship Order",
-        description: "Order will be shipped",
+        status: 'shipped',
+        title: 'Ship Order',
+        description: 'Order will be shipped',
       },
       {
-        status: "delivered",
-        title: "Deliver Order",
-        description: "Order will be delivered",
+        status: 'delivered',
+        title: 'Deliver Order',
+        description: 'Order will be delivered',
       },
       {
-        status: "completed",
-        title: "Complete Order",
-        description: "Order will be completed",
+        status: 'completed',
+        title: 'Complete Order',
+        description: 'Order will be completed',
       },
     ],
     confirmed: [
       {
-        status: "processing",
-        title: "Process Order",
-        description: "Order will be processed",
+        status: 'processing',
+        title: 'Process Order',
+        description: 'Order will be processed',
       },
       {
-        status: "shipped",
-        title: "Ship Order",
-        description: "Order will be shipped",
+        status: 'shipped',
+        title: 'Ship Order',
+        description: 'Order will be shipped',
       },
       {
-        status: "delivered",
-        title: "Deliver Order",
-        description: "Order will be delivered",
+        status: 'delivered',
+        title: 'Deliver Order',
+        description: 'Order will be delivered',
       },
       {
-        status: "completed",
-        title: "Complete Order",
-        description: "Order will be completed",
+        status: 'completed',
+        title: 'Complete Order',
+        description: 'Order will be completed',
       },
     ],
     processing: [
       {
-        status: "verified",
-        title: "Verify Order",
-        description: "Order will be verified",
+        status: 'verified',
+        title: 'Verify Order',
+        description: 'Order will be verified',
       },
       {
-        status: "shipped",
-        title: "Ship Order",
-        description: "Order will be shipped",
+        status: 'shipped',
+        title: 'Ship Order',
+        description: 'Order will be shipped',
       },
       {
-        status: "delivered",
-        title: "Deliver Order",
-        description: "Order will be delivered",
+        status: 'delivered',
+        title: 'Deliver Order',
+        description: 'Order will be delivered',
       },
       {
-        status: "completed",
-        title: "Complete Order",
-        description: "Order will be completed",
+        status: 'completed',
+        title: 'Complete Order',
+        description: 'Order will be completed',
       },
     ],
     verified: [
       {
-        status: "shipped",
-        title: "Ship Order",
-        description: "Order will be shipped",
+        status: 'shipped',
+        title: 'Ship Order',
+        description: 'Order will be shipped',
       },
       {
-        status: "delivered",
-        title: "Deliver Order",
-        description: "Order will be delivered",
+        status: 'delivered',
+        title: 'Deliver Order',
+        description: 'Order will be delivered',
       },
       {
-        status: "completed",
-        title: "Complete Order",
-        description: "Order will be completed",
+        status: 'completed',
+        title: 'Complete Order',
+        description: 'Order will be completed',
       },
     ],
     shipped: [
       {
-        status: "delivered",
-        title: "Deliver Order",
-        description: "Order will be delivered",
+        status: 'delivered',
+        title: 'Deliver Order',
+        description: 'Order will be delivered',
       },
       {
-        status: "completed",
-        title: "Complete Order",
-        description: "Order will be completed",
+        status: 'completed',
+        title: 'Complete Order',
+        description: 'Order will be completed',
       },
     ],
     delivered: [
       {
-        status: "completed",
-        title: "Complete Order",
-        description: "Order will be completed",
+        status: 'completed',
+        title: 'Complete Order',
+        description: 'Order will be completed',
       },
     ],
   };
@@ -935,23 +935,23 @@ const calculateOrderProgress = (status) => {
 // @access  Private/Admin
 const getDashboardAnalytics = async (req, res) => {
   try {
-    const { period = "30d" } = req.query;
+    const { period = '30d' } = req.query;
 
     // Calculate date range
     const endDate = new Date();
     const startDate = new Date();
 
     switch (period) {
-      case "7d":
+      case '7d':
         startDate.setDate(endDate.getDate() - 7);
         break;
-      case "30d":
+      case '30d':
         startDate.setDate(endDate.getDate() - 30);
         break;
-      case "90d":
+      case '90d':
         startDate.setDate(endDate.getDate() - 90);
         break;
-      case "1y":
+      case '1y':
         startDate.setFullYear(endDate.getFullYear() - 1);
         break;
       default:
@@ -961,7 +961,7 @@ const getDashboardAnalytics = async (req, res) => {
     // Get basic counts
     const [totalUsers, totalPartners, totalOrders, totalProducts] =
       await Promise.all([
-        User.countDocuments({ role: { $ne: "admin" } }),
+        User.countDocuments({ role: { $ne: 'admin' } }),
         Partner.countDocuments(),
         Order.countDocuments(),
         Product.countDocuments(),
@@ -971,7 +971,7 @@ const getDashboardAnalytics = async (req, res) => {
     const periodFilter = { createdAt: { $gte: startDate, $lte: endDate } };
 
     const [newUsers, newPartners, newOrders] = await Promise.all([
-      User.countDocuments({ ...periodFilter, role: { $ne: "admin" } }),
+      User.countDocuments({ ...periodFilter, role: { $ne: 'admin' } }),
       Partner.countDocuments(periodFilter),
       Order.countDocuments(periodFilter),
     ]);
@@ -981,15 +981,15 @@ const getDashboardAnalytics = async (req, res) => {
       {
         $match: {
           ...periodFilter,
-          status: "completed",
+          status: 'completed',
         },
       },
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: "$totalAmount" },
-          totalCommission: { $sum: "$commission.amount" },
-          averageOrderValue: { $avg: "$totalAmount" },
+          totalRevenue: { $sum: '$totalAmount' },
+          totalCommission: { $sum: '$commission.amount' },
+          averageOrderValue: { $avg: '$totalAmount' },
         },
       },
     ]);
@@ -999,7 +999,7 @@ const getDashboardAnalytics = async (req, res) => {
       { $match: periodFilter },
       {
         $group: {
-          _id: "$status",
+          _id: '$status',
           count: { $sum: 1 },
         },
       },
@@ -1010,26 +1010,26 @@ const getDashboardAnalytics = async (req, res) => {
       {
         $match: {
           ...periodFilter,
-          status: "completed",
+          status: 'completed',
         },
       },
       {
         $group: {
-          _id: "$partner",
+          _id: '$partner',
           totalOrders: { $sum: 1 },
-          totalRevenue: { $sum: "$totalAmount" },
-          totalCommission: { $sum: "$commission.amount" },
+          totalRevenue: { $sum: '$totalAmount' },
+          totalCommission: { $sum: '$commission.amount' },
         },
       },
       {
         $lookup: {
-          from: "partners",
-          localField: "_id",
-          foreignField: "_id",
-          as: "partner",
+          from: 'partners',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'partner',
         },
       },
-      { $unwind: "$partner" },
+      { $unwind: '$partner' },
       { $sort: { totalRevenue: -1 } },
       { $limit: 5 },
     ]);
@@ -1040,28 +1040,28 @@ const getDashboardAnalytics = async (req, res) => {
       {
         $group: {
           _id: {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" },
-            day: { $dayOfMonth: "$createdAt" },
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+            day: { $dayOfMonth: '$createdAt' },
           },
           orders: { $sum: 1 },
-          revenue: { $sum: "$totalAmount" },
+          revenue: { $sum: '$totalAmount' },
         },
       },
-      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
+      { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } },
     ]);
 
     // Condition Questionnaire analytics
     const [totalQuestionnaires, completedQuestionnaires] = await Promise.all([
       ConditionQuestionnaire.countDocuments(),
-      ConditionQuestionnaire.countDocuments({ status: "active" }),
+      ConditionQuestionnaire.countDocuments({ status: 'active' }),
     ]);
 
     // Device category analytics
     const deviceAnalytics = await Product.aggregate([
       {
         $group: {
-          _id: "$category",
+          _id: '$category',
           count: { $sum: 1 },
         },
       },
@@ -1073,16 +1073,16 @@ const getDashboardAnalytics = async (req, res) => {
     today.setHours(0, 0, 0, 0);
     const activeToday = await User.countDocuments({
       lastActive: { $gte: today },
-      role: { $ne: "admin" },
+      role: { $ne: 'admin' },
     });
 
     // Performance metrics
     const totalVisits = await Order.countDocuments();
-    const completedOrders = await Order.countDocuments({ status: "completed" });
+    const completedOrders = await Order.countDocuments({ status: 'completed' });
     const conversionRate =
       totalVisits > 0
         ? ((completedOrders / totalVisits) * 100).toFixed(1)
-        : "0.0";
+        : '0.0';
 
     res.json({
       overview: {
@@ -1105,12 +1105,12 @@ const getDashboardAnalytics = async (req, res) => {
         completionRate:
           totalQuestionnaires > 0
             ? ((completedQuestionnaires / totalQuestionnaires) * 100).toFixed(1)
-            : "0.0",
+            : '0.0',
       },
       devices: {
-        mobile: deviceAnalytics.find((d) => d._id === "mobile")?.count || 0,
-        laptop: deviceAnalytics.find((d) => d._id === "laptop")?.count || 0,
-        tablet: deviceAnalytics.find((d) => d._id === "tablet")?.count || 0,
+        mobile: deviceAnalytics.find((d) => d._id === 'mobile')?.count || 0,
+        laptop: deviceAnalytics.find((d) => d._id === 'laptop')?.count || 0,
+        tablet: deviceAnalytics.find((d) => d._id === 'tablet')?.count || 0,
         analytics: deviceAnalytics,
       },
       activity: {
@@ -1128,8 +1128,8 @@ const getDashboardAnalytics = async (req, res) => {
       period,
     });
   } catch (error) {
-    console.error("Error fetching analytics:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching analytics:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -1146,8 +1146,8 @@ const getCatalog = async (req, res) => {
       limit = 10,
       search,
       status,
-      sortBy = "createdAt",
-      sortOrder = "desc",
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
       minPrice,
       maxPrice,
     } = req.query;
@@ -1159,21 +1159,21 @@ const getCatalog = async (req, res) => {
     // Build filter object
     const filter = {};
 
-    if (category && category !== "all") {
+    if (category && category !== 'all') {
       filter.category = category;
     }
 
-    if (brand && brand !== "all") {
+    if (brand && brand !== 'all') {
       filter.brand = brand;
     }
 
-    if (model && model !== "all") {
+    if (model && model !== 'all') {
       // Handle model filtering with case-insensitive matching and URL decoding
       const decodedModel = decodeURIComponent(model);
-      filter.model = { $regex: decodedModel.trim(), $options: "i" };
+      filter.model = { $regex: decodedModel.trim(), $options: 'i' };
     }
 
-    if (status && status !== "all") {
+    if (status && status !== 'all') {
       filter.status = status;
     }
 
@@ -1190,7 +1190,7 @@ const getCatalog = async (req, res) => {
 
     // Search filter (only if no specific model is provided)
     if (search && search.trim() && !model) {
-      const searchRegex = { $regex: search.trim(), $options: "i" };
+      const searchRegex = { $regex: search.trim(), $options: 'i' };
       filter.$or = [
         { brand: searchRegex },
         { series: searchRegex },
@@ -1202,15 +1202,15 @@ const getCatalog = async (req, res) => {
     // Build sort object
     const sortOptions = {};
     const validSortFields = [
-      "createdAt",
-      "updatedAt",
-      "brand",
-      "model",
-      "basePrice",
-      "category",
+      'createdAt',
+      'updatedAt',
+      'brand',
+      'model',
+      'basePrice',
+      'category',
     ];
-    const sortField = validSortFields.includes(sortBy) ? sortBy : "createdAt";
-    const sortDirection = sortOrder === "asc" ? 1 : -1;
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const sortDirection = sortOrder === 'asc' ? 1 : -1;
     sortOptions[sortField] = sortDirection;
 
     // Execute queries in parallel for better performance
@@ -1220,12 +1220,12 @@ const getCatalog = async (req, res) => {
           .sort(sortOptions)
           .limit(limitNum)
           .skip((pageNum - 1) * limitNum)
-          .populate("createdBy", "name email")
+          .populate('createdBy', 'name email')
           .lean(),
         Product.countDocuments(filter),
-        Product.distinct("brand"),
-        Product.distinct("category"),
-        Product.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+        Product.distinct('brand'),
+        Product.distinct('category'),
+        Product.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
       ]);
 
     // Calculate price range
@@ -1233,9 +1233,9 @@ const getCatalog = async (req, res) => {
       {
         $group: {
           _id: null,
-          minPrice: { $min: "$basePrice" },
-          maxPrice: { $max: "$basePrice" },
-          avgPrice: { $avg: "$basePrice" },
+          minPrice: { $min: '$basePrice' },
+          maxPrice: { $max: '$basePrice' },
+          avgPrice: { $avg: '$basePrice' },
         },
       },
     ]);
@@ -1263,11 +1263,11 @@ const getCatalog = async (req, res) => {
         priceRange: priceStats[0] || { minPrice: 0, maxPrice: 0, avgPrice: 0 },
       },
       meta: {
-        searchTerm: search || "",
+        searchTerm: search || '',
         appliedFilters: {
-          category: category || "all",
-          brand: brand || "all",
-          status: status || "all",
+          category: category || 'all',
+          brand: brand || 'all',
+          status: status || 'all',
           priceRange: { min: minPrice, max: maxPrice },
         },
         sortBy: sortField,
@@ -1275,14 +1275,14 @@ const getCatalog = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching catalog:", error);
+    console.error('Error fetching catalog:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch product catalog",
+      message: 'Failed to fetch product catalog',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -1297,7 +1297,7 @@ const addProduct = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: errors.array(),
       });
     }
@@ -1311,7 +1311,7 @@ const addProduct = async (req, res) => {
       depreciationRate,
       specifications,
       images,
-      status = "active",
+      status = 'active',
       description,
       features,
     } = req.body;
@@ -1321,7 +1321,7 @@ const addProduct = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "Missing required fields: category, brand, model, and basePrice are required",
+          'Missing required fields: category, brand, model, and basePrice are required',
       });
     }
 
@@ -1329,7 +1329,7 @@ const addProduct = async (req, res) => {
     if (isNaN(basePrice) || parseFloat(basePrice) <= 0) {
       return res.status(400).json({
         success: false,
-        message: "Base price must be a positive number",
+        message: 'Base price must be a positive number',
       });
     }
 
@@ -1342,7 +1342,7 @@ const addProduct = async (req, res) => {
     ) {
       return res.status(400).json({
         success: false,
-        message: "Depreciation rate must be between 0 and 100",
+        message: 'Depreciation rate must be between 0 and 100',
       });
     }
 
@@ -1356,14 +1356,14 @@ const addProduct = async (req, res) => {
     if (existingProduct) {
       return res.status(409).json({
         success: false,
-        message: "Product with this category, brand, and model already exists",
+        message: 'Product with this category, brand, and model already exists',
       });
     }
 
     // Process images
     let processedImages = [];
     if (images) {
-      if (typeof images === "string") {
+      if (typeof images === 'string') {
         try {
           processedImages = JSON.parse(images);
         } catch (e) {
@@ -1376,8 +1376,8 @@ const addProduct = async (req, res) => {
       // Validate and clean image URLs
       processedImages = processedImages
         .map((img) => {
-          if (typeof img === "string") return img.trim();
-          return img.url || img.secure_url || "";
+          if (typeof img === 'string') return img.trim();
+          return img.url || img.secure_url || '';
         })
         .filter((url) => url && url.length > 0)
         .slice(0, 10); // Limit to 10 images
@@ -1386,13 +1386,13 @@ const addProduct = async (req, res) => {
     // Process specifications
     let processedSpecs = {};
     if (specifications) {
-      if (typeof specifications === "string") {
+      if (typeof specifications === 'string') {
         try {
           processedSpecs = JSON.parse(specifications);
         } catch (e) {
           processedSpecs = {};
         }
-      } else if (typeof specifications === "object") {
+      } else if (typeof specifications === 'object') {
         processedSpecs = specifications;
       }
     }
@@ -1401,16 +1401,16 @@ const addProduct = async (req, res) => {
     const productData = {
       category: category.toLowerCase(),
       brand: brand.trim(),
-      series: series ? series.trim() : "",
+      series: series ? series.trim() : '',
       model: model.trim(),
       basePrice: parseFloat(basePrice),
       depreciationRate: depreciationRate ? parseFloat(depreciationRate) : 15,
       specifications: processedSpecs,
       images: processedImages,
-      status: ["active", "inactive", "pending"].includes(status)
+      status: ['active', 'inactive', 'pending'].includes(status)
         ? status
-        : "active",
-      description: description ? description.trim() : "",
+        : 'active',
+      description: description ? description.trim() : '',
       features: Array.isArray(features) ? features : [],
       createdBy: req.user._id,
       createdAt: new Date(),
@@ -1422,43 +1422,43 @@ const addProduct = async (req, res) => {
 
     // Populate the created product for response
     const populatedProduct = await Product.findById(product._id)
-      .populate("createdBy", "name email")
+      .populate('createdBy', 'name email')
       .lean();
 
     res.status(201).json({
       success: true,
-      message: "Product added successfully to catalog",
+      message: 'Product added successfully to catalog',
       product: populatedProduct,
     });
   } catch (error) {
-    console.error("Error adding product to catalog:", error);
+    console.error('Error adding product to catalog:', error);
 
     // Handle specific MongoDB errors
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
-        message: "Product with this combination already exists",
+        message: 'Product with this combination already exists',
       });
     }
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(
         (err) => err.message
       );
       return res.status(400).json({
         success: false,
-        message: "Product validation failed",
+        message: 'Product validation failed',
         errors: validationErrors,
       });
     }
 
     res.status(500).json({
       success: false,
-      message: "Failed to add product to catalog",
+      message: 'Failed to add product to catalog',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -1468,21 +1468,21 @@ const addProduct = async (req, res) => {
 // @access  Private/Admin
 const uploadProductImages = async (req, res) => {
   try {
-    const cloudinary = require("../config/cloudinary.config");
+    const cloudinary = require('../config/cloudinary.config');
     const uploadedImages = [];
 
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "No images provided" });
+      return res.status(400).json({ message: 'No images provided' });
     }
 
     // Upload each image to Cloudinary
     for (const file of req.files) {
       try {
         const result = await cloudinary.uploader.upload(file.path, {
-          folder: "cashify/products",
+          folder: 'cashify/products',
           transformation: [
-            { width: 800, height: 800, crop: "fill", quality: "auto" },
-            { format: "webp" },
+            { width: 800, height: 800, crop: 'fill', quality: 'auto' },
+            { format: 'webp' },
           ],
         });
 
@@ -1493,17 +1493,17 @@ const uploadProductImages = async (req, res) => {
           height: result.height,
         });
       } catch (uploadError) {
-        console.error("Error uploading image:", uploadError);
+        console.error('Error uploading image:', uploadError);
       }
     }
 
     res.json({
-      message: "Images uploaded successfully",
+      message: 'Images uploaded successfully',
       images: uploadedImages,
     });
   } catch (error) {
-    console.error("Error uploading images:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error uploading images:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -1518,7 +1518,7 @@ const updateProduct = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid product ID format",
+        message: 'Invalid product ID format',
       });
     }
 
@@ -1527,7 +1527,7 @@ const updateProduct = async (req, res) => {
     if (!existingProduct) {
       return res.status(404).json({
         success: false,
-        message: "Product not found",
+        message: 'Product not found',
       });
     }
 
@@ -1557,7 +1557,7 @@ const updateProduct = async (req, res) => {
     }
 
     if (series !== undefined) {
-      updateData.series = series ? series.trim() : "";
+      updateData.series = series ? series.trim() : '';
     }
 
     if (model !== undefined) {
@@ -1568,7 +1568,7 @@ const updateProduct = async (req, res) => {
       if (isNaN(basePrice) || parseFloat(basePrice) <= 0) {
         return res.status(400).json({
           success: false,
-          message: "Base price must be a positive number",
+          message: 'Base price must be a positive number',
         });
       }
       updateData.basePrice = parseFloat(basePrice);
@@ -1582,17 +1582,17 @@ const updateProduct = async (req, res) => {
       ) {
         return res.status(400).json({
           success: false,
-          message: "Depreciation rate must be between 0 and 100",
+          message: 'Depreciation rate must be between 0 and 100',
         });
       }
       updateData.depreciationRate = parseFloat(depreciationRate);
     }
 
     if (status !== undefined) {
-      if (!["active", "inactive", "pending"].includes(status)) {
+      if (!['active', 'inactive', 'pending'].includes(status)) {
         return res.status(400).json({
           success: false,
-          message: "Status must be one of: active, inactive, pending",
+          message: 'Status must be one of: active, inactive, pending',
         });
       }
       updateData.status = status;
@@ -1609,7 +1609,7 @@ const updateProduct = async (req, res) => {
     // Process images if provided
     if (images !== undefined) {
       let processedImages = [];
-      if (typeof images === "string") {
+      if (typeof images === 'string') {
         try {
           processedImages = JSON.parse(images);
         } catch (e) {
@@ -1621,8 +1621,8 @@ const updateProduct = async (req, res) => {
 
       updateData.images = processedImages
         .map((img) => {
-          if (typeof img === "string") return img.trim();
-          return img.url || img.secure_url || "";
+          if (typeof img === 'string') return img.trim();
+          return img.url || img.secure_url || '';
         })
         .filter((url) => url && url.length > 0)
         .slice(0, 10);
@@ -1631,13 +1631,13 @@ const updateProduct = async (req, res) => {
     // Process specifications if provided
     if (specifications !== undefined) {
       let processedSpecs = {};
-      if (typeof specifications === "string") {
+      if (typeof specifications === 'string') {
         try {
           processedSpecs = JSON.parse(specifications);
         } catch (e) {
           processedSpecs = {};
         }
-      } else if (typeof specifications === "object") {
+      } else if (typeof specifications === 'object') {
         processedSpecs = specifications;
       }
       updateData.specifications = processedSpecs;
@@ -1666,7 +1666,7 @@ const updateProduct = async (req, res) => {
         return res.status(409).json({
           success: false,
           message:
-            "Another product with this category, brand, and model combination already exists",
+            'Another product with this category, brand, and model combination already exists',
         });
       }
     }
@@ -1679,35 +1679,35 @@ const updateProduct = async (req, res) => {
       new: true,
       runValidators: true,
     })
-      .populate("createdBy", "name email")
+      .populate('createdBy', 'name email')
       .lean();
 
     res.json({
       success: true,
-      message: "Product updated successfully",
+      message: 'Product updated successfully',
       product: updatedProduct,
     });
   } catch (error) {
-    console.error("Error updating product:", error);
+    console.error('Error updating product:', error);
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(
         (err) => err.message
       );
       return res.status(400).json({
         success: false,
-        message: "Product validation failed",
+        message: 'Product validation failed',
         errors: validationErrors,
       });
     }
 
     res.status(500).json({
       success: false,
-      message: "Failed to update product",
+      message: 'Failed to update product',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -1720,18 +1720,18 @@ const getProductById = async (req, res) => {
     const { id } = req.params;
 
     const product = await Product.findById(id).populate(
-      "createdBy",
-      "name email"
+      'createdBy',
+      'name email'
     );
 
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     res.json({ product });
   } catch (error) {
-    console.error("Error fetching product:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching product:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -1745,7 +1745,7 @@ const updateProductStatus = async (req, res) => {
 
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Invalid product ID" });
+      return res.status(400).json({ message: 'Invalid product ID' });
     }
 
     // Find and update the product status
@@ -1756,11 +1756,11 @@ const updateProductStatus = async (req, res) => {
     );
 
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     res.json({
-      message: "Product status updated successfully",
+      message: 'Product status updated successfully',
       product: {
         _id: product._id,
         category: product.category,
@@ -1772,7 +1772,7 @@ const updateProductStatus = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -1788,7 +1788,7 @@ const deleteProduct = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid product ID format",
+        message: 'Invalid product ID format',
       });
     }
 
@@ -1797,7 +1797,7 @@ const deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: "Product not found",
+        message: 'Product not found',
       });
     }
 
@@ -1805,8 +1805,8 @@ const deleteProduct = async (req, res) => {
     if (!force) {
       // Check if product has any active orders
       const activeOrders = await Order.find({
-        "items.product": id,
-        status: { $in: ["pending", "processing", "shipped", "confirmed"] },
+        'items.product': id,
+        status: { $in: ['pending', 'processing', 'shipped', 'confirmed'] },
       });
 
       if (activeOrders.length > 0) {
@@ -1840,7 +1840,7 @@ const deleteProduct = async (req, res) => {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       const recentTransactions = await Transaction.find({
-        "productDetails.productId": id,
+        'productDetails.productId': id,
         createdAt: { $gte: thirtyDaysAgo },
       });
 
@@ -1850,7 +1850,7 @@ const deleteProduct = async (req, res) => {
           message: `Product has ${recentTransactions.length} recent transaction(s) in the last 30 days. Consider deactivating instead of deleting, or use force delete.`,
           recentTransactionsCount: recentTransactions.length,
           canForceDelete: true,
-          suggestion: "Consider setting status to inactive instead of deleting",
+          suggestion: 'Consider setting status to inactive instead of deleting',
         });
       }
     }
@@ -1866,19 +1866,19 @@ const deleteProduct = async (req, res) => {
 
     // Delete images from Cloudinary if they exist
     if (product.images && product.images.length > 0) {
-      const cloudinary = require("../config/cloudinary.config");
+      const cloudinary = require('../config/cloudinary.config');
 
       for (const imageUrl of product.images) {
         try {
           // Extract public_id from Cloudinary URL
           const publicId = imageUrl
-            .split("/")
+            .split('/')
             .slice(-2)
-            .join("/")
-            .split(".")[0];
+            .join('/')
+            .split('.')[0];
           await cloudinary.uploader.destroy(`cashify/products/${publicId}`);
         } catch (deleteError) {
-          console.error("Error deleting image from Cloudinary:", deleteError);
+          console.error('Error deleting image from Cloudinary:', deleteError);
           // Continue with product deletion even if image deletion fails
         }
       }
@@ -1891,8 +1891,8 @@ const deleteProduct = async (req, res) => {
         Inventory.deleteMany({ product: id }),
         // Update orders to mark product as deleted
         Order.updateMany(
-          { "items.product": id },
-          { $set: { "items.$.productDeleted": true } }
+          { 'items.product': id },
+          { $set: { 'items.$.productDeleted': true } }
         ),
       ]);
     }
@@ -1903,29 +1903,29 @@ const deleteProduct = async (req, res) => {
     res.json({
       success: true,
       message: force
-        ? "Product and related data deleted successfully (forced)"
-        : "Product deleted successfully",
+        ? 'Product and related data deleted successfully (forced)'
+        : 'Product deleted successfully',
       deletedProduct: deletedProductInfo,
       forced: force,
     });
   } catch (error) {
-    console.error("Error deleting product:", error);
+    console.error('Error deleting product:', error);
 
     // Handle specific errors
-    if (error.name === "CastError") {
+    if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
-        message: "Invalid product ID format",
+        message: 'Invalid product ID format',
       });
     }
 
     res.status(500).json({
       success: false,
-      message: "Failed to delete product",
+      message: 'Failed to delete product',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -1957,8 +1957,8 @@ const getCommissionSettings = async (req, res) => {
 
     res.json(commissionSettings);
   } catch (error) {
-    console.error("Error fetching commission settings:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching commission settings:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -1969,10 +1969,10 @@ const updateCommissionSettings = async (req, res) => {
   try {
     // This would typically update a settings collection
     // For now, just returning success
-    res.json({ message: "Commission settings updated successfully" });
+    res.json({ message: 'Commission settings updated successfully' });
   } catch (error) {
-    console.error("Error updating commission settings:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error updating commission settings:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -1986,16 +1986,16 @@ const getAllUsers = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const search = req.query.search || "";
-    const role = req.query.role || "";
+    const search = req.query.search || '';
+    const role = req.query.role || '';
 
     // Build query
     let query = {};
     if (search) {
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-        { phone: { $regex: search, $options: "i" } },
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } },
       ];
     }
     if (role) {
@@ -2003,7 +2003,7 @@ const getAllUsers = async (req, res) => {
     }
 
     const users = await User.find(query)
-      .select("-password")
+      .select('-password')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -2012,9 +2012,9 @@ const getAllUsers = async (req, res) => {
 
     // Set cache control headers to prevent 304 responses
     res.set({
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      Pragma: "no-cache",
-      Expires: "0",
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: '0',
     });
 
     res.json({
@@ -2027,8 +2027,8 @@ const getAllUsers = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -2038,20 +2038,20 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
-      .select("-password")
+      .select('-password')
       .populate(
-        "roleTemplate",
-        "name displayName description color permissions"
+        'roleTemplate',
+        'name displayName description color permissions'
       );
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     res.json(user);
   } catch (error) {
-    console.error("Error fetching user:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching user:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -2070,7 +2070,7 @@ const createUser = async (req, res) => {
       email,
       password,
       phone,
-      role = "user",
+      role = 'user',
       address,
       roleTemplate,
     } = req.body;
@@ -2078,7 +2078,7 @@ const createUser = async (req, res) => {
     // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: 'User already exists' });
     }
 
     // Prepare user data
@@ -2093,7 +2093,7 @@ const createUser = async (req, res) => {
     };
 
     // Add roleTemplate only if role is partner and a template is selected
-    if (role === "partner" && roleTemplate) {
+    if (role === 'partner' && roleTemplate) {
       userData.roleTemplate = roleTemplate;
     }
 
@@ -2101,7 +2101,7 @@ const createUser = async (req, res) => {
     const user = await User.create(userData);
 
     // If role is partner, create Partner profile automatically
-    if (role === "partner") {
+    if (role === 'partner') {
       try {
         // Check if partner profile already exists
         const existingPartner = await Partner.findOne({ user: user._id });
@@ -2110,24 +2110,24 @@ const createUser = async (req, res) => {
           // Create basic partner profile with minimal required fields
           await Partner.create({
             user: user._id,
-            shopName: name || "Partner Shop", // Use user's name as default shop name
+            shopName: name || 'Partner Shop', // Use user's name as default shop name
             shopEmail: email,
-            shopPhone: phone || "0000000000",
+            shopPhone: phone || '0000000000',
             gstNumber: `GST${Date.now()}`, // Generate temporary GST number
             shopAddress: {
-              street: address?.street || "",
-              city: address?.city || "",
-              state: address?.state || "",
-              pincode: address?.pincode || "000000",
-              country: address?.country || "India",
+              street: address?.street || '',
+              city: address?.city || '',
+              state: address?.state || '',
+              pincode: address?.pincode || '000000',
+              country: address?.country || 'India',
             },
             isVerified: false,
-            verificationStatus: "pending",
+            verificationStatus: 'pending',
           });
           console.log(`✅ Partner profile created for user: ${email}`);
         }
       } catch (partnerError) {
-        console.error("Error creating partner profile:", partnerError);
+        console.error('Error creating partner profile:', partnerError);
         // Don't fail the user creation if partner profile creation fails
         // Partner can complete their profile later
       }
@@ -2135,22 +2135,22 @@ const createUser = async (req, res) => {
 
     // Return user without password, with populated roleTemplate
     const userResponse = await User.findById(user._id)
-      .select("-password")
+      .select('-password')
       .populate(
-        "roleTemplate",
-        "name displayName description color permissions"
+        'roleTemplate',
+        'name displayName description color permissions'
       );
 
     res.status(201).json({
       message:
-        role === "partner"
-          ? "Partner user created successfully. Please complete partner profile for full access."
-          : "User created successfully",
+        role === 'partner'
+          ? 'Partner user created successfully. Please complete partner profile for full access.'
+          : 'User created successfully',
       user: userResponse,
     });
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error creating user:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -2169,14 +2169,14 @@ const updateUser = async (req, res) => {
 
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     // Check if email is being changed and if it already exists
     if (email && email !== user.email) {
       const emailExists = await User.findOne({ email });
       if (emailExists) {
-        return res.status(400).json({ message: "Email already exists" });
+        return res.status(400).json({ message: 'Email already exists' });
       }
     }
 
@@ -2189,12 +2189,12 @@ const updateUser = async (req, res) => {
     if (phone) user.phone = phone;
     if (role) user.role = role;
     if (address) user.address = { ...user.address, ...address };
-    if (typeof isVerified === "boolean") user.isVerified = isVerified;
+    if (typeof isVerified === 'boolean') user.isVerified = isVerified;
 
     // Update roleTemplate for partner users
-    if (role === "partner" && roleTemplate !== undefined) {
+    if (role === 'partner' && roleTemplate !== undefined) {
       user.roleTemplate = roleTemplate || null;
-    } else if (role !== "partner") {
+    } else if (role !== 'partner') {
       // Clear roleTemplate if role is changed from partner to something else
       user.roleTemplate = null;
     }
@@ -2202,7 +2202,7 @@ const updateUser = async (req, res) => {
     const updatedUser = await user.save();
 
     // If role changed to partner, create Partner profile if it doesn't exist
-    if (role === "partner" && oldRole !== "partner") {
+    if (role === 'partner' && oldRole !== 'partner') {
       try {
         const existingPartner = await Partner.findOne({
           user: updatedUser._id,
@@ -2211,42 +2211,42 @@ const updateUser = async (req, res) => {
         if (!existingPartner) {
           await Partner.create({
             user: updatedUser._id,
-            shopName: name || "Partner Shop",
+            shopName: name || 'Partner Shop',
             shopEmail: email || updatedUser.email,
-            shopPhone: phone || updatedUser.phone || "0000000000",
+            shopPhone: phone || updatedUser.phone || '0000000000',
             gstNumber: `GST${Date.now()}`,
             shopAddress: {
-              street: address?.street || updatedUser.address?.street || "",
-              city: address?.city || updatedUser.address?.city || "",
-              state: address?.state || updatedUser.address?.state || "",
+              street: address?.street || updatedUser.address?.street || '',
+              city: address?.city || updatedUser.address?.city || '',
+              state: address?.state || updatedUser.address?.state || '',
               pincode:
-                address?.pincode || updatedUser.address?.pincode || "000000",
+                address?.pincode || updatedUser.address?.pincode || '000000',
               country:
-                address?.country || updatedUser.address?.country || "India",
+                address?.country || updatedUser.address?.country || 'India',
             },
             isVerified: false,
-            verificationStatus: "pending",
+            verificationStatus: 'pending',
           });
           console.log(
             `✅ Partner profile created for user: ${updatedUser.email}`
           );
         }
       } catch (partnerError) {
-        console.error("Error creating partner profile:", partnerError);
+        console.error('Error creating partner profile:', partnerError);
       }
     }
 
     const userResponse = await User.findById(updatedUser._id).select(
-      "-password"
+      '-password'
     );
 
     res.json({
-      message: "User updated successfully",
+      message: 'User updated successfully',
       user: userResponse,
     });
   } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error updating user:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -2258,20 +2258,20 @@ const deleteUser = async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     // Prevent deletion of admin users
-    if (user.role === "admin") {
-      return res.status(400).json({ message: "Cannot delete admin users" });
+    if (user.role === 'admin') {
+      return res.status(400).json({ message: 'Cannot delete admin users' });
     }
 
     await User.findByIdAndDelete(req.params.id);
 
-    res.json({ message: "User deleted successfully" });
+    res.json({ message: 'User deleted successfully' });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error deleting user:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -2284,7 +2284,7 @@ const updateUserPassword = async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     // Update password (will be hashed by pre-save middleware)
@@ -2293,13 +2293,13 @@ const updateUserPassword = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Password updated successfully",
+      message: 'Password updated successfully',
     });
   } catch (error) {
-    console.error("Error updating user password:", error);
+    console.error('Error updating user password:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to update password",
+      message: 'Failed to update password',
       error: error.message,
     });
   }
@@ -2317,11 +2317,11 @@ const getSellOrders = async (req, res) => {
       search,
       startDate,
       endDate,
-      sortBy = "createdAt",
-      sortOrder = "desc",
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
     } = req.query;
 
-    const SellOrder = require("../models/sellOrder.model");
+    const SellOrder = require('../models/sellOrder.model');
     const query = {};
 
     // Apply filters
@@ -2335,32 +2335,32 @@ const getSellOrders = async (req, res) => {
     // Search functionality
     if (search) {
       query.$or = [
-        { orderNumber: { $regex: search, $options: "i" } },
-        { "pickup.address.fullName": { $regex: search, $options: "i" } },
-        { "pickup.address.phone": { $regex: search, $options: "i" } },
+        { orderNumber: { $regex: search, $options: 'i' } },
+        { 'pickup.address.fullName': { $regex: search, $options: 'i' } },
+        { 'pickup.address.phone': { $regex: search, $options: 'i' } },
       ];
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
+    const sortOptions = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
     const [orders, total] = await Promise.all([
       SellOrder.find(query)
         .populate({
-          path: "sessionId",
+          path: 'sessionId',
           populate: {
-            path: "productId",
-            select: "name brand model images",
+            path: 'productId',
+            select: 'name brand model images',
           },
         })
-        .populate("userId", "name email phone")
+        .populate('userId', 'name email phone')
         .populate({
-          path: "assignedTo",
+          path: 'assignedTo',
           populate: {
-            path: "user",
-            select: "name email phone",
+            path: 'user',
+            select: 'name email phone',
           },
-          select: "businessName shopName email phone user",
+          select: 'businessName shopName email phone user',
         })
         .sort(sortOptions)
         .skip(skip)
@@ -2382,8 +2382,8 @@ const getSellOrders = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching sell orders:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error('Error fetching sell orders:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -2400,11 +2400,11 @@ const getBuyOrders = async (req, res) => {
       partnerId,
       startDate,
       endDate,
-      sortBy = "createdAt",
-      sortOrder = "desc",
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
     } = req.query;
 
-    const query = { orderType: "buy" };
+    const query = { orderType: 'buy' };
 
     // Apply filters
     if (status) query.status = status;
@@ -2417,14 +2417,14 @@ const getBuyOrders = async (req, res) => {
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
+    const sortOptions = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
     const [orders, total] = await Promise.all([
       Order.find(query)
-        .populate("user", "name email phone")
-        .populate("partner", "shopName shopEmail shopPhone email phone")
-        .populate("items.inventory", "product condition")
-        .populate("items.product", "name brand model images pricing")
+        .populate('user', 'name email phone')
+        .populate('partner', 'shopName shopEmail shopPhone email phone')
+        .populate('items.inventory', 'product condition')
+        .populate('items.product', 'name brand model images pricing')
         .sort(sortOptions)
         .skip(skip)
         .limit(parseInt(limit)),
@@ -2442,8 +2442,8 @@ const getBuyOrders = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching buy orders:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching buy orders:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -2457,7 +2457,7 @@ const updateOrderStatus = async (req, res) => {
 
     const order = await Order.findById(orderId);
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ message: 'Order not found' });
     }
 
     // Update order status
@@ -2471,19 +2471,19 @@ const updateOrderStatus = async (req, res) => {
 
     // Populate order details for response
     await order.populate([
-      { path: "user", select: "name email phone" },
-      { path: "partner", select: "businessName email phone" },
-      { path: "items.inventory", select: "product condition" },
-      { path: "items.product", select: "name brand model" },
+      { path: 'user', select: 'name email phone' },
+      { path: 'partner', select: 'businessName email phone' },
+      { path: 'items.inventory', select: 'product condition' },
+      { path: 'items.product', select: 'name brand model' },
     ]);
 
     res.json({
-      message: "Order status updated successfully",
+      message: 'Order status updated successfully',
       order,
     });
   } catch (error) {
-    console.error("Error updating order status:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error updating order status:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -2494,16 +2494,16 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
 
-    const order = await Order.findById(orderId).populate("items.product");
+    const order = await Order.findById(orderId).populate('items.product');
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ message: 'Order not found' });
     }
 
     // Get all verified partners
     const partners = await Partner.find({
       isVerified: true,
-      verificationStatus: "approved",
-    }).populate("user", "name email phone isActive");
+      verificationStatus: 'approved',
+    }).populate('user', 'name email phone isActive');
 
     // Check inventory status for each partner
     const partnerSuggestions = await Promise.all(
@@ -2518,7 +2518,7 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
             product: item.product._id,
             isAvailable: true,
             quantity: { $gte: item.quantity },
-          }).populate("product", "model brand category");
+          }).populate('product', 'model brand category');
 
           partnerObj.inventoryStatus.push({
             productId: item.product._id,
@@ -2588,8 +2588,8 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error getting partner suggestions:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error getting partner suggestions:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -2603,14 +2603,14 @@ const assignPartnerToOrder = async (req, res) => {
 
     const order = await Order.findById(orderId);
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ message: 'Order not found' });
     }
 
     // Verify partner exists
     if (partner) {
       const partnerExists = await Partner.findById(partner);
       if (!partnerExists) {
-        return res.status(404).json({ message: "Partner not found" });
+        return res.status(404).json({ message: 'Partner not found' });
       }
     }
 
@@ -2620,13 +2620,13 @@ const assignPartnerToOrder = async (req, res) => {
       assignedAt: new Date(),
       assignedBy: req.user._id,
       response: {
-        status: "pending",
+        status: 'pending',
       },
     };
 
     // Add to status history
     order.statusHistory.push({
-      status: "partner_assigned",
+      status: 'partner_assigned',
       timestamp: new Date(),
       note: `Order assigned to partner by admin`,
     });
@@ -2635,21 +2635,21 @@ const assignPartnerToOrder = async (req, res) => {
 
     // Populate order details for response
     await order.populate([
-      { path: "user", select: "name email phone" },
-      { path: "partner", select: "businessName shopName email phone" },
-      { path: "items.inventory", select: "product condition" },
-      { path: "items.product", select: "name brand model" },
+      { path: 'user', select: 'name email phone' },
+      { path: 'partner', select: 'businessName shopName email phone' },
+      { path: 'items.inventory', select: 'product condition' },
+      { path: 'items.product', select: 'name brand model' },
     ]);
 
     res.json({
       success: true,
       message:
-        "Partner assigned successfully. Partner will be notified to accept or reject the order.",
+        'Partner assigned successfully. Partner will be notified to accept or reject the order.',
       order,
     });
   } catch (error) {
-    console.error("Error assigning partner to order:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error assigning partner to order:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -2668,7 +2668,7 @@ const getBrands = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "Invalid pagination parameters. Page must be >= 1, limit must be between 1-100",
+          'Invalid pagination parameters. Page must be >= 1, limit must be between 1-100',
       });
     }
 
@@ -2681,19 +2681,19 @@ const getBrands = async (req, res) => {
       { $match: matchStage },
       {
         $group: {
-          _id: "$brand",
+          _id: '$brand',
           count: { $sum: 1 },
-          models: { $addToSet: "$model" },
-          categories: { $addToSet: "$category" },
-          lastUpdated: { $max: "$updatedAt" },
+          models: { $addToSet: '$model' },
+          categories: { $addToSet: '$category' },
+          lastUpdated: { $max: '$updatedAt' },
         },
       },
       {
         $project: {
           _id: 0,
-          brand: "$_id",
-          productCount: "$count",
-          modelCount: { $size: "$models" },
+          brand: '$_id',
+          productCount: '$count',
+          modelCount: { $size: '$models' },
           categories: 1,
           lastUpdated: 1,
         },
@@ -2708,8 +2708,8 @@ const getBrands = async (req, res) => {
     // Get total count for pagination
     const totalBrands = await Product.aggregate([
       { $match: matchStage },
-      { $group: { _id: "$brand" } },
-      { $count: "total" },
+      { $group: { _id: '$brand' } },
+      { $count: 'total' },
     ]);
 
     const total = totalBrands[0]?.total || 0;
@@ -2723,14 +2723,14 @@ const getBrands = async (req, res) => {
       data: brands,
     });
   } catch (error) {
-    console.error("Error fetching brands:", error);
+    console.error('Error fetching brands:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch brands",
+      message: 'Failed to fetch brands',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -2745,24 +2745,24 @@ const createBrand = async (req, res) => {
     // Comprehensive input validation
     const validationErrors = [];
 
-    if (!brand || typeof brand !== "string" || brand.trim().length < 2) {
+    if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
       validationErrors.push(
-        "Brand name is required and must be at least 2 characters"
+        'Brand name is required and must be at least 2 characters'
       );
     }
 
-    if (!category || typeof category !== "string") {
-      validationErrors.push("Category is required");
+    if (!category || typeof category !== 'string') {
+      validationErrors.push('Category is required');
     }
 
     if (basePrice && (isNaN(basePrice) || basePrice < 0)) {
-      validationErrors.push("Base price must be a valid positive number");
+      validationErrors.push('Base price must be a valid positive number');
     }
 
     if (validationErrors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: validationErrors,
       });
     }
@@ -2775,7 +2775,7 @@ const createBrand = async (req, res) => {
       return res.status(409).json({
         success: false,
         message: `Brand '${brand}' already exists`,
-        conflictField: "brand",
+        conflictField: 'brand',
       });
     }
 
@@ -2783,14 +2783,14 @@ const createBrand = async (req, res) => {
     const productData = {
       category,
       brand: brandName,
-      model: (model && model.trim()) || "default-model",
+      model: (model && model.trim()) || 'default-model',
       basePrice: basePrice || 0,
       variant: variant || {
-        ram: "4GB",
-        storage: "64GB",
+        ram: '4GB',
+        storage: '64GB',
       },
       createdBy: req.user.id,
-      status: "active",
+      status: 'active',
     };
 
     const newProduct = new Product(productData);
@@ -2808,16 +2808,16 @@ const createBrand = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error creating brand:", error);
+    console.error('Error creating brand:', error);
 
     // Handle specific MongoDB errors
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(
         (err) => err.message
       );
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: validationErrors,
       });
     }
@@ -2825,18 +2825,18 @@ const createBrand = async (req, res) => {
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
-        message: "Brand already exists",
+        message: 'Brand already exists',
         conflictField: Object.keys(error.keyPattern)[0],
       });
     }
 
     res.status(500).json({
       success: false,
-      message: "Failed to create brand",
+      message: 'Failed to create brand',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -2854,28 +2854,28 @@ const updateBrand = async (req, res) => {
 
     if (
       !brandName ||
-      typeof brandName !== "string" ||
+      typeof brandName !== 'string' ||
       brandName.trim().length < 2
     ) {
       validationErrors.push(
-        "Brand name parameter is required and must be at least 2 characters"
+        'Brand name parameter is required and must be at least 2 characters'
       );
     }
 
     if (
       !newBrandName ||
-      typeof newBrandName !== "string" ||
+      typeof newBrandName !== 'string' ||
       newBrandName.trim().length < 2
     ) {
       validationErrors.push(
-        "New brand name is required and must be at least 2 characters"
+        'New brand name is required and must be at least 2 characters'
       );
     }
 
     if (validationErrors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: validationErrors,
       });
     }
@@ -2887,7 +2887,7 @@ const updateBrand = async (req, res) => {
     if (oldBrandName === newBrandNameLower) {
       return res.status(400).json({
         success: false,
-        message: "New brand name must be different from current brand name",
+        message: 'New brand name must be different from current brand name',
       });
     }
 
@@ -2906,7 +2906,7 @@ const updateBrand = async (req, res) => {
       return res.status(409).json({
         success: false,
         message: `Brand '${newBrandName}' already exists`,
-        conflictField: "newBrandName",
+        conflictField: 'newBrandName',
       });
     }
 
@@ -2923,7 +2923,7 @@ const updateBrand = async (req, res) => {
     if (result.modifiedCount === 0) {
       return res.status(500).json({
         success: false,
-        message: "Failed to update brand. No products were modified",
+        message: 'Failed to update brand. No products were modified',
       });
     }
 
@@ -2939,23 +2939,23 @@ const updateBrand = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error updating brand:", error);
+    console.error('Error updating brand:', error);
 
     // Handle specific MongoDB errors
-    if (error.name === "CastError") {
+    if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
-        message: "Invalid brand identifier format",
+        message: 'Invalid brand identifier format',
       });
     }
 
     res.status(500).json({
       success: false,
-      message: "Failed to update brand",
+      message: 'Failed to update brand',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -2971,13 +2971,13 @@ const deleteBrand = async (req, res) => {
     // Input validation
     if (
       !brandName ||
-      typeof brandName !== "string" ||
+      typeof brandName !== 'string' ||
       brandName.trim().length < 2
     ) {
       return res.status(400).json({
         success: false,
         message:
-          "Brand name parameter is required and must be at least 2 characters",
+          'Brand name parameter is required and must be at least 2 characters',
       });
     }
 
@@ -2986,7 +2986,7 @@ const deleteBrand = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "Deletion confirmation is required. Set confirmDeletion to true in request body",
+          'Deletion confirmation is required. Set confirmDeletion to true in request body',
       });
     }
 
@@ -3020,7 +3020,7 @@ const deleteBrand = async (req, res) => {
     if (result.deletedCount === 0) {
       return res.status(500).json({
         success: false,
-        message: "Failed to delete brand. No products were removed",
+        message: 'Failed to delete brand. No products were removed',
       });
     }
 
@@ -3035,23 +3035,23 @@ const deleteBrand = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error deleting brand:", error);
+    console.error('Error deleting brand:', error);
 
     // Handle specific MongoDB errors
-    if (error.name === "CastError") {
+    if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
-        message: "Invalid brand identifier format",
+        message: 'Invalid brand identifier format',
       });
     }
 
     res.status(500).json({
       success: false,
-      message: "Failed to delete brand",
+      message: 'Failed to delete brand',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -3071,7 +3071,7 @@ const getModels = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "Invalid pagination parameters. Page must be >= 1, limit must be between 1-100",
+          'Invalid pagination parameters. Page must be >= 1, limit must be between 1-100',
       });
     }
 
@@ -3079,17 +3079,17 @@ const getModels = async (req, res) => {
 
     if (category) {
       const validCategories = [
-        "Mobile Phones",
-        "Laptops",
-        "Tablets",
-        "Smartwatches",
-        "Headphones",
+        'Mobile Phones',
+        'Laptops',
+        'Tablets',
+        'Smartwatches',
+        'Headphones',
       ];
       if (!validCategories.includes(category)) {
         return res.status(400).json({
           success: false,
           message: `Invalid category. Valid categories: ${validCategories.join(
-            ", "
+            ', '
           )}`,
         });
       }
@@ -3097,25 +3097,25 @@ const getModels = async (req, res) => {
     }
 
     if (brand) {
-      if (typeof brand !== "string" || brand.trim().length < 2) {
+      if (typeof brand !== 'string' || brand.trim().length < 2) {
         return res.status(400).json({
           success: false,
-          message: "Brand parameter must be at least 2 characters",
+          message: 'Brand parameter must be at least 2 characters',
         });
       }
       matchStage.brand = brand.toLowerCase();
     }
 
     if (search) {
-      if (typeof search !== "string" || search.trim().length < 2) {
+      if (typeof search !== 'string' || search.trim().length < 2) {
         return res.status(400).json({
           success: false,
-          message: "Search parameter must be at least 2 characters",
+          message: 'Search parameter must be at least 2 characters',
         });
       }
       matchStage.$or = [
-        { model: { $regex: search.trim(), $options: "i" } },
-        { brand: { $regex: search.trim(), $options: "i" } },
+        { model: { $regex: search.trim(), $options: 'i' } },
+        { brand: { $regex: search.trim(), $options: 'i' } },
       ];
     }
 
@@ -3124,25 +3124,25 @@ const getModels = async (req, res) => {
       {
         $group: {
           _id: {
-            model: "$model",
-            brand: "$brand",
-            category: "$category",
+            model: '$model',
+            brand: '$brand',
+            category: '$category',
           },
           count: { $sum: 1 },
-          variants: { $addToSet: "$variant" },
-          avgPrice: { $avg: "$basePrice" },
-          lastUpdated: { $max: "$updatedAt" },
+          variants: { $addToSet: '$variant' },
+          avgPrice: { $avg: '$basePrice' },
+          lastUpdated: { $max: '$updatedAt' },
         },
       },
       {
         $project: {
           _id: 0,
-          model: "$_id.model",
-          brand: "$_id.brand",
-          category: "$_id.category",
-          productCount: "$count",
-          variantCount: { $size: "$variants" },
-          avgPrice: { $round: ["$avgPrice", 2] },
+          model: '$_id.model',
+          brand: '$_id.brand',
+          category: '$_id.category',
+          productCount: '$count',
+          variantCount: { $size: '$variants' },
+          avgPrice: { $round: ['$avgPrice', 2] },
           lastUpdated: 1,
         },
       },
@@ -3159,13 +3159,13 @@ const getModels = async (req, res) => {
       {
         $group: {
           _id: {
-            model: "$model",
-            brand: "$brand",
-            category: "$category",
+            model: '$model',
+            brand: '$brand',
+            category: '$category',
           },
         },
       },
-      { $count: "total" },
+      { $count: 'total' },
     ]);
 
     const total = totalModels[0]?.total || 0;
@@ -3180,14 +3180,14 @@ const getModels = async (req, res) => {
       data: models,
     });
   } catch (error) {
-    console.error("Error fetching models:", error);
+    console.error('Error fetching models:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch models",
+      message: 'Failed to fetch models',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -3202,26 +3202,26 @@ const createModel = async (req, res) => {
     // Comprehensive input validation
     const validationErrors = [];
 
-    if (!brand || typeof brand !== "string" || brand.trim().length < 2) {
+    if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
       validationErrors.push(
-        "Brand is required and must be at least 2 characters"
+        'Brand is required and must be at least 2 characters'
       );
     }
 
-    if (!model || typeof model !== "string" || model.trim().length < 2) {
+    if (!model || typeof model !== 'string' || model.trim().length < 2) {
       validationErrors.push(
-        "Model is required and must be at least 2 characters"
+        'Model is required and must be at least 2 characters'
       );
     }
 
     if (basePrice && (isNaN(basePrice) || basePrice < 0)) {
-      validationErrors.push("Base price must be a valid positive number");
+      validationErrors.push('Base price must be a valid positive number');
     }
 
     if (validationErrors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: validationErrors,
       });
     }
@@ -3235,7 +3235,7 @@ const createModel = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: `Brand '${brand}' does not exist. Please create the brand first.`,
-        missingResource: "brand",
+        missingResource: 'brand',
       });
     }
 
@@ -3249,13 +3249,13 @@ const createModel = async (req, res) => {
       return res.status(409).json({
         success: false,
         message: `Model '${model}' already exists for brand '${brand}'`,
-        conflictField: "model",
+        conflictField: 'model',
       });
     }
 
     // Validate variant structure if provided
-    if (variant && typeof variant === "object") {
-      const requiredVariantFields = ["ram", "storage"];
+    if (variant && typeof variant === 'object') {
+      const requiredVariantFields = ['ram', 'storage'];
       const missingFields = requiredVariantFields.filter(
         (field) => !variant[field]
       );
@@ -3263,7 +3263,7 @@ const createModel = async (req, res) => {
         return res.status(400).json({
           success: false,
           message: `Variant missing required fields: ${missingFields.join(
-            ", "
+            ', '
           )}`,
           missingFields,
         });
@@ -3277,11 +3277,11 @@ const createModel = async (req, res) => {
       model: modelName,
       basePrice: basePrice || 0,
       variant: variant || {
-        ram: "4GB",
-        storage: "64GB",
+        ram: '4GB',
+        storage: '64GB',
       },
       createdBy: req.user.id,
-      status: "active",
+      status: 'active',
     };
 
     const newProduct = new Product(productData);
@@ -3301,16 +3301,16 @@ const createModel = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error creating model:", error);
+    console.error('Error creating model:', error);
 
     // Handle specific MongoDB errors
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(
         (err) => err.message
       );
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: validationErrors,
       });
     }
@@ -3318,18 +3318,18 @@ const createModel = async (req, res) => {
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
-        message: "Model already exists for this brand",
+        message: 'Model already exists for this brand',
         conflictField: Object.keys(error.keyPattern)[0],
       });
     }
 
     res.status(500).json({
       success: false,
-      message: "Failed to create model",
+      message: 'Failed to create model',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -3345,40 +3345,40 @@ const updateModel = async (req, res) => {
     // Input validation
     const validationErrors = [];
 
-    if (!brand || typeof brand !== "string" || brand.trim().length < 2) {
+    if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
       validationErrors.push(
-        "Brand parameter is required and must be at least 2 characters"
+        'Brand parameter is required and must be at least 2 characters'
       );
     }
 
     if (
       !modelName ||
-      typeof modelName !== "string" ||
+      typeof modelName !== 'string' ||
       modelName.trim().length < 2
     ) {
       validationErrors.push(
-        "Model name parameter is required and must be at least 2 characters"
+        'Model name parameter is required and must be at least 2 characters'
       );
     }
 
     if (
       !newModelName ||
-      typeof newModelName !== "string" ||
+      typeof newModelName !== 'string' ||
       newModelName.trim().length < 2
     ) {
       validationErrors.push(
-        "New model name is required and must be at least 2 characters"
+        'New model name is required and must be at least 2 characters'
       );
     }
 
     if (basePrice && (isNaN(basePrice) || basePrice < 0)) {
-      validationErrors.push("Base price must be a valid positive number");
+      validationErrors.push('Base price must be a valid positive number');
     }
 
     if (validationErrors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: validationErrors,
       });
     }
@@ -3391,7 +3391,7 @@ const updateModel = async (req, res) => {
     if (oldModelLower === newModelLower) {
       return res.status(400).json({
         success: false,
-        message: "New model name must be different from current model name",
+        message: 'New model name must be different from current model name',
       });
     }
 
@@ -3418,7 +3418,7 @@ const updateModel = async (req, res) => {
       return res.status(409).json({
         success: false,
         message: `Model '${newModelName}' already exists for brand '${brand}'`,
-        conflictField: "newModelName",
+        conflictField: 'newModelName',
       });
     }
 
@@ -3433,7 +3433,7 @@ const updateModel = async (req, res) => {
       updateData.basePrice = basePrice;
     }
 
-    if (variant && typeof variant === "object") {
+    if (variant && typeof variant === 'object') {
       updateData.variant = { ...originalModel.variant, ...variant };
     }
 
@@ -3449,7 +3449,7 @@ const updateModel = async (req, res) => {
     if (result.modifiedCount === 0) {
       return res.status(500).json({
         success: false,
-        message: "Failed to update model. No products were modified",
+        message: 'Failed to update model. No products were modified',
       });
     }
 
@@ -3467,23 +3467,23 @@ const updateModel = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error updating model:", error);
+    console.error('Error updating model:', error);
 
     // Handle specific MongoDB errors
-    if (error.name === "CastError") {
+    if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
-        message: "Invalid model identifier format",
+        message: 'Invalid model identifier format',
       });
     }
 
     res.status(500).json({
       success: false,
-      message: "Failed to update model",
+      message: 'Failed to update model',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -3499,26 +3499,26 @@ const deleteModel = async (req, res) => {
     // Input validation
     const validationErrors = [];
 
-    if (!brand || typeof brand !== "string" || brand.trim().length < 2) {
+    if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
       validationErrors.push(
-        "Brand parameter is required and must be at least 2 characters"
+        'Brand parameter is required and must be at least 2 characters'
       );
     }
 
     if (
       !modelName ||
-      typeof modelName !== "string" ||
+      typeof modelName !== 'string' ||
       modelName.trim().length < 2
     ) {
       validationErrors.push(
-        "Model name parameter is required and must be at least 2 characters"
+        'Model name parameter is required and must be at least 2 characters'
       );
     }
 
     if (validationErrors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: validationErrors,
       });
     }
@@ -3528,7 +3528,7 @@ const deleteModel = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "Deletion confirmation is required. Set confirmDeletion to true in request body",
+          'Deletion confirmation is required. Set confirmDeletion to true in request body',
       });
     }
 
@@ -3569,7 +3569,7 @@ const deleteModel = async (req, res) => {
     if (result.deletedCount === 0) {
       return res.status(500).json({
         success: false,
-        message: "Failed to delete model. No products were removed",
+        message: 'Failed to delete model. No products were removed',
       });
     }
 
@@ -3585,23 +3585,23 @@ const deleteModel = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error deleting model:", error);
+    console.error('Error deleting model:', error);
 
     // Handle specific MongoDB errors
-    if (error.name === "CastError") {
+    if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
-        message: "Invalid model identifier format",
+        message: 'Invalid model identifier format',
       });
     }
 
     res.status(500).json({
       success: false,
-      message: "Failed to delete model",
+      message: 'Failed to delete model',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -3619,35 +3619,35 @@ const getConditionQuestionnaires = async (req, res) => {
       model,
       isActive,
       search,
-      sortBy = "createdAt",
-      sortOrder = "desc",
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
     } = req.query;
 
     // Build filter object
     const filter = {};
 
     if (category) filter.category = category.toLowerCase();
-    if (brand) filter.brand = new RegExp(brand, "i");
-    if (model) filter.model = new RegExp(model, "i");
-    if (isActive !== undefined) filter.isActive = isActive === "true";
+    if (brand) filter.brand = new RegExp(brand, 'i');
+    if (model) filter.model = new RegExp(model, 'i');
+    if (isActive !== undefined) filter.isActive = isActive === 'true';
 
     // Add search functionality
     if (search) {
       filter.$or = [
-        { title: new RegExp(search, "i") },
-        { description: new RegExp(search, "i") },
-        { "metadata.tags": new RegExp(search, "i") },
+        { title: new RegExp(search, 'i') },
+        { description: new RegExp(search, 'i') },
+        { 'metadata.tags': new RegExp(search, 'i') },
       ];
     }
 
     // Build sort object
     const sort = {};
-    sort[sortBy] = sortOrder === "desc" ? -1 : 1;
+    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
     // Execute query with pagination
     const questionnaires = await ConditionQuestionnaire.find(filter)
-      .populate("createdBy", "name email")
-      .populate("updatedBy", "name email")
+      .populate('createdBy', 'name email')
+      .populate('updatedBy', 'name email')
       .sort(sort)
       .limit(limit * 1)
       .skip((page - 1) * limit)
@@ -3664,11 +3664,11 @@ const getConditionQuestionnaires = async (req, res) => {
           _id: null,
           totalQuestionnaires: { $sum: 1 },
           activeQuestionnaires: {
-            $sum: { $cond: [{ $eq: ["$isActive", true] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ['$isActive', true] }, 1, 0] },
           },
-          totalResponses: { $sum: "$analytics.totalResponses" },
-          avgCompletionTime: { $avg: "$analytics.averageCompletionTime" },
-          categoriesCount: { $addToSet: "$category" },
+          totalResponses: { $sum: '$analytics.totalResponses' },
+          avgCompletionTime: { $avg: '$analytics.averageCompletionTime' },
+          categoriesCount: { $addToSet: '$category' },
         },
       },
       {
@@ -3677,8 +3677,8 @@ const getConditionQuestionnaires = async (req, res) => {
           totalQuestionnaires: 1,
           activeQuestionnaires: 1,
           totalResponses: 1,
-          avgCompletionTime: { $round: ["$avgCompletionTime", 2] },
-          categoriesCount: { $size: "$categoriesCount" },
+          avgCompletionTime: { $round: ['$avgCompletionTime', 2] },
+          categoriesCount: { $size: '$categoriesCount' },
         },
       },
     ]);
@@ -3705,11 +3705,11 @@ const getConditionQuestionnaires = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching condition questionnaires:", error);
+    console.error('Error fetching condition questionnaires:', error);
     res.status(500).json({
       success: false,
-      message: "Server error while fetching questionnaires",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Server error while fetching questionnaires',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -3722,18 +3722,18 @@ const getConditionQuestionnaireById = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid questionnaire ID format",
+        message: 'Invalid questionnaire ID format',
       });
     }
 
     const questionnaire = await ConditionQuestionnaire.findById(id)
-      .populate("createdBy", "name email")
-      .populate("updatedBy", "name email");
+      .populate('createdBy', 'name email')
+      .populate('updatedBy', 'name email');
 
     if (!questionnaire) {
       return res.status(404).json({
         success: false,
-        message: "Condition questionnaire not found",
+        message: 'Condition questionnaire not found',
       });
     }
 
@@ -3742,11 +3742,11 @@ const getConditionQuestionnaireById = async (req, res) => {
       data: questionnaire,
     });
   } catch (error) {
-    console.error("Error fetching condition questionnaire:", error);
+    console.error('Error fetching condition questionnaire:', error);
     res.status(500).json({
       success: false,
-      message: "Server error while fetching questionnaire",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Server error while fetching questionnaire',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -3758,7 +3758,7 @@ const createConditionQuestionnaire = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: errors.array(),
       });
     }
@@ -3776,13 +3776,13 @@ const createConditionQuestionnaire = async (req, res) => {
       isDefault = false,
       metadata: rawMetadata,
     } = req.body;
-    console.log("req.body: ", req.body);
+    console.log('req.body: ', req.body);
 
     // Transform questions from object to array if needed
     let questions;
     if (Array.isArray(rawQuestions)) {
       questions = rawQuestions;
-    } else if (rawQuestions && typeof rawQuestions === "object") {
+    } else if (rawQuestions && typeof rawQuestions === 'object') {
       // Convert object to array (for frontend compatibility)
       questions = Object.values(rawQuestions);
     } else {
@@ -3792,7 +3792,7 @@ const createConditionQuestionnaire = async (req, res) => {
     // Transform metadata tags from object to array if needed
     let metadata = rawMetadata;
     if (metadata && metadata.tags && !Array.isArray(metadata.tags)) {
-      if (typeof metadata.tags === "object") {
+      if (typeof metadata.tags === 'object') {
         // Convert object to array
         metadata = {
           ...metadata,
@@ -3811,7 +3811,7 @@ const createConditionQuestionnaire = async (req, res) => {
     if (!questions || !Array.isArray(questions) || questions.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "At least one question is required",
+        message: 'At least one question is required',
       });
     }
 
@@ -3826,8 +3826,8 @@ const createConditionQuestionnaire = async (req, res) => {
       }
 
       if (
-        question.type === "single_choice" ||
-        question.type === "multiple_choice"
+        question.type === 'single_choice' ||
+        question.type === 'multiple_choice'
       ) {
         if (
           !question.options ||
@@ -3858,12 +3858,12 @@ const createConditionQuestionnaire = async (req, res) => {
       brand,
       model,
       questions,
-      version: version || "1.0.0",
+      version: version || '1.0.0',
       isActive,
       isDefault,
       metadata: {
         estimatedTime: metadata?.estimatedTime || 5,
-        difficulty: metadata?.difficulty || "easy",
+        difficulty: metadata?.difficulty || 'easy',
         tags: metadata?.tags || [],
         instructions: metadata?.instructions,
       },
@@ -3873,20 +3873,20 @@ const createConditionQuestionnaire = async (req, res) => {
     await questionnaire.save();
 
     // Populate the created questionnaire
-    await questionnaire.populate("createdBy", "name email");
+    await questionnaire.populate('createdBy', 'name email');
 
     res.status(201).json({
       success: true,
-      message: "Condition questionnaire created successfully",
+      message: 'Condition questionnaire created successfully',
       data: questionnaire,
     });
   } catch (error) {
-    console.error("Error creating condition questionnaire:", error);
+    console.error('Error creating condition questionnaire:', error);
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       return res.status(400).json({
         success: false,
-        message: "Validation error",
+        message: 'Validation error',
         errors: Object.values(error.errors).map((err) => ({
           field: err.path,
           message: err.message,
@@ -3896,8 +3896,8 @@ const createConditionQuestionnaire = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: "Server error while creating questionnaire",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Server error while creating questionnaire',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -3911,7 +3911,7 @@ const updateConditionQuestionnaire = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: errors.array(),
       });
     }
@@ -3919,7 +3919,7 @@ const updateConditionQuestionnaire = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid questionnaire ID format",
+        message: 'Invalid questionnaire ID format',
       });
     }
 
@@ -3942,7 +3942,7 @@ const updateConditionQuestionnaire = async (req, res) => {
     if (rawQuestions !== undefined) {
       if (Array.isArray(rawQuestions)) {
         questions = rawQuestions;
-      } else if (rawQuestions && typeof rawQuestions === "object") {
+      } else if (rawQuestions && typeof rawQuestions === 'object') {
         // Convert object to array (for frontend compatibility)
         questions = Object.values(rawQuestions);
       } else {
@@ -3953,7 +3953,7 @@ const updateConditionQuestionnaire = async (req, res) => {
     // Transform metadata tags from object to array if needed
     let metadata = rawMetadata;
     if (metadata && metadata.tags && !Array.isArray(metadata.tags)) {
-      if (typeof metadata.tags === "object") {
+      if (typeof metadata.tags === 'object') {
         // Convert object to array
         metadata = {
           ...metadata,
@@ -3973,7 +3973,7 @@ const updateConditionQuestionnaire = async (req, res) => {
     if (!existingQuestionnaire) {
       return res.status(404).json({
         success: false,
-        message: "Condition questionnaire not found",
+        message: 'Condition questionnaire not found',
       });
     }
 
@@ -3982,7 +3982,7 @@ const updateConditionQuestionnaire = async (req, res) => {
       if (!Array.isArray(questions) || questions.length === 0) {
         return res.status(400).json({
           success: false,
-          message: "At least one question is required",
+          message: 'At least one question is required',
         });
       }
 
@@ -3997,8 +3997,8 @@ const updateConditionQuestionnaire = async (req, res) => {
         }
 
         if (
-          question.type === "single_choice" ||
-          question.type === "multiple_choice"
+          question.type === 'single_choice' ||
+          question.type === 'multiple_choice'
         ) {
           if (
             !question.options ||
@@ -4058,21 +4058,21 @@ const updateConditionQuestionnaire = async (req, res) => {
       updateData,
       { new: true, runValidators: true }
     )
-      .populate("createdBy", "name email")
-      .populate("updatedBy", "name email");
+      .populate('createdBy', 'name email')
+      .populate('updatedBy', 'name email');
 
     res.json({
       success: true,
-      message: "Condition questionnaire updated successfully",
+      message: 'Condition questionnaire updated successfully',
       data: updatedQuestionnaire,
     });
   } catch (error) {
-    console.error("Error updating condition questionnaire:", error);
+    console.error('Error updating condition questionnaire:', error);
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       return res.status(400).json({
         success: false,
-        message: "Validation error",
+        message: 'Validation error',
         errors: Object.values(error.errors).map((err) => ({
           field: err.path,
           message: err.message,
@@ -4082,8 +4082,8 @@ const updateConditionQuestionnaire = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: "Server error while updating questionnaire",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Server error while updating questionnaire',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -4096,7 +4096,7 @@ const deleteConditionQuestionnaire = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid questionnaire ID format",
+        message: 'Invalid questionnaire ID format',
       });
     }
 
@@ -4105,21 +4105,21 @@ const deleteConditionQuestionnaire = async (req, res) => {
     if (!questionnaire) {
       return res.status(404).json({
         success: false,
-        message: "Condition questionnaire not found",
+        message: 'Condition questionnaire not found',
       });
     }
 
     // Check if questionnaire is being used in any products or orders
     // This is a safety check to prevent deletion of questionnaires in use
     const isInUse = await Product.exists({
-      "conditionFactors.questionnaireId": id,
+      'conditionFactors.questionnaireId': id,
     });
 
     if (isInUse) {
       return res.status(400).json({
         success: false,
         message:
-          "Cannot delete questionnaire as it is currently being used by products. Please deactivate it instead.",
+          'Cannot delete questionnaire as it is currently being used by products. Please deactivate it instead.',
       });
     }
 
@@ -4130,32 +4130,32 @@ const deleteConditionQuestionnaire = async (req, res) => {
         isActive: false,
         deletedAt: new Date(),
         deletedBy: req.user.id,
-        "metadata.deletionReason": req.body.reason || "Deleted by admin",
+        'metadata.deletionReason': req.body.reason || 'Deleted by admin',
       },
       { new: true }
     );
 
     // If force delete is requested and questionnaire is not in use
-    if (req.query.force === "true") {
+    if (req.query.force === 'true') {
       await ConditionQuestionnaire.findByIdAndDelete(id);
 
       return res.json({
         success: true,
-        message: "Condition questionnaire permanently deleted",
+        message: 'Condition questionnaire permanently deleted',
       });
     }
 
     res.json({
       success: true,
-      message: "Condition questionnaire deactivated successfully",
+      message: 'Condition questionnaire deactivated successfully',
       data: deletedQuestionnaire,
     });
   } catch (error) {
-    console.error("Error deleting condition questionnaire:", error);
+    console.error('Error deleting condition questionnaire:', error);
     res.status(500).json({
       success: false,
-      message: "Server error while deleting questionnaire",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Server error while deleting questionnaire',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -4168,14 +4168,14 @@ const getQuestionnairesByCategory = async (req, res) => {
 
     const filter = {
       category: category.toLowerCase(),
-      isActive: isActive === "true",
+      isActive: isActive === 'true',
     };
 
-    if (brand) filter.brand = new RegExp(brand, "i");
-    if (model) filter.model = new RegExp(model, "i");
+    if (brand) filter.brand = new RegExp(brand, 'i');
+    if (model) filter.model = new RegExp(model, 'i');
 
     const questionnaires = await ConditionQuestionnaire.find(filter)
-      .select("title description version isDefault metadata questions")
+      .select('title description version isDefault metadata questions')
       .sort({ isDefault: -1, createdAt: -1 })
       .lean();
 
@@ -4184,11 +4184,11 @@ const getQuestionnairesByCategory = async (req, res) => {
       data: questionnaires,
     });
   } catch (error) {
-    console.error("Error fetching questionnaires by category:", error);
+    console.error('Error fetching questionnaires by category:', error);
     res.status(500).json({
       success: false,
-      message: "Server error while fetching questionnaires",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Server error while fetching questionnaires',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 };
@@ -4201,7 +4201,7 @@ const updateModelByName = async (req, res) => {
     const { modelName } = req.params;
     const updateData = req.body;
 
-    console.log("Updating model:", modelName, "with data:", updateData);
+    console.log('Updating model:', modelName, 'with data:', updateData);
 
     // Decode URL-encoded model name
     const decodedModelName = decodeURIComponent(modelName);
@@ -4211,7 +4211,7 @@ const updateModelByName = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "Model name parameter is required and must be at least 2 characters",
+          'Model name parameter is required and must be at least 2 characters',
       });
     }
 
@@ -4267,7 +4267,7 @@ const updateModelByName = async (req, res) => {
     if (result.modifiedCount === 0) {
       return res.status(404).json({
         success: false,
-        message: "No products were updated. Model may not exist.",
+        message: 'No products were updated. Model may not exist.',
       });
     }
 
@@ -4283,15 +4283,15 @@ const updateModelByName = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error updating model by name:", error);
+    console.error('Error updating model by name:', error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to update model",
+      message: 'Failed to update model',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -4306,14 +4306,14 @@ const deleteModelByName = async (req, res) => {
     // Decode URL-encoded model name
     const decodedModelName = decodeURIComponent(modelName);
 
-    console.log("Deleting model:", decodedModelName);
+    console.log('Deleting model:', decodedModelName);
 
     // Input validation
     if (!decodedModelName || decodedModelName.trim().length < 2) {
       return res.status(400).json({
         success: false,
         message:
-          "Model name parameter is required and must be at least 2 characters",
+          'Model name parameter is required and must be at least 2 characters',
       });
     }
 
@@ -4344,15 +4344,15 @@ const deleteModelByName = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error deleting model by name:", error);
+    console.error('Error deleting model by name:', error);
 
     res.status(500).json({
       success: false,
-      message: "Failed to delete model",
+      message: 'Failed to delete model',
       error:
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === 'development'
           ? error.message
-          : "Internal server error",
+          : 'Internal server error',
     });
   }
 };
@@ -4367,17 +4367,17 @@ const getAgents = async (req, res) => {
 
   const query = {};
   if (status) {
-    query.isActive = status === "active";
+    query.isActive = status === 'active';
   }
 
   const agents = await Agent.find(query)
-    .populate("user", "name email phone isVerified isActive")
-    .populate("assignedPartner", "shopName shopEmail user")
+    .populate('user', 'name email phone isVerified isActive')
+    .populate('assignedPartner', 'shopName shopEmail user')
     .populate({
-      path: "assignedPartner",
+      path: 'assignedPartner',
       populate: {
-        path: "user",
-        select: "name email",
+        path: 'user',
+        select: 'name email',
       },
     })
     .sort({ createdAt: -1 })
@@ -4387,7 +4387,7 @@ const getAgents = async (req, res) => {
   // Filter by verification status if specified
   let filteredAgents = agents;
   if (verified !== undefined) {
-    const isVerified = verified === "true";
+    const isVerified = verified === 'true';
     filteredAgents = agents.filter(
       (agent) => agent.user.isVerified === isVerified
     );
@@ -4415,9 +4415,9 @@ const getAgents = async (req, res) => {
 const approveAgent = async (req, res) => {
   const agentId = req.params.id;
 
-  const agent = await Agent.findById(agentId).populate("user");
+  const agent = await Agent.findById(agentId).populate('user');
   if (!agent) {
-    throw new ApiError("Agent not found", 404);
+    throw new ApiError('Agent not found', 404);
   }
 
   // Update user verification status
@@ -4432,7 +4432,7 @@ const approveAgent = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: "Agent approved successfully",
+    message: 'Agent approved successfully',
     data: agent,
   });
 };
@@ -4446,9 +4446,9 @@ const rejectAgent = async (req, res) => {
   const agentId = req.params.id;
   const { reason } = req.body;
 
-  const agent = await Agent.findById(agentId).populate("user");
+  const agent = await Agent.findById(agentId).populate('user');
   if (!agent) {
-    throw new ApiError("Agent not found", 404);
+    throw new ApiError('Agent not found', 404);
   }
 
   // Update user verification status
@@ -4464,7 +4464,7 @@ const rejectAgent = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: "Agent rejected successfully",
+    message: 'Agent rejected successfully',
     data: agent,
   });
 };
@@ -4478,9 +4478,9 @@ const toggleAgentStatus = async (req, res) => {
   const agentId = req.params.id;
   const { isActive } = req.body;
 
-  const agent = await Agent.findById(agentId).populate("user");
+  const agent = await Agent.findById(agentId).populate('user');
   if (!agent) {
-    throw new ApiError("Agent not found", 404);
+    throw new ApiError('Agent not found', 404);
   }
 
   // Update agent status
@@ -4492,7 +4492,7 @@ const toggleAgentStatus = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: `Agent ${isActive ? "activated" : "deactivated"} successfully`,
+    message: `Agent ${isActive ? 'activated' : 'deactivated'} successfully`,
     data: agent,
   });
 };
@@ -4508,7 +4508,7 @@ const toggleUserStatus = async (req, res) => {
 
   const user = await User.findById(userId);
   if (!user) {
-    throw new ApiError("User not found", 404);
+    throw new ApiError('User not found', 404);
   }
 
   // Update user active status
@@ -4517,7 +4517,7 @@ const toggleUserStatus = async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: `User ${isActive ? "activated" : "deactivated"} successfully`,
+    message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
     data: user,
   });
 };

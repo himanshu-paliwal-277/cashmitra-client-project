@@ -54,14 +54,14 @@ const updateUserProfile = async (req, res) => {
     if (req.body.email) user.email = req.body.email;
     if (req.body.phone) user.phone = req.body.phone;
     if (req.body.dateOfBirth) user.dateOfBirth = req.body.dateOfBirth;
-    
+
     if (req.body.address) {
       user.address = {
         ...user.address,
         ...req.body.address,
       };
     }
-    
+
     if (req.body.profileImage) {
       user.profileImage = req.body.profileImage;
     }
@@ -96,13 +96,13 @@ const updateUserProfile = async (req, res) => {
 const getUserOrders = async (req, res) => {
   try {
     const { page = 1, limit = 10, status, orderType } = req.query;
-    
+
     const query = { user: req.user._id };
-    
+
     if (status) {
       query.status = status;
     }
-    
+
     if (orderType) {
       query.orderType = orderType;
     }
@@ -135,9 +135,9 @@ const getUserOrders = async (req, res) => {
 // @access  Private
 const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findOne({ 
-      _id: req.params.id, 
-      user: req.user._id 
+    const order = await Order.findOne({
+      _id: req.params.id,
+      user: req.user._id,
     })
       .populate('partner', 'name email phone address')
       .populate('items.product', 'name brand model images specifications')
@@ -159,8 +159,10 @@ const getOrderById = async (req, res) => {
 // @access  Private
 const getUserAddresses = async (req, res) => {
   try {
-    const addresses = await Address.find({ user: req.user._id })
-      .sort({ isDefault: -1, createdAt: -1 });
+    const addresses = await Address.find({ user: req.user._id }).sort({
+      isDefault: -1,
+      createdAt: -1,
+    });
 
     res.json(addresses);
   } catch (error) {
@@ -214,7 +216,7 @@ const updateAddress = async (req, res) => {
     }
 
     // Update address fields
-    Object.keys(req.body).forEach(key => {
+    Object.keys(req.body).forEach((key) => {
       if (req.body[key] !== undefined) {
         address[key] = req.body[key];
       }
@@ -267,10 +269,7 @@ const setDefaultAddress = async (req, res) => {
     }
 
     // Remove default flag from all user addresses
-    await Address.updateMany(
-      { user: req.user._id },
-      { isDefault: false }
-    );
+    await Address.updateMany({ user: req.user._id }, { isDefault: false });
 
     // Set this address as default
     address.isDefault = true;

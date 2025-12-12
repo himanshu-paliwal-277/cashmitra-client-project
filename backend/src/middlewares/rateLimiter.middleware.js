@@ -9,5 +9,5 @@ const authLimiter = rateLimit(securityConfig.authRateLimit);
 
 module.exports = {
   apiLimiter,
-  authLimiter
+  authLimiter,
 };

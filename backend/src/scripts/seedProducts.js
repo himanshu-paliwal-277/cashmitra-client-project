@@ -20,7 +20,7 @@ const seedProducts = async () => {
     // Check if products already exist
     const existingProducts = await Product.find();
     console.log(`\nExisting products (${existingProducts.length}):`);
-    existingProducts.forEach(product => {
+    existingProducts.forEach((product) => {
       console.log(`- ${product.brand} ${product.model} (${product.category})`);
     });
 
@@ -43,16 +43,16 @@ const seedProducts = async () => {
           storage: '128GB',
           processor: 'A16 Bionic',
           screenSize: '6.1 inch',
-          color: 'Deep Purple'
+          color: 'Deep Purple',
         },
         basePrice: 85000,
         depreciation: {
           ratePerMonth: 2.5,
-          maxDepreciation: 75
+          maxDepreciation: 75,
         },
         images: [
           'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500',
-          'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500'
+          'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500',
         ],
         specifications: new Map([
           ['Display', '6.1-inch Super Retina XDR display'],
@@ -60,9 +60,9 @@ const seedProducts = async () => {
           ['Battery', 'Up to 23 hours video playback'],
           ['Operating System', 'iOS 16'],
           ['Connectivity', '5G, Wi-Fi 6, Bluetooth 5.3'],
-          ['Water Resistance', 'IP68']
+          ['Water Resistance', 'IP68'],
         ]),
-        createdBy: adminUser._id
+        createdBy: adminUser._id,
       },
       {
         category: 'laptop',
@@ -74,16 +74,16 @@ const seedProducts = async () => {
           storage: '512GB SSD',
           processor: 'Intel Core i7-1260P',
           screenSize: '13.4 inch',
-          color: 'Platinum Silver'
+          color: 'Platinum Silver',
         },
         basePrice: 120000,
         depreciation: {
           ratePerMonth: 3,
-          maxDepreciation: 80
+          maxDepreciation: 80,
         },
         images: [
           'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500',
-          'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500'
+          'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500',
         ],
         specifications: new Map([
           ['Display', '13.4-inch FHD+ InfinityEdge display'],
@@ -91,9 +91,9 @@ const seedProducts = async () => {
           ['Graphics', 'Intel Iris Xe Graphics'],
           ['Operating System', 'Windows 11 Home'],
           ['Ports', '2x Thunderbolt 4, 1x microSD card reader'],
-          ['Weight', '1.27 kg']
+          ['Weight', '1.27 kg'],
         ]),
-        createdBy: adminUser._id
+        createdBy: adminUser._id,
       },
       {
         category: 'tablet',
@@ -105,16 +105,16 @@ const seedProducts = async () => {
           storage: '128GB',
           processor: 'Snapdragon 8 Gen 1',
           screenSize: '11 inch',
-          color: 'Graphite'
+          color: 'Graphite',
         },
         basePrice: 55000,
         depreciation: {
           ratePerMonth: 2,
-          maxDepreciation: 70
+          maxDepreciation: 70,
         },
         images: [
           'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500',
-          'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=500'
+          'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=500',
         ],
         specifications: new Map([
           ['Display', '11-inch LTPS TFT display'],
@@ -122,10 +122,10 @@ const seedProducts = async () => {
           ['Camera', '13MP rear, 12MP front'],
           ['Battery', '8000mAh'],
           ['Operating System', 'Android 12'],
-          ['Connectivity', 'Wi-Fi 6E, Bluetooth 5.2']
+          ['Connectivity', 'Wi-Fi 6E, Bluetooth 5.2'],
         ]),
-        createdBy: adminUser._id
-      }
+        createdBy: adminUser._id,
+      },
     ];
 
     // Insert products if none exist
@@ -133,8 +133,10 @@ const seedProducts = async () => {
       console.log('\nCreating sample products...');
       const createdProducts = await Product.insertMany(sampleProducts);
       console.log(`\nSuccessfully created ${createdProducts.length} products:`);
-      createdProducts.forEach(product => {
-        console.log(`- ${product.brand} ${product.model} (₹${product.basePrice})`);
+      createdProducts.forEach((product) => {
+        console.log(
+          `- ${product.brand} ${product.model} (₹${product.basePrice})`
+        );
       });
     } else {
       console.log('\nProducts already exist, skipping seed.');
@@ -142,7 +144,6 @@ const seedProducts = async () => {
 
     const totalProducts = await Product.countDocuments();
     console.log(`\nTotal products in database: ${totalProducts}`);
-
   } catch (error) {
     console.error('Error seeding products:', error);
   } finally {

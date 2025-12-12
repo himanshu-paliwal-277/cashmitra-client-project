@@ -20,7 +20,7 @@ const agentData = {
     phone: '+919876543210',
     role: 'agent',
     isActive: true,
-    isVerified: true
+    isVerified: true,
   },
   agent: {
     employeeId: 'EMP001',
@@ -28,41 +28,43 @@ const agentData = {
     documents: {
       aadhar: {
         number: '123456789012',
-        verified: true
+        verified: true,
       },
       pan: {
         number: 'ABCDE1234F',
-        verified: true
+        verified: true,
       },
       drivingLicense: {
         number: 'MH0120230001234',
-        verified: true
-      }
+        verified: true,
+      },
     },
     bankDetails: {
       accountNumber: '1234567890',
       ifscCode: 'HDFC0001234',
       accountHolderName: 'Test Agent',
-      bankName: 'HDFC Bank'
-    }
-  }
+      bankName: 'HDFC Bank',
+    },
+  },
 };
 
 async function seedAgent() {
   try {
     console.log('🔄 Connecting to MongoDB...');
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cashify');
+    await mongoose.connect(
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/cashify'
+    );
     console.log('✅ Connected to MongoDB\n');
 
     // Check if agent already exists
     const existingUser = await User.findOne({ email: agentData.user.email });
-    
+
     if (existingUser) {
       console.log('⚠️  Agent user already exists!');
       console.log(`   Email: ${existingUser.email}`);
       console.log(`   Role: ${existingUser.role}`);
       console.log(`   Active: ${existingUser.isActive}`);
-      
+
       // Update role and activate if needed
       let updated = false;
       if (existingUser.role !== 'agent') {
@@ -70,36 +72,38 @@ async function seedAgent() {
         existingUser.role = 'agent';
         updated = true;
       }
-      
+
       if (!existingUser.isActive) {
         console.log('🔄 Activating user account...');
         existingUser.isActive = true;
         updated = true;
       }
-      
+
       if (!existingUser.isVerified) {
         console.log('🔄 Verifying user account...');
         existingUser.isVerified = true;
         updated = true;
       }
-      
+
       if (updated) {
         await existingUser.save();
         console.log('✅ User account updated');
       }
-      
+
       // Check if agent profile exists
       const existingAgent = await Agent.findOne({ user: existingUser._id });
-      
+
       if (existingAgent) {
         console.log(`   Agent Code: ${existingAgent.agentCode}`);
         console.log('\n✅ Agent is ready for testing!\n');
       } else {
-        console.log('\n⚠️  User exists but Agent profile missing. Creating Agent profile...');
-        
+        console.log(
+          '\n⚠️  User exists but Agent profile missing. Creating Agent profile...'
+        );
+
         // Generate agent code
         const agentCode = await Agent.generateAgentCode();
-        
+
         const newAgent = new Agent({
           user: existingUser._id,
           agentCode: agentCode,
@@ -108,41 +112,41 @@ async function seedAgent() {
           documents: {
             aadharCard: agentData.agent.documents.aadhar.number,
             panCard: agentData.agent.documents.pan.number,
-            drivingLicense: agentData.agent.documents.drivingLicense.number
+            drivingLicense: agentData.agent.documents.drivingLicense.number,
           },
-          bankDetails: agentData.agent.bankDetails
+          bankDetails: agentData.agent.bankDetails,
         });
-        
+
         await newAgent.save();
         console.log(`✅ Agent profile created!`);
         console.log(`   Agent Code: ${newAgent.agentCode}\n`);
       }
-      
+
       await mongoose.disconnect();
       return;
     }
 
     console.log('📝 Creating new agent user...');
-    
+
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(agentData.user.password, salt);
-    
+
     // Create user
     const user = new User({
       ...agentData.user,
-      password: hashedPassword
+      password: hashedPassword,
     });
-    
+
     await user.save();
     console.log(`✅ User created: ${user.email}`);
-    
+
     // Create agent profile
     console.log('📝 Creating agent profile...');
-    
+
     // Generate agent code
     const agentCode = await Agent.generateAgentCode();
-    
+
     const agent = new Agent({
       user: user._id,
       agentCode: agentCode,
@@ -151,13 +155,13 @@ async function seedAgent() {
       documents: {
         aadharCard: agentData.agent.documents.aadhar.number,
         panCard: agentData.agent.documents.pan.number,
-        drivingLicense: agentData.agent.documents.drivingLicense.number
+        drivingLicense: agentData.agent.documents.drivingLicense.number,
       },
-      bankDetails: agentData.agent.bankDetails
+      bankDetails: agentData.agent.bankDetails,
     });
-    
+
     await agent.save();
-    
+
     console.log(`✅ Agent profile created!`);
     console.log('\n' + '='.repeat(60));
     console.log('AGENT DETAILS');
@@ -173,10 +177,9 @@ async function seedAgent() {
     console.log('='.repeat(60));
     console.log('\n✅ Agent seeder completed successfully!');
     console.log('🚀 You can now run the agent app tests!\n');
-    
+
     await mongoose.disconnect();
     console.log('✅ Disconnected from MongoDB\n');
-    
   } catch (error) {
     console.error('\n❌ Error seeding agent:');
     console.error(error);

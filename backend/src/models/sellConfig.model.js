@@ -8,23 +8,25 @@ const sellConfigSchema = new mongoose.Schema(
       required: [true, 'Product ID is required'],
       unique: true,
     },
-    steps: [{
-      key: {
-        type: String,
-        enum: ['variant', 'questions', 'defects', 'accessories', 'summary'],
-        required: [true, 'Step key is required'],
+    steps: [
+      {
+        key: {
+          type: String,
+          enum: ['variant', 'questions', 'defects', 'accessories', 'summary'],
+          required: [true, 'Step key is required'],
+        },
+        title: {
+          type: String,
+          required: [true, 'Step title is required'],
+          trim: true,
+        },
+        order: {
+          type: Number,
+          required: [true, 'Step order is required'],
+          min: [0, 'Step order cannot be negative'],
+        },
       },
-      title: {
-        type: String,
-        required: [true, 'Step title is required'],
-        trim: true,
-      },
-      order: {
-        type: Number,
-        required: [true, 'Step order is required'],
-        min: [0, 'Step order cannot be negative'],
-      },
-    }],
+    ],
     rules: {
       roundToNearest: {
         type: Number,
@@ -59,10 +61,10 @@ const sellConfigSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
   }
 );
 
@@ -70,41 +72,47 @@ const sellConfigSchema = new mongoose.Schema(
 sellConfigSchema.index({ productId: 1 }, { unique: true });
 
 // Virtual for ordered steps
-sellConfigSchema.virtual('orderedSteps').get(function() {
+sellConfigSchema.virtual('orderedSteps').get(function () {
   return this.steps.sort((a, b) => a.order - b.order);
 });
 
 // Method to get default configuration
-sellConfigSchema.statics.getDefaultConfig = function() {
+sellConfigSchema.statics.getDefaultConfig = function () {
   return {
     steps: [
       { key: 'variant', title: 'Select Variant', order: 1 },
       { key: 'questions', title: 'Answer Questions', order: 2 },
       { key: 'defects', title: 'Select Defects', order: 3 },
       { key: 'accessories', title: 'Select Accessories', order: 4 },
-      { key: 'summary', title: 'Review & Confirm', order: 5 }
+      { key: 'summary', title: 'Review & Confirm', order: 5 },
     ],
     rules: {
       roundToNearest: 10,
       floorPrice: 0,
       minPercent: -90,
-      maxPercent: 50
-    }
+      maxPercent: 50,
+    },
   };
 };
 
 // Method to create default config for a product
-sellConfigSchema.statics.createDefaultForProduct = function(productId, createdBy) {
+sellConfigSchema.statics.createDefaultForProduct = function (
+  productId,
+  createdBy
+) {
   const defaultConfig = this.getDefaultConfig();
   return this.create({
     productId,
     ...defaultConfig,
-    createdBy
+    createdBy,
   });
 };
 
 // Method to apply pricing rules
-sellConfigSchema.methods.applyPricingRules = function(basePrice, calculatedPrice) {
+sellConfigSchema.methods.applyPricingRules = function (
+  basePrice,
+  calculatedPrice
+) {
   const { rules } = this;
   let finalPrice = calculatedPrice;
 
@@ -131,7 +139,8 @@ sellConfigSchema.methods.applyPricingRules = function(basePrice, calculatedPrice
 
   // Apply rounding
   if (rules.roundToNearest && rules.roundToNearest > 0) {
-    finalPrice = Math.round(finalPrice / rules.roundToNearest) * rules.roundToNearest;
+    finalPrice =
+      Math.round(finalPrice / rules.roundToNearest) * rules.roundToNearest;
   }
 
   return Math.max(0, finalPrice); // Ensure non-negative

@@ -6,13 +6,13 @@
  * @version 1.0.0
  */
 
-const { validationResult } = require("express-validator");
-const SellAccessory = require("../models/sellAccessory.model");
-const SellProduct = require("../models/sellProduct.model");
+const { validationResult } = require('express-validator');
+const SellAccessory = require('../models/sellAccessory.model');
+const SellProduct = require('../models/sellProduct.model');
 const {
   ApiError,
   asyncHandler,
-} = require("../middlewares/errorHandler.middleware");
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * Create new sell accessory
@@ -22,16 +22,16 @@ const {
 exports.createAccessory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, "Validation Error", errors.array());
+    throw new ApiError(400, 'Validation Error', errors.array());
   }
 
   const { categoryId, key, title, delta } = req.body;
 
   // Verify category exists
-  const Category = require("../models/category.model");
+  const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, "Category not found");
+    throw new ApiError(404, 'Category not found');
   }
 
   // Check if accessory with same key already exists for this category
@@ -39,7 +39,7 @@ exports.createAccessory = asyncHandler(async (req, res) => {
   if (existingAccessory) {
     throw new ApiError(
       400,
-      "Accessory with this key already exists for this category"
+      'Accessory with this key already exists for this category'
     );
   }
 
@@ -62,7 +62,7 @@ exports.createAccessory = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     success: true,
-    message: "Accessory created successfully",
+    message: 'Accessory created successfully',
     data: accessory,
   });
 });
@@ -78,11 +78,11 @@ exports.getAccessories = asyncHandler(async (req, res) => {
   const query = {};
 
   if (categoryId) query.categoryId = categoryId;
-  if (isActive !== undefined) query.isActive = isActive === "true";
+  if (isActive !== undefined) query.isActive = isActive === 'true';
 
   const accessories = await SellAccessory.find(query)
-    .populate("categoryId", "name")
-    .populate("createdBy", "name email")
+    .populate('categoryId', 'name')
+    .populate('createdBy', 'name email')
     .sort({ order: 1 });
 
   res.json({
@@ -115,16 +115,16 @@ exports.getAccessoriesForCustomer = asyncHandler(async (req, res) => {
 exports.getCustomerAccessories = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, "Validation Error", errors.array());
+    throw new ApiError(400, 'Validation Error', errors.array());
   }
 
   const { categoryId } = req.query;
 
   // Verify category exists
-  const Category = require("../models/category.model");
+  const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, "Category not found");
+    throw new ApiError(404, 'Category not found');
   }
 
   // Get all active accessories for the category
@@ -146,11 +146,11 @@ exports.getCustomerAccessories = asyncHandler(async (req, res) => {
  */
 exports.getAccessory = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id)
-    .populate("categoryId", "name")
-    .populate("createdBy", "name email");
+    .populate('categoryId', 'name')
+    .populate('createdBy', 'name email');
 
   if (!accessory) {
-    throw new ApiError(404, "Accessory not found");
+    throw new ApiError(404, 'Accessory not found');
   }
 
   res.json({
@@ -167,14 +167,14 @@ exports.getAccessory = asyncHandler(async (req, res) => {
 exports.updateAccessory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, "Validation Error", errors.array());
+    throw new ApiError(400, 'Validation Error', errors.array());
   }
 
   const { key, title, delta, isActive, order } = req.body;
 
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
-    throw new ApiError(404, "Accessory not found");
+    throw new ApiError(404, 'Accessory not found');
   }
 
   // Check if key is being changed and if it conflicts
@@ -187,7 +187,7 @@ exports.updateAccessory = asyncHandler(async (req, res) => {
     if (existingAccessory) {
       throw new ApiError(
         400,
-        "Accessory with this key already exists for this category"
+        'Accessory with this key already exists for this category'
       );
     }
   }
@@ -197,12 +197,12 @@ exports.updateAccessory = asyncHandler(async (req, res) => {
     { ...req.body, updatedBy: req.user._id },
     { new: true, runValidators: true }
   )
-    .populate("categoryId", "name")
-    .populate("createdBy", "name email");
+    .populate('categoryId', 'name')
+    .populate('createdBy', 'name email');
 
   res.json({
     success: true,
-    message: "Accessory updated successfully",
+    message: 'Accessory updated successfully',
     data: updatedAccessory,
   });
 });
@@ -220,7 +220,7 @@ exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
     // Group by categoryId
     const byCategory = {};
     accessories.forEach((acc) => {
-      const catId = acc.categoryId ? acc.categoryId.toString() : "null";
+      const catId = acc.categoryId ? acc.categoryId.toString() : 'null';
       if (!byCategory[catId]) {
         byCategory[catId] = [];
       }
@@ -258,7 +258,7 @@ exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
   } catch (error) {
     throw new ApiError(
       500,
-      "Failed to reindex accessory orders: " + error.message
+      'Failed to reindex accessory orders: ' + error.message
     );
   }
 });
@@ -270,8 +270,8 @@ exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
  */
 exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
   try {
-    const SellProduct = require("../models/sellProduct.model");
-    const mongoose = require("mongoose");
+    const SellProduct = require('../models/sellProduct.model');
+    const mongoose = require('mongoose');
 
     // Get all accessories with productId field
     const accessories = await SellAccessory.find({}).lean();
@@ -281,16 +281,16 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
     // Migrate productId to categoryId
     for (const acc of accessories) {
       // Check if it has productId field (even if null)
-      if ("productId" in acc) {
+      if ('productId' in acc) {
         if (acc.productId && !acc.categoryId) {
           // Get the product to find its categoryId
           const product = await SellProduct.findById(acc.productId).select(
-            "categoryId"
+            'categoryId'
           );
 
           if (product && product.categoryId) {
             // Update with categoryId and remove productId
-            await mongoose.connection.collection("sellaccessories").updateOne(
+            await mongoose.connection.collection('sellaccessories').updateOne(
               { _id: acc._id },
               {
                 $set: { categoryId: product.categoryId },
@@ -302,7 +302,7 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
         } else if (!acc.productId && !acc.categoryId) {
           // Remove empty productId field
           await mongoose.connection
-            .collection("sellaccessories")
+            .collection('sellaccessories')
             .updateOne({ _id: acc._id }, { $unset: { productId: 1 } });
         }
       }
@@ -313,7 +313,7 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
     const byCategory = {};
 
     updatedAccessories.forEach((acc) => {
-      const catId = acc.categoryId ? acc.categoryId.toString() : "null";
+      const catId = acc.categoryId ? acc.categoryId.toString() : 'null';
       if (!byCategory[catId]) byCategory[catId] = [];
       byCategory[catId].push(acc);
     });
@@ -342,7 +342,7 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
       data: { migratedCount, reindexedCount },
     });
   } catch (error) {
-    throw new ApiError(500, "Migration failed: " + error.message);
+    throw new ApiError(500, 'Migration failed: ' + error.message);
   }
 });
 
@@ -354,14 +354,14 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
 exports.deleteAccessory = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
-    throw new ApiError(404, "Accessory not found");
+    throw new ApiError(404, 'Accessory not found');
   }
 
   await accessory.deleteOne();
 
   res.json({
     success: true,
-    message: "Accessory deleted successfully",
+    message: 'Accessory deleted successfully',
   });
 });
 
@@ -374,17 +374,17 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
   const { categoryId, accessories } = req.body;
 
   // Verify category exists
-  const Category = require("../models/category.model");
+  const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, "Category not found");
+    throw new ApiError(404, 'Category not found');
   }
 
   // Validate accessories array
   if (!Array.isArray(accessories) || accessories.length === 0) {
     throw new ApiError(
       400,
-      "Accessories array is required and cannot be empty"
+      'Accessories array is required and cannot be empty'
     );
   }
 
@@ -396,7 +396,7 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
   if (duplicateKeys.length > 0) {
     throw new ApiError(
       400,
-      `Duplicate keys found in request: ${duplicateKeys.join(", ")}`
+      `Duplicate keys found in request: ${duplicateKeys.join(', ')}`
     );
   }
 
@@ -411,7 +411,7 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
     throw new ApiError(
       400,
       `Accessories with these keys already exist for this category: ${existingKeys.join(
-        ", "
+        ', '
       )}`
     );
   }
@@ -434,9 +434,8 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
   }));
 
   // Bulk insert
-  const createdAccessories = await SellAccessory.insertMany(
-    accessoriesToCreate
-  );
+  const createdAccessories =
+    await SellAccessory.insertMany(accessoriesToCreate);
 
   res.status(201).json({
     success: true,
@@ -454,17 +453,17 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
   const { categoryId, accessoryIds } = req.body;
 
   // Verify category exists
-  const Category = require("../models/category.model");
+  const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, "Category not found");
+    throw new ApiError(404, 'Category not found');
   }
 
   // Validate accessoryIds array
   if (!Array.isArray(accessoryIds) || accessoryIds.length === 0) {
     throw new ApiError(
       400,
-      "Accessory IDs array is required and cannot be empty"
+      'Accessory IDs array is required and cannot be empty'
     );
   }
 
@@ -477,7 +476,7 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
   if (accessories.length !== accessoryIds.length) {
     throw new ApiError(
       400,
-      "Some accessories do not belong to the specified category"
+      'Some accessories do not belong to the specified category'
     );
   }
 
@@ -494,7 +493,7 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Accessories reordered successfully",
+    message: 'Accessories reordered successfully',
     data: updatedAccessories,
   });
 });
@@ -507,7 +506,7 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
 exports.toggleAccessoryStatus = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
-    throw new ApiError(404, "Accessory not found");
+    throw new ApiError(404, 'Accessory not found');
   }
 
   accessory.isActive = !accessory.isActive;
@@ -516,7 +515,7 @@ exports.toggleAccessoryStatus = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: `Accessory ${
-      accessory.isActive ? "activated" : "deactivated"
+      accessory.isActive ? 'activated' : 'deactivated'
     } successfully`,
     data: accessory,
   });

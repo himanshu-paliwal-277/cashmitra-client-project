@@ -12,7 +12,7 @@ exports.attachPartner = async (req, res, next) => {
     }
 
     const partner = await Partner.findOne({ user: req.user.id });
-    
+
     if (!partner) {
       throw new ApiError(404, 'Partner profile not found');
     }
@@ -64,7 +64,10 @@ exports.checkResourceOwnership = (Model, resourceIdParam = 'id') => {
           throw new ApiError(404, 'Resource not found');
         }
 
-        if (resource.partnerId && resource.partnerId.toString() !== req.partnerId.toString()) {
+        if (
+          resource.partnerId &&
+          resource.partnerId.toString() !== req.partnerId.toString()
+        ) {
           throw new ApiError(403, 'You can only access your own resources');
         }
       }

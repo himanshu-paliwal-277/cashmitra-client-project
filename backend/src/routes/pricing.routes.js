@@ -1,164 +1,164 @@
-const express = require("express");
-const { check } = require("express-validator");
-const pricingController = require("../controllers/pricing.controller");
-const { protect, authorize } = require("../middlewares/auth.middleware");
-const { validateRequest } = require("../middlewares/validation.middleware");
-const { asyncHandler } = require("../middlewares/errorHandler.middleware");
+const express = require('express');
+const { check } = require('express-validator');
+const pricingController = require('../controllers/pricing.controller');
+const { protect, authorize } = require('../middlewares/auth.middleware');
+const { validateRequest } = require('../middlewares/validation.middleware');
+const { asyncHandler } = require('../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
 // Apply authentication and admin authorization to all routes
 router.use(protect);
-router.use(authorize("admin"));
+router.use(authorize('admin'));
 
 // Validation rules
 const createPricingValidation = [
-  check("product")
+  check('product')
     .notEmpty()
-    .withMessage("Product ID is required")
+    .withMessage('Product ID is required')
     .isMongoId()
-    .withMessage("Invalid product ID"),
-  check("basePrice")
+    .withMessage('Invalid product ID'),
+  check('basePrice')
     .notEmpty()
-    .withMessage("Base price is required")
+    .withMessage('Base price is required')
     .isNumeric()
-    .withMessage("Base price must be a number")
+    .withMessage('Base price must be a number')
     .isFloat({ min: 0 })
-    .withMessage("Base price must be positive"),
-  check("conditions")
+    .withMessage('Base price must be positive'),
+  check('conditions')
     .optional()
     .isObject()
-    .withMessage("Conditions must be an object"),
-  check("conditions.excellent.percentage")
+    .withMessage('Conditions must be an object'),
+  check('conditions.excellent.percentage')
     .optional()
     .isNumeric()
-    .withMessage("Excellent percentage must be a number")
+    .withMessage('Excellent percentage must be a number')
     .isFloat({ min: 0, max: 100 })
-    .withMessage("Excellent percentage must be between 0 and 100"),
-  check("conditions.good.percentage")
+    .withMessage('Excellent percentage must be between 0 and 100'),
+  check('conditions.good.percentage')
     .optional()
     .isNumeric()
-    .withMessage("Good percentage must be a number")
+    .withMessage('Good percentage must be a number')
     .isFloat({ min: 0, max: 100 })
-    .withMessage("Good percentage must be between 0 and 100"),
-  check("conditions.fair.percentage")
+    .withMessage('Good percentage must be between 0 and 100'),
+  check('conditions.fair.percentage')
     .optional()
     .isNumeric()
-    .withMessage("Fair percentage must be a number")
+    .withMessage('Fair percentage must be a number')
     .isFloat({ min: 0, max: 100 })
-    .withMessage("Fair percentage must be between 0 and 100"),
-  check("conditions.poor.percentage")
+    .withMessage('Fair percentage must be between 0 and 100'),
+  check('conditions.poor.percentage')
     .optional()
     .isNumeric()
-    .withMessage("Poor percentage must be a number")
+    .withMessage('Poor percentage must be a number')
     .isFloat({ min: 0, max: 100 })
-    .withMessage("Poor percentage must be between 0 and 100"),
-  check("marketAdjustments")
+    .withMessage('Poor percentage must be between 0 and 100'),
+  check('marketAdjustments')
     .optional()
     .isObject()
-    .withMessage("Market adjustments must be an object"),
-  check("marketAdjustments.demandMultiplier")
+    .withMessage('Market adjustments must be an object'),
+  check('marketAdjustments.demandMultiplier')
     .optional()
     .isNumeric()
-    .withMessage("Demand multiplier must be a number")
+    .withMessage('Demand multiplier must be a number')
     .isFloat({ min: 0.1, max: 3.0 })
-    .withMessage("Demand multiplier must be between 0.1 and 3.0"),
-  check("marketAdjustments.seasonalAdjustment")
+    .withMessage('Demand multiplier must be between 0.1 and 3.0'),
+  check('marketAdjustments.seasonalAdjustment')
     .optional()
     .isNumeric()
-    .withMessage("Seasonal adjustment must be a number")
+    .withMessage('Seasonal adjustment must be a number')
     .isFloat({ min: -50, max: 50 })
-    .withMessage("Seasonal adjustment must be between -50% and 50%"),
-  check("marketAdjustments.competitorPricing")
+    .withMessage('Seasonal adjustment must be between -50% and 50%'),
+  check('marketAdjustments.competitorPricing')
     .optional()
     .isNumeric()
-    .withMessage("Competitor pricing must be a number")
+    .withMessage('Competitor pricing must be a number')
     .isFloat({ min: 0 })
-    .withMessage("Competitor pricing must be positive"),
-  check("isActive")
+    .withMessage('Competitor pricing must be positive'),
+  check('isActive')
     .optional()
     .isBoolean()
-    .withMessage("isActive must be a boolean"),
+    .withMessage('isActive must be a boolean'),
 ];
 
 const updatePricingValidation = [
-  check("basePrice")
+  check('basePrice')
     .optional()
     .isNumeric()
-    .withMessage("Base price must be a number")
+    .withMessage('Base price must be a number')
     .isFloat({ min: 0 })
-    .withMessage("Base price must be positive"),
-  check("conditions")
+    .withMessage('Base price must be positive'),
+  check('conditions')
     .optional()
     .isObject()
-    .withMessage("Conditions must be an object"),
-  check("conditions.excellent.percentage")
+    .withMessage('Conditions must be an object'),
+  check('conditions.excellent.percentage')
     .optional()
     .isNumeric()
-    .withMessage("Excellent percentage must be a number")
+    .withMessage('Excellent percentage must be a number')
     .isFloat({ min: 0, max: 100 })
-    .withMessage("Excellent percentage must be between 0 and 100"),
-  check("conditions.good.percentage")
+    .withMessage('Excellent percentage must be between 0 and 100'),
+  check('conditions.good.percentage')
     .optional()
     .isNumeric()
-    .withMessage("Good percentage must be a number")
+    .withMessage('Good percentage must be a number')
     .isFloat({ min: 0, max: 100 })
-    .withMessage("Good percentage must be between 0 and 100"),
-  check("conditions.fair.percentage")
+    .withMessage('Good percentage must be between 0 and 100'),
+  check('conditions.fair.percentage')
     .optional()
     .isNumeric()
-    .withMessage("Fair percentage must be a number")
+    .withMessage('Fair percentage must be a number')
     .isFloat({ min: 0, max: 100 })
-    .withMessage("Fair percentage must be between 0 and 100"),
-  check("conditions.poor.percentage")
+    .withMessage('Fair percentage must be between 0 and 100'),
+  check('conditions.poor.percentage')
     .optional()
     .isNumeric()
-    .withMessage("Poor percentage must be a number")
+    .withMessage('Poor percentage must be a number')
     .isFloat({ min: 0, max: 100 })
-    .withMessage("Poor percentage must be between 0 and 100"),
-  check("marketAdjustments")
+    .withMessage('Poor percentage must be between 0 and 100'),
+  check('marketAdjustments')
     .optional()
     .isObject()
-    .withMessage("Market adjustments must be an object"),
-  check("marketAdjustments.demandMultiplier")
+    .withMessage('Market adjustments must be an object'),
+  check('marketAdjustments.demandMultiplier')
     .optional()
     .isNumeric()
-    .withMessage("Demand multiplier must be a number")
+    .withMessage('Demand multiplier must be a number')
     .isFloat({ min: 0.1, max: 3.0 })
-    .withMessage("Demand multiplier must be between 0.1 and 3.0"),
-  check("marketAdjustments.seasonalAdjustment")
+    .withMessage('Demand multiplier must be between 0.1 and 3.0'),
+  check('marketAdjustments.seasonalAdjustment')
     .optional()
     .isNumeric()
-    .withMessage("Seasonal adjustment must be a number")
+    .withMessage('Seasonal adjustment must be a number')
     .isFloat({ min: -50, max: 50 })
-    .withMessage("Seasonal adjustment must be between -50% and 50%"),
-  check("marketAdjustments.competitorPricing")
+    .withMessage('Seasonal adjustment must be between -50% and 50%'),
+  check('marketAdjustments.competitorPricing')
     .optional()
     .isNumeric()
-    .withMessage("Competitor pricing must be a number")
+    .withMessage('Competitor pricing must be a number')
     .isFloat({ min: 0 })
-    .withMessage("Competitor pricing must be positive"),
-  check("isActive")
+    .withMessage('Competitor pricing must be positive'),
+  check('isActive')
     .optional()
     .isBoolean()
-    .withMessage("isActive must be a boolean"),
+    .withMessage('isActive must be a boolean'),
 ];
 
 const bulkUpdateValidation = [
-  check("updates")
+  check('updates')
     .isArray({ min: 1 })
-    .withMessage("Updates array is required and must not be empty"),
-  check("updates.*.id").isMongoId().withMessage("Invalid pricing ID"),
-  check("updates.*.basePrice")
+    .withMessage('Updates array is required and must not be empty'),
+  check('updates.*.id').isMongoId().withMessage('Invalid pricing ID'),
+  check('updates.*.basePrice')
     .optional()
     .isNumeric()
-    .withMessage("Base price must be a number")
+    .withMessage('Base price must be a number')
     .isFloat({ min: 0 })
-    .withMessage("Base price must be positive"),
-  check("updates.*.isActive")
+    .withMessage('Base price must be positive'),
+  check('updates.*.isActive')
     .optional()
     .isBoolean()
-    .withMessage("isActive must be a boolean"),
+    .withMessage('isActive must be a boolean'),
 ];
 
 // Routes
@@ -166,18 +166,18 @@ const bulkUpdateValidation = [
 // @route   GET /api/admin/pricing/stats
 // @desc    Get pricing statistics
 // @access  Private/Admin
-router.get("/stats", asyncHandler(pricingController.getPricingStats));
+router.get('/stats', asyncHandler(pricingController.getPricingStats));
 
 // @route   GET /api/admin/pricing
 // @desc    Get all pricing configurations with filtering and pagination
 // @access  Private/Admin
-router.get("/", asyncHandler(pricingController.getPricingConfigs));
+router.get('/', asyncHandler(pricingController.getPricingConfigs));
 
 // @route   POST /api/admin/pricing
 // @desc    Create new pricing configuration
 // @access  Private/Admin
 router.post(
-  "/",
+  '/',
   createPricingValidation,
   validateRequest,
   asyncHandler(pricingController.createPricingConfig)
@@ -187,7 +187,7 @@ router.post(
 // @desc    Bulk update pricing configurations
 // @access  Private/Admin
 router.put(
-  "/bulk",
+  '/bulk',
   bulkUpdateValidation,
   validateRequest,
   asyncHandler(pricingController.bulkUpdatePricing)
@@ -197,8 +197,8 @@ router.put(
 // @desc    Get single pricing configuration
 // @access  Private/Admin
 router.get(
-  "/:id",
-  [check("id").isMongoId().withMessage("Invalid pricing ID")],
+  '/:id',
+  [check('id').isMongoId().withMessage('Invalid pricing ID')],
   validateRequest,
   asyncHandler(pricingController.getPricingConfig)
 );
@@ -207,9 +207,9 @@ router.get(
 // @desc    Update pricing configuration
 // @access  Private/Admin
 router.put(
-  "/:id",
+  '/:id',
   [
-    check("id").isMongoId().withMessage("Invalid pricing ID"),
+    check('id').isMongoId().withMessage('Invalid pricing ID'),
     ...updatePricingValidation,
   ],
   validateRequest,
@@ -220,8 +220,8 @@ router.put(
 // @desc    Delete pricing configuration
 // @access  Private/Admin
 router.delete(
-  "/:id",
-  [check("id").isMongoId().withMessage("Invalid pricing ID")],
+  '/:id',
+  [check('id').isMongoId().withMessage('Invalid pricing ID')],
   validateRequest,
   asyncHandler(pricingController.deletePricingConfig)
 );
@@ -230,8 +230,8 @@ router.delete(
 // @desc    Get pricing for specific product
 // @access  Private/Admin
 router.get(
-  "/product/:productId",
-  [check("productId").isMongoId().withMessage("Invalid product ID")],
+  '/product/:productId',
+  [check('productId').isMongoId().withMessage('Invalid product ID')],
   validateRequest,
   asyncHandler(pricingController.getPricingByProduct)
 );
@@ -240,17 +240,17 @@ router.get(
 // @desc    Calculate final price with adjustments
 // @access  Private/Admin
 router.post(
-  "/:id/calculate",
+  '/:id/calculate',
   [
-    check("id").isMongoId().withMessage("Invalid pricing ID"),
-    check("condition")
+    check('id').isMongoId().withMessage('Invalid pricing ID'),
+    check('condition')
       .optional()
-      .isIn(["excellent", "good", "fair", "poor"])
-      .withMessage("Invalid condition"),
-    check("adjustments")
+      .isIn(['excellent', 'good', 'fair', 'poor'])
+      .withMessage('Invalid condition'),
+    check('adjustments')
       .optional()
       .isArray()
-      .withMessage("Adjustments must be an array"),
+      .withMessage('Adjustments must be an array'),
   ],
   validateRequest,
   asyncHandler(pricingController.calculatePrice)

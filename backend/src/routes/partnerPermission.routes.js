@@ -33,7 +33,7 @@ router.get(
       .notEmpty()
       .withMessage('Menu item is required')
       .isAlphanumeric()
-      .withMessage('Menu item must be alphanumeric')
+      .withMessage('Menu item must be alphanumeric'),
   ],
   protect,
   authorize('partner'),
@@ -84,7 +84,7 @@ router.get(
     query('isActive')
       .optional()
       .isBoolean()
-      .withMessage('isActive must be a boolean')
+      .withMessage('isActive must be a boolean'),
   ],
   protect,
   authorize('admin'),
@@ -116,7 +116,9 @@ router.post(
       .notEmpty()
       .withMessage('Role template name is required')
       .isAlphanumeric('en-US', { ignore: '_-' })
-      .withMessage('Role template name must be alphanumeric with underscores or hyphens')
+      .withMessage(
+        'Role template name must be alphanumeric with underscores or hyphens'
+      )
       .isLength({ min: 2, max: 50 })
       .withMessage('Role template name must be between 2 and 50 characters'),
     check('displayName')
@@ -145,7 +147,7 @@ router.post(
     check('limits')
       .optional()
       .isObject()
-      .withMessage('Limits must be an object')
+      .withMessage('Limits must be an object'),
   ],
   protect,
   authorize('admin'),
@@ -161,9 +163,7 @@ router.post(
 router.put(
   '/admin/role-templates/:templateId',
   [
-    param('templateId')
-      .notEmpty()
-      .withMessage('Template ID is required'),
+    param('templateId').notEmpty().withMessage('Template ID is required'),
     check('displayName')
       .optional()
       .isLength({ min: 2, max: 100 })
@@ -189,7 +189,7 @@ router.put(
     check('limits')
       .optional()
       .isObject()
-      .withMessage('Limits must be an object')
+      .withMessage('Limits must be an object'),
   ],
   protect,
   authorize('admin'),
@@ -204,11 +204,7 @@ router.put(
  */
 router.delete(
   '/admin/role-templates/:templateId',
-  [
-    param('templateId')
-      .notEmpty()
-      .withMessage('Template ID is required')
-  ],
+  [param('templateId').notEmpty().withMessage('Template ID is required')],
   protect,
   authorize('admin'),
   validateRequest,
@@ -239,7 +235,9 @@ router.post(
       .notEmpty()
       .withMessage('Permission name is required')
       .isAlphanumeric('en-US', { ignore: '_-' })
-      .withMessage('Permission name must be alphanumeric with underscores or hyphens only')
+      .withMessage(
+        'Permission name must be alphanumeric with underscores or hyphens only'
+      )
       .isLength({ min: 2, max: 50 })
       .withMessage('Permission name must be between 2 and 50 characters'),
     check('displayName')
@@ -256,7 +254,15 @@ router.post(
     check('category')
       .notEmpty()
       .withMessage('Category is required')
-      .isIn(['Dashboard', 'Inventory Management', 'Order Management', 'Financial Management', 'Analytics & Reports', 'Support & Communication', 'Settings'])
+      .isIn([
+        'Dashboard',
+        'Inventory Management',
+        'Order Management',
+        'Financial Management',
+        'Analytics & Reports',
+        'Support & Communication',
+        'Settings',
+      ])
       .withMessage('Invalid category'),
     check('path')
       .optional()
@@ -269,7 +275,7 @@ router.post(
       .isString()
       .trim()
       .isLength({ max: 50 })
-      .withMessage('Icon name cannot exceed 50 characters')
+      .withMessage('Icon name cannot exceed 50 characters'),
   ],
   protect,
   authorize('admin'),
@@ -284,11 +290,7 @@ router.post(
  */
 router.get(
   '/admin/:partnerId',
-  [
-    param('partnerId')
-      .isMongoId()
-      .withMessage('Invalid partner ID')
-  ],
+  [param('partnerId').isMongoId().withMessage('Invalid partner ID')],
   protect,
   authorize('admin'),
   validateRequest,
@@ -303,9 +305,7 @@ router.get(
 router.put(
   '/admin/:partnerId',
   [
-    param('partnerId')
-      .isMongoId()
-      .withMessage('Invalid partner ID'),
+    param('partnerId').isMongoId().withMessage('Invalid partner ID'),
     check('permissions')
       .optional()
       .isObject()
@@ -359,7 +359,7 @@ router.put(
     check('features.prioritySupport')
       .optional()
       .isBoolean()
-      .withMessage('Priority support must be a boolean')
+      .withMessage('Priority support must be a boolean'),
   ],
   protect,
   authorize('admin'),
@@ -375,9 +375,7 @@ router.put(
 router.post(
   '/admin/:partnerId/grant',
   [
-    param('partnerId')
-      .isMongoId()
-      .withMessage('Invalid partner ID'),
+    param('partnerId').isMongoId().withMessage('Invalid partner ID'),
     check('menuItem')
       .notEmpty()
       .withMessage('Menu item is required')
@@ -406,7 +404,7 @@ router.post(
     check('restrictions.maxDailyTransactions')
       .optional()
       .isInt({ min: 0 })
-      .withMessage('Max daily transactions must be a positive integer')
+      .withMessage('Max daily transactions must be a positive integer'),
   ],
   protect,
   authorize('admin'),
@@ -422,14 +420,12 @@ router.post(
 router.post(
   '/admin/:partnerId/revoke',
   [
-    param('partnerId')
-      .isMongoId()
-      .withMessage('Invalid partner ID'),
+    param('partnerId').isMongoId().withMessage('Invalid partner ID'),
     check('menuItem')
       .notEmpty()
       .withMessage('Menu item is required')
       .isAlphanumeric()
-      .withMessage('Menu item must be alphanumeric')
+      .withMessage('Menu item must be alphanumeric'),
   ],
   protect,
   authorize('admin'),
@@ -445,14 +441,12 @@ router.post(
 router.post(
   '/admin/:partnerId/apply-role',
   [
-    param('partnerId')
-      .isMongoId()
-      .withMessage('Invalid partner ID'),
+    param('partnerId').isMongoId().withMessage('Invalid partner ID'),
     check('roleTemplate')
       .notEmpty()
       .withMessage('Role template is required')
       .isIn(['basic', 'seller', 'premium', 'enterprise', 'custom'])
-      .withMessage('Invalid role template')
+      .withMessage('Invalid role template'),
   ],
   protect,
   authorize('admin'),

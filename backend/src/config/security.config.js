@@ -5,13 +5,13 @@
 const securityConfig = {
   // CORS configuration
   cors: {
-    origin:  '*',
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
     exposedHeaders: ['X-CSRF-Token'],
-    credentials: true
+    credentials: true,
   },
-  
+
   // Helmet configuration for HTTP security headers
   helmet: {
     contentSecurityPolicy: {
@@ -24,14 +24,14 @@ const securityConfig = {
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],
-        frameSrc: ["'none'"]
-      }
+        frameSrc: ["'none'"],
+      },
     },
     xssFilter: true,
     noSniff: true,
-    referrerPolicy: { policy: 'same-origin' }
+    referrerPolicy: { policy: 'same-origin' },
   },
-  
+
   // Rate limiting configuration
   rateLimit: {
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -40,10 +40,10 @@ const securityConfig = {
     legacyHeaders: false,
     message: {
       success: false,
-      message: 'Too many requests, please try again later.'
-    }
+      message: 'Too many requests, please try again later.',
+    },
   },
-  
+
   // Authentication rate limiting (for login/register)
   authRateLimit: {
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -52,10 +52,10 @@ const securityConfig = {
     legacyHeaders: false,
     message: {
       success: false,
-      message: 'Too many authentication attempts, please try again later.'
-    }
+      message: 'Too many authentication attempts, please try again later.',
+    },
   },
-  
+
   // Session configuration
   session: {
     secret: process.env.SESSION_SECRET || 'cashify-secret-key',
@@ -65,15 +65,15 @@ const securityConfig = {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
   },
-  
+
   // JWT configuration
   jwt: {
     secret: process.env.JWT_SECRET || 'cashify-jwt-secret',
-    expiresIn: '1d'
-  }
+    expiresIn: '1d',
+  },
 };
 
 module.exports = securityConfig;

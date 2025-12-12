@@ -1,10 +1,10 @@
-const Finance = require("../models/finance.model");
-const Transaction = require("../models/transaction.model");
-const { Order } = require("../models/order.model");
-const User = require("../models/user.model");
-const Partner = require("../models/partner.model");
-const { validationResult } = require("express-validator");
-const mongoose = require("mongoose");
+const Finance = require('../models/finance.model');
+const Transaction = require('../models/transaction.model');
+const { Order } = require('../models/order.model');
+const User = require('../models/user.model');
+const Partner = require('../models/partner.model');
+const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 // @desc    Get all financial transactions (Finance + Wallet Transactions)
 // @route   GET /api/admin/finance
@@ -21,15 +21,15 @@ const getFinancialTransactions = async (req, res) => {
       partnerId,
       startDate,
       endDate,
-      sortBy = "createdAt",
-      sortOrder = "desc",
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
     } = req.query;
 
     // Build filter object for Finance transactions
     const financeFilter = {};
     if (
       transactionType &&
-      ["commission", "refund", "adjustment", "withdrawal", "deposit"].includes(
+      ['commission', 'refund', 'adjustment', 'withdrawal', 'deposit'].includes(
         transactionType
       )
     ) {
@@ -44,7 +44,7 @@ const getFinancialTransactions = async (req, res) => {
     const walletFilter = {};
     if (
       transactionType &&
-      ["payout", "commission", "wallet_credit", "wallet_debit"].includes(
+      ['payout', 'commission', 'wallet_credit', 'wallet_debit'].includes(
         transactionType
       )
     ) {
@@ -66,31 +66,31 @@ const getFinancialTransactions = async (req, res) => {
 
     // Get Finance transactions
     const financeTransactions = await Finance.find(financeFilter)
-      .populate("order", "orderType totalAmount")
-      .populate("user", "name email")
-      .populate("partner", "shopName shopEmail businessName email")
-      .populate("processedBy", "name email")
+      .populate('order', 'orderType totalAmount')
+      .populate('user', 'name email')
+      .populate('partner', 'shopName shopEmail businessName email')
+      .populate('processedBy', 'name email')
       .lean();
 
     // Get Wallet transactions
     const walletTransactions = await Transaction.find(walletFilter)
-      .populate("order", "orderType totalAmount")
-      .populate("user", "name email")
-      .populate("partner", "shopName shopEmail businessName email")
+      .populate('order', 'orderType totalAmount')
+      .populate('user', 'name email')
+      .populate('partner', 'shopName shopEmail businessName email')
       .lean();
 
     // Merge and normalize transactions
     const allTransactions = [
       ...financeTransactions.map((t) => ({
         ...t,
-        source: "finance",
+        source: 'finance',
         // Normalize fields for consistent display
-        paymentMethod: t.paymentMethod || "N/A",
+        paymentMethod: t.paymentMethod || 'N/A',
         description: t.description || `${t.transactionType} transaction`,
       })),
       ...walletTransactions.map((t) => ({
         ...t,
-        source: "wallet",
+        source: 'wallet',
         // Normalize fields for consistent display
         category: t.transactionType,
         description: t.description || `${t.transactionType} transaction`,
@@ -98,18 +98,18 @@ const getFinancialTransactions = async (req, res) => {
     ];
 
     // Sort merged transactions
-    const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
+    const sortOptions = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
     allTransactions.sort((a, b) => {
       const aValue = a[sortBy];
       const bValue = b[sortBy];
 
-      if (sortBy === "createdAt") {
-        return sortOrder === "desc"
+      if (sortBy === 'createdAt') {
+        return sortOrder === 'desc'
           ? new Date(bValue) - new Date(aValue)
           : new Date(aValue) - new Date(bValue);
       }
 
-      if (sortOrder === "desc") {
+      if (sortOrder === 'desc') {
         return bValue > aValue ? 1 : -1;
       } else {
         return aValue > bValue ? 1 : -1;
@@ -161,7 +161,7 @@ const getFinancialTransactions = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -171,22 +171,22 @@ const getFinancialTransactions = async (req, res) => {
 const getFinancialTransaction = async (req, res) => {
   try {
     const transaction = await Finance.findById(req.params.id)
-      .populate("order", "orderType totalAmount items")
-      .populate("user", "name email phone")
-      .populate("partner", "businessName email phone")
-      .populate("processedBy", "name email");
+      .populate('order', 'orderType totalAmount items')
+      .populate('user', 'name email phone')
+      .populate('partner', 'businessName email phone')
+      .populate('processedBy', 'name email');
 
     if (!transaction) {
-      return res.status(404).json({ message: "Transaction not found" });
+      return res.status(404).json({ message: 'Transaction not found' });
     }
 
     res.json(transaction);
   } catch (error) {
     console.error(error);
-    if (error.kind === "ObjectId") {
-      return res.status(404).json({ message: "Transaction not found" });
+    if (error.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Transaction not found' });
     }
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -209,15 +209,15 @@ const createFinancialTransaction = async (req, res) => {
     await transaction.save();
 
     const populatedTransaction = await Finance.findById(transaction._id)
-      .populate("order", "orderType totalAmount")
-      .populate("user", "name email")
-      .populate("partner", "businessName email")
-      .populate("processedBy", "name email");
+      .populate('order', 'orderType totalAmount')
+      .populate('user', 'name email')
+      .populate('partner', 'businessName email')
+      .populate('processedBy', 'name email');
 
     res.status(201).json(populatedTransaction);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -233,11 +233,11 @@ const updateFinancialTransaction = async (req, res) => {
 
     const transaction = await Finance.findById(req.params.id);
     if (!transaction) {
-      return res.status(404).json({ message: "Transaction not found" });
+      return res.status(404).json({ message: 'Transaction not found' });
     }
 
     // If status is being changed to processed, update processed fields
-    if (req.body.status === "processed" && transaction.status !== "processed") {
+    if (req.body.status === 'processed' && transaction.status !== 'processed') {
       req.body.processedBy = req.user.id;
       req.body.processedAt = new Date();
     }
@@ -247,18 +247,18 @@ const updateFinancialTransaction = async (req, res) => {
       { $set: req.body },
       { new: true, runValidators: true }
     )
-      .populate("order", "orderType totalAmount")
-      .populate("user", "name email")
-      .populate("partner", "businessName email")
-      .populate("processedBy", "name email");
+      .populate('order', 'orderType totalAmount')
+      .populate('user', 'name email')
+      .populate('partner', 'businessName email')
+      .populate('processedBy', 'name email');
 
     res.json(updatedTransaction);
   } catch (error) {
     console.error(error);
-    if (error.kind === "ObjectId") {
-      return res.status(404).json({ message: "Transaction not found" });
+    if (error.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Transaction not found' });
     }
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -269,25 +269,25 @@ const processTransaction = async (req, res) => {
   try {
     const transaction = await Finance.findById(req.params.id);
     if (!transaction) {
-      return res.status(404).json({ message: "Transaction not found" });
+      return res.status(404).json({ message: 'Transaction not found' });
     }
 
-    if (transaction.status === "processed") {
-      return res.status(400).json({ message: "Transaction already processed" });
+    if (transaction.status === 'processed') {
+      return res.status(400).json({ message: 'Transaction already processed' });
     }
 
     await transaction.processTransaction(req.user.id);
 
     const updatedTransaction = await Finance.findById(req.params.id)
-      .populate("order", "orderType totalAmount")
-      .populate("user", "name email")
-      .populate("partner", "businessName email")
-      .populate("processedBy", "name email");
+      .populate('order', 'orderType totalAmount')
+      .populate('user', 'name email')
+      .populate('partner', 'businessName email')
+      .populate('processedBy', 'name email');
 
     res.json(updatedTransaction);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -304,8 +304,8 @@ const getCommissionSummary = async (req, res) => {
     const totalStats = await Finance.aggregate([
       {
         $match: {
-          transactionType: "commission",
-          status: "processed",
+          transactionType: 'commission',
+          status: 'processed',
           ...(startDate &&
             endDate && {
               processedAt: {
@@ -318,9 +318,9 @@ const getCommissionSummary = async (req, res) => {
       {
         $group: {
           _id: null,
-          totalCommission: { $sum: "$commission.amount" },
-          totalTransactionValue: { $sum: "$amount" },
-          avgCommissionRate: { $avg: "$commission.rate" },
+          totalCommission: { $sum: '$commission.amount' },
+          totalTransactionValue: { $sum: '$amount' },
+          avgCommissionRate: { $avg: '$commission.rate' },
           transactionCount: { $sum: 1 },
         },
       },
@@ -337,7 +337,7 @@ const getCommissionSummary = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -352,7 +352,7 @@ const getPartnerEarnings = async (req, res) => {
     // Validate partner exists
     const partner = await Partner.findById(partnerId);
     if (!partner) {
-      return res.status(404).json({ message: "Partner not found" });
+      return res.status(404).json({ message: 'Partner not found' });
     }
 
     const earnings = await Finance.getPartnerEarnings(
@@ -366,7 +366,7 @@ const getPartnerEarnings = async (req, res) => {
       {
         $match: {
           partner: mongoose.Types.ObjectId(partnerId),
-          status: "processed",
+          status: 'processed',
           ...(startDate &&
             endDate && {
               processedAt: {
@@ -378,9 +378,9 @@ const getPartnerEarnings = async (req, res) => {
       },
       {
         $group: {
-          _id: "$transactionType",
-          totalAmount: { $sum: "$amount" },
-          totalCommission: { $sum: "$commission.amount" },
+          _id: '$transactionType',
+          totalAmount: { $sum: '$amount' },
+          totalCommission: { $sum: '$commission.amount' },
           count: { $sum: 1 },
         },
       },
@@ -403,7 +403,7 @@ const getPartnerEarnings = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -412,7 +412,7 @@ const getPartnerEarnings = async (req, res) => {
 // @access  Private/Admin
 const getFinancialDashboard = async (req, res) => {
   try {
-    const { period = "30" } = req.query; // days
+    const { period = '30' } = req.query; // days
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - parseInt(period));
 
@@ -426,18 +426,18 @@ const getFinancialDashboard = async (req, res) => {
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: "$amount" },
-          totalCommission: { $sum: "$commission.amount" },
+          totalRevenue: { $sum: '$amount' },
+          totalCommission: { $sum: '$commission.amount' },
           totalTransactions: { $sum: 1 },
-          avgTransactionValue: { $avg: "$amount" },
+          avgTransactionValue: { $avg: '$amount' },
           pendingAmount: {
             $sum: {
-              $cond: [{ $eq: ["$status", "pending"] }, "$amount", 0],
+              $cond: [{ $eq: ['$status', 'pending'] }, '$amount', 0],
             },
           },
           processedAmount: {
             $sum: {
-              $cond: [{ $eq: ["$status", "processed"] }, "$amount", 0],
+              $cond: [{ $eq: ['$status', 'processed'] }, '$amount', 0],
             },
           },
         },
@@ -449,19 +449,19 @@ const getFinancialDashboard = async (req, res) => {
       {
         $match: {
           createdAt: { $gte: startDate },
-          status: "processed",
+          status: 'processed',
         },
       },
       {
         $group: {
           _id: {
             $dateToString: {
-              format: "%Y-%m-%d",
-              date: "$createdAt",
+              format: '%Y-%m-%d',
+              date: '$createdAt',
             },
           },
-          revenue: { $sum: "$amount" },
-          commission: { $sum: "$commission.amount" },
+          revenue: { $sum: '$amount' },
+          commission: { $sum: '$commission.amount' },
           transactions: { $sum: 1 },
         },
       },
@@ -477,8 +477,8 @@ const getFinancialDashboard = async (req, res) => {
       },
       {
         $group: {
-          _id: "$transactionType",
-          amount: { $sum: "$amount" },
+          _id: '$transactionType',
+          amount: { $sum: '$amount' },
           count: { $sum: 1 },
         },
       },
@@ -491,26 +491,26 @@ const getFinancialDashboard = async (req, res) => {
         $match: {
           partner: { $exists: true },
           createdAt: { $gte: startDate },
-          status: "processed",
+          status: 'processed',
         },
       },
       {
         $group: {
-          _id: "$partner",
-          totalEarnings: { $sum: "$amount" },
-          totalCommission: { $sum: "$commission.amount" },
+          _id: '$partner',
+          totalEarnings: { $sum: '$amount' },
+          totalCommission: { $sum: '$commission.amount' },
           transactionCount: { $sum: 1 },
         },
       },
       {
         $lookup: {
-          from: "partners",
-          localField: "_id",
-          foreignField: "_id",
-          as: "partnerInfo",
+          from: 'partners',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'partnerInfo',
         },
       },
-      { $unwind: "$partnerInfo" },
+      { $unwind: '$partnerInfo' },
       { $sort: { totalEarnings: -1 } },
       { $limit: 10 },
     ]);
@@ -530,7 +530,7 @@ const getFinancialDashboard = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -544,7 +544,7 @@ const exportFinancialData = async (req, res) => {
       endDate,
       transactionType,
       status,
-      format = "json",
+      format = 'json',
     } = req.query;
 
     const filter = {};
@@ -558,36 +558,36 @@ const exportFinancialData = async (req, res) => {
     }
 
     const transactions = await Finance.find(filter)
-      .populate("order", "orderType totalAmount")
-      .populate("user", "name email")
-      .populate("partner", "businessName email")
-      .populate("processedBy", "name email")
+      .populate('order', 'orderType totalAmount')
+      .populate('user', 'name email')
+      .populate('partner', 'businessName email')
+      .populate('processedBy', 'name email')
       .sort({ createdAt: -1 })
       .lean();
 
-    if (format === "csv") {
+    if (format === 'csv') {
       // Convert to CSV format
       const csvData = transactions.map((t) => ({
-        Date: t.createdAt.toISOString().split("T")[0],
+        Date: t.createdAt.toISOString().split('T')[0],
         Type: t.transactionType,
         Amount: t.amount,
         Commission: t.commission?.amount || 0,
         Status: t.status,
-        User: t.user?.name || "",
-        Partner: t.partner?.businessName || "",
-        Description: t.description || "",
+        User: t.user?.name || '',
+        Partner: t.partner?.businessName || '',
+        Description: t.description || '',
       }));
 
-      res.setHeader("Content-Type", "text/csv");
+      res.setHeader('Content-Type', 'text/csv');
       res.setHeader(
-        "Content-Disposition",
-        "attachment; filename=financial-data.csv"
+        'Content-Disposition',
+        'attachment; filename=financial-data.csv'
       );
 
       // Simple CSV conversion (in production, use a proper CSV library)
-      const headers = Object.keys(csvData[0] || {}).join(",");
-      const rows = csvData.map((row) => Object.values(row).join(","));
-      const csv = [headers, ...rows].join("\n");
+      const headers = Object.keys(csvData[0] || {}).join(',');
+      const rows = csvData.map((row) => Object.values(row).join(','));
+      const csv = [headers, ...rows].join('\n');
 
       res.send(csv);
     } else {
@@ -605,7 +605,7 @@ const exportFinancialData = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -618,17 +618,17 @@ module.exports = {
     try {
       const transaction = await Finance.findById(req.params.id);
       if (!transaction) {
-        return res.status(404).json({ message: "Transaction not found" });
+        return res.status(404).json({ message: 'Transaction not found' });
       }
 
       await Finance.findByIdAndDelete(req.params.id);
-      res.json({ message: "Transaction deleted successfully" });
+      res.json({ message: 'Transaction deleted successfully' });
     } catch (error) {
       console.error(error);
-      if (error.kind === "ObjectId") {
-        return res.status(404).json({ message: "Transaction not found" });
+      if (error.kind === 'ObjectId') {
+        return res.status(404).json({ message: 'Transaction not found' });
       }
-      res.status(500).json({ message: "Server Error", error: error.message });
+      res.status(500).json({ message: 'Server Error', error: error.message });
     }
   },
   processTransaction,
@@ -638,7 +638,7 @@ module.exports = {
   exportFinancialData,
   getRevenueAnalytics: async (req, res) => {
     try {
-      const { period = "monthly", months = 6 } = req.query;
+      const { period = 'monthly', months = 6 } = req.query;
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - parseInt(months));
 
@@ -646,39 +646,39 @@ module.exports = {
         {
           $match: {
             createdAt: { $gte: startDate },
-            status: "processed",
+            status: 'processed',
           },
         },
         {
           $group: {
             _id: {
-              year: { $year: "$createdAt" },
-              month: { $month: "$createdAt" },
+              year: { $year: '$createdAt' },
+              month: { $month: '$createdAt' },
             },
-            revenue: { $sum: "$amount" },
-            commission: { $sum: "$commission.amount" },
+            revenue: { $sum: '$amount' },
+            commission: { $sum: '$commission.amount' },
             transactions: { $sum: 1 },
           },
         },
-        { $sort: { "_id.year": 1, "_id.month": 1 } },
+        { $sort: { '_id.year': 1, '_id.month': 1 } },
       ]);
 
       res.json({ analytics });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Server Error", error: error.message });
+      res.status(500).json({ message: 'Server Error', error: error.message });
     }
   },
   getCommissionTrends: async (req, res) => {
     try {
-      const { period = "daily", days = 30 } = req.query;
+      const { period = 'daily', days = 30 } = req.query;
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - parseInt(days));
 
       const trends = await Finance.aggregate([
         {
           $match: {
-            transactionType: "commission",
+            transactionType: 'commission',
             createdAt: { $gte: startDate },
           },
         },
@@ -686,12 +686,12 @@ module.exports = {
           $group: {
             _id: {
               $dateToString: {
-                format: "%Y-%m-%d",
-                date: "$createdAt",
+                format: '%Y-%m-%d',
+                date: '$createdAt',
               },
             },
-            totalCommission: { $sum: "$commission.amount" },
-            avgCommissionRate: { $avg: "$commission.rate" },
+            totalCommission: { $sum: '$commission.amount' },
+            avgCommissionRate: { $avg: '$commission.rate' },
             count: { $sum: 1 },
           },
         },
@@ -701,7 +701,7 @@ module.exports = {
       res.json({ trends });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Server Error", error: error.message });
+      res.status(500).json({ message: 'Server Error', error: error.message });
     }
   },
   reconcileTransactions: async (req, res) => {
@@ -731,17 +731,17 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Server Error", error: error.message });
+      res.status(500).json({ message: 'Server Error', error: error.message });
     }
   },
   getPendingPayments: async (req, res) => {
     try {
       const pendingPayments = await Finance.find({
-        status: "pending",
-        transactionType: { $in: ["payment", "withdrawal"] },
+        status: 'pending',
+        transactionType: { $in: ['payment', 'withdrawal'] },
       })
-        .populate("partner", "businessName email")
-        .populate("user", "name email")
+        .populate('partner', 'businessName email')
+        .populate('user', 'name email')
         .sort({ createdAt: -1 });
 
       const totalPending = pendingPayments.reduce(
@@ -758,7 +758,7 @@ module.exports = {
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Server Error", error: error.message });
+      res.status(500).json({ message: 'Server Error', error: error.message });
     }
   },
   processPayment: async (req, res) => {
@@ -767,14 +767,14 @@ module.exports = {
 
       const transaction = await Finance.findById(transactionId);
       if (!transaction) {
-        return res.status(404).json({ message: "Transaction not found" });
+        return res.status(404).json({ message: 'Transaction not found' });
       }
 
-      if (transaction.status !== "pending") {
-        return res.status(400).json({ message: "Transaction is not pending" });
+      if (transaction.status !== 'pending') {
+        return res.status(400).json({ message: 'Transaction is not pending' });
       }
 
-      transaction.status = "processed";
+      transaction.status = 'processed';
       transaction.processedBy = req.user.id;
       transaction.processedAt = new Date();
       transaction.paymentMethod = paymentMethod;
@@ -783,17 +783,17 @@ module.exports = {
       await transaction.save();
 
       const updatedTransaction = await Finance.findById(transactionId)
-        .populate("partner", "businessName email")
-        .populate("user", "name email")
-        .populate("processedBy", "name email");
+        .populate('partner', 'businessName email')
+        .populate('user', 'name email')
+        .populate('processedBy', 'name email');
 
       res.json({
-        message: "Payment processed successfully",
+        message: 'Payment processed successfully',
         transaction: updatedTransaction,
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Server Error", error: error.message });
+      res.status(500).json({ message: 'Server Error', error: error.message });
     }
   },
 };

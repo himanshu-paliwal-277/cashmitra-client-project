@@ -14,7 +14,10 @@ const SellQuestion = require('../models/sellQuestion.model');
 const SellDefect = require('../models/sellDefect.model');
 const SellAccessory = require('../models/sellAccessory.model');
 const Pickup = require('../models/pickup.model');
-const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middleware');
+const {
+  ApiError,
+  asyncHandler,
+} = require('../middlewares/errorHandler.middleware');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -32,8 +35,11 @@ exports.login = asyncHandler(async (req, res) => {
   }
 
   // Find user with agent role
-  const user = await User.findOne({ email: email.toLowerCase(), role: 'agent' }).select('+password');
-  
+  const user = await User.findOne({
+    email: email.toLowerCase(),
+    role: 'agent',
+  }).select('+password');
+
   if (!user) {
     throw new ApiError(401, 'Invalid credentials');
   }
@@ -45,34 +51,37 @@ exports.login = asyncHandler(async (req, res) => {
     isActive: user.isActive,
     isActiveType: typeof user.isActive,
     isVerified: user.isVerified,
-    hasPassword: !!user.password
+    hasPassword: !!user.password,
   });
 
   // Check if user is active
   if (!user.isActive) {
-    throw new ApiError(403, 'Your account has been deactivated. Please contact admin.');
+    throw new ApiError(
+      403,
+      'Your account has been deactivated. Please contact admin.'
+    );
   }
 
   // Verify password
   const isPasswordValid = await bcrypt.compare(password, user.password);
-  
+
   if (!isPasswordValid) {
     throw new ApiError(401, 'Invalid credentials');
   }
 
   // Get agent profile
   const agent = await Agent.findOne({ user: user._id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
 
   // Generate JWT token
   const token = jwt.sign(
-    { 
-      id: user._id, 
+    {
+      id: user._id,
       role: user.role,
-      agentId: agent._id
+      agentId: agent._id,
     },
     process.env.JWT_SECRET,
     { expiresIn: '30d' }
@@ -97,9 +106,9 @@ exports.login = asyncHandler(async (req, res) => {
         coverageAreas: agent.coverageAreas,
         maxPickupsPerDay: agent.maxPickupsPerDay,
         isActive: agent.isActive,
-        performanceMetrics: agent.performanceMetrics
-      }
-    }
+        performanceMetrics: agent.performanceMetrics,
+      },
+    },
   });
 });
 
@@ -119,7 +128,7 @@ exports.getProfile = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: agent
+    data: agent,
   });
 });
 
@@ -130,7 +139,7 @@ exports.getProfile = asyncHandler(async (req, res) => {
  */
 exports.getTodayOrders = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -142,7 +151,7 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
   // Get today's date range
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
-  
+
   const endOfDay = new Date();
   endOfDay.setHours(23, 59, 59, 999);
 
@@ -153,14 +162,17 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
   const todayPickups = await Pickup.find({
     agent: agent._id,
     scheduledDate: { $gte: startOfDay, $lte: endOfDay },
-    status: { $in: ['scheduled', 'in_progress', 'picked'] }
+    status: { $in: ['scheduled', 'in_progress', 'picked'] },
   })
     .populate({
       path: 'order',
       populate: [
-        { path: 'sessionId', populate: { path: 'productId', select: 'name images' } },
-        { path: 'userId', select: 'name email phone' }
-      ]
+        {
+          path: 'sessionId',
+          populate: { path: 'productId', select: 'name images' },
+        },
+        { path: 'userId', select: 'name email phone' },
+      ],
     })
     .sort({ scheduledTime: 1 });
 
@@ -170,12 +182,12 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
   const todaySellOrders = await SellOrder.find({
     assignedTo: req.user.id, // Use USER ID for assignment
     'pickup.slot.date': { $gte: startOfDay, $lte: endOfDay },
-    status: { $in: ['draft', 'confirmed', 'picked', 'paid'] } // Include draft status
+    status: { $in: ['draft', 'confirmed', 'picked', 'paid'] }, // Include draft status
   })
     .populate('sessionId')
     .populate({
       path: 'sessionId',
-      populate: { path: 'productId', select: 'name images' }
+      populate: { path: 'productId', select: 'name images' },
     })
     .populate('userId', 'name email phone')
     .populate('assignedTo', 'name phone email')
@@ -186,41 +198,46 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
   // OPTION 3: Also fetch ALL sell orders assigned to agent (for debugging/showing all assignments)
   const allAssignedSellOrders = await SellOrder.find({
     assignedTo: req.user.id,
-    status: { $nin: ['cancelled'] } // Exclude only cancelled orders
+    status: { $nin: ['cancelled'] }, // Exclude only cancelled orders
   })
     .populate('sessionId')
     .populate({
       path: 'sessionId',
-      populate: { path: 'productId', select: 'name images' }
+      populate: { path: 'productId', select: 'name images' },
     })
     .populate('userId', 'name email phone')
     .populate('assignedTo', 'name phone email')
     .sort({ 'pickup.slot.date': -1 })
     .limit(50); // Limit to 50 recent orders
 
-  console.log('All assigned sell orders (any date):', allAssignedSellOrders.length);
-  
+  console.log(
+    'All assigned sell orders (any date):',
+    allAssignedSellOrders.length
+  );
+
   // Log the dates of all assigned orders for debugging
   if (allAssignedSellOrders.length > 0) {
     console.log('Assigned order dates:');
-    allAssignedSellOrders.forEach(order => {
-      console.log(`  - ${order.orderNumber}: ${order.pickup?.slot?.date || 'No date'} (Status: ${order.status})`);
+    allAssignedSellOrders.forEach((order) => {
+      console.log(
+        `  - ${order.orderNumber}: ${order.pickup?.slot?.date || 'No date'} (Status: ${order.status})`
+      );
     });
   }
 
   // Get orders from pickups
-  const pickupOrders = todayPickups.map(pickup => ({
+  const pickupOrders = todayPickups.map((pickup) => ({
     pickupId: pickup._id,
     orderId: pickup.order._id,
     orderNumber: pickup.order.orderNumber,
     customer: {
       name: pickup.order.userId?.name,
       phone: pickup.order.userId?.phone,
-      email: pickup.order.userId?.email
+      email: pickup.order.userId?.email,
     },
     product: {
       name: pickup.order.sessionId?.productId?.name,
-      image: pickup.order.sessionId?.productId?.images?.[0] || null
+      image: pickup.order.sessionId?.productId?.images?.[0] || null,
     },
     pickupAddress: pickup.pickupAddress,
     scheduledTime: pickup.scheduledTime,
@@ -228,62 +245,68 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
     quoteAmount: pickup.order.quoteAmount,
     finalPrice: pickup.order.finalPrice,
     paymentStatus: pickup.order.paymentStatus,
-    sourceType: 'pickup'
+    sourceType: 'pickup',
   }));
 
   // Get orders directly from sell orders
-  const sellOrders = todaySellOrders.map(order => ({
+  const sellOrders = todaySellOrders.map((order) => ({
     orderId: order._id,
     orderNumber: order.orderNumber,
     customer: {
       name: order.pickup?.address?.fullName || order.userId?.name,
       phone: order.pickup?.address?.phone || order.userId?.phone,
-      email: order.userId?.email
+      email: order.userId?.email,
     },
     product: {
       name: order.sessionId?.productId?.name,
-      image: order.sessionId?.productId?.images?.[0] || null
+      image: order.sessionId?.productId?.images?.[0] || null,
     },
-    pickupAddress: order.pickup?.address ? {
-      street: order.pickup.address.street,
-      city: order.pickup.address.city,
-      state: order.pickup.address.state,
-      pincode: order.pickup.address.pincode
-    } : null,
+    pickupAddress: order.pickup?.address
+      ? {
+          street: order.pickup.address.street,
+          city: order.pickup.address.city,
+          state: order.pickup.address.state,
+          pincode: order.pickup.address.pincode,
+        }
+      : null,
     scheduledTime: order.pickup?.slot?.date,
     status: order.status,
     quoteAmount: order.quoteAmount,
     actualAmount: order.actualAmount,
     paymentStatus: order.paymentStatus || 'pending',
     assignedAgent: order.assignedTo,
-    sourceType: 'sellOrder'
+    sourceType: 'sellOrder',
   }));
 
   // If no orders for today but agent has assigned orders, include ALL assigned orders
   let allOrders = [...pickupOrders, ...sellOrders];
-  
+
   if (allOrders.length === 0 && allAssignedSellOrders.length > 0) {
-    console.log('⚠️  No orders for today, but agent has assigned orders with different dates');
+    console.log(
+      '⚠️  No orders for today, but agent has assigned orders with different dates'
+    );
     console.log('   Including all assigned orders regardless of date...');
-    
-    const allAssignedOrders = allAssignedSellOrders.map(order => ({
+
+    const allAssignedOrders = allAssignedSellOrders.map((order) => ({
       orderId: order._id,
       orderNumber: order.orderNumber,
       customer: {
         name: order.pickup?.address?.fullName || order.userId?.name,
         phone: order.pickup?.address?.phone || order.userId?.phone,
-        email: order.userId?.email
+        email: order.userId?.email,
       },
       product: {
         name: order.sessionId?.productId?.name,
-        image: order.sessionId?.productId?.images?.[0] || null
+        image: order.sessionId?.productId?.images?.[0] || null,
       },
-      pickupAddress: order.pickup?.address ? {
-        street: order.pickup.address.street,
-        city: order.pickup.address.city,
-        state: order.pickup.address.state,
-        pincode: order.pickup.address.pincode
-      } : null,
+      pickupAddress: order.pickup?.address
+        ? {
+            street: order.pickup.address.street,
+            city: order.pickup.address.city,
+            state: order.pickup.address.state,
+            pincode: order.pickup.address.pincode,
+          }
+        : null,
       scheduledTime: order.pickup?.slot?.date,
       status: order.status,
       quoteAmount: order.quoteAmount,
@@ -291,9 +314,9 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
       paymentStatus: order.paymentStatus || 'pending',
       assignedAgent: order.assignedTo,
       sourceType: 'sellOrder',
-      note: 'Pickup date is not today'
+      note: 'Pickup date is not today',
     }));
-    
+
     allOrders = allAssignedOrders;
   }
 
@@ -304,7 +327,7 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     count: allOrders.length,
-    data: allOrders
+    data: allOrders,
   });
 });
 
@@ -315,7 +338,7 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
  */
 exports.getTomorrowOrders = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -324,7 +347,7 @@ exports.getTomorrowOrders = asyncHandler(async (req, res) => {
   const startOfTomorrow = new Date();
   startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
   startOfTomorrow.setHours(0, 0, 0, 0);
-  
+
   const endOfTomorrow = new Date();
   endOfTomorrow.setDate(endOfTomorrow.getDate() + 1);
   endOfTomorrow.setHours(23, 59, 59, 999);
@@ -333,41 +356,44 @@ exports.getTomorrowOrders = asyncHandler(async (req, res) => {
   const tomorrowPickups = await Pickup.find({
     agent: agent._id,
     scheduledDate: { $gte: startOfTomorrow, $lte: endOfTomorrow },
-    status: { $in: ['scheduled', 'confirmed'] }
+    status: { $in: ['scheduled', 'confirmed'] },
   })
     .populate({
       path: 'order',
       populate: [
-        { path: 'sessionId', populate: { path: 'productId', select: 'name images' } },
-        { path: 'userId', select: 'name email phone' }
-      ]
+        {
+          path: 'sessionId',
+          populate: { path: 'productId', select: 'name images' },
+        },
+        { path: 'userId', select: 'name email phone' },
+      ],
     })
     .sort({ scheduledTime: 1 });
 
   // Get orders from pickups
-  const orders = tomorrowPickups.map(pickup => ({
+  const orders = tomorrowPickups.map((pickup) => ({
     pickupId: pickup._id,
     orderId: pickup.order._id,
     orderNumber: pickup.order.orderNumber,
     customer: {
       name: pickup.order.userId?.name,
       phone: pickup.order.userId?.phone,
-      email: pickup.order.userId?.email
+      email: pickup.order.userId?.email,
     },
     product: {
       name: pickup.order.sessionId?.productId?.name,
-      image: pickup.order.sessionId?.productId?.images?.[0] || null
+      image: pickup.order.sessionId?.productId?.images?.[0] || null,
     },
     pickupAddress: pickup.pickupAddress,
     scheduledTime: pickup.scheduledTime,
     status: pickup.status,
-    quoteAmount: pickup.order.quoteAmount
+    quoteAmount: pickup.order.quoteAmount,
   }));
 
   res.json({
     success: true,
     count: orders.length,
-    data: orders
+    data: orders,
   });
 });
 
@@ -378,7 +404,7 @@ exports.getTomorrowOrders = asyncHandler(async (req, res) => {
  */
 exports.getPastOrders = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -395,8 +421,8 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
     agent: agent._id,
     $or: [
       { scheduledDate: { $lt: today } },
-      { status: { $in: ['completed', 'cancelled'] } }
-    ]
+      { status: { $in: ['completed', 'cancelled'] } },
+    ],
   };
 
   if (status) {
@@ -408,9 +434,12 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
     .populate({
       path: 'order',
       populate: [
-        { path: 'sessionId', populate: { path: 'productId', select: 'name images' } },
-        { path: 'userId', select: 'name email phone' }
-      ]
+        {
+          path: 'sessionId',
+          populate: { path: 'productId', select: 'name images' },
+        },
+        { path: 'userId', select: 'name email phone' },
+      ],
     })
     .sort({ scheduledDate: -1, scheduledTime: -1 })
     .skip(skip)
@@ -419,17 +448,17 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
   const total = await Pickup.countDocuments(filter);
 
   // Get orders from pickups
-  const orders = pastPickups.map(pickup => ({
+  const orders = pastPickups.map((pickup) => ({
     pickupId: pickup._id,
     orderId: pickup.order._id,
     orderNumber: pickup.order.orderNumber,
     customer: {
       name: pickup.order.userId?.name,
-      phone: pickup.order.userId?.phone
+      phone: pickup.order.userId?.phone,
     },
     product: {
       name: pickup.order.sessionId?.productId?.name,
-      image: pickup.order.sessionId?.productId?.images?.[0] || null
+      image: pickup.order.sessionId?.productId?.images?.[0] || null,
     },
     pickupAddress: pickup.pickupAddress,
     scheduledDate: pickup.scheduledDate,
@@ -438,7 +467,7 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
     status: pickup.status,
     quoteAmount: pickup.order.quoteAmount,
     finalPrice: pickup.order.finalPrice,
-    paymentStatus: pickup.order.paymentStatus
+    paymentStatus: pickup.order.paymentStatus,
   }));
 
   res.json({
@@ -447,7 +476,7 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
     total,
     page: parseInt(page),
     pages: Math.ceil(total / limit),
-    data: orders
+    data: orders,
   });
 });
 
@@ -458,7 +487,7 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
  */
 exports.getOrderDetails = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -471,10 +500,13 @@ exports.getOrderDetails = asyncHandler(async (req, res) => {
       path: 'sessionId',
       populate: [
         { path: 'productId', select: 'name images variants' },
-        { path: 'selectedAnswers.questionId', select: 'questionText type options' },
+        {
+          path: 'selectedAnswers.questionId',
+          select: 'questionText type options',
+        },
         { path: 'selectedDefects', select: 'name description impact' },
-        { path: 'includedAccessories', select: 'name description' }
-      ]
+        { path: 'includedAccessories', select: 'name description' },
+      ],
     })
     .populate('userId', 'name email phone')
     .populate('partnerId', 'shopName shopEmail');
@@ -496,41 +528,44 @@ exports.getOrderDetails = asyncHandler(async (req, res) => {
     orderNumber: order.orderNumber,
     status: order.status,
     paymentStatus: order.paymentStatus,
-    
+
     customer: {
       name: order.userId?.name,
       email: order.userId?.email,
-      phone: order.userId?.phone
+      phone: order.userId?.phone,
     },
 
     product: {
       name: order.sessionId?.productId?.name,
       images: order.sessionId?.productId?.images || [],
-      variant: order.sessionId?.selectedVariant
+      variant: order.sessionId?.selectedVariant,
     },
 
     pricing: {
       quoteAmount: order.quoteAmount,
       finalPrice: order.finalPrice,
       adjustmentReason: order.adjustmentReason,
-      currency: 'INR'
+      currency: 'INR',
     },
 
     evaluation: {
-      answers: order.sessionId?.selectedAnswers?.map(ans => ({
-        question: ans.questionId?.questionText,
-        answer: ans.answer,
-        type: ans.questionId?.type
-      })) || [],
-      defects: order.sessionId?.selectedDefects?.map(def => ({
-        name: def.name,
-        description: def.description,
-        impact: def.impact
-      })) || [],
-      accessories: order.sessionId?.includedAccessories?.map(acc => ({
-        name: acc.name,
-        description: acc.description
-      })) || []
+      answers:
+        order.sessionId?.selectedAnswers?.map((ans) => ({
+          question: ans.questionId?.questionText,
+          answer: ans.answer,
+          type: ans.questionId?.type,
+        })) || [],
+      defects:
+        order.sessionId?.selectedDefects?.map((def) => ({
+          name: def.name,
+          description: def.description,
+          impact: def.impact,
+        })) || [],
+      accessories:
+        order.sessionId?.includedAccessories?.map((acc) => ({
+          name: acc.name,
+          description: acc.description,
+        })) || [],
     },
 
     pickup: {
@@ -541,18 +576,18 @@ exports.getOrderDetails = asyncHandler(async (req, res) => {
       status: pickup.status,
       notes: pickup.notes,
       actualPickupTime: pickup.actualPickupTime,
-      completedAt: pickup.completedAt
+      completedAt: pickup.completedAt,
     },
 
     timestamps: {
       createdAt: order.createdAt,
-      updatedAt: order.updatedAt
-    }
+      updatedAt: order.updatedAt,
+    },
   };
 
   res.json({
     success: true,
-    data: orderDetails
+    data: orderDetails,
   });
 });
 
@@ -563,7 +598,7 @@ exports.getOrderDetails = asyncHandler(async (req, res) => {
  */
 exports.startPickup = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -577,7 +612,10 @@ exports.startPickup = asyncHandler(async (req, res) => {
   }
 
   if (pickup.status !== 'scheduled' && pickup.status !== 'confirmed') {
-    throw new ApiError(400, `Cannot start pickup with status: ${pickup.status}`);
+    throw new ApiError(
+      400,
+      `Cannot start pickup with status: ${pickup.status}`
+    );
   }
 
   pickup.status = 'in_progress';
@@ -587,7 +625,7 @@ exports.startPickup = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Pickup started successfully',
-    data: pickup
+    data: pickup,
   });
 });
 
@@ -608,13 +646,13 @@ exports.getEvaluationQuestions = asyncHandler(async (req, res) => {
   // Get questions for this product's category
   const questions = await SellQuestion.find({
     categoryId: product.categoryId._id,
-    isActive: true
+    isActive: true,
   }).sort({ order: 1 });
 
   // Get defects for this category
   const defects = await SellDefect.find({
     categoryId: product.categoryId._id,
-    isActive: true
+    isActive: true,
   }).sort({ severity: -1 });
 
   res.json({
@@ -624,26 +662,26 @@ exports.getEvaluationQuestions = asyncHandler(async (req, res) => {
         _id: product._id,
         name: product.name,
         images: product.images,
-        category: product.categoryId.name
+        category: product.categoryId.name,
       },
-      questions: questions.map(q => ({
+      questions: questions.map((q) => ({
         _id: q._id,
         questionText: q.questionText,
         type: q.type,
         options: q.options,
         priceImpact: q.priceImpact,
         order: q.order,
-        isRequired: q.isRequired
+        isRequired: q.isRequired,
       })),
-      defects: defects.map(d => ({
+      defects: defects.map((d) => ({
         _id: d._id,
         name: d.name,
         description: d.description,
         severity: d.severity,
         priceDeduction: d.priceDeduction,
-        category: d.category
-      }))
-    }
+        category: d.category,
+      })),
+    },
   });
 });
 
@@ -656,17 +694,16 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
   const { orderId, answers, selectedDefects, physicalInspection } = req.body;
 
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
 
   // Find the order
-  const order = await SellOrder.findById(orderId)
-    .populate({
-      path: 'sessionId',
-      populate: { path: 'productId', select: 'name variants' }
-    });
+  const order = await SellOrder.findById(orderId).populate({
+    path: 'sessionId',
+    populate: { path: 'productId', select: 'name variants' },
+  });
 
   if (!order) {
     throw new ApiError(404, 'Order not found');
@@ -674,14 +711,14 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
 
   // Verify this order is assigned to this agent
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
-  
+
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
 
   // Get base price from the selected variant
   const variant = order.sessionId.productId.variants.find(
-    v => v.label === order.sessionId.selectedVariant
+    (v) => v.label === order.sessionId.selectedVariant
   );
 
   if (!variant) {
@@ -694,10 +731,12 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
   if (answers && answers.length > 0) {
     for (const answer of answers) {
       const question = await SellQuestion.findById(answer.questionId);
-      
+
       if (question && question.priceImpact) {
-        const selectedOption = question.options.find(opt => opt.value === answer.answer);
-        
+        const selectedOption = question.options.find(
+          (opt) => opt.value === answer.answer
+        );
+
         if (selectedOption && selectedOption.priceAdjustment) {
           if (selectedOption.adjustmentType === 'percentage') {
             finalPrice -= (finalPrice * selectedOption.priceAdjustment) / 100;
@@ -713,7 +752,7 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
   if (selectedDefects && selectedDefects.length > 0) {
     for (const defectId of selectedDefects) {
       const defect = await SellDefect.findById(defectId);
-      
+
       if (defect && defect.priceDeduction) {
         if (defect.deductionType === 'percentage') {
           finalPrice -= (finalPrice * defect.priceDeduction) / 100;
@@ -751,8 +790,11 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
       basePrice: variant.basePrice,
       calculatedPrice: finalPrice,
       adjustment: order.quoteAmount - finalPrice,
-      adjustmentPercentage: ((order.quoteAmount - finalPrice) / order.quoteAmount * 100).toFixed(2)
-    }
+      adjustmentPercentage: (
+        ((order.quoteAmount - finalPrice) / order.quoteAmount) *
+        100
+      ).toFixed(2),
+    },
   });
 });
 
@@ -763,27 +805,33 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
  */
 exports.completeEvaluation = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
 
   const { pickupId } = req.params;
-  const { finalPrice, adjustmentReason, answers, selectedDefects, photos } = req.body;
+  const { finalPrice, adjustmentReason, answers, selectedDefects, photos } =
+    req.body;
 
   if (!finalPrice) {
     throw new ApiError(400, 'Final price is required');
   }
 
-  const pickup = await Pickup.findOne({ _id: pickupId, agent: agent._id })
-    .populate('order');
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    agent: agent._id,
+  }).populate('order');
 
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found or not assigned to you');
   }
 
   if (pickup.status !== 'in_progress' && pickup.status !== 'picked') {
-    throw new ApiError(400, `Cannot complete evaluation with status: ${pickup.status}`);
+    throw new ApiError(
+      400,
+      `Cannot complete evaluation with status: ${pickup.status}`
+    );
   }
 
   // Update order with final evaluation
@@ -793,7 +841,7 @@ exports.completeEvaluation = asyncHandler(async (req, res) => {
   order.evaluatedBy = agent._id;
   order.evaluatedAt = new Date();
   order.status = 'evaluated';
-  
+
   if (photos) {
     order.evaluationPhotos = photos;
   }
@@ -807,7 +855,7 @@ exports.completeEvaluation = asyncHandler(async (req, res) => {
     answers,
     selectedDefects,
     finalPrice,
-    adjustmentReason
+    adjustmentReason,
   };
   pickup.completedAt = new Date();
   await pickup.save();
@@ -827,9 +875,9 @@ exports.completeEvaluation = asyncHandler(async (req, res) => {
       status: order.status,
       pickup: {
         status: pickup.status,
-        completedAt: pickup.completedAt
-      }
-    }
+        completedAt: pickup.completedAt,
+      },
+    },
   });
 });
 
@@ -840,7 +888,7 @@ exports.completeEvaluation = asyncHandler(async (req, res) => {
  */
 exports.completePayment = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -860,7 +908,7 @@ exports.completePayment = asyncHandler(async (req, res) => {
 
   // Verify this order is assigned to this agent
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
-  
+
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
@@ -892,8 +940,8 @@ exports.completePayment = asyncHandler(async (req, res) => {
       paymentStatus: order.paymentStatus,
       paymentMethod: order.paymentMethod,
       amount: order.finalPrice,
-      paidAt: order.paidAt
-    }
+      paidAt: order.paidAt,
+    },
   });
 });
 
@@ -904,7 +952,7 @@ exports.completePayment = asyncHandler(async (req, res) => {
  */
 exports.getStatistics = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -916,51 +964,54 @@ exports.getStatistics = asyncHandler(async (req, res) => {
   const todayPickups = await Pickup.countDocuments({
     agent: agent._id,
     scheduledDate: { $gte: today },
-    status: { $in: ['scheduled', 'in_progress', 'picked'] }
+    status: { $in: ['scheduled', 'in_progress', 'picked'] },
   });
 
   const completedToday = await Pickup.countDocuments({
     agent: agent._id,
     completedAt: { $gte: today },
-    status: 'completed'
+    status: 'completed',
   });
 
   // Get this month's stats
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  
+
   const monthlyPickups = await Pickup.countDocuments({
     agent: agent._id,
     createdAt: { $gte: startOfMonth },
-    status: 'completed'
+    status: 'completed',
   });
 
   // Calculate total earnings this month
   const monthlyOrders = await SellOrder.find({
     evaluatedBy: agent._id,
     evaluatedAt: { $gte: startOfMonth },
-    status: 'completed'
+    status: 'completed',
   });
 
-  const monthlyEarnings = monthlyOrders.reduce((sum, order) => sum + (order.finalPrice || 0), 0);
+  const monthlyEarnings = monthlyOrders.reduce(
+    (sum, order) => sum + (order.finalPrice || 0),
+    0
+  );
 
   res.json({
     success: true,
     data: {
       today: {
         scheduled: todayPickups,
-        completed: completedToday
+        completed: completedToday,
       },
       thisMonth: {
         totalPickups: monthlyPickups,
-        totalEarnings: monthlyEarnings
+        totalEarnings: monthlyEarnings,
       },
       overall: {
         totalPickups: agent.performanceMetrics.totalPickups,
         completedPickups: agent.performanceMetrics.completedPickups,
         rating: agent.performanceMetrics.rating,
-        totalReviews: agent.performanceMetrics.totalReviews
-      }
-    }
+        totalReviews: agent.performanceMetrics.totalReviews,
+      },
+    },
   });
 });
 
@@ -977,14 +1028,14 @@ exports.updateLocation = asyncHandler(async (req, res) => {
   }
 
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
 
   agent.currentLocation = {
     type: 'Point',
-    coordinates: [longitude, latitude]
+    coordinates: [longitude, latitude],
   };
   agent.lastLocationUpdate = new Date();
   await agent.save();
@@ -994,8 +1045,8 @@ exports.updateLocation = asyncHandler(async (req, res) => {
     message: 'Location updated successfully',
     data: {
       location: agent.currentLocation,
-      updatedAt: agent.lastLocationUpdate
-    }
+      updatedAt: agent.lastLocationUpdate,
+    },
   });
 });
 
@@ -1006,7 +1057,7 @@ exports.updateLocation = asyncHandler(async (req, res) => {
  */
 exports.uploadCustomerSelfie = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -1026,7 +1077,7 @@ exports.uploadCustomerSelfie = asyncHandler(async (req, res) => {
 
   // Verify this order is assigned to this agent
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
-  
+
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
@@ -1035,11 +1086,11 @@ exports.uploadCustomerSelfie = asyncHandler(async (req, res) => {
   if (!order.evaluationData) {
     order.evaluationData = {};
   }
-  
+
   order.evaluationData.customerSelfie = selfieImage;
   order.evaluationData.selfieCapturedAt = new Date();
   order.evaluationData.selfieCapturedBy = agent._id;
-  
+
   await order.save();
 
   res.json({
@@ -1049,8 +1100,8 @@ exports.uploadCustomerSelfie = asyncHandler(async (req, res) => {
       orderId: order._id,
       orderNumber: order.orderNumber,
       selfieImage: selfieImage,
-      capturedAt: order.evaluationData.selfieCapturedAt
-    }
+      capturedAt: order.evaluationData.selfieCapturedAt,
+    },
   });
 });
 
@@ -1061,7 +1112,7 @@ exports.uploadCustomerSelfie = asyncHandler(async (req, res) => {
  */
 exports.uploadGadgetImages = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -1077,7 +1128,7 @@ exports.uploadGadgetImages = asyncHandler(async (req, res) => {
 
   // Verify this order is assigned to this agent
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
-  
+
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
@@ -1086,7 +1137,7 @@ exports.uploadGadgetImages = asyncHandler(async (req, res) => {
   if (!order.evaluationData) {
     order.evaluationData = {};
   }
-  
+
   order.evaluationData.gadgetImages = {
     backImage,
     edge1,
@@ -1095,9 +1146,9 @@ exports.uploadGadgetImages = asyncHandler(async (req, res) => {
     edge4,
     frontImage,
     uploadedAt: new Date(),
-    uploadedBy: agent._id
+    uploadedBy: agent._id,
   };
-  
+
   await order.save();
 
   res.json({
@@ -1112,10 +1163,10 @@ exports.uploadGadgetImages = asyncHandler(async (req, res) => {
         edge2: !!edge2,
         edge3: !!edge3,
         edge4: !!edge4,
-        frontImage: !!frontImage
+        frontImage: !!frontImage,
       },
-      uploadedAt: order.evaluationData.gadgetImages.uploadedAt
-    }
+      uploadedAt: order.evaluationData.gadgetImages.uploadedAt,
+    },
   });
 });
 
@@ -1126,7 +1177,7 @@ exports.uploadGadgetImages = asyncHandler(async (req, res) => {
  */
 exports.uploadIMEIScan = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -1146,7 +1197,7 @@ exports.uploadIMEIScan = asyncHandler(async (req, res) => {
 
   // Verify this order is assigned to this agent
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
-  
+
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
@@ -1155,15 +1206,15 @@ exports.uploadIMEIScan = asyncHandler(async (req, res) => {
   if (!order.evaluationData) {
     order.evaluationData = {};
   }
-  
+
   order.evaluationData.imeiScan = {
     image: imeiImage,
     imei1: imei1 || null,
     imei2: imei2 || null,
     scannedAt: new Date(),
-    scannedBy: agent._id
+    scannedBy: agent._id,
   };
-  
+
   await order.save();
 
   res.json({
@@ -1174,8 +1225,8 @@ exports.uploadIMEIScan = asyncHandler(async (req, res) => {
       orderNumber: order.orderNumber,
       imei1,
       imei2,
-      scannedAt: order.evaluationData.imeiScan.scannedAt
-    }
+      scannedAt: order.evaluationData.imeiScan.scannedAt,
+    },
   });
 });
 
@@ -1186,7 +1237,7 @@ exports.uploadIMEIScan = asyncHandler(async (req, res) => {
  */
 exports.reEvaluateDevice = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -1204,17 +1255,19 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
 
   // Verify this order is assigned to this agent
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
-  
+
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
 
   // Get the original session for comparison
   const originalSession = order.offerSession;
-  
+
   // Get product details
   const product = await SellProduct.findById(order.product._id);
-  const variant = product.variants.find(v => v._id.toString() === order.variant.toString());
+  const variant = product.variants.find(
+    (v) => v._id.toString() === order.variant.toString()
+  );
 
   if (!variant) {
     throw new ApiError(404, 'Variant not found');
@@ -1224,32 +1277,37 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
   let basePrice = variant.basePrice;
   let percentDelta = 0;
   let absDelta = 0;
-  const breakdown = [{
-    label: 'Base Price',
-    delta: basePrice,
-    type: 'base'
-  }];
+  const breakdown = [
+    {
+      label: 'Base Price',
+      delta: basePrice,
+      type: 'base',
+    },
+  ];
 
   // Process answers from agent evaluation
   if (answers && typeof answers === 'object') {
     for (const [, answerData] of Object.entries(answers)) {
       if (answerData && answerData.delta) {
         const adjust = answerData.delta.sign === '-' ? -1 : 1;
-        
+
         if (answerData.delta.type === 'percent') {
           percentDelta += adjust * (answerData.delta.value || 0);
         } else {
           absDelta += adjust * (answerData.delta.value || 0);
         }
-        
-        const deltaValue = answerData.delta.type === 'percent' 
-          ? Math.round(basePrice * adjust * answerData.delta.value / 100)
-          : adjust * answerData.delta.value;
-        
+
+        const deltaValue =
+          answerData.delta.type === 'percent'
+            ? Math.round((basePrice * adjust * answerData.delta.value) / 100)
+            : adjust * answerData.delta.value;
+
         breakdown.push({
-          label: answerData.questionText || `Question: ${answerData.answerText || answerData.answerValue}`,
+          label:
+            answerData.questionText ||
+            `Question: ${answerData.answerText || answerData.answerValue}`,
           delta: deltaValue,
-          type: 'question'
+          type: 'question',
         });
       }
     }
@@ -1257,30 +1315,33 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
 
   // Process defects (including duplicates like frontend)
   if (defects && defects.length > 0) {
-    const allDefects = await SellDefect.getForVariants(order.product._id, [order.variant]);
-    
+    const allDefects = await SellDefect.getForVariants(order.product._id, [
+      order.variant,
+    ]);
+
     for (const defectKey of defects) {
-      const defect = allDefects.find(d => 
-        d.key === defectKey || d._id.toString() === defectKey
+      const defect = allDefects.find(
+        (d) => d.key === defectKey || d._id.toString() === defectKey
       );
-      
+
       if (defect && defect.delta) {
         const adjust = defect.delta.sign === '-' ? -1 : 1;
-        
+
         if (defect.delta.type === 'percent') {
           percentDelta += adjust * (defect.delta.value || 0);
         } else {
           absDelta += adjust * (defect.delta.value || 0);
         }
-        
-        const deltaValue = defect.delta.type === 'percent'
-          ? Math.round(basePrice * adjust * defect.delta.value / 100)
-          : adjust * defect.delta.value;
-        
+
+        const deltaValue =
+          defect.delta.type === 'percent'
+            ? Math.round((basePrice * adjust * defect.delta.value) / 100)
+            : adjust * defect.delta.value;
+
         breakdown.push({
           label: defect.title,
           delta: deltaValue,
-          type: 'defect'
+          type: 'defect',
         });
       }
     }
@@ -1288,37 +1349,42 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
 
   // Process accessories
   if (accessories && accessories.length > 0) {
-    const allAccessories = await SellAccessory.getActiveForCategory(product.categoryId);
-    
+    const allAccessories = await SellAccessory.getActiveForCategory(
+      product.categoryId
+    );
+
     for (const accessoryKey of accessories) {
-      const accessory = allAccessories.find(a => 
-        a.key === accessoryKey || a._id.toString() === accessoryKey
+      const accessory = allAccessories.find(
+        (a) => a.key === accessoryKey || a._id.toString() === accessoryKey
       );
-      
+
       if (accessory && accessory.delta) {
         const adjust = accessory.delta.sign === '-' ? -1 : 1;
-        
+
         if (accessory.delta.type === 'percent') {
           percentDelta += adjust * (accessory.delta.value || 0);
         } else {
           absDelta += adjust * (accessory.delta.value || 0);
         }
-        
-        const deltaValue = accessory.delta.type === 'percent'
-          ? Math.round(basePrice * adjust * accessory.delta.value / 100)
-          : adjust * accessory.delta.value;
-        
+
+        const deltaValue =
+          accessory.delta.type === 'percent'
+            ? Math.round((basePrice * adjust * accessory.delta.value) / 100)
+            : adjust * accessory.delta.value;
+
         breakdown.push({
           label: accessory.title,
           delta: deltaValue,
-          type: 'accessory'
+          type: 'accessory',
         });
       }
     }
   }
 
   // Calculate final price - exactly like frontend
-  let reEvaluatedPrice = Math.round(basePrice * (1 + percentDelta / 100) + absDelta);
+  let reEvaluatedPrice = Math.round(
+    basePrice * (1 + percentDelta / 100) + absDelta
+  );
 
   // Apply negotiation if any
   let negotiationAmount = 0;
@@ -1327,7 +1393,7 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
     breakdown.push({
       label: 'Negotiation Adjustment',
       delta: negotiation,
-      type: 'negotiation'
+      type: 'negotiation',
     });
   }
 
@@ -1346,7 +1412,7 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
     finalPrice,
     breakdown,
     evaluatedAt: new Date(),
-    evaluatedBy: agent._id
+    evaluatedBy: agent._id,
   };
 
   // Calculate processing fee
@@ -1358,7 +1424,7 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
   order.status = 'evaluated';
   order.evaluatedBy = agent._id;
   order.evaluatedAt = new Date();
-  
+
   await order.save();
 
   // Update pickup status
@@ -1369,17 +1435,17 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
   const priceComparison = {
     original: {
       quotedPrice: originalSession?.finalPrice || order.quotedPrice,
-      breakdown: originalSession?.breakdown || []
+      breakdown: originalSession?.breakdown || [],
     },
     reEvaluated: {
       price: reEvaluatedPrice,
       negotiation: negotiationAmount,
       finalPrice,
-      breakdown
+      breakdown,
     },
     difference: finalPrice - (originalSession?.finalPrice || order.quotedPrice),
     processingFee,
-    totalAmount: order.finalPrice
+    totalAmount: order.finalPrice,
   };
 
   res.json({
@@ -1391,8 +1457,8 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
       priceComparison,
       agentNotes: agentNotes,
       evaluatedAt: order.evaluatedAt,
-      status: order.status
-    }
+      status: order.status,
+    },
   });
 });
 
@@ -1403,7 +1469,7 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
  */
 exports.getCompleteOrderDetails = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
-  
+
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
@@ -1422,7 +1488,7 @@ exports.getCompleteOrderDetails = asyncHandler(async (req, res) => {
 
   // Verify this order is assigned to this agent
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
-  
+
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
@@ -1439,21 +1505,21 @@ exports.getCompleteOrderDetails = asyncHandler(async (req, res) => {
         variant: order.variant,
         quotedPrice: order.quotedPrice,
         finalPrice: order.finalPrice,
-        processingFee: order.processingFee
+        processingFee: order.processingFee,
       },
       pickup: {
         scheduledDate: pickup.scheduledDate,
         scheduledTime: pickup.scheduledTime,
         address: pickup.address,
-        status: pickup.status
+        status: pickup.status,
       },
       evaluationData: order.evaluationData || {},
       originalSession: order.offerSession,
       timestamps: {
         createdAt: order.createdAt,
         evaluatedAt: order.evaluatedAt,
-        completedAt: order.completedAt
-      }
-    }
+        completedAt: order.completedAt,
+      },
+    },
   });
 });

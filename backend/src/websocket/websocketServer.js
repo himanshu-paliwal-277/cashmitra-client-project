@@ -6,16 +6,16 @@ const { Partner } = require('../models/partner.model');
 
 class WebSocketServer {
   constructor(server) {
-    this.wss = new WebSocket.Server({ 
+    this.wss = new WebSocket.Server({
       server,
       path: '/ws',
-      verifyClient: this.verifyClient.bind(this)
+      verifyClient: this.verifyClient.bind(this),
     });
-    
+
     this.clients = new Map(); // Store authenticated clients
     this.adminClients = new Set(); // Store admin clients
     this.userClients = new Map(); // Store user clients by userId
-    
+
     this.setupWebSocketServer();
     this.setupOrderChangeStream();
   }
@@ -23,8 +23,10 @@ class WebSocketServer {
   verifyClient(info) {
     // Extract token from query parameters or headers
     const url = new URL(info.req.url, 'http://localhost');
-    const token = url.searchParams.get('token') || info.req.headers.authorization?.replace('Bearer ', '');
-    
+    const token =
+      url.searchParams.get('token') ||
+      info.req.headers.authorization?.replace('Bearer ', '');
+
     if (!token) {
       return false;
     }
@@ -43,12 +45,12 @@ class WebSocketServer {
     this.wss.on('connection', (ws, req) => {
       const user = req.user;
       console.log(`WebSocket client connected: ${user.id} (${user.role})`);
-      
+
       // Store client with user info
       this.clients.set(ws, {
         userId: user.id,
         role: user.role,
-        lastPing: Date.now()
+        lastPing: Date.now(),
       });
 
       // Add to role-specific collections
@@ -65,7 +67,7 @@ class WebSocketServer {
       this.sendToClient(ws, {
         type: 'connection',
         status: 'connected',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Handle incoming messages
@@ -125,7 +127,10 @@ class WebSocketServer {
         this.handleUnsubscription(ws, data);
         break;
       case 'ping':
-        this.sendToClient(ws, { type: 'pong', timestamp: new Date().toISOString() });
+        this.sendToClient(ws, {
+          type: 'pong',
+          timestamp: new Date().toISOString(),
+        });
         break;
       default:
         console.log('Unknown message type:', data.type);
@@ -141,11 +146,11 @@ class WebSocketServer {
     }
 
     clientInfo.subscriptions.add(data.channel);
-    
+
     this.sendToClient(ws, {
       type: 'subscription_confirmed',
       channel: data.channel,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -154,19 +159,21 @@ class WebSocketServer {
     if (!clientInfo || !clientInfo.subscriptions) return;
 
     clientInfo.subscriptions.delete(data.channel);
-    
+
     this.sendToClient(ws, {
       type: 'unsubscription_confirmed',
       channel: data.channel,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
   handleClientDisconnect(ws) {
     const clientInfo = this.clients.get(ws);
     if (clientInfo) {
-      console.log(`WebSocket client disconnected: ${clientInfo.userId} (${clientInfo.role})`);
-      
+      console.log(
+        `WebSocket client disconnected: ${clientInfo.userId} (${clientInfo.role})`
+      );
+
       // Remove from role-specific collections
       if (clientInfo.role === 'admin') {
         this.adminClients.delete(ws);
@@ -180,14 +187,14 @@ class WebSocketServer {
         }
       }
     }
-    
+
     this.clients.delete(ws);
   }
 
   setupOrderChangeStream() {
     // MongoDB Change Streams for real-time order updates
     const orderChangeStream = Order.watch([
-      { $match: { operationType: { $in: ['insert', 'update', 'replace'] } } }
+      { $match: { operationType: { $in: ['insert', 'update', 'replace'] } } },
     ]);
 
     orderChangeStream.on('change', (change) => {
@@ -202,7 +209,7 @@ class WebSocketServer {
   async handleOrderChange(change) {
     try {
       const { operationType, fullDocument, documentKey } = change;
-      
+
       let order;
       if (fullDocument) {
         order = fullDocument;
@@ -229,9 +236,9 @@ class WebSocketServer {
           partner: order.partner,
           items: order.items,
           createdAt: order.createdAt,
-          updatedAt: order.updatedAt
+          updatedAt: order.updatedAt,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       // Send to all admin clients
@@ -246,7 +253,6 @@ class WebSocketServer {
       if (order.partner && order.partner._id) {
         this.sendToUser(order.partner._id.toString(), eventData);
       }
-
     } catch (error) {
       console.error('Error handling order change:', error);
     }
@@ -261,7 +267,10 @@ class WebSocketServer {
   broadcastToAdmins(data) {
     this.adminClients.forEach((ws) => {
       const clientInfo = this.clients.get(ws);
-      if (clientInfo && (!clientInfo.subscriptions || clientInfo.subscriptions.has('orders'))) {
+      if (
+        clientInfo &&
+        (!clientInfo.subscriptions || clientInfo.subscriptions.has('orders'))
+      ) {
         this.sendToClient(ws, data);
       }
     });
@@ -272,7 +281,10 @@ class WebSocketServer {
     if (userSockets) {
       userSockets.forEach((ws) => {
         const clientInfo = this.clients.get(ws);
-        if (clientInfo && (!clientInfo.subscriptions || clientInfo.subscriptions.has('orders'))) {
+        if (
+          clientInfo &&
+          (!clientInfo.subscriptions || clientInfo.subscriptions.has('orders'))
+        ) {
           this.sendToClient(ws, data);
         }
       });
@@ -284,12 +296,15 @@ class WebSocketServer {
     const eventData = {
       type: 'analytics_update',
       data: analyticsData,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.adminClients.forEach((ws) => {
       const clientInfo = this.clients.get(ws);
-      if (clientInfo && (!clientInfo.subscriptions || clientInfo.subscriptions.has('analytics'))) {
+      if (
+        clientInfo &&
+        (!clientInfo.subscriptions || clientInfo.subscriptions.has('analytics'))
+      ) {
         this.sendToClient(ws, eventData);
       }
     });
@@ -300,7 +315,7 @@ class WebSocketServer {
     const eventData = {
       type: 'inventory_update',
       data: inventoryData,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.broadcastToAdmins(eventData);
@@ -311,7 +326,7 @@ class WebSocketServer {
     const eventData = {
       type: 'notification',
       notification,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     if (userId === 'admin') {
@@ -328,8 +343,10 @@ class WebSocketServer {
       adminConnections: this.adminClients.size,
       userConnections: this.userClients.size,
       activeChannels: Array.from(this.clients.values())
-        .flatMap(client => client.subscriptions ? Array.from(client.subscriptions) : [])
-        .filter((channel, index, arr) => arr.indexOf(channel) === index)
+        .flatMap((client) =>
+          client.subscriptions ? Array.from(client.subscriptions) : []
+        )
+        .filter((channel, index, arr) => arr.indexOf(channel) === index),
     };
   }
 }

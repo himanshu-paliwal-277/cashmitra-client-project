@@ -32,7 +32,14 @@ const createLeadValidation = [
     .withMessage('Interested in must be selling, buying, or both'),
   check('source')
     .optional()
-    .isIn(['website', 'social_media', 'referral', 'advertisement', 'direct', 'other'])
+    .isIn([
+      'website',
+      'social_media',
+      'referral',
+      'advertisement',
+      'direct',
+      'other',
+    ])
     .withMessage('Invalid source'),
   check('priority')
     .optional()
@@ -74,7 +81,14 @@ const updateLeadValidation = [
     .withMessage('Invalid priority'),
   check('source')
     .optional()
-    .isIn(['website', 'social_media', 'referral', 'advertisement', 'direct', 'other'])
+    .isIn([
+      'website',
+      'social_media',
+      'referral',
+      'advertisement',
+      'direct',
+      'other',
+    ])
     .withMessage('Invalid source'),
   check('interestedIn')
     .optional()
@@ -132,11 +146,7 @@ router.post(
 // @access  Private/Admin
 router.get(
   '/:id',
-  [
-    check('id')
-      .isMongoId()
-      .withMessage('Invalid lead ID'),
-  ],
+  [check('id').isMongoId().withMessage('Invalid lead ID')],
   validateRequest,
   asyncHandler(leadsController.getLead)
 );
@@ -147,9 +157,7 @@ router.get(
 router.put(
   '/:id',
   [
-    check('id')
-      .isMongoId()
-      .withMessage('Invalid lead ID'),
+    check('id').isMongoId().withMessage('Invalid lead ID'),
     ...updateLeadValidation,
   ],
   validateRequest,
@@ -161,11 +169,7 @@ router.put(
 // @access  Private/Admin
 router.delete(
   '/:id',
-  [
-    check('id')
-      .isMongoId()
-      .withMessage('Invalid lead ID'),
-  ],
+  [check('id').isMongoId().withMessage('Invalid lead ID')],
   validateRequest,
   asyncHandler(leadsController.deleteLead)
 );
@@ -176,9 +180,7 @@ router.delete(
 router.put(
   '/:id/assign',
   [
-    check('id')
-      .isMongoId()
-      .withMessage('Invalid lead ID'),
+    check('id').isMongoId().withMessage('Invalid lead ID'),
     ...assignLeadValidation,
   ],
   validateRequest,

@@ -28,7 +28,7 @@ router.post('/image', protect, upload.single('image'), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: 'No image file provided'
+        message: 'No image file provided',
       });
     }
 
@@ -42,8 +42,8 @@ router.post('/image', protect, upload.single('image'), async (req, res) => {
       resource_type: 'image',
       transformation: [
         { width: 800, height: 600, crop: 'limit' },
-        { quality: 'auto' }
-      ]
+        { quality: 'auto' },
+      ],
     });
 
     res.json({
@@ -52,16 +52,15 @@ router.post('/image', protect, upload.single('image'), async (req, res) => {
         url: result.secure_url,
         public_id: result.public_id,
         width: result.width,
-        height: result.height
-      }
+        height: result.height,
+      },
     });
-
   } catch (error) {
     console.error('Upload error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to upload image',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -72,7 +71,7 @@ router.post('/images', protect, upload.array('images', 5), async (req, res) => {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'No image files provided'
+        message: 'No image files provided',
       });
     }
 
@@ -85,31 +84,30 @@ router.post('/images', protect, upload.array('images', 5), async (req, res) => {
         resource_type: 'image',
         transformation: [
           { width: 800, height: 600, crop: 'limit' },
-          { quality: 'auto' }
-        ]
+          { quality: 'auto' },
+        ],
       });
     });
 
     const results = await Promise.all(uploadPromises);
 
-    const uploadedImages = results.map(result => ({
+    const uploadedImages = results.map((result) => ({
       url: result.secure_url,
       public_id: result.public_id,
       width: result.width,
-      height: result.height
+      height: result.height,
     }));
 
     res.json({
       success: true,
-      data: uploadedImages
+      data: uploadedImages,
     });
-
   } catch (error) {
     console.error('Upload error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to upload images',
-      error: error.message
+      error: error.message,
     });
   }
 });

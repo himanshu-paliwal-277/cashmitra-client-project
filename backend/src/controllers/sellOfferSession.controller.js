@@ -6,16 +6,16 @@
  * @version 1.0.0
  */
 
-const { validationResult } = require("express-validator");
-const mongoose = require("mongoose");
-const SellOfferSession = require("../models/sellOfferSession.model");
-const SellProduct = require("../models/sellProduct.model");
-const SellDefect = require("../models/sellDefect.model");
-const SellAccessory = require("../models/sellAccessory.model");
+const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
+const SellOfferSession = require('../models/sellOfferSession.model');
+const SellProduct = require('../models/sellProduct.model');
+const SellDefect = require('../models/sellDefect.model');
+const SellAccessory = require('../models/sellAccessory.model');
 const {
   ApiError,
   asyncHandler,
-} = require("../middlewares/errorHandler.middleware");
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * Create new offer session with complete assessment data
@@ -25,13 +25,13 @@ const {
 exports.createSession = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, "Validation Error", errors.array());
+    throw new ApiError(400, 'Validation Error', errors.array());
   }
 
   const { userId, productId, variantId, answers, defects, accessories } =
     req.body;
 
-  console.log("Creating session with data:", {
+  console.log('Creating session with data:', {
     userId,
     productId,
     variantId,
@@ -45,13 +45,13 @@ exports.createSession = asyncHandler(async (req, res) => {
   const finalUserId = req.user?.id || userId;
 
   if (!finalUserId) {
-    throw new ApiError(400, "User ID is required");
+    throw new ApiError(400, 'User ID is required');
   }
 
   // Verify product exists
   const product = await SellProduct.findById(productId);
   if (!product) {
-    throw new ApiError(404, "Product not found");
+    throw new ApiError(404, 'Product not found');
   }
 
   // Find the variant in product.variants array
@@ -59,20 +59,20 @@ exports.createSession = asyncHandler(async (req, res) => {
     (v) => v._id.toString() === variantId.toString()
   );
   if (!variant) {
-    throw new ApiError(404, "Variant not found in product");
+    throw new ApiError(404, 'Variant not found in product');
   }
 
   if (!variant.isActive) {
-    throw new ApiError(400, "Selected variant is not available");
+    throw new ApiError(400, 'Selected variant is not available');
   }
 
   // Transform answers from frontend format to backend format
   // Frontend sends: { questionId: { questionId, answerValue, delta: {...}, ... } }
   // Store the complete answer object including delta for price calculation
   let processedAnswers = new Map();
-  if (answers && typeof answers === "object") {
+  if (answers && typeof answers === 'object') {
     Object.entries(answers).forEach(([key, value]) => {
-      if (value && typeof value === "object") {
+      if (value && typeof value === 'object') {
         // Store the complete answer object (includes delta, answerValue, questionText, etc.)
         processedAnswers.set(key, value);
       } else if (value) {
@@ -100,9 +100,9 @@ exports.createSession = asyncHandler(async (req, res) => {
     finalPrice: variant.basePrice,
     breakdown: [
       {
-        label: "Base Price",
+        label: 'Base Price',
         delta: variant.basePrice,
-        type: "base",
+        type: 'base',
       },
     ],
   });
@@ -116,11 +116,11 @@ exports.createSession = asyncHandler(async (req, res) => {
   await session.save();
 
   // Populate product details for response
-  await session.populate("productId", "name images categoryId");
+  await session.populate('productId', 'name images categoryId');
 
   res.status(201).json({
     success: true,
-    message: "Offer session created successfully",
+    message: 'Offer session created successfully',
     data: {
       sessionId: session._id,
       sessionToken: session.sessionToken,
@@ -164,21 +164,21 @@ exports.getSession = asyncHandler(async (req, res) => {
   const { sessionToken } = req.query;
 
   const session = await SellOfferSession.findById(sessionId)
-    .populate("productId", "name images")
-    .populate("userId", "name email");
+    .populate('productId', 'name images')
+    .populate('userId', 'name email');
 
   if (!session) {
-    throw new ApiError(404, "Session not found");
+    throw new ApiError(404, 'Session not found');
   }
 
   // Verify session token if provided
   if (sessionToken && !session.verifyToken(sessionToken)) {
-    throw new ApiError(401, "Invalid session token");
+    throw new ApiError(401, 'Invalid session token');
   }
 
   // Check if session is expired
   if (session.expiresAt < new Date()) {
-    throw new ApiError(410, "Session has expired");
+    throw new ApiError(410, 'Session has expired');
   }
 
   res.json({
@@ -198,12 +198,12 @@ exports.updateAnswers = asyncHandler(async (req, res) => {
 
   const session = await SellOfferSession.findById(sessionId);
   if (!session) {
-    throw new ApiError(404, "Session not found");
+    throw new ApiError(404, 'Session not found');
   }
 
   // Verify session token
   if (!session.verifyToken(sessionToken)) {
-    throw new ApiError(401, "Invalid session token");
+    throw new ApiError(401, 'Invalid session token');
   }
 
   // Update answers
@@ -215,7 +215,7 @@ exports.updateAnswers = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Answers updated successfully",
+    message: 'Answers updated successfully',
     data: {
       finalPrice: session.finalPrice,
       breakdown: session.breakdown,
@@ -234,12 +234,12 @@ exports.updateDefects = asyncHandler(async (req, res) => {
 
   const session = await SellOfferSession.findById(sessionId);
   if (!session) {
-    throw new ApiError(404, "Session not found");
+    throw new ApiError(404, 'Session not found');
   }
 
   // Verify session token
   if (!session.verifyToken(sessionToken)) {
-    throw new ApiError(401, "Invalid session token");
+    throw new ApiError(401, 'Invalid session token');
   }
 
   // Update defects
@@ -251,7 +251,7 @@ exports.updateDefects = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Defects updated successfully",
+    message: 'Defects updated successfully',
     data: {
       finalPrice: session.finalPrice,
       breakdown: session.breakdown,
@@ -270,12 +270,12 @@ exports.updateAccessories = asyncHandler(async (req, res) => {
 
   const session = await SellOfferSession.findById(sessionId);
   if (!session) {
-    throw new ApiError(404, "Session not found");
+    throw new ApiError(404, 'Session not found');
   }
 
   // Verify session token
   if (!session.verifyToken(sessionToken)) {
-    throw new ApiError(401, "Invalid session token");
+    throw new ApiError(401, 'Invalid session token');
   }
 
   // Update accessories
@@ -287,7 +287,7 @@ exports.updateAccessories = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Accessories updated successfully",
+    message: 'Accessories updated successfully',
     data: {
       finalPrice: session.finalPrice,
       breakdown: session.breakdown,
@@ -306,12 +306,12 @@ exports.getCurrentPrice = asyncHandler(async (req, res) => {
 
   const session = await SellOfferSession.findById(sessionId);
   if (!session) {
-    throw new ApiError(404, "Session not found");
+    throw new ApiError(404, 'Session not found');
   }
 
   // Verify session token
   if (!session.verifyToken(sessionToken)) {
-    throw new ApiError(401, "Invalid session token");
+    throw new ApiError(401, 'Invalid session token');
   }
 
   res.json({
@@ -338,12 +338,12 @@ exports.extendSession = asyncHandler(async (req, res) => {
 
   const session = await SellOfferSession.findById(sessionId);
   if (!session) {
-    throw new ApiError(404, "Session not found");
+    throw new ApiError(404, 'Session not found');
   }
 
   // Verify session token
   if (!session.verifyToken(sessionToken)) {
-    throw new ApiError(401, "Invalid session token");
+    throw new ApiError(401, 'Invalid session token');
   }
 
   session.extendExpiry();
@@ -351,7 +351,7 @@ exports.extendSession = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Session extended successfully",
+    message: 'Session extended successfully',
     data: {
       expiresAt: session.expiresAt,
     },
@@ -367,7 +367,7 @@ exports.getUserActiveSessions = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
   const sessions = await SellOfferSession.findActiveSessions(userId)
-    .populate("productId", "name images variants")
+    .populate('productId', 'name images variants')
     .sort({ updatedAt: -1 });
 
   // Transform sessions to include variant data from the populated product
@@ -427,19 +427,19 @@ exports.deleteSession = asyncHandler(async (req, res) => {
 
   const session = await SellOfferSession.findById(sessionId);
   if (!session) {
-    throw new ApiError(404, "Session not found");
+    throw new ApiError(404, 'Session not found');
   }
 
   // Verify session token
   if (!session.verifyToken(sessionToken)) {
-    throw new ApiError(401, "Invalid session token");
+    throw new ApiError(401, 'Invalid session token');
   }
 
   await session.deleteOne();
 
   res.json({
     success: true,
-    message: "Session deleted successfully",
+    message: 'Session deleted successfully',
   });
 });
 
@@ -452,11 +452,11 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 10,
-    search = "",
-    status = "all",
-    deviceType = "all",
-    sortBy = "createdAt",
-    sortOrder = "desc",
+    search = '',
+    status = 'all',
+    deviceType = 'all',
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
   } = req.query;
 
   const query = {};
@@ -464,15 +464,15 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
   // Search filter
   if (search) {
     const users = await mongoose
-      .model("User")
+      .model('User')
       .find({
         $or: [
-          { name: { $regex: search, $options: "i" } },
-          { email: { $regex: search, $options: "i" } },
-          { phone: { $regex: search, $options: "i" } },
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { phone: { $regex: search, $options: 'i' } },
         ],
       })
-      .select("_id");
+      .select('_id');
 
     const userIds = users.map((u) => u._id);
     query.userId = { $in: userIds };
@@ -480,23 +480,23 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
 
   // Status filter
   const now = new Date();
-  if (status === "active") {
+  if (status === 'active') {
     query.isActive = true;
     query.expiresAt = { $gt: now };
-  } else if (status === "expired") {
+  } else if (status === 'expired') {
     query.expiresAt = { $lt: now };
-  } else if (status === "completed") {
+  } else if (status === 'completed') {
     query.isActive = false;
   }
 
   // Calculate pagination
   const skip = (parseInt(page) - 1) * parseInt(limit);
-  const sort = { [sortBy]: sortOrder === "asc" ? 1 : -1 };
+  const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
   // Fetch sessions with populated data
   const sessions = await SellOfferSession.find(query)
-    .populate("userId", "name email phone")
-    .populate("productId", "name images categoryId")
+    .populate('userId', 'name email phone')
+    .populate('productId', 'name images categoryId')
     .sort(sort)
     .skip(skip)
     .limit(parseInt(limit));
@@ -511,7 +511,7 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
       // Find variant in product
       if (sessionObj.productId && sessionObj.productId._id) {
         const product = await mongoose
-          .model("SellProduct")
+          .model('SellProduct')
           .findById(sessionObj.productId._id);
         if (product && product.variants) {
           const variant = product.variants.find(
@@ -554,7 +554,7 @@ exports.updateSessionStatus = asyncHandler(async (req, res) => {
 
   const session = await SellOfferSession.findById(sessionId);
   if (!session) {
-    throw new ApiError(404, "Session not found");
+    throw new ApiError(404, 'Session not found');
   }
 
   session.isActive = isActive;
@@ -562,7 +562,7 @@ exports.updateSessionStatus = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Session status updated successfully",
+    message: 'Session status updated successfully',
     data: session,
   });
 });
@@ -588,16 +588,16 @@ exports.cleanupExpiredSessions = asyncHandler(async (req, res) => {
 async function recalculateSessionPrice(session) {
   const breakdown = [
     {
-      label: "Base Price",
+      label: 'Base Price',
       delta: session.basePrice,
-      type: "base",
+      type: 'base',
     },
   ];
 
   let percentDelta = 0;
   let absDelta = 0;
 
-  console.log("Starting price calculation:", {
+  console.log('Starting price calculation:', {
     basePrice: session.basePrice,
     answersSize: session.answers?.size || 0,
     defectsCount: session.defects?.length || 0,
@@ -610,17 +610,17 @@ async function recalculateSessionPrice(session) {
     try {
       for (const [, answerData] of session.answers) {
         // Check if answerData has delta (frontend format)
-        if (answerData && typeof answerData === "object" && answerData.delta) {
-          const adjust = answerData.delta.sign === "-" ? -1 : 1;
+        if (answerData && typeof answerData === 'object' && answerData.delta) {
+          const adjust = answerData.delta.sign === '-' ? -1 : 1;
 
-          if (answerData.delta.type === "percent") {
+          if (answerData.delta.type === 'percent') {
             percentDelta += adjust * (answerData.delta.value || 0);
           } else {
             absDelta += adjust * (answerData.delta.value || 0);
           }
 
           const deltaValue =
-            answerData.delta.type === "percent"
+            answerData.delta.type === 'percent'
               ? Math.round(
                   (session.basePrice * adjust * answerData.delta.value) / 100
                 )
@@ -631,7 +631,7 @@ async function recalculateSessionPrice(session) {
               answerData.questionText ||
               `Question: ${answerData.answerText || answerData.answerValue}`,
             delta: deltaValue,
-            type: "question",
+            type: 'question',
           });
 
           console.log(
@@ -642,7 +642,7 @@ async function recalculateSessionPrice(session) {
         }
       }
     } catch (error) {
-      console.error("Error calculating question adjustments:", error);
+      console.error('Error calculating question adjustments:', error);
     }
   }
 
@@ -659,16 +659,16 @@ async function recalculateSessionPrice(session) {
         );
 
         if (defect && defect.delta) {
-          const adjust = defect.delta.sign === "-" ? -1 : 1;
+          const adjust = defect.delta.sign === '-' ? -1 : 1;
 
-          if (defect.delta.type === "percent") {
+          if (defect.delta.type === 'percent') {
             percentDelta += adjust * (defect.delta.value || 0);
           } else {
             absDelta += adjust * (defect.delta.value || 0);
           }
 
           const deltaValue =
-            defect.delta.type === "percent"
+            defect.delta.type === 'percent'
               ? Math.round(
                   (session.basePrice * adjust * defect.delta.value) / 100
                 )
@@ -677,14 +677,14 @@ async function recalculateSessionPrice(session) {
           breakdown.push({
             label: defect.title,
             delta: deltaValue,
-            type: "defect",
+            type: 'defect',
           });
 
           console.log(`Defect: ${defect.title} = ${deltaValue}`);
         }
       }
     } catch (error) {
-      console.error("Error calculating defect adjustments:", error);
+      console.error('Error calculating defect adjustments:', error);
     }
   }
 
@@ -704,16 +704,16 @@ async function recalculateSessionPrice(session) {
           );
 
           if (accessory && accessory.delta) {
-            const adjust = accessory.delta.sign === "-" ? -1 : 1;
+            const adjust = accessory.delta.sign === '-' ? -1 : 1;
 
-            if (accessory.delta.type === "percent") {
+            if (accessory.delta.type === 'percent') {
               percentDelta += adjust * (accessory.delta.value || 0);
             } else {
               absDelta += adjust * (accessory.delta.value || 0);
             }
 
             const deltaValue =
-              accessory.delta.type === "percent"
+              accessory.delta.type === 'percent'
                 ? Math.round(
                     (session.basePrice * adjust * accessory.delta.value) / 100
                   )
@@ -722,7 +722,7 @@ async function recalculateSessionPrice(session) {
             breakdown.push({
               label: accessory.title,
               delta: deltaValue,
-              type: "accessory",
+              type: 'accessory',
             });
 
             console.log(`Accessory: ${accessory.title} = ${deltaValue}`);
@@ -730,7 +730,7 @@ async function recalculateSessionPrice(session) {
         }
       }
     } catch (error) {
-      console.error("Error calculating accessory adjustments:", error);
+      console.error('Error calculating accessory adjustments:', error);
     }
   }
 
@@ -740,7 +740,7 @@ async function recalculateSessionPrice(session) {
     session.basePrice * (1 + percentDelta / 100) + absDelta
   );
 
-  console.log("Price calculation result:", {
+  console.log('Price calculation result:', {
     basePrice: session.basePrice,
     percentDelta,
     absDelta,

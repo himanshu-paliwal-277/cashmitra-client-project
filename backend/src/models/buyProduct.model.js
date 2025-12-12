@@ -136,7 +136,7 @@ const BuyProductSchema = new mongoose.Schema(
     // Full product details
     productDetails: {
       frontCamera: FrontCameraSchema, // ← now sub-doc
-      rearCamera: RearCameraSchema,   // ← now sub-doc
+      rearCamera: RearCameraSchema, // ← now sub-doc
 
       networkConnectivity: {
         wifi: String,
@@ -202,7 +202,13 @@ const BuyProductSchema = new mongoose.Schema(
     },
 
     relatedProducts: [
-      { id: String, name: String, price: Number, image: String, rating: Number },
+      {
+        id: String,
+        name: String,
+        price: Number,
+        image: String,
+        rating: Number,
+      },
     ],
 
     legal: {

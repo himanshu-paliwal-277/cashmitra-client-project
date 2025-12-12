@@ -6,15 +6,15 @@
  * @version 1.0.0
  */
 
-const { validationResult } = require("express-validator");
-const SellQuestion = require("../models/sellQuestion.model");
-const SellProduct = require("../models/sellProduct.model");
-const Category = require("../models/category.model");
-const SellSuperCategory = require("../models/sellSuperCategory.model");
+const { validationResult } = require('express-validator');
+const SellQuestion = require('../models/sellQuestion.model');
+const SellProduct = require('../models/sellProduct.model');
+const Category = require('../models/category.model');
+const SellSuperCategory = require('../models/sellSuperCategory.model');
 const {
   ApiError,
   asyncHandler,
-} = require("../middlewares/errorHandler.middleware");
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * Create new sell question
@@ -24,7 +24,7 @@ const {
 exports.createQuestion = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, "Validation Error", errors.array());
+    throw new ApiError(400, 'Validation Error', errors.array());
   }
 
   const {
@@ -44,7 +44,7 @@ exports.createQuestion = asyncHandler(async (req, res) => {
     category = await SellSuperCategory.findById(categoryId);
   }
   if (!category) {
-    throw new ApiError(404, "Category not found");
+    throw new ApiError(404, 'Category not found');
   }
 
   // Check if question with same key already exists for this category
@@ -52,7 +52,7 @@ exports.createQuestion = asyncHandler(async (req, res) => {
   if (existingQuestion) {
     throw new ApiError(
       400,
-      "Question with this key already exists for this category"
+      'Question with this key already exists for this category'
     );
   }
 
@@ -79,7 +79,7 @@ exports.createQuestion = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     success: true,
-    message: "Question created successfully",
+    message: 'Question created successfully',
     data: question,
   });
 });
@@ -92,7 +92,7 @@ exports.createQuestion = asyncHandler(async (req, res) => {
 exports.getQuestions = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, "Validation Error", errors.array());
+    throw new ApiError(400, 'Validation Error', errors.array());
   }
 
   const { categoryId, section } = req.query;
@@ -115,13 +115,13 @@ exports.getQuestions = asyncHandler(async (req, res) => {
       if (questionObj.categoryId) {
         // Try to find in Category first
         let category = await Category.findById(questionObj.categoryId).select(
-          "_id name displayName"
+          '_id name displayName'
         );
         // If not found, try SellSuperCategory
         if (!category) {
           category = await SellSuperCategory.findById(
             questionObj.categoryId
-          ).select("_id name displayName");
+          ).select('_id name displayName');
         }
         questionObj.categoryId = category || questionObj.categoryId;
       }
@@ -146,7 +146,7 @@ exports.getQuestionsForCustomer = asyncHandler(async (req, res) => {
   // Verify category exists
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, "Category not found");
+    throw new ApiError(404, 'Category not found');
   }
 
   // Get questions for the category
@@ -180,7 +180,7 @@ exports.getQuestionsForCustomer = asyncHandler(async (req, res) => {
 exports.getCustomerQuestions = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, "Validation Error", errors.array());
+    throw new ApiError(400, 'Validation Error', errors.array());
   }
 
   const { productId, variantId } = req.query;
@@ -188,7 +188,7 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
   // Get product to find categoryId
   const product = await SellProduct.findById(productId);
   if (!product) {
-    throw new ApiError(404, "Product not found");
+    throw new ApiError(404, 'Product not found');
   }
 
   const categoryId = product.categoryId;
@@ -196,7 +196,7 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
   // Verify category exists
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, "Category not found");
+    throw new ApiError(404, 'Category not found');
   }
 
   // Get questions for the category
@@ -229,11 +229,11 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
  */
 exports.getQuestion = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id)
-    .populate("categoryId", "name")
-    .populate("createdBy", "name email");
+    .populate('categoryId', 'name')
+    .populate('createdBy', 'name email');
 
   if (!question) {
-    throw new ApiError(404, "Question not found");
+    throw new ApiError(404, 'Question not found');
   }
 
   res.json({
@@ -250,7 +250,7 @@ exports.getQuestion = asyncHandler(async (req, res) => {
 exports.updateQuestion = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, "Validation Error", errors.array());
+    throw new ApiError(400, 'Validation Error', errors.array());
   }
 
   const {
@@ -270,7 +270,7 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
 
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
-    throw new ApiError(404, "Question not found");
+    throw new ApiError(404, 'Question not found');
   }
 
   // Check if key is being changed and if it conflicts
@@ -283,7 +283,7 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
     if (existingQuestion) {
       throw new ApiError(
         400,
-        "Question with this key already exists for this category"
+        'Question with this key already exists for this category'
       );
     }
   }
@@ -302,7 +302,7 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
       category = await SellSuperCategory.findById(categoryId);
     }
     if (!category) {
-      throw new ApiError(404, "Category not found");
+      throw new ApiError(404, 'Category not found');
     }
     question.categoryId = categoryId;
   }
@@ -323,7 +323,7 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Question updated successfully",
+    message: 'Question updated successfully',
     data: question,
   });
 });
@@ -336,14 +336,14 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
 exports.deleteQuestion = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
-    throw new ApiError(404, "Question not found");
+    throw new ApiError(404, 'Question not found');
   }
 
   await question.deleteOne();
 
   res.json({
     success: true,
-    message: "Question deleted successfully",
+    message: 'Question deleted successfully',
   });
 });
 
@@ -356,18 +356,18 @@ exports.addOption = asyncHandler(async (req, res) => {
   const { key, label, value, delta, showIf } = req.body;
 
   if (!key || !label || !value) {
-    throw new ApiError(400, "Key, label, and value are required");
+    throw new ApiError(400, 'Key, label, and value are required');
   }
 
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
-    throw new ApiError(404, "Question not found");
+    throw new ApiError(404, 'Question not found');
   }
 
   // Check if option key already exists
   const existingOption = question.options.find((opt) => opt.key === key);
   if (existingOption) {
-    throw new ApiError(400, "Option with this key already exists");
+    throw new ApiError(400, 'Option with this key already exists');
   }
 
   question.options.push({
@@ -382,7 +382,7 @@ exports.addOption = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Option added successfully",
+    message: 'Option added successfully',
     data: question,
   });
 });
@@ -397,7 +397,7 @@ exports.updateOption = asyncHandler(async (req, res) => {
 
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
-    throw new ApiError(404, "Question not found");
+    throw new ApiError(404, 'Question not found');
   }
 
   // Find option by key (since _id is disabled)
@@ -405,7 +405,7 @@ exports.updateOption = asyncHandler(async (req, res) => {
     (opt) => opt.key === req.params.optionId
   );
   if (optionIndex === -1) {
-    throw new ApiError(404, "Option not found");
+    throw new ApiError(404, 'Option not found');
   }
 
   const option = question.options[optionIndex];
@@ -414,7 +414,7 @@ exports.updateOption = asyncHandler(async (req, res) => {
   if (key && key !== option.key) {
     const existingOption = question.options.find((opt) => opt.key === key);
     if (existingOption) {
-      throw new ApiError(400, "Option with this key already exists");
+      throw new ApiError(400, 'Option with this key already exists');
     }
   }
 
@@ -429,7 +429,7 @@ exports.updateOption = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Option updated successfully",
+    message: 'Option updated successfully',
     data: question,
   });
 });
@@ -442,7 +442,7 @@ exports.updateOption = asyncHandler(async (req, res) => {
 exports.deleteOption = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
-    throw new ApiError(404, "Question not found");
+    throw new ApiError(404, 'Question not found');
   }
 
   // Find option by key (since _id is disabled)
@@ -450,7 +450,7 @@ exports.deleteOption = asyncHandler(async (req, res) => {
     (opt) => opt.key === req.params.optionId
   );
   if (optionIndex === -1) {
-    throw new ApiError(404, "Option not found");
+    throw new ApiError(404, 'Option not found');
   }
 
   question.options.splice(optionIndex, 1);
@@ -458,7 +458,7 @@ exports.deleteOption = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Option deleted successfully",
+    message: 'Option deleted successfully',
     data: question,
   });
 });
@@ -472,7 +472,7 @@ exports.reorderQuestions = asyncHandler(async (req, res) => {
   const { categoryId, section, questionIds } = req.body;
 
   if (!section || !Array.isArray(questionIds)) {
-    throw new ApiError(400, "Section and question IDs array are required");
+    throw new ApiError(400, 'Section and question IDs array are required');
   }
 
   // Verify category exists if categoryId is provided (optional check - don't fail if category is orphaned)
@@ -495,7 +495,7 @@ exports.reorderQuestions = asyncHandler(async (req, res) => {
   });
 
   if (questions.length !== questionIds.length) {
-    throw new ApiError(400, "Some question IDs are invalid");
+    throw new ApiError(400, 'Some question IDs are invalid');
   }
 
   // Verify all questions belong to the same category and section
@@ -514,7 +514,7 @@ exports.reorderQuestions = asyncHandler(async (req, res) => {
   if (!allSameSection || !allSameCategory) {
     throw new ApiError(
       400,
-      "All questions must belong to the same category and section"
+      'All questions must belong to the same category and section'
     );
   }
 
@@ -531,6 +531,6 @@ exports.reorderQuestions = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Questions reordered successfully",
+    message: 'Questions reordered successfully',
   });
 });

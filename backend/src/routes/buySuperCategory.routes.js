@@ -16,7 +16,10 @@ router.use(authorize('admin'));
 router.get('/', buySuperCategoryController.getAllSuperCategories);
 
 // Get categories by super category (must be before /:id route)
-router.get('/:id/categories', buySuperCategoryController.getCategoriesBySuperCategory);
+router.get(
+  '/:id/categories',
+  buySuperCategoryController.getCategoriesBySuperCategory
+);
 
 // Get single super category
 router.get('/:id', buySuperCategoryController.getSuperCategory);

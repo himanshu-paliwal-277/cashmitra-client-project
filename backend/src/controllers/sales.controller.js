@@ -5,7 +5,10 @@ const Product = require('../models/buyProduct.model');
 const Partner = require('../models/partner.model');
 const Transaction = require('../models/transaction.model');
 const Wallet = require('../models/wallet.model');
-const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middleware');
+const {
+  ApiError,
+  asyncHandler,
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * @desc    Create a new order (Buy transaction)
@@ -14,13 +17,17 @@ const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middlewa
  */
 exports.createOrder = asyncHandler(async (req, res) => {
   // console.log('items: ', req.body);
-  
+
   // Convert items object to array if necessary
-  if (req.body.items && typeof req.body.items === 'object' && !Array.isArray(req.body.items)) {
+  if (
+    req.body.items &&
+    typeof req.body.items === 'object' &&
+    !Array.isArray(req.body.items)
+  ) {
     req.body.items = Object.values(req.body.items);
     console.log('Converted items object to array:', req.body.items);
   }
-  
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -48,9 +55,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
       throw new ApiError(404, `Product ${inventoryId} not found`);
     }
 
-
     // Validate product basePrice
-  
 
     // Use product basePrice for calculation
     const itemTotal = product.pricing.mrp * quantity;
@@ -61,14 +66,14 @@ exports.createOrder = asyncHandler(async (req, res) => {
       quantity,
       unitPrice: product.pricing.mrp,
       totalPrice: itemTotal,
-      condition:  'good'
+      condition: 'good',
     };
 
     processedItems.push(processedItem);
   }
 
   // Calculate commission (assuming 10% platform commission)
-  const commissionRate = 0.10;
+  const commissionRate = 0.1;
   const totalCommission = totalAmount * commissionRate;
   const partnerAmount = totalAmount - totalCommission;
 
@@ -98,20 +103,20 @@ exports.createOrder = asyncHandler(async (req, res) => {
     discountAmount,
     commission: {
       rate: commissionRate,
-      amount: totalCommission
+      amount: totalCommission,
     },
     paymentDetails: {
       method: paymentMethod === 'card' ? 'UPI' : paymentMethod, // Map card to UPI
-      status: 'pending'
+      status: 'pending',
     },
     shippingDetails: {
       address: shippingAddress,
-      status: 'pending'
+      status: 'pending',
     },
     status: 'pending',
     metadata: {
-      couponCode
-    }
+      couponCode,
+    },
   });
 
   await order.save();
@@ -121,7 +126,10 @@ exports.createOrder = asyncHandler(async (req, res) => {
   // Populate order for response
   await order.populate([
     { path: 'user', select: 'name email phone' },
-    { path: 'items.product', select: 'name brand  model variant images pricing:' }
+    {
+      path: 'items.product',
+      select: 'name brand  model variant images pricing:',
+    },
   ]);
 
   res.status(201).json({
@@ -129,8 +137,8 @@ exports.createOrder = asyncHandler(async (req, res) => {
     message: 'Order created successfully',
     data: {
       order,
-      paymentRequired: totalAmount
-    }
+      paymentRequired: totalAmount,
+    },
   });
 });
 
@@ -169,7 +177,7 @@ exports.processPayment = asyncHandler(async (req, res) => {
       ...paymentDetails,
       status: 'completed',
       paidAt: new Date(),
-      transactionId: `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      transactionId: `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
     order.status = 'confirmed';
     order.shippingDetails.status = 'processing';
@@ -179,9 +187,9 @@ exports.processPayment = asyncHandler(async (req, res) => {
     // Update transactions
     await Transaction.updateMany(
       { order: orderId },
-      { 
+      {
         status: 'completed',
-        completedAt: new Date()
+        completedAt: new Date(),
       }
     );
 
@@ -193,10 +201,10 @@ exports.processPayment = asyncHandler(async (req, res) => {
         wallet = new Wallet({
           partner: transaction.partner,
           balance: 0,
-          pendingAmount: 0
+          pendingAmount: 0,
         });
       }
-      
+
       wallet.pendingAmount += transaction.amount;
       await wallet.save();
     }
@@ -208,8 +216,8 @@ exports.processPayment = asyncHandler(async (req, res) => {
       message: 'Payment processed successfully',
       data: {
         order,
-        paymentStatus: 'completed'
-      }
+        paymentStatus: 'completed',
+      },
     });
   } else {
     // Note: Inventory restoration removed as we're working directly with products
@@ -231,27 +239,31 @@ exports.getOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const userId = req.user.id;
 
-  const order = await Order.findOne({ _id: orderId, user: userId })
-    .populate([
-      { path: 'user', select: 'name email phone' },
-      { path: 'items.product', select: 'brand model variant images specifications' },
-      { path: 'items.partner', select: 'shopName address phone' }
-    ]);
+  const order = await Order.findOne({ _id: orderId, user: userId }).populate([
+    { path: 'user', select: 'name email phone' },
+    {
+      path: 'items.product',
+      select: 'brand model variant images specifications',
+    },
+    { path: 'items.partner', select: 'shopName address phone' },
+  ]);
 
   if (!order) {
     throw new ApiError(404, 'Order not found');
   }
 
   // Get related transactions
-  const transactions = await Transaction.find({ order: orderId })
-    .populate('partner', 'shopName');
+  const transactions = await Transaction.find({ order: orderId }).populate(
+    'partner',
+    'shopName'
+  );
 
   res.json({
     success: true,
     data: {
       order,
-      transactions
-    }
+      transactions,
+    },
   });
 });
 
@@ -262,13 +274,13 @@ exports.getOrder = asyncHandler(async (req, res) => {
  */
 exports.getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const { 
-    page = 1, 
-    limit = 10, 
-    status, 
+  const {
+    page = 1,
+    limit = 10,
+    status,
     orderType = 'buy',
     sortBy = 'createdAt',
-    sortOrder = 'desc'
+    sortOrder = 'desc',
   } = req.query;
 
   const filter = { user: userId, orderType };
@@ -284,7 +296,7 @@ exports.getUserOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find(filter)
     .populate([
       { path: 'items.product', select: 'brand model variant images' },
-      { path: 'items.partner', select: 'shopName' }
+      { path: 'items.partner', select: 'shopName' },
     ])
     .sort(sort)
     .skip(skip)
@@ -298,7 +310,7 @@ exports.getUserOrders = asyncHandler(async (req, res) => {
     total,
     page: parseInt(page),
     pages: Math.ceil(total / parseInt(limit)),
-    data: orders
+    data: orders,
   });
 });
 
@@ -328,16 +340,16 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
   order.metadata = {
     ...order.metadata,
     cancellationReason: reason,
-    cancelledAt: new Date()
+    cancelledAt: new Date(),
   };
   await order.save();
 
   // Update transactions
   await Transaction.updateMany(
     { order: orderId },
-    { 
+    {
       status: 'cancelled',
-      metadata: { cancellationReason: reason }
+      metadata: { cancellationReason: reason },
     }
   );
 
@@ -351,7 +363,7 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Order cancelled successfully',
-    data: order
+    data: order,
   });
 });
 
@@ -371,10 +383,10 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
   }
 
   // Verify partner has items in this order
-  const hasPartnerItems = order.items.some(item => 
-    item.partner.toString() === partnerId
+  const hasPartnerItems = order.items.some(
+    (item) => item.partner.toString() === partnerId
   );
-  
+
   if (!hasPartnerItems) {
     throw new ApiError(403, 'Not authorized to update this order');
   }
@@ -385,7 +397,7 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
     status,
     trackingNumber,
     estimatedDelivery,
-    updatedAt: new Date()
+    updatedAt: new Date(),
   };
 
   // Update order status based on shipping status
@@ -394,7 +406,7 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
   } else if (status === 'delivered') {
     order.status = 'delivered';
     order.deliveredAt = new Date();
-    
+
     // Release partner payments
     await Transaction.updateMany(
       { order: orderId, partner: partnerId },
@@ -407,7 +419,7 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Shipping status updated successfully',
-    data: order
+    data: order,
   });
 });
 
@@ -418,12 +430,12 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
  */
 exports.getSalesAnalytics = asyncHandler(async (req, res) => {
   const { startDate, endDate, groupBy = 'day' } = req.query;
-  
+
   const matchStage = {
     orderType: 'buy',
-    status: { $in: ['confirmed', 'shipped', 'delivered'] }
+    status: { $in: ['confirmed', 'shipped', 'delivered'] },
   };
-  
+
   if (startDate || endDate) {
     matchStage.createdAt = {};
     if (startDate) matchStage.createdAt.$gte = new Date(startDate);
@@ -438,15 +450,15 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
         _id: {
           $dateToString: {
             format: groupBy === 'month' ? '%Y-%m' : '%Y-%m-%d',
-            date: '$createdAt'
-          }
+            date: '$createdAt',
+          },
         },
         totalSales: { $sum: '$totalAmount' },
         orderCount: { $sum: 1 },
-        avgOrderValue: { $avg: '$totalAmount' }
-      }
+        avgOrderValue: { $avg: '$totalAmount' },
+      },
     },
-    { $sort: { '_id': 1 } }
+    { $sort: { _id: 1 } },
   ]);
 
   // Top selling products
@@ -457,16 +469,16 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
       $group: {
         _id: '$items.product',
         totalQuantity: { $sum: '$items.quantity' },
-        totalRevenue: { $sum: '$items.totalPrice' }
-      }
+        totalRevenue: { $sum: '$items.totalPrice' },
+      },
     },
     {
       $lookup: {
         from: 'products',
         localField: '_id',
         foreignField: '_id',
-        as: 'product'
-      }
+        as: 'product',
+      },
     },
     { $unwind: '$product' },
     {
@@ -474,14 +486,14 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
         product: {
           brand: '$product.brand',
           model: '$product.model',
-          variant: '$product.variant'
+          variant: '$product.variant',
         },
         totalQuantity: 1,
-        totalRevenue: 1
-      }
+        totalRevenue: 1,
+      },
     },
     { $sort: { totalQuantity: -1 } },
-    { $limit: 10 }
+    { $limit: 10 },
   ]);
 
   // Overall statistics
@@ -493,9 +505,9 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
         totalOrders: { $sum: 1 },
         totalRevenue: { $sum: '$totalAmount' },
         totalCommission: { $sum: '$commission' },
-        avgOrderValue: { $avg: '$totalAmount' }
-      }
-    }
+        avgOrderValue: { $avg: '$totalAmount' },
+      },
+    },
   ]);
 
   res.json({
@@ -507,8 +519,8 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
         totalOrders: 0,
         totalRevenue: 0,
         totalCommission: 0,
-        avgOrderValue: 0
-      }
-    }
+        avgOrderValue: 0,
+      },
+    },
   });
 });

@@ -21,7 +21,7 @@ const {
   cancelOrder,
   rescheduleOrder,
   getOrderPickupDetails,
-  getOrdersForPickup
+  getOrdersForPickup,
 } = require('../controllers/sellOrder.controller');
 const { protect, authorize } = require('../middlewares/auth.middleware');
 
@@ -63,12 +63,14 @@ const createOrderValidation = [
     .withMessage('Time window must be morning, afternoon, or evening'),
   body('payment.method')
     .isIn(['upi', 'bank_transfer', 'wallet', 'cash'])
-    .withMessage('Payment method must be one of: upi, bank_transfer, wallet, cash'),
+    .withMessage(
+      'Payment method must be one of: upi, bank_transfer, wallet, cash'
+    ),
   body('orderNumber')
     .optional()
     .trim()
     .isLength({ min: 1, max: 50 })
-    .withMessage('Order number must be between 1 and 50 characters')
+    .withMessage('Order number must be between 1 and 50 characters'),
 ];
 
 const updateStatusValidation = [
@@ -102,8 +104,7 @@ const updateStatusValidation = [
   //   .trim()
   //   .isLength({ min: 1, max: 100 })
   //   .withMessage('Transaction ID must be between 1 and 100 characters')
-
-  ];
+];
 
 const assignStaffValidation = [
   body('staffId')
@@ -125,7 +126,7 @@ const assignStaffValidation = [
       throw new Error('Either staffId or assignedTo must be provided');
     }
     return true;
-  })
+  }),
 ];
 
 const updatePickupValidation = [
@@ -145,7 +146,7 @@ const updatePickupValidation = [
   body('finalPrice')
     .optional()
     .isFloat({ min: 0 })
-    .withMessage('Final price must be a positive number')
+    .withMessage('Final price must be a positive number'),
 ];
 
 // Query validation
@@ -184,7 +185,7 @@ const getAllOrdersValidation = [
     .optional()
     .trim()
     .isLength({ min: 1, max: 100 })
-    .withMessage('Search term must be between 1 and 100 characters')
+    .withMessage('Search term must be between 1 and 100 characters'),
 ];
 
 const getStatisticsValidation = [
@@ -201,7 +202,7 @@ const getStatisticsValidation = [
   query('groupBy')
     .optional()
     .isIn(['day', 'week', 'month'])
-    .withMessage('Group by must be day, week, or month')
+    .withMessage('Group by must be day, week, or month'),
 ];
 
 // Protected routes - require authentication
@@ -210,19 +211,38 @@ router.use(protect);
 // User order routes
 router.post('/', createOrderValidation, createOrder);
 router.get('/my-orders', getUserOrders);
-router.get('/:orderId', 
-  param('orderId').isMongoId().withMessage('Order ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/:orderId',
+  param('orderId')
+    .isMongoId()
+    .withMessage('Order ID must be a valid MongoDB ObjectId'),
   getOrder
 );
-router.put('/:orderId/cancel', 
-  param('orderId').isMongoId().withMessage('Order ID must be a valid MongoDB ObjectId'),
-  body('reason').trim().isLength({ min: 1, max: 500 }).withMessage('Cancel reason is required and must be between 1 and 500 characters'),
+router.put(
+  '/:orderId/cancel',
+  param('orderId')
+    .isMongoId()
+    .withMessage('Order ID must be a valid MongoDB ObjectId'),
+  body('reason')
+    .trim()
+    .isLength({ min: 1, max: 500 })
+    .withMessage(
+      'Cancel reason is required and must be between 1 and 500 characters'
+    ),
   cancelOrder
 );
-router.put('/:orderId/reschedule', 
-  param('orderId').isMongoId().withMessage('Order ID must be a valid MongoDB ObjectId'),
-  body('newDate').isISO8601().toDate().withMessage('New pickup date must be a valid date'),
-  body('newTimeWindow').isIn(['morning', 'afternoon', 'evening']).withMessage('Time window must be morning, afternoon, or evening'),
+router.put(
+  '/:orderId/reschedule',
+  param('orderId')
+    .isMongoId()
+    .withMessage('Order ID must be a valid MongoDB ObjectId'),
+  body('newDate')
+    .isISO8601()
+    .toDate()
+    .withMessage('New pickup date must be a valid date'),
+  body('newTimeWindow')
+    .isIn(['morning', 'afternoon', 'evening'])
+    .withMessage('Time window must be morning, afternoon, or evening'),
   rescheduleOrder
 );
 
@@ -231,35 +251,53 @@ router.use(authorize('admin'));
 
 // New endpoints for pickup management
 router.get('/pickup/orders-list', getOrdersForPickup);
-router.get('/:orderId/pickup-details', 
-  param('orderId').isMongoId().withMessage('Order ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/:orderId/pickup-details',
+  param('orderId')
+    .isMongoId()
+    .withMessage('Order ID must be a valid MongoDB ObjectId'),
   getOrderPickupDetails
 );
 
 // Admin order management
 router.get('/', getAllOrdersValidation, getAllOrders);
-router.put('/:orderId/status', 
-  param('orderId').isMongoId().withMessage('Order ID must be a valid MongoDB ObjectId'),
+router.put(
+  '/:orderId/status',
+  param('orderId')
+    .isMongoId()
+    .withMessage('Order ID must be a valid MongoDB ObjectId'),
   updateStatusValidation,
   updateOrderStatus
 );
-router.put('/:orderId/assign-staff', 
-  param('orderId').isMongoId().withMessage('Order ID must be a valid MongoDB ObjectId'),
+router.put(
+  '/:orderId/assign-staff',
+  param('orderId')
+    .isMongoId()
+    .withMessage('Order ID must be a valid MongoDB ObjectId'),
   assignStaffValidation,
   assignOrder
 );
-router.put('/:orderId/pickup-details', 
-  param('orderId').isMongoId().withMessage('Order ID must be a valid MongoDB ObjectId'),
+router.put(
+  '/:orderId/pickup-details',
+  param('orderId')
+    .isMongoId()
+    .withMessage('Order ID must be a valid MongoDB ObjectId'),
   updatePickupValidation,
   updatePickupDetails
 );
-router.get('/status/:status', 
-  param('status').isIn(['draft', 'confirmed', 'cancelled', 'picked_up', 'paid']).withMessage('Invalid status'),
+router.get(
+  '/status/:status',
+  param('status')
+    .isIn(['draft', 'confirmed', 'cancelled', 'picked_up', 'paid'])
+    .withMessage('Invalid status'),
   getOrdersByStatus
 );
 router.get('/admin/statistics', getStatisticsValidation, getOrderStats);
-router.delete('/:orderId', 
-  param('orderId').isMongoId().withMessage('Order ID must be a valid MongoDB ObjectId'),
+router.delete(
+  '/:orderId',
+  param('orderId')
+    .isMongoId()
+    .withMessage('Order ID must be a valid MongoDB ObjectId'),
   deleteOrder
 );
 

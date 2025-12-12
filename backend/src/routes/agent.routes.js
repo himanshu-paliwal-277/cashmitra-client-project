@@ -15,9 +15,12 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/temp/');
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname)
+    );
+  },
 });
 
 const upload = multer({
@@ -25,15 +28,17 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const extname = allowedTypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
     const mimetype = allowedTypes.test(file.mimetype);
-    
+
     if (extname && mimetype) {
       return cb(null, true);
     } else {
       cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
     }
-  }
+  },
 });
 
 // Agent Authentication
@@ -41,7 +46,7 @@ router.post(
   '/login',
   [
     check('email').isEmail().withMessage('Please include a valid email'),
-    check('password').exists().withMessage('Password is required')
+    check('password').exists().withMessage('Password is required'),
   ],
   validateRequest,
   asyncHandler(agentController.loginAgent)
@@ -57,7 +62,10 @@ router.get('/stats', asyncHandler(agentController.getAgentStats));
 
 // Pickup Management
 router.get('/pickups', asyncHandler(agentController.getAssignedPickups));
-router.get('/pickups/:pickupId', asyncHandler(agentController.getPickupDetails));
+router.get(
+  '/pickups/:pickupId',
+  asyncHandler(agentController.getPickupDetails)
+);
 
 // Pickup Status Updates
 router.put(
@@ -86,7 +94,9 @@ router.post(
 router.post(
   '/pickups/:pickupId/verify-otp',
   [
-    check('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
+    check('otp')
+      .isLength({ min: 6, max: 6 })
+      .withMessage('OTP must be 6 digits'),
   ],
   validateRequest,
   asyncHandler(agentController.verifyCustomerOTP)
@@ -101,7 +111,7 @@ router.post(
     { name: 'edge1', maxCount: 1 },
     { name: 'edge2', maxCount: 1 },
     { name: 'edge3', maxCount: 1 },
-    { name: 'edge4', maxCount: 1 }
+    { name: 'edge4', maxCount: 1 },
   ]),
   asyncHandler(agentController.uploadDevicePhotos)
 );
@@ -110,8 +120,13 @@ router.post(
 router.post(
   '/pickups/:pickupId/imei',
   [
-    check('imei1').isLength({ min: 15, max: 15 }).withMessage('IMEI 1 must be 15 digits'),
-    check('imei2').optional().isLength({ min: 15, max: 15 }).withMessage('IMEI 2 must be 15 digits')
+    check('imei1')
+      .isLength({ min: 15, max: 15 })
+      .withMessage('IMEI 1 must be 15 digits'),
+    check('imei2')
+      .optional()
+      .isLength({ min: 15, max: 15 })
+      .withMessage('IMEI 2 must be 15 digits'),
   ],
   validateRequest,
   asyncHandler(agentController.verifyIMEI)
@@ -121,10 +136,16 @@ router.post(
 router.post(
   '/pickups/:pickupId/inspection',
   [
-    check('inspectionData').isObject().withMessage('Inspection data is required'),
-    check('inspectionData.screenCondition').notEmpty().withMessage('Screen condition is required'),
-    check('inspectionData.sim1Working').isBoolean().withMessage('SIM 1 status is required'),
-    check('inspectionData.sim2Working').optional().isBoolean()
+    check('inspectionData')
+      .isObject()
+      .withMessage('Inspection data is required'),
+    check('inspectionData.screenCondition')
+      .notEmpty()
+      .withMessage('Screen condition is required'),
+    check('inspectionData.sim1Working')
+      .isBoolean()
+      .withMessage('SIM 1 status is required'),
+    check('inspectionData.sim2Working').optional().isBoolean(),
   ],
   validateRequest,
   asyncHandler(agentController.submitDeviceInspection)
@@ -140,8 +161,12 @@ router.get(
 router.put(
   '/pickups/:pickupId/price',
   [
-    check('adjustedPrice').isNumeric().withMessage('Adjusted price must be a number'),
-    check('reason').notEmpty().withMessage('Reason for price adjustment is required')
+    check('adjustedPrice')
+      .isNumeric()
+      .withMessage('Adjusted price must be a number'),
+    check('reason')
+      .notEmpty()
+      .withMessage('Reason for price adjustment is required'),
   ],
   validateRequest,
   asyncHandler(agentController.updatePrice)
@@ -152,7 +177,7 @@ router.post(
   '/pickups/:pickupId/customer-decision',
   [
     check('accepted').isBoolean().withMessage('Accepted status is required'),
-    check('rejectionReason').optional().notEmpty()
+    check('rejectionReason').optional().notEmpty(),
   ],
   validateRequest,
   asyncHandler(agentController.recordCustomerDecision)
@@ -163,8 +188,10 @@ router.post(
   '/pickups/:pickupId/payment',
   [
     check('amount').isNumeric().withMessage('Payment amount is required'),
-    check('method').isIn(['cash', 'upi', 'neft', 'bank_transfer']).withMessage('Invalid payment method'),
-    check('transactionId').optional().notEmpty()
+    check('method')
+      .isIn(['cash', 'upi', 'neft', 'bank_transfer'])
+      .withMessage('Invalid payment method'),
+    check('transactionId').optional().notEmpty(),
   ],
   validateRequest,
   asyncHandler(agentController.recordPayment)
@@ -179,7 +206,9 @@ router.post(
 router.post(
   '/pickups/:pickupId/verify-final-otp',
   [
-    check('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
+    check('otp')
+      .isLength({ min: 6, max: 6 })
+      .withMessage('OTP must be 6 digits'),
   ],
   validateRequest,
   asyncHandler(agentController.verifyFinalOTP)
@@ -203,6 +232,9 @@ router.get('/completed-today', asyncHandler(agentController.getCompletedToday));
 
 // Daily Report
 router.get('/daily-report', asyncHandler(agentController.getDailyReport));
-router.post('/submit-daily-report', asyncHandler(agentController.submitDailyReport));
+router.post(
+  '/submit-daily-report',
+  asyncHandler(agentController.submitDailyReport)
+);
 
 module.exports = router;

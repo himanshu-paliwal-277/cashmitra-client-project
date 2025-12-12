@@ -9,7 +9,7 @@ const {
   getProductFilters,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
 } = require('../controllers/product.controller');
 const { protect } = require('../middlewares/auth.middleware');
 
@@ -39,7 +39,14 @@ const productListValidation = [
     .withMessage('Maximum price must be a non-negative number'),
   query('sortBy')
     .optional()
-    .isIn(['createdAt', 'price', 'rating', 'popularity', 'availability', 'name'])
+    .isIn([
+      'createdAt',
+      'price',
+      'rating',
+      'popularity',
+      'availability',
+      'name',
+    ])
     .withMessage('Invalid sort field'),
   query('sortOrder')
     .optional()
@@ -69,7 +76,7 @@ const productListValidation = [
   query('condition')
     .optional()
     .isIn(['Excellent', 'Good', 'Fair', 'Poor'])
-    .withMessage('Invalid condition value')
+    .withMessage('Invalid condition value'),
 ];
 
 const productDetailValidation = [
@@ -80,7 +87,7 @@ const productDetailValidation = [
     .optional()
     .isLength({ min: 6, max: 6 })
     .isNumeric()
-    .withMessage('Pincode must be a 6-digit number')
+    .withMessage('Pincode must be a 6-digit number'),
 ];
 
 const suggestionValidation = [
@@ -90,21 +97,21 @@ const suggestionValidation = [
   query('limit')
     .optional()
     .isInt({ min: 1, max: 20 })
-    .withMessage('Limit must be between 1 and 20')
+    .withMessage('Limit must be between 1 and 20'),
 ];
 
 const categoryFilterValidation = [
   query('category')
     .optional()
     .isMongoId()
-    .withMessage('Category must be a valid MongoDB ObjectId')
+    .withMessage('Category must be a valid MongoDB ObjectId'),
 ];
 
 const filterValidation = [
   query('category')
     .optional()
     .isMongoId()
-    .withMessage('Category must be a valid MongoDB ObjectId')
+    .withMessage('Category must be a valid MongoDB ObjectId'),
 ];
 
 const createProductValidation = [
@@ -137,14 +144,11 @@ const createProductValidation = [
     .optional()
     .isFloat({ min: 0, max: 100 })
     .withMessage('Max depreciation must be between 0 and 100'),
-  body('images')
-    .optional()
-    .isArray()
-    .withMessage('Images must be an array'),
+  body('images').optional().isArray().withMessage('Images must be an array'),
   body('images.*')
     .optional()
     .isURL()
-    .withMessage('Each image must be a valid URL')
+    .withMessage('Each image must be a valid URL'),
 ];
 
 const updateProductValidation = [
@@ -179,20 +183,17 @@ const updateProductValidation = [
     .optional()
     .isFloat({ min: 0, max: 100 })
     .withMessage('Max depreciation must be between 0 and 100'),
-  body('images')
-    .optional()
-    .isArray()
-    .withMessage('Images must be an array'),
+  body('images').optional().isArray().withMessage('Images must be an array'),
   body('images.*')
     .optional()
     .isURL()
-    .withMessage('Each image must be a valid URL')
+    .withMessage('Each image must be a valid URL'),
 ];
 
 const deleteProductValidation = [
   param('id')
     .isMongoId()
-    .withMessage('Product ID must be a valid MongoDB ObjectId')
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
 ];
 
 // Public routes

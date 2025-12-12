@@ -11,11 +11,11 @@ module.exports = {
       '@babel/preset-env',
       {
         targets: {
-          node: 'current'
+          node: 'current',
         },
-        modules: 'commonjs'
-      }
-    ]
+        modules: 'commonjs',
+      },
+    ],
   ],
   env: {
     test: {
@@ -24,14 +24,14 @@ module.exports = {
           '@babel/preset-env',
           {
             targets: {
-              node: 'current'
+              node: 'current',
             },
-            modules: 'commonjs'
-          }
-        ]
-      ]
-    }
-  }
+            modules: 'commonjs',
+          },
+        ],
+      ],
+    },
+  },
 };
 
 console.log('✅ Babel configuration loaded!');

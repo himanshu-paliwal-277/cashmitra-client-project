@@ -8,14 +8,14 @@ const validateCreateBuyProduct = [
     .withMessage('Category ID is required')
     .isMongoId()
     .withMessage('Invalid category ID format'),
-  
+
   body('name')
     .trim()
     .notEmpty()
     .withMessage('Product name is required')
     .isLength({ min: 2, max: 200 })
     .withMessage('Product name must be between 2 and 200 characters'),
-  
+
   body('brand')
     .trim()
     .notEmpty()
@@ -458,7 +458,7 @@ const validateCreateBuyProduct = [
   body('sortOrder')
     .optional()
     .isInt()
-    .withMessage('Sort order must be an integer')
+    .withMessage('Sort order must be an integer'),
 ];
 
 // Validation for updating buy products (similar but all optional)
@@ -467,13 +467,13 @@ const validateUpdateBuyProduct = [
     .optional()
     .isMongoId()
     .withMessage('Invalid category ID format'),
-  
+
   body('name')
     .optional()
     .trim()
     .isLength({ min: 2, max: 200 })
     .withMessage('Product name must be between 2 and 200 characters'),
-  
+
   body('brand')
     .optional()
     .trim()
@@ -481,15 +481,15 @@ const validateUpdateBuyProduct = [
     .withMessage('Brand must be between 2 and 100 characters'),
 
   // Include all the same validations as create but make them optional
-  ...validateCreateBuyProduct.map(validation => {
+  ...validateCreateBuyProduct.map((validation) => {
     // Make all validations optional for update
     if (validation.builder && validation.builder.fields) {
-      validation.builder.fields.forEach(field => {
+      validation.builder.fields.forEach((field) => {
         field.optional = true;
       });
     }
     return validation;
-  })
+  }),
 ];
 
 // Middleware to handle validation results
@@ -499,11 +499,11 @@ const handleValidationErrors = (req, res, next) => {
     return res.status(400).json({
       success: false,
       message: 'Validation failed',
-      errors: errors.array().map(error => ({
+      errors: errors.array().map((error) => ({
         field: error.path,
         message: error.msg,
-        value: error.value
-      }))
+        value: error.value,
+      })),
     });
   }
   next();
@@ -512,5 +512,5 @@ const handleValidationErrors = (req, res, next) => {
 module.exports = {
   validateCreateBuyProduct,
   validateUpdateBuyProduct,
-  handleValidationErrors
+  handleValidationErrors,
 };

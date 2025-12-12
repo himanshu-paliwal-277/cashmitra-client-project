@@ -18,19 +18,21 @@ const loginVendor = async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email with vendor role
-    const user = await User.findOne({ email, role: 'vendor' }).select('+password');
+    const user = await User.findOne({ email, role: 'vendor' }).select(
+      '+password'
+    );
 
     // Check if user exists and password matches
     if (user && (await user.matchPassword(password))) {
       // Check if vendor has active permissions
-      const permissions = await VendorPermission.findOne({ 
-        vendor: user._id, 
-        isActive: true 
+      const permissions = await VendorPermission.findOne({
+        vendor: user._id,
+        isActive: true,
       });
 
       if (!permissions) {
-        return res.status(403).json({ 
-          message: 'Vendor access not granted. Please contact administrator.' 
+        return res.status(403).json({
+          message: 'Vendor access not granted. Please contact administrator.',
         });
       }
 
@@ -40,7 +42,7 @@ const loginVendor = async (req, res) => {
         email: user.email,
         role: user.role,
         token: generateToken(user._id, user.role),
-        permissions: permissions.permissions
+        permissions: permissions.permissions,
       });
     } else {
       res.status(401).json({ message: 'Invalid vendor credentials' });
@@ -60,9 +62,9 @@ const getVendorProfile = async (req, res) => {
 
     if (vendor && vendor.role === 'vendor') {
       // Get vendor permissions
-      const permissions = await VendorPermission.findOne({ 
-        vendor: vendor._id, 
-        isActive: true 
+      const permissions = await VendorPermission.findOne({
+        vendor: vendor._id,
+        isActive: true,
       });
 
       res.json({
@@ -71,7 +73,7 @@ const getVendorProfile = async (req, res) => {
         email: vendor.email,
         role: vendor.role,
         phone: vendor.phone,
-        permissions: permissions ? permissions.permissions : {}
+        permissions: permissions ? permissions.permissions : {},
       });
     } else {
       res.status(404).json({ message: 'Vendor not found' });
@@ -87,29 +89,29 @@ const getVendorProfile = async (req, res) => {
 // @access  Private/Vendor
 const getVendorPermissions = async (req, res) => {
   try {
-    const permissions = await VendorPermission.findOne({ 
-      vendor: req.user._id, 
-      isActive: true 
+    const permissions = await VendorPermission.findOne({
+      vendor: req.user._id,
+      isActive: true,
     });
 
     if (!permissions) {
-      return res.status(404).json({ 
-        message: 'No permissions found for this vendor' 
+      return res.status(404).json({
+        message: 'No permissions found for this vendor',
       });
     }
 
     // Get available menu items with permission status
     const menuItems = VendorPermission.getMenuItems();
-    const vendorMenuItems = menuItems.map(item => ({
+    const vendorMenuItems = menuItems.map((item) => ({
       ...item,
       hasAccess: permissions.hasPermission(item.name),
-      restrictions: permissions.permissions.get(item.name)?.restrictions || {}
+      restrictions: permissions.permissions.get(item.name)?.restrictions || {},
     }));
 
     res.json({
       permissions: vendorMenuItems,
       roleTemplate: permissions.roleTemplate,
-      lastUpdated: permissions.updatedAt
+      lastUpdated: permissions.updatedAt,
     });
   } catch (error) {
     console.error(error);
@@ -127,11 +129,11 @@ const getAllVendors = async (req, res) => {
 
     // Build search query
     let query = { role: 'vendor' };
-    
+
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
+        { email: { $regex: search, $options: 'i' } },
       ];
     }
 
@@ -145,16 +147,16 @@ const getAllVendors = async (req, res) => {
     // Get permissions for each vendor
     const vendorsWithPermissions = await Promise.all(
       vendors.map(async (vendor) => {
-        const permissions = await VendorPermission.findOne({ 
-          vendor: vendor._id 
+        const permissions = await VendorPermission.findOne({
+          vendor: vendor._id,
         });
-        
+
         return {
           ...vendor.toObject(),
           hasPermissions: !!permissions,
           isActive: permissions?.isActive || false,
           roleTemplate: permissions?.roleTemplate || null,
-          lastUpdated: permissions?.updatedAt || null
+          lastUpdated: permissions?.updatedAt || null,
         };
       })
     );
@@ -162,9 +164,9 @@ const getAllVendors = async (req, res) => {
     // Filter by status if specified
     let filteredVendors = vendorsWithPermissions;
     if (status === 'active') {
-      filteredVendors = vendorsWithPermissions.filter(v => v.isActive);
+      filteredVendors = vendorsWithPermissions.filter((v) => v.isActive);
     } else if (status === 'inactive') {
-      filteredVendors = vendorsWithPermissions.filter(v => !v.isActive);
+      filteredVendors = vendorsWithPermissions.filter((v) => !v.isActive);
     }
 
     const total = await User.countDocuments(query);
@@ -176,8 +178,8 @@ const getAllVendors = async (req, res) => {
         totalPages: Math.ceil(total / limit),
         totalVendors: total,
         hasNext: page * limit < total,
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -219,7 +221,7 @@ const createVendor = async (req, res) => {
         vendor: vendor._id,
         roleTemplate,
         lastUpdatedBy: req.user._id,
-        notes: `Initial vendor creation with ${roleTemplate} template`
+        notes: `Initial vendor creation with ${roleTemplate} template`,
       });
 
       // Apply role template
@@ -233,7 +235,7 @@ const createVendor = async (req, res) => {
         role: vendor.role,
         phone: vendor.phone,
         roleTemplate,
-        message: 'Vendor created successfully'
+        message: 'Vendor created successfully',
       });
     } else {
       res.status(400).json({ message: 'Invalid vendor data' });
@@ -259,12 +261,14 @@ const updateVendorPermissions = async (req, res) => {
     }
 
     // Find or create vendor permissions
-    let vendorPermissions = await VendorPermission.findOne({ vendor: vendorId });
-    
+    let vendorPermissions = await VendorPermission.findOne({
+      vendor: vendorId,
+    });
+
     if (!vendorPermissions) {
       vendorPermissions = new VendorPermission({
         vendor: vendorId,
-        lastUpdatedBy: req.user._id
+        lastUpdatedBy: req.user._id,
       });
     }
 
@@ -273,8 +277,8 @@ const updateVendorPermissions = async (req, res) => {
       for (const [menuItem, permissionData] of Object.entries(permissions)) {
         if (permissionData.granted) {
           await vendorPermissions.grantPermission(
-            menuItem, 
-            req.user._id, 
+            menuItem,
+            req.user._id,
             permissionData.restrictions
           );
         } else {
@@ -300,7 +304,7 @@ const updateVendorPermissions = async (req, res) => {
     res.json({
       message: 'Vendor permissions updated successfully',
       permissions: vendorPermissions.permissions,
-      roleTemplate: vendorPermissions.roleTemplate
+      roleTemplate: vendorPermissions.roleTemplate,
     });
   } catch (error) {
     console.error(error);
@@ -326,10 +330,12 @@ const getVendorPermissionsAdmin = async (req, res) => {
 
     // Get available menu items with permission status
     const menuItems = VendorPermission.getMenuItems();
-    const vendorMenuItems = menuItems.map(item => ({
+    const vendorMenuItems = menuItems.map((item) => ({
       ...item,
       hasAccess: permissions ? permissions.hasPermission(item.name) : false,
-      restrictions: permissions ? (permissions.permissions.get(item.name)?.restrictions || {}) : {}
+      restrictions: permissions
+        ? permissions.permissions.get(item.name)?.restrictions || {}
+        : {},
     }));
 
     res.json({
@@ -337,13 +343,13 @@ const getVendorPermissionsAdmin = async (req, res) => {
         _id: vendor._id,
         name: vendor.name,
         email: vendor.email,
-        phone: vendor.phone
+        phone: vendor.phone,
       },
       permissions: vendorMenuItems,
       roleTemplate: permissions?.roleTemplate || null,
       isActive: permissions?.isActive || false,
       lastUpdated: permissions?.updatedAt || null,
-      notes: permissions?.notes || ''
+      notes: permissions?.notes || '',
     });
   } catch (error) {
     console.error(error);
@@ -366,12 +372,14 @@ const toggleVendorStatus = async (req, res) => {
     }
 
     // Find or create vendor permissions
-    let vendorPermissions = await VendorPermission.findOne({ vendor: vendorId });
-    
+    let vendorPermissions = await VendorPermission.findOne({
+      vendor: vendorId,
+    });
+
     if (!vendorPermissions) {
       vendorPermissions = new VendorPermission({
         vendor: vendorId,
-        lastUpdatedBy: req.user._id
+        lastUpdatedBy: req.user._id,
       });
     }
 
@@ -386,7 +394,7 @@ const toggleVendorStatus = async (req, res) => {
 
     res.json({
       message: `Vendor ${isActive ? 'activated' : 'deactivated'} successfully`,
-      isActive: vendorPermissions.isActive
+      isActive: vendorPermissions.isActive,
     });
   } catch (error) {
     console.error(error);
@@ -443,5 +451,5 @@ module.exports = {
   getVendorPermissionsAdmin,
   toggleVendorStatus,
   deleteVendor,
-  getMenuItems
+  getMenuItems,
 };

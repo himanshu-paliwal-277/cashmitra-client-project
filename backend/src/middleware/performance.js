@@ -13,13 +13,13 @@ const mongoose = require('mongoose');
 let redisClient;
 if (process.env.REDIS_URL && process.env.NODE_ENV !== 'test') {
   redisClient = redis.createClient({
-    url: process.env.REDIS_URL
+    url: process.env.REDIS_URL,
   });
-  
+
   redisClient.on('error', (err) => {
     console.error('Redis Client Error:', err);
   });
-  
+
   redisClient.connect();
 }
 
@@ -38,7 +38,7 @@ const compressionMiddleware = compression({
   threshold: 1024,
   chunkSize: 16 * 1024,
   windowBits: 15,
-  memLevel: 8
+  memLevel: 8,
 });
 
 /**
@@ -53,35 +53,35 @@ const cache = (duration = 300) => {
     if (req.method !== 'GET' || !redisClient) {
       return next();
     }
-    
+
     try {
       const key = `cache:${req.originalUrl}`;
       const cached = await redisClient.get(key);
-      
+
       if (cached) {
         const data = JSON.parse(cached);
         res.set('X-Cache', 'HIT');
         res.set('Cache-Control', `public, max-age=${duration}`);
         return res.json(data);
       }
-      
+
       // Store original json method
       const originalJson = res.json;
-      
+
       // Override json method to cache response
-      res.json = function(data) {
+      res.json = function (data) {
         // Cache successful responses only
         if (res.statusCode >= 200 && res.statusCode < 300) {
           redisClient.setEx(key, duration, JSON.stringify(data));
         }
-        
+
         res.set('X-Cache', 'MISS');
         res.set('Cache-Control', `public, max-age=${duration}`);
-        
+
         // Call original json method
         return originalJson.call(this, data);
       };
-      
+
       next();
     } catch (error) {
       console.error('Cache middleware error:', error);
@@ -100,17 +100,17 @@ const invalidateCache = (patterns) => {
     if (!redisClient) {
       return next();
     }
-    
+
     try {
       const patternsArray = Array.isArray(patterns) ? patterns : [patterns];
-      
+
       for (const pattern of patternsArray) {
         const keys = await redisClient.keys(`cache:*${pattern}*`);
         if (keys.length > 0) {
           await redisClient.del(keys);
         }
       }
-      
+
       next();
     } catch (error) {
       console.error('Cache invalidation error:', error);
@@ -129,28 +129,28 @@ const optimizeQueries = () => {
     req.queryOptions = {
       lean: true, // Return plain objects instead of Mongoose documents
       maxTimeMS: 5000, // Maximum query execution time
-      hint: null // Can be set by controllers for specific indexes
+      hint: null, // Can be set by controllers for specific indexes
     };
-    
+
     // Add pagination helpers
     req.getPagination = () => {
       const page = Math.max(1, parseInt(req.query.page) || 1);
       const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
       const skip = (page - 1) * limit;
-      
+
       return { page, limit, skip };
     };
-    
+
     // Add sorting helpers
     req.getSorting = (defaultSort = { createdAt: -1 }) => {
       const { sort, order } = req.query;
-      
+
       if (!sort) return defaultSort;
-      
+
       const sortOrder = order === 'asc' ? 1 : -1;
       return { [sort]: sortOrder };
     };
-    
+
     next();
   };
 };
@@ -162,47 +162,51 @@ const optimizeQueries = () => {
 const performanceMonitor = () => {
   return (req, res, next) => {
     const startTime = Date.now();
-    
+
     // Track database queries
     let queryCount = 0;
     let queryTime = 0;
-    
+
     const originalQuery = mongoose.Query.prototype.exec;
-    mongoose.Query.prototype.exec = function() {
+    mongoose.Query.prototype.exec = function () {
       const queryStart = Date.now();
       queryCount++;
-      
+
       return originalQuery.call(this).finally(() => {
         queryTime += Date.now() - queryStart;
       });
     };
-    
+
     // Override res.end to calculate response time
     const originalEnd = res.end;
-    res.end = function(...args) {
+    res.end = function (...args) {
       const responseTime = Date.now() - startTime;
-      
+
       // Add performance headers
       res.set('X-Response-Time', `${responseTime}ms`);
       res.set('X-Query-Count', queryCount.toString());
       res.set('X-Query-Time', `${queryTime}ms`);
-      
+
       // Log slow requests
       if (responseTime > 1000) {
-        console.warn(`Slow request detected: ${req.method} ${req.originalUrl} - ${responseTime}ms`);
+        console.warn(
+          `Slow request detected: ${req.method} ${req.originalUrl} - ${responseTime}ms`
+        );
       }
-      
+
       // Log performance metrics
       if (process.env.NODE_ENV === 'development') {
-        console.log(`${req.method} ${req.originalUrl} - ${responseTime}ms (${queryCount} queries, ${queryTime}ms)`);
+        console.log(
+          `${req.method} ${req.originalUrl} - ${responseTime}ms (${queryCount} queries, ${queryTime}ms)`
+        );
       }
-      
+
       // Restore original query method
       mongoose.Query.prototype.exec = originalQuery;
-      
+
       return originalEnd.call(this, ...args);
     };
-    
+
     next();
   };
 };
@@ -214,19 +218,22 @@ const performanceMonitor = () => {
 const memoryMonitor = () => {
   return (req, res, next) => {
     const memUsage = process.memoryUsage();
-    
+
     // Add memory usage headers in development
     if (process.env.NODE_ENV === 'development') {
       res.set('X-Memory-RSS', `${Math.round(memUsage.rss / 1024 / 1024)}MB`);
-      res.set('X-Memory-Heap-Used', `${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`);
+      res.set(
+        'X-Memory-Heap-Used',
+        `${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`
+      );
     }
-    
+
     // Log memory warnings
     const heapUsedMB = memUsage.heapUsed / 1024 / 1024;
     if (heapUsedMB > 500) {
       console.warn(`High memory usage detected: ${Math.round(heapUsedMB)}MB`);
     }
-    
+
     next();
   };
 };
@@ -238,23 +245,23 @@ const memoryMonitor = () => {
 const optimizeResponse = () => {
   return (req, res, next) => {
     const originalJson = res.json;
-    
-    res.json = function(data) {
+
+    res.json = function (data) {
       // Remove sensitive fields from responses
       if (data && typeof data === 'object') {
         data = removeSensitiveFields(data);
       }
-      
+
       // Add response metadata
       const responseData = {
         success: true,
         timestamp: new Date().toISOString(),
-        ...data
+        ...data,
       };
-      
+
       return originalJson.call(this, responseData);
     };
-    
+
     next();
   };
 };
@@ -266,28 +273,28 @@ const optimizeResponse = () => {
  */
 const removeSensitiveFields = (data) => {
   if (Array.isArray(data)) {
-    return data.map(item => removeSensitiveFields(item));
+    return data.map((item) => removeSensitiveFields(item));
   }
-  
+
   if (data && typeof data === 'object') {
     const cleaned = { ...data };
-    
+
     // Remove sensitive fields
     delete cleaned.password;
     delete cleaned.__v;
     delete cleaned.resetPasswordToken;
     delete cleaned.resetPasswordExpire;
-    
+
     // Recursively clean nested objects
-    Object.keys(cleaned).forEach(key => {
+    Object.keys(cleaned).forEach((key) => {
       if (cleaned[key] && typeof cleaned[key] === 'object') {
         cleaned[key] = removeSensitiveFields(cleaned[key]);
       }
     });
-    
+
     return cleaned;
   }
-  
+
   return data;
 };
 
@@ -299,10 +306,10 @@ const optimizeDatabase = () => {
   // Set mongoose options for better performance
   mongoose.set('bufferCommands', false);
   mongoose.set('bufferMaxEntries', 0);
-  
+
   // Enable query result caching
   mongoose.set('applyPluginsToDiscriminators', true);
-  
+
   console.log('✅ Database optimization applied');
 };
 
@@ -313,22 +320,22 @@ const optimizeDatabase = () => {
 const applyPerformanceOptimizations = (app) => {
   // Apply compression
   app.use(compressionMiddleware);
-  
+
   // Apply performance monitoring
   app.use(performanceMonitor());
-  
+
   // Apply memory monitoring
   app.use(memoryMonitor());
-  
+
   // Apply query optimization
   app.use(optimizeQueries());
-  
+
   // Apply response optimization
   app.use(optimizeResponse());
-  
+
   // Optimize database
   optimizeDatabase();
-  
+
   console.log('✅ Performance optimizations applied');
 };
 
@@ -341,7 +348,7 @@ module.exports = {
   memoryMonitor,
   optimizeResponse,
   applyPerformanceOptimizations,
-  redisClient
+  redisClient,
 };
 
 console.log('✅ Performance middleware loaded successfully!');

@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const walletSchema = new mongoose.Schema(
   {
     partner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Partner",
+      ref: 'Partner',
       required: true,
     },
     balance: {
@@ -14,7 +14,7 @@ const walletSchema = new mongoose.Schema(
     },
     currency: {
       type: String,
-      default: "INR",
+      default: 'INR',
     },
     isActive: {
       type: Boolean,
@@ -23,7 +23,7 @@ const walletSchema = new mongoose.Schema(
     transactions: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Transaction",
+        ref: 'Transaction',
       },
     ],
     lastUpdated: {
@@ -41,8 +41,8 @@ const walletSchema = new mongoose.Schema(
       },
       payoutSchedule: {
         type: String,
-        enum: ["manual", "weekly", "biweekly", "monthly"],
-        default: "manual",
+        enum: ['manual', 'weekly', 'biweekly', 'monthly'],
+        default: 'manual',
       },
       bankDetails: {
         accountNumber: String,
@@ -60,6 +60,6 @@ const walletSchema = new mongoose.Schema(
 // Create index for efficient querying
 walletSchema.index({ partner: 1 }, { unique: true });
 
-const Wallet = mongoose.model("Wallet", walletSchema);
+const Wallet = mongoose.model('Wallet', walletSchema);
 
 module.exports = Wallet;

@@ -6,9 +6,7 @@ const router = express.Router();
 
 // Validation middleware
 const validateAddInventory = [
-  body('product')
-    .isMongoId()
-    .withMessage('Valid product ID is required'),
+  body('product').isMongoId().withMessage('Valid product ID is required'),
   body('condition')
     .isIn(['new', 'like-new', 'good', 'fair', 'poor'])
     .withMessage('Valid condition is required'),
@@ -23,10 +21,7 @@ const validateAddInventory = [
     .isString()
     .isLength({ max: 1000 })
     .withMessage('Description must be a string with max 1000 characters'),
-  body('images')
-    .optional()
-    .isArray()
-    .withMessage('Images must be an array'),
+  body('images').optional().isArray().withMessage('Images must be an array'),
   body('images.*')
     .optional()
     .isURL()
@@ -50,13 +45,11 @@ const validateAddInventory = [
   body('location')
     .optional()
     .isString()
-    .withMessage('Location must be a string')
+    .withMessage('Location must be a string'),
 ];
 
 const validateUpdateInventory = [
-  param('id')
-    .isMongoId()
-    .withMessage('Valid inventory ID is required'),
+  param('id').isMongoId().withMessage('Valid inventory ID is required'),
   body('condition')
     .optional()
     .isIn(['new', 'like-new', 'good', 'fair', 'poor'])
@@ -74,10 +67,7 @@ const validateUpdateInventory = [
     .isString()
     .isLength({ max: 1000 })
     .withMessage('Description must be a string with max 1000 characters'),
-  body('images')
-    .optional()
-    .isArray()
-    .withMessage('Images must be an array'),
+  body('images').optional().isArray().withMessage('Images must be an array'),
   body('images.*')
     .optional()
     .isURL()
@@ -97,13 +87,11 @@ const validateUpdateInventory = [
   body('isAvailable')
     .optional()
     .isBoolean()
-    .withMessage('isAvailable must be a boolean')
+    .withMessage('isAvailable must be a boolean'),
 ];
 
 const validateInventoryId = [
-  param('id')
-    .isMongoId()
-    .withMessage('Valid inventory ID is required')
+  param('id').isMongoId().withMessage('Valid inventory ID is required'),
 ];
 
 const validateGetInventory = [
@@ -151,23 +139,18 @@ const validateGetInventory = [
     .optional()
     .isIn(['asc', 'desc'])
     .withMessage('Sort order must be asc or desc'),
-  query('search')
-    .optional()
-    .isString()
-    .withMessage('Search must be a string')
+  query('search').optional().isString().withMessage('Search must be a string'),
 ];
 
 const validateUpdateStock = [
-  param('id')
-    .isMongoId()
-    .withMessage('Valid inventory ID is required'),
+  param('id').isMongoId().withMessage('Valid inventory ID is required'),
   body('quantity')
     .isInt({ min: 0 })
     .withMessage('Quantity must be a non-negative integer'),
   body('operation')
     .optional()
     .isIn(['set', 'add', 'subtract'])
-    .withMessage('Operation must be set, add, or subtract')
+    .withMessage('Operation must be set, add, or subtract'),
 ];
 
 const validateAnalytics = [
@@ -182,7 +165,7 @@ const validateAnalytics = [
   query('endDate')
     .optional()
     .isISO8601()
-    .withMessage('End date must be a valid date')
+    .withMessage('End date must be a valid date'),
 ];
 
 const validateBulkUpdate = [
@@ -207,7 +190,7 @@ const validateBulkUpdate = [
   body('updates.*.isAvailable')
     .optional()
     .isBoolean()
-    .withMessage('isAvailable must be a boolean')
+    .withMessage('isAvailable must be a boolean'),
 ];
 
 // Public routes
@@ -218,40 +201,46 @@ router.get('/:id', validateInventoryId, inventoryController.getInventoryItem);
 router.use(protect);
 
 // Partner/Admin routes
-router.post('/', 
-  authorize('partner', 'admin'), 
-  validateAddInventory, 
+router.post(
+  '/',
+  authorize('partner', 'admin'),
+  validateAddInventory,
   inventoryController.addInventoryItem
 );
 
-router.put('/:id', 
-  authorize('partner', 'admin'), 
-  validateUpdateInventory, 
+router.put(
+  '/:id',
+  authorize('partner', 'admin'),
+  validateUpdateInventory,
   inventoryController.updateInventoryItem
 );
 
-router.delete('/:id', 
-  authorize('partner', 'admin'), 
-  validateInventoryId, 
+router.delete(
+  '/:id',
+  authorize('partner', 'admin'),
+  validateInventoryId,
   inventoryController.deleteInventoryItem
 );
 
-router.patch('/:id/stock', 
-  authorize('partner', 'admin'), 
-  validateUpdateStock, 
+router.patch(
+  '/:id/stock',
+  authorize('partner', 'admin'),
+  validateUpdateStock,
   inventoryController.updateStock
 );
 
-router.patch('/bulk-update', 
-  authorize('partner', 'admin'), 
-  validateBulkUpdate, 
+router.patch(
+  '/bulk-update',
+  authorize('partner', 'admin'),
+  validateBulkUpdate,
   inventoryController.bulkUpdateInventory
 );
 
 // Analytics routes
-router.get('/analytics/overview', 
-  authorize('partner', 'admin'), 
-  validateAnalytics, 
+router.get(
+  '/analytics/overview',
+  authorize('partner', 'admin'),
+  validateAnalytics,
   inventoryController.getInventoryAnalytics
 );
 

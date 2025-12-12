@@ -22,7 +22,7 @@ const createAdminUser = async () => {
   try {
     // Check if admin user already exists
     const adminExists = await User.findOne({ role: 'admin' });
-    
+
     if (adminExists) {
       console.log('Admin user already exists');
       return;
@@ -32,10 +32,10 @@ const createAdminUser = async () => {
     const adminUser = await User.create({
       name: 'Admin User',
       email: 'admin@cashify.com',
-      password: 'Admin@123',  // This should be changed after first login
+      password: 'Admin@123', // This should be changed after first login
       phone: '9876543210',
       role: 'admin',
-      isVerified: true
+      isVerified: true,
     });
 
     console.log('Admin user created successfully:', adminUser.email);

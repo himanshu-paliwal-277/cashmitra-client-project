@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
     roleTemplate: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'RoleTemplate',
-      default: null
+      default: null,
     },
     isVerified: {
       type: Boolean,

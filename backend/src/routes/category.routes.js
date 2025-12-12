@@ -8,7 +8,7 @@ const {
   deleteCategory,
   getCategoryStats,
   bulkUpdateStatus,
-  searchCategories
+  searchCategories,
 } = require('../controllers/category.controller');
 const { protect, authorize } = require('../middlewares/auth.middleware');
 
@@ -24,14 +24,8 @@ const categoryValidation = [
     .optional()
     .isLength({ max: 500 })
     .withMessage('Description cannot exceed 500 characters'),
-  body('image')
-    .optional()
-    .isURL()
-    .withMessage('Image must be a valid URL'),
-  body('icon')
-    .optional()
-    .isString()
-    .withMessage('Icon must be a string'),
+  body('image').optional().isURL().withMessage('Image must be a valid URL'),
+  body('icon').optional().isString().withMessage('Icon must be a string'),
   body('parentCategory')
     .optional()
     .isMongoId()
@@ -51,14 +45,14 @@ const categoryValidation = [
   body('sortOrder')
     .optional()
     .isInt({ min: 0 })
-    .withMessage('Sort order must be a non-negative integer')
+    .withMessage('Sort order must be a non-negative integer'),
 ];
 
 const updateCategoryValidation = [
   param('id')
     .isMongoId()
     .withMessage('Category ID must be a valid MongoDB ObjectId'),
-  ...categoryValidation
+  ...categoryValidation,
 ];
 
 const bulkStatusValidation = [
@@ -68,9 +62,7 @@ const bulkStatusValidation = [
   body('categoryIds.*')
     .isMongoId()
     .withMessage('Each category ID must be a valid MongoDB ObjectId'),
-  body('isActive')
-    .isBoolean()
-    .withMessage('isActive must be a boolean')
+  body('isActive').isBoolean().withMessage('isActive must be a boolean'),
 ];
 
 const searchValidation = [
@@ -85,7 +77,7 @@ const searchValidation = [
   query('includeInactive')
     .optional()
     .isBoolean()
-    .withMessage('includeInactive must be a boolean')
+    .withMessage('includeInactive must be a boolean'),
 ];
 
 // Public routes
@@ -99,8 +91,11 @@ router.use(authorize('admin')); // All routes below require admin role
 
 router.post('/', categoryValidation, createCategory);
 router.put('/:id', updateCategoryValidation, updateCategory);
-router.delete('/:id', 
-  param('id').isMongoId().withMessage('Category ID must be a valid MongoDB ObjectId'),
+router.delete(
+  '/:id',
+  param('id')
+    .isMongoId()
+    .withMessage('Category ID must be a valid MongoDB ObjectId'),
   deleteCategory
 );
 router.get('/admin/stats', getCategoryStats);

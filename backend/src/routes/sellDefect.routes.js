@@ -16,7 +16,7 @@ const {
   bulkCreateDefects,
   reorderDefects,
   getDefectCategories,
-  getDefectsByCategory
+  getDefectsByCategory,
 } = require('../controllers/sellDefect.controller');
 const { protect, authorize } = require('../middlewares/auth.middleware');
 
@@ -28,14 +28,27 @@ const defectValidation = [
     .isMongoId()
     .withMessage('Category ID must be a valid MongoDB ObjectId'),
   body('section')
-    .isIn(['screen', 'body', 'functional', 'battery', 'camera', 'sensor', 'buttons', 'others'])
-    .withMessage('Section must be one of: screen, body, functional, battery, camera, sensor, buttons, others'),
+    .isIn([
+      'screen',
+      'body',
+      'functional',
+      'battery',
+      'camera',
+      'sensor',
+      'buttons',
+      'others',
+    ])
+    .withMessage(
+      'Section must be one of: screen, body, functional, battery, camera, sensor, buttons, others'
+    ),
   body('key')
     .trim()
     .isLength({ min: 1, max: 100 })
     .withMessage('Key must be between 1 and 100 characters')
     .matches(/^[a-z0-9_]+$/)
-    .withMessage('Key must contain only lowercase letters, numbers, and underscores'),
+    .withMessage(
+      'Key must contain only lowercase letters, numbers, and underscores'
+    ),
   body('title')
     .trim()
     .isLength({ min: 1, max: 200 })
@@ -61,12 +74,15 @@ const defectValidation = [
   body('isActive')
     .optional()
     .isBoolean()
-    .withMessage('isActive must be a boolean')
+    .withMessage('isActive must be a boolean'),
 ];
 
 // Public routes for customers
-router.get('/category/:categoryId', 
-  param('categoryId').isMongoId().withMessage('Category ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/category/:categoryId',
+  param('categoryId')
+    .isMongoId()
+    .withMessage('Category ID must be a valid MongoDB ObjectId'),
   getDefectsByCategory
 );
 router.get('/categories', getDefectCategories);
@@ -78,26 +94,37 @@ router.use(authorize('admin'));
 // CRUD routes
 router.post('/', defectValidation, createDefect);
 router.get('/', getDefects);
-router.get('/:id', 
-  param('id').isMongoId().withMessage('Defect ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/:id',
+  param('id')
+    .isMongoId()
+    .withMessage('Defect ID must be a valid MongoDB ObjectId'),
   getDefect
 );
-router.put('/:id', 
-  param('id').isMongoId().withMessage('Defect ID must be a valid MongoDB ObjectId'),
+router.put(
+  '/:id',
+  param('id')
+    .isMongoId()
+    .withMessage('Defect ID must be a valid MongoDB ObjectId'),
   defectValidation,
   updateDefect
 );
-router.delete('/:id', 
-  param('id').isMongoId().withMessage('Defect ID must be a valid MongoDB ObjectId'),
+router.delete(
+  '/:id',
+  param('id')
+    .isMongoId()
+    .withMessage('Defect ID must be a valid MongoDB ObjectId'),
   deleteDefect
 );
 
 // Bulk operations
-router.post('/bulk', 
+router.post(
+  '/bulk',
   body('defects').isArray({ min: 1 }).withMessage('Defects array is required'),
   bulkCreateDefects
 );
-router.put('/reorder', 
+router.put(
+  '/reorder',
   body('defects').isArray({ min: 1 }).withMessage('Defects array is required'),
   reorderDefects
 );

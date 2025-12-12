@@ -1,7 +1,7 @@
-const Pricing = require("../models/pricing.model");
-const Product = require("../models/product.model");
-const { validationResult } = require("express-validator");
-const mongoose = require("mongoose");
+const Pricing = require('../models/pricing.model');
+const Product = require('../models/product.model');
+const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 // @desc    Get all pricing configurations
 // @route   GET /api/admin/pricing
@@ -14,31 +14,31 @@ const getPricingConfigs = async (req, res) => {
       isActive,
       productId,
       search,
-      sortBy = "createdAt",
-      sortOrder = "desc",
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
     } = req.query;
 
     // Build filter object
     const filter = {};
-    if (isActive !== undefined) filter.isActive = isActive === "true";
+    if (isActive !== undefined) filter.isActive = isActive === 'true';
     if (productId) filter.product = productId;
 
     // Calculate pagination
     const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
+    const sortOptions = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
     // Build aggregation pipeline
     const pipeline = [
       {
         $lookup: {
-          from: "products",
-          localField: "product",
-          foreignField: "_id",
-          as: "productInfo",
+          from: 'products',
+          localField: 'product',
+          foreignField: '_id',
+          as: 'productInfo',
         },
       },
       {
-        $unwind: "$productInfo",
+        $unwind: '$productInfo',
       },
     ];
 
@@ -47,9 +47,9 @@ const getPricingConfigs = async (req, res) => {
       pipeline.push({
         $match: {
           $or: [
-            { "productInfo.name": { $regex: search, $options: "i" } },
-            { "productInfo.brand": { $regex: search, $options: "i" } },
-            { "productInfo.model": { $regex: search, $options: "i" } },
+            { 'productInfo.name': { $regex: search, $options: 'i' } },
+            { 'productInfo.brand': { $regex: search, $options: 'i' } },
+            { 'productInfo.model': { $regex: search, $options: 'i' } },
           ],
         },
       });
@@ -69,45 +69,45 @@ const getPricingConfigs = async (req, res) => {
     // Add user lookup for updatedBy
     pipeline.push({
       $lookup: {
-        from: "users",
-        localField: "updatedBy",
-        foreignField: "_id",
-        as: "updatedByInfo",
+        from: 'users',
+        localField: 'updatedBy',
+        foreignField: '_id',
+        as: 'updatedByInfo',
       },
     });
 
     // Calculate condition prices
     pipeline.push({
       $addFields: {
-        "conditions.excellent.price": {
+        'conditions.excellent.price': {
           $round: {
             $multiply: [
-              "$basePrice",
-              { $divide: ["$conditions.excellent.percentage", 100] },
+              '$basePrice',
+              { $divide: ['$conditions.excellent.percentage', 100] },
             ],
           },
         },
-        "conditions.good.price": {
+        'conditions.good.price': {
           $round: {
             $multiply: [
-              "$basePrice",
-              { $divide: ["$conditions.good.percentage", 100] },
+              '$basePrice',
+              { $divide: ['$conditions.good.percentage', 100] },
             ],
           },
         },
-        "conditions.fair.price": {
+        'conditions.fair.price': {
           $round: {
             $multiply: [
-              "$basePrice",
-              { $divide: ["$conditions.fair.percentage", 100] },
+              '$basePrice',
+              { $divide: ['$conditions.fair.percentage', 100] },
             ],
           },
         },
-        "conditions.poor.price": {
+        'conditions.poor.price': {
           $round: {
             $multiply: [
-              "$basePrice",
-              { $divide: ["$conditions.poor.percentage", 100] },
+              '$basePrice',
+              { $divide: ['$conditions.poor.percentage', 100] },
             ],
           },
         },
@@ -120,22 +120,22 @@ const getPricingConfigs = async (req, res) => {
     const countPipeline = [
       {
         $lookup: {
-          from: "products",
-          localField: "product",
-          foreignField: "_id",
-          as: "productInfo",
+          from: 'products',
+          localField: 'product',
+          foreignField: '_id',
+          as: 'productInfo',
         },
       },
-      { $unwind: "$productInfo" },
+      { $unwind: '$productInfo' },
     ];
 
     if (search) {
       countPipeline.push({
         $match: {
           $or: [
-            { "productInfo.name": { $regex: search, $options: "i" } },
-            { "productInfo.brand": { $regex: search, $options: "i" } },
-            { "productInfo.model": { $regex: search, $options: "i" } },
+            { 'productInfo.name': { $regex: search, $options: 'i' } },
+            { 'productInfo.brand': { $regex: search, $options: 'i' } },
+            { 'productInfo.model': { $regex: search, $options: 'i' } },
           ],
         },
       });
@@ -145,7 +145,7 @@ const getPricingConfigs = async (req, res) => {
       countPipeline.push({ $match: filter });
     }
 
-    countPipeline.push({ $count: "total" });
+    countPipeline.push({ $count: 'total' });
     const totalResult = await Pricing.aggregate(countPipeline);
     const total = totalResult[0]?.total || 0;
 
@@ -160,7 +160,7 @@ const getPricingConfigs = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -170,25 +170,25 @@ const getPricingConfigs = async (req, res) => {
 const getPricingConfig = async (req, res) => {
   try {
     const pricing = await Pricing.findById(req.params.id)
-      .populate("product", "name brand model category")
-      .populate("updatedBy", "name email")
-      .populate("priceHistory.updatedBy", "name email");
+      .populate('product', 'name brand model category')
+      .populate('updatedBy', 'name email')
+      .populate('priceHistory.updatedBy', 'name email');
 
     if (!pricing) {
       return res
         .status(404)
-        .json({ message: "Pricing configuration not found" });
+        .json({ message: 'Pricing configuration not found' });
     }
 
     res.json(pricing);
   } catch (error) {
     console.error(error);
-    if (error.kind === "ObjectId") {
+    if (error.kind === 'ObjectId') {
       return res
         .status(404)
-        .json({ message: "Pricing configuration not found" });
+        .json({ message: 'Pricing configuration not found' });
     }
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -207,7 +207,7 @@ const createPricingConfig = async (req, res) => {
     // Check if product exists
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     // Check if active pricing already exists for this product
@@ -218,7 +218,7 @@ const createPricingConfig = async (req, res) => {
 
     if (existingPricing) {
       return res.status(400).json({
-        message: "Active pricing configuration already exists for this product",
+        message: 'Active pricing configuration already exists for this product',
       });
     }
 
@@ -231,13 +231,13 @@ const createPricingConfig = async (req, res) => {
     await pricing.save();
 
     const populatedPricing = await Pricing.findById(pricing._id)
-      .populate("product", "name brand model category")
-      .populate("updatedBy", "name email");
+      .populate('product', 'name brand model category')
+      .populate('updatedBy', 'name email');
 
     res.status(201).json(populatedPricing);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -255,7 +255,7 @@ const updatePricingConfig = async (req, res) => {
     if (!pricing) {
       return res
         .status(404)
-        .json({ message: "Pricing configuration not found" });
+        .json({ message: 'Pricing configuration not found' });
     }
 
     // Store current pricing in history before updating
@@ -263,7 +263,7 @@ const updatePricingConfig = async (req, res) => {
       date: new Date(),
       basePrice: pricing.basePrice,
       conditions: pricing.conditions,
-      reason: req.body.updateReason || "Manual update",
+      reason: req.body.updateReason || 'Manual update',
       updatedBy: req.user.id,
     };
 
@@ -278,18 +278,18 @@ const updatePricingConfig = async (req, res) => {
       updateData,
       { new: true, runValidators: true }
     )
-      .populate("product", "name brand model category")
-      .populate("updatedBy", "name email");
+      .populate('product', 'name brand model category')
+      .populate('updatedBy', 'name email');
 
     res.json(updatedPricing);
   } catch (error) {
     console.error(error);
-    if (error.kind === "ObjectId") {
+    if (error.kind === 'ObjectId') {
       return res
         .status(404)
-        .json({ message: "Pricing configuration not found" });
+        .json({ message: 'Pricing configuration not found' });
     }
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -302,19 +302,19 @@ const deletePricingConfig = async (req, res) => {
     if (!pricing) {
       return res
         .status(404)
-        .json({ message: "Pricing configuration not found" });
+        .json({ message: 'Pricing configuration not found' });
     }
 
     await Pricing.findByIdAndDelete(req.params.id);
-    res.json({ message: "Pricing configuration deleted successfully" });
+    res.json({ message: 'Pricing configuration deleted successfully' });
   } catch (error) {
     console.error(error);
-    if (error.kind === "ObjectId") {
+    if (error.kind === 'ObjectId') {
       return res
         .status(404)
-        .json({ message: "Pricing configuration not found" });
+        .json({ message: 'Pricing configuration not found' });
     }
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -330,7 +330,7 @@ const getProductPricing = async (req, res) => {
     if (!pricing) {
       return res
         .status(404)
-        .json({ message: "No active pricing found for this product" });
+        .json({ message: 'No active pricing found for this product' });
     }
 
     let response = {
@@ -351,7 +351,7 @@ const getProductPricing = async (req, res) => {
     res.json(response);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -360,10 +360,10 @@ const getProductPricing = async (req, res) => {
 // @access  Private/Admin
 const bulkUpdatePricing = async (req, res) => {
   try {
-    const { updates, updateReason = "Bulk update" } = req.body;
+    const { updates, updateReason = 'Bulk update' } = req.body;
 
     if (!Array.isArray(updates) || updates.length === 0) {
-      return res.status(400).json({ message: "Updates array is required" });
+      return res.status(400).json({ message: 'Updates array is required' });
     }
 
     const results = [];
@@ -375,7 +375,7 @@ const bulkUpdatePricing = async (req, res) => {
 
         const pricing = await Pricing.findById(pricingId);
         if (!pricing) {
-          errors.push({ pricingId, error: "Pricing configuration not found" });
+          errors.push({ pricingId, error: 'Pricing configuration not found' });
           continue;
         }
 
@@ -396,7 +396,7 @@ const bulkUpdatePricing = async (req, res) => {
             $push: { priceHistory: historyEntry },
           },
           { new: true, runValidators: true }
-        ).populate("product", "name brand model");
+        ).populate('product', 'name brand model');
 
         results.push(updatedPricing);
       } catch (error) {
@@ -411,7 +411,7 @@ const bulkUpdatePricing = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -428,7 +428,7 @@ const getPricingStats = async (req, res) => {
       {
         $group: {
           _id: null,
-          avgBasePrice: { $avg: "$basePrice" },
+          avgBasePrice: { $avg: '$basePrice' },
         },
       },
     ]);
@@ -445,7 +445,7 @@ const getPricingStats = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 
@@ -454,13 +454,13 @@ const getPricingStats = async (req, res) => {
 // @access  Private/Admin
 const calculatePrice = async (req, res) => {
   try {
-    const { condition = "excellent", adjustments = [] } = req.body;
+    const { condition = 'excellent', adjustments = [] } = req.body;
 
     const pricing = await Pricing.findById(req.params.id);
     if (!pricing) {
       return res
         .status(404)
-        .json({ message: "Pricing configuration not found" });
+        .json({ message: 'Pricing configuration not found' });
     }
 
     // Calculate final price using the model method
@@ -475,12 +475,12 @@ const calculatePrice = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    if (error.kind === "ObjectId") {
+    if (error.kind === 'ObjectId') {
       return res
         .status(404)
-        .json({ message: "Pricing configuration not found" });
+        .json({ message: 'Pricing configuration not found' });
     }
-    res.status(500).json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 

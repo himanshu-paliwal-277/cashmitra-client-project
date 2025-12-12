@@ -20,14 +20,20 @@ class ApiError extends Error {
    * @param {Array} [errors] - Detailed validation errors
    * @param {boolean} [isOperational=true] - Whether error is operational
    */
-  constructor(message, statusCode, code = null, errors = [], isOperational = true) {
+  constructor(
+    message,
+    statusCode,
+    code = null,
+    errors = [],
+    isOperational = true
+  ) {
     super(message);
     this.statusCode = statusCode;
     this.code = code;
     this.errors = errors;
     this.isOperational = isOperational;
     this.timestamp = new Date().toISOString();
-    
+
     Error.captureStackTrace(this, this.constructor);
   }
 }
@@ -117,19 +123,19 @@ class RateLimitError extends ApiError {
  */
 const formatMongooseValidationError = (error) => {
   const errors = [];
-  
+
   if (error.errors) {
-    Object.keys(error.errors).forEach(field => {
+    Object.keys(error.errors).forEach((field) => {
       const fieldError = error.errors[field];
       errors.push({
         field,
         message: fieldError.message,
         value: fieldError.value,
-        type: fieldError.kind
+        type: fieldError.kind,
       });
     });
   }
-  
+
   return errors;
 };
 
@@ -141,13 +147,15 @@ const formatMongooseValidationError = (error) => {
 const formatDuplicateKeyError = (error) => {
   const field = Object.keys(error.keyValue)[0];
   const value = error.keyValue[field];
-  
-  return [{
-    field,
-    message: `${field} '${value}' already exists`,
-    value,
-    type: 'duplicate'
-  }];
+
+  return [
+    {
+      field,
+      message: `${field} '${value}' already exists`,
+      value,
+      type: 'duplicate',
+    },
+  ];
 };
 
 /**
@@ -156,12 +164,14 @@ const formatDuplicateKeyError = (error) => {
  * @returns {Array} Formatted validation errors
  */
 const formatCastError = (error) => {
-  return [{
-    field: error.path,
-    message: `Invalid ${error.path}: ${error.value}`,
-    value: error.value,
-    type: 'cast'
-  }];
+  return [
+    {
+      field: error.path,
+      message: `Invalid ${error.path}: ${error.value}`,
+      value: error.value,
+      type: 'cast',
+    },
+  ];
 };
 
 /**
@@ -182,10 +192,10 @@ const logError = (error, req) => {
       message: error.message,
       stack: error.stack,
       statusCode: error.statusCode,
-      code: error.code
-    }
+      code: error.code,
+    },
   };
-  
+
   // In production, use proper logging service
   if (process.env.NODE_ENV === 'production') {
     console.error('API Error:', JSON.stringify(errorLog, null, 2));
@@ -204,38 +214,38 @@ const logError = (error, req) => {
 const errorHandler = (err, req, res, next) => {
   let error = { ...err };
   error.message = err.message;
-  
+
   // Log error
   logError(err, req);
-  
+
   // Mongoose validation error
   if (err.name === 'ValidationError') {
     const errors = formatMongooseValidationError(err);
     error = new ValidationError(errors);
   }
-  
+
   // Mongoose duplicate key error
   if (err.code === 11000) {
     const errors = formatDuplicateKeyError(err);
     error = new ConflictError('Duplicate field value', 'DUPLICATE_FIELD');
     error.errors = errors;
   }
-  
+
   // Mongoose cast error
   if (err.name === 'CastError') {
     const errors = formatCastError(err);
     error = new ValidationError(errors, 'Invalid data format');
   }
-  
+
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
     error = new AuthenticationError('Invalid token', 'TOKEN_INVALID');
   }
-  
+
   if (err.name === 'TokenExpiredError') {
     error = new AuthenticationError('Token expired', 'TOKEN_EXPIRED');
   }
-  
+
   // Multer errors (file upload)
   if (err.code === 'LIMIT_FILE_SIZE') {
     error = new ValidationError(
@@ -243,48 +253,48 @@ const errorHandler = (err, req, res, next) => {
       'File upload failed'
     );
   }
-  
+
   if (err.code === 'LIMIT_FILE_COUNT') {
     error = new ValidationError(
       [{ field: 'files', message: 'Too many files', type: 'file_count' }],
       'File upload failed'
     );
   }
-  
+
   // Default to 500 server error
   if (!error.statusCode) {
     error = new ApiError(
-      process.env.NODE_ENV === 'production' 
-        ? 'Internal server error' 
+      process.env.NODE_ENV === 'production'
+        ? 'Internal server error'
         : err.message,
       500,
       'INTERNAL_ERROR'
     );
   }
-  
+
   // Prepare response
   const response = {
     success: false,
     message: error.message,
     code: error.code,
-    timestamp: error.timestamp || new Date().toISOString()
+    timestamp: error.timestamp || new Date().toISOString(),
   };
-  
+
   // Add errors array if present
   if (error.errors && error.errors.length > 0) {
     response.errors = error.errors;
   }
-  
+
   // Add stack trace in development
   if (process.env.NODE_ENV === 'development') {
     response.stack = error.stack;
   }
-  
+
   // Add retry-after header for rate limit errors
   if (error instanceof RateLimitError) {
     res.set('Retry-After', error.retryAfter);
   }
-  
+
   res.status(error.statusCode).json(response);
 };
 
@@ -295,7 +305,10 @@ const errorHandler = (err, req, res, next) => {
  * @param {Function} next - Express next function
  */
 const notFoundHandler = (req, res, next) => {
-  const error = new NotFoundError(`Route ${req.originalUrl}`, 'ROUTE_NOT_FOUND');
+  const error = new NotFoundError(
+    `Route ${req.originalUrl}`,
+    'ROUTE_NOT_FOUND'
+  );
   next(error);
 };
 
@@ -318,18 +331,24 @@ const asyncHandler = (fn) => {
  * @param {number} statusCode - HTTP status code
  * @param {Object} meta - Additional metadata (pagination, etc.)
  */
-const successResponse = (res, data = null, message = 'Success', statusCode = 200, meta = {}) => {
+const successResponse = (
+  res,
+  data = null,
+  message = 'Success',
+  statusCode = 200,
+  meta = {}
+) => {
   const response = {
     success: true,
     message,
     timestamp: new Date().toISOString(),
-    ...meta
+    ...meta,
   };
-  
+
   if (data !== null) {
     response.data = data;
   }
-  
+
   res.status(statusCode).json(response);
 };
 
@@ -342,16 +361,23 @@ const successResponse = (res, data = null, message = 'Success', statusCode = 200
  * @param {number} limit - Items per page
  * @param {string} message - Success message
  */
-const paginatedResponse = (res, data, total, page, limit, message = 'Success') => {
+const paginatedResponse = (
+  res,
+  data,
+  total,
+  page,
+  limit,
+  message = 'Success'
+) => {
   const totalPages = Math.ceil(total / limit);
-  
+
   successResponse(res, data, message, 200, {
     count: data.length,
     total,
     page: parseInt(page),
     pages: totalPages,
     hasNext: page < totalPages,
-    hasPrev: page > 1
+    hasPrev: page > 1,
   });
 };
 
@@ -365,13 +391,13 @@ module.exports = {
   ConflictError,
   BusinessLogicError,
   RateLimitError,
-  
+
   // Middleware
   errorHandler,
   notFoundHandler,
   asyncHandler,
-  
+
   // Response helpers
   successResponse,
-  paginatedResponse
+  paginatedResponse,
 };

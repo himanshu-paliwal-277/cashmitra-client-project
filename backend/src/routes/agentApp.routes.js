@@ -7,7 +7,10 @@ const express = require('express');
 const { check } = require('express-validator');
 const agentAppController = require('../controllers/agentApp.controller');
 const { protect, authorize } = require('../middlewares/auth.middleware');
-const { validateRequest, validateObjectId } = require('../middlewares/validation.middleware');
+const {
+  validateRequest,
+  validateObjectId,
+} = require('../middlewares/validation.middleware');
 const { asyncHandler } = require('../middlewares/errorHandler.middleware');
 
 const router = express.Router();
@@ -24,9 +27,7 @@ router.post(
       .isEmail()
       .normalizeEmail()
       .withMessage('Valid email is required'),
-    check('password')
-      .notEmpty()
-      .withMessage('Password is required')
+    check('password').notEmpty().withMessage('Password is required'),
   ],
   validateRequest,
   asyncHandler(agentAppController.login)
@@ -41,20 +42,14 @@ router.use(authorize('agent'));
  * @desc    Get agent profile
  * @access  Private (Agent)
  */
-router.get(
-  '/profile',
-  asyncHandler(agentAppController.getProfile)
-);
+router.get('/profile', asyncHandler(agentAppController.getProfile));
 
 /**
  * @route   GET /api/agent-app/orders/today
  * @desc    Get today's assigned orders
  * @access  Private (Agent)
  */
-router.get(
-  '/orders/today',
-  asyncHandler(agentAppController.getTodayOrders)
-);
+router.get('/orders/today', asyncHandler(agentAppController.getTodayOrders));
 
 /**
  * @route   GET /api/agent-app/orders/tomorrow
@@ -81,7 +76,7 @@ router.get(
     check('limit')
       .optional()
       .isInt({ min: 1, max: 100 })
-      .withMessage('Limit must be between 1 and 100')
+      .withMessage('Limit must be between 1 and 100'),
   ],
   validateRequest,
   asyncHandler(agentAppController.getPastOrders)
@@ -128,9 +123,7 @@ router.get(
 router.post(
   '/evaluation/calculate-price',
   [
-    check('orderId')
-      .isMongoId()
-      .withMessage('Valid order ID is required'),
+    check('orderId').isMongoId().withMessage('Valid order ID is required'),
     check('answers')
       .optional()
       .isArray()
@@ -138,7 +131,7 @@ router.post(
     check('selectedDefects')
       .optional()
       .isArray()
-      .withMessage('Selected defects must be an array')
+      .withMessage('Selected defects must be an array'),
   ],
   validateRequest,
   asyncHandler(agentAppController.calculatePrice)
@@ -169,10 +162,7 @@ router.put(
       .optional()
       .isArray()
       .withMessage('Selected defects must be an array'),
-    check('photos')
-      .optional()
-      .isArray()
-      .withMessage('Photos must be an array')
+    check('photos').optional().isArray().withMessage('Photos must be an array'),
   ],
   validateRequest,
   asyncHandler(agentAppController.completeEvaluation)
@@ -198,7 +188,7 @@ router.put(
     check('paymentProof')
       .optional()
       .isURL()
-      .withMessage('Payment proof must be a valid URL')
+      .withMessage('Payment proof must be a valid URL'),
   ],
   validateRequest,
   asyncHandler(agentAppController.completePayment)
@@ -209,10 +199,7 @@ router.put(
  * @desc    Get agent statistics
  * @access  Private (Agent)
  */
-router.get(
-  '/statistics',
-  asyncHandler(agentAppController.getStatistics)
-);
+router.get('/statistics', asyncHandler(agentAppController.getStatistics));
 
 /**
  * @route   PUT /api/agent-app/location
@@ -227,7 +214,7 @@ router.put(
       .withMessage('Valid latitude is required'),
     check('longitude')
       .isFloat({ min: -180, max: 180 })
-      .withMessage('Valid longitude is required')
+      .withMessage('Valid longitude is required'),
   ],
   validateRequest,
   asyncHandler(agentAppController.updateLocation)
@@ -241,11 +228,7 @@ router.put(
 router.post(
   '/orders/:orderId/customer-selfie',
   validateObjectId('orderId'),
-  [
-    check('selfieImage')
-      .notEmpty()
-      .withMessage('Selfie image is required')
-  ],
+  [check('selfieImage').notEmpty().withMessage('Selfie image is required')],
   validateRequest,
   asyncHandler(agentAppController.uploadCustomerSelfie)
 );
@@ -270,9 +253,7 @@ router.post(
   '/orders/:orderId/imei-scan',
   validateObjectId('orderId'),
   [
-    check('imeiImage')
-      .notEmpty()
-      .withMessage('IMEI scan image is required'),
+    check('imeiImage').notEmpty().withMessage('IMEI scan image is required'),
     check('imei1')
       .optional()
       .trim()
@@ -282,7 +263,7 @@ router.post(
       .optional()
       .trim()
       .isLength({ min: 15, max: 15 })
-      .withMessage('IMEI 2 must be 15 digits')
+      .withMessage('IMEI 2 must be 15 digits'),
   ],
   validateRequest,
   asyncHandler(agentAppController.uploadIMEIScan)
@@ -317,7 +298,7 @@ router.post(
     check('negotiation')
       .optional()
       .isNumeric()
-      .withMessage('Negotiation must be a number')
+      .withMessage('Negotiation must be a number'),
   ],
   validateRequest,
   asyncHandler(agentAppController.reEvaluateDevice)

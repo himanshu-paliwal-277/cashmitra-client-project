@@ -9,7 +9,10 @@
 const { validationResult } = require('express-validator');
 const SellConfig = require('../models/sellConfig.model');
 const SellProduct = require('../models/sellProduct.model');
-const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middleware');
+const {
+  ApiError,
+  asyncHandler,
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * Create or update sell configuration
@@ -42,7 +45,7 @@ exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
     res.json({
       success: true,
       message: 'Configuration updated successfully',
-      data: config
+      data: config,
     });
   } else {
     // Create new config
@@ -53,15 +56,15 @@ exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
         { key: 'questions', title: 'Answer Questions', order: 2 },
         { key: 'defects', title: 'Select Defects', order: 3 },
         { key: 'accessories', title: 'Select Accessories', order: 4 },
-        { key: 'summary', title: 'Review & Confirm', order: 5 }
+        { key: 'summary', title: 'Review & Confirm', order: 5 },
       ],
       rules: rules || {
         roundToNearest: 10,
         floorPrice: 0,
         minPercent: -90,
-        maxPercent: 50
+        maxPercent: 50,
       },
-      createdBy: req.user.id
+      createdBy: req.user.id,
     });
 
     await config.save();
@@ -69,7 +72,7 @@ exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Configuration created successfully',
-      data: config
+      data: config,
     });
   }
 });
@@ -94,7 +97,7 @@ exports.getConfig = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: config
+    data: config,
   });
 });
 
@@ -116,8 +119,8 @@ exports.getConfigForCustomer = asyncHandler(async (req, res) => {
     success: true,
     data: {
       steps: config.orderedSteps || config.steps,
-      rules: config.rules
-    }
+      rules: config.rules,
+    },
   });
 });
 
@@ -150,8 +153,8 @@ exports.getCustomerConfig = asyncHandler(async (req, res) => {
     success: true,
     data: {
       steps: config.orderedSteps || config.steps,
-      rules: config.rules
-    }
+      rules: config.rules,
+    },
   });
 });
 
@@ -169,7 +172,7 @@ exports.updateSteps = asyncHandler(async (req, res) => {
   }
 
   let config = await SellConfig.findOne({ productId });
-  
+
   if (!config) {
     // Create config if it doesn't exist
     config = await SellConfig.createDefaultForProduct(productId, req.user.id);
@@ -181,7 +184,7 @@ exports.updateSteps = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Steps updated successfully',
-    data: config
+    data: config,
   });
 });
 
@@ -199,7 +202,7 @@ exports.updateRules = asyncHandler(async (req, res) => {
   }
 
   let config = await SellConfig.findOne({ productId });
-  
+
   if (!config) {
     // Create config if it doesn't exist
     config = await SellConfig.createDefaultForProduct(productId, req.user.id);
@@ -211,7 +214,7 @@ exports.updateRules = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Pricing rules updated successfully',
-    data: config
+    data: config,
   });
 });
 
@@ -232,7 +235,7 @@ exports.deleteConfig = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Configuration deleted successfully'
+    message: 'Configuration deleted successfully',
   });
 });
 
@@ -254,12 +257,15 @@ exports.resetToDefault = asyncHandler(async (req, res) => {
   await SellConfig.deleteOne({ productId });
 
   // Create new default config
-  const config = await SellConfig.createDefaultForProduct(productId, req.user.id);
+  const config = await SellConfig.createDefaultForProduct(
+    productId,
+    req.user.id
+  );
 
   res.json({
     success: true,
     message: 'Configuration reset to default successfully',
-    data: config
+    data: config,
   });
 });
 
@@ -277,7 +283,7 @@ exports.testPricing = asyncHandler(async (req, res) => {
   }
 
   let config = await SellConfig.findOne({ productId });
-  
+
   if (!config) {
     config = SellConfig.getDefaultConfig();
   }
@@ -293,14 +299,14 @@ exports.testPricing = asyncHandler(async (req, res) => {
     if (delta.type === 'abs') {
       adjustmentValue = delta.sign === '+' ? delta.value : -delta.value;
     } else if (delta.type === 'percent') {
-      adjustmentValue = (basePrice * delta.value / 100);
+      adjustmentValue = (basePrice * delta.value) / 100;
       adjustmentValue = delta.sign === '+' ? adjustmentValue : -adjustmentValue;
     }
 
     totalAdjustment += adjustmentValue;
     breakdown.push({
       label,
-      delta: adjustmentValue
+      delta: adjustmentValue,
     });
   }
 
@@ -316,8 +322,8 @@ exports.testPricing = asyncHandler(async (req, res) => {
       rawPrice,
       finalPrice,
       breakdown,
-      rules: config.rules
-    }
+      rules: config.rules,
+    },
   });
 });
 
@@ -334,15 +340,15 @@ exports.getAllConfigs = asyncHandler(async (req, res) => {
     limit: parseInt(limit),
     populate: [
       { path: 'productId', select: 'name status' },
-      { path: 'createdBy', select: 'name email' }
+      { path: 'createdBy', select: 'name email' },
     ],
-    sort: { createdAt: -1 }
+    sort: { createdAt: -1 },
   };
 
   const configs = await SellConfig.paginate({}, options);
 
   res.json({
     success: true,
-    data: configs
+    data: configs,
   });
 });

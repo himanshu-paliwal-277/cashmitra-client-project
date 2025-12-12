@@ -3,7 +3,10 @@ const Product = require('../models/product.model');
 const Inventory = require('../models/inventory.model');
 const Category = require('../models/category.model');
 const Partner = require('../models/partner.model');
-const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middleware');
+const {
+  ApiError,
+  asyncHandler,
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * @desc    Get all products with advanced filtering and search
@@ -24,7 +27,7 @@ exports.getProducts = asyncHandler(async (req, res) => {
     sortOrder = 'desc',
     availability = 'all',
     pincode,
-    featured
+    featured,
   } = req.query;
 
   // Build aggregation pipeline
@@ -32,15 +35,15 @@ exports.getProducts = asyncHandler(async (req, res) => {
 
   // Match stage for basic product filtering
   const matchStage = {};
-  
+
   if (category) {
     matchStage.category = category;
   }
-  
+
   if (brand) {
     matchStage.brand = { $regex: brand, $options: 'i' };
   }
-  
+
   if (search) {
     matchStage.$or = [
       { brand: { $regex: search, $options: 'i' } },
@@ -49,10 +52,10 @@ exports.getProducts = asyncHandler(async (req, res) => {
       { variant: { $regex: search, $options: 'i' } },
       { 'specifications.processor': { $regex: search, $options: 'i' } },
       { 'specifications.storage': { $regex: search, $options: 'i' } },
-      { 'specifications.ram': { $regex: search, $options: 'i' } }
+      { 'specifications.ram': { $regex: search, $options: 'i' } },
     ];
   }
-  
+
   pipeline.push({ $match: matchStage });
 
   // Lookup inventory data
@@ -61,16 +64,18 @@ exports.getProducts = asyncHandler(async (req, res) => {
       from: 'inventories',
       localField: '_id',
       foreignField: 'product',
-      as: 'inventory'
-    }
+      as: 'inventory',
+    },
   });
 
   // Filter by availability
   if (availability !== 'all') {
     pipeline.push({
       $match: {
-        'inventory': { $elemMatch: { isAvailable: availability === 'available' } }
-      }
+        inventory: {
+          $elemMatch: { isAvailable: availability === 'available' },
+        },
+      },
     });
   }
 
@@ -78,8 +83,8 @@ exports.getProducts = asyncHandler(async (req, res) => {
   if (condition) {
     pipeline.push({
       $match: {
-        'inventory': { $elemMatch: { condition: condition } }
-      }
+        inventory: { $elemMatch: { condition: condition } },
+      },
     });
   }
 
@@ -88,11 +93,11 @@ exports.getProducts = asyncHandler(async (req, res) => {
     const priceFilter = {};
     if (minPrice) priceFilter.$gte = Number(minPrice);
     if (maxPrice) priceFilter.$lte = Number(maxPrice);
-    
+
     pipeline.push({
       $match: {
-        'inventory': { $elemMatch: { price: priceFilter } }
-      }
+        inventory: { $elemMatch: { price: priceFilter } },
+      },
     });
   }
 
@@ -103,14 +108,16 @@ exports.getProducts = asyncHandler(async (req, res) => {
         from: 'partners',
         localField: 'inventory.partner',
         foreignField: '_id',
-        as: 'partners'
-      }
+        as: 'partners',
+      },
     });
-    
+
     pipeline.push({
       $match: {
-        'partners': { $elemMatch: { 'address.pincode': pincode, isVerified: true } }
-      }
+        partners: {
+          $elemMatch: { 'address.pincode': pincode, isVerified: true },
+        },
+      },
     });
   }
 
@@ -123,14 +130,14 @@ exports.getProducts = asyncHandler(async (req, res) => {
         $size: {
           $filter: {
             input: '$inventory',
-            cond: { $eq: ['$$this.isAvailable', true] }
-          }
-        }
+            cond: { $eq: ['$$this.isAvailable', true] },
+          },
+        },
       },
       totalStock: { $sum: '$inventory.quantity' },
       avgRating: { $avg: '$inventory.rating' },
-      reviewCount: { $sum: '$inventory.reviewCount' }
-    }
+      reviewCount: { $sum: '$inventory.reviewCount' },
+    },
   });
 
   // Filter featured products if requested
@@ -140,9 +147,9 @@ exports.getProducts = asyncHandler(async (req, res) => {
         $or: [
           { avgRating: { $gte: 4.0 } },
           { reviewCount: { $gte: 10 } },
-          { availableCount: { $gte: 5 } }
-        ]
-      }
+          { availableCount: { $gte: 5 } },
+        ],
+      },
     });
   }
 
@@ -152,21 +159,21 @@ exports.getProducts = asyncHandler(async (req, res) => {
       from: 'categories',
       localField: 'category',
       foreignField: '_id',
-      as: 'categoryInfo'
-    }
+      as: 'categoryInfo',
+    },
   });
 
   pipeline.push({
     $unwind: {
       path: '$categoryInfo',
-      preserveNullAndEmptyArrays: true
-    }
+      preserveNullAndEmptyArrays: true,
+    },
   });
 
   // Sort stage
   const sortStage = {};
   const order = sortOrder === 'desc' ? -1 : 1;
-  
+
   switch (sortBy) {
     case 'price':
       sortStage.minPrice = order;
@@ -187,7 +194,7 @@ exports.getProducts = asyncHandler(async (req, res) => {
     default:
       sortStage.createdAt = order;
   }
-  
+
   pipeline.push({ $sort: sortStage });
 
   // Pagination
@@ -212,8 +219,8 @@ exports.getProducts = asyncHandler(async (req, res) => {
       avgRating: 1,
       reviewCount: 1,
       createdAt: 1,
-      updatedAt: 1
-    }
+      updatedAt: 1,
+    },
   });
 
   // Execute aggregation
@@ -231,7 +238,7 @@ exports.getProducts = asyncHandler(async (req, res) => {
     total,
     page: parseInt(page),
     pages: Math.ceil(total / parseInt(limit)),
-    data: products
+    data: products,
   });
 });
 
@@ -245,23 +252,23 @@ exports.getProduct = asyncHandler(async (req, res) => {
   const { pincode } = req.query;
 
   const product = await Product.findById(id).populate('category', 'name slug');
-  
+
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
   // Build inventory filter
   const inventoryFilter = { product: id };
-  
+
   // Filter by pincode if provided
   if (pincode) {
-    const partners = await Partner.find({ 
-      'address.pincode': pincode, 
-      isVerified: true 
+    const partners = await Partner.find({
+      'address.pincode': pincode,
+      isVerified: true,
     }).select('_id');
-    
+
     if (partners.length > 0) {
-      inventoryFilter.partner = { $in: partners.map(p => p._id) };
+      inventoryFilter.partner = { $in: partners.map((p) => p._id) };
     } else {
       inventoryFilter.partner = { $in: [] }; // No partners in this pincode
     }
@@ -274,12 +281,18 @@ exports.getProduct = asyncHandler(async (req, res) => {
 
   // Calculate product statistics
   const stats = {
-    minPrice: inventory.length > 0 ? Math.min(...inventory.map(i => i.price)) : null,
-    maxPrice: inventory.length > 0 ? Math.max(...inventory.map(i => i.price)) : null,
-    availableCount: inventory.filter(i => i.isAvailable).length,
+    minPrice:
+      inventory.length > 0 ? Math.min(...inventory.map((i) => i.price)) : null,
+    maxPrice:
+      inventory.length > 0 ? Math.max(...inventory.map((i) => i.price)) : null,
+    availableCount: inventory.filter((i) => i.isAvailable).length,
     totalStock: inventory.reduce((sum, i) => sum + i.quantity, 0),
-    avgRating: inventory.length > 0 ? inventory.reduce((sum, i) => sum + (i.rating || 0), 0) / inventory.length : 0,
-    totalReviews: inventory.reduce((sum, i) => sum + (i.reviewCount || 0), 0)
+    avgRating:
+      inventory.length > 0
+        ? inventory.reduce((sum, i) => sum + (i.rating || 0), 0) /
+          inventory.length
+        : 0,
+    totalReviews: inventory.reduce((sum, i) => sum + (i.reviewCount || 0), 0),
   };
 
   res.json({
@@ -287,8 +300,8 @@ exports.getProduct = asyncHandler(async (req, res) => {
     data: {
       ...product.toObject(),
       inventory,
-      stats
-    }
+      stats,
+    },
   });
 });
 
@@ -315,22 +328,22 @@ exports.getProductSuggestions = asyncHandler(async (req, res) => {
           { category: product.category },
           { brand: product.brand },
           { 'specifications.processor': product.specifications?.processor },
-          { 'specifications.ram': product.specifications?.ram }
-        ]
-      }
+          { 'specifications.ram': product.specifications?.ram },
+        ],
+      },
     },
     {
       $lookup: {
         from: 'inventories',
         localField: '_id',
         foreignField: 'product',
-        as: 'inventory'
-      }
+        as: 'inventory',
+      },
     },
     {
       $match: {
-        'inventory': { $elemMatch: { isAvailable: true } }
-      }
+        inventory: { $elemMatch: { isAvailable: true } },
+      },
     },
     {
       $addFields: {
@@ -340,17 +353,17 @@ exports.getProductSuggestions = asyncHandler(async (req, res) => {
           $size: {
             $filter: {
               input: '$inventory',
-              cond: { $eq: ['$$this.isAvailable', true] }
-            }
-          }
-        }
-      }
+              cond: { $eq: ['$$this.isAvailable', true] },
+            },
+          },
+        },
+      },
     },
     {
-      $sort: { avgRating: -1, availableCount: -1 }
+      $sort: { avgRating: -1, availableCount: -1 },
     },
     {
-      $limit: parseInt(limit)
+      $limit: parseInt(limit),
     },
     {
       $project: {
@@ -361,15 +374,15 @@ exports.getProductSuggestions = asyncHandler(async (req, res) => {
         images: 1,
         minPrice: 1,
         avgRating: 1,
-        availableCount: 1
-      }
-    }
+        availableCount: 1,
+      },
+    },
   ]);
 
   res.json({
     success: true,
     count: suggestions.length,
-    data: suggestions
+    data: suggestions,
   });
 });
 
@@ -385,19 +398,19 @@ exports.getProductCategories = asyncHandler(async (req, res) => {
         from: 'products',
         localField: '_id',
         foreignField: 'category',
-        as: 'products'
-      }
+        as: 'products',
+      },
     },
     {
       $addFields: {
-        productCount: { $size: '$products' }
-      }
+        productCount: { $size: '$products' },
+      },
     },
     {
       $match: {
         productCount: { $gt: 0 },
-        isActive: true
-      }
+        isActive: true,
+      },
     },
     {
       $project: {
@@ -406,18 +419,18 @@ exports.getProductCategories = asyncHandler(async (req, res) => {
         description: 1,
         image: 1,
         icon: 1,
-        productCount: 1
-      }
+        productCount: 1,
+      },
     },
     {
-      $sort: { productCount: -1, name: 1 }
-    }
+      $sort: { productCount: -1, name: 1 },
+    },
   ]);
 
   res.json({
     success: true,
     count: categories.length,
-    data: categories
+    data: categories,
   });
 });
 
@@ -428,7 +441,7 @@ exports.getProductCategories = asyncHandler(async (req, res) => {
  */
 exports.getProductBrands = asyncHandler(async (req, res) => {
   const { category } = req.query;
-  
+
   const matchStage = {};
   if (category) {
     matchStage.category = category;
@@ -440,26 +453,26 @@ exports.getProductBrands = asyncHandler(async (req, res) => {
       $group: {
         _id: '$brand',
         count: { $sum: 1 },
-        models: { $addToSet: '$model' }
-      }
+        models: { $addToSet: '$model' },
+      },
     },
     {
       $project: {
         _id: 0,
         brand: '$_id',
         productCount: '$count',
-        modelCount: { $size: '$models' }
-      }
+        modelCount: { $size: '$models' },
+      },
     },
     {
-      $sort: { productCount: -1, brand: 1 }
-    }
+      $sort: { productCount: -1, brand: 1 },
+    },
   ]);
 
   res.json({
     success: true,
     count: brands.length,
-    data: brands
+    data: brands,
   });
 });
 
@@ -470,7 +483,7 @@ exports.getProductBrands = asyncHandler(async (req, res) => {
  */
 exports.getProductFilters = asyncHandler(async (req, res) => {
   const { category } = req.query;
-  
+
   const matchStage = {};
   if (category) {
     matchStage.category = category;
@@ -483,11 +496,11 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
         from: 'products',
         localField: 'product',
         foreignField: '_id',
-        as: 'productInfo'
-      }
+        as: 'productInfo',
+      },
     },
     {
-      $unwind: '$productInfo'
+      $unwind: '$productInfo',
     },
     {
       $match: {
@@ -495,16 +508,16 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
         ...Object.keys(matchStage).reduce((acc, key) => {
           acc[`productInfo.${key}`] = matchStage[key];
           return acc;
-        }, {})
-      }
+        }, {}),
+      },
     },
     {
       $group: {
         _id: null,
         minPrice: { $min: '$price' },
-        maxPrice: { $max: '$price' }
-      }
-    }
+        maxPrice: { $max: '$price' },
+      },
+    },
   ]);
 
   // Get available conditions
@@ -514,11 +527,11 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
         from: 'products',
         localField: 'product',
         foreignField: '_id',
-        as: 'productInfo'
-      }
+        as: 'productInfo',
+      },
     },
     {
-      $unwind: '$productInfo'
+      $unwind: '$productInfo',
     },
     {
       $match: {
@@ -526,18 +539,18 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
         ...Object.keys(matchStage).reduce((acc, key) => {
           acc[`productInfo.${key}`] = matchStage[key];
           return acc;
-        }, {})
-      }
+        }, {}),
+      },
     },
     {
       $group: {
         _id: '$condition',
-        count: { $sum: 1 }
-      }
+        count: { $sum: 1 },
+      },
     },
     {
-      $sort: { count: -1 }
-    }
+      $sort: { count: -1 },
+    },
   ]);
 
   // Get brands
@@ -546,24 +559,25 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
     {
       $group: {
         _id: '$brand',
-        count: { $sum: 1 }
-      }
+        count: { $sum: 1 },
+      },
     },
     {
-      $sort: { count: -1, _id: 1 }
+      $sort: { count: -1, _id: 1 },
     },
     {
-      $limit: 20
-    }
+      $limit: 20,
+    },
   ]);
 
   res.json({
     success: true,
     data: {
-      priceRange: priceRange.length > 0 ? priceRange[0] : { minPrice: 0, maxPrice: 0 },
-      conditions: conditions.map(c => ({ condition: c._id, count: c.count })),
-      brands: brands.map(b => ({ brand: b._id, count: b.count }))
-    }
+      priceRange:
+        priceRange.length > 0 ? priceRange[0] : { minPrice: 0, maxPrice: 0 },
+      conditions: conditions.map((c) => ({ condition: c._id, count: c.count })),
+      brands: brands.map((b) => ({ brand: b._id, count: b.count })),
+    },
   });
 });
 
@@ -588,7 +602,7 @@ exports.createProduct = asyncHandler(async (req, res) => {
     depreciation,
     images,
     specifications,
-    description
+    description,
   } = req.body;
 
   // Check if category exists
@@ -609,7 +623,7 @@ exports.createProduct = asyncHandler(async (req, res) => {
     images: images || [],
     specifications: new Map(Object.entries(specifications || {})),
     description,
-    createdBy: req.user._id
+    createdBy: req.user._id,
   });
 
   // Populate category information
@@ -618,7 +632,7 @@ exports.createProduct = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     message: 'Product created successfully',
-    data: product
+    data: product,
   });
 });
 
@@ -643,7 +657,10 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   }
 
   // Check if user owns the product or is admin
-  if (product.createdBy.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+  if (
+    product.createdBy.toString() !== req.user._id.toString() &&
+    req.user.role !== 'admin'
+  ) {
     throw new ApiError(403, 'Not authorized to update this product');
   }
 
@@ -657,20 +674,21 @@ exports.updateProduct = asyncHandler(async (req, res) => {
 
   // Convert specifications to Map if provided
   if (updateData.specifications) {
-    updateData.specifications = new Map(Object.entries(updateData.specifications));
+    updateData.specifications = new Map(
+      Object.entries(updateData.specifications)
+    );
   }
 
   // Update the product
-  const updatedProduct = await Product.findByIdAndUpdate(
-    id,
-    updateData,
-    { new: true, runValidators: true }
-  ).populate('category', 'name slug');
+  const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  }).populate('category', 'name slug');
 
   res.json({
     success: true,
     message: 'Product updated successfully',
-    data: updatedProduct
+    data: updatedProduct,
   });
 });
 
@@ -689,14 +707,20 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
   }
 
   // Check if user owns the product or is admin
-  if (product.createdBy.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+  if (
+    product.createdBy.toString() !== req.user._id.toString() &&
+    req.user.role !== 'admin'
+  ) {
     throw new ApiError(403, 'Not authorized to delete this product');
   }
 
   // Check if product has any inventory
   const inventory = await Inventory.find({ product: id });
   if (inventory.length > 0) {
-    throw new ApiError(400, 'Cannot delete product with existing inventory. Please remove all inventory first.');
+    throw new ApiError(
+      400,
+      'Cannot delete product with existing inventory. Please remove all inventory first.'
+    );
   }
 
   // Delete the product
@@ -704,6 +728,6 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Product deleted successfully'
+    message: 'Product deleted successfully',
   });
 });

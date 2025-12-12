@@ -29,7 +29,14 @@ const pickupSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['scheduled', 'confirmed', 'in_transit', 'completed', 'cancelled', 'rescheduled'],
+      enum: [
+        'scheduled',
+        'confirmed',
+        'in_transit',
+        'completed',
+        'cancelled',
+        'rescheduled',
+      ],
       default: 'scheduled',
     },
     scheduledDate: {
@@ -84,26 +91,28 @@ const pickupSchema = new mongoose.Schema(
         trim: true,
       },
     },
-    items: [{
-      name: {
-        type: String,
-        required: [true, 'Item name is required'],
-        trim: true,
+    items: [
+      {
+        name: {
+          type: String,
+          required: [true, 'Item name is required'],
+          trim: true,
+        },
+        description: {
+          type: String,
+          trim: true,
+        },
+        quantity: {
+          type: Number,
+          required: [true, 'Item quantity is required'],
+          min: [1, 'Quantity must be at least 1'],
+        },
+        estimatedValue: {
+          type: Number,
+          min: [0, 'Estimated value cannot be negative'],
+        },
       },
-      description: {
-        type: String,
-        trim: true,
-      },
-      quantity: {
-        type: Number,
-        required: [true, 'Item quantity is required'],
-        min: [1, 'Quantity must be at least 1'],
-      },
-      estimatedValue: {
-        type: Number,
-        min: [0, 'Estimated value cannot be negative'],
-      },
-    }],
+    ],
     priority: {
       type: String,
       enum: ['low', 'medium', 'high', 'urgent'],
@@ -113,30 +122,34 @@ const pickupSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    pickupImages: [{
-      type: String, // URLs to uploaded images
-    }],
-    communication: [{
-      type: {
-        type: String,
-        enum: ['sms', 'email', 'call', 'whatsapp'],
-        required: true,
+    pickupImages: [
+      {
+        type: String, // URLs to uploaded images
       },
-      message: {
-        type: String,
-        required: true,
-        trim: true,
+    ],
+    communication: [
+      {
+        type: {
+          type: String,
+          enum: ['sms', 'email', 'call', 'whatsapp'],
+          required: true,
+        },
+        message: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        sentAt: {
+          type: Date,
+          default: Date.now,
+        },
+        sentBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
       },
-      sentAt: {
-        type: Date,
-        default: Date.now,
-      },
-      sentBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-      },
-    }],
+    ],
     actualPickupTime: {
       type: Date,
     },
@@ -155,22 +168,24 @@ const pickupSchema = new mongoose.Schema(
       timeSlot: String,
       reason: String,
     },
-    notes: [{
-      content: {
-        type: String,
-        required: true,
-        trim: true,
+    notes: [
+      {
+        content: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        addedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+        addedAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
-      addedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-      },
-      addedAt: {
-        type: Date,
-        default: Date.now,
-      },
-    }],
+    ],
   },
   {
     timestamps: true,
@@ -188,27 +203,27 @@ pickupSchema.index({ 'customer.phone': 1 });
 pickupSchema.index({ orderNumber: 1 });
 
 // Virtual for formatted scheduled time
-pickupSchema.virtual('formattedScheduledTime').get(function() {
+pickupSchema.virtual('formattedScheduledTime').get(function () {
   if (!this.scheduledDate || !this.scheduledTimeSlot) return null;
-  
+
   const date = this.scheduledDate.toLocaleDateString();
   const timeSlot = this.scheduledTimeSlot;
   return `${date} ${timeSlot}`;
 });
 
 // Virtual for pickup duration (if completed)
-pickupSchema.virtual('pickupDuration').get(function() {
+pickupSchema.virtual('pickupDuration').get(function () {
   if (!this.actualPickupTime || !this.completedAt) return null;
-  
+
   const duration = this.completedAt - this.actualPickupTime;
   return Math.round(duration / (1000 * 60)); // Duration in minutes
 });
 
 // Pre-save middleware to update status timestamps
-pickupSchema.pre('save', function(next) {
+pickupSchema.pre('save', function (next) {
   if (this.isModified('status')) {
     const now = new Date();
-    
+
     switch (this.status) {
       case 'completed':
         if (!this.completedAt) this.completedAt = now;
@@ -225,7 +240,7 @@ pickupSchema.pre('save', function(next) {
 });
 
 // Static method to get pickup statistics
-pickupSchema.statics.getPickupStats = async function(filters = {}) {
+pickupSchema.statics.getPickupStats = async function (filters = {}) {
   const pipeline = [
     { $match: filters },
     {
@@ -235,9 +250,9 @@ pickupSchema.statics.getPickupStats = async function(filters = {}) {
       },
     },
   ];
-  
+
   const stats = await this.aggregate(pipeline);
-  
+
   // Convert to object format
   const result = {
     total: 0,
@@ -248,17 +263,17 @@ pickupSchema.statics.getPickupStats = async function(filters = {}) {
     cancelled: 0,
     rescheduled: 0,
   };
-  
-  stats.forEach(stat => {
+
+  stats.forEach((stat) => {
     result[stat._id] = stat.count;
     result.total += stat.count;
   });
-  
+
   return result;
 };
 
 // Instance method to add communication log
-pickupSchema.methods.addCommunication = function(type, message, sentBy) {
+pickupSchema.methods.addCommunication = function (type, message, sentBy) {
   this.communication.push({
     type,
     message,
@@ -269,7 +284,7 @@ pickupSchema.methods.addCommunication = function(type, message, sentBy) {
 };
 
 // Instance method to add note
-pickupSchema.methods.addNote = function(content, addedBy) {
+pickupSchema.methods.addNote = function (content, addedBy) {
   this.notes.push({
     content,
     addedBy,

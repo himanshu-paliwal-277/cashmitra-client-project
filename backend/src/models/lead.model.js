@@ -20,7 +20,14 @@ const leadSchema = new mongoose.Schema(
     },
     source: {
       type: String,
-      enum: ['website', 'social_media', 'referral', 'advertisement', 'direct', 'other'],
+      enum: [
+        'website',
+        'social_media',
+        'referral',
+        'advertisement',
+        'direct',
+        'other',
+      ],
       default: 'website',
     },
     status: {
@@ -63,10 +70,12 @@ const leadSchema = new mongoose.Schema(
     conversionDate: {
       type: Date,
     },
-    tags: [{
-      type: String,
-      trim: true,
-    }],
+    tags: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     metadata: {
       ipAddress: String,
       userAgent: String,
@@ -88,25 +97,25 @@ leadSchema.index({ createdAt: -1 });
 leadSchema.index({ followUpDate: 1 });
 
 // Virtual for lead age in days
-leadSchema.virtual('ageInDays').get(function() {
+leadSchema.virtual('ageInDays').get(function () {
   return Math.floor((Date.now() - this.createdAt) / (1000 * 60 * 60 * 24));
 });
 
 // Method to check if lead is overdue for follow-up
-leadSchema.methods.isOverdue = function() {
+leadSchema.methods.isOverdue = function () {
   return this.followUpDate && this.followUpDate < new Date();
 };
 
 // Static method to get leads by status
-leadSchema.statics.getByStatus = function(status) {
+leadSchema.statics.getByStatus = function (status) {
   return this.find({ status }).populate('assignedTo', 'name email');
 };
 
 // Static method to get overdue leads
-leadSchema.statics.getOverdue = function() {
+leadSchema.statics.getOverdue = function () {
   return this.find({
     followUpDate: { $lt: new Date() },
-    status: { $nin: ['converted', 'lost'] }
+    status: { $nin: ['converted', 'lost'] },
   }).populate('assignedTo', 'name email');
 };
 

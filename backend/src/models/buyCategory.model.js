@@ -42,7 +42,7 @@ const buyCategorySchema = new mongoose.Schema(
       ref: 'User',
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -50,12 +50,12 @@ const buyCategorySchema = new mongoose.Schema(
 );
 
 // Virtual for display name
-buyCategorySchema.virtual('displayName').get(function() {
+buyCategorySchema.virtual('displayName').get(function () {
   return this.name;
 });
 
 // Pre-save middleware to generate slug
-buyCategorySchema.pre('save', function(next) {
+buyCategorySchema.pre('save', function (next) {
   if (this.isModified('name') && !this.slug) {
     this.slug = this.name
       .toLowerCase()

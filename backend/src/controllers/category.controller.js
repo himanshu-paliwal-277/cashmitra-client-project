@@ -8,7 +8,10 @@
 
 const { validationResult } = require('express-validator');
 const Category = require('../models/category.model');
-const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middleware');
+const {
+  ApiError,
+  asyncHandler,
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * Create new category
@@ -29,7 +32,15 @@ exports.createCategory = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Validation Error', errors.array());
   }
 
-  const { name, description, image, icon, superCategory, specifications, metadata } = req.body;
+  const {
+    name,
+    description,
+    image,
+    icon,
+    superCategory,
+    specifications,
+    metadata,
+  } = req.body;
 
   // Check if category with same name already exists
   const existingCategory = await Category.findOne({ name: name.trim() });
@@ -46,7 +57,7 @@ exports.createCategory = asyncHandler(async (req, res) => {
     parentCategory: null, // Always null for flat structure
     specifications,
     metadata,
-    createdBy: req.user.id
+    createdBy: req.user.id,
   });
 
   await category.save();
@@ -56,7 +67,7 @@ exports.createCategory = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     message: 'Category created successfully',
-    data: category
+    data: category,
   });
 });
 
@@ -73,19 +84,19 @@ exports.createCategory = asyncHandler(async (req, res) => {
  */
 exports.getCategories = asyncHandler(async (req, res) => {
   const { includeInactive } = req.query;
-  
+
   const filter = includeInactive === 'true' ? {} : { isActive: true };
-  
+
   // Return flat list of categories
   const categories = await Category.find(filter)
     .populate('createdBy', 'name')
     .populate('superCategory', 'name image')
     .sort({ sortOrder: 1, name: 1 });
-  
+
   res.json({
     success: true,
     count: categories.length,
-    data: categories
+    data: categories,
   });
 });
 
@@ -100,7 +111,7 @@ exports.getCategories = asyncHandler(async (req, res) => {
  */
 exports.getCategory = asyncHandler(async (req, res) => {
   const { identifier } = req.params;
-  
+
   // Try to find by ID first, then by slug
   let category;
   if (identifier.match(/^[0-9a-fA-F]{24}$/)) {
@@ -110,16 +121,16 @@ exports.getCategory = asyncHandler(async (req, res) => {
     // It's a slug
     category = await Category.findOne({ slug: identifier });
   }
-  
+
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
-  
+
   await category.populate('createdBy', 'name');
-  
+
   res.json({
     success: true,
-    data: category
+    data: category,
   });
 });
 
@@ -144,13 +155,23 @@ exports.updateCategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Category not found');
   }
 
-  const { name, description, image, icon, superCategory, specifications, metadata, isActive, sortOrder } = req.body;
+  const {
+    name,
+    description,
+    image,
+    icon,
+    superCategory,
+    specifications,
+    metadata,
+    isActive,
+    sortOrder,
+  } = req.body;
 
   // Check if name is being changed and if new name already exists
   if (name && name.trim() !== category.name) {
-    const existingCategory = await Category.findOne({ 
+    const existingCategory = await Category.findOne({
       name: name.trim(),
-      _id: { $ne: category._id }
+      _id: { $ne: category._id },
     });
     if (existingCategory) {
       throw new ApiError(400, 'Category with this name already exists');
@@ -159,9 +180,9 @@ exports.updateCategory = asyncHandler(async (req, res) => {
 
   // Update category fields
   const updateFields = {
-    updatedBy: req.user.id
+    updatedBy: req.user.id,
   };
-  
+
   if (name) updateFields.name = name.trim();
   if (description !== undefined) updateFields.description = description;
   if (image !== undefined) updateFields.image = image;
@@ -183,7 +204,7 @@ exports.updateCategory = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Category updated successfully',
-    data: updatedCategory
+    data: updatedCategory,
   });
 });
 
@@ -213,7 +234,7 @@ exports.deleteCategory = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Category deleted successfully'
+    message: 'Category deleted successfully',
   });
 });
 
@@ -228,17 +249,17 @@ exports.deleteCategory = asyncHandler(async (req, res) => {
 exports.getCategoryStats = asyncHandler(async (req, res) => {
   const totalCategories = await Category.countDocuments();
   const activeCategories = await Category.countDocuments({ isActive: true });
-  
+
   // Get categories with most products (if products are linked to categories)
   // This would need to be implemented when Product model is linked
-  
+
   res.json({
     success: true,
     data: {
       totalCategories,
       activeCategories,
-      inactiveCategories: totalCategories - activeCategories
-    }
+      inactiveCategories: totalCategories - activeCategories,
+    },
   });
 });
 
@@ -267,9 +288,9 @@ exports.bulkUpdateStatus = asyncHandler(async (req, res) => {
 
   const result = await Category.updateMany(
     { _id: { $in: categoryIds } },
-    { 
+    {
       isActive,
-      updatedBy: req.user.id
+      updatedBy: req.user.id,
     }
   );
 
@@ -278,8 +299,8 @@ exports.bulkUpdateStatus = asyncHandler(async (req, res) => {
     message: `${result.modifiedCount} categories updated successfully`,
     data: {
       matchedCount: result.matchedCount,
-      modifiedCount: result.modifiedCount
-    }
+      modifiedCount: result.modifiedCount,
+    },
   });
 });
 
@@ -297,7 +318,7 @@ exports.bulkUpdateStatus = asyncHandler(async (req, res) => {
  */
 exports.searchCategories = asyncHandler(async (req, res) => {
   const { q, limit = 10, includeInactive = false } = req.query;
-  
+
   if (!q || q.trim().length < 2) {
     throw new ApiError(400, 'Search query must be at least 2 characters long');
   }
@@ -306,8 +327,8 @@ exports.searchCategories = asyncHandler(async (req, res) => {
     $or: [
       { name: { $regex: q.trim(), $options: 'i' } },
       { description: { $regex: q.trim(), $options: 'i' } },
-      { 'metadata.keywords': { $in: [new RegExp(q.trim(), 'i')] } }
-    ]
+      { 'metadata.keywords': { $in: [new RegExp(q.trim(), 'i')] } },
+    ],
   };
 
   if (includeInactive !== 'true') {
@@ -322,6 +343,6 @@ exports.searchCategories = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     count: categories.length,
-    data: categories
+    data: categories,
   });
 });

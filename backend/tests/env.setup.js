@@ -36,6 +36,7 @@ process.env.EMAIL_PASS = 'test-password';
 process.env.DISABLE_EXTERNAL_APIS = 'true';
 
 // Set test database configuration
-process.env.MONGO_URI = process.env.MONGO_TEST_URI || 'mongodb://localhost:27017/cashify_test';
+process.env.MONGO_URI =
+  process.env.MONGO_TEST_URI || 'mongodb://localhost:27017/cashify_test';
 
 console.log('✅ Test environment variables configured!');

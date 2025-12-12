@@ -65,7 +65,13 @@ const financeSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ['sales_commission', 'partner_commission', 'platform_fee', 'processing_fee', 'other'],
+      enum: [
+        'sales_commission',
+        'partner_commission',
+        'platform_fee',
+        'processing_fee',
+        'other',
+      ],
       default: 'sales_commission',
     },
     processedBy: {
@@ -80,11 +86,13 @@ const financeSchema = new mongoose.Schema(
       taxAmount: Number,
       netAmount: Number,
       exchangeRate: Number,
-      fees: [{
-        type: String,
-        amount: Number,
-        description: String,
-      }],
+      fees: [
+        {
+          type: String,
+          amount: Number,
+          description: String,
+        },
+      ],
     },
   },
   {
@@ -103,7 +111,7 @@ financeSchema.index({ createdAt: -1 });
 financeSchema.index({ processedAt: -1 });
 
 // Virtual for net amount after commission
-financeSchema.virtual('netAmount').get(function() {
+financeSchema.virtual('netAmount').get(function () {
   if (this.commission && this.commission.amount) {
     return this.amount - this.commission.amount;
   }
@@ -111,11 +119,13 @@ financeSchema.virtual('netAmount').get(function() {
 });
 
 // Pre-save middleware to calculate commission
-financeSchema.pre('save', function(next) {
+financeSchema.pre('save', function (next) {
   if (this.isModified('amount') || this.isModified('commission.rate')) {
     if (this.commission && this.commission.rate) {
       if (this.commission.type === 'percentage') {
-        this.commission.amount = Math.round(this.amount * (this.commission.rate / 100));
+        this.commission.amount = Math.round(
+          this.amount * (this.commission.rate / 100)
+        );
       } else {
         this.commission.amount = this.commission.rate;
       }
@@ -125,7 +135,7 @@ financeSchema.pre('save', function(next) {
 });
 
 // Method to process transaction
-financeSchema.methods.processTransaction = function(processedBy) {
+financeSchema.methods.processTransaction = function (processedBy) {
   this.status = 'processed';
   this.processedBy = processedBy;
   this.processedAt = new Date();
@@ -133,19 +143,19 @@ financeSchema.methods.processTransaction = function(processedBy) {
 };
 
 // Static method to get commission summary
-financeSchema.statics.getCommissionSummary = function(startDate, endDate) {
+financeSchema.statics.getCommissionSummary = function (startDate, endDate) {
   const matchStage = {
     transactionType: 'commission',
     status: 'processed',
   };
-  
+
   if (startDate && endDate) {
     matchStage.processedAt = {
       $gte: new Date(startDate),
       $lte: new Date(endDate),
     };
   }
-  
+
   return this.aggregate([
     { $match: matchStage },
     {
@@ -164,19 +174,23 @@ financeSchema.statics.getCommissionSummary = function(startDate, endDate) {
 };
 
 // Static method to get partner earnings
-financeSchema.statics.getPartnerEarnings = function(partnerId, startDate, endDate) {
+financeSchema.statics.getPartnerEarnings = function (
+  partnerId,
+  startDate,
+  endDate
+) {
   const matchStage = {
     partner: mongoose.Types.ObjectId(partnerId),
     status: 'processed',
   };
-  
+
   if (startDate && endDate) {
     matchStage.processedAt = {
       $gte: new Date(startDate),
       $lte: new Date(endDate),
     };
   }
-  
+
   return this.aggregate([
     { $match: matchStage },
     {

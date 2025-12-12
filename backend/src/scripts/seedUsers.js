@@ -11,7 +11,7 @@ const sampleUsers = [
     password: 'password123',
     phone: '9876543210',
     role: 'user',
-    isVerified: true
+    isVerified: true,
   },
   {
     name: 'Jane Smith',
@@ -19,7 +19,7 @@ const sampleUsers = [
     password: 'password123',
     phone: '9876543211',
     role: 'user',
-    isVerified: false
+    isVerified: false,
   },
   {
     name: 'Mike Johnson',
@@ -27,7 +27,7 @@ const sampleUsers = [
     password: 'password123',
     phone: '9876543212',
     role: 'partner',
-    isVerified: true
+    isVerified: true,
   },
   {
     name: 'Sarah Wilson',
@@ -35,7 +35,7 @@ const sampleUsers = [
     password: 'password123',
     phone: '9876543213',
     role: 'user',
-    isVerified: true
+    isVerified: true,
   },
   {
     name: 'Admin User',
@@ -43,20 +43,24 @@ const sampleUsers = [
     password: 'admin123',
     phone: '9876543214',
     role: 'admin',
-    isVerified: true
-  }
+    isVerified: true,
+  },
 ];
 
 async function seedUsers() {
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/cashify');
+    await mongoose.connect(
+      process.env.MONGO_URI || 'mongodb://localhost:27017/cashify'
+    );
     console.log('Connected to MongoDB');
 
     // Check if users already exist
     const existingUsers = await User.countDocuments();
     if (existingUsers > 0) {
-      console.log(`Database already has ${existingUsers} users. Skipping seed.`);
+      console.log(
+        `Database already has ${existingUsers} users. Skipping seed.`
+      );
       return;
     }
 
@@ -66,7 +70,7 @@ async function seedUsers() {
         const hashedPassword = await bcrypt.hash(user.password, 12);
         return {
           ...user,
-          password: hashedPassword
+          password: hashedPassword,
         };
       })
     );
@@ -74,11 +78,10 @@ async function seedUsers() {
     // Insert users
     const createdUsers = await User.insertMany(usersToCreate);
     console.log(`Successfully created ${createdUsers.length} users:`);
-    
-    createdUsers.forEach(user => {
+
+    createdUsers.forEach((user) => {
       console.log(`- ${user.name} (${user.email}) - Role: ${user.role}`);
     });
-
   } catch (error) {
     console.error('Error seeding users:', error);
   } finally {

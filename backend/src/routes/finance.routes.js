@@ -27,18 +27,9 @@ const createTransactionValidation = [
     .optional()
     .isIn(['INR', 'USD', 'EUR'])
     .withMessage('Invalid currency'),
-  check('order')
-    .optional()
-    .isMongoId()
-    .withMessage('Invalid order ID'),
-  check('user')
-    .optional()
-    .isMongoId()
-    .withMessage('Invalid user ID'),
-  check('partner')
-    .optional()
-    .isMongoId()
-    .withMessage('Invalid partner ID'),
+  check('order').optional().isMongoId().withMessage('Invalid order ID'),
+  check('user').optional().isMongoId().withMessage('Invalid user ID'),
+  check('partner').optional().isMongoId().withMessage('Invalid partner ID'),
   check('status')
     .optional()
     .isIn(['pending', 'completed', 'failed', 'cancelled'])
@@ -144,11 +135,7 @@ router.post(
 // @access  Private/Admin
 router.get(
   '/transactions/:id',
-  [
-    check('id')
-      .isMongoId()
-      .withMessage('Invalid transaction ID'),
-  ],
+  [check('id').isMongoId().withMessage('Invalid transaction ID')],
   validateRequest,
   asyncHandler(financeController.getTransaction)
 );
@@ -159,9 +146,7 @@ router.get(
 router.put(
   '/transactions/:id',
   [
-    check('id')
-      .isMongoId()
-      .withMessage('Invalid transaction ID'),
+    check('id').isMongoId().withMessage('Invalid transaction ID'),
     ...updateTransactionValidation,
   ],
   validateRequest,
@@ -173,11 +158,7 @@ router.put(
 // @access  Private/Admin
 router.delete(
   '/transactions/:id',
-  [
-    check('id')
-      .isMongoId()
-      .withMessage('Invalid transaction ID'),
-  ],
+  [check('id').isMongoId().withMessage('Invalid transaction ID')],
   validateRequest,
   asyncHandler(financeController.deleteTransaction)
 );
@@ -230,9 +211,7 @@ router.post(
     check('transactionIds')
       .isArray({ min: 1 })
       .withMessage('Transaction IDs array is required'),
-    check('transactionIds.*')
-      .isMongoId()
-      .withMessage('Invalid transaction ID'),
+    check('transactionIds.*').isMongoId().withMessage('Invalid transaction ID'),
     check('reconciliationType')
       .isIn(['manual', 'automated', 'bulk'])
       .withMessage('Invalid reconciliation type'),
@@ -244,7 +223,10 @@ router.post(
 // @route   GET /api/admin/finance/pending-payments
 // @desc    Get pending payments
 // @access  Private/Admin
-router.get('/pending-payments', asyncHandler(financeController.getPendingPayments));
+router.get(
+  '/pending-payments',
+  asyncHandler(financeController.getPendingPayments)
+);
 
 // @route   POST /api/admin/finance/process-payment
 // @desc    Process pending payment
@@ -252,9 +234,7 @@ router.get('/pending-payments', asyncHandler(financeController.getPendingPayment
 router.post(
   '/process-payment',
   [
-    check('transactionId')
-      .isMongoId()
-      .withMessage('Invalid transaction ID'),
+    check('transactionId').isMongoId().withMessage('Invalid transaction ID'),
     check('paymentMethod')
       .isIn(['bank_transfer', 'upi', 'wallet', 'cheque'])
       .withMessage('Invalid payment method'),

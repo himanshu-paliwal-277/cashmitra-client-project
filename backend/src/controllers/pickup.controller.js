@@ -28,44 +28,43 @@ exports.createPickup = asyncHandler(async (req, res) => {
     address,
     items,
     priority,
-    specialInstructions
+    specialInstructions,
   } = req.body;
 
   // Verify the order exists and extract address information
   let order;
   let orderAddress = {};
-  
+
   if (orderType === 'SellOrder') {
     order = await SellOrder.findById(orderId)
       .populate({
         path: 'sessionId',
         populate: {
           path: 'productId',
-          select: 'name'
-        }
+          select: 'name',
+        },
       })
       .populate('userId', 'name phone email');
-      
+
     if (order) {
       // Extract address from SellOrder pickup details
       orderAddress = {
         street: order.pickup?.address?.street || '',
         city: order.pickup?.address?.city || '',
         state: order.pickup?.address?.state || '',
-        pincode: order.pickup?.address?.pincode || ''
+        pincode: order.pickup?.address?.pincode || '',
       };
     }
   } else {
-    order = await Order.findById(orderId)
-      .populate('user', 'name phone email');
-      
+    order = await Order.findById(orderId).populate('user', 'name phone email');
+
     if (order) {
       // Extract address from Order shippingDetails
       orderAddress = {
         street: order.shippingDetails?.address?.street || '',
         city: order.shippingDetails?.address?.city || '',
         state: order.shippingDetails?.address?.state || '',
-        pincode: order.shippingDetails?.address?.pincode || ''
+        pincode: order.shippingDetails?.address?.pincode || '',
       };
     }
   }
@@ -75,7 +74,8 @@ exports.createPickup = asyncHandler(async (req, res) => {
   }
 
   // Use order address if address not provided in request
-  const finalAddress = address && Object.keys(address).length > 0 ? address : orderAddress;
+  const finalAddress =
+    address && Object.keys(address).length > 0 ? address : orderAddress;
 
   // Verify the assigned agent exists and has appropriate role
   const agent = await User.findById(assignedTo);
@@ -106,11 +106,13 @@ exports.createPickup = asyncHandler(async (req, res) => {
     items,
     priority: priority || 'medium',
     specialInstructions,
-    statusHistory: [{
-      status: 'assigned',
-      updatedBy: req.user.id,
-      notes: 'Pickup assigned to agent'
-    }]
+    statusHistory: [
+      {
+        status: 'assigned',
+        updatedBy: req.user.id,
+        notes: 'Pickup assigned to agent',
+      },
+    ],
   });
 
   await pickup.save();
@@ -118,13 +120,13 @@ exports.createPickup = asyncHandler(async (req, res) => {
   // Populate the response
   await pickup.populate([
     { path: 'assignedTo', select: 'name email phone' },
-    { path: 'assignedBy', select: 'name email' }
+    { path: 'assignedBy', select: 'name email' },
   ]);
 
   res.status(201).json({
     success: true,
     message: 'Pickup created successfully',
-    data: pickup
+    data: pickup,
   });
 });
 
@@ -143,7 +145,7 @@ exports.getPickups = asyncHandler(async (req, res) => {
     pincode,
     startDate,
     endDate,
-    search
+    search,
   } = req.query;
 
   const query = {};
@@ -168,7 +170,7 @@ exports.getPickups = asyncHandler(async (req, res) => {
       { 'customer.name': { $regex: search, $options: 'i' } },
       { 'customer.phone': { $regex: search, $options: 'i' } },
       { 'address.street': { $regex: search, $options: 'i' } },
-      { 'address.city': { $regex: search, $options: 'i' } }
+      { 'address.city': { $regex: search, $options: 'i' } },
     ];
   }
 
@@ -205,12 +207,12 @@ exports.getPickups = asyncHandler(async (req, res) => {
     hasPrevPage: pageNum > 1,
     nextPage: pageNum < totalPages ? pageNum + 1 : null,
     prevPage: pageNum > 1 ? pageNum - 1 : null,
-    pagingCounter: skip + 1
+    pagingCounter: skip + 1,
   };
 
   res.json({
     success: true,
-    data: pickups
+    data: pickups,
   });
 });
 
@@ -234,13 +236,16 @@ exports.getPickupById = asyncHandler(async (req, res) => {
   }
 
   // Role-based access control
-  if (['pickup_agent', 'driver'].includes(req.user.role) && pickup.assignedTo._id.toString() !== req.user.id) {
+  if (
+    ['pickup_agent', 'driver'].includes(req.user.role) &&
+    pickup.assignedTo._id.toString() !== req.user.id
+  ) {
     throw new ApiError(403, 'Access denied');
   }
 
   res.json({
     success: true,
-    data: pickup
+    data: pickup,
   });
 });
 
@@ -251,14 +256,17 @@ exports.getPickupById = asyncHandler(async (req, res) => {
  */
 exports.updatePickupStatus = asyncHandler(async (req, res) => {
   const { status, notes, location } = req.body;
-  
+
   const pickup = await Pickup.findById(req.params.id);
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found');
   }
 
   // Role-based access control
-  if (['pickup_agent', 'driver'].includes(req.user.role) && pickup.assignedTo.toString() !== req.user.id) {
+  if (
+    ['pickup_agent', 'driver'].includes(req.user.role) &&
+    pickup.assignedTo.toString() !== req.user.id
+  ) {
     throw new ApiError(403, 'Access denied');
   }
 
@@ -272,11 +280,14 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
     rescheduled: ['confirmed', 'cancelled'],
     failed: ['assigned', 'cancelled'],
     completed: [],
-    cancelled: []
+    cancelled: [],
   };
 
   if (!validTransitions[pickup.status].includes(status)) {
-    throw new ApiError(400, `Invalid status transition from ${pickup.status} to ${status}`);
+    throw new ApiError(
+      400,
+      `Invalid status transition from ${pickup.status} to ${status}`
+    );
   }
 
   // Update pickup with status
@@ -299,13 +310,13 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
 
   await pickup.populate([
     { path: 'assignedTo', select: 'name email phone' },
-    { path: 'assignedBy', select: 'name email' }
+    { path: 'assignedBy', select: 'name email' },
   ]);
 
   res.json({
     success: true,
     message: 'Pickup status updated successfully',
-    data: pickup
+    data: pickup,
   });
 });
 
@@ -316,14 +327,17 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
  */
 exports.reschedulePickup = asyncHandler(async (req, res) => {
   const { newDate, newTimeSlot, reason } = req.body;
-  
+
   const pickup = await Pickup.findById(req.params.id);
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found');
   }
 
   // Role-based access control
-  if (['pickup_agent', 'driver'].includes(req.user.role) && pickup.assignedTo.toString() !== req.user.id) {
+  if (
+    ['pickup_agent', 'driver'].includes(req.user.role) &&
+    pickup.assignedTo.toString() !== req.user.id
+  ) {
     throw new ApiError(403, 'Access denied');
   }
 
@@ -335,13 +349,13 @@ exports.reschedulePickup = asyncHandler(async (req, res) => {
 
   await pickup.populate([
     { path: 'assignedTo', select: 'name email phone' },
-    { path: 'assignedBy', select: 'name email' }
+    { path: 'assignedBy', select: 'name email' },
   ]);
 
   res.json({
     success: true,
     message: 'Pickup rescheduled successfully',
-    data: pickup
+    data: pickup,
   });
 });
 
@@ -352,14 +366,17 @@ exports.reschedulePickup = asyncHandler(async (req, res) => {
  */
 exports.cancelPickup = asyncHandler(async (req, res) => {
   const { reason } = req.body;
-  
+
   const pickup = await Pickup.findById(req.params.id);
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found');
   }
 
   // Only admin or assigned agent can cancel
-  if (req.user.role !== 'admin' && pickup.assignedTo.toString() !== req.user.id) {
+  if (
+    req.user.role !== 'admin' &&
+    pickup.assignedTo.toString() !== req.user.id
+  ) {
     throw new ApiError(403, 'Access denied');
   }
 
@@ -371,13 +388,13 @@ exports.cancelPickup = asyncHandler(async (req, res) => {
 
   await pickup.populate([
     { path: 'assignedTo', select: 'name email phone' },
-    { path: 'assignedBy', select: 'name email' }
+    { path: 'assignedBy', select: 'name email' },
   ]);
 
   res.json({
     success: true,
     message: 'Pickup cancelled successfully',
-    data: pickup
+    data: pickup,
   });
 });
 
@@ -388,7 +405,7 @@ exports.cancelPickup = asyncHandler(async (req, res) => {
  */
 exports.reassignPickup = asyncHandler(async (req, res) => {
   const { newAgentId, reason } = req.body;
-  
+
   const pickup = await Pickup.findById(req.params.id);
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found');
@@ -421,13 +438,13 @@ exports.reassignPickup = asyncHandler(async (req, res) => {
 
   await pickup.populate([
     { path: 'assignedTo', select: 'name email phone' },
-    { path: 'assignedBy', select: 'name email' }
+    { path: 'assignedBy', select: 'name email' },
   ]);
 
   res.json({
     success: true,
     message: 'Pickup reassigned successfully',
-    data: pickup
+    data: pickup,
   });
 });
 
@@ -451,26 +468,35 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
 
   // Overall statistics
   const totalPickups = await Pickup.countDocuments(combinedFilter);
-  const completedPickups = await Pickup.countDocuments({ ...combinedFilter, status: 'completed' });
-  const pendingPickups = await Pickup.countDocuments({ 
-    ...combinedFilter, 
-    status: { $in: ['assigned', 'confirmed', 'in_transit', 'arrived'] } 
+  const completedPickups = await Pickup.countDocuments({
+    ...combinedFilter,
+    status: 'completed',
   });
-  const failedPickups = await Pickup.countDocuments({ ...combinedFilter, status: 'failed' });
-  const cancelledPickups = await Pickup.countDocuments({ ...combinedFilter, status: 'cancelled' });
+  const pendingPickups = await Pickup.countDocuments({
+    ...combinedFilter,
+    status: { $in: ['assigned', 'confirmed', 'in_transit', 'arrived'] },
+  });
+  const failedPickups = await Pickup.countDocuments({
+    ...combinedFilter,
+    status: 'failed',
+  });
+  const cancelledPickups = await Pickup.countDocuments({
+    ...combinedFilter,
+    status: 'cancelled',
+  });
 
   // Status distribution
   const statusDistribution = await Pickup.aggregate([
     { $match: combinedFilter },
     { $group: { _id: '$status', count: { $sum: 1 } } },
-    { $sort: { count: -1 } }
+    { $sort: { count: -1 } },
   ]);
 
   // Priority distribution
   const priorityDistribution = await Pickup.aggregate([
     { $match: combinedFilter },
     { $group: { _id: '$priority', count: { $sum: 1 } } },
-    { $sort: { count: -1 } }
+    { $sort: { count: -1 } },
   ]);
 
   // Agent performance
@@ -480,18 +506,22 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
       $group: {
         _id: '$assignedTo',
         totalAssigned: { $sum: 1 },
-        completed: { $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] } },
+        completed: {
+          $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] },
+        },
         failed: { $sum: { $cond: [{ $eq: ['$status', 'failed'] }, 1, 0] } },
-        cancelled: { $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] } }
-      }
+        cancelled: {
+          $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] },
+        },
+      },
     },
     {
       $lookup: {
         from: 'users',
         localField: '_id',
         foreignField: '_id',
-        as: 'agent'
-      }
+        as: 'agent',
+      },
     },
     { $unwind: '$agent' },
     {
@@ -506,12 +536,12 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
           $cond: [
             { $eq: ['$totalAssigned', 0] },
             0,
-            { $multiply: [{ $divide: ['$completed', '$totalAssigned'] }, 100] }
-          ]
-        }
-      }
+            { $multiply: [{ $divide: ['$completed', '$totalAssigned'] }, 100] },
+          ],
+        },
+      },
     },
-    { $sort: { successRate: -1 } }
+    { $sort: { successRate: -1 } },
   ]);
 
   // Daily pickup trends
@@ -522,14 +552,16 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
         _id: {
           year: { $year: '$createdAt' },
           month: { $month: '$createdAt' },
-          day: { $dayOfMonth: '$createdAt' }
+          day: { $dayOfMonth: '$createdAt' },
         },
         total: { $sum: 1 },
-        completed: { $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] } },
-        failed: { $sum: { $cond: [{ $eq: ['$status', 'failed'] }, 1, 0] } }
-      }
+        completed: {
+          $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] },
+        },
+        failed: { $sum: { $cond: [{ $eq: ['$status', 'failed'] }, 1, 0] } },
+      },
     },
-    { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } }
+    { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } },
   ]);
 
   res.json({
@@ -541,13 +573,16 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
         pendingPickups,
         failedPickups,
         cancelledPickups,
-        successRate: totalPickups > 0 ? ((completedPickups / totalPickups) * 100).toFixed(2) : 0
+        successRate:
+          totalPickups > 0
+            ? ((completedPickups / totalPickups) * 100).toFixed(2)
+            : 0,
       },
       statusDistribution,
       priorityDistribution,
       agentPerformance,
-      dailyTrends
-    }
+      dailyTrends,
+    },
   });
 });
 
@@ -561,7 +596,10 @@ exports.getAgentPickups = asyncHandler(async (req, res) => {
   const { status, date } = req.query;
 
   // Role-based access control
-  if (['pickup_agent', 'driver'].includes(req.user.role) && req.user.id !== agentId) {
+  if (
+    ['pickup_agent', 'driver'].includes(req.user.role) &&
+    req.user.id !== agentId
+  ) {
     throw new ApiError(403, 'Access denied');
   }
 
@@ -573,15 +611,16 @@ exports.getAgentPickups = asyncHandler(async (req, res) => {
     const targetDate = new Date(date);
     const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
     const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
-    
-    filteredPickups = pickups.filter(pickup => 
-      pickup.scheduledDate >= startOfDay && pickup.scheduledDate <= endOfDay
+
+    filteredPickups = pickups.filter(
+      (pickup) =>
+        pickup.scheduledDate >= startOfDay && pickup.scheduledDate <= endOfDay
     );
   }
 
   res.json({
     success: true,
-    data: filteredPickups
+    data: filteredPickups,
   });
 });
 
@@ -592,7 +631,7 @@ exports.getAgentPickups = asyncHandler(async (req, res) => {
  */
 exports.addCommunication = asyncHandler(async (req, res) => {
   const { type, message, status } = req.body;
-  
+
   const pickup = await Pickup.findById(req.params.id);
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found');
@@ -602,7 +641,7 @@ exports.addCommunication = asyncHandler(async (req, res) => {
     type,
     message,
     sentBy: req.user.id,
-    status: status || 'sent'
+    status: status || 'sent',
   });
 
   await pickup.save();
@@ -610,7 +649,7 @@ exports.addCommunication = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Communication logged successfully',
-    data: pickup
+    data: pickup,
   });
 });
 
@@ -626,7 +665,10 @@ exports.uploadPickupImages = asyncHandler(async (req, res) => {
   }
 
   // Role-based access control
-  if (['pickup_agent', 'driver'].includes(req.user.role) && pickup.assignedTo.toString() !== req.user.id) {
+  if (
+    ['pickup_agent', 'driver'].includes(req.user.role) &&
+    pickup.assignedTo.toString() !== req.user.id
+  ) {
     throw new ApiError(403, 'Access denied');
   }
 
@@ -635,7 +677,7 @@ exports.uploadPickupImages = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'No images uploaded');
   }
 
-  const imageUrls = req.files.map(file => file.path || file.filename);
+  const imageUrls = req.files.map((file) => file.path || file.filename);
   pickup.pickupImages = [...(pickup.pickupImages || []), ...imageUrls];
 
   await pickup.save();
@@ -643,7 +685,7 @@ exports.uploadPickupImages = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Images uploaded successfully',
-    data: { images: imageUrls }
+    data: { images: imageUrls },
   });
 });
 
@@ -654,13 +696,13 @@ exports.uploadPickupImages = asyncHandler(async (req, res) => {
  */
 exports.getPickupSlots = asyncHandler(async (req, res) => {
   const { date } = req.query;
-  
+
   // Define available time slots
   const timeSlots = [
     { id: 1, slot: '09:00-12:00', label: 'Morning (9 AM - 12 PM)' },
     { id: 2, slot: '12:00-15:00', label: 'Afternoon (12 PM - 3 PM)' },
     { id: 3, slot: '15:00-18:00', label: 'Evening (3 PM - 6 PM)' },
-    { id: 4, slot: '18:00-21:00', label: 'Night (6 PM - 9 PM)' }
+    { id: 4, slot: '18:00-21:00', label: 'Night (6 PM - 9 PM)' },
   ];
 
   // If date is provided, check availability for that date
@@ -672,32 +714,32 @@ exports.getPickupSlots = asyncHandler(async (req, res) => {
     // Get existing pickups for the date
     const existingPickups = await Pickup.find({
       scheduledDate: { $gte: startOfDay, $lte: endOfDay },
-      status: { $nin: ['cancelled', 'completed'] }
+      status: { $nin: ['cancelled', 'completed'] },
     });
 
     // Count pickups per time slot (assuming max 10 pickups per slot)
     const slotCounts = {};
-    existingPickups.forEach(pickup => {
+    existingPickups.forEach((pickup) => {
       const slot = pickup.scheduledTimeSlot;
       slotCounts[slot] = (slotCounts[slot] || 0) + 1;
     });
 
     // Mark slots as available/unavailable
-    const availableSlots = timeSlots.map(slot => ({
+    const availableSlots = timeSlots.map((slot) => ({
       ...slot,
       available: (slotCounts[slot.slot] || 0) < 10,
-      bookings: slotCounts[slot.slot] || 0
+      bookings: slotCounts[slot.slot] || 0,
     }));
 
     return res.json({
       success: true,
-      data: { slots: availableSlots, date }
+      data: { slots: availableSlots, date },
     });
   }
 
   res.json({
     success: true,
-    data: { slots: timeSlots }
+    data: { slots: timeSlots },
   });
 });
 
@@ -725,7 +767,7 @@ exports.updatePickup = asyncHandler(async (req, res) => {
     address,
     items,
     priority,
-    specialInstructions
+    specialInstructions,
   } = req.body;
 
   // Update fields if provided
@@ -753,12 +795,12 @@ exports.updatePickup = asyncHandler(async (req, res) => {
 
   await pickup.populate([
     { path: 'assignedTo', select: 'name email phone role' },
-    { path: 'orderId' }
+    { path: 'orderId' },
   ]);
 
   res.json({
     success: true,
     message: 'Pickup updated successfully',
-    data: { pickup }
+    data: { pickup },
   });
 });

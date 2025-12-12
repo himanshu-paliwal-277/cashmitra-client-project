@@ -10,11 +10,11 @@ const sanitizeData = (data) => {
   if (typeof data === 'string') {
     return xss(data);
   }
-  
+
   if (Array.isArray(data)) {
-    return data.map(item => sanitizeData(item));
+    return data.map((item) => sanitizeData(item));
   }
-  
+
   if (typeof data === 'object' && data !== null) {
     const sanitized = {};
     for (const [key, value] of Object.entries(data)) {
@@ -22,7 +22,7 @@ const sanitizeData = (data) => {
     }
     return sanitized;
   }
-  
+
   return data;
 };
 
@@ -70,5 +70,5 @@ module.exports = {
   generateSecureToken,
   hashData,
   generateCSRFToken,
-  validateCSRFToken
+  validateCSRFToken,
 };

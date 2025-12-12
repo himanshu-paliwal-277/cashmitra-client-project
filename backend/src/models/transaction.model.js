@@ -4,7 +4,14 @@ const transactionSchema = new mongoose.Schema(
   {
     transactionType: {
       type: String,
-      enum: ['order_payment', 'commission', 'payout', 'refund', 'wallet_credit', 'wallet_debit'],
+      enum: [
+        'order_payment',
+        'commission',
+        'payout',
+        'refund',
+        'wallet_credit',
+        'wallet_debit',
+      ],
       required: true,
     },
     amount: {

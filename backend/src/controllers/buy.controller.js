@@ -1,13 +1,13 @@
-const { validationResult } = require("express-validator");
-const BuyProduct = require("../models/buyProduct.model");
-const Order = require("../models/order.model");
-const Cart = require("../models/cart.model");
-const User = require("../models/user.model");
-const Partner = require("../models/partner.model");
-const Product = require("../models/product.model");
-const Wallet = require("../models/wallet.model");
-const Transaction = require("../models/transaction.model");
-const mongoose = require("mongoose");
+const { validationResult } = require('express-validator');
+const BuyProduct = require('../models/buyProduct.model');
+const Order = require('../models/order.model');
+const Cart = require('../models/cart.model');
+const User = require('../models/user.model');
+const Partner = require('../models/partner.model');
+const Product = require('../models/product.model');
+const Wallet = require('../models/wallet.model');
+const Transaction = require('../models/transaction.model');
+const mongoose = require('mongoose');
 
 /**
  * @desc    Search products by category, brand, or model
@@ -24,7 +24,7 @@ const searchProducts = async (req, res) => {
 
     // Add category filter if provided
     if (category) {
-      filter["product.category"] = category;
+      filter['product.category'] = category;
     }
 
     // Add condition filter if provided
@@ -43,7 +43,7 @@ const searchProducts = async (req, res) => {
     let partnerIds = [];
     if (pincode) {
       const partners = await Partner.find({
-        "address.pincode": pincode,
+        'address.pincode': pincode,
         isVerified: true,
       });
       partnerIds = partners.map((partner) => partner._id);
@@ -52,7 +52,7 @@ const searchProducts = async (req, res) => {
         return res.json({
           products: [],
           total: 0,
-          message: "No partner shops available in your area",
+          message: 'No partner shops available in your area',
         });
       }
 
@@ -65,8 +65,8 @@ const searchProducts = async (req, res) => {
       // First find products matching the query
       const products = await Product.find(
         { $text: { $search: query } },
-        { score: { $meta: "textScore" } }
-      ).sort({ score: { $meta: "textScore" } });
+        { score: { $meta: 'textScore' } }
+      ).sort({ score: { $meta: 'textScore' } });
 
       const productIds = products.map((product) => product._id);
 
@@ -85,7 +85,7 @@ const searchProducts = async (req, res) => {
     const skip = (page - 1) * limit;
 
     inventoryItems = await BuyProduct.find(filter)
-      .populate("partner", "shopName address rating")
+      .populate('partner', 'shopName address rating')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -99,8 +99,8 @@ const searchProducts = async (req, res) => {
       pages: Math.ceil(total / limit),
     });
   } catch (error) {
-    console.error("Error searching products:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error searching products:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -112,12 +112,12 @@ const searchProducts = async (req, res) => {
 const getProductDetails = async (req, res) => {
   try {
     const product = await BuyProduct.findById(req.params.id).populate(
-      "partner",
-      "shopName address phone rating"
+      'partner',
+      'shopName address phone rating'
     );
 
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     // Find similar products from the same partner
@@ -125,7 +125,7 @@ const getProductDetails = async (req, res) => {
       partner: product.partner._id,
       category: product.category,
       _id: { $ne: product._id },
-      "availability.inStock": true,
+      'availability.inStock': true,
     }).limit(4);
 
     res.json({
@@ -133,8 +133,8 @@ const getProductDetails = async (req, res) => {
       similarProducts,
     });
   } catch (error) {
-    console.error("Error fetching product details:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching product details:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -156,11 +156,11 @@ const addToCart = async (req, res) => {
     // Check if product exists and is available
     const product = await BuyProduct.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     if (!product.availability.inStock) {
-      return res.status(400).json({ message: "Product is not available" });
+      return res.status(400).json({ message: 'Product is not available' });
     }
 
     // Find or create user's cart
@@ -218,13 +218,13 @@ const addToCart = async (req, res) => {
     const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
     res.json({
-      message: "Product added to cart",
+      message: 'Product added to cart',
       cart: cartItems,
       total,
     });
   } catch (error) {
-    console.error("Error adding to cart:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error adding to cart:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -295,8 +295,8 @@ const getCart = async (req, res) => {
       total,
     });
   } catch (error) {
-    console.error("Error fetching cart:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching cart:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -320,7 +320,7 @@ const updateCartItem = async (req, res) => {
     // Find user's cart
     const cart = await Cart.findOne({ user: userId });
     if (!cart) {
-      return res.status(404).json({ message: "Cart is empty" });
+      return res.status(404).json({ message: 'Cart is empty' });
     }
 
     // Find the item in the cart
@@ -329,7 +329,7 @@ const updateCartItem = async (req, res) => {
     );
 
     if (itemIndex === -1) {
-      return res.status(404).json({ message: "Item not found in cart" });
+      return res.status(404).json({ message: 'Item not found in cart' });
     }
 
     // Check product availability
@@ -338,11 +338,11 @@ const updateCartItem = async (req, res) => {
       // Remove item from cart if it no longer exists
       cart.items.splice(itemIndex, 1);
       await cart.save();
-      return res.status(404).json({ message: "Product no longer exists" });
+      return res.status(404).json({ message: 'Product no longer exists' });
     }
 
     if (!product.availability.inStock) {
-      return res.status(400).json({ message: "Product is not available" });
+      return res.status(400).json({ message: 'Product is not available' });
     }
 
     // Update quantity
@@ -356,12 +356,12 @@ const updateCartItem = async (req, res) => {
     await cart.save();
 
     res.json({
-      message: "Cart updated successfully",
+      message: 'Cart updated successfully',
       cart: cart.items,
     });
   } catch (error) {
-    console.error("Error updating cart:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error updating cart:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -379,7 +379,7 @@ const removeCartItem = async (req, res) => {
     // Find user's cart
     const cart = await Cart.findOne({ user: userId });
     if (!cart) {
-      return res.status(404).json({ message: "Cart is empty" });
+      return res.status(404).json({ message: 'Cart is empty' });
     }
 
     // Find the item in the cart
@@ -388,7 +388,7 @@ const removeCartItem = async (req, res) => {
     );
 
     if (itemIndex === -1) {
-      return res.status(404).json({ message: "Item not found in cart" });
+      return res.status(404).json({ message: 'Item not found in cart' });
     }
 
     // Remove item from cart
@@ -396,12 +396,12 @@ const removeCartItem = async (req, res) => {
     await cart.save();
 
     res.json({
-      message: "Item removed from cart",
+      message: 'Item removed from cart',
       cart: cart.items,
     });
   } catch (error) {
-    console.error("Error removing cart item:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error removing cart item:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -423,7 +423,7 @@ const checkout = async (req, res) => {
     // Find user's cart
     const cart = await Cart.findOne({ user: userId });
     if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ message: "Cart is empty" });
+      return res.status(400).json({ message: 'Cart is empty' });
     }
 
     // Group cart items by partner
@@ -432,12 +432,12 @@ const checkout = async (req, res) => {
     // Validate all items and group by partner
     for (const item of cart.items) {
       const product = await BuyProduct.findById(item.productId).populate(
-        "partner"
+        'partner'
       );
 
       if (!product) {
         return res.status(404).json({
-          message: "One or more products in your cart are no longer available",
+          message: 'One or more products in your cart are no longer available',
         });
       }
 
@@ -481,7 +481,7 @@ const checkout = async (req, res) => {
 
       // Create order
       const order = new Order({
-        orderType: "buy",
+        orderType: 'buy',
         user: req.user._id,
         partner: partnerId,
         items: partnerData.items,
@@ -492,18 +492,18 @@ const checkout = async (req, res) => {
         },
         paymentDetails: {
           method: paymentMethod,
-          status: "pending",
+          status: 'pending',
         },
         shippingDetails: {
           address: shippingAddress,
           contactPhone: req.user.phone,
-          deliveryMethod: "Cashmitra Logistics",
+          deliveryMethod: 'Cashmitra Logistics',
         },
-        status: "pending",
+        status: 'pending',
         statusHistory: [
           {
-            status: "pending",
-            note: "Order created and pending partner confirmation",
+            status: 'pending',
+            note: 'Order created and pending partner confirmation',
           },
         ],
       });
@@ -517,7 +517,7 @@ const checkout = async (req, res) => {
     await cart.save();
 
     res.status(201).json({
-      message: "Orders created successfully",
+      message: 'Orders created successfully',
       orders: orders.map((order) => ({
         _id: order._id,
         partner: order.partner,
@@ -526,8 +526,8 @@ const checkout = async (req, res) => {
       })),
     });
   } catch (error) {
-    console.error("Error during checkout:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error during checkout:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -541,25 +541,25 @@ const getBuyOrderDetails = async (req, res) => {
     const order = await Order.findOne({
       _id: req.params.id,
       user: req.user._id,
-      orderType: "buy",
+      orderType: 'buy',
     })
-      .populate("partner", "shopName address phone")
+      .populate('partner', 'shopName address phone')
       .populate({
-        path: "items.inventory",
+        path: 'items.inventory',
         populate: {
-          path: "product",
-          select: "category brand model variant images",
+          path: 'product',
+          select: 'category brand model variant images',
         },
       });
 
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(404).json({ message: 'Order not found' });
     }
 
     res.json({ order });
   } catch (error) {
-    console.error("Error fetching buy order:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching buy order:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -576,16 +576,16 @@ const getUserBuyOrders = async (req, res) => {
 
     const orders = await Order.find({
       user: req.user._id,
-      orderType: "buy",
+      orderType: 'buy',
     })
-      .populate("partner", "shopName")
+      .populate('partner', 'shopName')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
     const total = await Order.countDocuments({
       user: req.user._id,
-      orderType: "buy",
+      orderType: 'buy',
     });
 
     res.json({
@@ -595,8 +595,8 @@ const getUserBuyOrders = async (req, res) => {
       pages: Math.ceil(total / limit),
     });
   } catch (error) {
-    console.error("Error fetching user buy orders:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('Error fetching user buy orders:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

@@ -15,7 +15,7 @@ const {
   updateRules,
   deleteConfig,
   resetToDefault,
-  testPricing
+  testPricing,
 } = require('../controllers/sellConfig.controller');
 const { protect, authorize } = require('../middlewares/auth.middleware');
 
@@ -26,10 +26,7 @@ const configValidation = [
   body('productId')
     .isMongoId()
     .withMessage('Product ID must be a valid MongoDB ObjectId'),
-  body('steps')
-    .optional()
-    .isArray()
-    .withMessage('Steps must be an array'),
+  body('steps').optional().isArray().withMessage('Steps must be an array'),
   body('steps.*.key')
     .optional()
     .trim()
@@ -44,10 +41,7 @@ const configValidation = [
     .optional()
     .isInt({ min: 0 })
     .withMessage('Step order must be a non-negative integer'),
-  body('rules')
-    .optional()
-    .isObject()
-    .withMessage('Rules must be an object'),
+  body('rules').optional().isObject().withMessage('Rules must be an object'),
   body('rules.roundToNearest')
     .optional()
     .isNumeric({ min: 1 })
@@ -67,13 +61,11 @@ const configValidation = [
   body('rules.maxPercent')
     .optional()
     .isNumeric({ min: 0, max: 100 })
-    .withMessage('Max percent must be between 0 and 100')
+    .withMessage('Max percent must be between 0 and 100'),
 ];
 
 const stepsValidation = [
-  body('steps')
-    .isArray({ min: 1 })
-    .withMessage('Steps array is required'),
+  body('steps').isArray({ min: 1 }).withMessage('Steps array is required'),
   body('steps.*.key')
     .trim()
     .isLength({ min: 1, max: 100 })
@@ -84,13 +76,11 @@ const stepsValidation = [
     .withMessage('Step title must be between 1 and 200 characters'),
   body('steps.*.order')
     .isInt({ min: 0 })
-    .withMessage('Step order must be a non-negative integer')
+    .withMessage('Step order must be a non-negative integer'),
 ];
 
 const rulesValidation = [
-  body('rules')
-    .isObject()
-    .withMessage('Rules object is required'),
+  body('rules').isObject().withMessage('Rules object is required'),
   body('rules.roundToNearest')
     .optional()
     .isNumeric({ min: 1 })
@@ -110,7 +100,7 @@ const rulesValidation = [
   body('rules.maxPercent')
     .optional()
     .isNumeric({ min: 0, max: 100 })
-    .withMessage('Max percent must be between 0 and 100')
+    .withMessage('Max percent must be between 0 and 100'),
 ];
 
 const testPricingValidation = [
@@ -120,12 +110,15 @@ const testPricingValidation = [
   body('adjustments')
     .optional()
     .isNumeric()
-    .withMessage('Adjustments must be a number')
+    .withMessage('Adjustments must be a number'),
 ];
 
 // Public routes for customers
-router.get('/customer/:productId', 
-  param('productId').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/customer/:productId',
+  param('productId')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   getCustomerConfig
 );
 
@@ -135,36 +128,54 @@ router.use(authorize('admin'));
 
 // CRUD routes
 router.post('/', configValidation, createOrUpdateConfig);
-router.get('/:productId', 
-  param('productId').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/:productId',
+  param('productId')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   getConfig
 );
-router.delete('/:productId', 
-  param('productId').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.delete(
+  '/:productId',
+  param('productId')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   deleteConfig
 );
 
 // Update specific parts
-router.put('/:productId/steps', 
-  param('productId').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.put(
+  '/:productId/steps',
+  param('productId')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   stepsValidation,
   updateSteps
 );
-router.put('/:productId/rules', 
-  param('productId').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.put(
+  '/:productId/rules',
+  param('productId')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   rulesValidation,
   updateRules
 );
 
 // Reset to default
-router.post('/:productId/reset', 
-  param('productId').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.post(
+  '/:productId/reset',
+  param('productId')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   resetToDefault
 );
 
 // Test pricing
-router.post('/:productId/test-pricing', 
-  param('productId').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.post(
+  '/:productId/test-pricing',
+  param('productId')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   testPricingValidation,
   testPricing
 );

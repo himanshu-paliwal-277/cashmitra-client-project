@@ -26,7 +26,7 @@ const getLeads = async (req, res) => {
     if (priority) filter.priority = priority;
     if (source) filter.source = source;
     if (assignedTo) filter.assignedTo = assignedTo;
-    
+
     // Add search functionality
     if (search) {
       filter.$or = [
@@ -83,8 +83,10 @@ const getLeads = async (req, res) => {
 // @access  Private/Admin
 const getLead = async (req, res) => {
   try {
-    const lead = await Lead.findById(req.params.id)
-      .populate('assignedTo', 'name email phone');
+    const lead = await Lead.findById(req.params.id).populate(
+      'assignedTo',
+      'name email phone'
+    );
 
     if (!lead) {
       return res.status(404).json({ message: 'Lead not found' });
@@ -122,14 +124,18 @@ const createLead = async (req, res) => {
     const lead = new Lead(leadData);
     await lead.save();
 
-    const populatedLead = await Lead.findById(lead._id)
-      .populate('assignedTo', 'name email');
+    const populatedLead = await Lead.findById(lead._id).populate(
+      'assignedTo',
+      'name email'
+    );
 
     res.status(201).json(populatedLead);
   } catch (error) {
     console.error(error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: 'Lead with this email already exists' });
+      return res
+        .status(400)
+        .json({ message: 'Lead with this email already exists' });
     }
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
@@ -233,7 +239,7 @@ const assignLead = async (req, res) => {
 const getLeadStats = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    
+
     const matchStage = {};
     if (startDate && endDate) {
       matchStage.createdAt = {
@@ -249,9 +255,15 @@ const getLeadStats = async (req, res) => {
           _id: null,
           total: { $sum: 1 },
           new: { $sum: { $cond: [{ $eq: ['$status', 'new'] }, 1, 0] } },
-          contacted: { $sum: { $cond: [{ $eq: ['$status', 'contacted'] }, 1, 0] } },
-          qualified: { $sum: { $cond: [{ $eq: ['$status', 'qualified'] }, 1, 0] } },
-          converted: { $sum: { $cond: [{ $eq: ['$status', 'converted'] }, 1, 0] } },
+          contacted: {
+            $sum: { $cond: [{ $eq: ['$status', 'contacted'] }, 1, 0] },
+          },
+          qualified: {
+            $sum: { $cond: [{ $eq: ['$status', 'qualified'] }, 1, 0] },
+          },
+          converted: {
+            $sum: { $cond: [{ $eq: ['$status', 'converted'] }, 1, 0] },
+          },
           lost: { $sum: { $cond: [{ $eq: ['$status', 'lost'] }, 1, 0] } },
           avgEstimatedValue: { $avg: '$estimatedValue' },
         },
@@ -269,7 +281,9 @@ const getLeadStats = async (req, res) => {
       { $sort: { count: -1 } },
     ]);
 
-    const conversionRate = stats[0] ? (stats[0].converted / stats[0].total * 100).toFixed(2) : 0;
+    const conversionRate = stats[0]
+      ? ((stats[0].converted / stats[0].total) * 100).toFixed(2)
+      : 0;
 
     res.json({
       overview: stats[0] || {

@@ -28,12 +28,8 @@ const validateCreateOrder = [
   body('shippingAddress.street')
     .notEmpty()
     .withMessage('Street address is required'),
-  body('shippingAddress.city')
-    .notEmpty()
-    .withMessage('City is required'),
-  body('shippingAddress.state')
-    .notEmpty()
-    .withMessage('State is required'),
+  body('shippingAddress.city').notEmpty().withMessage('City is required'),
+  body('shippingAddress.state').notEmpty().withMessage('State is required'),
   body('shippingAddress.pincode')
     .matches(/^[1-9][0-9]{5}$/)
     .withMessage('Valid pincode is required'),
@@ -41,20 +37,18 @@ const validateCreateOrder = [
     .matches(/^[6-9]\d{9}$/)
     .withMessage('Valid phone number is required'),
   body('paymentMethod')
-    .isIn(['card', 'UPI', 'netbanking', 'wallet','Cash'])
+    .isIn(['card', 'UPI', 'netbanking', 'wallet', 'Cash'])
     .withMessage('Valid payment method is required'),
   body('couponCode')
     .optional()
     .isString()
-    .withMessage('Coupon code must be a string')
+    .withMessage('Coupon code must be a string'),
 ];
 
 const validateProcessPayment = [
-  param('orderId')
-    .isMongoId()
-    .withMessage('Valid order ID is required'),
+  param('orderId').isMongoId().withMessage('Valid order ID is required'),
   body('paymentDetails.method')
-    .isIn(['card', 'UPI', 'netbanking', 'wallet','Cash'])
+    .isIn(['card', 'UPI', 'netbanking', 'wallet', 'Cash'])
     .withMessage('Valid payment method is required'),
   body('paymentDetails.transactionId')
     .optional()
@@ -63,13 +57,11 @@ const validateProcessPayment = [
   body('paymentDetails.gatewayResponse')
     .optional()
     .isObject()
-    .withMessage('Gateway response must be an object')
+    .withMessage('Gateway response must be an object'),
 ];
 
 const validateOrderId = [
-  param('orderId')
-    .isMongoId()
-    .withMessage('Valid order ID is required')
+  param('orderId').isMongoId().withMessage('Valid order ID is required'),
 ];
 
 const validateGetOrders = [
@@ -83,7 +75,14 @@ const validateGetOrders = [
     .withMessage('Limit must be between 1 and 100'),
   query('status')
     .optional()
-    .isIn(['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'returned'])
+    .isIn([
+      'pending',
+      'confirmed',
+      'shipped',
+      'delivered',
+      'cancelled',
+      'returned',
+    ])
     .withMessage('Invalid status'),
   query('orderType')
     .optional()
@@ -96,22 +95,16 @@ const validateGetOrders = [
   query('sortOrder')
     .optional()
     .isIn(['asc', 'desc'])
-    .withMessage('Sort order must be asc or desc')
+    .withMessage('Sort order must be asc or desc'),
 ];
 
 const validateCancelOrder = [
-  param('orderId')
-    .isMongoId()
-    .withMessage('Valid order ID is required'),
-  body('reason')
-    .notEmpty()
-    .withMessage('Cancellation reason is required')
+  param('orderId').isMongoId().withMessage('Valid order ID is required'),
+  body('reason').notEmpty().withMessage('Cancellation reason is required'),
 ];
 
 const validateUpdateShipping = [
-  param('orderId')
-    .isMongoId()
-    .withMessage('Valid order ID is required'),
+  param('orderId').isMongoId().withMessage('Valid order ID is required'),
   body('status')
     .isIn(['processing', 'shipped', 'delivered', 'returned'])
     .withMessage('Invalid shipping status'),
@@ -122,7 +115,7 @@ const validateUpdateShipping = [
   body('estimatedDelivery')
     .optional()
     .isISO8601()
-    .withMessage('Estimated delivery must be a valid date')
+    .withMessage('Estimated delivery must be a valid date'),
 ];
 
 const validateAnalytics = [
@@ -137,7 +130,7 @@ const validateAnalytics = [
   query('groupBy')
     .optional()
     .isIn(['day', 'week', 'month'])
-    .withMessage('Group by must be day, week, or month')
+    .withMessage('Group by must be day, week, or month'),
 ];
 
 // Public routes (none for sales)
@@ -149,20 +142,30 @@ router.use(protect);
 router.post('/orders', validateCreateOrder, salesController.createOrder);
 router.get('/orders', validateGetOrders, salesController.getUserOrders);
 router.get('/orders/:orderId', validateOrderId, salesController.getOrder);
-router.post('/orders/:orderId/payment', validateProcessPayment, salesController.processPayment);
-router.patch('/orders/:orderId/cancel', validateCancelOrder, salesController.cancelOrder);
+router.post(
+  '/orders/:orderId/payment',
+  validateProcessPayment,
+  salesController.processPayment
+);
+router.patch(
+  '/orders/:orderId/cancel',
+  validateCancelOrder,
+  salesController.cancelOrder
+);
 
 // Partner routes (require partner authorization)
-router.patch('/orders/:orderId/shipping', 
-  authorize('partner', 'admin'), 
-  validateUpdateShipping, 
+router.patch(
+  '/orders/:orderId/shipping',
+  authorize('partner', 'admin'),
+  validateUpdateShipping,
   salesController.updateShippingStatus
 );
 
 // Admin routes
-router.get('/analytics', 
-  authorize('admin'), 
-  validateAnalytics, 
+router.get(
+  '/analytics',
+  authorize('admin'),
+  validateAnalytics,
   salesController.getSalesAnalytics
 );
 

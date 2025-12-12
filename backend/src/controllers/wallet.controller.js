@@ -1,9 +1,9 @@
-const Wallet = require("../models/wallet.model");
-const Transaction = require("../models/transaction.model");
-const Partner = require("../models/partner.model");
-const { Order } = require("../models/order.model");
-const { validationResult } = require("express-validator");
-const mongoose = require("mongoose");
+const Wallet = require('../models/wallet.model');
+const Transaction = require('../models/transaction.model');
+const Partner = require('../models/partner.model');
+const { Order } = require('../models/order.model');
+const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 // Get wallet details
 exports.getWallet = async (req, res) => {
@@ -12,15 +12,15 @@ exports.getWallet = async (req, res) => {
     if (!partner) {
       return res.status(400).json({
         success: false,
-        message: "Partner not found",
+        message: 'Partner not found',
       });
     }
 
     const partnerId = partner._id;
 
     let wallet = await Wallet.findOne({ partner: partnerId })
-      .populate("transactions")
-      .populate("partner", "shopName user");
+      .populate('transactions')
+      .populate('partner', 'shopName user');
 
     if (!wallet) {
       // Create wallet if it doesn't exist
@@ -30,8 +30,8 @@ exports.getWallet = async (req, res) => {
       });
 
       wallet = await Wallet.findById(wallet._id)
-        .populate("transactions")
-        .populate("partner", "shopName user");
+        .populate('transactions')
+        .populate('partner', 'shopName user');
     }
 
     res.status(200).json({
@@ -39,10 +39,10 @@ exports.getWallet = async (req, res) => {
       data: wallet,
     });
   } catch (error) {
-    console.error("Get wallet error:", error);
+    console.error('Get wallet error:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
       error: error.message,
     });
   }
@@ -55,7 +55,7 @@ exports.getTransactions = async (req, res) => {
     if (!partner) {
       return res.status(404).json({
         success: false,
-        message: "Partner profile not found",
+        message: 'Partner profile not found',
       });
     }
 
@@ -67,7 +67,7 @@ exports.getTransactions = async (req, res) => {
     if (status) query.status = status;
 
     const transactions = await Transaction.find(query)
-      .populate("order", "orderType totalAmount")
+      .populate('order', 'orderType totalAmount')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
@@ -84,10 +84,10 @@ exports.getTransactions = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get transactions error:", error);
+    console.error('Get transactions error:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
       error: error.message,
     });
   }
@@ -103,9 +103,9 @@ exports.processCommission = async (
   session.startTransaction();
 
   try {
-    const order = await Order.findById(orderId).populate("partner");
+    const order = await Order.findById(orderId).populate('partner');
     if (!order) {
-      throw new Error("Order not found");
+      throw new Error('Order not found');
     }
 
     const partnerId = order.partner._id;
@@ -129,12 +129,12 @@ exports.processCommission = async (
     const transaction = await Transaction.create(
       [
         {
-          transactionType: "commission",
+          transactionType: 'commission',
           amount: commissionAmount,
           partner: partnerId,
           order: orderId,
-          paymentMethod: "System",
-          status: "completed",
+          paymentMethod: 'System',
+          status: 'completed',
           description: `Commission for ${order.orderType} order - ${commissionRate}%`,
           metadata: {
             commissionRate,
@@ -169,7 +169,7 @@ exports.requestPayout = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: errors.array(),
       });
     }
@@ -178,7 +178,7 @@ exports.requestPayout = async (req, res) => {
     if (!partner) {
       return res.status(404).json({
         success: false,
-        message: "Partner profile not found",
+        message: 'Partner profile not found',
       });
     }
 
@@ -189,14 +189,14 @@ exports.requestPayout = async (req, res) => {
     if (!wallet) {
       return res.status(404).json({
         success: false,
-        message: "Wallet not found",
+        message: 'Wallet not found',
       });
     }
 
     if (wallet.balance < amount) {
       return res.status(400).json({
         success: false,
-        message: "Insufficient balance",
+        message: 'Insufficient balance',
       });
     }
 
@@ -213,21 +213,21 @@ exports.requestPayout = async (req, res) => {
     try {
       // Create payout transaction
       const paymentDetails = {};
-      if (paymentMethod === "Bank Transfer") {
+      if (paymentMethod === 'Bank Transfer') {
         paymentDetails.bankDetails = bankDetails;
-      } else if (paymentMethod === "UPI") {
+      } else if (paymentMethod === 'UPI') {
         paymentDetails.upiDetails = { upiId };
       }
 
       const transaction = await Transaction.create(
         [
           {
-            transactionType: "payout",
+            transactionType: 'payout',
             amount: -amount, // Negative for debit
             partner: partnerId,
             paymentMethod,
             paymentDetails,
-            status: "pending",
+            status: 'pending',
             description: `Payout request via ${paymentMethod}`,
             metadata: {
               requestedAt: new Date(),
@@ -248,7 +248,7 @@ exports.requestPayout = async (req, res) => {
 
       res.status(201).json({
         success: true,
-        message: "Payout request submitted successfully",
+        message: 'Payout request submitted successfully',
         data: {
           transaction: transaction[0],
           remainingBalance: wallet.balance,
@@ -261,10 +261,10 @@ exports.requestPayout = async (req, res) => {
       session.endSession();
     }
   } catch (error) {
-    console.error("Request payout error:", error);
+    console.error('Request payout error:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
       error: error.message,
     });
   }
@@ -277,7 +277,7 @@ exports.updatePayoutSettings = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: "Validation failed",
+        message: 'Validation failed',
         errors: errors.array(),
       });
     }
@@ -286,7 +286,7 @@ exports.updatePayoutSettings = async (req, res) => {
     if (!partner) {
       return res.status(404).json({
         success: false,
-        message: "Partner profile not found",
+        message: 'Partner profile not found',
       });
     }
 
@@ -303,7 +303,7 @@ exports.updatePayoutSettings = async (req, res) => {
     if (!wallet) {
       return res.status(404).json({
         success: false,
-        message: "Wallet not found",
+        message: 'Wallet not found',
       });
     }
 
@@ -329,14 +329,14 @@ exports.updatePayoutSettings = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Payout settings updated successfully",
+      message: 'Payout settings updated successfully',
       data: wallet.payoutSettings,
     });
   } catch (error) {
-    console.error("Update payout settings error:", error);
+    console.error('Update payout settings error:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
       error: error.message,
     });
   }
@@ -349,7 +349,7 @@ exports.getPayoutHistory = async (req, res) => {
     if (!partner) {
       return res.status(404).json({
         success: false,
-        message: "Partner profile not found",
+        message: 'Partner profile not found',
       });
     }
 
@@ -358,7 +358,7 @@ exports.getPayoutHistory = async (req, res) => {
 
     const query = {
       partner: partnerId,
-      transactionType: "payout",
+      transactionType: 'payout',
     };
     if (status) query.status = status;
 
@@ -379,10 +379,10 @@ exports.getPayoutHistory = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get payout history error:", error);
+    console.error('Get payout history error:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
       error: error.message,
     });
   }
@@ -395,12 +395,12 @@ exports.getWalletAnalytics = async (req, res) => {
     if (!partner) {
       return res.status(404).json({
         success: false,
-        message: "Partner profile not found",
+        message: 'Partner profile not found',
       });
     }
 
     const partnerId = partner._id;
-    const { period = "30" } = req.query; // days
+    const { period = '30' } = req.query; // days
 
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - parseInt(period));
@@ -414,7 +414,7 @@ exports.getWalletAnalytics = async (req, res) => {
         payoutSettings: {
           minimumPayoutAmount: 1000,
           autoPayoutEnabled: false,
-          payoutSchedule: "manual",
+          payoutSchedule: 'manual',
         },
       });
     }
@@ -423,22 +423,22 @@ exports.getWalletAnalytics = async (req, res) => {
     const transactions = await Transaction.find({
       partner: partnerId,
       createdAt: { $gte: startDate },
-      status: "completed",
+      status: 'completed',
     });
 
     // Calculate analytics
     const totalEarnings = transactions
-      .filter((t) => t.transactionType === "commission")
+      .filter((t) => t.transactionType === 'commission')
       .reduce((sum, t) => sum + t.amount, 0);
 
     const totalPayouts = transactions
-      .filter((t) => t.transactionType === "payout")
+      .filter((t) => t.transactionType === 'payout')
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
     const pendingPayouts = await Transaction.find({
       partner: partnerId,
-      transactionType: "payout",
-      status: "pending",
+      transactionType: 'payout',
+      status: 'pending',
     });
 
     const pendingAmount = pendingPayouts.reduce(
@@ -449,14 +449,14 @@ exports.getWalletAnalytics = async (req, res) => {
     // Group transactions by date for chart data
     const dailyData = {};
     transactions.forEach((transaction) => {
-      const date = transaction.createdAt.toISOString().split("T")[0];
+      const date = transaction.createdAt.toISOString().split('T')[0];
       if (!dailyData[date]) {
         dailyData[date] = { earnings: 0, payouts: 0 };
       }
 
-      if (transaction.transactionType === "commission") {
+      if (transaction.transactionType === 'commission') {
         dailyData[date].earnings += transaction.amount;
-      } else if (transaction.transactionType === "payout") {
+      } else if (transaction.transactionType === 'payout') {
         dailyData[date].payouts += Math.abs(transaction.amount);
       }
     });
@@ -482,10 +482,10 @@ exports.getWalletAnalytics = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get wallet analytics error:", error);
+    console.error('Get wallet analytics error:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
       error: error.message,
     });
   }
@@ -497,36 +497,36 @@ exports.processPayout = async (req, res) => {
     const { transactionId } = req.params;
     const { status, notes } = req.body;
 
-    if (!["completed", "failed"].includes(status)) {
+    if (!['completed', 'failed'].includes(status)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid status. Must be completed or failed",
+        message: 'Invalid status. Must be completed or failed',
       });
     }
 
     const transaction = await Transaction.findById(transactionId).populate(
-      "partner",
-      "shopName user"
+      'partner',
+      'shopName user'
     );
 
     if (!transaction) {
       return res.status(404).json({
         success: false,
-        message: "Transaction not found",
+        message: 'Transaction not found',
       });
     }
 
-    if (transaction.transactionType !== "payout") {
+    if (transaction.transactionType !== 'payout') {
       return res.status(400).json({
         success: false,
-        message: "Transaction is not a payout request",
+        message: 'Transaction is not a payout request',
       });
     }
 
-    if (transaction.status !== "pending") {
+    if (transaction.status !== 'pending') {
       return res.status(400).json({
         success: false,
-        message: "Transaction is not pending",
+        message: 'Transaction is not pending',
       });
     }
 
@@ -536,12 +536,12 @@ exports.processPayout = async (req, res) => {
     try {
       // Update transaction status
       transaction.status = status;
-      transaction.metadata.set("processedAt", new Date());
-      transaction.metadata.set("processedBy", req.user._id);
-      if (notes) transaction.metadata.set("adminNotes", notes);
+      transaction.metadata.set('processedAt', new Date());
+      transaction.metadata.set('processedBy', req.user._id);
+      if (notes) transaction.metadata.set('adminNotes', notes);
 
       // If failed, refund the amount to wallet
-      if (status === "failed") {
+      if (status === 'failed') {
         const wallet = await Wallet.findOne({
           partner: transaction.partner._id,
         }).session(session);
@@ -558,7 +558,7 @@ exports.processPayout = async (req, res) => {
       res.status(200).json({
         success: true,
         message: `Payout ${
-          status === "completed" ? "approved" : "rejected"
+          status === 'completed' ? 'approved' : 'rejected'
         } successfully`,
         data: transaction,
       });
@@ -569,10 +569,10 @@ exports.processPayout = async (req, res) => {
       session.endSession();
     }
   } catch (error) {
-    console.error("Process payout error:", error);
+    console.error('Process payout error:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
       error: error.message,
     });
   }
@@ -584,17 +584,17 @@ exports.getAllPayouts = async (req, res) => {
     const { page = 1, limit = 10, status } = req.query;
 
     const query = {
-      transactionType: "payout",
+      transactionType: 'payout',
     };
     if (status) query.status = status;
 
     const payouts = await Transaction.find(query)
       .populate({
-        path: "partner",
-        select: "shopName shopEmail user",
+        path: 'partner',
+        select: 'shopName shopEmail user',
         populate: {
-          path: "user",
-          select: "name email",
+          path: 'user',
+          select: 'name email',
         },
       })
       .sort({ createdAt: -1 })
@@ -613,10 +613,10 @@ exports.getAllPayouts = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get all payouts error:", error);
+    console.error('Get all payouts error:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
       error: error.message,
     });
   }
@@ -628,15 +628,15 @@ exports.getPendingPayouts = async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
 
     const payouts = await Transaction.find({
-      transactionType: "payout",
-      status: "pending",
+      transactionType: 'payout',
+      status: 'pending',
     })
       .populate({
-        path: "partner",
-        select: "shopName shopEmail user",
+        path: 'partner',
+        select: 'shopName shopEmail user',
         populate: {
-          path: "user",
-          select: "name email",
+          path: 'user',
+          select: 'name email',
         },
       })
       .sort({ createdAt: -1 })
@@ -644,8 +644,8 @@ exports.getPendingPayouts = async (req, res) => {
       .skip((page - 1) * limit);
 
     const totalPayouts = await Transaction.countDocuments({
-      transactionType: "payout",
-      status: "pending",
+      transactionType: 'payout',
+      status: 'pending',
     });
 
     res.status(200).json({
@@ -658,10 +658,10 @@ exports.getPendingPayouts = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Get pending payouts error:", error);
+    console.error('Get pending payouts error:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
       error: error.message,
     });
   }

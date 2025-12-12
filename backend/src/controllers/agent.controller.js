@@ -18,20 +18,23 @@ exports.loginAgent = async (req, res) => {
   const { email, password } = req.body;
 
   // Find user with driver role
-  const user = await User.findOne({ email, role: 'driver' }).select('+password');
+  const user = await User.findOne({ email, role: 'driver' }).select(
+    '+password'
+  );
 
   if (!user) {
-    return res.status(401).json({ 
+    return res.status(401).json({
       success: false,
-      message: 'Invalid credentials. Please contact admin if you are a field agent.' 
+      message:
+        'Invalid credentials. Please contact admin if you are a field agent.',
     });
   }
 
   // Check password
   if (!(await user.matchPassword(password))) {
-    return res.status(401).json({ 
+    return res.status(401).json({
       success: false,
-      message: 'Invalid credentials' 
+      message: 'Invalid credentials',
     });
   }
 
@@ -44,8 +47,8 @@ exports.loginAgent = async (req, res) => {
       phone: user.phone,
       role: user.role,
       profileImage: user.profileImage,
-      token: generateToken(user._id, user.role)
-    }
+      token: generateToken(user._id, user.role),
+    },
   });
 };
 
@@ -64,33 +67,33 @@ exports.getAgentDashboard = async (req, res) => {
     Pickup.countDocuments({
       assignedTo: agentId,
       status: { $in: ['scheduled', 'confirmed'] },
-      scheduledDate: { $gte: today }
+      scheduledDate: { $gte: today },
     }),
     Pickup.countDocuments({
       assignedTo: agentId,
       status: 'in_transit',
-      scheduledDate: { $gte: today }
+      scheduledDate: { $gte: today },
     }),
     Pickup.countDocuments({
       assignedTo: agentId,
       status: 'completed',
-      updatedAt: { $gte: today }
+      updatedAt: { $gte: today },
     }),
     Pickup.aggregate([
       {
         $match: {
           assignedTo: agentId,
           status: 'completed',
-          updatedAt: { $gte: today }
-        }
+          updatedAt: { $gte: today },
+        },
       },
       {
         $group: {
           _id: null,
-          totalEarnings: { $sum: '$agentCommission' }
-        }
-      }
-    ])
+          totalEarnings: { $sum: '$agentCommission' },
+        },
+      },
+    ]),
   ]);
 
   res.json({
@@ -100,9 +103,9 @@ exports.getAgentDashboard = async (req, res) => {
         pending,
         inProgress,
         completed,
-        earnings: todayEarnings[0]?.totalEarnings || 0
-      }
-    }
+        earnings: todayEarnings[0]?.totalEarnings || 0,
+      },
+    },
   });
 };
 
@@ -113,20 +116,20 @@ exports.getAgentDashboard = async (req, res) => {
  */
 exports.getAgentStats = async (req, res) => {
   const agentId = req.user._id;
-  
+
   const stats = await Pickup.aggregate([
     { $match: { assignedTo: agentId } },
     {
       $group: {
         _id: '$status',
-        count: { $sum: 1 }
-      }
-    }
+        count: { $sum: 1 },
+      },
+    },
   ]);
 
   res.json({
     success: true,
-    data: { stats }
+    data: { stats },
   });
 };
 
@@ -140,13 +143,13 @@ exports.getAssignedPickups = async (req, res) => {
   const { status, date } = req.query;
 
   const filter = { assignedTo: agentId };
-  
+
   if (status) {
     filter.status = status;
   } else {
     // Default: show only active pickups (using correct Pickup model statuses)
-    filter.status = { 
-      $in: ['scheduled', 'confirmed', 'in_transit'] 
+    filter.status = {
+      $in: ['scheduled', 'confirmed', 'in_transit'],
     };
   }
 
@@ -155,10 +158,10 @@ exports.getAssignedPickups = async (req, res) => {
     targetDate.setHours(0, 0, 0, 0);
     const nextDay = new Date(targetDate);
     nextDay.setDate(nextDay.getDate() + 1);
-    
+
     filter.scheduledDate = {
       $gte: targetDate,
-      $lt: nextDay
+      $lt: nextDay,
     };
   }
 
@@ -169,7 +172,7 @@ exports.getAssignedPickups = async (req, res) => {
 
   res.json({
     success: true,
-    data: { pickups }
+    data: { pickups },
   });
 };
 
@@ -182,23 +185,23 @@ exports.getPickupDetails = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   })
     .populate('orderId')
     .populate('assignedTo', 'name email phone');
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found or not assigned to you' 
+      message: 'Pickup not found or not assigned to you',
     });
   }
 
   res.json({
     success: true,
-    data: { pickup }
+    data: { pickup },
   });
 };
 
@@ -211,16 +214,16 @@ exports.startPickup = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
     assignedTo: agentId,
-    status: 'agent_assigned'
+    status: 'agent_assigned',
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found or already started' 
+      message: 'Pickup not found or already started',
     });
   }
 
@@ -229,7 +232,7 @@ exports.startPickup = async (req, res) => {
     status: 'agent_on_way',
     timestamp: new Date(),
     updatedBy: agentId,
-    note: 'Agent started journey to customer location'
+    note: 'Agent started journey to customer location',
   });
 
   await pickup.save();
@@ -239,7 +242,7 @@ exports.startPickup = async (req, res) => {
   res.json({
     success: true,
     message: 'Pickup started successfully',
-    data: { pickup }
+    data: { pickup },
   });
 };
 
@@ -252,16 +255,16 @@ exports.reachedDoorstep = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
     assignedTo: agentId,
-    status: 'agent_on_way'
+    status: 'agent_on_way',
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found or invalid status' 
+      message: 'Pickup not found or invalid status',
     });
   }
 
@@ -270,7 +273,7 @@ exports.reachedDoorstep = async (req, res) => {
     status: 'agent_arrived',
     timestamp: new Date(),
     updatedBy: agentId,
-    note: 'Agent reached customer doorstep'
+    note: 'Agent reached customer doorstep',
   });
 
   await pickup.save();
@@ -278,7 +281,7 @@ exports.reachedDoorstep = async (req, res) => {
   res.json({
     success: true,
     message: 'Marked as reached doorstep',
-    data: { pickup }
+    data: { pickup },
   });
 };
 
@@ -292,36 +295,34 @@ exports.uploadAgentSelfie = async (req, res) => {
   const agentId = req.user._id;
 
   if (!req.file) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'Selfie image is required' 
+      message: 'Selfie image is required',
     });
   }
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
   // Upload to Cloudinary
   const result = await cloudinary.uploader.upload(req.file.path, {
     folder: 'cashify/agent-selfies',
-    transformation: [
-      { width: 500, height: 500, crop: 'fill' }
-    ]
+    transformation: [{ width: 500, height: 500, crop: 'fill' }],
   });
 
   pickup.agentVerification = {
     selfieUrl: result.secure_url,
     verifiedAt: new Date(),
-    agentId: agentId
+    agentId: agentId,
   };
 
   await pickup.save();
@@ -329,9 +330,9 @@ exports.uploadAgentSelfie = async (req, res) => {
   res.json({
     success: true,
     message: 'Selfie uploaded successfully',
-    data: { 
-      selfieUrl: result.secure_url 
-    }
+    data: {
+      selfieUrl: result.secure_url,
+    },
   });
 };
 
@@ -344,25 +345,25 @@ exports.sendCustomerOTP = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
   // Generate 6-digit OTP
   const otp = crypto.randomInt(100000, 999999).toString();
-  
+
   // Store OTP with 5-minute expiry
   otpStore.set(pickupId, {
     otp,
-    expiresAt: Date.now() + 5 * 60 * 1000
+    expiresAt: Date.now() + 5 * 60 * 1000,
   });
 
   // Send OTP via Email
@@ -380,8 +381,11 @@ exports.sendCustomerOTP = async (req, res) => {
     message: 'OTP sent successfully',
     data: {
       email: pickup.customer.email?.replace(/(.{2})(.*)(@.*)/, '$1***$3'),
-      phone: pickup.customer.phone?.replace(/(\d{3})(\d{4})(\d{4})/, '$1****$3')
-    }
+      phone: pickup.customer.phone?.replace(
+        /(\d{3})(\d{4})(\d{4})/,
+        '$1****$3'
+      ),
+    },
   });
 };
 
@@ -397,24 +401,24 @@ exports.verifyCustomerOTP = async (req, res) => {
   const storedOTP = otpStore.get(pickupId);
 
   if (!storedOTP) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'OTP expired or not found. Please request a new OTP.' 
+      message: 'OTP expired or not found. Please request a new OTP.',
     });
   }
 
   if (Date.now() > storedOTP.expiresAt) {
     otpStore.delete(pickupId);
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'OTP has expired. Please request a new OTP.' 
+      message: 'OTP has expired. Please request a new OTP.',
     });
   }
 
   if (storedOTP.otp !== otp) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'Invalid OTP. Please try again.' 
+      message: 'Invalid OTP. Please try again.',
     });
   }
 
@@ -425,13 +429,14 @@ exports.verifyCustomerOTP = async (req, res) => {
   pickup.customerVerification = {
     verified: true,
     verifiedAt: new Date(),
-    method: 'otp'
+    method: 'otp',
   };
   await pickup.save();
 
   res.json({
     success: true,
-    message: 'Customer verified successfully. You can now proceed with device inspection.'
+    message:
+      'Customer verified successfully. You can now proceed with device inspection.',
   });
 };
 
@@ -444,22 +449,22 @@ exports.uploadDevicePhotos = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
   if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'Please upload at least one device photo' 
+      message: 'Please upload at least one device photo',
     });
   }
 
@@ -470,11 +475,9 @@ exports.uploadDevicePhotos = async (req, res) => {
     const file = files[0];
     const result = await cloudinary.uploader.upload(file.path, {
       folder: `cashify/device-photos/${pickupId}`,
-      transformation: [
-        { width: 1200, height: 1600, crop: 'limit' }
-      ]
+      transformation: [{ width: 1200, height: 1600, crop: 'limit' }],
     });
-    
+
     uploadedImages[fieldName] = result.secure_url;
   }
 
@@ -486,7 +489,7 @@ exports.uploadDevicePhotos = async (req, res) => {
     edge3: uploadedImages.edge3,
     edge4: uploadedImages.edge4,
     uploadedAt: new Date(),
-    uploadedBy: agentId
+    uploadedBy: agentId,
   };
 
   await pickup.save();
@@ -494,7 +497,7 @@ exports.uploadDevicePhotos = async (req, res) => {
   res.json({
     success: true,
     message: 'Device photos uploaded successfully',
-    data: { devicePhotos: pickup.devicePhotos }
+    data: { devicePhotos: pickup.devicePhotos },
   });
 };
 
@@ -508,15 +511,15 @@ exports.verifyIMEI = async (req, res) => {
   const { imei1, imei2 } = req.body;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
@@ -524,7 +527,7 @@ exports.verifyIMEI = async (req, res) => {
     imei1,
     imei2: imei2 || null,
     verifiedAt: new Date(),
-    verifiedBy: agentId
+    verifiedBy: agentId,
   };
 
   await pickup.save();
@@ -532,7 +535,7 @@ exports.verifyIMEI = async (req, res) => {
   res.json({
     success: true,
     message: 'IMEI verified successfully',
-    data: { deviceIMEI: pickup.deviceIMEI }
+    data: { deviceIMEI: pickup.deviceIMEI },
   });
 };
 
@@ -546,15 +549,15 @@ exports.submitDeviceInspection = async (req, res) => {
   const { inspectionData } = req.body;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   }).populate('orderId');
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
@@ -562,14 +565,14 @@ exports.submitDeviceInspection = async (req, res) => {
   pickup.inspectionData = {
     ...inspectionData,
     inspectedAt: new Date(),
-    inspectedBy: agentId
+    inspectedBy: agentId,
   };
 
   pickup.statusHistory.push({
     status: 'inspection_in_progress',
     timestamp: new Date(),
     updatedBy: agentId,
-    note: 'Device inspection completed'
+    note: 'Device inspection completed',
   });
 
   await pickup.save();
@@ -577,7 +580,7 @@ exports.submitDeviceInspection = async (req, res) => {
   res.json({
     success: true,
     message: 'Inspection data saved successfully',
-    data: { inspection: pickup.inspectionData }
+    data: { inspection: pickup.inspectionData },
   });
 };
 
@@ -590,15 +593,15 @@ exports.calculateFinalPrice = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   }).populate('orderId');
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
@@ -607,7 +610,7 @@ exports.calculateFinalPrice = async (req, res) => {
 
   // Calculate price based on inspection
   const inspection = pickup.inspectionData;
-  
+
   if (inspection) {
     // Screen condition deduction
     if (inspection.screenCondition === 'cracked') {
@@ -647,7 +650,10 @@ exports.calculateFinalPrice = async (req, res) => {
     // Additional issues
     if (inspection.additionalIssues && inspection.additionalIssues.length > 0) {
       const additionalDeduction = inspection.additionalIssues.length * 200;
-      deductions.push({ reason: 'Additional issues found', amount: additionalDeduction });
+      deductions.push({
+        reason: 'Additional issues found',
+        amount: additionalDeduction,
+      });
       finalPrice -= additionalDeduction;
     }
   }
@@ -661,8 +667,8 @@ exports.calculateFinalPrice = async (req, res) => {
       estimatedPrice: pickup.orderId.estimatedPrice,
       finalPrice,
       deductions,
-      totalDeduction: pickup.orderId.estimatedPrice - finalPrice
-    }
+      totalDeduction: pickup.orderId.estimatedPrice - finalPrice,
+    },
   });
 };
 
@@ -676,15 +682,15 @@ exports.updatePrice = async (req, res) => {
   const { adjustedPrice, reason } = req.body;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
@@ -693,7 +699,7 @@ exports.updatePrice = async (req, res) => {
     adjustedPrice,
     reason,
     adjustedBy: agentId,
-    adjustedAt: new Date()
+    adjustedAt: new Date(),
   };
 
   pickup.status = 'price_revised';
@@ -701,7 +707,7 @@ exports.updatePrice = async (req, res) => {
     status: 'price_revised',
     timestamp: new Date(),
     updatedBy: agentId,
-    note: `Price revised to ₹${adjustedPrice}. Reason: ${reason}`
+    note: `Price revised to ₹${adjustedPrice}. Reason: ${reason}`,
   });
 
   await pickup.save();
@@ -709,7 +715,7 @@ exports.updatePrice = async (req, res) => {
   res.json({
     success: true,
     message: 'Price updated successfully',
-    data: { priceAdjustment: pickup.priceAdjustment }
+    data: { priceAdjustment: pickup.priceAdjustment },
   });
 };
 
@@ -723,15 +729,15 @@ exports.recordCustomerDecision = async (req, res) => {
   const { accepted, rejectionReason } = req.body;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
@@ -741,16 +747,17 @@ exports.recordCustomerDecision = async (req, res) => {
       status: 'customer_accepted',
       timestamp: new Date(),
       updatedBy: agentId,
-      note: 'Customer accepted the revised price'
+      note: 'Customer accepted the revised price',
     });
   } else {
     pickup.status = 'cancelled';
-    pickup.cancellationReason = rejectionReason || 'Customer rejected the price';
+    pickup.cancellationReason =
+      rejectionReason || 'Customer rejected the price';
     pickup.statusHistory.push({
       status: 'cancelled',
       timestamp: new Date(),
       updatedBy: agentId,
-      note: `Pickup cancelled: ${rejectionReason}`
+      note: `Pickup cancelled: ${rejectionReason}`,
     });
   }
 
@@ -758,8 +765,10 @@ exports.recordCustomerDecision = async (req, res) => {
 
   res.json({
     success: true,
-    message: accepted ? 'Customer accepted. Proceed to payment.' : 'Pickup cancelled',
-    data: { pickup }
+    message: accepted
+      ? 'Customer accepted. Proceed to payment.'
+      : 'Pickup cancelled',
+    data: { pickup },
   });
 };
 
@@ -773,15 +782,15 @@ exports.recordPayment = async (req, res) => {
   const { amount, method, transactionId } = req.body;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
@@ -790,7 +799,7 @@ exports.recordPayment = async (req, res) => {
     method,
     transactionId,
     paidAt: new Date(),
-    paidBy: agentId
+    paidBy: agentId,
   };
 
   pickup.status = 'payment_completed';
@@ -798,7 +807,7 @@ exports.recordPayment = async (req, res) => {
     status: 'payment_completed',
     timestamp: new Date(),
     updatedBy: agentId,
-    note: `Payment of ₹${amount} completed via ${method}`
+    note: `Payment of ₹${amount} completed via ${method}`,
   });
 
   await pickup.save();
@@ -806,7 +815,7 @@ exports.recordPayment = async (req, res) => {
   res.json({
     success: true,
     message: 'Payment recorded successfully',
-    data: { payment: pickup.payment }
+    data: { payment: pickup.payment },
   });
 };
 
@@ -819,32 +828,32 @@ exports.sendFinalOTP = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
   // Generate 6-digit OTP
   const otp = crypto.randomInt(100000, 999999).toString();
-  
+
   // Store OTP with 5-minute expiry
   otpStore.set(`final_${pickupId}`, {
     otp,
-    expiresAt: Date.now() + 5 * 60 * 1000
+    expiresAt: Date.now() + 5 * 60 * 1000,
   });
 
   // Send OTP via Email & SMS
   if (pickup.customer.email) {
     await sendOTPEmail(
-      pickup.customer.email, 
-      otp, 
+      pickup.customer.email,
+      otp,
       pickup.customer.name,
       'Final Confirmation OTP'
     );
@@ -856,7 +865,7 @@ exports.sendFinalOTP = async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Final OTP sent successfully'
+    message: 'Final OTP sent successfully',
   });
 };
 
@@ -872,24 +881,24 @@ exports.verifyFinalOTP = async (req, res) => {
   const storedOTP = otpStore.get(`final_${pickupId}`);
 
   if (!storedOTP) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'OTP expired or not found. Please request a new OTP.' 
+      message: 'OTP expired or not found. Please request a new OTP.',
     });
   }
 
   if (Date.now() > storedOTP.expiresAt) {
     otpStore.delete(`final_${pickupId}`);
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'OTP has expired. Please request a new OTP.' 
+      message: 'OTP has expired. Please request a new OTP.',
     });
   }
 
   if (storedOTP.otp !== otp) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'Invalid OTP. Please try again.' 
+      message: 'Invalid OTP. Please try again.',
     });
   }
 
@@ -898,7 +907,7 @@ exports.verifyFinalOTP = async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Final OTP verified. You can now complete the pickup.'
+    message: 'Final OTP verified. You can now complete the pickup.',
   });
 };
 
@@ -911,15 +920,15 @@ exports.completePickup = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
@@ -929,11 +938,12 @@ exports.completePickup = async (req, res) => {
     status: 'device_collected',
     timestamp: new Date(),
     updatedBy: agentId,
-    note: 'Device collected successfully'
+    note: 'Device collected successfully',
   });
 
   // Calculate agent commission (e.g., 2% of final price)
-  const finalPrice = pickup.priceAdjustment?.adjustedPrice || pickup.orderId.estimatedPrice;
+  const finalPrice =
+    pickup.priceAdjustment?.adjustedPrice || pickup.orderId.estimatedPrice;
   pickup.agentCommission = finalPrice * 0.02;
 
   await pickup.save();
@@ -941,10 +951,10 @@ exports.completePickup = async (req, res) => {
   res.json({
     success: true,
     message: 'Pickup completed successfully! Device collected.',
-    data: { 
+    data: {
       pickup,
-      commission: pickup.agentCommission
-    }
+      commission: pickup.agentCommission,
+    },
   });
 };
 
@@ -958,32 +968,32 @@ exports.saveCustomerSignature = async (req, res) => {
   const agentId = req.user._id;
 
   if (!req.file) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'Signature image is required' 
+      message: 'Signature image is required',
     });
   }
 
-  const pickup = await Pickup.findOne({ 
-    _id: pickupId, 
-    assignedTo: agentId 
+  const pickup = await Pickup.findOne({
+    _id: pickupId,
+    assignedTo: agentId,
   });
 
   if (!pickup) {
-    return res.status(404).json({ 
+    return res.status(404).json({
       success: false,
-      message: 'Pickup not found' 
+      message: 'Pickup not found',
     });
   }
 
   // Upload signature to Cloudinary
   const result = await cloudinary.uploader.upload(req.file.path, {
-    folder: `cashify/signatures/${pickupId}`
+    folder: `cashify/signatures/${pickupId}`,
   });
 
   pickup.customerSignature = {
     signatureUrl: result.secure_url,
-    signedAt: new Date()
+    signedAt: new Date(),
   };
 
   await pickup.save();
@@ -991,7 +1001,7 @@ exports.saveCustomerSignature = async (req, res) => {
   res.json({
     success: true,
     message: 'Customer signature saved successfully',
-    data: { signatureUrl: result.secure_url }
+    data: { signatureUrl: result.secure_url },
   });
 };
 
@@ -1004,9 +1014,9 @@ exports.getPickupHistory = async (req, res) => {
   const agentId = req.user._id;
   const { page = 1, limit = 20 } = req.query;
 
-  const pickups = await Pickup.find({ 
+  const pickups = await Pickup.find({
     assignedTo: agentId,
-    status: { $in: ['completed', 'cancelled'] }
+    status: { $in: ['completed', 'cancelled'] },
   })
     .populate('orderId', 'orderNumber deviceDetails')
     .populate('assignedTo', 'name')
@@ -1014,21 +1024,21 @@ exports.getPickupHistory = async (req, res) => {
     .skip((page - 1) * limit)
     .limit(parseInt(limit));
 
-  const total = await Pickup.countDocuments({ 
+  const total = await Pickup.countDocuments({
     assignedTo: agentId,
-    status: { $in: ['completed', 'cancelled'] }
+    status: { $in: ['completed', 'cancelled'] },
   });
 
   res.json({
     success: true,
-    data: { 
+    data: {
       pickups,
       pagination: {
         total,
         page: parseInt(page),
-        pages: Math.ceil(total / limit)
-      }
-    }
+        pages: Math.ceil(total / limit),
+      },
+    },
   });
 };
 
@@ -1045,14 +1055,14 @@ exports.getCompletedToday = async (req, res) => {
   const pickups = await Pickup.find({
     assignedTo: agentId,
     status: 'completed',
-    completedAt: { $gte: today }
+    completedAt: { $gte: today },
   })
     .populate('orderId', 'orderNumber deviceDetails')
     .populate('assignedTo', 'name');
 
   res.json({
     success: true,
-    data: { pickups }
+    data: { pickups },
   });
 };
 
@@ -1070,28 +1080,28 @@ exports.getDailyReport = async (req, res) => {
     Pickup.find({
       assignedTo: agentId,
       status: 'device_collected',
-      completedAt: { $gte: today }
+      completedAt: { $gte: today },
     }).populate('orderId'),
     Pickup.find({
       assignedTo: agentId,
       status: 'cancelled',
-      updatedAt: { $gte: today }
+      updatedAt: { $gte: today },
     }),
     Pickup.aggregate([
       {
         $match: {
           assignedTo: agentId,
           status: 'device_collected',
-          completedAt: { $gte: today }
-        }
+          completedAt: { $gte: today },
+        },
       },
       {
         $group: {
           _id: null,
-          total: { $sum: '$agentCommission' }
-        }
-      }
-    ])
+          total: { $sum: '$agentCommission' },
+        },
+      },
+    ]),
   ]);
 
   res.json({
@@ -1103,9 +1113,9 @@ exports.getDailyReport = async (req, res) => {
       totalEarnings: totalEarnings[0]?.total || 0,
       pickups: {
         completed,
-        cancelled
-      }
-    }
+        cancelled,
+      },
+    },
   });
 };
 
@@ -1123,6 +1133,6 @@ exports.submitDailyReport = async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Daily report submitted successfully'
+    message: 'Daily report submitted successfully',
   });
 };

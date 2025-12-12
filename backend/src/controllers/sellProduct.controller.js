@@ -10,7 +10,10 @@ const { validationResult } = require('express-validator');
 const SellProduct = require('../models/sellProduct.model');
 const SellConfig = require('../models/sellConfig.model');
 const Category = require('../models/category.model');
-const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middleware');
+const {
+  ApiError,
+  asyncHandler,
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * Create new sell product
@@ -44,7 +47,7 @@ exports.createProduct = asyncHandler(async (req, res) => {
     variants: variants || [],
     tags: tags || [],
     partnerId: partnerId, // Add partner ID
-    createdBy: req.user.id
+    createdBy: req.user.id,
   });
 
   await product.save();
@@ -59,7 +62,7 @@ exports.createProduct = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     message: 'Product created successfully',
-    data: product
+    data: product,
   });
 });
 
@@ -70,21 +73,21 @@ exports.createProduct = asyncHandler(async (req, res) => {
  */
 exports.getProducts = asyncHandler(async (req, res) => {
   const { status, categoryId, search } = req.query;
-  
+
   const query = {};
-  
+
   // Filter by partnerId if user is a partner
   if (req.user.role === 'partner' && req.partnerId) {
     query.partnerId = req.partnerId;
   }
   // Admins see all products (no partnerId filter)
-  
+
   if (status) query.status = status;
   if (categoryId) query.categoryId = categoryId;
   if (search) {
     query.$or = [
       { name: { $regex: search, $options: 'i' } },
-      { tags: { $in: [new RegExp(search, 'i')] } }
+      { tags: { $in: [new RegExp(search, 'i')] } },
     ];
   }
 
@@ -95,7 +98,7 @@ exports.getProducts = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: products
+    data: products,
   });
 });
 
@@ -115,7 +118,7 @@ exports.getProduct = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: product
+    data: product,
   });
 });
 
@@ -139,9 +142,9 @@ exports.updateProduct = asyncHandler(async (req, res) => {
 
   // Check if name is being changed and if it conflicts
   if (name && name.trim() !== product.name) {
-    const existingProduct = await SellProduct.findOne({ 
+    const existingProduct = await SellProduct.findOne({
       name: name.trim(),
-      _id: { $ne: req.params.id }
+      _id: { $ne: req.params.id },
     });
     if (existingProduct) {
       throw new ApiError(400, 'Product with this name already exists');
@@ -161,7 +164,7 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Product updated successfully',
-    data: product
+    data: product,
   });
 });
 
@@ -180,7 +183,7 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Product deleted successfully'
+    message: 'Product deleted successfully',
   });
 });
 
@@ -198,7 +201,7 @@ exports.getVariants = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Variants retrieved successfully',
-    variants: product.variants
+    variants: product.variants,
   });
 });
 
@@ -222,7 +225,7 @@ exports.addVariant = asyncHandler(async (req, res) => {
   product.variants.push({
     label: label.trim(),
     basePrice: parseFloat(basePrice),
-    isActive: true
+    isActive: true,
   });
 
   await product.save();
@@ -230,7 +233,7 @@ exports.addVariant = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Variant added successfully',
-    data: product
+    data: product,
   });
 });
 
@@ -261,7 +264,7 @@ exports.updateVariant = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Variant updated successfully',
-    data: product
+    data: product,
   });
 });
 
@@ -287,7 +290,7 @@ exports.deleteVariant = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: 'Variant deleted successfully',
-    data: product
+    data: product,
   });
 });
 
@@ -301,15 +304,15 @@ exports.getProductStats = asyncHandler(async (req, res) => {
     {
       $group: {
         _id: '$status',
-        count: { $sum: 1 }
-      }
-    }
+        count: { $sum: 1 },
+      },
+    },
   ]);
 
   const totalProducts = await SellProduct.countDocuments();
   const totalVariants = await SellProduct.aggregate([
     { $unwind: '$variants' },
-    { $count: 'total' }
+    { $count: 'total' },
   ]);
 
   res.json({
@@ -317,8 +320,8 @@ exports.getProductStats = asyncHandler(async (req, res) => {
     data: {
       totalProducts,
       totalVariants: totalVariants[0]?.total || 0,
-      statusBreakdown: stats
-    }
+      statusBreakdown: stats,
+    },
   });
 });
 
@@ -339,7 +342,7 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
     search,
     category,
     sortBy = 'name',
-    sortOrder = 'asc'
+    sortOrder = 'asc',
   } = req.query;
 
   // Build query for active products only
@@ -348,7 +351,7 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
   if (search) {
     query.$or = [
       { name: { $regex: search, $options: 'i' } },
-      { tags: { $in: [new RegExp(search, 'i')] } }
+      { tags: { $in: [new RegExp(search, 'i')] } },
     ];
   }
 
@@ -369,13 +372,13 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit)),
-    SellProduct.countDocuments(query)
+    SellProduct.countDocuments(query),
   ]);
 
   // Filter only active variants for customer view
-  const customerProducts = products.map(product => ({
+  const customerProducts = products.map((product) => ({
     ...product.toObject(),
-    variants: product.variants.filter(variant => variant.isActive)
+    variants: product.variants.filter((variant) => variant.isActive),
   }));
 
   res.json({
@@ -386,9 +389,9 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
         currentPage: parseInt(page),
         totalPages: Math.ceil(total / parseInt(limit)),
         totalItems: total,
-        itemsPerPage: parseInt(limit)
-      }
-    }
+        itemsPerPage: parseInt(limit),
+      },
+    },
   });
 });
 
@@ -403,13 +406,13 @@ exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
     page = 1,
     limit = 20,
     sortBy = 'name',
-    sortOrder = 'asc'
+    sortOrder = 'asc',
   } = req.query;
 
   // Find category by name (case-insensitive)
-  const categoryDoc = await Category.findOne({ 
+  const categoryDoc = await Category.findOne({
     name: { $regex: new RegExp(`^${category}$`, 'i') },
-    isActive: true 
+    isActive: true,
   });
 
   if (!categoryDoc) {
@@ -417,9 +420,9 @@ exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
   }
 
   // Build query for active products in this category
-  const query = { 
+  const query = {
     status: 'active',
-    categoryId: categoryDoc._id
+    categoryId: categoryDoc._id,
   };
 
   // Build sort object
@@ -435,13 +438,13 @@ exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit)),
-    SellProduct.countDocuments(query)
+    SellProduct.countDocuments(query),
   ]);
 
   // Filter only active variants for customer view
-  const customerProducts = products.map(product => ({
+  const customerProducts = products.map((product) => ({
     ...product.toObject(),
-    variants: product.variants.filter(variant => variant.isActive)
+    variants: product.variants.filter((variant) => variant.isActive),
   }));
 
   res.json({
@@ -452,8 +455,8 @@ exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
         currentPage: parseInt(page),
         totalPages: Math.ceil(total / parseInt(limit)),
         totalItems: total,
-        itemsPerPage: parseInt(limit)
-      }
-    }
+        itemsPerPage: parseInt(limit),
+      },
+    },
   });
 });

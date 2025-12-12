@@ -42,7 +42,7 @@ const sellSuperCategorySchema = new mongoose.Schema(
       ref: 'User',
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -50,7 +50,7 @@ const sellSuperCategorySchema = new mongoose.Schema(
 );
 
 // Virtual for display name
-sellSuperCategorySchema.virtual('displayName').get(function() {
+sellSuperCategorySchema.virtual('displayName').get(function () {
   return this.name;
 });
 
@@ -62,7 +62,7 @@ sellSuperCategorySchema.virtual('categories', {
 });
 
 // Pre-save middleware to generate slug
-sellSuperCategorySchema.pre('save', function(next) {
+sellSuperCategorySchema.pre('save', function (next) {
   if (this.isModified('name') && !this.slug) {
     this.slug = this.name
       .toLowerCase()
@@ -77,6 +77,9 @@ sellSuperCategorySchema.index({ name: 1 });
 sellSuperCategorySchema.index({ slug: 1 });
 sellSuperCategorySchema.index({ isActive: 1, sortOrder: 1 });
 
-const SellSuperCategory = mongoose.model('SellSuperCategory', sellSuperCategorySchema);
+const SellSuperCategory = mongoose.model(
+  'SellSuperCategory',
+  sellSuperCategorySchema
+);
 
 module.exports = SellSuperCategory;

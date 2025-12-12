@@ -6,7 +6,7 @@ const {
   getBuyCategory,
   updateBuyCategory,
   deleteBuyCategory,
-  getBuyCategoryStats
+  getBuyCategoryStats,
 } = require('../controllers/buyCategory.controller');
 const { protect, authorize } = require('../middlewares/auth.middleware');
 
@@ -39,13 +39,16 @@ const updateBuyCategoryValidation = [
   body('sortOrder')
     .optional()
     .isInt({ min: 0 })
-    .withMessage('Sort order must be a non-negative integer')
+    .withMessage('Sort order must be a non-negative integer'),
 ];
 
 // Public routes
 router.get('/', getBuyCategories);
-router.get('/:id', 
-  param('id').isMongoId().withMessage('Buy category ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/:id',
+  param('id')
+    .isMongoId()
+    .withMessage('Buy category ID must be a valid MongoDB ObjectId'),
   getBuyCategory
 );
 
@@ -55,8 +58,11 @@ router.use(authorize('admin')); // All routes below require admin role
 
 router.post('/', buyCategoryValidation, createBuyCategory);
 router.put('/:id', updateBuyCategoryValidation, updateBuyCategory);
-router.delete('/:id', 
-  param('id').isMongoId().withMessage('Buy category ID must be a valid MongoDB ObjectId'),
+router.delete(
+  '/:id',
+  param('id')
+    .isMongoId()
+    .withMessage('Buy category ID must be a valid MongoDB ObjectId'),
   deleteBuyCategory
 );
 router.get('/admin/stats', getBuyCategoryStats);

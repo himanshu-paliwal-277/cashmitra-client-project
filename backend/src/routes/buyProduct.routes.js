@@ -9,13 +9,13 @@ const {
   deleteBuyProduct,
   getBuyProductStats,
   addProductReview,
-  toggleProductStatus
+  toggleProductStatus,
 } = require('../controllers/buyProduct.controller');
 const { protect, authorize } = require('../middlewares/auth.middleware');
 const {
   validateCreateBuyProduct,
   validateUpdateBuyProduct,
-  handleValidationErrors
+  handleValidationErrors,
 } = require('../middlewares/buyProductValidation.middleware');
 
 const router = express.Router();
@@ -34,7 +34,7 @@ const validateProductReview = [
     .optional()
     .trim()
     .isLength({ min: 2, max: 50 })
-    .withMessage('Reviewer name must be between 2 and 50 characters')
+    .withMessage('Reviewer name must be between 2 and 50 characters'),
 ];
 
 // Public routes (no authentication required)
@@ -44,7 +44,12 @@ router.get('/category/:category', getBuyProductsByCategory);
 router.get('/:id', getBuyProductById);
 
 // Temporarily moved POST route for testing (no authentication)
-router.post('/', validateCreateBuyProduct, handleValidationErrors, createBuyProduct);
+router.post(
+  '/',
+  validateCreateBuyProduct,
+  handleValidationErrors,
+  createBuyProduct
+);
 
 // Protected routes (authentication required)
 router.use(protect);
@@ -54,7 +59,13 @@ const { attachPartner } = require('../middlewares/partner.middleware');
 router.use(attachPartner);
 
 // Admin and Partner routes (both can manage buy products)
-router.put('/:id', authorize('admin', 'partner'), validateUpdateBuyProduct, handleValidationErrors, updateBuyProduct);
+router.put(
+  '/:id',
+  authorize('admin', 'partner'),
+  validateUpdateBuyProduct,
+  handleValidationErrors,
+  updateBuyProduct
+);
 router.delete('/:id', authorize('admin', 'partner'), deleteBuyProduct);
 router.patch('/:id/toggle-status', authorize('admin'), toggleProductStatus);
 

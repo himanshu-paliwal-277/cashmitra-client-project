@@ -19,39 +19,45 @@ const sellProductSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    images: [{
-      type: String,
-      trim: true,
-    }],
+    images: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     status: {
       type: String,
       enum: ['active', 'inactive'],
       default: 'active',
     },
-    variants: [{
-      _id: {
-        type: mongoose.Schema.Types.ObjectId,
-        default: () => new mongoose.Types.ObjectId(),
+    variants: [
+      {
+        _id: {
+          type: mongoose.Schema.Types.ObjectId,
+          default: () => new mongoose.Types.ObjectId(),
+        },
+        label: {
+          type: String,
+          required: [true, 'Variant label is required'],
+          trim: true,
+        },
+        basePrice: {
+          type: Number,
+          required: [true, 'Base price is required'],
+          min: [0, 'Base price cannot be negative'],
+        },
+        isActive: {
+          type: Boolean,
+          default: true,
+        },
       },
-      label: {
+    ],
+    tags: [
+      {
         type: String,
-        required: [true, 'Variant label is required'],
         trim: true,
       },
-      basePrice: {
-        type: Number,
-        required: [true, 'Base price is required'],
-        min: [0, 'Base price cannot be negative'],
-      },
-      isActive: {
-        type: Boolean,
-        default: true,
-      },
-    }],
-    tags: [{
-      type: String,
-      trim: true,
-    }],
+    ],
     partnerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Partner',
@@ -63,10 +69,10 @@ const sellProductSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
   }
 );
 
@@ -76,12 +82,14 @@ sellProductSchema.index({ slug: 1 }, { unique: true });
 sellProductSchema.index({ name: 'text', tags: 'text' });
 
 // Virtual for active variants
-sellProductSchema.virtual('activeVariants').get(function() {
-  return this.variants ? this.variants.filter(variant => variant.isActive) : [];
+sellProductSchema.virtual('activeVariants').get(function () {
+  return this.variants
+    ? this.variants.filter((variant) => variant.isActive)
+    : [];
 });
 
 // Pre-save middleware to generate slug if not provided
-sellProductSchema.pre('save', function(next) {
+sellProductSchema.pre('save', function (next) {
   if (!this.slug && this.name) {
     this.slug = this.name
       .toLowerCase()

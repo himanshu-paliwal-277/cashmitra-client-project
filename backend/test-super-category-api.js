@@ -16,14 +16,13 @@ async function testSuperCategoryAPI() {
     console.log('1️⃣ Testing GET /api/buy-super-categories');
     const response1 = await fetch(`${API_BASE_URL}/buy-super-categories`, {
       headers: {
-        'Authorization': `Bearer ${ADMIN_TOKEN}`,
+        Authorization: `Bearer ${ADMIN_TOKEN}`,
       },
     });
     const data1 = await response1.json();
     console.log('Status:', response1.status);
     console.log('Response:', JSON.stringify(data1, null, 2));
     console.log('✅ Test 1 completed\n');
-
   } catch (error) {
     console.error('❌ Error:', error.message);
   }

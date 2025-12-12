@@ -78,18 +78,20 @@ const schedulePickupValidation = [
     .optional()
     .trim()
     .isLength({ max: 500 })
-    .withMessage('Notes cannot exceed 500 characters')
+    .withMessage('Notes cannot exceed 500 characters'),
 ];
 
 const updateStatusValidation = [
   body('status')
     .isIn(['scheduled', 'in_transit', 'completed', 'cancelled', 'rescheduled'])
-    .withMessage('Status must be one of: scheduled, in_transit, completed, cancelled, rescheduled'),
+    .withMessage(
+      'Status must be one of: scheduled, in_transit, completed, cancelled, rescheduled'
+    ),
   body('notes')
     .optional()
     .trim()
     .isLength({ max: 500 })
-    .withMessage('Notes cannot exceed 500 characters')
+    .withMessage('Notes cannot exceed 500 characters'),
 ];
 
 const getPickupsValidation = [
@@ -109,18 +111,25 @@ const getPickupsValidation = [
     .optional()
     .isISO8601()
     .toDate()
-    .withMessage('Date must be a valid date')
+    .withMessage('Date must be a valid date'),
 ];
 
 // Apply authentication middleware
 router.use(protect);
 
 // Public routes (authenticated users)
-router.post('/schedule', schedulePickupValidation, pickupController.createPickup);
+router.post(
+  '/schedule',
+  schedulePickupValidation,
+  pickupController.createPickup
+);
 router.get('/my-pickups', pickupController.getPickups);
 router.get('/slots', pickupController.getPickupSlots);
-router.get('/:pickupId', 
-  param('pickupId').isMongoId().withMessage('Pickup ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/:pickupId',
+  param('pickupId')
+    .isMongoId()
+    .withMessage('Pickup ID must be a valid MongoDB ObjectId'),
   pickupController.getPickupById
 );
 
@@ -128,50 +137,77 @@ router.get('/:pickupId',
 router.use(authorize('admin'));
 router.get('/', getPickupsValidation, pickupController.getPickups);
 router.post('/', schedulePickupValidation, pickupController.createPickup);
-router.put('/:pickupId', 
-  param('pickupId').isMongoId().withMessage('Pickup ID must be a valid MongoDB ObjectId'),
+router.put(
+  '/:pickupId',
+  param('pickupId')
+    .isMongoId()
+    .withMessage('Pickup ID must be a valid MongoDB ObjectId'),
   schedulePickupValidation,
   pickupController.updatePickup
 );
-router.patch('/:pickupId/status', 
-  param('pickupId').isMongoId().withMessage('Pickup ID must be a valid MongoDB ObjectId'),
+router.patch(
+  '/:pickupId/status',
+  param('pickupId')
+    .isMongoId()
+    .withMessage('Pickup ID must be a valid MongoDB ObjectId'),
   updateStatusValidation,
   pickupController.updatePickupStatus
 );
-router.patch('/:pickupId/assign', 
-  param('pickupId').isMongoId().withMessage('Pickup ID must be a valid MongoDB ObjectId'),
+router.patch(
+  '/:pickupId/assign',
+  param('pickupId')
+    .isMongoId()
+    .withMessage('Pickup ID must be a valid MongoDB ObjectId'),
   body('assignedTo').isMongoId().withMessage('Assigned agent ID must be valid'),
   pickupController.reassignPickup
 );
-router.patch('/:pickupId/reassign', 
-  param('pickupId').isMongoId().withMessage('Pickup ID must be a valid MongoDB ObjectId'),
+router.patch(
+  '/:pickupId/reassign',
+  param('pickupId')
+    .isMongoId()
+    .withMessage('Pickup ID must be a valid MongoDB ObjectId'),
   body('assignedTo').isMongoId().withMessage('Assigned agent ID must be valid'),
   pickupController.reassignPickup
 );
-router.patch('/:pickupId/cancel', 
-  param('pickupId').isMongoId().withMessage('Pickup ID must be a valid MongoDB ObjectId'),
+router.patch(
+  '/:pickupId/cancel',
+  param('pickupId')
+    .isMongoId()
+    .withMessage('Pickup ID must be a valid MongoDB ObjectId'),
   body('reason').notEmpty().withMessage('Cancellation reason is required'),
   pickupController.cancelPickup
 );
-router.patch('/:pickupId/reschedule', 
-  param('pickupId').isMongoId().withMessage('Pickup ID must be a valid MongoDB ObjectId'),
+router.patch(
+  '/:pickupId/reschedule',
+  param('pickupId')
+    .isMongoId()
+    .withMessage('Pickup ID must be a valid MongoDB ObjectId'),
   body('newDate').isISO8601().toDate().withMessage('New date must be valid'),
   body('newTimeSlot').notEmpty().withMessage('New time slot is required'),
   pickupController.reschedulePickup
 );
 router.get('/analytics', pickupController.getPickupAnalytics);
-router.get('/agent/:agentId', 
+router.get(
+  '/agent/:agentId',
   param('agentId').isMongoId().withMessage('Agent ID must be valid'),
   pickupController.getAgentPickups
 );
-router.post('/:pickupId/communication', 
-  param('pickupId').isMongoId().withMessage('Pickup ID must be a valid MongoDB ObjectId'),
-  body('type').isIn(['sms', 'email', 'call', 'whatsapp']).withMessage('Communication type must be valid'),
+router.post(
+  '/:pickupId/communication',
+  param('pickupId')
+    .isMongoId()
+    .withMessage('Pickup ID must be a valid MongoDB ObjectId'),
+  body('type')
+    .isIn(['sms', 'email', 'call', 'whatsapp'])
+    .withMessage('Communication type must be valid'),
   body('message').notEmpty().withMessage('Message is required'),
   pickupController.addCommunication
 );
-router.post('/:pickupId/images', 
-  param('pickupId').isMongoId().withMessage('Pickup ID must be a valid MongoDB ObjectId'),
+router.post(
+  '/:pickupId/images',
+  param('pickupId')
+    .isMongoId()
+    .withMessage('Pickup ID must be a valid MongoDB ObjectId'),
   pickupController.uploadPickupImages
 );
 

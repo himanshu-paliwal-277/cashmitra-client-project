@@ -13,10 +13,10 @@ const validateRequest = (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       success: false,
-      errors: errors.array().map(error => ({
+      errors: errors.array().map((error) => ({
         field: error.param,
-        message: error.msg
-      }))
+        message: error.msg,
+      })),
     });
   }
   next();
@@ -33,7 +33,7 @@ const validateObjectId = (paramName) => {
     if (!validationUtils.isValidObjectId(id)) {
       return res.status(400).json({
         success: false,
-        message: `Invalid ${paramName} format`
+        message: `Invalid ${paramName} format`,
       });
     }
     next();
@@ -48,21 +48,21 @@ const validateObjectId = (paramName) => {
 const validateAssessmentId = (paramName) => {
   return (req, res, next) => {
     const id = req.params[paramName];
-    
+
     // Check if it's a valid ObjectId
     if (validationUtils.isValidObjectId(id)) {
       return next();
     }
-    
+
     // Check if it's a valid custom assessment format: assessment_timestamp_randomstring
     const assessmentPattern = /^assessment_\d+_[a-zA-Z0-9]+$/;
     if (assessmentPattern.test(id)) {
       return next();
     }
-    
+
     return res.status(400).json({
       success: false,
-      message: `Invalid ${paramName} format`
+      message: `Invalid ${paramName} format`,
     });
   };
 };
@@ -77,14 +77,14 @@ const validateAssessmentId = (paramName) => {
 const validatePasswordStrength = (req, res, next) => {
   const { password } = req.body;
   const validation = validationUtils.validatePassword(password);
-  
+
   if (!validation.isValid) {
     return res.status(400).json({
       success: false,
-      message: validation.message
+      message: validation.message,
     });
   }
-  
+
   next();
 };
 
@@ -92,5 +92,5 @@ module.exports = {
   validateRequest,
   validateObjectId,
   validateAssessmentId,
-  validatePasswordStrength
+  validatePasswordStrength,
 };

@@ -29,8 +29,8 @@ const createAdmin = async () => {
         city: 'Admin City',
         state: 'Admin State',
         pincode: '123456',
-        country: 'India'
-      }
+        country: 'India',
+      },
     };
 
     const admin = new User(adminData);
@@ -39,7 +39,7 @@ const createAdmin = async () => {
     console.log('Admin user created successfully!');
     console.log('Email: admin@cashify.com');
     console.log('Password: admin123');
-    
+
     process.exit(0);
   } catch (error) {
     console.error('Error creating admin:', error);

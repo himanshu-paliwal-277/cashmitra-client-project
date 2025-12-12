@@ -12,7 +12,10 @@
 const axios = require('axios');
 
 // ---------- Config ----------
-const BASE_URL = (process.env.BASE_URL || 'http://127.0.0.1:5000/api').replace(/\/$/, '');
+const BASE_URL = (process.env.BASE_URL || 'http://127.0.0.1:5000/api').replace(
+  /\/$/,
+  ''
+);
 const CATEGORY_ID = process.env.CATEGORY_ID || '68ded4d10abfa075fd99a13f';
 
 // ---------- Helpers ----------
@@ -95,7 +98,11 @@ function buildValidProductData() {
     ],
 
     addOns: [
-      { name: 'Screen Protection', cost: 999, description: 'Premium tempered glass' },
+      {
+        name: 'Screen Protection',
+        cost: 999,
+        description: 'Premium tempered glass',
+      },
       { name: 'Back Cover', cost: 699, description: 'Matte shockproof case' },
       {
         name: '1-Year Accidental Damage Plan',
@@ -105,8 +112,16 @@ function buildValidProductData() {
     ],
 
     offers: [
-      { type: 'Membership', value: 'Extra 5% off', conditions: 'For Plus members' },
-      { type: 'Bank', value: '₹2000 instant discount', conditions: 'ABC Bank Credit Cards' },
+      {
+        type: 'Membership',
+        value: 'Extra 5% off',
+        conditions: 'For Plus members',
+      },
+      {
+        type: 'Bank',
+        value: '₹2000 instant discount',
+        conditions: 'ABC Bank Credit Cards',
+      },
     ],
 
     rating: {
@@ -122,7 +137,12 @@ function buildValidProductData() {
     },
 
     reviews: [
-      { reviewer: 'John Doe', rating: 5, date: '2024-01-15', comment: 'Excellent condition!' },
+      {
+        reviewer: 'John Doe',
+        rating: 5,
+        date: '2024-01-15',
+        comment: 'Excellent condition!',
+      },
       {
         reviewer: 'Aisha K.',
         rating: 4,
@@ -173,7 +193,12 @@ function buildValidProductData() {
       },
       rearCamera: {
         setup: 'Triple',
-        camera1: { resolution: '48MP', aperture: 'f/1.78', type: 'Main', lens: 'Wide' },
+        camera1: {
+          resolution: '48MP',
+          aperture: 'f/1.78',
+          type: 'Main',
+          lens: 'Wide',
+        },
         camera2: {
           resolution: '12MP',
           aperture: 'f/2.8',
@@ -248,7 +273,14 @@ function buildValidProductData() {
       },
       sensorsMisc: {
         fingerprintScanner: false,
-        sensors: ['Face ID', 'Gyro', 'Accelerometer', 'Proximity', 'Ambient Light', 'Barometer'],
+        sensors: [
+          'Face ID',
+          'Gyro',
+          'Accelerometer',
+          'Proximity',
+          'Ambient Light',
+          'Barometer',
+        ],
       },
     },
 
@@ -308,7 +340,10 @@ async function apiCreate() {
 
 async function apiGet(id) {
   try {
-    const res = await axios.get(`${BASE_URL}/buy-products/${id}`, { timeout: 15000, proxy: false });
+    const res = await axios.get(`${BASE_URL}/buy-products/${id}`, {
+      timeout: 15000,
+      proxy: false,
+    });
     const item = res.data?.data;
     console.log('✅ Fetched by ID:', item?._id, '-', item?.name);
   } catch (err) {
@@ -324,7 +359,12 @@ async function apiList(q = 'iphone', page = 1, limit = 5) {
       proxy: false,
     });
     const items = res.data?.data || [];
-    console.log(`✅ Listed (${items.length}) items. First:`, items[0]?._id, '-', items[0]?.name);
+    console.log(
+      `✅ Listed (${items.length}) items. First:`,
+      items[0]?._id,
+      '-',
+      items[0]?.name
+    );
   } catch (err) {
     logAxiosErr(err, 'List products failed');
   }
@@ -350,7 +390,10 @@ async function apiUpdate(id) {
 
 async function apiDelete(id) {
   try {
-    const res = await axios.delete(`${BASE_URL}/buy-products/${id}`, { timeout: 15000, proxy: false });
+    const res = await axios.delete(`${BASE_URL}/buy-products/${id}`, {
+      timeout: 15000,
+      proxy: false,
+    });
     console.log('✅ Deleted:', id, '-', res.data?.message || 'OK');
   } catch (err) {
     logAxiosErr(err, 'Delete product failed');
@@ -368,7 +411,6 @@ async function apiDelete(id) {
     console.log('\n⚠️ Create did not return an ID. Aborting further steps.');
     return;
   }
-
 
   console.log('\n🏁 E2E test finished.');
 })();

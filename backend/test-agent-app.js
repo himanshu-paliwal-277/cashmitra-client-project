@@ -12,7 +12,7 @@ const AGENT_APP_URL = `${BASE_URL}/agent-app`;
 // Test credentials
 const AGENT_CREDENTIALS = {
   email: 'agent@test.com',
-  password: 'agent123'
+  password: 'agent123',
 };
 
 let authToken = '';
@@ -35,7 +35,10 @@ const logTest = (testName, success, data = null, error = null) => {
     if (error) {
       console.log('Error:', error.message);
       if (error.response?.data) {
-        console.log('Error Details:', JSON.stringify(error.response.data, null, 2));
+        console.log(
+          'Error Details:',
+          JSON.stringify(error.response.data, null, 2)
+        );
       }
     }
   }
@@ -47,15 +50,15 @@ const authenticatedRequest = async (method, url, data = null) => {
     method,
     url,
     headers: {
-      'Authorization': `Bearer ${authToken}`,
-      'Content-Type': 'application/json'
-    }
+      Authorization: `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+    },
   };
-  
+
   if (data) {
     config.data = data;
   }
-  
+
   return axios(config);
 };
 
@@ -64,7 +67,10 @@ const authenticatedRequest = async (method, url, data = null) => {
 // 1. Test agent login
 async function testLogin() {
   try {
-    const response = await axios.post(`${AGENT_APP_URL}/login`, AGENT_CREDENTIALS);
+    const response = await axios.post(
+      `${AGENT_APP_URL}/login`,
+      AGENT_CREDENTIALS
+    );
     authToken = response.data.data.token;
     agentId = response.data.data.agent._id;
     logTest('Agent Login', true, response.data);
@@ -78,7 +84,10 @@ async function testLogin() {
 // 2. Test get agent profile
 async function testGetProfile() {
   try {
-    const response = await authenticatedRequest('GET', `${AGENT_APP_URL}/profile`);
+    const response = await authenticatedRequest(
+      'GET',
+      `${AGENT_APP_URL}/profile`
+    );
     logTest('Get Agent Profile', true, response.data);
     return true;
   } catch (error) {
@@ -90,15 +99,18 @@ async function testGetProfile() {
 // 3. Test get today's orders
 async function testGetTodayOrders() {
   try {
-    const response = await authenticatedRequest('GET', `${AGENT_APP_URL}/orders/today`);
+    const response = await authenticatedRequest(
+      'GET',
+      `${AGENT_APP_URL}/orders/today`
+    );
     if (response.data.data.orders.length > 0) {
       testOrderId = response.data.data.orders[0].orderId;
       testPickupId = response.data.data.orders[0].pickupId;
     }
-    logTest('Get Today\'s Orders', true, response.data);
+    logTest("Get Today's Orders", true, response.data);
     return true;
   } catch (error) {
-    logTest('Get Today\'s Orders', false, null, error);
+    logTest("Get Today's Orders", false, null, error);
     return false;
   }
 }
@@ -106,11 +118,14 @@ async function testGetTodayOrders() {
 // 4. Test get tomorrow's orders
 async function testGetTomorrowOrders() {
   try {
-    const response = await authenticatedRequest('GET', `${AGENT_APP_URL}/orders/tomorrow`);
-    logTest('Get Tomorrow\'s Orders', true, response.data);
+    const response = await authenticatedRequest(
+      'GET',
+      `${AGENT_APP_URL}/orders/tomorrow`
+    );
+    logTest("Get Tomorrow's Orders", true, response.data);
     return true;
   } catch (error) {
-    logTest('Get Tomorrow\'s Orders', false, null, error);
+    logTest("Get Tomorrow's Orders", false, null, error);
     return false;
   }
 }
@@ -118,7 +133,10 @@ async function testGetTomorrowOrders() {
 // 5. Test get past orders
 async function testGetPastOrders() {
   try {
-    const response = await authenticatedRequest('GET', `${AGENT_APP_URL}/orders/past?page=1&limit=10`);
+    const response = await authenticatedRequest(
+      'GET',
+      `${AGENT_APP_URL}/orders/past?page=1&limit=10`
+    );
     logTest('Get Past Orders', true, response.data);
     return true;
   } catch (error) {
@@ -130,12 +148,17 @@ async function testGetPastOrders() {
 // 6. Test get order details
 async function testGetOrderDetails() {
   if (!testOrderId) {
-    logTest('Get Order Details', false, null, { message: 'No test order ID available' });
+    logTest('Get Order Details', false, null, {
+      message: 'No test order ID available',
+    });
     return false;
   }
-  
+
   try {
-    const response = await authenticatedRequest('GET', `${AGENT_APP_URL}/orders/${testOrderId}`);
+    const response = await authenticatedRequest(
+      'GET',
+      `${AGENT_APP_URL}/orders/${testOrderId}`
+    );
     logTest('Get Order Details', true, response.data);
     return true;
   } catch (error) {
@@ -147,12 +170,17 @@ async function testGetOrderDetails() {
 // 7. Test start pickup
 async function testStartPickup() {
   if (!testPickupId) {
-    logTest('Start Pickup', false, null, { message: 'No test pickup ID available' });
+    logTest('Start Pickup', false, null, {
+      message: 'No test pickup ID available',
+    });
     return false;
   }
-  
+
   try {
-    const response = await authenticatedRequest('PUT', `${AGENT_APP_URL}/pickups/${testPickupId}/start`);
+    const response = await authenticatedRequest(
+      'PUT',
+      `${AGENT_APP_URL}/pickups/${testPickupId}/start`
+    );
     logTest('Start Pickup', true, response.data);
     return true;
   } catch (error) {
@@ -165,9 +193,12 @@ async function testStartPickup() {
 async function testGetEvaluationQuestions() {
   // Using a dummy product ID - replace with actual product ID from your database
   const dummyProductId = '507f1f77bcf86cd799439011';
-  
+
   try {
-    const response = await authenticatedRequest('GET', `${AGENT_APP_URL}/evaluation/questions/${dummyProductId}`);
+    const response = await authenticatedRequest(
+      'GET',
+      `${AGENT_APP_URL}/evaluation/questions/${dummyProductId}`
+    );
     logTest('Get Evaluation Questions', true, response.data);
     return true;
   } catch (error) {
@@ -179,25 +210,34 @@ async function testGetEvaluationQuestions() {
 // 9. Test calculate price
 async function testCalculatePrice() {
   if (!testOrderId) {
-    logTest('Calculate Price', false, null, { message: 'No test order ID available' });
+    logTest('Calculate Price', false, null, {
+      message: 'No test order ID available',
+    });
     return false;
   }
-  
+
   try {
     const requestData = {
       orderId: testOrderId,
       answers: [
-        { questionId: '507f1f77bcf86cd799439011', selectedOptionId: '507f1f77bcf86cd799439012' }
+        {
+          questionId: '507f1f77bcf86cd799439011',
+          selectedOptionId: '507f1f77bcf86cd799439012',
+        },
       ],
       selectedDefects: ['507f1f77bcf86cd799439013'],
       physicalInspection: {
         screenCondition: 'good',
         bodyCondition: 'excellent',
-        functionalCondition: 'working'
-      }
+        functionalCondition: 'working',
+      },
     };
-    
-    const response = await authenticatedRequest('POST', `${AGENT_APP_URL}/evaluation/calculate-price`, requestData);
+
+    const response = await authenticatedRequest(
+      'POST',
+      `${AGENT_APP_URL}/evaluation/calculate-price`,
+      requestData
+    );
     logTest('Calculate Price', true, response.data);
     return true;
   } catch (error) {
@@ -209,22 +249,34 @@ async function testCalculatePrice() {
 // 10. Test complete evaluation
 async function testCompleteEvaluation() {
   if (!testPickupId) {
-    logTest('Complete Evaluation', false, null, { message: 'No test pickup ID available' });
+    logTest('Complete Evaluation', false, null, {
+      message: 'No test pickup ID available',
+    });
     return false;
   }
-  
+
   try {
     const requestData = {
       finalPrice: 15000,
       adjustmentReason: 'Minor scratches found on screen',
       answers: [
-        { questionId: '507f1f77bcf86cd799439011', selectedOptionId: '507f1f77bcf86cd799439012' }
+        {
+          questionId: '507f1f77bcf86cd799439011',
+          selectedOptionId: '507f1f77bcf86cd799439012',
+        },
       ],
       selectedDefects: ['507f1f77bcf86cd799439013'],
-      photos: ['https://example.com/photo1.jpg', 'https://example.com/photo2.jpg']
+      photos: [
+        'https://example.com/photo1.jpg',
+        'https://example.com/photo2.jpg',
+      ],
     };
-    
-    const response = await authenticatedRequest('PUT', `${AGENT_APP_URL}/pickups/${testPickupId}/complete-evaluation`, requestData);
+
+    const response = await authenticatedRequest(
+      'PUT',
+      `${AGENT_APP_URL}/pickups/${testPickupId}/complete-evaluation`,
+      requestData
+    );
     logTest('Complete Evaluation', true, response.data);
     return true;
   } catch (error) {
@@ -236,18 +288,24 @@ async function testCompleteEvaluation() {
 // 11. Test complete payment
 async function testCompletePayment() {
   if (!testOrderId) {
-    logTest('Complete Payment', false, null, { message: 'No test order ID available' });
+    logTest('Complete Payment', false, null, {
+      message: 'No test order ID available',
+    });
     return false;
   }
-  
+
   try {
     const requestData = {
       paymentMethod: 'cash',
       transactionId: 'CASH_' + Date.now(),
-      paymentProof: 'https://example.com/receipt.jpg'
+      paymentProof: 'https://example.com/receipt.jpg',
     };
-    
-    const response = await authenticatedRequest('PUT', `${AGENT_APP_URL}/orders/${testOrderId}/payment`, requestData);
+
+    const response = await authenticatedRequest(
+      'PUT',
+      `${AGENT_APP_URL}/orders/${testOrderId}/payment`,
+      requestData
+    );
     logTest('Complete Payment', true, response.data);
     return true;
   } catch (error) {
@@ -259,7 +317,10 @@ async function testCompletePayment() {
 // 12. Test get statistics
 async function testGetStatistics() {
   try {
-    const response = await authenticatedRequest('GET', `${AGENT_APP_URL}/statistics`);
+    const response = await authenticatedRequest(
+      'GET',
+      `${AGENT_APP_URL}/statistics`
+    );
     logTest('Get Statistics', true, response.data);
     return true;
   } catch (error) {
@@ -273,10 +334,14 @@ async function testUpdateLocation() {
   try {
     const requestData = {
       latitude: 28.6139,
-      longitude: 77.2090
+      longitude: 77.209,
     };
-    
-    const response = await authenticatedRequest('PUT', `${AGENT_APP_URL}/location`, requestData);
+
+    const response = await authenticatedRequest(
+      'PUT',
+      `${AGENT_APP_URL}/location`,
+      requestData
+    );
     logTest('Update Location', true, response.data);
     return true;
   } catch (error) {
@@ -291,13 +356,13 @@ async function runAllTests() {
   console.log('╔════════════════════════════════════════════════════════════╗');
   console.log('║         AGENT APP API TEST SUITE                          ║');
   console.log('╚════════════════════════════════════════════════════════════╝');
-  
+
   const results = {
     passed: 0,
     failed: 0,
-    skipped: 0
+    skipped: 0,
   };
-  
+
   // Phase 1: Authentication
   console.log('\n📱 PHASE 1: Authentication');
   if (await testLogin()) {
@@ -307,56 +372,56 @@ async function runAllTests() {
     console.log('\n⚠️  Authentication failed. Stopping tests.');
     return;
   }
-  
+
   // Phase 2: Profile & Orders
   console.log('\n📋 PHASE 2: Profile & Orders');
-  results.passed += await testGetProfile() ? 1 : 0;
-  results.passed += await testGetTodayOrders() ? 1 : 0;
-  results.passed += await testGetTomorrowOrders() ? 1 : 0;
-  results.passed += await testGetPastOrders() ? 1 : 0;
-  
+  results.passed += (await testGetProfile()) ? 1 : 0;
+  results.passed += (await testGetTodayOrders()) ? 1 : 0;
+  results.passed += (await testGetTomorrowOrders()) ? 1 : 0;
+  results.passed += (await testGetPastOrders()) ? 1 : 0;
+
   if (testOrderId) {
-    results.passed += await testGetOrderDetails() ? 1 : 0;
+    results.passed += (await testGetOrderDetails()) ? 1 : 0;
   } else {
     console.log('\n⚠️  Skipping order details test - no orders found');
     results.skipped++;
   }
-  
+
   // Phase 3: Pickup Operations
   console.log('\n🚚 PHASE 3: Pickup Operations');
   if (testPickupId) {
-    results.passed += await testStartPickup() ? 1 : 0;
+    results.passed += (await testStartPickup()) ? 1 : 0;
   } else {
     console.log('\n⚠️  Skipping pickup tests - no pickup ID available');
     results.skipped++;
   }
-  
+
   // Phase 4: Evaluation
   console.log('\n🔍 PHASE 4: Evaluation');
-  results.passed += await testGetEvaluationQuestions() ? 1 : 0;
-  results.passed += await testCalculatePrice() ? 1 : 0;
-  
+  results.passed += (await testGetEvaluationQuestions()) ? 1 : 0;
+  results.passed += (await testCalculatePrice()) ? 1 : 0;
+
   if (testPickupId) {
-    results.passed += await testCompleteEvaluation() ? 1 : 0;
+    results.passed += (await testCompleteEvaluation()) ? 1 : 0;
   } else {
     console.log('\n⚠️  Skipping complete evaluation - no pickup ID available');
     results.skipped++;
   }
-  
+
   // Phase 5: Payment
   console.log('\n💰 PHASE 5: Payment');
   if (testOrderId) {
-    results.passed += await testCompletePayment() ? 1 : 0;
+    results.passed += (await testCompletePayment()) ? 1 : 0;
   } else {
     console.log('\n⚠️  Skipping payment test - no order ID available');
     results.skipped++;
   }
-  
+
   // Phase 6: Analytics & Location
   console.log('\n📊 PHASE 6: Analytics & Location');
-  results.passed += await testGetStatistics() ? 1 : 0;
-  results.passed += await testUpdateLocation() ? 1 : 0;
-  
+  results.passed += (await testGetStatistics()) ? 1 : 0;
+  results.passed += (await testUpdateLocation()) ? 1 : 0;
+
   // Final results
   console.log('\n\n');
   console.log('╔════════════════════════════════════════════════════════════╗');
@@ -365,12 +430,14 @@ async function runAllTests() {
   console.log(`\n✅ Passed: ${results.passed}`);
   console.log(`❌ Failed: ${results.failed}`);
   console.log(`⚠️  Skipped: ${results.skipped}`);
-  console.log(`\nTotal Tests: ${results.passed + results.failed + results.skipped}`);
+  console.log(
+    `\nTotal Tests: ${results.passed + results.failed + results.skipped}`
+  );
   console.log('\n');
 }
 
 // Run tests
-runAllTests().catch(error => {
+runAllTests().catch((error) => {
   console.error('Test suite error:', error);
   process.exit(1);
 });

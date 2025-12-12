@@ -7,14 +7,19 @@ const transporter = nodemailer.createTransport({
   secure: false,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
+    pass: process.env.EMAIL_PASSWORD,
+  },
 });
 
 /**
  * Send OTP via Email
  */
-exports.sendOTPEmail = async (email, otp, customerName, subject = 'Your OTP for Device Collection') => {
+exports.sendOTPEmail = async (
+  email,
+  otp,
+  customerName,
+  subject = 'Your OTP for Device Collection'
+) => {
   try {
     const mailOptions = {
       from: `"Cashify" <${process.env.EMAIL_USER}>`,
@@ -61,7 +66,7 @@ exports.sendOTPEmail = async (email, otp, customerName, subject = 'Your OTP for 
           </div>
         </body>
         </html>
-      `
+      `,
     };
 
     await transporter.sendMail(mailOptions);
@@ -94,7 +99,7 @@ exports.sendOTPSMS = async (phone, otp) => {
     */
 
     console.log(`OTP SMS would be sent to ${phone}: ${otp}`);
-    
+
     // For now, just log the OTP (in production, use actual SMS service)
     return true;
   } catch (error) {
@@ -113,7 +118,7 @@ exports.sendEmail = async (to, subject, html) => {
       from: `"Cashify" <${process.env.EMAIL_USER}>`,
       to,
       subject,
-      html
+      html,
     };
 
     await transporter.sendMail(mailOptions);

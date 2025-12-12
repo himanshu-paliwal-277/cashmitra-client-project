@@ -12,29 +12,30 @@ const getBuyProducts = async (req, res) => {
 
     // Build filter object
     const filter = {};
-    
+
     // Filter by categoryId (ObjectId)
     if (req.query.categoryId) {
       filter.categoryId = req.query.categoryId;
     }
-    
+
     // Filter by category name
     if (req.query.category) {
-      const categoryDoc = await BuyCategory.findOne({ 
-        name: new RegExp(`^${req.query.category}$`, 'i') 
+      const categoryDoc = await BuyCategory.findOne({
+        name: new RegExp(`^${req.query.category}$`, 'i'),
       });
       if (categoryDoc) {
         filter.categoryId = categoryDoc._id;
       }
     }
-    
+
     if (req.query.brand) filter.brand = new RegExp(req.query.brand, 'i');
-    if (req.query.isActive !== undefined) filter.isActive = req.query.isActive === 'true';
+    if (req.query.isActive !== undefined)
+      filter.isActive = req.query.isActive === 'true';
     if (req.query.search) {
       filter.$or = [
         { name: new RegExp(req.query.search, 'i') },
         { brand: new RegExp(req.query.search, 'i') },
-        { description: new RegExp(req.query.search, 'i') }
+        { description: new RegExp(req.query.search, 'i') },
       ];
     }
 
@@ -62,15 +63,15 @@ const getBuyProducts = async (req, res) => {
         current: page,
         pages: Math.ceil(total / limit),
         total,
-        limit
-      }
+        limit,
+      },
     });
   } catch (error) {
     console.error('Error fetching buy products:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching buy products',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -84,33 +85,36 @@ const deleteBuyProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Buy product not found'
+        message: 'Buy product not found',
       });
     }
-    
+
     // 🔒 OWNERSHIP CHECK - Partners can only delete their own products
     if (req.user && req.user.role === 'partner' && req.partnerId) {
-      if (product.partnerId && product.partnerId.toString() !== req.partnerId.toString()) {
+      if (
+        product.partnerId &&
+        product.partnerId.toString() !== req.partnerId.toString()
+      ) {
         return res.status(403).json({
           success: false,
-          message: 'You do not have permission to delete this product'
+          message: 'You do not have permission to delete this product',
         });
       }
     }
-    
+
     // Now delete the product
     await BuyProduct.findByIdAndDelete(req.params.id);
 
     res.json({
       success: true,
-      message: 'Buy product deleted successfully'
+      message: 'Buy product deleted successfully',
     });
   } catch (error) {
     console.error('Error deleting buy product:', error);
     res.status(500).json({
       success: false,
       message: 'Error deleting buy product',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -128,20 +132,20 @@ const getBuyProductById = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Buy product not found'
+        message: 'Buy product not found',
       });
     }
 
     res.json({
       success: true,
-      data: product
+      data: product,
     });
   } catch (error) {
     console.error('Error fetching buy product:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching buy product',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -156,21 +160,39 @@ function normalizeBuyProductInput(input = {}) {
 
   // topSpecs: ensure object
   if (Array.isArray(body.topSpecs)) {
-    const [screenSize = '', chipset = '', pixelDensity = '', networkSupport = '', simSlots = ''] = body.topSpecs;
-    body.topSpecs = { screenSize, chipset, pixelDensity, networkSupport, simSlots };
+    const [
+      screenSize = '',
+      chipset = '',
+      pixelDensity = '',
+      networkSupport = '',
+      simSlots = '',
+    ] = body.topSpecs;
+    body.topSpecs = {
+      screenSize,
+      chipset,
+      pixelDensity,
+      networkSupport,
+      simSlots,
+    };
   }
 
   body.productDetails = body.productDetails || {};
 
   // map cameras → front/rearCamera
-  if (body.productDetails.cameras && typeof body.productDetails.cameras === 'object') {
+  if (
+    body.productDetails.cameras &&
+    typeof body.productDetails.cameras === 'object'
+  ) {
     const { front = {}, rear = {} } = body.productDetails.cameras;
     body.productDetails.frontCamera = body.productDetails.frontCamera || {};
     if (!body.productDetails.frontCamera.resolution && front.primary)
       body.productDetails.frontCamera.resolution = front.primary;
 
     body.productDetails.rearCamera = body.productDetails.rearCamera || {};
-    if (!body.productDetails.rearCamera.camera1 && (rear.primary || rear.main)) {
+    if (
+      !body.productDetails.rearCamera.camera1 &&
+      (rear.primary || rear.main)
+    ) {
       body.productDetails.rearCamera.camera1 = {
         resolution: rear.primary || rear.main,
         aperture: rear.aperture,
@@ -178,7 +200,10 @@ function normalizeBuyProductInput(input = {}) {
         lens: rear.lens,
       };
     }
-    if (!body.productDetails.rearCamera.camera2 && (rear.telephoto || rear.ultraWide)) {
+    if (
+      !body.productDetails.rearCamera.camera2 &&
+      (rear.telephoto || rear.ultraWide)
+    ) {
       const res = rear.telephoto || rear.ultraWide;
       body.productDetails.rearCamera.camera2 = {
         resolution: res,
@@ -191,7 +216,10 @@ function normalizeBuyProductInput(input = {}) {
   }
 
   // network → networkConnectivity
-  if (body.productDetails.network && typeof body.productDetails.network === 'object') {
+  if (
+    body.productDetails.network &&
+    typeof body.productDetails.network === 'object'
+  ) {
     const n = body.productDetails.network;
     body.productDetails.networkConnectivity = {
       wifi: n.wifi || n.connectivity || '',
@@ -208,8 +236,10 @@ function normalizeBuyProductInput(input = {}) {
   }
 
   // Ensure objects not strings
-  if (typeof body.productDetails.frontCamera !== 'object') body.productDetails.frontCamera = {};
-  if (typeof body.productDetails.rearCamera !== 'object') body.productDetails.rearCamera = {};
+  if (typeof body.productDetails.frontCamera !== 'object')
+    body.productDetails.frontCamera = {};
+  if (typeof body.productDetails.rearCamera !== 'object')
+    body.productDetails.rearCamera = {};
 
   // paymentOptions normalization
   if (body.paymentOptions && typeof body.paymentOptions === 'object') {
@@ -267,7 +297,7 @@ const createBuyProduct = async (req, res) => {
       ...normalizedData,
       createdBy: req.user ? req.user.id : null,
     };
-    
+
     // 🔒 AUTO-ATTACH partnerId if user is a partner
     if (req.user && req.user.role === 'partner' && req.partnerId) {
       productData.partnerId = req.partnerId;
@@ -302,7 +332,7 @@ const updateBuyProduct = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
@@ -312,37 +342,40 @@ const updateBuyProduct = async (req, res) => {
       if (!category) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid category ID'
+          message: 'Invalid category ID',
         });
       }
     }
 
     // Find product first to check ownership
     const existingProduct = await BuyProduct.findById(req.params.id);
-    
+
     if (!existingProduct) {
       return res.status(404).json({
         success: false,
-        message: 'Buy product not found'
+        message: 'Buy product not found',
       });
     }
-    
+
     // 🔒 OWNERSHIP CHECK - Partners can only update their own products
     if (req.user && req.user.role === 'partner' && req.partnerId) {
-      if (existingProduct.partnerId && existingProduct.partnerId.toString() !== req.partnerId.toString()) {
+      if (
+        existingProduct.partnerId &&
+        existingProduct.partnerId.toString() !== req.partnerId.toString()
+      ) {
         return res.status(403).json({
           success: false,
-          message: 'You do not have permission to update this product'
+          message: 'You do not have permission to update this product',
         });
       }
     }
-    
+
     // Process array fields to ensure proper data structure
     const processedData = processArrayFields(req.body);
 
     const updateData = {
       ...processedData,
-      updatedBy: req.user.id
+      updatedBy: req.user.id,
     };
 
     const product = await BuyProduct.findByIdAndUpdate(
@@ -353,17 +386,16 @@ const updateBuyProduct = async (req, res) => {
       .populate('categoryId', 'name')
       .populate('updatedBy', 'name email');
 
-
     res.json({
       success: true,
-      message: 'Buy product deleted successfully'
+      message: 'Buy product deleted successfully',
     });
   } catch (error) {
     console.error('Error deleting buy product:', error);
     res.status(500).json({
       success: false,
       message: 'Error deleting buy product',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -373,8 +405,12 @@ const getBuyProductStats = async (req, res) => {
   try {
     const totalProducts = await BuyProduct.countDocuments();
     const activeProducts = await BuyProduct.countDocuments({ isActive: true });
-    const inactiveProducts = await BuyProduct.countDocuments({ isActive: false });
-    const refurbishedProducts = await BuyProduct.countDocuments({ isRefurbished: true });
+    const inactiveProducts = await BuyProduct.countDocuments({
+      isActive: false,
+    });
+    const refurbishedProducts = await BuyProduct.countDocuments({
+      isRefurbished: true,
+    });
 
     // Get products by category
     const productsByCategory = await BuyProduct.aggregate([
@@ -383,25 +419,27 @@ const getBuyProductStats = async (req, res) => {
           from: 'buycategories',
           localField: 'categoryId',
           foreignField: '_id',
-          as: 'category'
-        }
+          as: 'category',
+        },
       },
       {
-        $unwind: '$category'
+        $unwind: '$category',
       },
       {
         $group: {
           _id: '$category.name',
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
       {
-        $sort: { count: -1 }
-      }
+        $sort: { count: -1 },
+      },
     ]);
 
     // Get top rated products
-    const topRatedProducts = await BuyProduct.find({ 'rating.average': { $gte: 4 } })
+    const topRatedProducts = await BuyProduct.find({
+      'rating.average': { $gte: 4 },
+    })
       .select('name brand rating.average')
       .sort({ 'rating.average': -1 })
       .limit(5);
@@ -420,19 +458,19 @@ const getBuyProductStats = async (req, res) => {
           totalProducts,
           activeProducts,
           inactiveProducts,
-          refurbishedProducts
+          refurbishedProducts,
         },
         productsByCategory,
         topRatedProducts,
-        recentProducts
-      }
+        recentProducts,
+      },
     });
   } catch (error) {
     console.error('Error fetching buy product stats:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching buy product statistics',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -447,7 +485,7 @@ const addProductReview = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: 'Product not found',
       });
     }
 
@@ -456,7 +494,7 @@ const addProductReview = async (req, res) => {
       reviewer: reviewer || 'Anonymous',
       rating,
       comment,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
     };
 
     product.reviews.push(newReview);
@@ -467,12 +505,12 @@ const addProductReview = async (req, res) => {
     product.rating.totalReviews += 1;
 
     // Recalculate average rating
-    const totalRating = 
-      (product.rating.breakdown['5star'] * 5) +
-      (product.rating.breakdown['4star'] * 4) +
-      (product.rating.breakdown['3star'] * 3) +
-      (product.rating.breakdown['2star'] * 2) +
-      (product.rating.breakdown['1star'] * 1);
+    const totalRating =
+      product.rating.breakdown['5star'] * 5 +
+      product.rating.breakdown['4star'] * 4 +
+      product.rating.breakdown['3star'] * 3 +
+      product.rating.breakdown['2star'] * 2 +
+      product.rating.breakdown['1star'] * 1;
 
     product.rating.average = totalRating / product.rating.totalReviews;
 
@@ -483,15 +521,15 @@ const addProductReview = async (req, res) => {
       message: 'Review added successfully',
       data: {
         review: newReview,
-        updatedRating: product.rating
-      }
+        updatedRating: product.rating,
+      },
     });
   } catch (error) {
     console.error('Error adding product review:', error);
     res.status(500).json({
       success: false,
       message: 'Error adding product review',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -503,7 +541,7 @@ const toggleProductStatus = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: 'Product not found',
       });
     }
 
@@ -514,14 +552,14 @@ const toggleProductStatus = async (req, res) => {
     res.json({
       success: true,
       message: `Product ${product.isActive ? 'activated' : 'deactivated'} successfully`,
-      data: { isActive: product.isActive }
+      data: { isActive: product.isActive },
     });
   } catch (error) {
     console.error('Error toggling product status:', error);
     res.status(500).json({
       success: false,
       message: 'Error toggling product status',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -535,22 +573,22 @@ const getBuyProductsByCategory = async (req, res) => {
     const skip = (page - 1) * limit;
 
     // Find category by name (case-insensitive)
-    const categoryDoc = await BuyCategory.findOne({ 
+    const categoryDoc = await BuyCategory.findOne({
       name: new RegExp(`^${category}$`, 'i'),
-      isActive: true 
+      isActive: true,
     });
 
     if (!categoryDoc) {
       return res.status(404).json({
         success: false,
-        message: 'Category not found'
+        message: 'Category not found',
       });
     }
 
     // Build filter object
-    const filter = { 
+    const filter = {
       categoryId: categoryDoc._id,
-      isActive: true 
+      isActive: true,
     };
 
     // Add search functionality if provided
@@ -558,7 +596,7 @@ const getBuyProductsByCategory = async (req, res) => {
       filter.$or = [
         { name: new RegExp(req.query.search, 'i') },
         { brand: new RegExp(req.query.search, 'i') },
-        { description: new RegExp(req.query.search, 'i') }
+        { description: new RegExp(req.query.search, 'i') },
       ];
     }
 
@@ -589,21 +627,21 @@ const getBuyProductsByCategory = async (req, res) => {
       data: products,
       category: {
         id: categoryDoc._id,
-        name: categoryDoc.name
+        name: categoryDoc.name,
       },
       pagination: {
         current: page,
         pages: Math.ceil(total / limit),
         total,
-        limit
-      }
+        limit,
+      },
     });
   } catch (error) {
     console.error('Error fetching products by category:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching products by category',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -617,5 +655,5 @@ module.exports = {
   deleteBuyProduct,
   getBuyProductStats,
   addProductReview,
-  toggleProductStatus
+  toggleProductStatus,
 };

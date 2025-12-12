@@ -3,7 +3,10 @@ const Inventory = require('../models/inventory.model');
 const Product = require('../models/product.model');
 const Partner = require('../models/partner.model');
 const { Order } = require('../models/order.model');
-const { ApiError, asyncHandler } = require('../middlewares/errorHandler.middleware');
+const {
+  ApiError,
+  asyncHandler,
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * @desc    Add new inventory item
@@ -25,9 +28,9 @@ exports.addInventoryItem = asyncHandler(async (req, res) => {
     images,
     specifications,
     warranty,
-    location
+    location,
   } = req.body;
-  
+
   const partnerId = req.user.partnerId || req.user.id; // Assuming partner middleware
 
   // Verify product exists
@@ -46,7 +49,7 @@ exports.addInventoryItem = asyncHandler(async (req, res) => {
   const existingInventory = await Inventory.findOne({
     partner: partnerId,
     product,
-    condition
+    condition,
   });
 
   if (existingInventory) {
@@ -55,7 +58,7 @@ exports.addInventoryItem = asyncHandler(async (req, res) => {
     existingInventory.price = price; // Update to latest price
     existingInventory.isAvailable = true;
     existingInventory.updatedAt = new Date();
-    
+
     if (description) existingInventory.description = description;
     if (images && images.length > 0) existingInventory.images = images;
     if (specifications) existingInventory.specifications = specifications;
@@ -66,13 +69,13 @@ exports.addInventoryItem = asyncHandler(async (req, res) => {
 
     await existingInventory.populate([
       { path: 'product', select: 'brand model variant category' },
-      { path: 'partner', select: 'shopName address' }
+      { path: 'partner', select: 'shopName address' },
     ]);
 
     res.status(200).json({
       success: true,
       message: 'Inventory updated successfully',
-      data: existingInventory
+      data: existingInventory,
     });
   } else {
     // Create new inventory item
@@ -87,20 +90,20 @@ exports.addInventoryItem = asyncHandler(async (req, res) => {
       specifications: specifications || {},
       warranty,
       location,
-      isAvailable: quantity > 0
+      isAvailable: quantity > 0,
     });
 
     await inventoryItem.save();
 
     await inventoryItem.populate([
       { path: 'product', select: 'brand model variant category' },
-      { path: 'partner', select: 'shopName address' }
+      { path: 'partner', select: 'shopName address' },
     ]);
 
     res.status(201).json({
       success: true,
       message: 'Inventory item added successfully',
-      data: inventoryItem
+      data: inventoryItem,
     });
   }
 });
@@ -123,18 +126,18 @@ exports.getInventoryItems = asyncHandler(async (req, res) => {
     location,
     sortBy = 'createdAt',
     sortOrder = 'desc',
-    search
+    search,
   } = req.query;
 
   // Build filter object
   const filter = {};
-  
+
   if (partner) filter.partner = partner;
   if (product) filter.product = product;
   if (condition) filter.condition = condition;
   if (isAvailable !== undefined) filter.isAvailable = isAvailable === 'true';
   if (location) filter.location = new RegExp(location, 'i');
-  
+
   if (minPrice || maxPrice) {
     filter.price = {};
     if (minPrice) filter.price.$gte = parseFloat(minPrice);
@@ -149,12 +152,12 @@ exports.getInventoryItems = asyncHandler(async (req, res) => {
 
   let query = Inventory.find(filter)
     .populate([
-      { 
-        path: 'product', 
+      {
+        path: 'product',
         select: 'brand model variant category images specifications',
-        populate: { path: 'category', select: 'name' }
+        populate: { path: 'category', select: 'name' },
       },
-      { path: 'partner', select: 'shopName address phone' }
+      { path: 'partner', select: 'shopName address phone' },
     ])
     .sort(sort)
     .skip(skip)
@@ -168,10 +171,10 @@ exports.getInventoryItems = asyncHandler(async (req, res) => {
         { 'product.brand': searchRegex },
         { 'product.model': searchRegex },
         { 'product.variant': searchRegex },
-        { description: searchRegex }
-      ]
+        { description: searchRegex },
+      ],
     };
-    
+
     // Use aggregation for complex search
     const aggregationPipeline = [
       {
@@ -179,8 +182,8 @@ exports.getInventoryItems = asyncHandler(async (req, res) => {
           from: 'products',
           localField: 'product',
           foreignField: '_id',
-          as: 'productInfo'
-        }
+          as: 'productInfo',
+        },
       },
       { $unwind: '$productInfo' },
       {
@@ -190,9 +193,9 @@ exports.getInventoryItems = asyncHandler(async (req, res) => {
             { 'productInfo.brand': searchRegex },
             { 'productInfo.model': searchRegex },
             { 'productInfo.variant': searchRegex },
-            { description: searchRegex }
-          ]
-        }
+            { description: searchRegex },
+          ],
+        },
       },
       { $sort: sort },
       { $skip: skip },
@@ -202,8 +205,8 @@ exports.getInventoryItems = asyncHandler(async (req, res) => {
           from: 'partners',
           localField: 'partner',
           foreignField: '_id',
-          as: 'partnerInfo'
-        }
+          as: 'partnerInfo',
+        },
       },
       { $unwind: '$partnerInfo' },
       {
@@ -211,17 +214,17 @@ exports.getInventoryItems = asyncHandler(async (req, res) => {
           from: 'categories',
           localField: 'productInfo.category',
           foreignField: '_id',
-          as: 'categoryInfo'
-        }
-      }
+          as: 'categoryInfo',
+        },
+      },
     ];
 
     const inventoryItems = await Inventory.aggregate(aggregationPipeline);
     const totalWithSearch = await Inventory.aggregate([
       ...aggregationPipeline.slice(0, 4),
-      { $count: 'total' }
+      { $count: 'total' },
     ]);
-    
+
     const total = totalWithSearch[0]?.total || 0;
 
     return res.json({
@@ -230,7 +233,7 @@ exports.getInventoryItems = asyncHandler(async (req, res) => {
       total,
       page: parseInt(page),
       pages: Math.ceil(total / parseInt(limit)),
-      data: inventoryItems
+      data: inventoryItems,
     });
   }
 
@@ -243,7 +246,7 @@ exports.getInventoryItems = asyncHandler(async (req, res) => {
     total,
     page: parseInt(page),
     pages: Math.ceil(total / parseInt(limit)),
-    data: inventoryItems
+    data: inventoryItems,
   });
 });
 
@@ -255,15 +258,14 @@ exports.getInventoryItems = asyncHandler(async (req, res) => {
 exports.getInventoryItem = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const inventoryItem = await Inventory.findById(id)
-    .populate([
-      { 
-        path: 'product', 
-        select: 'brand model variant category images specifications',
-        populate: { path: 'category', select: 'name slug' }
-      },
-      { path: 'partner', select: 'shopName address phone rating' }
-    ]);
+  const inventoryItem = await Inventory.findById(id).populate([
+    {
+      path: 'product',
+      select: 'brand model variant category images specifications',
+      populate: { path: 'category', select: 'name slug' },
+    },
+    { path: 'partner', select: 'shopName address phone rating' },
+  ]);
 
   if (!inventoryItem) {
     throw new ApiError(404, 'Inventory item not found');
@@ -271,7 +273,7 @@ exports.getInventoryItem = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: inventoryItem
+    data: inventoryItem,
   });
 });
 
@@ -317,13 +319,13 @@ exports.updateInventoryItem = asyncHandler(async (req, res) => {
     { new: true, runValidators: true }
   ).populate([
     { path: 'product', select: 'brand model variant category' },
-    { path: 'partner', select: 'shopName address' }
+    { path: 'partner', select: 'shopName address' },
   ]);
 
   res.json({
     success: true,
     message: 'Inventory item updated successfully',
-    data: updatedItem
+    data: updatedItem,
   });
 });
 
@@ -350,7 +352,7 @@ exports.deleteInventoryItem = asyncHandler(async (req, res) => {
   // Check if item is in any pending orders
   const pendingOrders = await Order.findOne({
     'items.inventory': id,
-    status: { $in: ['pending', 'confirmed'] }
+    status: { $in: ['pending', 'confirmed'] },
   });
 
   if (pendingOrders) {
@@ -361,7 +363,7 @@ exports.deleteInventoryItem = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: 'Inventory item deleted successfully'
+    message: 'Inventory item deleted successfully',
   });
 });
 
@@ -413,7 +415,7 @@ exports.updateStock = asyncHandler(async (req, res) => {
 
   await inventoryItem.populate([
     { path: 'product', select: 'brand model variant' },
-    { path: 'partner', select: 'shopName' }
+    { path: 'partner', select: 'shopName' },
   ]);
 
   res.json({
@@ -421,11 +423,15 @@ exports.updateStock = asyncHandler(async (req, res) => {
     message: 'Stock updated successfully',
     data: {
       inventoryItem,
-      previousQuantity: operation === 'set' ? null : 
-        operation === 'add' ? newQuantity - quantity : newQuantity + quantity,
+      previousQuantity:
+        operation === 'set'
+          ? null
+          : operation === 'add'
+            ? newQuantity - quantity
+            : newQuantity + quantity,
       newQuantity,
-      operation
-    }
+      operation,
+    },
   });
 });
 
@@ -463,10 +469,10 @@ exports.getInventoryAnalytics = asyncHandler(async (req, res) => {
         totalItems: { $sum: 1 },
         totalQuantity: { $sum: '$quantity' },
         availableItems: {
-          $sum: { $cond: [{ $eq: ['$isAvailable', true] }, 1, 0] }
-        }
-      }
-    }
+          $sum: { $cond: [{ $eq: ['$isAvailable', true] }, 1, 0] },
+        },
+      },
+    },
   ]);
 
   // Inventory by condition
@@ -477,16 +483,16 @@ exports.getInventoryAnalytics = asyncHandler(async (req, res) => {
         _id: '$condition',
         count: { $sum: 1 },
         totalQuantity: { $sum: '$quantity' },
-        avgPrice: { $avg: '$price' }
-      }
+        avgPrice: { $avg: '$price' },
+      },
     },
-    { $sort: { count: -1 } }
+    { $sort: { count: -1 } },
   ]);
 
   // Low stock items (quantity < 5)
   const lowStockItems = await Inventory.find({
     ...filter,
-    quantity: { $lt: 5, $gt: 0 }
+    quantity: { $lt: 5, $gt: 0 },
   })
     .populate('product', 'brand model variant')
     .populate('partner', 'shopName')
@@ -496,7 +502,7 @@ exports.getInventoryAnalytics = asyncHandler(async (req, res) => {
   // Out of stock items
   const outOfStockCount = await Inventory.countDocuments({
     ...filter,
-    quantity: 0
+    quantity: 0,
   });
 
   // Top products by quantity
@@ -507,16 +513,16 @@ exports.getInventoryAnalytics = asyncHandler(async (req, res) => {
         _id: '$product',
         totalQuantity: { $sum: '$quantity' },
         totalValue: { $sum: { $multiply: ['$price', '$quantity'] } },
-        itemCount: { $sum: 1 }
-      }
+        itemCount: { $sum: 1 },
+      },
     },
     {
       $lookup: {
         from: 'products',
         localField: '_id',
         foreignField: '_id',
-        as: 'product'
-      }
+        as: 'product',
+      },
     },
     { $unwind: '$product' },
     {
@@ -524,15 +530,15 @@ exports.getInventoryAnalytics = asyncHandler(async (req, res) => {
         product: {
           brand: '$product.brand',
           model: '$product.model',
-          variant: '$product.variant'
+          variant: '$product.variant',
         },
         totalQuantity: 1,
         totalValue: 1,
-        itemCount: 1
-      }
+        itemCount: 1,
+      },
     },
     { $sort: { totalQuantity: -1 } },
-    { $limit: 10 }
+    { $limit: 10 },
   ]);
 
   res.json({
@@ -542,13 +548,13 @@ exports.getInventoryAnalytics = asyncHandler(async (req, res) => {
         totalValue: 0,
         totalItems: 0,
         totalQuantity: 0,
-        availableItems: 0
+        availableItems: 0,
       },
       inventoryByCondition,
       lowStockItems,
       outOfStockCount,
-      topProductsByQuantity
-    }
+      topProductsByQuantity,
+    },
   });
 });
 
@@ -577,7 +583,7 @@ exports.bulkUpdateInventory = asyncHandler(async (req, res) => {
   for (const update of updates) {
     try {
       const { id, ...updateData } = update;
-      
+
       const inventoryItem = await Inventory.findById(id);
       if (!inventoryItem) {
         errors_list.push({ id, error: 'Inventory item not found' });
@@ -621,8 +627,8 @@ exports.bulkUpdateInventory = asyncHandler(async (req, res) => {
       summary: {
         total: updates.length,
         successful: results.length,
-        failed: errors_list.length
-      }
-    }
+        failed: errors_list.length,
+      },
+    },
   });
 });

@@ -6,13 +6,13 @@
  * @version 1.0.0
  */
 
-const { validationResult } = require("express-validator");
-const SellDefect = require("../models/sellDefect.model");
-const Category = require("../models/category.model");
+const { validationResult } = require('express-validator');
+const SellDefect = require('../models/sellDefect.model');
+const Category = require('../models/category.model');
 const {
   ApiError,
   asyncHandler,
-} = require("../middlewares/errorHandler.middleware");
+} = require('../middlewares/errorHandler.middleware');
 
 /**
  * Create new sell defect
@@ -22,7 +22,7 @@ const {
 exports.createDefect = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, "Validation Error", errors.array());
+    throw new ApiError(400, 'Validation Error', errors.array());
   }
 
   const { categoryId, section, key, title, icon, delta } = req.body;
@@ -30,7 +30,7 @@ exports.createDefect = asyncHandler(async (req, res) => {
   // Verify category exists
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, "Category not found");
+    throw new ApiError(404, 'Category not found');
   }
 
   // Check if defect with same key already exists for this category
@@ -38,7 +38,7 @@ exports.createDefect = asyncHandler(async (req, res) => {
   if (existingDefect) {
     throw new ApiError(
       400,
-      "Defect with this key already exists for this category"
+      'Defect with this key already exists for this category'
     );
   }
 
@@ -63,7 +63,7 @@ exports.createDefect = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     success: true,
-    message: "Defect created successfully",
+    message: 'Defect created successfully',
     data: defect,
   });
 });
@@ -79,7 +79,7 @@ exports.getDefectsByCategory = asyncHandler(async (req, res) => {
   // Verify category exists
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, "Category not found");
+    throw new ApiError(404, 'Category not found');
   }
 
   const defects = await SellDefect.getGroupedBySection(categoryId);
@@ -124,11 +124,11 @@ exports.getDefects = asyncHandler(async (req, res) => {
 
   if (categoryId) query.categoryId = categoryId;
   if (section) query.section = section;
-  if (isActive !== undefined) query.isActive = isActive === "true";
+  if (isActive !== undefined) query.isActive = isActive === 'true';
 
   const defects = await SellDefect.find(query)
-    .populate("categoryId", "name")
-    .populate("createdBy", "name email")
+    .populate('categoryId', 'name')
+    .populate('createdBy', 'name email')
     .sort({ section: 1, order: 1 });
 
   res.json({
@@ -144,11 +144,11 @@ exports.getDefects = asyncHandler(async (req, res) => {
  */
 exports.getDefect = asyncHandler(async (req, res) => {
   const defect = await SellDefect.findById(req.params.id)
-    .populate("productId", "name")
-    .populate("createdBy", "name email");
+    .populate('productId', 'name')
+    .populate('createdBy', 'name email');
 
   if (!defect) {
-    throw new ApiError(404, "Defect not found");
+    throw new ApiError(404, 'Defect not found');
   }
 
   res.json({
@@ -165,7 +165,7 @@ exports.getDefect = asyncHandler(async (req, res) => {
 exports.updateDefect = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new ApiError(400, "Validation Error", errors.array());
+    throw new ApiError(400, 'Validation Error', errors.array());
   }
 
   const { id } = req.params;
@@ -174,7 +174,7 @@ exports.updateDefect = asyncHandler(async (req, res) => {
 
   const defect = await SellDefect.findById(id);
   if (!defect) {
-    throw new ApiError(404, "Defect not found");
+    throw new ApiError(404, 'Defect not found');
   }
 
   // If categoryId is being changed, verify new category exists
@@ -185,13 +185,13 @@ exports.updateDefect = asyncHandler(async (req, res) => {
   ) {
     const category = await Category.findById(categoryId);
     if (!category) {
-      throw new ApiError(404, "Category not found");
+      throw new ApiError(404, 'Category not found');
     }
   } else if (categoryId && !defect.categoryId) {
     // If defect doesn't have a categoryId, verify the new one exists
     const category = await Category.findById(categoryId);
     if (!category) {
-      throw new ApiError(404, "Category not found");
+      throw new ApiError(404, 'Category not found');
     }
   }
 
@@ -205,7 +205,7 @@ exports.updateDefect = asyncHandler(async (req, res) => {
     if (existingDefect) {
       throw new ApiError(
         400,
-        "Defect with this key already exists for this category"
+        'Defect with this key already exists for this category'
       );
     }
   }
@@ -226,7 +226,7 @@ exports.updateDefect = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Defect updated successfully",
+    message: 'Defect updated successfully',
     data: defect,
   });
 });
@@ -239,14 +239,14 @@ exports.updateDefect = asyncHandler(async (req, res) => {
 exports.deleteDefect = asyncHandler(async (req, res) => {
   const defect = await SellDefect.findById(req.params.id);
   if (!defect) {
-    throw new ApiError(404, "Defect not found");
+    throw new ApiError(404, 'Defect not found');
   }
 
   await defect.deleteOne();
 
   res.json({
     success: true,
-    message: "Defect deleted successfully",
+    message: 'Defect deleted successfully',
   });
 });
 
@@ -259,13 +259,13 @@ exports.bulkCreateDefects = asyncHandler(async (req, res) => {
   const { categoryId, defects } = req.body;
 
   if (!categoryId || !Array.isArray(defects) || defects.length === 0) {
-    throw new ApiError(400, "Category ID and defects array are required");
+    throw new ApiError(400, 'Category ID and defects array are required');
   }
 
   // Verify category exists
   const category = await Category.findById(categoryId);
   if (!category) {
-    throw new ApiError(404, "Category not found");
+    throw new ApiError(404, 'Category not found');
   }
 
   // Prepare defects with order numbers
@@ -322,7 +322,7 @@ exports.reorderDefects = asyncHandler(async (req, res) => {
   if (!productId || !category || !Array.isArray(defectIds)) {
     throw new ApiError(
       400,
-      "Product ID, category, and defect IDs array are required"
+      'Product ID, category, and defect IDs array are required'
     );
   }
 
@@ -335,7 +335,7 @@ exports.reorderDefects = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Defects reordered successfully",
+    message: 'Defects reordered successfully',
   });
 });
 
@@ -346,14 +346,14 @@ exports.reorderDefects = asyncHandler(async (req, res) => {
  */
 exports.getDefectCategories = asyncHandler(async (req, res) => {
   const categories = [
-    "screen",
-    "body",
-    "functional",
-    "battery",
-    "camera",
-    "sensor",
-    "buttons",
-    "others",
+    'screen',
+    'body',
+    'functional',
+    'battery',
+    'camera',
+    'sensor',
+    'buttons',
+    'others',
   ];
 
   res.json({

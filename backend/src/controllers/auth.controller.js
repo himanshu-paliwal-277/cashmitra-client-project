@@ -62,7 +62,9 @@ const loginPartner = async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email and role partner
-    const user = await User.findOne({ email, role: 'partner' }).select('+password');
+    const user = await User.findOne({ email, role: 'partner' }).select(
+      '+password'
+    );
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
@@ -71,8 +73,10 @@ const loginPartner = async (req, res) => {
     // Check if password matches
     if (await user.matchPassword(password)) {
       // Find partner details
-      const partner = await Partner.findOne({ user: user._id }).populate('user');
-      
+      const partner = await Partner.findOne({ user: user._id }).populate(
+        'user'
+      );
+
       if (!partner) {
         return res.status(404).json({ message: 'Partner profile not found' });
       }
@@ -218,14 +222,14 @@ const updateUserProfile = async (req, res) => {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
       user.phone = req.body.phone || user.phone;
-      
+
       if (req.body.address) {
         user.address = {
           ...user.address,
           ...req.body.address,
         };
       }
-      
+
       if (req.body.password) {
         user.password = req.body.password;
       }

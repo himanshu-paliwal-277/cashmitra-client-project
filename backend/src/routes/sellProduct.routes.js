@@ -19,7 +19,7 @@ const {
   updateVariant,
   deleteVariant,
   getCustomerProducts,
-  getSellProductsByCategory
+  getSellProductsByCategory,
 } = require('../controllers/sellProduct.controller');
 const { protect, authorize } = require('../middlewares/auth.middleware');
 
@@ -34,10 +34,7 @@ const productValidation = [
     .trim()
     .isLength({ min: 2, max: 200 })
     .withMessage('Product name must be between 2 and 200 characters'),
-  body('images')
-    .optional()
-    .isArray()
-    .withMessage('Images must be an array'),
+  body('images').optional().isArray().withMessage('Images must be an array'),
   body('images.*')
     .optional()
     .isURL()
@@ -63,22 +60,19 @@ const productValidation = [
     .optional()
     .isBoolean()
     .withMessage('Variant isActive must be a boolean'),
-  body('tags')
-    .optional()
-    .isArray()
-    .withMessage('Tags must be an array'),
+  body('tags').optional().isArray().withMessage('Tags must be an array'),
   body('tags.*')
     .optional()
     .trim()
     .isLength({ min: 1, max: 50 })
-    .withMessage('Each tag must be between 1 and 50 characters')
+    .withMessage('Each tag must be between 1 and 50 characters'),
 ];
 
 const updateProductValidation = [
   param('id')
     .isMongoId()
     .withMessage('Product ID must be a valid MongoDB ObjectId'),
-  ...productValidation
+  ...productValidation,
 ];
 
 const variantValidation = [
@@ -95,7 +89,7 @@ const variantValidation = [
   body('isActive')
     .optional()
     .isBoolean()
-    .withMessage('isActive must be a boolean')
+    .withMessage('isActive must be a boolean'),
 ];
 
 const updateVariantValidation = [
@@ -117,7 +111,7 @@ const updateVariantValidation = [
   body('isActive')
     .optional()
     .isBoolean()
-    .withMessage('isActive must be a boolean')
+    .withMessage('isActive must be a boolean'),
 ];
 
 const queryValidation = [
@@ -149,14 +143,17 @@ const queryValidation = [
   query('sortOrder')
     .optional()
     .isIn(['asc', 'desc'])
-    .withMessage('SortOrder must be either asc or desc')
+    .withMessage('SortOrder must be either asc or desc'),
 ];
 
 // Public routes for customers
 router.get('/customer', queryValidation, getCustomerProducts);
 router.get('/category/:category', getSellProductsByCategory);
-router.get('/customer/:id', 
-  param('id').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/customer/:id',
+  param('id')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   getProduct
 );
 
@@ -176,26 +173,40 @@ router.use(authorize('admin', 'partner'));
 router.post('/', productValidation, createProduct);
 router.get('/', queryValidation, getProducts);
 router.get('/stats', getProductStats);
-router.get('/:id', 
-  param('id').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/:id',
+  param('id')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   getProduct
 );
 router.put('/:id', updateProductValidation, updateProduct);
-router.delete('/:id', 
-  param('id').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.delete(
+  '/:id',
+  param('id')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   deleteProduct
 );
 
 // Variant management routes
-router.get('/:id/variants', 
-  param('id').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
+router.get(
+  '/:id/variants',
+  param('id')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
   getVariants
 );
 router.post('/:id/variants', variantValidation, addVariant);
 router.put('/:id/variants/:variantId', updateVariantValidation, updateVariant);
-router.delete('/:id/variants/:variantId', 
-  param('id').isMongoId().withMessage('Product ID must be a valid MongoDB ObjectId'),
-  param('variantId').isMongoId().withMessage('Variant ID must be a valid MongoDB ObjectId'),
+router.delete(
+  '/:id/variants/:variantId',
+  param('id')
+    .isMongoId()
+    .withMessage('Product ID must be a valid MongoDB ObjectId'),
+  param('variantId')
+    .isMongoId()
+    .withMessage('Variant ID must be a valid MongoDB ObjectId'),
   deleteVariant
 );
 
