@@ -284,7 +284,7 @@ const SellProducts = () => {
         </p>
         <div className="flex items-baseline gap-2 mb-4">
           <span className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-            $
+            ₹
             {product.variants && product.variants.length > 0
               ? product.variants[0].basePrice
               : 'N/A'}
