@@ -2,120 +2,97 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import productService from '../../../services/productService';
 
-interface ProductVariant {
-  ram?: string;
-  storage?: string;
-  processor?: string;
-  screenSize?: string;
-  color?: string;
-}
-
-interface Product {
+interface Category {
   _id: string;
-  brand: string;
-  model: string;
-  series?: string;
-  variant?: ProductVariant;
-  images?: string[];
-  minPrice?: number | null;
-  maxPrice?: number | null;
-  availableCount?: number;
-  totalStock?: number;
-  avgRating?: number | null;
-  reviewCount?: number;
-  pricing?: {
-    mrp?: number;
-    discountedPrice?: number;
-    discountPercent?: number;
-  };
+  name: string;
+  description?: string;
+  image?: string;
+  sortOrder?: number;
+  isActive: boolean;
+  superCategory?: string;
 }
-
 const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: any) => {
   const navigate = useNavigate();
-  const [phones, setPhones] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Mobile super category ID - you can make this dynamic if needed
+  const MOBILE_SUPER_CATEGORY_ID = '69028f06887ace411d8fe98e';
+
   useEffect(() => {
     if (isVisible) {
-      fetchPhones();
+      fetchCategories();
     }
   }, [isVisible]);
 
-  const fetchPhones = async () => {
+  const fetchCategories = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Use public productService to get buy products
-      const response = await productService.getBuyProducts({
-        limit: 8,
-        page: 1,
-      });
+      // Get categories from Mobile super category
+      const response =
+        await productService.getBuyCategoriesBySuperCategory(MOBILE_SUPER_CATEGORY_ID);
 
-      if (response.products) {
-        setPhones(response.products);
+      if (response) {
+        setCategories(response);
       } else {
-        setError('Failed to load phones');
+        setError('Failed to load categories');
       }
     } catch (err) {
-      console.error('Error fetching phones:', err);
-      setError('Failed to load phones');
+      console.error('Error fetching categories:', err);
+      setError('Failed to load categories');
     } finally {
       setLoading(false);
     }
   };
 
-  const getProductName = (product: any) => {
-    return product.name || `${product.brand} ${product.model || ''}`.trim();
+  const getCategoryImage = (categoryName: string) => {
+    const imageMap: Record<string, string> = {
+      Mobile: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
+      Smartphone:
+        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
+      Phone: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
+      iPhone: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=200&h=200&fit=crop',
+      Samsung: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=200&h=200&fit=crop',
+      OnePlus: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=200&h=200&fit=crop',
+      Xiaomi: 'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=200&h=200&fit=crop',
+      Oppo: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
+      Vivo: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
+      Realme: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
+      default: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=200&h=200&fit=crop',
+    };
+    return imageMap[categoryName] || imageMap['default'];
   };
 
-  const getProductImage = (product: any) => {
-    if (product.images) {
-      if (typeof product.images === 'object' && !Array.isArray(product.images)) {
-        return product.images.main || product.images.gallery || product.images.thumbnail;
-      }
-      if (Array.isArray(product.images) && product.images.length > 0) {
-        return product.images[0];
-      }
-    }
-    return 'https://cdn-icons-png.flaticon.com/128/17003/17003579.png';
+  const getCategoryIcon = (iconName: string) => {
+    const iconMap: Record<string, string> = {
+      Mobile: '📱',
+      Smartphone: '📱',
+      Phone: '📱',
+      iPhone: '📱',
+      Samsung: '📱',
+      OnePlus: '📱',
+      Xiaomi: '📱',
+      Oppo: '📱',
+      Vivo: '📱',
+      Realme: '📱',
+      default: '📱',
+    };
+    return iconMap[iconName] || iconMap['default'];
   };
 
-  const getVariantInfo = (product: any) => {
-    if (product.variants && product.variants.length > 0) {
-      const variant = product.variants[0];
-      const parts = [];
-      if (variant.storage) parts.push(variant.storage);
-      if (variant.color) parts.push(variant.color);
-      return parts.length > 0 ? parts.join(' | ') : null;
-    }
-    return null;
-  };
-
-  const formatPrice = (product: any) => {
-    const price =
-      product.pricing?.discountedPrice ||
-      product.pricing?.mrp ||
-      product.minPrice ||
-      product.maxPrice;
-    if (!price) return 'Price not available';
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
-
-  const handlePhoneClick = (phone: Product) => {
-    const path = `/buy/product/${phone._id}`;
+  const handleCategoryClick = (category: Category) => {
+    // Navigate to products page for Mobile super category and this category
+    const path = `/buy/Mobile/${encodeURIComponent(category.name)}/products`;
     navigate(path);
     onClose?.();
     onLinkClick(path);
   };
 
   const handleViewAllClick = () => {
-    const path = '/buy?category=mobile';
+    const path = '/buy/category/Mobile';
     navigate(path);
     onClose?.();
     onLinkClick(path);
@@ -129,14 +106,14 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-100">
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-0.5">Popular Phones</h3>
-            <p className="text-xs text-gray-600">Certified refurbished devices</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-0.5">Phone Categories</h3>
+            <p className="text-xs text-gray-600">Browse by phone brands</p>
           </div>
           <button
             className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
             onClick={handleViewAllClick}
           >
-            View All
+            View All Categories
           </button>
         </div>
       </div>
@@ -173,7 +150,7 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
             </div>
             <p className="text-red-600 text-sm mb-4 font-medium">{error}</p>
             <button
-              onClick={fetchPhones}
+              onClick={fetchCategories}
               className="px-5 py-2.5 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
             >
               Try Again
@@ -181,75 +158,40 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
           </div>
         )}
 
-        {/* Phones Grid */}
-        {!loading && !error && phones.length > 0 && (
+        {/* Categories Grid */}
+        {!loading && !error && categories.length > 0 && (
           <>
             <div className="grid grid-cols-2 gap-3 max-h-[420px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
-              {phones.slice(0, 8).map(phone => {
-                const variantInfo = getVariantInfo(phone);
-                const productName = getProductName(phone);
-                const productImage = getProductImage(phone);
-                const discount = phone.pricing?.discountPercent;
+              {categories.map(category => {
+                const imageUrl = category.image || getCategoryImage(category.name);
 
                 return (
                   <div
-                    key={phone._id}
-                    className="group relative flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-md cursor-pointer transition-all duration-300 hover:border-green-500 hover:shadow-lg"
-                    onClick={() => handlePhoneClick(phone)}
+                    key={category._id}
+                    className="group flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer transition-all duration-200 bg-gray-50 hover:bg-green-50 hover:border-green-600 hover:shadow-md"
+                    onClick={() => handleCategoryClick(category)}
                   >
-                    {/* Discount Badge */}
-                    {Number(discount) > 0 && (
-                      <div className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                        {Number(discount)}% OFF
-                      </div>
-                    )}
-
-                    {/* Product Image */}
-                    <div className="w-16 h-16 flex-shrink-0 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200 overflow-hidden group-hover:border-green-400 transition-colors">
+                    <div className="w-[50px] h-[50px] flex-shrink-0 flex items-center justify-center mr-3 bg-white rounded-lg border border-gray-200 overflow-hidden">
                       <img
-                        src={productImage}
-                        alt={productName}
-                        className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-300"
+                        src={imageUrl}
+                        alt={category.name}
+                        className="w-full h-full object-contain p-1"
                         onError={e => {
-                          (e.target as HTMLImageElement).src =
-                            'https://cdn-icons-png.flaticon.com/128/17003/17003579.png';
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
                         }}
                       />
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-bold text-gray-900 leading-tight line-clamp-2 mb-1 group-hover:text-green-700 transition-colors">
-                        {productName}
-                      </h4>
-                      <p className="text-[11px] text-gray-500 font-medium mb-1.5">{phone.brand}</p>
-
-                      {variantInfo && (
-                        <div className="flex items-center gap-1 mb-1.5">
-                          <span className="text-[10px] bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-medium">
-                            {variantInfo}
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-base font-bold text-green-600">
-                          {formatPrice(phone)}
-                        </span>
-                        {phone.pricing?.mrp &&
-                          phone.pricing.mrp > (phone.pricing?.discountedPrice || 0) && (
-                            <span className="text-[10px] text-gray-400 line-through">
-                              ₹{phone.pricing.mrp.toLocaleString()}
-                            </span>
-                          )}
+                      <div className="hidden w-full h-full items-center justify-center text-2xl">
+                        {getCategoryIcon(category.name)}
                       </div>
-
-                      {(phone as any).availability?.inStock && (
-                        <div className="flex items-center gap-1 mt-1">
-                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                          <span className="text-[10px] text-green-600 font-semibold">In Stock</span>
-                        </div>
-                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-1">{category.name}</h4>
+                      <p className="text-xs text-gray-600 leading-snug line-clamp-2">
+                        {category.description || `Browse ${category.name.toLowerCase()} phones`}
+                      </p>
                     </div>
                   </div>
                 );
@@ -267,7 +209,7 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
                   />
                 </svg>
                 <span className="font-medium">
-                  Certified Quality • 6-Month Warranty • Easy Returns
+                  Browse phone categories • Find your perfect device • Quality assured
                 </span>
               </div>
             </div>
@@ -275,7 +217,7 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
         )}
 
         {/* Empty State */}
-        {!loading && !error && phones.length === 0 && (
+        {!loading && !error && categories.length === 0 && (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
@@ -292,8 +234,10 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
                 />
               </svg>
             </div>
-            <p className="text-gray-600 text-sm font-medium">No phones available at the moment</p>
-            <p className="text-gray-400 text-xs mt-1">Check back soon for amazing deals!</p>
+            <p className="text-gray-600 text-sm font-medium">
+              No phone categories available at the moment
+            </p>
+            <p className="text-gray-400 text-xs mt-1">Check back soon for new categories!</p>
           </div>
         )}
       </div>
