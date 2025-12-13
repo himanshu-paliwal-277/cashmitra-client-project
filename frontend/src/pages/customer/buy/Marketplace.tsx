@@ -21,6 +21,7 @@ import {
   TrendingUp,
   AlertCircle,
 } from 'lucide-react';
+import { useCart } from '../../../contexts/CartContext';
 import productService from '../../../services/productService';
 import { getBuyCategories, getBuyProducts } from '../../../services/productService';
 import ProductItemCard from './ProductItemCard';
@@ -55,6 +56,7 @@ const getCategoryIcon = (categoryName: any) => {
 const Marketplace = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { addToCart } = useCart();
   const categoryFromUrl = searchParams.get('category');
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -176,9 +178,21 @@ const Marketplace = () => {
     navigate(`/buy/product/${productId}`);
   };
 
-  const handleAddToCart = (e: any, product: any) => {
+  const handleAddToCart = async (e: any, product: any) => {
     e.stopPropagation();
-    console.log('Added to cart:', product);
+
+    // Transform product data to match cart format
+    const cartProduct = {
+      _id: product._id,
+      name: product.series || product.model || `${product.brand} ${product.model}` || product.name,
+      price: product.minPrice || product.maxPrice || product.price || 0,
+      images: product.images || [],
+      brand: product.brand,
+      model: product.model,
+      inventoryId: product._id,
+    };
+
+    await addToCart(cartProduct, 1);
   };
 
   const renderStars = (rating: any) => {
@@ -256,14 +270,10 @@ const Marketplace = () => {
           originalPrice={originalPrice}
           discount={discount}
           condition={condition}
-          variant={variant}
-          rating={rating}
-          reviewCount={reviewCount}
           wishlist={wishlist}
           toggleWishlist={toggleWishlist}
           handleProductClick={handleProductClick}
           handleAddToCart={handleAddToCart}
-          renderStars={renderStars}
         />
       );
     }

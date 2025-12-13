@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useAuth } from './AuthContext';
 import { API_BASE_URL } from '../utils/api';
 
@@ -56,6 +57,7 @@ export const CartProvider = ({ children }: any) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [hasInitialSync, setHasInitialSync] = useState(false);
   const { user, getAuthToken } = useAuth();
 
   // Load cart from localStorage on mount
@@ -71,21 +73,35 @@ export const CartProvider = ({ children }: any) => {
     }
   }, []);
 
+  // Clear sync flag when user logs out
+  useEffect(() => {
+    if (!user) {
+      localStorage.removeItem('cartSynced');
+      setHasInitialSync(false);
+    }
+  }, [user]);
+
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
   useEffect(() => {
-    if (user) {
+    // Only sync cart with server when user logs in for the first time in this session
+    // and only if there are local cart items or we haven't synced yet
+    if (user && !hasInitialSync && (cartItems.length > 0 || !localStorage.getItem('cartSynced'))) {
       syncCartWithServer();
+      setHasInitialSync(true);
+      localStorage.setItem('cartSynced', 'true');
     }
-  }, [user]);
+  }, [user, hasInitialSync]);
 
   const syncCartWithServer = async () => {
     try {
       const token = getAuthToken();
       if (!token) return;
+
+      console.log('Syncing cart with server...');
 
       // Get server cart
       const response = await fetch(`${API_BASE_URL}/buy/cart`, {
@@ -96,7 +112,7 @@ export const CartProvider = ({ children }: any) => {
 
       if (response.ok) {
         const serverCartResponse = await response.json();
-        console.log('serverCart: ', serverCartResponse);
+        console.log('Server cart response:', serverCartResponse);
 
         // Extract cart items from the new backend response format
         const serverCartItems = serverCartResponse.cart || [];
@@ -143,13 +159,63 @@ export const CartProvider = ({ children }: any) => {
           };
         });
 
-        // If there are local cart items, sync them to server first
-        if (cartItems.length > 0) {
+        // Only sync local items to server if there are local items AND no server items
+        // This prevents unnecessary API calls on every page load
+        if (cartItems.length > 0 && serverCartItems.length === 0) {
+          console.log('Syncing local items to server...');
           await syncLocalItemsToServer(cartItems);
-        }
+          // After syncing, fetch the updated server cart
+          const updatedResponse = await fetch(`${API_BASE_URL}/buy/cart`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (updatedResponse.ok) {
+            const updatedServerCartResponse = await updatedResponse.json();
+            const updatedServerCartItems = updatedServerCartResponse.cart || [];
+            const updatedTransformedItems = updatedServerCartItems.map((item: any) => {
+              let imageUrl = '/placeholder-phone.jpg';
+              if (item.product?.images) {
+                if (Array.isArray(item.product.images)) {
+                  imageUrl = item.product.images[0] || '/placeholder-phone.jpg';
+                } else if (typeof item.product.images === 'object') {
+                  imageUrl =
+                    item.product.images.main ||
+                    item.product.images.gallery ||
+                    item.product.images.thumbnail ||
+                    '/placeholder-phone.jpg';
+                }
+              }
 
-        // Set server cart items as the source of truth
-        setCartItems(transformedServerItems);
+              return {
+                productId: item.productId,
+                inventoryId: item.productId,
+                quantity: item.quantity,
+                price: item.price,
+                subtotal: item.subtotal,
+                product: item.product,
+                partner: item.partner,
+                isAvailable: item.isAvailable,
+                image: imageUrl,
+                name:
+                  item.product?.brand && item.product?.model
+                    ? `${item.product.brand} ${item.product.model}`
+                    : item.product?.name || 'Unknown Product',
+                brand: item.product?.brand,
+                model: item.product?.model,
+                variant: item.product?.variant,
+                images: item.product?.images || [],
+                shopName: item.partner?.shopName,
+                addedAt: item.addedAt,
+              };
+            });
+            setCartItems(updatedTransformedItems);
+          }
+        } else {
+          // Set server cart items as the source of truth
+          console.log('Setting server cart items as source of truth');
+          setCartItems(transformedServerItems);
+        }
 
         // Set the total from server response
         if (serverCartResponse.total !== undefined) {
@@ -214,30 +280,6 @@ export const CartProvider = ({ children }: any) => {
     return merged;
   };
 
-  const updateServerCart = async (items: any) => {
-    try {
-      const token = getAuthToken();
-      if (!token) return;
-
-      // Use individual addToCart calls for each item
-      for (const item of items) {
-        await fetch(`${API_BASE_URL}/buy/cart`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            productId: item.productId || item.inventoryId,
-            quantity: item.quantity,
-          }),
-        });
-      }
-    } catch (err) {
-      console.error('Error updating server cart:', err);
-    }
-  };
-
   const addToCart = async (product: any, quantity = 1) => {
     console.log('product: ', product);
     try {
@@ -246,6 +288,8 @@ export const CartProvider = ({ children }: any) => {
       const existingItemIndex = cartItems.findIndex(item => item.productId === product._id);
 
       let updatedCart;
+      let isNewItem = false;
+
       if (existingItemIndex >= 0) {
         // Update existing item and move to front
         const updatedItem = {
@@ -257,8 +301,23 @@ export const CartProvider = ({ children }: any) => {
         };
         const otherItems = cartItems.filter((_, index) => index !== existingItemIndex);
         updatedCart = [updatedItem, ...otherItems]; // Move updated item to front
+
+        // Show toast for quantity update
+        toast.success(
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🛒</span>
+            <div>
+              <div className="font-semibold">{product.name}</div>
+              <div className="text-sm opacity-80">Quantity updated to {updatedItem.quantity}</div>
+            </div>
+          </div>,
+          {
+            className: 'bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0',
+          }
+        );
       } else {
         // Add new item
+        isNewItem = true;
         const cartItem = {
           productId: product._id,
           inventoryId: product.inventoryId || product._id, // Use inventoryId if available, fallback to productId
@@ -272,19 +331,62 @@ export const CartProvider = ({ children }: any) => {
           addedAt: new Date().toISOString(), // Add timestamp for ordering
         };
         updatedCart = [cartItem, ...cartItems]; // Add to beginning for most recent first
+
+        // Show toast for new item
+        toast.success(
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🛒</span>
+            <div>
+              <div className="font-semibold">{product.name}</div>
+              <div className="text-sm opacity-80">Added to cart successfully!</div>
+            </div>
+          </div>,
+          {
+            className: 'bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0',
+          }
+        );
       }
+
       setCartItems(updatedCart);
 
       // Update server if user is logged in
       if (user) {
-        await updateServerCart(updatedCart);
-        // Sync with server to get full product details
-        await syncCartWithServer();
+        const token = getAuthToken();
+        if (token) {
+          // Only add the new/updated item to server, not the entire cart
+          try {
+            await fetch(`${API_BASE_URL}/buy/cart`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                productId: product._id,
+                quantity: quantity,
+              }),
+            });
+          } catch (serverError) {
+            console.warn('Failed to sync item to server:', serverError);
+          }
+        }
       }
 
       return { success: true };
     } catch (err) {
       setError(err.message);
+      toast.error(
+        <div className="flex items-center gap-2">
+          <span className="text-lg">❌</span>
+          <div>
+            <div className="font-semibold">Failed to add to cart</div>
+            <div className="text-sm opacity-80">{product.name}</div>
+          </div>
+        </div>,
+        {
+          className: 'bg-gradient-to-r from-red-500 to-rose-500 text-white border-0',
+        }
+      );
       return { success: false, error: err.message };
     } finally {
       setLoading(false);
@@ -306,6 +408,20 @@ export const CartProvider = ({ children }: any) => {
       const updatedCart = cartItems.filter(item => item.productId !== productId);
       setCartItems(updatedCart);
 
+      // Show success toast
+      toast.success(
+        <div className="flex items-center gap-2">
+          <span className="text-lg">🗑️</span>
+          <div>
+            <div className="font-semibold">Removed from cart</div>
+            <div className="text-sm opacity-80">{itemToRemove.name}</div>
+          </div>
+        </div>,
+        {
+          className: 'bg-gradient-to-r from-orange-500 to-red-500 text-white border-0',
+        }
+      );
+
       // Update server if user is logged in
       if (user) {
         const token = getAuthToken();
@@ -321,6 +437,18 @@ export const CartProvider = ({ children }: any) => {
           if (!response.ok) {
             // Revert local state if server update fails
             setCartItems(cartItems);
+            toast.error(
+              <div className="flex items-center gap-2">
+                <span className="text-lg">❌</span>
+                <div>
+                  <div className="font-semibold">Failed to remove from cart</div>
+                  <div className="text-sm opacity-80">{itemToRemove.name}</div>
+                </div>
+              </div>,
+              {
+                className: 'bg-gradient-to-r from-red-500 to-rose-500 text-white border-0',
+              }
+            );
             throw new Error('Failed to remove item from server cart');
           }
         }
@@ -328,6 +456,20 @@ export const CartProvider = ({ children }: any) => {
     } catch (err) {
       console.error('Error removing from cart:', err);
       setError(err.message);
+      if (!err.message.includes('Failed to remove')) {
+        toast.error(
+          <div className="flex items-center gap-2">
+            <span className="text-lg">❌</span>
+            <div>
+              <div className="font-semibold">Failed to remove item</div>
+              <div className="text-sm opacity-80">Please try again</div>
+            </div>
+          </div>,
+          {
+            className: 'bg-gradient-to-r from-red-500 to-rose-500 text-white border-0',
+          }
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -391,8 +533,26 @@ export const CartProvider = ({ children }: any) => {
       setLoading(true);
       setError(null);
 
+      const itemCount = cartItems.length;
+
       // Update local state first
       setCartItems([]);
+
+      // Show success toast
+      if (itemCount > 0) {
+        toast.success(
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🧹</span>
+            <div>
+              <div className="font-semibold">Cart cleared</div>
+              <div className="text-sm opacity-80">{itemCount} items removed</div>
+            </div>
+          </div>,
+          {
+            className: 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-0',
+          }
+        );
+      }
 
       // Clear server cart if user is logged in
       if (user) {
@@ -423,6 +583,18 @@ export const CartProvider = ({ children }: any) => {
     } catch (err) {
       console.error('Error clearing cart:', err);
       setError(err.message);
+      toast.error(
+        <div className="flex items-center gap-2">
+          <span className="text-lg">❌</span>
+          <div>
+            <div className="font-semibold">Failed to clear cart</div>
+            <div className="text-sm opacity-80">Please try again</div>
+          </div>
+        </div>,
+        {
+          className: 'bg-gradient-to-r from-red-500 to-rose-500 text-white border-0',
+        }
+      );
     } finally {
       setLoading(false);
     }

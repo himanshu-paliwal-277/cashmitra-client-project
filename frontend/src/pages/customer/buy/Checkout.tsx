@@ -12,7 +12,7 @@ import {
   Plus,
   Star,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../../components/ui/Button';
 import Card from '../../../components/ui/Card';
 import Input from '../../../components/ui/Input';
@@ -24,6 +24,7 @@ import './Checkout.css';
 
 const Checkout = ({ onBack, onOrderComplete }: any) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, setOrderData } = useAuth();
 
   // Handle back navigation
@@ -34,7 +35,31 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
       navigate('/buy');
     }
   };
+
   const { cartItems, getCartTotal, clearCart } = useCart();
+
+  // Check if this is a "Buy Now" checkout
+  const buyNowData = location.state?.buyNowItem;
+  const isBuyNow = location.state?.isBuyNow;
+
+  // Debug: Log the received data
+  console.log('Checkout Debug:', {
+    isBuyNow,
+    buyNowData,
+    locationState: location.state,
+    cartItems,
+  });
+
+  // Use either Buy Now item or cart items
+  const checkoutItems = isBuyNow && buyNowData ? [buyNowData] : cartItems;
+
+  // Calculate total for checkout items
+  const getCheckoutTotal = () => {
+    if (isBuyNow && buyNowData) {
+      return buyNowData.price * buyNowData.quantity;
+    }
+    return getCartTotal();
+  };
   const { addresses = [], loading: addressLoading, addAddress } = useUserAddresses();
 
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -103,7 +128,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
     },
   ];
 
-  const subtotal = getCartTotal();
+  const subtotal = getCheckoutTotal();
   const deliveryFee =
     selectedDelivery === 'express' ? 99 : selectedDelivery === 'priority' ? 199 : 0;
   const total = subtotal + deliveryFee;
@@ -149,11 +174,15 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
       const selectedAddressObj = addresses.find(a => (a._id || a.id) === selectedAddress);
       if (!selectedAddressObj) throw new Error('Please select a delivery address');
 
-      let processedCartItems = cartItems;
-      if (!Array.isArray(cartItems) && typeof cartItems === 'object' && cartItems !== null) {
-        const keys = Object.keys(cartItems);
-        const numeric = keys.every(k => !isNaN(k));
-        if (numeric && keys.length) processedCartItems = Object.values(cartItems);
+      let processedCartItems = checkoutItems;
+      if (
+        !Array.isArray(checkoutItems) &&
+        typeof checkoutItems === 'object' &&
+        checkoutItems !== null
+      ) {
+        const keys = Object.keys(checkoutItems);
+        const numeric = keys.every(k => !isNaN(Number(k)));
+        if (numeric && keys.length) processedCartItems = Object.values(checkoutItems);
       }
       if (!Array.isArray(processedCartItems) || processedCartItems.length === 0) {
         throw new Error('Cart is empty or invalid');
@@ -163,7 +192,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
         const inventoryId = item.inventoryId || item.productId;
         if (!inventoryId)
           throw new Error(`Invalid item: missing inventoryId for ${item.name || 'unknown item'}`);
-        return { inventoryId, quantity: parseInt(item.quantity) || 1 };
+        return { inventoryId, quantity: parseInt(String(item.quantity)) || 1 };
       });
 
       const orderData = {
@@ -183,7 +212,10 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
       if (response.data.success) {
         const order = response.data.data.order;
         setOrderData(order);
-        await clearCart();
+        // Only clear cart if this is not a Buy Now purchase
+        if (!isBuyNow) {
+          await clearCart();
+        }
         navigate(`/order-confirmation/${order._id}`, { state: { orderData: order } });
         if (onOrderComplete) onOrderComplete(order);
       }
@@ -196,9 +228,11 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
   };
 
   const sortedCart = useMemo(() => {
-    const arr = Array.isArray(cartItems) ? cartItems : [];
-    return [...arr].sort((a, b) => new Date(b.addedAt || 0) - new Date(a.addedAt || 0));
-  }, [cartItems]);
+    const arr = Array.isArray(checkoutItems) ? checkoutItems : [];
+    return [...arr].sort(
+      (a, b) => new Date(b.addedAt || 0).getTime() - new Date(a.addedAt || 0).getTime()
+    );
+  }, [checkoutItems]);
 
   return (
     <div className="co-page">
@@ -209,7 +243,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
             <ArrowLeft size={18} />
             <span>Back to Shopping</span>
           </button>
-          <h1 className="co-title">Secure Checkout</h1>
+          <h1 className="co-title">{isBuyNow ? 'Buy Now - Secure Checkout' : 'Secure Checkout'}</h1>
           <div className="co-header-spacer" />
         </div>
       </header>
@@ -351,7 +385,11 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
                   <div key={item.productId || item.inventoryId} className="sum-item">
                     <div className="sum-img">
                       <img
-                        src={item.image || '/placeholder-image.jpg'}
+                        src={
+                          item.image ||
+                          (item.images && Array.isArray(item.images) ? item.images[0] : null) ||
+                          '/placeholder-image.jpg'
+                        }
                         alt={item.name || 'Item'}
                         loading="lazy"
                       />

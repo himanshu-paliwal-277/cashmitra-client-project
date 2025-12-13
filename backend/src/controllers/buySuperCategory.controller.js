@@ -200,3 +200,28 @@ exports.getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
     data: categories,
   });
 });
+// @desc    Get categories by super category (public)
+// @route   GET /api/buy-super-categories/public/:id/categories
+// @access  Public
+exports.getPublicCategoriesBySuperCategory = asyncHandler(async (req, res) => {
+  const superCategory = await BuySuperCategory.findById(req.params.id);
+
+  if (!superCategory) {
+    throw new ApiError(404, 'Super category not found');
+  }
+
+  if (!superCategory.isActive) {
+    throw new ApiError(404, 'Super category is not active');
+  }
+
+  const categories = await BuyCategory.find({
+    superCategory: req.params.id,
+    isActive: true, // Only return active categories for public endpoint
+  }).sort('sortOrder');
+
+  res.status(200).json({
+    success: true,
+    count: categories.length,
+    data: categories,
+  });
+});

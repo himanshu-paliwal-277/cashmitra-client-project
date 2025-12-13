@@ -24,7 +24,8 @@ const SellPhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }
   }, [hookCategories, hookLoading]);
 
   const handleCategoryClick = (category: any) => {
-    const path = `/sell?category=${category.name}`;
+    // Navigate to model selection with Mobile as super category and category as brand
+    const path = `/sell/Mobile/${category.name}/model`;
     navigate(path);
     onClose?.();
     onLinkClick(path);

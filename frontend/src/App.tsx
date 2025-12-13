@@ -1,6 +1,8 @@
 import { Suspense, useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { theme } from './utils';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
@@ -59,6 +61,22 @@ function App() {
                     <Suspense fallback={<AppLoader text="Starting App..." />}>
                       <AppContent />
                     </Suspense>
+                    {/* Toast Container */}
+                    <ToastContainer
+                      position="top-right"
+                      autoClose={3000}
+                      hideProgressBar={false}
+                      newestOnTop={false}
+                      closeOnClick
+                      rtl={false}
+                      pauseOnFocusLoss
+                      draggable
+                      pauseOnHover
+                      theme="light"
+                      className="mt-16"
+                      toastClassName="bg-white shadow-lg border border-gray-200 rounded-xl"
+                      progressClassName="bg-gradient-to-r from-green-500 to-emerald-500"
+                    />
                   </AgentAuthProvider>
                 </PartnerAuthProvider>
               </AdminAuthProvider>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { adminService } from '../../../services/adminService';
+import sellService from '../../../services/sellService';
 import './CategoryProducts.css';
 
 const CategoryProducts = () => {
@@ -32,7 +32,7 @@ const CategoryProducts = () => {
         ...(selectedBrand && { brand: selectedBrand }),
       };
 
-      const response = await adminService.getBuyProductsByCategory(category, params);
+      const response = await sellService.getSellProductsByCategory(category, params);
 
       if (response.success) {
         // Handle the new API response structure where products are directly in response.data
@@ -72,9 +72,9 @@ const CategoryProducts = () => {
       })
     );
 
-    // Navigate to the sell model page with category, brand, and product ID parameters
+    // Navigate to the sell model page with category and brand as path parameters
     navigate(
-      `/sell/model?category=${encodeURIComponent(category)}&brand=${encodeURIComponent(product.brand || '')}&productId=${encodeURIComponent(product._id)}`
+      `/sell/${encodeURIComponent(category)}/${encodeURIComponent(product.brand || 'unknown')}/model`
     );
   };
 
@@ -193,7 +193,7 @@ const CategoryProducts = () => {
                       alt={product.name}
                       className="product-image"
                       onError={e => {
-                        e.target.src = '/placeholder-product.jpg';
+                        (e.target as HTMLImageElement).src = '/placeholder-product.jpg';
                       }}
                     />
                   </div>

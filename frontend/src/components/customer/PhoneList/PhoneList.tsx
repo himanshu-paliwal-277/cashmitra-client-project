@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, Heart, ShoppingCart, Eye } from 'lucide-react';
+import { useCart } from '../../../contexts/CartContext';
 import { productCategoriesAPI } from '../../../services/productCategories';
+import productService from '../../../services/productService';
 import './PhoneList.css';
 
 const PhoneList = () => {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [phones, setPhones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -74,13 +77,14 @@ const PhoneList = () => {
 
   const fetchFallbackPhones = async () => {
     try {
-      // Try to search for mobile products
-      const searchResponse = await productCategoriesAPI.searchProducts('mobile phone', {
+      // Try to search for mobile products using productService
+      const searchResponse = await productService.getBuyProducts({
+        search: 'mobile phone',
         limit: 12,
       });
 
-      if (searchResponse.success && searchResponse.data?.data) {
-        setPhones(searchResponse.data.data);
+      if (searchResponse.products && searchResponse.products.length > 0) {
+        setPhones(searchResponse.products);
       } else {
         // Use static fallback data
         setPhones(getFallbackPhones());
@@ -148,10 +152,21 @@ const PhoneList = () => {
     navigate(`/product/${productId}`);
   };
 
-  const handleAddToCart = (e: any, product: any) => {
+  const handleAddToCart = async (e: any, product: any) => {
     e.stopPropagation();
-    // Add to cart logic here
-    console.log('Added to cart:', product);
+
+    // Transform product data to match cart format
+    const cartProduct = {
+      _id: product._id,
+      name: product.series || product.model || `${product.brand} ${product.model}` || product.name,
+      price: product.minPrice || product.maxPrice || product.price || 0,
+      images: product.images || [],
+      brand: product.brand,
+      model: product.model,
+      inventoryId: product._id,
+    };
+
+    await addToCart(cartProduct, 1);
   };
 
   const handleWishlist = (e: any, product: any) => {
@@ -223,7 +238,7 @@ const PhoneList = () => {
                 alt={phone.name || 'Phone'}
                 className="phone-image"
                 onError={e => {
-                  e.target.src = '/api/placeholder/280/200';
+                  (e.target as HTMLImageElement).src = '/api/placeholder/280/200';
                 }}
               />
 

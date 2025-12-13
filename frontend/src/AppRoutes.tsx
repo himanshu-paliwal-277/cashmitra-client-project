@@ -38,8 +38,11 @@ const SellAccessories = lazy(() => import('./pages/customer/sell/SellAccessories
 const SellCategoryHome = lazy(() => import('./pages/customer/sell/SellCategoryHome'));
 
 // Buy Flow Pages (Lazy)
-const Marketplace = lazy(() => import('./pages/customer/buy/Marketplace'));
+const BuySuperCategorySelection = lazy(
+  () => import('./pages/customer/buy/BuySuperCategorySelection')
+);
 const BuyCategoryHome = lazy(() => import('./pages/customer/buy/BuyCategoryHome'));
+const BuyProductsPage = lazy(() => import('./pages/customer/buy/BuyProductsPage'));
 const ProductDetails = lazy(() => import('./pages/customer/buy/ProductDetails'));
 const Cart = lazy(() => import('./pages/customer/buy/Cart'));
 const Checkout = lazy(() => import('./pages/customer/buy/Checkout'));
@@ -228,8 +231,9 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
         <Route path="/sell-mobile" element={<SellMobileForm />} />
 
         {/* Buy Flow Pages */}
-        <Route path="/buy" element={<Marketplace />} />
+        <Route path="/buy" element={<BuySuperCategorySelection />} />
         <Route path="/buy/category/:category" element={<BuyCategoryHome />} />
+        <Route path="/buy/:superCategory/:category/products" element={<BuyProductsPage />} />
         <Route path="/buy/product/:productId" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

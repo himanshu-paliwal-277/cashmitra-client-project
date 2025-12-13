@@ -163,23 +163,240 @@ const ProductDetails = () => {
 
   const getProductName = () => {
     if (!product) return '';
-    // Prioritize series, then model, then brand + model, fallback to name
+
+    // Use the name field directly from backend, as it contains the full product name
+    if (product.name && product.name.trim()) {
+      return product.name;
+    }
+
+    // Fallback logic for other data structures
     if (product.series && product.series !== 'default-model') {
       return product.series;
     }
     if (product.model && product.model !== 'default-model') {
       return `${product.brand} ${product.model}`;
     }
-    // Fallback to product name if model is undefined or default
-    return product.name || `${product.brand}`;
+
+    // Final fallback
+    return product.brand || 'Unknown Product';
   };
 
   const getProductImage = () => {
     if (!product) return '/placeholder-phone.jpg';
+
+    // Handle object-based images structure from backend
+    if (product.images && typeof product.images === 'object') {
+      if (product.images.main) return product.images.main;
+      if (product.images.gallery) return product.images.gallery;
+      if (product.images.thumbnail) return product.images.thumbnail;
+    }
+
+    // Handle array-based images structure (fallback)
     if (product.images && Array.isArray(product.images) && product.images.length > 0) {
       return product.images[0];
     }
+
     return '/placeholder-phone.jpg';
+  };
+
+  // Helper function to check if a value exists and is not empty
+  const hasValue = (value: any) => {
+    if (value === null || value === undefined) return false;
+    if (typeof value === 'string') return value.trim() !== '';
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === 'object') return Object.keys(value).length > 0;
+    return Boolean(value);
+  };
+
+  // Helper function to get valid specs for top specs section
+  const getValidTopSpecs = () => {
+    const specs = [];
+
+    if (hasValue(product.productDetails?.display?.size) || hasValue(product.topSpecs?.screenSize)) {
+      specs.push({
+        icon: <Monitor size={ICON_SIZE} />,
+        label: 'Screen Size',
+        value: product.productDetails?.display?.size || product.topSpecs?.screenSize,
+      });
+    }
+
+    if (
+      hasValue(product.productDetails?.performance?.chipset) ||
+      hasValue(product.topSpecs?.chipset)
+    ) {
+      specs.push({
+        icon: <Cpu size={ICON_SIZE} />,
+        label: 'Chipset',
+        value: product.productDetails?.performance?.chipset || product.topSpecs?.chipset,
+      });
+    }
+
+    if (hasValue(product.topSpecs?.pixelDensity)) {
+      specs.push({
+        icon: <HardDrive size={ICON_SIZE} />,
+        label: 'Pixel Density',
+        value: product.topSpecs.pixelDensity,
+      });
+    }
+
+    if (
+      hasValue(product.productDetails?.networkConnectivity?.networkSupport) ||
+      hasValue(product.topSpecs?.networkSupport)
+    ) {
+      specs.push({
+        icon: <Smartphone size={ICON_SIZE} />,
+        label: 'Network',
+        value:
+          product.productDetails?.networkConnectivity?.networkSupport ||
+          product.topSpecs?.networkSupport,
+      });
+    }
+
+    if (
+      hasValue(product.productDetails?.networkConnectivity?.simSlots) ||
+      hasValue(product.topSpecs?.simSlots)
+    ) {
+      specs.push({
+        icon: <Smartphone size={ICON_SIZE} />,
+        label: 'SIM Slots',
+        value: product.productDetails?.networkConnectivity?.simSlots || product.topSpecs?.simSlots,
+      });
+    }
+
+    return specs;
+  };
+
+  // Helper functions for accordion sections
+  const getDisplayRows = () => {
+    const rows = [];
+    if (hasValue(product.productDetails?.display?.size)) {
+      rows.push(['Screen Size', product.productDetails.display.size]);
+    }
+    if (
+      hasValue(product.productDetails?.display?.technology || product.productDetails?.display?.type)
+    ) {
+      rows.push([
+        'Type',
+        product.productDetails.display.technology || product.productDetails.display.type,
+      ]);
+    }
+    if (hasValue(product.productDetails?.display?.resolution)) {
+      rows.push(['Resolution', product.productDetails.display.resolution]);
+    }
+    if (hasValue(product.productDetails?.display?.refreshRate)) {
+      rows.push(['Refresh Rate', product.productDetails.display.refreshRate]);
+    }
+    if (hasValue(product.productDetails?.display?.protection)) {
+      rows.push(['Protection', product.productDetails.display.protection]);
+    }
+    return rows;
+  };
+
+  const getPerformanceRows = () => {
+    const rows = [];
+    if (hasValue(product.productDetails?.performance?.chipset)) {
+      rows.push(['Chipset', product.productDetails.performance.chipset]);
+    }
+    if (hasValue(product.productDetails?.performance?.gpu)) {
+      rows.push(['GPU', product.productDetails.performance.gpu]);
+    }
+    if (hasValue(product.productDetails?.performance?.os)) {
+      rows.push(['OS', product.productDetails.performance.os]);
+    }
+    if (hasValue(product.productDetails?.performance?.architecture)) {
+      rows.push(['Architecture', product.productDetails.performance.architecture]);
+    }
+    if (hasValue(product.productDetails?.memoryStorage?.ramType)) {
+      rows.push(['RAM Type', product.productDetails.memoryStorage.ramType]);
+    }
+    if (hasValue(product.productDetails?.memoryStorage?.romType)) {
+      rows.push(['Storage Type', product.productDetails.memoryStorage.romType]);
+    }
+    return rows;
+  };
+
+  const getCameraRows = () => {
+    const rows = [];
+    if (hasValue(product.productDetails?.rearCamera?.setup)) {
+      rows.push(['Rear Setup', product.productDetails.rearCamera.setup]);
+    }
+    if (hasValue(product.productDetails?.frontCamera?.resolution)) {
+      rows.push(['Front', product.productDetails.frontCamera.resolution]);
+    }
+    if (hasValue(product.productDetails?.rearCamera?.videoRecording)) {
+      rows.push(['Video', product.productDetails.rearCamera.videoRecording.join(', ')]);
+    }
+    if (hasValue(product.productDetails?.rearCamera?.flash)) {
+      rows.push(['Flash', product.productDetails.rearCamera.flash]);
+    }
+    return rows;
+  };
+
+  const getBatteryRows = () => {
+    const rows = [];
+    if (hasValue(product.productDetails?.battery?.capacity)) {
+      rows.push(['Capacity', product.productDetails.battery.capacity]);
+    }
+    if (hasValue(product.productDetails?.battery?.charging?.wired)) {
+      rows.push(['Fast Charging', product.productDetails.battery.charging.wired]);
+    }
+    if (hasValue(product.productDetails?.battery?.charging?.wireless)) {
+      rows.push(['Wireless', product.productDetails.battery.charging.wireless ? 'Yes' : 'No']);
+    }
+    if (hasValue(product.productDetails?.battery?.type)) {
+      rows.push(['Type', product.productDetails.battery.type]);
+    }
+    return rows;
+  };
+
+  const getConnectivityRows = () => {
+    const rows = [];
+    if (hasValue(product.productDetails?.networkConnectivity?.networkSupport)) {
+      rows.push(['Network', product.productDetails.networkConnectivity.networkSupport]);
+    }
+    if (hasValue(product.productDetails?.networkConnectivity?.wifi)) {
+      rows.push(['Wi-Fi', product.productDetails.networkConnectivity.wifi]);
+    }
+    if (hasValue(product.productDetails?.networkConnectivity?.bluetooth)) {
+      rows.push(['Bluetooth', product.productDetails.networkConnectivity.bluetooth]);
+    }
+    if (hasValue(product.productDetails?.networkConnectivity?.nfc)) {
+      rows.push(['NFC', product.productDetails.networkConnectivity.nfc ? 'Yes' : 'No']);
+    }
+    if (hasValue(product.productDetails?.networkConnectivity?.gps)) {
+      rows.push(['GPS', product.productDetails.networkConnectivity.gps]);
+    }
+    if (hasValue(product.productDetails?.networkConnectivity?.simSlots)) {
+      rows.push(['SIM Slots', product.productDetails.networkConnectivity.simSlots]);
+    }
+    return rows;
+  };
+
+  const getDesignRows = () => {
+    const rows = [];
+    if (hasValue(product.productDetails?.design?.weight)) {
+      rows.push(['Weight', product.productDetails.design.weight]);
+    }
+    if (hasValue(product.productDetails?.design?.build)) {
+      rows.push(['Build', product.productDetails.design.build]);
+    }
+    if (hasValue(product.productDetails?.design?.colors)) {
+      rows.push(['Colors', product.productDetails.design.colors.join(', ')]);
+    }
+    if (hasValue(product.productDetails?.design?.dimensions)) {
+      const dims = product.productDetails.design.dimensions;
+      if (hasValue(dims.height) || hasValue(dims.width) || hasValue(dims.thickness)) {
+        const dimensionStr = [dims.height, dims.width, dims.thickness].filter(Boolean).join(' × ');
+        if (dimensionStr) rows.push(['Dimensions', dimensionStr]);
+      }
+    }
+    if (hasValue(product.productDetails?.sensorsMisc?.fingerprintScanner)) {
+      rows.push([
+        'Fingerprint',
+        product.productDetails.sensorsMisc.fingerprintScanner ? 'Yes' : 'No',
+      ]);
+    }
+    return rows;
   };
 
   const addItem = (goCheckout = false) => {
@@ -194,23 +411,73 @@ const ProductDetails = () => {
     const productName = getProductName();
     const productImage = getProductImage();
 
-    addToCart(
-      {
-        _id: product._id,
-        name: productName,
-        price: selectedVariant?.price || product.minPrice || product.maxPrice || product.price || 0,
-        images: [productImage],
-        brand: product.brand || 'Unknown Brand',
-        model: product.model || 'Unknown Model',
-        condition: selectedCondition,
-        inventoryId: product.inventoryId || product._id,
-        variant: selectedVariant,
-        storage: selectedStorage,
-        color: selectedColor,
-      },
-      quantity
-    );
-    if (goCheckout) navigate('/checkout');
+    const imageArray = getImageArray();
+    const calculatedPrice =
+      selectedVariant?.price ||
+      product.pricing?.discountedPrice ||
+      product.pricing?.mrp ||
+      product.minPrice ||
+      product.maxPrice ||
+      product.price ||
+      0;
+
+    // Debug: Log price calculation details
+    console.log('Price Calculation Debug:', {
+      selectedVariant: selectedVariant,
+      'product.pricing?.discountedPrice': product.pricing?.discountedPrice,
+      'product.pricing?.mrp': product.pricing?.mrp,
+      'product.minPrice': product.minPrice,
+      'product.maxPrice': product.maxPrice,
+      'product.price': product.price,
+      calculatedPrice: calculatedPrice,
+      productName: productName,
+      productImage: productImage,
+      imageArray: imageArray,
+    });
+
+    const productData = {
+      _id: product._id,
+      name: productName,
+      price:
+        selectedVariant?.price ||
+        product.pricing?.discountedPrice ||
+        product.pricing?.mrp ||
+        product.minPrice ||
+        product.maxPrice ||
+        product.price ||
+        0,
+      image: productImage, // For checkout compatibility
+      images: imageArray, // Full image array
+      brand: product.brand || 'Unknown Brand',
+      model: product.model || product.series || 'Unknown Model',
+      condition: selectedCondition,
+      inventoryId: product.inventoryId || product._id,
+      variant: selectedVariant,
+      storage: selectedStorage,
+      color: selectedColor,
+    };
+
+    if (goCheckout) {
+      // Debug: Log the product data being sent to checkout
+      console.log('Buy Now - Product Data:', {
+        ...productData,
+        quantity: quantity,
+      });
+
+      // For Buy Now: Navigate to checkout with specific product data, don't add to cart
+      navigate('/checkout', {
+        state: {
+          buyNowItem: {
+            ...productData,
+            quantity: quantity,
+          },
+          isBuyNow: true,
+        },
+      });
+    } else {
+      // For Add to Cart: Add to cart normally
+      addToCart(productData, quantity);
+    }
   };
 
   const renderStars = (rating = 5) =>
@@ -679,6 +946,7 @@ const ProductDetails = () => {
               <button
                 className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl"
                 onClick={() => addItem(true)}
+                title="Skip cart and go directly to checkout"
               >
                 <Zap size={18} />
                 <span>Buy Now</span>
@@ -755,7 +1023,7 @@ const ProductDetails = () => {
                 }`}
                 onClick={() => setActiveTab('reviews')}
               >
-                <Star size={16} /> Reviews ({product.totalReviews || 4})
+                <Star size={16} /> Reviews ({product.rating?.totalReviews || 0})
               </button>
               <button
                 className={`flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
@@ -792,155 +1060,137 @@ const ProductDetails = () => {
             {/* CONTENT */}
             {activeTab === 'specs' && (
               <div className="p-6">
-                {/* Top specs */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-                  <SpecTile
-                    icon={<Monitor size={ICON_SIZE} />}
-                    label="Screen Size"
-                    value={
-                      product.productDetails?.display?.size ||
-                      product.topSpecs?.screenSize ||
-                      '6.7 inches'
-                    }
-                  />
-                  <SpecTile
-                    icon={<Cpu size={ICON_SIZE} />}
-                    label="Chipset"
-                    value={
-                      product.productDetails?.performance?.chipset ||
-                      product.topSpecs?.chipset ||
-                      'Google Tensor G3'
-                    }
-                  />
-                  <SpecTile
-                    icon={<HardDrive size={ICON_SIZE} />}
-                    label="Pixel Density"
-                    value={product.topSpecs?.pixelDensity || '490 ppi'}
-                  />
-                  <SpecTile
-                    icon={<Smartphone size={ICON_SIZE} />}
-                    label="Network"
-                    value={
-                      product.productDetails?.networkConnectivity?.networkSupport ||
-                      product.topSpecs?.networkSupport ||
-                      '5G'
-                    }
-                  />
-                  <SpecTile
-                    icon={<Smartphone size={ICON_SIZE} />}
-                    label="SIM Slots"
-                    value={
-                      product.productDetails?.networkConnectivity?.simSlots ||
-                      product.topSpecs?.simSlots ||
-                      'Dual SIM, GSM+GSM'
-                    }
-                  />
-                </div>
+                {/* Top specs - Only show if there's actual data */}
+                {(() => {
+                  const validSpecs = getValidTopSpecs();
+                  const displayRows = getDisplayRows();
+                  const performanceRows = getPerformanceRows();
+                  const cameraRows = getCameraRows();
+                  const batteryRows = getBatteryRows();
+                  const connectivityRows = getConnectivityRows();
+                  const designRows = getDesignRows();
 
-                {/* Accordions (single-open) */}
-                <Acc
-                  label="Display"
-                  icon={<Monitor size={ICON_SIZE} />}
-                  open={openKey === 'display'}
-                  onToggle={() => setOpenKey(openKey === 'display' ? '' : 'display')}
-                  rows={[
-                    ['Screen Size', product.productDetails?.display?.size || '6.7 inches'],
-                    ['Type', product.productDetails?.display?.technology || 'LTPO OLED'],
-                    ['Resolution', product.productDetails?.display?.resolution || '2992 × 1344'],
-                    ['Refresh Rate', product.productDetails?.display?.refreshRate || '120Hz'],
-                    ['Peak Brightness', product.topSpecs?.pixelDensity || '2400 nits peak'],
-                  ]}
-                />
-                <Acc
-                  label="Performance"
-                  icon={<Cpu size={ICON_SIZE} />}
-                  open={openKey === 'performance'}
-                  onToggle={() => setOpenKey(openKey === 'performance' ? '' : 'performance')}
-                  rows={[
-                    ['Chipset', product.productDetails?.performance?.chipset || 'Google Tensor G3'],
-                    ['GPU', product.productDetails?.performance?.gpu || 'Immortalis-G715s MC10'],
-                    ['OS', product.productDetails?.performance?.os || 'Android 14'],
-                    ['Architecture', product.productDetails?.performance?.architecture || 'ARM64'],
-                    ['RAM Type', product.productDetails?.memoryStorage?.ramType || 'LPDDR5X'],
-                    ['Storage Type', product.productDetails?.memoryStorage?.romType || 'UFS 3.1'],
-                  ]}
-                />
-                <Acc
-                  label="Camera"
-                  icon={<Camera size={ICON_SIZE} />}
-                  open={openKey === 'camera'}
-                  onToggle={() => setOpenKey(openKey === 'camera' ? '' : 'camera')}
-                  rows={[
-                    [
-                      'Rear Setup',
-                      product.productDetails?.rearCamera?.setup || '50MP OIS + 48MP + 48MP',
-                    ],
-                    ['Front', product.productDetails?.frontCamera?.resolution || '10.5MP'],
-                    [
-                      'Video',
-                      product.productDetails?.rearCamera?.videoRecording?.join(', ') ||
-                        '4K60, 1080p240',
-                    ],
-                    ['Flash', product.productDetails?.rearCamera?.flash || 'LED'],
-                  ]}
-                />
-                <Acc
-                  label="Battery & Charging"
-                  icon={<Battery size={ICON_SIZE} />}
-                  open={openKey === 'battery'}
-                  onToggle={() => setOpenKey(openKey === 'battery' ? '' : 'battery')}
-                  rows={[
-                    ['Capacity', product.productDetails?.battery?.capacity || '5000 mAh'],
-                    ['Fast Charging', product.productDetails?.battery?.fastCharging || '30W'],
-                    ['Wireless', product.productDetails?.battery?.wirelessCharging || '23W'],
-                  ]}
-                />
-                <Acc
-                  label="Connectivity"
-                  icon={<Wifi size={ICON_SIZE} />}
-                  open={openKey === 'connectivity'}
-                  onToggle={() => setOpenKey(openKey === 'connectivity' ? '' : 'connectivity')}
-                  rows={[
-                    [
-                      'Network',
-                      product.productDetails?.networkConnectivity?.networkSupport || '5G / 4G',
-                    ],
-                    ['Wi-Fi', product.productDetails?.networkConnectivity?.wifi || 'Wi-Fi 6E'],
-                    ['Bluetooth', product.productDetails?.networkConnectivity?.bluetooth || '5.3'],
-                    ['NFC', product.productDetails?.networkConnectivity?.nfc ? 'Yes' : 'No'],
-                    [
-                      'GPS',
-                      product.productDetails?.networkConnectivity?.gps || 'GPS, GLONASS, Galileo',
-                    ],
-                    [
-                      'SIM Slots',
-                      product.productDetails?.networkConnectivity?.simSlots || 'Dual SIM',
-                    ],
-                  ]}
-                />
-                <Acc
-                  label="Design & Build"
-                  icon={<Smartphone size={ICON_SIZE} />}
-                  open={openKey === 'design'}
-                  onToggle={() => setOpenKey(openKey === 'design' ? '' : 'design')}
-                  rows={[
-                    ['Weight', product.productDetails?.design?.weight || '210 g'],
-                    [
-                      'Build',
-                      product.productDetails?.design?.build || 'Aluminum, Gorilla Glass Victus 2',
-                    ],
-                    [
-                      'Colors',
-                      (
-                        product.productDetails?.design?.colors || ['Obsidian', 'Porcelain', 'Bay']
-                      ).join(', '),
-                    ],
-                    [
-                      'Fingerprint',
-                      product.productDetails?.sensorsMisc?.fingerprintScanner ? 'Yes' : 'No',
-                    ],
-                  ]}
-                />
+                  const hasAnySpecs =
+                    validSpecs.length > 0 ||
+                    displayRows.length > 0 ||
+                    performanceRows.length > 0 ||
+                    cameraRows.length > 0 ||
+                    batteryRows.length > 0 ||
+                    connectivityRows.length > 0 ||
+                    designRows.length > 0;
+
+                  if (!hasAnySpecs) {
+                    return (
+                      <div className="text-center py-12">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <FileText size={24} className="text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          No specifications available
+                        </h3>
+                        <p className="text-gray-600">
+                          Detailed specifications for this product are not available yet.
+                        </p>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <>
+                      {validSpecs.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+                          {validSpecs.map((spec, index) => (
+                            <SpecTile
+                              key={index}
+                              icon={spec.icon}
+                              label={spec.label}
+                              value={spec.value}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+
+                {/* Accordions (single-open) - Only show sections with actual data */}
+                {(() => {
+                  const displayRows = getDisplayRows();
+                  return displayRows.length > 0 ? (
+                    <Acc
+                      label="Display"
+                      icon={<Monitor size={ICON_SIZE} />}
+                      open={openKey === 'display'}
+                      onToggle={() => setOpenKey(openKey === 'display' ? '' : 'display')}
+                      rows={displayRows}
+                    />
+                  ) : null;
+                })()}
+
+                {(() => {
+                  const performanceRows = getPerformanceRows();
+                  return performanceRows.length > 0 ? (
+                    <Acc
+                      label="Performance"
+                      icon={<Cpu size={ICON_SIZE} />}
+                      open={openKey === 'performance'}
+                      onToggle={() => setOpenKey(openKey === 'performance' ? '' : 'performance')}
+                      rows={performanceRows}
+                    />
+                  ) : null;
+                })()}
+
+                {(() => {
+                  const cameraRows = getCameraRows();
+                  return cameraRows.length > 0 ? (
+                    <Acc
+                      label="Camera"
+                      icon={<Camera size={ICON_SIZE} />}
+                      open={openKey === 'camera'}
+                      onToggle={() => setOpenKey(openKey === 'camera' ? '' : 'camera')}
+                      rows={cameraRows}
+                    />
+                  ) : null;
+                })()}
+
+                {(() => {
+                  const batteryRows = getBatteryRows();
+                  return batteryRows.length > 0 ? (
+                    <Acc
+                      label="Battery & Charging"
+                      icon={<Battery size={ICON_SIZE} />}
+                      open={openKey === 'battery'}
+                      onToggle={() => setOpenKey(openKey === 'battery' ? '' : 'battery')}
+                      rows={batteryRows}
+                    />
+                  ) : null;
+                })()}
+
+                {(() => {
+                  const connectivityRows = getConnectivityRows();
+                  return connectivityRows.length > 0 ? (
+                    <Acc
+                      label="Connectivity"
+                      icon={<Wifi size={ICON_SIZE} />}
+                      open={openKey === 'connectivity'}
+                      onToggle={() => setOpenKey(openKey === 'connectivity' ? '' : 'connectivity')}
+                      rows={connectivityRows}
+                    />
+                  ) : null;
+                })()}
+
+                {(() => {
+                  const designRows = getDesignRows();
+                  return designRows.length > 0 ? (
+                    <Acc
+                      label="Design & Build"
+                      icon={<Smartphone size={ICON_SIZE} />}
+                      open={openKey === 'design'}
+                      onToggle={() => setOpenKey(openKey === 'design' ? '' : 'design')}
+                      rows={designRows}
+                    />
+                  ) : null;
+                })()}
               </div>
             )}
 
@@ -949,12 +1199,14 @@ const ProductDetails = () => {
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
                   <div className="text-center">
                     <div className="text-5xl font-bold text-gray-900 mb-2">
-                      {product.averageRating || '5.0'}
+                      {product.rating?.average || '0.0'}
                     </div>
                     <div className="flex items-center justify-center gap-1 mb-2">
-                      {renderStars(Math.round(product.averageRating || 5))}
+                      {renderStars(Math.round(product.rating?.average || 0))}
                     </div>
-                    <div className="text-sm text-gray-600">out of 5</div>
+                    <div className="text-sm text-gray-600">
+                      out of 5 ({product.rating?.totalReviews || 0} reviews)
+                    </div>
                   </div>
                 </div>
 
@@ -1059,21 +1311,23 @@ const ProductDetails = () => {
 
             {activeTab === 'offers' && (
               <div className="p-6 space-y-4">
-                <Offer
-                  icon={<Percent size={20} />}
-                  title="Bank Offer"
-                  desc="10% instant discount up to ₹2,000 on select cards"
-                />
-                <Offer
-                  icon={<CreditCard size={20} />}
-                  title="No-Cost EMI"
-                  desc="Available on major credit/debit cards"
-                />
-                <Offer
-                  icon={<Gift size={20} />}
-                  title="Exchange Bonus"
-                  desc="Get extra value for your old smartphone"
-                />
+                {product.offers && product.offers.length > 0 ? (
+                  product.offers.map((offer: any, index: number) => (
+                    <Offer
+                      key={index}
+                      icon={<Gift size={20} />}
+                      title={offer.title || offer.name}
+                      desc={offer.description || offer.desc}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="text-gray-500 mb-2">No special offers available</div>
+                    <div className="text-sm text-gray-400">
+                      Check back later for exciting deals!
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

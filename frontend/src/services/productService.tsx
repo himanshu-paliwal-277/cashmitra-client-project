@@ -132,6 +132,19 @@ class ProductService {
     }
   }
 
+  // Get buy categories by super category (public)
+  async getBuyCategoriesBySuperCategory(superCategoryId) {
+    try {
+      const response = await api.get(`/buy-super-categories/public/${superCategoryId}/categories`);
+      return response.data.data || [];
+    } catch (error) {
+      console.error('Error fetching buy categories by super category:', error);
+      throw new Error(
+        error.response?.data?.message || 'Failed to fetch categories for super category'
+      );
+    }
+  }
+
   // Get buy products (public) - for marketplace
   async getBuyProducts(params: any = {}) {
     try {
@@ -270,6 +283,7 @@ export const {
   getBuySuperCategories,
   getSellSuperCategories,
   getBuyCategories,
+  getBuyCategoriesBySuperCategory,
   getBuyProducts,
   getBuyProductById,
   getBrands,

@@ -66,13 +66,13 @@ const SellCategoryHome = () => {
   }, []);
 
   const handleCategoryClick = (category: any) => {
-    // Navigate to sell page with category filter
-    navigate(`/sell?category=${encodeURIComponent(category.name)}`);
+    // Navigate to products page for this category
+    navigate(`/sell/${encodeURIComponent(category.name)}/products`);
   };
 
   const handleSuperCategoryClick = (superCategory: any) => {
-    // Navigate to sell page with super category filter
-    navigate(`/sell?superCategory=${encodeURIComponent(superCategory.name)}`);
+    // Navigate to brand selection for this super category
+    navigate(`/sell/${encodeURIComponent(superCategory.name)}/brand`);
   };
 
   if (loading) {

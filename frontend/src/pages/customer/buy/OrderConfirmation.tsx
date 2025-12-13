@@ -14,7 +14,7 @@ import {
 import Button from '../../../components/ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
 
-const OrderConfirmation = ({ orderData, onContinueShopping, onGoHome }) => {
+const OrderConfirmation = ({ orderData = null, onContinueShopping = null, onGoHome = null }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentOrder, clearOrderData } = useAuth();

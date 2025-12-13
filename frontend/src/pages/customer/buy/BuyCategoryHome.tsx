@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getBuySuperCategories, getBuyCategories } from '../../../services/productService';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  getBuySuperCategories,
+  getBuyCategoriesBySuperCategory,
+} from '../../../services/productService';
 import {
   Smartphone,
   Tablet,
@@ -16,6 +19,7 @@ import {
   TrendingUp,
   Zap,
   Star,
+  Package,
 } from 'lucide-react';
 
 const getIconForSuperCategory = (name: any) => {
@@ -68,7 +72,8 @@ const getIconForSuperCategory = (name: any) => {
 
 const BuyCategoryHome = () => {
   const navigate = useNavigate();
-  const [superCategories, setSuperCategories] = useState([]);
+  const { category: superCategoryName } = useParams();
+  const [superCategory, setSuperCategory] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -77,12 +82,28 @@ const BuyCategoryHome = () => {
     try {
       setLoading(true);
       setError(null);
-      const [superCatData, catData] = await Promise.all([
-        getBuySuperCategories(),
-        getBuyCategories(),
-      ]);
-      setSuperCategories(superCatData || []);
-      setCategories(catData || []);
+      // First get all super categories to find the one we need
+      const superCatData = await getBuySuperCategories();
+
+      // Find the specific super category
+      const foundSuperCategory = superCatData?.find(
+        sc => sc.name.toLowerCase() === superCategoryName?.toLowerCase()
+      );
+
+      if (!foundSuperCategory) {
+        throw new Error(`Super category "${superCategoryName}" not found`);
+      }
+
+      setSuperCategory(foundSuperCategory);
+
+      console.log('Debug - Super Category Name:', superCategoryName);
+      console.log('Debug - Found Super Category:', foundSuperCategory);
+
+      // Get categories for this specific super category using the new API
+      const categoriesData = await getBuyCategoriesBySuperCategory(foundSuperCategory._id);
+
+      console.log('Debug - Categories for Super Category:', categoriesData);
+      setCategories(categoriesData);
     } catch (err) {
       console.error('Error fetching data:', err);
       setError(err.message || 'Failed to load categories');
@@ -96,7 +117,10 @@ const BuyCategoryHome = () => {
   }, []);
 
   const handleCategoryClick = (category: any) => {
-    navigate(`/buy?category=${encodeURIComponent(category.name)}`);
+    // Navigate to products page for this super category and category
+    navigate(
+      `/buy/${encodeURIComponent(superCategoryName)}/${encodeURIComponent(category.name)}/products`
+    );
   };
 
   if (loading) {
@@ -112,15 +136,31 @@ const BuyCategoryHome = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+      {/* Breadcrumb */}
+      <div className="main-container py-4">
+        <nav className="flex items-center gap-2 text-sm flex-wrap">
+          <button
+            onClick={() => navigate('/buy')}
+            className="text-gray-600 hover:text-blue-600 font-medium transition-colors"
+          >
+            Buy
+          </button>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-900 font-semibold">
+            {superCategory?.displayName || superCategoryName}
+          </span>
+        </nav>
+      </div>
+
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-16 px-4">
+      <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-12 px-4">
         <div className="main-container text-center">
-          <h1 className="text-4xl text-white sm:text-5xl lg:text-6xl font-bold mb-4">
-            Buy Refurbished Devices
+          <h1 className="text-3xl text-white sm:text-4xl lg:text-5xl font-bold mb-4">
+            {superCategory?.displayName || superCategoryName} Categories
           </h1>
-          <p className="text-xl sm:text-2xl text-blue-100 max-w-3xl mx-auto">
-            Get premium quality refurbished gadgets at unbeatable prices. Fully tested, certified,
-            and with warranty!
+          <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto">
+            Choose from our wide range of{' '}
+            {(superCategory?.displayName || superCategoryName)?.toLowerCase()} categories
           </p>
         </div>
       </section>
@@ -213,22 +253,25 @@ const BuyCategoryHome = () => {
           </div>
         ) : (
           <>
-            {/* Main Section Title */}
+            {/* Categories Section Title */}
             <div className="text-center mt-16 mb-12">
               <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
-                What would you like to buy?
+                Choose a Category
               </h2>
-              <p className="text-lg text-slate-600">Choose a category to explore amazing deals</p>
+              <p className="text-lg text-slate-600">
+                Select from our {(superCategory?.displayName || superCategoryName)?.toLowerCase()}{' '}
+                categories
+              </p>
             </div>
 
-            {/* Main Super Categories Grid */}
+            {/* Categories Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 mb-16">
-              {superCategories.map(superCat => {
-                const { icon, bgGradient } = getIconForSuperCategory(superCat.name);
+              {categories.map(category => {
+                const { icon, bgGradient } = getIconForSuperCategory(category.name);
                 return (
                   <button
-                    key={superCat._id}
-                    onClick={() => navigate('/buy')}
+                    key={category._id}
+                    onClick={() => handleCategoryClick(category)}
                     className="group relative bg-white rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-slate-200 hover:border-transparent overflow-hidden"
                   >
                     <div
@@ -236,10 +279,10 @@ const BuyCategoryHome = () => {
                     />
                     <div className="relative">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 bg-white rounded-2xl shadow-lg flex items-center justify-center overflow-hidden group-hover:shadow-xl transition-shadow">
-                        {superCat.image ? (
+                        {category.image ? (
                           <img
-                            src={superCat.image}
-                            alt={superCat.name}
+                            src={category.image}
+                            alt={category.name}
                             className="w-full h-full object-cover"
                           />
                         ) : (
@@ -249,11 +292,11 @@ const BuyCategoryHome = () => {
                         )}
                       </div>
                       <h3 className="text-base sm:text-lg font-bold text-slate-900 text-center mb-2 group-hover:text-blue-600 transition-colors">
-                        {superCat.name}
+                        {category.name}
                       </h3>
-                      {superCat.description && (
+                      {category.description && (
                         <p className="text-xs text-slate-600 text-center line-clamp-2">
-                          {superCat.description}
+                          {category.description}
                         </p>
                       )}
                     </div>
@@ -261,62 +304,27 @@ const BuyCategoryHome = () => {
                 );
               })}
             </div>
-
-            {/* Categories under each Super Category */}
-            {superCategories.map(superCat => {
-              if (!superCat.categories || superCat.categories.length === 0) return null;
-              const { icon, bgGradient } = getIconForSuperCategory(superCat.name);
-
-              return (
-                <section key={superCat._id} className="mb-16">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-12 h-12 bg-gradient-to-r ${bgGradient} rounded-xl flex items-center justify-center text-white`}
-                      >
-                        {icon}
-                      </div>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">
-                        {superCat.name}
-                      </h3>
-                    </div>
-                    <button
-                      onClick={() => navigate('/buy')}
-                      className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-semibold transition-colors group"
-                    >
-                      View All
-                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    {superCat.categories.slice(0, 5).map((category: any) => (
-                      <button
-                        key={category._id}
-                        onClick={() => handleCategoryClick(category)}
-                        className="bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:scale-105 border border-slate-200 group"
-                      >
-                        <div className="w-20 h-20 mx-auto mb-4 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden group-hover:bg-blue-50 transition-colors">
-                          {category.image ? (
-                            <img
-                              src={category.image}
-                              alt={category.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <Smartphone className="w-8 h-8 text-slate-600 group-hover:text-blue-600 transition-colors" />
-                          )}
-                        </div>
-                        <h4 className="text-sm font-bold text-slate-900 text-center group-hover:text-blue-600 transition-colors">
-                          {category.name}
-                        </h4>
-                      </button>
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
           </>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && categories.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Package className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Categories Found</h3>
+            <p className="text-gray-600 mb-6">
+              No categories are available for {superCategory?.displayName || superCategoryName} at
+              the moment.
+            </p>
+            <button
+              onClick={() => navigate('/buy')}
+              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Browse All Categories
+            </button>
+          </div>
         )}
 
         {/* Why Choose Us Section */}
