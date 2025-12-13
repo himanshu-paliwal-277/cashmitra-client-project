@@ -77,6 +77,7 @@ const sellOrderRoutes = require('./routes/sellOrder.routes');
 const pickupRoutes = require('./routes/pickup.routes');
 const agentRoutes = require('./routes/agent.routes');
 const agentAppRoutes = require('./routes/agentApp.routes');
+const contactRoutes = require('./routes/contact.routes');
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -97,6 +98,7 @@ app.use('/api/buy', buyRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/contact', contactRoutes);
 app.use('/api/realtime', require('./routes/realtime.routes'));
 
 // Sell module routes

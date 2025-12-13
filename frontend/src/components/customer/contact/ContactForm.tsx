@@ -1,5 +1,6 @@
-import { Send, User, Mail, Phone, MessageSquare, CheckCircle2 } from 'lucide-react';
+import { Send, User, Mail, Phone, MessageSquare, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
+import contactService from '../../../services/contactService';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const ContactForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e: any) => {
     setFormData({
@@ -22,24 +24,28 @@ const ContactForm = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError('');
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      await contactService.sendContactForm(formData);
+      setIsSubmitted(true);
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: '',
-      });
-    }, 3000);
+      // Reset form after 5 seconds
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: '',
+        });
+      }, 5000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -71,6 +77,16 @@ const ContactForm = () => {
             Fill out the form below and we'll get back to you as soon as possible.
           </p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+              <p className="text-red-700 font-medium">{error}</p>
+            </div>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -168,7 +184,7 @@ const ContactForm = () => {
               value={formData.message}
               onChange={handleChange}
               required
-              rows="6"
+              rows={6}
               className="w-full px-4 py-4 bg-grey-50 border-2 border-grey-200 rounded-xl focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-100 outline-none transition-all duration-300 resize-none"
               placeholder="Tell us more about your inquiry..."
             ></textarea>
