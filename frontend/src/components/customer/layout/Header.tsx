@@ -128,6 +128,8 @@ const Header = () => {
       hasDropdown: true,
       dropdownComponent: PhoneDropdown,
     },
+    { id: 'buy-tablet', label: 'Buy Tablet', href: '/buy/category/Tablet' },
+    { id: 'buy-laptop', label: 'Buy Laptop', href: '/buy/category/Laptop' },
     {
       id: 'sell-phone',
       label: 'Sell Phone',
@@ -135,6 +137,8 @@ const Header = () => {
       hasDropdown: true,
       dropdownComponent: SellPhoneDropdown,
     },
+    { id: 'sell-tablet', label: 'Sell Tablet', href: '/sell/Tablet/brand' },
+    { id: 'sell-laptop', label: 'Sell Laptop', href: '/sell/Laptop/brand' },
     { id: 'sell-gadgets', label: 'Sell Gadgets', href: '/sell' },
     { id: 'buy-refurbished', label: 'Buy Refurbished', href: '/buy' },
   ];
@@ -179,7 +183,7 @@ const Header = () => {
           {/* Location - Hidden on mobile and tablet */}
           <button className="hidden xl:flex items-center gap-1.5 px-3 py-2 bg-transparent border border-gray-300 rounded-md text-sm font-medium text-gray-800 transition-all hover:bg-gray-50 hover:border-gray-400">
             <MapPin size={16} />
-            Gurgaon
+            Mumbai
             <ChevronDown size={14} />
           </button>
 

@@ -40,7 +40,7 @@ const Footer = () => {
           </div>
 
           <div className="flex items-center gap-3 text-gray-300 text-sm">
-            <MapPin size={16} /> <span>Bangalore, Karnataka, India</span>
+            <MapPin size={16} /> <span>Mumbai, Maharashtra, India</span>
           </div>
 
           {/* Social Icons */}

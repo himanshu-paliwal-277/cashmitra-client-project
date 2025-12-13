@@ -5,73 +5,59 @@ const ServicesSection = () => {
   const ourServices = [
     {
       id: 1,
-      title: 'Sell Phone',
+      title: 'Buy Tablets',
       image:
-        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=80&h=80&fit=crop&crop=center',
-      alt: 'Sell Phone',
+        'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=80&h=80&fit=crop&crop=center',
+      alt: 'Buy Tablets',
     },
     {
       id: 2,
-      title: 'Buy Gadgets',
-      image:
-        'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=80&h=80&fit=crop&crop=center',
-      alt: 'Buy Gadgets',
-    },
-    {
-      id: 3,
       title: 'Buy Phone',
       image:
         'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=80&h=80&fit=crop&crop=center',
       alt: 'Buy Phone',
     },
     {
-      id: 4,
+      id: 3,
       title: 'Buy Laptops',
       image:
         'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=80&h=80&fit=crop&crop=center',
       alt: 'Buy Laptops',
     },
     {
-      id: 5,
-      title: 'Repair Phone',
+      id: 4,
+      title: 'Sell Phone',
       image:
-        'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=80&h=80&fit=crop&crop=center',
-      alt: 'Repair Phone',
+        'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=80&h=80&fit=crop&crop=center',
+      alt: 'Sell Phone',
+    },
+    {
+      id: 5,
+      title: 'Sell Laptop',
+      image:
+        'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=80&h=80&fit=crop&crop=center',
+      alt: 'Sell Laptop',
     },
     {
       id: 6,
-      title: 'Repair Laptop',
+      title: 'Sell Tablets',
       image:
-        'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=80&h=80&fit=crop&crop=center',
-      alt: 'Repair Laptop',
+        'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=80&h=80&fit=crop&crop=center',
+      alt: 'Sell Tablets',
     },
     {
       id: 7,
+      title: 'Repair Devices',
+      image:
+        'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=80&h=80&fit=crop&crop=center',
+      alt: 'Repair Devices',
+    },
+    {
+      id: 8,
       title: 'Find New Phone',
       image:
         'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=80&h=80&fit=crop&crop=center',
       alt: 'Find New Phone',
-    },
-    {
-      id: 8,
-      title: 'Nearby Stores',
-      image:
-        'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=80&h=80&fit=crop&crop=center',
-      alt: 'Nearby Stores',
-    },
-    {
-      id: 9,
-      title: 'Buy Smartwatches',
-      image:
-        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop&crop=center',
-      alt: 'Buy Smartwatches',
-    },
-    {
-      id: 10,
-      title: 'Recycle',
-      image:
-        'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=80&h=80&fit=crop&crop=center',
-      alt: 'Recycle',
     },
   ];
 
@@ -151,7 +137,7 @@ const ServicesSection = () => {
         </div>
 
         {/* Sell Services */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-8 text-center">
             Sell Your Old Device Now
           </h2>
@@ -161,7 +147,7 @@ const ServicesSection = () => {
               <ServiceCard key={service.id} service={service} />
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
