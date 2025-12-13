@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Facebook,
@@ -13,8 +13,47 @@ import {
   Truck,
   RotateCcw,
 } from 'lucide-react';
+import productService from '../../../services/productService';
 
 const Footer = () => {
+  const [buySuperCategories, setBuySuperCategories] = useState([]);
+  const [sellSuperCategories, setSellSuperCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSuperCategories = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch both buy and sell super categories
+        const [buyCategories, sellCategories] = await Promise.all([
+          productService.getBuySuperCategories(),
+          productService.getSellSuperCategories(),
+        ]);
+
+        // Sort categories by sortOrder if available, then by name
+        const sortCategories = categories => {
+          return categories.sort((a, b) => {
+            if (a.sortOrder !== undefined && b.sortOrder !== undefined) {
+              return a.sortOrder - b.sortOrder;
+            }
+            return a.name.localeCompare(b.name);
+          });
+        };
+
+        setBuySuperCategories(sortCategories(buyCategories || []));
+        setSellSuperCategories(sortCategories(sellCategories || []));
+      } catch (error) {
+        console.error('Error fetching super categories for footer:', error);
+        // Keep empty arrays as fallback
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSuperCategories();
+  }, []);
+
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-4 mt-auto main-container">
       {/* ===== GRID ===== */}
@@ -68,37 +107,60 @@ const Footer = () => {
         <div className="flex flex-col gap-4">
           <h3 className="text-lg font-semibold">Sell</h3>
           <ul className="flex flex-col gap-2">
-            <li>
-              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/sell">
-                Sell Mobile
-              </Link>
-            </li>
-            <li>
-              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/sell">
-                Sell Tablet
-              </Link>
-            </li>
-            <li>
-              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/sell">
-                Sell Laptop
-              </Link>
-            </li>
-            {/* <li>
-              <Link
-                className="text-gray-300 text-sm hover:text-primary-light"
-                to="/sell/price-calculator"
-              >
-                Price Calculator
-              </Link>
-            </li> */}
-            {/* <li>
-              <Link
-                className="text-gray-300 text-sm hover:text-primary-light"
-                to="/sell/how-it-works"
-              >
-                How It Works
-              </Link>
-            </li> */}
+            {loading ? (
+              // Loading state
+              <>
+                <li className="animate-pulse">
+                  <div className="h-4 bg-gray-700 rounded w-20"></div>
+                </li>
+                <li className="animate-pulse">
+                  <div className="h-4 bg-gray-700 rounded w-24"></div>
+                </li>
+                <li className="animate-pulse">
+                  <div className="h-4 bg-gray-700 rounded w-22"></div>
+                </li>
+              </>
+            ) : sellSuperCategories.length > 0 ? (
+              // Dynamic links based on sell super categories
+              sellSuperCategories.slice(0, 3).map(category => (
+                <li key={category._id}>
+                  <Link
+                    className="text-gray-300 text-sm hover:text-primary-light"
+                    to={`/sell/${encodeURIComponent(category.name)}/brand`}
+                  >
+                    Sell {category.name}
+                  </Link>
+                </li>
+              ))
+            ) : (
+              // Fallback to static links if no categories found
+              <>
+                <li>
+                  <Link
+                    className="text-gray-300 text-sm hover:text-primary-light"
+                    to="/sell/Mobile/brand"
+                  >
+                    Sell Mobile
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="text-gray-300 text-sm hover:text-primary-light"
+                    to="/sell/Tablet/brand"
+                  >
+                    Sell Tablet
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="text-gray-300 text-sm hover:text-primary-light"
+                    to="/sell/Laptop/brand"
+                  >
+                    Sell Laptop
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </div>
 
@@ -106,43 +168,60 @@ const Footer = () => {
         <div className="flex flex-col gap-4">
           <h3 className="text-lg font-semibold">Buy</h3>
           <ul className="flex flex-col gap-2">
-            <li>
-              <Link
-                className="text-gray-300 text-sm hover:text-primary-light"
-                to="/buy?category=mobile"
-              >
-                Buy Mobile
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="text-gray-300 text-sm hover:text-primary-light"
-                to="/buy?category=tablet"
-              >
-                Buy Tablet
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="text-gray-300 text-sm hover:text-primary-light"
-                to="/buy?category=laptop"
-              >
-                Buy Laptop
-              </Link>
-            </li>
-            {/* <li>
-              <Link
-                className="text-gray-300 text-sm hover:text-primary-light"
-                to="/buy/refurbished"
-              >
-                Refurbished Devices
-              </Link>
-            </li> */}
-            {/* <li>
-              <Link className="text-gray-300 text-sm hover:text-primary-light" to="/buy/warranty">
-                Warranty Info
-              </Link>
-            </li> */}
+            {loading ? (
+              // Loading state
+              <>
+                <li className="animate-pulse">
+                  <div className="h-4 bg-gray-700 rounded w-20"></div>
+                </li>
+                <li className="animate-pulse">
+                  <div className="h-4 bg-gray-700 rounded w-24"></div>
+                </li>
+                <li className="animate-pulse">
+                  <div className="h-4 bg-gray-700 rounded w-22"></div>
+                </li>
+              </>
+            ) : buySuperCategories.length > 0 ? (
+              // Dynamic links based on buy super categories
+              buySuperCategories.slice(0, 3).map(category => (
+                <li key={category._id}>
+                  <Link
+                    className="text-gray-300 text-sm hover:text-primary-light"
+                    to={`/buy/category/${encodeURIComponent(category.name)}`}
+                  >
+                    Buy {category.name}
+                  </Link>
+                </li>
+              ))
+            ) : (
+              // Fallback to static links if no categories found
+              <>
+                <li>
+                  <Link
+                    className="text-gray-300 text-sm hover:text-primary-light"
+                    to="/buy?category=mobile"
+                  >
+                    Buy Mobile
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="text-gray-300 text-sm hover:text-primary-light"
+                    to="/buy?category=tablet"
+                  >
+                    Buy Tablet
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="text-gray-300 text-sm hover:text-primary-light"
+                    to="/buy?category=laptop"
+                  >
+                    Buy Laptop
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </div>
 
