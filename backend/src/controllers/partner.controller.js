@@ -694,7 +694,14 @@ exports.getOrders = async (req, res) => {
     if (orderType === 'sell' || !orderType) {
       const sellOrders = await SellOrder.find(sellQueryObj)
         .populate('userId', 'name email phone')
-        .populate('sessionId')
+        .populate({
+          path: 'sessionId',
+          populate: {
+            path: 'productId',
+            model: 'SellProduct',
+            select: 'name brand images categoryId variants isActive',
+          },
+        })
         .populate('assignedTo', 'name email phone')
         .sort(sortObj)
         .lean();
@@ -721,10 +728,16 @@ exports.getOrders = async (req, res) => {
           {
             _id: `${order._id}_item`,
             product: {
-              _id: order.sessionId?._id || 'unknown',
-              name: order.sessionId?.productDetails?.name || 'Device for Sell',
-              brand: order.sessionId?.productDetails?.brand || 'Unknown',
-              images: order.sessionId?.productDetails?.images || {},
+              _id:
+                order.sessionId?.productId?._id ||
+                order.sessionId?.productId ||
+                'unknown',
+              name: order.sessionId?.productId?.name || 'Device for Sell',
+              brand: order.sessionId?.productId?.brand || 'Unknown',
+              images: order.sessionId?.productId?.images || {},
+              categoryId: order.sessionId?.productId?.categoryId || null,
+              variants: order.sessionId?.productId?.variants || [],
+              isActive: order.sessionId?.productId?.isActive || true,
             },
             quantity: 1,
             price: order.actualAmount || order.quoteAmount,
@@ -1128,7 +1141,14 @@ exports.getDashboardStats = async (req, res) => {
       .sort('-createdAt')
       .limit(3)
       .populate('userId', 'name')
-      .populate('sessionId')
+      .populate({
+        path: 'sessionId',
+        populate: {
+          path: 'productId',
+          model: 'SellProduct',
+          select: 'name brand images categoryId variants isActive',
+        },
+      })
       .lean();
 
     // Transform sell orders to match buy order structure for frontend
@@ -1140,9 +1160,16 @@ exports.getDashboardStats = async (req, res) => {
       items: [
         {
           product: {
-            name: order.sessionId?.productDetails?.name || 'Device for Sell',
-            brand: order.sessionId?.productDetails?.brand || 'Unknown',
-            images: order.sessionId?.productDetails?.images || {},
+            _id:
+              order.sessionId?.productId?._id ||
+              order.sessionId?.productId ||
+              'unknown',
+            name: order.sessionId?.productId?.name || 'Device for Sell',
+            brand: order.sessionId?.productId?.brand || 'Unknown',
+            images: order.sessionId?.productId?.images || {},
+            categoryId: order.sessionId?.productId?.categoryId || null,
+            variants: order.sessionId?.productId?.variants || [],
+            isActive: order.sessionId?.productId?.isActive || true,
           },
           quantity: 1,
           price: order.actualAmount || order.quoteAmount,
@@ -1250,7 +1277,14 @@ exports.getDashboardSellBuy = async (req, res) => {
   const recentOrders = await SellOrder.find({ assignedTo: partnerId })
     .sort({ createdAt: -1 })
     .limit(10)
-    .populate('sessionId')
+    .populate({
+      path: 'sessionId',
+      populate: {
+        path: 'productId',
+        model: 'SellProduct',
+        select: 'name brand images categoryId variants isActive',
+      },
+    })
     .populate('userId', 'name email phone');
 
   res.status(200).json({
@@ -1390,7 +1424,14 @@ exports.getPartnerSellOrders = async (req, res) => {
   const skip = (page - 1) * limit;
 
   const orders = await SellOrder.find(filter)
-    .populate('sessionId')
+    .populate({
+      path: 'sessionId',
+      populate: {
+        path: 'productId',
+        model: 'SellProduct',
+        select: 'name brand images categoryId variants isActive',
+      },
+    })
     .populate('userId', 'name email phone')
     .sort({ createdAt: -1 })
     .skip(skip)
@@ -1425,7 +1466,14 @@ exports.getPartnerSellOrderDetails = async (req, res) => {
   const orderId = req.params.id;
 
   const order = await SellOrder.findOne({ _id: orderId, assignedTo: partnerId })
-    .populate('sessionId')
+    .populate({
+      path: 'sessionId',
+      populate: {
+        path: 'productId',
+        model: 'SellProduct',
+        select: 'name brand images categoryId variants isActive',
+      },
+    })
     .populate('userId', 'name email phone address');
 
   if (!order) {

@@ -75,7 +75,14 @@ interface OrderItem {
 interface Order {
   _id: string;
   orderType: 'buy' | 'sell';
-  user: {
+  user?: {
+    _id: string;
+    name: string;
+    email: string;
+    phone: string;
+  };
+  // Sell order user field
+  userId?: {
     _id: string;
     name: string;
     email: string;
@@ -133,6 +140,20 @@ interface Order {
     _id?: string;
   }>;
   // Sell order specific fields
+  pickup?: {
+    address?: {
+      fullName?: string;
+      phone?: string;
+      street: string;
+      city: string;
+      state: string;
+      pincode: string;
+    };
+    slot?: {
+      date: string;
+      window: string;
+    };
+  };
   pickupDetails?: {
     address?: {
       fullName?: string;
@@ -148,10 +169,42 @@ interface Order {
     };
     assignedTo?: {
       _id: string;
-      name: string;
-      email: string;
-      phone: string;
+      name?: string;
+      email?: string;
+      phone?: string;
     };
+  };
+  // Sell order session data
+  sessionId?: {
+    _id: string;
+    userId: string;
+    productId: string;
+    variantId: string;
+    partnerId?: string;
+    answers: any;
+    defects: string[];
+    accessories: string[];
+    basePrice: number;
+    breakdown: Array<{
+      label: string;
+      delta: number;
+      type: string;
+      _id: string;
+    }>;
+    finalPrice: number;
+    currency: string;
+    isActive: boolean;
+    computedAt: string;
+    expiresAt: string;
+    sessionToken: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  assignedTo?: {
+    _id: string;
+    name?: string;
+    email?: string;
+    phone?: string;
   };
   orderNumber?: string;
   quoteAmount?: number;
@@ -166,8 +219,34 @@ function Orders() {
 
   const getProductImage = (images: any) => {
     if (!images) return null;
-    if (typeof images === 'object' && images.main) return images.main;
     if (Array.isArray(images) && images[0]) return images[0];
+    if (typeof images === 'object' && images.main) return images.main;
+    return null;
+  };
+
+  const getProductBrand = (product: any) => {
+    // If brand is available and not "Unknown", use it
+    if (product?.brand && product.brand !== 'Unknown') {
+      return product.brand;
+    }
+    // Extract brand from product name (first word)
+    if (product?.name) {
+      return product.name.split(' ')[0];
+    }
+    return 'Unknown';
+  };
+
+  const getSelectedVariant = (order: any) => {
+    if (
+      order.orderType === 'sell' &&
+      order.sessionId?.variantId &&
+      order.sessionId?.productId?.variants
+    ) {
+      const variant = order.sessionId.productId.variants.find(
+        (v: any) => v._id === order.sessionId.variantId
+      );
+      return variant?.label || null;
+    }
     return null;
   };
   const [orders, setOrders] = useState<Order[]>([]);
@@ -254,7 +333,23 @@ function Orders() {
 
         if (response.success) {
           const ordersList = response.data.docs || [];
-          setOrders(ordersList);
+
+          // Process orders to ensure consistent data structure
+          const processedOrders = ordersList.map((order: any) => {
+            return {
+              ...order,
+              // Ensure user data is properly mapped for both buy and sell orders
+              user: order.user || order.userId,
+              // Map pickup data consistently for sell orders
+              pickupDetails: order.pickupDetails || {
+                address: order.pickup?.address,
+                slot: order.pickup?.slot,
+                assignedTo: order.assignedTo,
+              },
+            };
+          });
+
+          setOrders(processedOrders);
 
           // Update pagination state
           setCurrentPage(response.data.page || 1);
@@ -403,6 +498,7 @@ function Orders() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
+      // Common statuses
       pending: { color: 'bg-yellow-100 text-yellow-800', icon: <Clock size={12} /> },
       confirmed: { color: 'bg-blue-100 text-blue-800', icon: <CheckCircle size={12} /> },
       processing: { color: 'bg-purple-100 text-purple-800', icon: <Package size={12} /> },
@@ -410,6 +506,10 @@ function Orders() {
       delivered: { color: 'bg-green-100 text-green-800', icon: <CheckCircle size={12} /> },
       cancelled: { color: 'bg-red-100 text-red-800', icon: <X size={12} /> },
       returned: { color: 'bg-gray-100 text-gray-800', icon: <AlertTriangle size={12} /> },
+      // Sell order specific statuses
+      draft: { color: 'bg-gray-100 text-gray-800', icon: <Clock size={12} /> },
+      picked: { color: 'bg-orange-100 text-orange-800', icon: <Truck size={12} /> },
+      paid: { color: 'bg-green-100 text-green-800', icon: <CheckCircle size={12} /> },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
@@ -815,15 +915,17 @@ function Orders() {
                         })}
                       </div>
                     )}
-                    {order.pickupDetails?.slot && (
+                    {(order.pickupDetails?.slot || order.pickup?.slot) && (
                       <div className="flex items-center gap-2 text-green-600">
                         <Truck size={14} />
                         Pickup:{' '}
-                        {new Date(order.pickupDetails.slot.date).toLocaleDateString('en-IN', {
+                        {new Date(
+                          (order.pickupDetails?.slot?.date || order.pickup?.slot?.date)!
+                        ).toLocaleDateString('en-IN', {
                           month: 'short',
                           day: 'numeric',
                         })}{' '}
-                        ({order.pickupDetails.slot.window})
+                        ({order.pickupDetails?.slot?.window || order.pickup?.slot?.window})
                       </div>
                     )}
                   </div>
@@ -851,13 +953,20 @@ function Orders() {
                     <div className="space-y-2 text-sm text-slate-600">
                       <div className="flex items-center gap-2">
                         <User size={14} />
-                        {order.user.name}
+                        {(order.user || order.userId)?.name || 'Unknown User'}
                       </div>
 
                       <div className="flex items-center gap-2">
                         <CreditCard size={14} />
-                        {order.user.email}
+                        {(order.user || order.userId)?.email || 'No email'}
                       </div>
+
+                      {(order.user || order.userId)?.phone && (
+                        <div className="flex items-center gap-2">
+                          <CreditCard size={14} />
+                          {(order.user || order.userId)?.phone}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -872,33 +981,44 @@ function Orders() {
                         <div>
                           {order.shippingDetails?.address ||
                           order.shippingAddress ||
-                          order.pickupDetails?.address ? (
+                          order.pickupDetails?.address ||
+                          order.pickup?.address ? (
                             <>
-                              {order.pickupDetails?.address?.fullName && (
+                              {(order.pickupDetails?.address?.fullName ||
+                                order.pickup?.address?.fullName) && (
                                 <div className="font-medium">
-                                  {order.pickupDetails.address.fullName}
+                                  {order.pickupDetails?.address?.fullName ||
+                                    order.pickup?.address?.fullName}
                                 </div>
                               )}
-                              {order.pickupDetails?.address?.phone && (
-                                <div>{order.pickupDetails.address.phone}</div>
+                              {(order.pickupDetails?.address?.phone ||
+                                order.pickup?.address?.phone) && (
+                                <div>
+                                  {order.pickupDetails?.address?.phone ||
+                                    order.pickup?.address?.phone}
+                                </div>
                               )}
                               <div>
                                 {order.shippingDetails?.address?.street ||
                                   order.shippingAddress?.street ||
-                                  order.pickupDetails?.address?.street}
+                                  order.pickupDetails?.address?.street ||
+                                  order.pickup?.address?.street}
                               </div>
                               <div>
                                 {order.shippingDetails?.address?.city ||
                                   order.shippingAddress?.city ||
-                                  order.pickupDetails?.address?.city}
+                                  order.pickupDetails?.address?.city ||
+                                  order.pickup?.address?.city}
                                 ,{' '}
                                 {order.shippingDetails?.address?.state ||
                                   order.shippingAddress?.state ||
-                                  order.pickupDetails?.address?.state}{' '}
+                                  order.pickupDetails?.address?.state ||
+                                  order.pickup?.address?.state}{' '}
                                 -{' '}
                                 {order.shippingDetails?.address?.pincode ||
                                   order.shippingAddress?.pincode ||
-                                  order.pickupDetails?.address?.pincode}
+                                  order.pickupDetails?.address?.pincode ||
+                                  order.pickup?.address?.pincode}
                               </div>
                               {order.shippingDetails?.address?.country && (
                                 <div>{order.shippingDetails.address.country}</div>
@@ -922,15 +1042,17 @@ function Orders() {
                         <div>
                           <span className="font-medium text-blue-900">Quote Amount:</span>
                           <div className="text-lg font-bold text-blue-600">
-                            ₹{order.totalAmount?.toLocaleString()}
+                            ₹{(order.quoteAmount || order.totalAmount)?.toLocaleString()}
                           </div>
                         </div>
-                        {order.pickupDetails?.slot && (
+                        {(order.pickupDetails?.slot || order.pickup?.slot) && (
                           <div>
                             <span className="font-medium text-blue-900">Pickup Slot:</span>
                             <div className="text-blue-800">
-                              {new Date(order.pickupDetails.slot.date).toLocaleDateString('en-IN')}(
-                              {order.pickupDetails.slot.window})
+                              {new Date(
+                                (order.pickupDetails?.slot?.date || order.pickup?.slot?.date)!
+                              ).toLocaleDateString('en-IN')}
+                              ({order.pickupDetails?.slot?.window || order.pickup?.slot?.window})
                             </div>
                           </div>
                         )}
@@ -944,7 +1066,32 @@ function Orders() {
                           <span className="font-medium text-blue-900">Order Type:</span>
                           <div className="text-blue-800">Customer selling device to you</div>
                         </div>
+                        {getSelectedVariant(order) && (
+                          <div>
+                            <span className="font-medium text-blue-900">Selected Variant:</span>
+                            <div className="text-blue-800">{getSelectedVariant(order)}</div>
+                          </div>
+                        )}
                       </div>
+                      {order.sessionId?.breakdown && order.sessionId.breakdown.length > 0 && (
+                        <div className="mt-4 pt-3 border-t border-blue-200">
+                          <span className="font-medium text-blue-900 text-sm">
+                            Price Breakdown:
+                          </span>
+                          <div className="mt-2 space-y-1">
+                            {order.sessionId.breakdown.map((item: any, index: number) => (
+                              <div key={index} className="flex justify-between text-xs">
+                                <span className="text-blue-700">{item.label}:</span>
+                                <span
+                                  className={`font-medium ${item.delta >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                                >
+                                  {item.delta >= 0 ? '+' : ''}₹{item.delta.toLocaleString()}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       <div className="mt-3 pt-3 border-t border-blue-200">
                         <p className="text-xs text-blue-700">
                           <strong>Note:</strong> This is a sell order where the customer is selling
@@ -970,9 +1117,9 @@ function Orders() {
                             <img
                               src={getProductImage(item.product?.images)!}
                               alt={
-                                item.product?.model ||
                                 item.product?.name ||
-                                `${item.product?.brand} Product`
+                                item.product?.model ||
+                                `${getProductBrand(item.product)} Product`
                               }
                               className="w-full h-full object-contain rounded-lg"
                             />
@@ -984,11 +1131,9 @@ function Orders() {
                           <h5 className="font-semibold text-slate-900">
                             {item.product?.name ||
                               item.product?.model ||
-                              `${item.product?.brand || 'Unknown'} Product`}
+                              `${getProductBrand(item.product)} Product`}
                           </h5>
-                          <p className="text-sm text-slate-600">
-                            {item.product?.brand || 'Unknown Brand'}
-                          </p>
+                          <p className="text-sm text-slate-600">{getProductBrand(item.product)}</p>
                           {item.product?.categoryId?.name && (
                             <p className="text-sm text-slate-500">
                               Category: {item.product.categoryId.name}
@@ -1195,6 +1340,20 @@ function Orders() {
                       {new Date(selectedOrder.createdAt).toLocaleDateString()}
                     </span>
                   </div>
+                  {selectedOrder.orderType === 'sell' && selectedOrder.quoteAmount && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">Quote Amount:</span>
+                      <span className="font-medium text-green-600">
+                        ₹{selectedOrder.quoteAmount.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                  {selectedOrder.orderNumber && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">Order Number:</span>
+                      <span className="font-medium">{selectedOrder.orderNumber}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1204,34 +1363,73 @@ function Orders() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-slate-600">Name:</span>
-                    <span className="font-medium">{selectedOrder.user.name}</span>
+                    <span className="font-medium">
+                      {(selectedOrder.user || selectedOrder.userId)?.name || 'Unknown User'}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Email:</span>
-                    <span className="font-medium">{selectedOrder.user.email}</span>
+                    <span className="font-medium">
+                      {(selectedOrder.user || selectedOrder.userId)?.email || 'No email'}
+                    </span>
                   </div>
+                  {(selectedOrder.user || selectedOrder.userId)?.phone && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-600">Phone:</span>
+                      <span className="font-medium">
+                        {(selectedOrder.user || selectedOrder.userId)?.phone}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Shipping Address */}
+            {/* Address */}
             <div className="mb-6">
-              <h3 className="font-semibold text-slate-900 mb-3">Shipping Address</h3>
+              <h3 className="font-semibold text-slate-900 mb-3">
+                {selectedOrder.orderType === 'buy' ? 'Shipping Address' : 'Pickup Address'}
+              </h3>
               <div className="bg-slate-50 p-4 rounded-lg">
                 <p className="text-sm text-slate-700">
-                  {selectedOrder.shippingDetails?.address || selectedOrder.shippingAddress ? (
+                  {selectedOrder.shippingDetails?.address ||
+                  selectedOrder.shippingAddress ||
+                  selectedOrder.pickupDetails?.address ||
+                  selectedOrder.pickup?.address ? (
                     <>
+                      {(selectedOrder.pickupDetails?.address?.fullName ||
+                        selectedOrder.pickup?.address?.fullName) && (
+                        <div className="font-medium mb-1">
+                          {selectedOrder.pickupDetails?.address?.fullName ||
+                            selectedOrder.pickup?.address?.fullName}
+                        </div>
+                      )}
+                      {(selectedOrder.pickupDetails?.address?.phone ||
+                        selectedOrder.pickup?.address?.phone) && (
+                        <div className="mb-1">
+                          {selectedOrder.pickupDetails?.address?.phone ||
+                            selectedOrder.pickup?.address?.phone}
+                        </div>
+                      )}
                       {selectedOrder.shippingDetails?.address?.street ||
-                        selectedOrder.shippingAddress?.street}
+                        selectedOrder.shippingAddress?.street ||
+                        selectedOrder.pickupDetails?.address?.street ||
+                        selectedOrder.pickup?.address?.street}
                       ,{' '}
                       {selectedOrder.shippingDetails?.address?.city ||
-                        selectedOrder.shippingAddress?.city}
+                        selectedOrder.shippingAddress?.city ||
+                        selectedOrder.pickupDetails?.address?.city ||
+                        selectedOrder.pickup?.address?.city}
                       ,{' '}
                       {selectedOrder.shippingDetails?.address?.state ||
-                        selectedOrder.shippingAddress?.state}{' '}
+                        selectedOrder.shippingAddress?.state ||
+                        selectedOrder.pickupDetails?.address?.state ||
+                        selectedOrder.pickup?.address?.state}{' '}
                       -{' '}
                       {selectedOrder.shippingDetails?.address?.pincode ||
-                        selectedOrder.shippingAddress?.pincode}
+                        selectedOrder.shippingAddress?.pincode ||
+                        selectedOrder.pickupDetails?.address?.pincode ||
+                        selectedOrder.pickup?.address?.pincode}
                       {selectedOrder.shippingDetails?.address?.country && (
                         <>, {selectedOrder.shippingDetails.address.country}</>
                       )}
@@ -1254,9 +1452,9 @@ function Orders() {
                         <img
                           src={getProductImage(item.product?.images)!}
                           alt={
-                            item.product?.model ||
                             item.product?.name ||
-                            `${item.product?.brand} Product`
+                            item.product?.model ||
+                            `${getProductBrand(item.product)} Product`
                           }
                           className="w-full h-full object-contain rounded-lg"
                         />
@@ -1268,11 +1466,9 @@ function Orders() {
                       <h4 className="font-semibold text-slate-900">
                         {item.product?.name ||
                           item.product?.model ||
-                          `${item.product?.brand || 'Unknown'} Product`}
+                          `${getProductBrand(item.product)} Product`}
                       </h4>
-                      <p className="text-sm text-slate-600">
-                        {item.product?.brand || 'Unknown Brand'}
-                      </p>
+                      <p className="text-sm text-slate-600">{getProductBrand(item.product)}</p>
                       {item.product?.categoryId?.name && (
                         <p className="text-sm text-slate-500">
                           Category: {item.product.categoryId.name}
@@ -1281,18 +1477,25 @@ function Orders() {
                       {item.product?.variants && item.product.variants.length > 0 && (
                         <p className="text-sm text-slate-500">
                           Variants:{' '}
-                          {item.product.variants.map(v => `${v.storage} ${v.color}`).join(', ')}
+                          {item.product.variants
+                            .map(
+                              (v: any) => v.label || `${v.storage || ''} ${v.color || ''}`.trim()
+                            )
+                            .filter(Boolean)
+                            .join(', ')}
                         </p>
                       )}
                       <p className="text-sm text-slate-500">Quantity: {item.quantity}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-slate-900">
-                        {item.product?.pricing?.mrp ||
-                        item.product?.pricing?.discountedPrice ||
-                        item.product?.price
-                          ? `₹${(item.product.pricing?.mrp || item.product.pricing?.discountedPrice || item.product.price)?.toLocaleString()}`
-                          : 'Price N/A'}
+                        {selectedOrder?.orderType === 'sell'
+                          ? `₹${item.price?.toLocaleString() || selectedOrder.totalAmount?.toLocaleString()}`
+                          : item.product?.pricing?.mrp ||
+                              item.product?.pricing?.discountedPrice ||
+                              item.product?.price
+                            ? `₹${(item.product.pricing?.mrp || item.product.pricing?.discountedPrice || item.product.price)?.toLocaleString()}`
+                            : 'Price N/A'}
                       </p>
                       {item.product?.pricing?.discountedPrice &&
                         item.product?.pricing?.mrp &&
