@@ -12,7 +12,7 @@ const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Validation middleware for creating buy categories
+
 const buyCategoryValidation = [
   body('name')
     .trim()
@@ -22,7 +22,7 @@ const buyCategoryValidation = [
     .withMessage('Buy category name is required'),
 ];
 
-// Validation middleware for updating buy categories
+
 const updateBuyCategoryValidation = [
   param('id')
     .isMongoId()
@@ -42,7 +42,7 @@ const updateBuyCategoryValidation = [
     .withMessage('Sort order must be a non-negative integer'),
 ];
 
-// Public routes
+
 router.get('/', getBuyCategories);
 router.get(
   '/:id',
@@ -52,9 +52,9 @@ router.get(
   getBuyCategory
 );
 
-// Protected routes (require authentication and admin role)
-router.use(protect); // All routes below require authentication
-router.use(authorize('admin')); // All routes below require admin role
+
+router.use(protect); 
+router.use(authorize('admin')); 
 
 router.post('/', buyCategoryValidation, createBuyCategory);
 router.put('/:id', updateBuyCategoryValidation, updateBuyCategory);

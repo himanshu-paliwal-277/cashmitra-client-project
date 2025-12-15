@@ -56,16 +56,16 @@ const sellAccessorySchema = new mongoose.Schema(
   }
 );
 
-// Compound index for unique key per category
+
 sellAccessorySchema.index({ categoryId: 1, key: 1 }, { unique: true });
 
-// Index for querying by category
+
 sellAccessorySchema.index({ categoryId: 1, order: 1 });
 
-// Index for active accessories
+
 sellAccessorySchema.index({ categoryId: 1, isActive: 1 });
 
-// Method to get active accessories for a category
+
 sellAccessorySchema.statics.getActiveForCategory = function (categoryId) {
   return this.find({
     categoryId,

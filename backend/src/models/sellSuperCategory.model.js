@@ -49,19 +49,19 @@ const sellSuperCategorySchema = new mongoose.Schema(
   }
 );
 
-// Virtual for display name
+
 sellSuperCategorySchema.virtual('displayName').get(function () {
   return this.name;
 });
 
-// Virtual to populate categories
+
 sellSuperCategorySchema.virtual('categories', {
   ref: 'Category',
   localField: '_id',
   foreignField: 'superCategory',
 });
 
-// Pre-save middleware to generate slug
+
 sellSuperCategorySchema.pre('save', function (next) {
   if (this.isModified('name') && !this.slug) {
     this.slug = this.name

@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const User = require('../models/user.model');
 
-// Load environment variables
+
 dotenv.config();
 
-// MongoDB connection
+
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
@@ -17,10 +17,10 @@ const connectDB = async () => {
   }
 };
 
-// Create admin user
+
 const createAdminUser = async () => {
   try {
-    // Check if admin user already exists
+    
     const adminExists = await User.findOne({ role: 'admin' });
 
     if (adminExists) {
@@ -28,11 +28,11 @@ const createAdminUser = async () => {
       return;
     }
 
-    // Create new admin user
+    
     const adminUser = await User.create({
       name: 'Admin User',
       email: 'admin@cashify.com',
-      password: 'Admin@123', // This should be changed after first login
+      password: 'Admin@123', 
       phone: '9876543210',
       role: 'admin',
       isVerified: true,
@@ -42,13 +42,13 @@ const createAdminUser = async () => {
   } catch (error) {
     console.error('Error creating admin user:', error.message);
   } finally {
-    // Disconnect from MongoDB
+    
     mongoose.disconnect();
     console.log('MongoDB disconnected');
   }
 };
 
-// Run the script
+
 const run = async () => {
   const connected = await connectDB();
   if (connected) {

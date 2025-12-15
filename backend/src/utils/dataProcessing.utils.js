@@ -1,16 +1,10 @@
-/**
- * Data processing utilities for handling array fields and data transformation
- */
 
-/**
- * Converts object-like arrays to proper arrays and filters out empty/invalid entries
- * @param {Object} data - The data object to process
- * @returns {Object} - Processed data with proper arrays
- */
+
+
 const processArrayFields = (data) => {
   const processedData = { ...data };
 
-  // Helper function to convert object to array and filter empty entries
+  
   const convertToArray = (obj) => {
     if (!obj) return [];
     if (Array.isArray(obj)) {
@@ -28,7 +22,7 @@ const processArrayFields = (data) => {
     return [];
   };
 
-  // Helper function to convert string arrays to proper arrays
+  
   const convertStringArray = (obj) => {
     if (!obj) return [];
     if (Array.isArray(obj)) {
@@ -56,7 +50,7 @@ const processArrayFields = (data) => {
     });
   };
 
-  // Process main array fields
+  
   if (processedData.images) {
     processedData.images = convertStringArray(processedData.images);
   }
@@ -67,7 +61,7 @@ const processArrayFields = (data) => {
     );
   }
 
-  // Special handling for variants - filter out string values that can't be cast to objects
+  
   if (processedData.variants) {
     const variantsArray = Array.isArray(processedData.variants)
       ? processedData.variants
@@ -82,7 +76,7 @@ const processArrayFields = (data) => {
     );
   }
 
-  // Special handling for addOns - filter out string values that can't be cast to objects
+  
   if (processedData.addOns) {
     const addOnsArray = Array.isArray(processedData.addOns)
       ? processedData.addOns
@@ -123,7 +117,7 @@ const processArrayFields = (data) => {
     );
   }
 
-  // Process payment options arrays
+  
   if (processedData.paymentOptions) {
     if (processedData.paymentOptions.emiPlans) {
       processedData.paymentOptions.emiPlans = filterEmptyObjects(
@@ -137,11 +131,11 @@ const processArrayFields = (data) => {
     }
   }
 
-  // Process productDetails nested arrays
+  
   if (processedData.productDetails) {
     const details = processedData.productDetails;
 
-    // Camera features and video recording
+    
     if (details.rearCamera) {
       if (details.rearCamera.features) {
         details.rearCamera.features = convertStringArray(
@@ -193,17 +187,17 @@ const processArrayFields = (data) => {
       }
     }
 
-    // Display features
+    
     if (details.display && details.display.features) {
       details.display.features = convertStringArray(details.display.features);
     }
 
-    // Design colors
+    
     if (details.design && details.design.colors) {
       details.design.colors = convertStringArray(details.design.colors);
     }
 
-    // Network connectivity
+    
     if (details.networkConnectivity) {
       if (details.networkConnectivity.wifiFeatures) {
         details.networkConnectivity.wifiFeatures = convertStringArray(
@@ -217,14 +211,14 @@ const processArrayFields = (data) => {
       }
     }
 
-    // Memory storage variants
+    
     if (details.memoryStorage && details.memoryStorage.phoneVariants) {
       details.memoryStorage.phoneVariants = convertStringArray(
         details.memoryStorage.phoneVariants
       );
     }
 
-    // Sensors
+    
     if (details.sensorsMisc && details.sensorsMisc.sensors) {
       details.sensorsMisc.sensors = convertStringArray(
         details.sensorsMisc.sensors
@@ -235,7 +229,7 @@ const processArrayFields = (data) => {
     }
   }
 
-  // Ensure only sortOrder is converted to number, preserve object structures for others
+  
   if (processedData.sortOrder !== undefined) {
     processedData.sortOrder = Number(processedData.sortOrder) || 0;
   }

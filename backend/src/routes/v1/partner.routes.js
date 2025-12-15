@@ -11,7 +11,7 @@ const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
 
 const router = express.Router();
 
-// Register partner shop
+
 router.post(
   '/register',
   protect,
@@ -32,7 +32,7 @@ router.post(
   asyncHandler(partnerController.registerPartnerShop)
 );
 
-// Partner profile routes
+
 router.get(
   '/profile',
   protect,
@@ -70,7 +70,7 @@ router.put(
   asyncHandler(partnerController.updatePartnerProfile)
 );
 
-// Document upload
+
 router.put(
   '/documents',
   protect,
@@ -97,7 +97,7 @@ router.put(
   asyncHandler(partnerController.uploadDocuments)
 );
 
-// Inventory management
+
 router.post(
   '/inventory',
   protect,
@@ -123,7 +123,7 @@ router.post(
   asyncHandler(partnerController.addInventory)
 );
 
-// Products catalog (for inventory selection)
+
 router.get(
   '/products',
   protect,
@@ -170,7 +170,7 @@ router.delete(
   asyncHandler(partnerController.removeInventory)
 );
 
-// Order management
+
 router.get(
   '/orders',
   protect,
@@ -178,7 +178,7 @@ router.get(
   asyncHandler(partnerController.getOrders)
 );
 
-// Check missing inventory for assigned order
+
 router.get(
   '/orders/:id/missing-inventory',
   protect,
@@ -187,7 +187,7 @@ router.get(
   asyncHandler(partnerController.checkMissingInventory)
 );
 
-// Respond to order assignment (accept/reject)
+
 router.put(
   '/orders/:id/respond',
   protect,
@@ -224,7 +224,7 @@ router.put(
   asyncHandler(partnerController.updateOrderStatus)
 );
 
-// Dashboard
+
 router.get(
   '/dashboard',
   protect,
@@ -232,14 +232,14 @@ router.get(
   asyncHandler(partnerController.getDashboardStats)
 );
 
-// ==================== NEW ROUTES FOR SELL/BUY PRODUCTS CRM ====================
+
 
 const {
   attachPartner,
   requirePartner,
 } = require('../../middlewares/partner.middleware');
 
-// Apply partner middleware to all sell/buy routes
+
 router.use(
   '/dashboard-sellbuy',
   protect,
@@ -269,25 +269,25 @@ router.use(
   requirePartner
 );
 
-// Dashboard for sell/buy products
+
 router.get(
   '/dashboard-sellbuy',
   asyncHandler(partnerController.getDashboardSellBuy)
 );
 
-// Sell products
+
 router.get(
   '/sell-products',
   asyncHandler(partnerController.getPartnerSellProducts)
 );
 
-// Buy products
+
 router.get(
   '/buy-products',
   asyncHandler(partnerController.getPartnerBuyProducts)
 );
 
-// Sell orders
+
 router.get(
   '/sell-orders',
   asyncHandler(partnerController.getPartnerSellOrders)
@@ -310,8 +310,8 @@ router.put(
   asyncHandler(partnerController.updatePartnerSellOrderStatus)
 );
 
-// Agent Management Routes
-// Get partner's agents
+
+
 router.get(
   '/agents',
   protect,
@@ -319,7 +319,7 @@ router.get(
   asyncHandler(partnerController.getPartnerAgents)
 );
 
-// Create new agent
+
 router.post(
   '/agents',
   protect,
@@ -342,7 +342,7 @@ router.post(
   asyncHandler(partnerController.createAgent)
 );
 
-// Update agent
+
 router.put(
   '/agents/:agentId',
   protect,
@@ -366,7 +366,7 @@ router.put(
   asyncHandler(partnerController.updateAgent)
 );
 
-// Delete agent
+
 router.delete(
   '/agents/:agentId',
   protect,

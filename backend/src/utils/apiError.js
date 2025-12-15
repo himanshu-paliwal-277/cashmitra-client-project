@@ -1,6 +1,4 @@
-/**
- * Custom error class for API errors
- */
+
 class ApiError extends Error {
   constructor(message, statusCode, errors = []) {
     super(message);

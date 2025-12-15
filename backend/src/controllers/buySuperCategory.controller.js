@@ -5,9 +5,9 @@ const {
   ApiError,
 } = require('../middlewares/errorHandler.middleware');
 
-// @desc    Get all super categories
-// @route   GET /api/buy-super-categories
-// @access  Private/Admin
+
+
+
 exports.getAllSuperCategories = asyncHandler(async (req, res) => {
   const { isActive, search, sort = 'sortOrder' } = req.query;
 
@@ -35,9 +35,9 @@ exports.getAllSuperCategories = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get active super categories (public)
-// @route   GET /api/buy-super-categories/public
-// @access  Public
+
+
+
 exports.getPublicSuperCategories = asyncHandler(async (req, res) => {
   const { search, sort = 'sortOrder' } = req.query;
 
@@ -61,9 +61,9 @@ exports.getPublicSuperCategories = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get single super category
-// @route   GET /api/buy-super-categories/:id
-// @access  Private/Admin
+
+
+
 exports.getSuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await BuySuperCategory.findById(req.params.id).populate(
     'categories'
@@ -79,13 +79,13 @@ exports.getSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Create super category
-// @route   POST /api/buy-super-categories
-// @access  Private/Admin
+
+
+
 exports.createSuperCategory = asyncHandler(async (req, res) => {
   const { name, description, image, isActive, sortOrder } = req.body;
 
-  // Check if image URL is provided
+  
   if (!image) {
     throw new ApiError(400, 'Please provide an image URL');
   }
@@ -93,7 +93,7 @@ exports.createSuperCategory = asyncHandler(async (req, res) => {
   const superCategoryData = {
     name,
     description,
-    image, // Cloudinary URL from frontend
+    image, 
     isActive,
     sortOrder,
     createdBy: req.user._id,
@@ -108,9 +108,9 @@ exports.createSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Update super category
-// @route   PUT /api/buy-super-categories/:id
-// @access  Private/Admin
+
+
+
 exports.updateSuperCategory = asyncHandler(async (req, res) => {
   let superCategory = await BuySuperCategory.findById(req.params.id);
 
@@ -128,7 +128,7 @@ exports.updateSuperCategory = asyncHandler(async (req, res) => {
     updatedBy: req.user._id,
   };
 
-  // Update image if new URL is provided
+  
   if (image) {
     updateData.image = image;
   }
@@ -149,9 +149,9 @@ exports.updateSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Delete super category
-// @route   DELETE /api/buy-super-categories/:id
-// @access  Private/Admin
+
+
+
 exports.deleteSuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await BuySuperCategory.findById(req.params.id);
 
@@ -159,7 +159,7 @@ exports.deleteSuperCategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Super category not found');
   }
 
-  // Check if there are categories linked to this super category
+  
   const categoriesCount = await BuyCategory.countDocuments({
     superCategory: req.params.id,
   });
@@ -180,9 +180,9 @@ exports.deleteSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get categories by super category
-// @route   GET /api/buy-super-categories/:id/categories
-// @access  Private/Admin
+
+
+
 exports.getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await BuySuperCategory.findById(req.params.id);
 
@@ -200,9 +200,9 @@ exports.getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
     data: categories,
   });
 });
-// @desc    Get categories by super category (public)
-// @route   GET /api/buy-super-categories/public/:id/categories
-// @access  Public
+
+
+
 exports.getPublicCategoriesBySuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await BuySuperCategory.findById(req.params.id);
 
@@ -216,7 +216,7 @@ exports.getPublicCategoriesBySuperCategory = asyncHandler(async (req, res) => {
 
   const categories = await BuyCategory.find({
     superCategory: req.params.id,
-    isActive: true, // Only return active categories for public endpoint
+    isActive: true, 
   }).sort('sortOrder');
 
   res.status(200).json({

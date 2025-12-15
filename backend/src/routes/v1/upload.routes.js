@@ -5,15 +5,15 @@ const { protect } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Configure multer for memory storage
+
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 5 * 1024 * 1024, 
   },
   fileFilter: (req, file, cb) => {
-    // Check if file is an image
+    
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
@@ -22,7 +22,7 @@ const upload = multer({
   },
 });
 
-// Upload single image endpoint
+
 router.post('/image', protect, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -32,11 +32,11 @@ router.post('/image', protect, upload.single('image'), async (req, res) => {
       });
     }
 
-    // Convert buffer to base64
+    
     const base64String = req.file.buffer.toString('base64');
     const dataURI = `data:${req.file.mimetype};base64,${base64String}`;
 
-    // Upload to Cloudinary
+    
     const result = await cloudinary.uploader.upload(dataURI, {
       folder: 'products',
       resource_type: 'image',
@@ -65,7 +65,7 @@ router.post('/image', protect, upload.single('image'), async (req, res) => {
   }
 });
 
-// Upload multiple images endpoint
+
 router.post('/images', protect, upload.array('images', 5), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {

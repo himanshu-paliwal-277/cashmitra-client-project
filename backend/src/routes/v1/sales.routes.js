@@ -4,11 +4,11 @@ const salesController = require('../../controllers/sales.controller');
 const { protect, authorize } = require('../../middlewares/auth.middleware');
 const router = express.Router();
 
-// Validation middleware
+
 const validateCreateOrder = [
   body('items')
     .custom((value) => {
-      // Accept both arrays and objects, convert objects to arrays
+      
       if (Array.isArray(value)) {
         return value.length > 0;
       }
@@ -133,12 +133,12 @@ const validateAnalytics = [
     .withMessage('Group by must be day, week, or month'),
 ];
 
-// Public routes (none for sales)
 
-// Protected routes (require authentication)
+
+
 router.use(protect);
 
-// Order management routes
+
 router.post('/orders', validateCreateOrder, salesController.createOrder);
 router.get('/orders', validateGetOrders, salesController.getUserOrders);
 router.get('/orders/:orderId', validateOrderId, salesController.getOrder);
@@ -153,7 +153,7 @@ router.patch(
   salesController.cancelOrder
 );
 
-// Partner routes (require partner authorization)
+
 router.patch(
   '/orders/:orderId/shipping',
   authorize('partner', 'admin'),
@@ -161,7 +161,7 @@ router.patch(
   salesController.updateShippingStatus
 );
 
-// Admin routes
+
 router.get(
   '/analytics',
   authorize('admin'),

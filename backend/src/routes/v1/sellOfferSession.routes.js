@@ -1,9 +1,4 @@
-/**
- * @fileoverview Sell Offer Session Routes
- * @description Routes for managing sell offer sessions and price calculations
- * @author Cashify Development Team
- * @version 1.0.0
- */
+
 
 const express = require('express');
 const { body } = require('express-validator');
@@ -25,7 +20,7 @@ const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Validation middleware
+
 const createSessionValidation = [
   body('userId')
     .optional()
@@ -65,16 +60,16 @@ const updateAccessoriesValidation = [
     .withMessage('Each accessory must be a string'),
 ];
 
-// Public routes - no authentication required
+
 router.post('/create', createSessionValidation, createSession);
 router.get('/:sessionId', getSession);
 router.get('/:sessionId/price', getCurrentPrice);
 
-// Protected routes - require authentication
+
 router.use(protect);
 
-// User session routes
-router.post('/', createSessionValidation, createSession); // For authenticated users
+
+router.post('/', createSessionValidation, createSession); 
 router.get('/my-sessions', getUserSessions);
 router.put('/:sessionId/answers', updateAnswersValidation, updateAnswers);
 router.put('/:sessionId/defects', updateDefectsValidation, updateDefects);
@@ -86,7 +81,7 @@ router.put(
 router.post('/:sessionId/extend', extendSession);
 router.delete('/:sessionId', deleteSession);
 
-// Admin only routes
+
 router.get('/admin/all', authorize('admin'), getAllSessions);
 router.patch(
   '/admin/:sessionId/status',

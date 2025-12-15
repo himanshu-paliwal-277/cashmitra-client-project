@@ -1,9 +1,4 @@
-/**
- * @fileoverview Sell Accessory Routes
- * @description Routes for managing sell accessories including CRUD operations
- * @author Cashify Development Team
- * @version 1.0.0
- */
+
 
 const express = require('express');
 const { body, param, query } = require('express-validator');
@@ -22,7 +17,7 @@ const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Validation middleware for create
+
 const createAccessoryValidation = [
   body('categoryId')
     .isMongoId()
@@ -58,7 +53,7 @@ const createAccessoryValidation = [
     .withMessage('isActive must be a boolean'),
 ];
 
-// Validation middleware for update (all fields optional)
+
 const updateAccessoryValidation = [
   body('categoryId')
     .optional()
@@ -100,7 +95,7 @@ const updateAccessoryValidation = [
     .withMessage('isActive must be a boolean'),
 ];
 
-// Public routes for customers
+
 router.get(
   '/customer',
   query('categoryId')
@@ -109,11 +104,11 @@ router.get(
   getCustomerAccessories
 );
 
-// Protected routes
+
 router.use(protect);
 router.use(authorize('admin'));
 
-// CRUD routes
+
 router.post('/', createAccessoryValidation, createAccessory);
 router.get('/', getAccessories);
 router.get(
@@ -139,7 +134,7 @@ router.delete(
   deleteAccessory
 );
 
-// Bulk operations
+
 router.post(
   '/bulk',
   body('accessories')
@@ -155,7 +150,7 @@ router.put(
   reorderAccessories
 );
 
-// Reindex orders
+
 const {
   reindexAccessoryOrders,
   migrateAndReindexAccessories,
@@ -163,7 +158,7 @@ const {
 router.post('/reindex-orders', reindexAccessoryOrders);
 router.post('/migrate-and-reindex', migrateAndReindexAccessories);
 
-// Status toggle
+
 router.patch(
   '/:id/toggle-status',
   param('id')

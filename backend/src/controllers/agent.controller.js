@@ -6,18 +6,14 @@ const { sendOTPEmail, sendOTPSMS } = require('../utils/notification.utils');
 const cloudinary = require('../config/cloudinary.config');
 const crypto = require('crypto');
 
-// Store OTPs temporarily (In production, use Redis)
+
 const otpStore = new Map();
 
-/**
- * @desc    Agent Login
- * @route   POST /api/agent/login
- * @access  Public
- */
+
 exports.loginAgent = async (req, res) => {
   const { email, password } = req.body;
 
-  // Find user with driver role
+  
   const user = await User.findOne({ email, role: 'driver' }).select(
     '+password'
   );
@@ -30,7 +26,7 @@ exports.loginAgent = async (req, res) => {
     });
   }
 
-  // Check password
+  
   if (!(await user.matchPassword(password))) {
     return res.status(401).json({
       success: false,
@@ -52,17 +48,13 @@ exports.loginAgent = async (req, res) => {
   });
 };
 
-/**
- * @desc    Get Agent Dashboard
- * @route   GET /api/agent/dashboard
- * @access  Private (Agent)
- */
+
 exports.getAgentDashboard = async (req, res) => {
   const agentId = req.user._id;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Get today's statistics (using correct Pickup model statuses)
+  
   const [pending, inProgress, completed, todayEarnings] = await Promise.all([
     Pickup.countDocuments({
       assignedTo: agentId,
@@ -109,11 +101,7 @@ exports.getAgentDashboard = async (req, res) => {
   });
 };
 
-/**
- * @desc    Get Agent Stats
- * @route   GET /api/agent/stats
- * @access  Private (Agent)
- */
+
 exports.getAgentStats = async (req, res) => {
   const agentId = req.user._id;
 
@@ -133,11 +121,7 @@ exports.getAgentStats = async (req, res) => {
   });
 };
 
-/**
- * @desc    Get Assigned Pickups
- * @route   GET /api/agent/pickups
- * @access  Private (Agent)
- */
+
 exports.getAssignedPickups = async (req, res) => {
   const agentId = req.user._id;
   const { status, date } = req.query;
@@ -147,7 +131,7 @@ exports.getAssignedPickups = async (req, res) => {
   if (status) {
     filter.status = status;
   } else {
-    // Default: show only active pickups (using correct Pickup model statuses)
+    
     filter.status = {
       $in: ['scheduled', 'confirmed', 'in_transit'],
     };
@@ -176,11 +160,7 @@ exports.getAssignedPickups = async (req, res) => {
   });
 };
 
-/**
- * @desc    Get Pickup Details
- * @route   GET /api/agent/pickups/:pickupId
- * @access  Private (Agent)
- */
+
 exports.getPickupDetails = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -205,11 +185,7 @@ exports.getPickupDetails = async (req, res) => {
   });
 };
 
-/**
- * @desc    Start Pickup Journey
- * @route   PUT /api/agent/pickups/:pickupId/start
- * @access  Private (Agent)
- */
+
 exports.startPickup = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -237,7 +213,7 @@ exports.startPickup = async (req, res) => {
 
   await pickup.save();
 
-  // TODO: Send notification to customer
+  
 
   res.json({
     success: true,
@@ -246,11 +222,7 @@ exports.startPickup = async (req, res) => {
   });
 };
 
-/**
- * @desc    Mark as Reached Doorstep
- * @route   PUT /api/agent/pickups/:pickupId/reached
- * @access  Private (Agent)
- */
+
 exports.reachedDoorstep = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -285,11 +257,7 @@ exports.reachedDoorstep = async (req, res) => {
   });
 };
 
-/**
- * @desc    Upload Agent Selfie (Face Detection)
- * @route   POST /api/agent/pickups/:pickupId/selfie
- * @access  Private (Agent)
- */
+
 exports.uploadAgentSelfie = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -313,7 +281,7 @@ exports.uploadAgentSelfie = async (req, res) => {
     });
   }
 
-  // Upload to Cloudinary
+  
   const result = await cloudinary.uploader.upload(req.file.path, {
     folder: 'cashify/agent-selfies',
     transformation: [{ width: 500, height: 500, crop: 'fill' }],
@@ -336,11 +304,7 @@ exports.uploadAgentSelfie = async (req, res) => {
   });
 };
 
-/**
- * @desc    Send OTP to Customer
- * @route   POST /api/agent/pickups/:pickupId/send-otp
- * @access  Private (Agent)
- */
+
 exports.sendCustomerOTP = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -357,21 +321,21 @@ exports.sendCustomerOTP = async (req, res) => {
     });
   }
 
-  // Generate 6-digit OTP
+  
   const otp = crypto.randomInt(100000, 999999).toString();
 
-  // Store OTP with 5-minute expiry
+  
   otpStore.set(pickupId, {
     otp,
     expiresAt: Date.now() + 5 * 60 * 1000,
   });
 
-  // Send OTP via Email
+  
   if (pickup.customer.email) {
     await sendOTPEmail(pickup.customer.email, otp, pickup.customer.name);
   }
 
-  // Send OTP via SMS
+  
   if (pickup.customer.phone) {
     await sendOTPSMS(pickup.customer.phone, otp);
   }
@@ -389,11 +353,7 @@ exports.sendCustomerOTP = async (req, res) => {
   });
 };
 
-/**
- * @desc    Verify Customer OTP
- * @route   POST /api/agent/pickups/:pickupId/verify-otp
- * @access  Private (Agent)
- */
+
 exports.verifyCustomerOTP = async (req, res) => {
   const { pickupId } = req.params;
   const { otp } = req.body;
@@ -422,7 +382,7 @@ exports.verifyCustomerOTP = async (req, res) => {
     });
   }
 
-  // OTP verified successfully
+  
   otpStore.delete(pickupId);
 
   const pickup = await Pickup.findById(pickupId);
@@ -440,11 +400,7 @@ exports.verifyCustomerOTP = async (req, res) => {
   });
 };
 
-/**
- * @desc    Upload Device Photos
- * @route   POST /api/agent/pickups/:pickupId/device-photos
- * @access  Private (Agent)
- */
+
 exports.uploadDevicePhotos = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -470,7 +426,7 @@ exports.uploadDevicePhotos = async (req, res) => {
 
   const uploadedImages = {};
 
-  // Upload all images to Cloudinary
+  
   for (const [fieldName, files] of Object.entries(req.files)) {
     const file = files[0];
     const result = await cloudinary.uploader.upload(file.path, {
@@ -501,11 +457,7 @@ exports.uploadDevicePhotos = async (req, res) => {
   });
 };
 
-/**
- * @desc    Verify IMEI
- * @route   POST /api/agent/pickups/:pickupId/imei
- * @access  Private (Agent)
- */
+
 exports.verifyIMEI = async (req, res) => {
   const { pickupId } = req.params;
   const { imei1, imei2 } = req.body;
@@ -539,11 +491,7 @@ exports.verifyIMEI = async (req, res) => {
   });
 };
 
-/**
- * @desc    Submit Device Inspection
- * @route   POST /api/agent/pickups/:pickupId/inspection
- * @access  Private (Agent)
- */
+
 exports.submitDeviceInspection = async (req, res) => {
   const { pickupId } = req.params;
   const { inspectionData } = req.body;
@@ -584,11 +532,7 @@ exports.submitDeviceInspection = async (req, res) => {
   });
 };
 
-/**
- * @desc    Calculate Final Price
- * @route   GET /api/agent/pickups/:pickupId/final-price
- * @access  Private (Agent)
- */
+
 exports.calculateFinalPrice = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -608,11 +552,11 @@ exports.calculateFinalPrice = async (req, res) => {
   let finalPrice = pickup.orderId.estimatedPrice;
   let deductions = [];
 
-  // Calculate price based on inspection
+  
   const inspection = pickup.inspectionData;
 
   if (inspection) {
-    // Screen condition deduction
+    
     if (inspection.screenCondition === 'cracked') {
       deductions.push({ reason: 'Cracked screen', amount: 2000 });
       finalPrice -= 2000;
@@ -621,7 +565,7 @@ exports.calculateFinalPrice = async (req, res) => {
       finalPrice -= 500;
     }
 
-    // Dead pixels deduction
+    
     if (inspection.deadPixels === 'few') {
       deductions.push({ reason: 'Few dead pixels', amount: 300 });
       finalPrice -= 300;
@@ -630,7 +574,7 @@ exports.calculateFinalPrice = async (req, res) => {
       finalPrice -= 800;
     }
 
-    // SIM not working
+    
     if (!inspection.sim1Working) {
       deductions.push({ reason: 'SIM 1 not working', amount: 500 });
       finalPrice -= 500;
@@ -640,14 +584,14 @@ exports.calculateFinalPrice = async (req, res) => {
       finalPrice -= 300;
     }
 
-    // Battery health
+    
     if (inspection.batteryHealth < 70) {
       const deduction = (80 - inspection.batteryHealth) * 20;
       deductions.push({ reason: 'Poor battery health', amount: deduction });
       finalPrice -= deduction;
     }
 
-    // Additional issues
+    
     if (inspection.additionalIssues && inspection.additionalIssues.length > 0) {
       const additionalDeduction = inspection.additionalIssues.length * 200;
       deductions.push({
@@ -658,7 +602,7 @@ exports.calculateFinalPrice = async (req, res) => {
     }
   }
 
-  // Ensure price doesn't go below minimum
+  
   finalPrice = Math.max(finalPrice, 1000);
 
   res.json({
@@ -672,11 +616,7 @@ exports.calculateFinalPrice = async (req, res) => {
   });
 };
 
-/**
- * @desc    Update Price (Manual Adjustment)
- * @route   PUT /api/agent/pickups/:pickupId/price
- * @access  Private (Agent)
- */
+
 exports.updatePrice = async (req, res) => {
   const { pickupId } = req.params;
   const { adjustedPrice, reason } = req.body;
@@ -719,11 +659,7 @@ exports.updatePrice = async (req, res) => {
   });
 };
 
-/**
- * @desc    Record Customer Decision
- * @route   POST /api/agent/pickups/:pickupId/customer-decision
- * @access  Private (Agent)
- */
+
 exports.recordCustomerDecision = async (req, res) => {
   const { pickupId } = req.params;
   const { accepted, rejectionReason } = req.body;
@@ -772,11 +708,7 @@ exports.recordCustomerDecision = async (req, res) => {
   });
 };
 
-/**
- * @desc    Record Payment
- * @route   POST /api/agent/pickups/:pickupId/payment
- * @access  Private (Agent)
- */
+
 exports.recordPayment = async (req, res) => {
   const { pickupId } = req.params;
   const { amount, method, transactionId } = req.body;
@@ -819,11 +751,7 @@ exports.recordPayment = async (req, res) => {
   });
 };
 
-/**
- * @desc    Send Final OTP
- * @route   POST /api/agent/pickups/:pickupId/send-final-otp
- * @access  Private (Agent)
- */
+
 exports.sendFinalOTP = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -840,16 +768,16 @@ exports.sendFinalOTP = async (req, res) => {
     });
   }
 
-  // Generate 6-digit OTP
+  
   const otp = crypto.randomInt(100000, 999999).toString();
 
-  // Store OTP with 5-minute expiry
+  
   otpStore.set(`final_${pickupId}`, {
     otp,
     expiresAt: Date.now() + 5 * 60 * 1000,
   });
 
-  // Send OTP via Email & SMS
+  
   if (pickup.customer.email) {
     await sendOTPEmail(
       pickup.customer.email,
@@ -869,11 +797,7 @@ exports.sendFinalOTP = async (req, res) => {
   });
 };
 
-/**
- * @desc    Verify Final OTP
- * @route   POST /api/agent/pickups/:pickupId/verify-final-otp
- * @access  Private (Agent)
- */
+
 exports.verifyFinalOTP = async (req, res) => {
   const { pickupId } = req.params;
   const { otp } = req.body;
@@ -902,7 +826,7 @@ exports.verifyFinalOTP = async (req, res) => {
     });
   }
 
-  // OTP verified
+  
   otpStore.delete(`final_${pickupId}`);
 
   res.json({
@@ -911,11 +835,7 @@ exports.verifyFinalOTP = async (req, res) => {
   });
 };
 
-/**
- * @desc    Complete Pickup
- * @route   POST /api/agent/pickups/:pickupId/complete
- * @access  Private (Agent)
- */
+
 exports.completePickup = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -941,7 +861,7 @@ exports.completePickup = async (req, res) => {
     note: 'Device collected successfully',
   });
 
-  // Calculate agent commission (e.g., 2% of final price)
+  
   const finalPrice =
     pickup.priceAdjustment?.adjustedPrice || pickup.orderId.estimatedPrice;
   pickup.agentCommission = finalPrice * 0.02;
@@ -958,11 +878,7 @@ exports.completePickup = async (req, res) => {
   });
 };
 
-/**
- * @desc    Save Customer Signature
- * @route   POST /api/agent/pickups/:pickupId/signature
- * @access  Private (Agent)
- */
+
 exports.saveCustomerSignature = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -986,7 +902,7 @@ exports.saveCustomerSignature = async (req, res) => {
     });
   }
 
-  // Upload signature to Cloudinary
+  
   const result = await cloudinary.uploader.upload(req.file.path, {
     folder: `cashify/signatures/${pickupId}`,
   });
@@ -1005,11 +921,7 @@ exports.saveCustomerSignature = async (req, res) => {
   });
 };
 
-/**
- * @desc    Get Pickup History
- * @route   GET /api/agent/history
- * @access  Private (Agent)
- */
+
 exports.getPickupHistory = async (req, res) => {
   const agentId = req.user._id;
   const { page = 1, limit = 20 } = req.query;
@@ -1042,11 +954,7 @@ exports.getPickupHistory = async (req, res) => {
   });
 };
 
-/**
- * @desc    Get Completed Pickups Today
- * @route   GET /api/agent/completed-today
- * @access  Private (Agent)
- */
+
 exports.getCompletedToday = async (req, res) => {
   const agentId = req.user._id;
   const today = new Date();
@@ -1066,11 +974,7 @@ exports.getCompletedToday = async (req, res) => {
   });
 };
 
-/**
- * @desc    Get Daily Report
- * @route   GET /api/agent/daily-report
- * @access  Private (Agent)
- */
+
 exports.getDailyReport = async (req, res) => {
   const agentId = req.user._id;
   const today = new Date();
@@ -1119,17 +1023,13 @@ exports.getDailyReport = async (req, res) => {
   });
 };
 
-/**
- * @desc    Submit Daily Report
- * @route   POST /api/agent/submit-daily-report
- * @access  Private (Agent)
- */
+
 exports.submitDailyReport = async (req, res) => {
   const agentId = req.user._id;
   const { notes, issues } = req.body;
 
-  // Create daily report
-  // TODO: Create DailyReport model
+  
+  
 
   res.json({
     success: true,

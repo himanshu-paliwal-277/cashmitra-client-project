@@ -1,7 +1,4 @@
-/**
- * @fileoverview Agent Model
- * @description Schema for field agents who perform device pickups and evaluations
- */
+
 
 const mongoose = require('mongoose');
 
@@ -111,17 +108,17 @@ const agentSchema = new mongoose.Schema(
   }
 );
 
-// Index for geospatial queries
+
 agentSchema.index({ currentLocation: '2dsphere' });
 
-// Index for quick lookups
+
 agentSchema.index({ user: 1 });
 agentSchema.index({ agentCode: 1 });
 agentSchema.index({ assignedPartner: 1 });
 agentSchema.index({ isActive: 1 });
 agentSchema.index({ coverageAreas: 1 });
 
-// Virtual for completion rate
+
 agentSchema.virtual('completionRate').get(function () {
   if (this.performanceMetrics.totalPickups === 0) return 0;
   return (
@@ -131,13 +128,13 @@ agentSchema.virtual('completionRate').get(function () {
   ).toFixed(2);
 });
 
-// Static method to generate unique agent code
+
 agentSchema.statics.generateAgentCode = async function () {
   const date = new Date();
   const year = date.getFullYear().toString().substr(-2);
   const month = String(date.getMonth() + 1).padStart(2, '0');
 
-  // Count agents created this month
+  
   const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
   const count = await this.countDocuments({
     createdAt: { $gte: startOfMonth },
@@ -147,7 +144,7 @@ agentSchema.statics.generateAgentCode = async function () {
   return `AGT${year}${month}${sequence}`;
 };
 
-// Method to update location
+
 agentSchema.methods.updateLocation = function (latitude, longitude) {
   this.currentLocation = {
     type: 'Point',
@@ -157,9 +154,9 @@ agentSchema.methods.updateLocation = function (latitude, longitude) {
   return this.save();
 };
 
-// Method to calculate distance from a point
+
 agentSchema.methods.distanceFrom = function (latitude, longitude) {
-  const R = 6371; // Earth's radius in km
+  const R = 6371; 
   const dLat =
     ((latitude - this.currentLocation.coordinates[1]) * Math.PI) / 180;
   const dLon =
@@ -173,10 +170,10 @@ agentSchema.methods.distanceFrom = function (latitude, longitude) {
       Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in km
+  return R * c; 
 };
 
-// Method to update performance metrics
+
 agentSchema.methods.updateMetrics = async function (updateData) {
   if (updateData.completed) {
     this.performanceMetrics.completedPickups += 1;
@@ -202,7 +199,7 @@ agentSchema.methods.updateMetrics = async function (updateData) {
   return this.save();
 };
 
-// Static method to find nearby agents
+
 agentSchema.statics.findNearby = function (
   latitude,
   longitude,
@@ -216,13 +213,13 @@ agentSchema.statics.findNearby = function (
           type: 'Point',
           coordinates: [longitude, latitude],
         },
-        $maxDistance: maxDistance, // in meters
+        $maxDistance: maxDistance, 
       },
     },
   });
 };
 
-// Static method to find agents by coverage area
+
 agentSchema.statics.findByCoverageArea = function (area) {
   return this.find({
     isActive: true,

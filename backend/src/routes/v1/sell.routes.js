@@ -11,7 +11,7 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-// Public routes for product selection
+
 router.get('/categories', asyncHandler(sellController.getProductCategories));
 router.get(
   '/brands/:category',
@@ -30,13 +30,13 @@ router.get(
   asyncHandler(sellController.getVariantsByModel)
 );
 
-// Product search route
+
 router.get(
   '/products/search',
   asyncHandler(sellController.findProductsByModel)
 );
 
-// Protected routes for price calculation and order creation
+
 router.post(
   '/calculate-price',
   protect,
@@ -77,7 +77,7 @@ router.post(
       .isIn(['bank_transfer', 'wallet', 'upi'])
       .withMessage('Valid payment method is required'),
   ],
-  // validateRequest,
+  
   asyncHandler(sellController.createSellOrder)
 );
 
@@ -88,26 +88,26 @@ router.get(
   asyncHandler(sellController.getSellOrderStatus)
 );
 
-// Get price quote for assessment (public endpoint)
+
 router.get(
   '/quote/:assessmentId',
   validateAssessmentId('assessmentId'),
   asyncHandler(sellController.getPriceQuote)
 );
 
-// Refresh price quote for assessment (public endpoint)
+
 router.post(
   '/refresh-quote/:assessmentId',
   validateAssessmentId('assessmentId'),
   asyncHandler(sellController.refreshPriceQuote)
 );
 
-// Submit assessment for price calculation
+
 router.post(
   '/submit-assessment',
   [
     check('category').custom((value, { req }) => {
-      // Handle both string and object formats
+      
       if (typeof value === 'string' && value.trim()) {
         return true;
       }
@@ -121,7 +121,7 @@ router.post(
       throw new Error('Category is required');
     }),
     check('brand').custom((value, { req }) => {
-      // Handle both direct brand field and nested category.brand
+      
       if (typeof value === 'string' && value.trim()) {
         return true;
       }
@@ -136,7 +136,7 @@ router.post(
       throw new Error('Brand is required');
     }),
     check('model').custom((value, { req }) => {
-      // Handle both direct model field and nested category.model
+      
       if (typeof value === 'string' && value.trim()) {
         return true;
       }
@@ -151,7 +151,7 @@ router.post(
       throw new Error('Model is required');
     }),
     check('answers').custom((value, { req }) => {
-      // Check if answers exists and is an object (not null, not array)
+      
       if (value && typeof value === 'object' && !Array.isArray(value)) {
         return true;
       }
@@ -163,7 +163,7 @@ router.post(
   asyncHandler(sellController.submitAssessment)
 );
 
-// Partner route for updating order status
+
 router.put(
   '/orders/:id/status',
   protect,

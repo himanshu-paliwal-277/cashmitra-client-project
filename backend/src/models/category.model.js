@@ -77,12 +77,12 @@ const categorySchema = new mongoose.Schema(
   }
 );
 
-// Virtual for display purposes
+
 categorySchema.virtual('displayName').get(function () {
   return this.name;
 });
 
-// Pre-save middleware to generate slug
+
 categorySchema.pre('save', function (next) {
   if (this.isModified('name') || !this.slug) {
     this.slug = this.name

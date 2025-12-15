@@ -1,9 +1,4 @@
-/**
- * @fileoverview Sell Defect Routes
- * @description Routes for managing sell defects including CRUD operations
- * @author Cashify Development Team
- * @version 1.0.0
- */
+
 
 const express = require('express');
 const { body, param, query } = require('express-validator');
@@ -22,7 +17,7 @@ const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Validation middleware
+
 const defectValidation = [
   body('categoryId')
     .isMongoId()
@@ -77,7 +72,7 @@ const defectValidation = [
     .withMessage('isActive must be a boolean'),
 ];
 
-// Public routes for customers
+
 router.get(
   '/category/:categoryId',
   param('categoryId')
@@ -87,11 +82,11 @@ router.get(
 );
 router.get('/categories', getDefectCategories);
 
-// Protected routes
+
 router.use(protect);
 router.use(authorize('admin'));
 
-// CRUD routes
+
 router.post('/', defectValidation, createDefect);
 router.get('/', getDefects);
 router.get(
@@ -117,7 +112,7 @@ router.delete(
   deleteDefect
 );
 
-// Bulk operations
+
 router.post(
   '/bulk',
   body('defects').isArray({ min: 1 }).withMessage('Defects array is required'),

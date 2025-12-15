@@ -3,9 +3,9 @@ const { Order } = require('../models/order.model');
 const Address = require('../models/address.model');
 const { validationResult } = require('express-validator');
 
-// @desc    Get user profile
-// @route   GET /api/user/profile
-// @access  Private
+
+
+
 const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
@@ -33,9 +33,9 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-// @desc    Update user profile
-// @route   PUT /api/user/profile
-// @access  Private
+
+
+
 const updateUserProfile = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -49,7 +49,7 @@ const updateUserProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Update user fields
+    
     if (req.body.name) user.name = req.body.name;
     if (req.body.email) user.email = req.body.email;
     if (req.body.phone) user.phone = req.body.phone;
@@ -90,9 +90,9 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-// @desc    Get user orders
-// @route   GET /api/user/orders
-// @access  Private
+
+
+
 const getUserOrders = async (req, res) => {
   try {
     const { page = 1, limit = 10, status, orderType } = req.query;
@@ -130,9 +130,9 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-// @desc    Get single order
-// @route   GET /api/user/orders/:id
-// @access  Private
+
+
+
 const getOrderById = async (req, res) => {
   try {
     const order = await Order.findOne({
@@ -154,9 +154,9 @@ const getOrderById = async (req, res) => {
   }
 };
 
-// @desc    Get user addresses
-// @route   GET /api/user/addresses
-// @access  Private
+
+
+
 const getUserAddresses = async (req, res) => {
   try {
     const addresses = await Address.find({ user: req.user._id }).sort({
@@ -171,9 +171,9 @@ const getUserAddresses = async (req, res) => {
   }
 };
 
-// @desc    Add new address
-// @route   POST /api/user/addresses
-// @access  Private
+
+
+
 const addAddress = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -196,9 +196,9 @@ const addAddress = async (req, res) => {
   }
 };
 
-// @desc    Update address
-// @route   PUT /api/user/addresses/:id
-// @access  Private
+
+
+
 const updateAddress = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -215,7 +215,7 @@ const updateAddress = async (req, res) => {
       return res.status(404).json({ message: 'Address not found' });
     }
 
-    // Update address fields
+    
     Object.keys(req.body).forEach((key) => {
       if (req.body[key] !== undefined) {
         address[key] = req.body[key];
@@ -231,9 +231,9 @@ const updateAddress = async (req, res) => {
   }
 };
 
-// @desc    Delete address
-// @route   DELETE /api/user/addresses/:id
-// @access  Private
+
+
+
 const deleteAddress = async (req, res) => {
   try {
     const address = await Address.findOne({
@@ -254,9 +254,9 @@ const deleteAddress = async (req, res) => {
   }
 };
 
-// @desc    Set default address
-// @route   PUT /api/user/addresses/:id/default
-// @access  Private
+
+
+
 const setDefaultAddress = async (req, res) => {
   try {
     const address = await Address.findOne({
@@ -268,10 +268,10 @@ const setDefaultAddress = async (req, res) => {
       return res.status(404).json({ message: 'Address not found' });
     }
 
-    // Remove default flag from all user addresses
+    
     await Address.updateMany({ user: req.user._id }, { isDefault: false });
 
-    // Set this address as default
+    
     address.isDefault = true;
     await address.save();
 

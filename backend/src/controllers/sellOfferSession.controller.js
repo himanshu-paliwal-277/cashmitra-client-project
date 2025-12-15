@@ -1,10 +1,4 @@
-/**
- * @fileoverview Sell Offer Session Management Controller
- * @description Handles all sell offer session-related operations including
- * session creation, price calculation, and session management.
- * @author Cashify Development Team
- * @version 1.0.0
- */
+
 
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
@@ -17,11 +11,7 @@ const {
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
 
-/**
- * Create new offer session with complete assessment data
- * @route POST /api/sell-sessions/create
- * @access Public/Private
- */
+
 exports.createSession = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -41,20 +31,20 @@ exports.createSession = asyncHandler(async (req, res) => {
     accessoriesLength: accessories ? accessories.length : 0,
   });
 
-  // Use authenticated user ID if available, otherwise use provided userId
+  
   const finalUserId = req.user?.id || userId;
 
   if (!finalUserId) {
     throw new ApiError(400, 'User ID is required');
   }
 
-  // Verify product exists
+  
   const product = await SellProduct.findById(productId);
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
-  // Find the variant in product.variants array
+  
   const variant = product.variants.find(
     (v) => v._id.toString() === variantId.toString()
   );
@@ -66,28 +56,28 @@ exports.createSession = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Selected variant is not available');
   }
 
-  // Transform answers from frontend format to backend format
-  // Frontend sends: { questionId: { questionId, answerValue, delta: {...}, ... } }
-  // Store the complete answer object including delta for price calculation
+  
+  
+  
   let processedAnswers = new Map();
   if (answers && typeof answers === 'object') {
     Object.entries(answers).forEach(([key, value]) => {
       if (value && typeof value === 'object') {
-        // Store the complete answer object (includes delta, answerValue, questionText, etc.)
+        
         processedAnswers.set(key, value);
       } else if (value) {
-        // Handle direct value format
+        
         processedAnswers.set(key, Array.isArray(value) ? value : [value]);
       }
     });
   }
 
-  // DON'T remove duplicates - frontend includes duplicates in calculation
-  // Frontend comment: "Process defects (note: data has duplicates, but we sum all)"
+  
+  
   const processedDefects = defects || [];
   const processedAccessories = accessories || [];
 
-  // Create session with all assessment data
+  
   const session = new SellOfferSession({
     userId: finalUserId,
     productId,
@@ -107,15 +97,15 @@ exports.createSession = asyncHandler(async (req, res) => {
     ],
   });
 
-  // Calculate final price with all adjustments
+  
   await recalculateSessionPrice(session);
 
-  // Generate session token for tracking
+  
   session.generateSessionToken();
 
   await session.save();
 
-  // Populate product details for response
+  
   await session.populate('productId', 'name images categoryId');
 
   res.status(201).json({
@@ -154,11 +144,7 @@ exports.createSession = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get session details
- * @route GET /api/sell/sessions/:sessionId
- * @access Public
- */
+
 exports.getSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.query;
@@ -171,12 +157,12 @@ exports.getSession = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  // Verify session token if provided
+  
   if (sessionToken && !session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
 
-  // Check if session is expired
+  
   if (session.expiresAt < new Date()) {
     throw new ApiError(410, 'Session has expired');
   }
@@ -187,11 +173,7 @@ exports.getSession = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update session answers
- * @route PUT /api/sell/sessions/:sessionId/answers
- * @access Public
- */
+
 exports.updateAnswers = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { answers, sessionToken } = req.body;
@@ -201,15 +183,15 @@ exports.updateAnswers = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  // Verify session token
+  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
 
-  // Update answers
+  
   session.answers = new Map(Object.entries(answers || {}));
 
-  // Recalculate price
+  
   await recalculateSessionPrice(session);
   await session.save();
 
@@ -223,11 +205,7 @@ exports.updateAnswers = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update session defects
- * @route PUT /api/sell/sessions/:sessionId/defects
- * @access Public
- */
+
 exports.updateDefects = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { defects, sessionToken } = req.body;
@@ -237,15 +215,15 @@ exports.updateDefects = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  // Verify session token
+  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
 
-  // Update defects
+  
   session.defects = defects || [];
 
-  // Recalculate price
+  
   await recalculateSessionPrice(session);
   await session.save();
 
@@ -259,11 +237,7 @@ exports.updateDefects = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update session accessories
- * @route PUT /api/sell/sessions/:sessionId/accessories
- * @access Public
- */
+
 exports.updateAccessories = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { accessories, sessionToken } = req.body;
@@ -273,15 +247,15 @@ exports.updateAccessories = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  // Verify session token
+  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
 
-  // Update accessories
+  
   session.accessories = accessories || [];
 
-  // Recalculate price
+  
   await recalculateSessionPrice(session);
   await session.save();
 
@@ -295,11 +269,7 @@ exports.updateAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get current price calculation
- * @route GET /api/sell/sessions/:sessionId/price
- * @access Public
- */
+
 exports.getCurrentPrice = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.query;
@@ -309,7 +279,7 @@ exports.getCurrentPrice = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  // Verify session token
+  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
@@ -327,11 +297,7 @@ exports.getCurrentPrice = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Extend session expiry
- * @route POST /api/sell/sessions/:sessionId/extend
- * @access Public
- */
+
 exports.extendSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.body;
@@ -341,7 +307,7 @@ exports.extendSession = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  // Verify session token
+  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
@@ -358,11 +324,7 @@ exports.extendSession = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get user's active sessions
- * @route GET /api/sell/sessions/user/active
- * @access Private
- */
+
 exports.getUserActiveSessions = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
@@ -370,11 +332,11 @@ exports.getUserActiveSessions = asyncHandler(async (req, res) => {
     .populate('productId', 'name images variants')
     .sort({ updatedAt: -1 });
 
-  // Transform sessions to include variant data from the populated product
+  
   const transformedSessions = sessions.map((session) => {
     const sessionObj = session.toObject();
 
-    // Find the variant within the product's variants array
+    
     if (
       sessionObj.productId &&
       sessionObj.productId.variants &&
@@ -394,7 +356,7 @@ exports.getUserActiveSessions = asyncHandler(async (req, res) => {
       }
     }
 
-    // Ensure activeVariants is available
+    
     if (sessionObj.productId && sessionObj.productId.variants) {
       sessionObj.productId.activeVariants =
         sessionObj.productId.variants.filter((v) => v.isActive);
@@ -409,18 +371,10 @@ exports.getUserActiveSessions = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get user sessions (alias for getUserActiveSessions)
- * @route GET /api/sell/sessions/my-sessions
- * @access Private
- */
+
 exports.getUserSessions = exports.getUserActiveSessions;
 
-/**
- * Delete session
- * @route DELETE /api/sell/sessions/:sessionId
- * @access Public
- */
+
 exports.deleteSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.body;
@@ -430,7 +384,7 @@ exports.deleteSession = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  // Verify session token
+  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
@@ -443,11 +397,7 @@ exports.deleteSession = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get all sessions (Admin only)
- * @route GET /api/sell-sessions/admin/all
- * @access Private (Admin only)
- */
+
 exports.getAllSessions = asyncHandler(async (req, res) => {
   const {
     page = 1,
@@ -461,7 +411,7 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
 
   const query = {};
 
-  // Search filter
+  
   if (search) {
     const users = await mongoose
       .model('User')
@@ -478,7 +428,7 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
     query.userId = { $in: userIds };
   }
 
-  // Status filter
+  
   const now = new Date();
   if (status === 'active') {
     query.isActive = true;
@@ -489,11 +439,11 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
     query.isActive = false;
   }
 
-  // Calculate pagination
+  
   const skip = (parseInt(page) - 1) * parseInt(limit);
   const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
-  // Fetch sessions with populated data
+  
   const sessions = await SellOfferSession.find(query)
     .populate('userId', 'name email phone')
     .populate('productId', 'name images categoryId')
@@ -503,12 +453,12 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
 
   const total = await SellOfferSession.countDocuments(query);
 
-  // Transform sessions to include variant data
+  
   const transformedSessions = await Promise.all(
     sessions.map(async (session) => {
       const sessionObj = session.toObject();
 
-      // Find variant in product
+      
       if (sessionObj.productId && sessionObj.productId._id) {
         const product = await mongoose
           .model('SellProduct')
@@ -543,11 +493,7 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update session status (Admin only)
- * @route PATCH /api/sell-sessions/admin/:sessionId/status
- * @access Private (Admin only)
- */
+
 exports.updateSessionStatus = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { isActive } = req.body;
@@ -567,11 +513,7 @@ exports.updateSessionStatus = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Clean up expired sessions (Admin only)
- * @route POST /api/sell-sessions/admin/cleanup
- * @access Private (Admin only)
- */
+
 exports.cleanupExpiredSessions = asyncHandler(async (req, res) => {
   const result = await SellOfferSession.cleanupExpired();
 
@@ -582,9 +524,7 @@ exports.cleanupExpiredSessions = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Helper function to recalculate session price - matches frontend calculation
- */
+
 async function recalculateSessionPrice(session) {
   const breakdown = [
     {
@@ -604,12 +544,12 @@ async function recalculateSessionPrice(session) {
     accessoriesCount: session.accessories?.length || 0,
   });
 
-  // Calculate adjustments from answers
-  // Frontend sends answers with delta already included: { questionId: { delta: {...}, ... } }
+  
+  
   if (session.answers && session.answers.size > 0) {
     try {
       for (const [, answerData] of session.answers) {
-        // Check if answerData has delta (frontend format)
+        
         if (answerData && typeof answerData === 'object' && answerData.delta) {
           const adjust = answerData.delta.sign === '-' ? -1 : 1;
 
@@ -646,7 +586,7 @@ async function recalculateSessionPrice(session) {
     }
   }
 
-  // Calculate adjustments from defects
+  
   if (session.defects && session.defects.length > 0) {
     try {
       const defects = await SellDefect.getForVariants(session.productId, [
@@ -688,10 +628,10 @@ async function recalculateSessionPrice(session) {
     }
   }
 
-  // Calculate adjustments from accessories
+  
   if (session.accessories && session.accessories.length > 0) {
     try {
-      // Get product to find categoryId
+      
       const product = await SellProduct.findById(session.productId);
       if (product && product.categoryId) {
         const accessories = await SellAccessory.getActiveForCategory(
@@ -734,8 +674,8 @@ async function recalculateSessionPrice(session) {
     }
   }
 
-  // Calculate final price - exactly like frontend
-  // adjustedPrice = basePrice * (1 + percentDelta / 100) + absDelta
+  
+  
   const finalPrice = Math.round(
     session.basePrice * (1 + percentDelta / 100) + absDelta
   );
@@ -748,7 +688,7 @@ async function recalculateSessionPrice(session) {
     breakdownItems: breakdown.length,
   });
 
-  // Update session
+  
   session.breakdown = breakdown;
   session.finalPrice = finalPrice;
 }

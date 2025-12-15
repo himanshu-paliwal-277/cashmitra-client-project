@@ -65,7 +65,7 @@ const transactionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create indexes for efficient querying
+
 transactionSchema.index({ transactionType: 1 });
 transactionSchema.index({ user: 1 });
 transactionSchema.index({ partner: 1 });

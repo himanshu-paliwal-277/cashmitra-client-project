@@ -1,9 +1,4 @@
-/**
- * @fileoverview Sell Order Routes
- * @description Routes for managing sell orders and order lifecycle
- * @author Cashify Development Team
- * @version 1.0.0
- */
+
 
 const express = require('express');
 const { body, param, query } = require('express-validator');
@@ -27,7 +22,7 @@ const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Validation middleware
+
 const createOrderValidation = [
   body('sessionId')
     .isMongoId()
@@ -74,36 +69,36 @@ const createOrderValidation = [
 ];
 
 const updateStatusValidation = [
-  // body('status')
-  //   .isIn(['confirmed', 'cancelled', 'picked_up', 'paid'])
-  //   .withMessage('Status must be one of: confirmed, cancelled, picked_up, paid'),
-  // body('notes')
-  //   .optional()
-  //   .trim()
-  //   .isLength({ max: 500 })
-  //   .withMessage('Notes cannot exceed 500 characters'),
-  // body('cancelReason')
-  //   .if(body('status').equals('cancelled'))
-  //   .notEmpty()
-  //   .withMessage('Cancel reason is required when cancelling order'),
-  // body('paymentDetails')
-  //   .if(body('status').equals('paid'))
-  //   .isObject()
-  //   .withMessage('Payment details are required when marking as paid'),
-  // body('paymentDetails.method')
-  //   .if(body('status').equals('paid'))
-  //   .isIn(['bank_transfer', 'upi', 'cash', 'cheque'])
-  //   .withMessage('Payment method must be valid'),
-  // body('paymentDetails.amount')
-  //   .if(body('status').equals('paid'))
-  //   .isFloat({ min: 0 })
-  //   .withMessage('Payment amount must be a positive number'),
-  // body('paymentDetails.transactionId')
-  //   .if(body('status').equals('paid'))
-  //   .optional()
-  //   .trim()
-  //   .isLength({ min: 1, max: 100 })
-  //   .withMessage('Transaction ID must be between 1 and 100 characters')
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 ];
 
 const assignStaffValidation = [
@@ -120,7 +115,7 @@ const assignStaffValidation = [
     .trim()
     .isLength({ max: 500 })
     .withMessage('Notes cannot exceed 500 characters'),
-  // Custom validation to ensure at least one of staffId or assignedTo is provided
+  
   body().custom((value, { req }) => {
     if (!req.body.staffId && !req.body.assignedTo) {
       throw new Error('Either staffId or assignedTo must be provided');
@@ -149,7 +144,7 @@ const updatePickupValidation = [
     .withMessage('Final price must be a positive number'),
 ];
 
-// Query validation
+
 const getAllOrdersValidation = [
   query('page')
     .optional()
@@ -205,10 +200,10 @@ const getStatisticsValidation = [
     .withMessage('Group by must be day, week, or month'),
 ];
 
-// Protected routes - require authentication
+
 router.use(protect);
 
-// User order routes
+
 router.post('/', createOrderValidation, createOrder);
 router.get('/my-orders', getUserOrders);
 router.get(
@@ -246,10 +241,10 @@ router.put(
   rescheduleOrder
 );
 
-// Admin only routes
+
 router.use(authorize('admin'));
 
-// New endpoints for pickup management
+
 router.get('/pickup/orders-list', getOrdersForPickup);
 router.get(
   '/:orderId/pickup-details',
@@ -259,7 +254,7 @@ router.get(
   getOrderPickupDetails
 );
 
-// Admin order management
+
 router.get('/', getAllOrdersValidation, getAllOrders);
 router.put(
   '/:orderId/status',

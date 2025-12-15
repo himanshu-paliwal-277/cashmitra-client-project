@@ -62,7 +62,7 @@ exports.sendContactEmail = asyncHandler(async (req, res) => {
 
     const adminMailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // Admin email
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER, 
       subject: `New Contact Form Submission: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">

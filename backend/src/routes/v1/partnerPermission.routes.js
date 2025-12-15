@@ -7,13 +7,9 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-// ============ PARTNER ROUTES ============
 
-/**
- * @route   GET /api/partner-permissions
- * @desc    Get current partner's permissions
- * @access  Private (Partner only)
- */
+
+
 router.get(
   '/',
   protect,
@@ -21,11 +17,7 @@ router.get(
   asyncHandler(partnerPermissionController.getPartnerPermissions)
 );
 
-/**
- * @route   GET /api/partner-permissions/check/:menuItem
- * @desc    Check specific permission for current partner
- * @access  Private (Partner only)
- */
+
 router.get(
   '/check/:menuItem',
   [
@@ -41,11 +33,7 @@ router.get(
   asyncHandler(partnerPermissionController.checkPermission)
 );
 
-/**
- * @route   GET /api/partner-permissions/menu-items
- * @desc    Get available menu items for current partner
- * @access  Private (Partner only)
- */
+
 router.get(
   '/menu-items',
   protect,
@@ -53,13 +41,9 @@ router.get(
   asyncHandler(partnerPermissionController.getAvailableMenuItems)
 );
 
-// ============ ADMIN ROUTES ============
 
-/**
- * @route   GET /api/partner-permissions/admin
- * @desc    Get all partner permissions (Admin only)
- * @access  Private (Admin only)
- */
+
+
 router.get(
   '/admin',
   [
@@ -92,11 +76,7 @@ router.get(
   asyncHandler(partnerPermissionController.getAllPartnerPermissions)
 );
 
-/**
- * @route   GET /api/partner-permissions/admin/role-templates
- * @desc    Get available role templates (Admin only)
- * @access  Private (Admin only)
- */
+
 router.get(
   '/admin/role-templates',
   protect,
@@ -104,11 +84,7 @@ router.get(
   asyncHandler(partnerPermissionController.getRoleTemplates)
 );
 
-/**
- * @route   POST /api/partner-permissions/admin/role-templates
- * @desc    Create a new role template (Admin only)
- * @access  Private (Admin only)
- */
+
 router.post(
   '/admin/role-templates',
   [
@@ -155,11 +131,7 @@ router.post(
   asyncHandler(partnerPermissionController.createRoleTemplate)
 );
 
-/**
- * @route   PUT /api/partner-permissions/admin/role-templates/:templateId
- * @desc    Update a role template (Admin only)
- * @access  Private (Admin only)
- */
+
 router.put(
   '/admin/role-templates/:templateId',
   [
@@ -197,11 +169,7 @@ router.put(
   asyncHandler(partnerPermissionController.updateRoleTemplate)
 );
 
-/**
- * @route   DELETE /api/partner-permissions/admin/role-templates/:templateId
- * @desc    Delete a role template (Admin only)
- * @access  Private (Admin only)
- */
+
 router.delete(
   '/admin/role-templates/:templateId',
   [param('templateId').notEmpty().withMessage('Template ID is required')],
@@ -211,11 +179,7 @@ router.delete(
   asyncHandler(partnerPermissionController.deleteRoleTemplate)
 );
 
-/**
- * @route   GET /api/partner-permissions/admin/menu-items
- * @desc    Get menu items structure (Admin only)
- * @access  Private (Admin only)
- */
+
 router.get(
   '/admin/menu-items',
   protect,
@@ -223,11 +187,7 @@ router.get(
   asyncHandler(partnerPermissionController.getMenuItemsStructure)
 );
 
-/**
- * @route   POST /api/partner-permissions/admin/create-permission
- * @desc    Create a new permission type (Admin only)
- * @access  Private (Admin only)
- */
+
 router.post(
   '/admin/create-permission',
   [
@@ -283,11 +243,7 @@ router.post(
   asyncHandler(partnerPermissionController.createPermission)
 );
 
-/**
- * @route   GET /api/partner-permissions/admin/:partnerId
- * @desc    Get partner permissions by ID (Admin only)
- * @access  Private (Admin only)
- */
+
 router.get(
   '/admin/:partnerId',
   [param('partnerId').isMongoId().withMessage('Invalid partner ID')],
@@ -297,11 +253,7 @@ router.get(
   asyncHandler(partnerPermissionController.getPartnerPermissionsById)
 );
 
-/**
- * @route   PUT /api/partner-permissions/admin/:partnerId
- * @desc    Update partner permissions (Admin only)
- * @access  Private (Admin only)
- */
+
 router.put(
   '/admin/:partnerId',
   [
@@ -367,11 +319,7 @@ router.put(
   asyncHandler(partnerPermissionController.updatePartnerPermissions)
 );
 
-/**
- * @route   POST /api/partner-permissions/admin/:partnerId/grant
- * @desc    Grant specific permission to partner (Admin only)
- * @access  Private (Admin only)
- */
+
 router.post(
   '/admin/:partnerId/grant',
   [
@@ -412,11 +360,7 @@ router.post(
   asyncHandler(partnerPermissionController.grantPermission)
 );
 
-/**
- * @route   POST /api/partner-permissions/admin/:partnerId/revoke
- * @desc    Revoke specific permission from partner (Admin only)
- * @access  Private (Admin only)
- */
+
 router.post(
   '/admin/:partnerId/revoke',
   [
@@ -433,11 +377,7 @@ router.post(
   asyncHandler(partnerPermissionController.revokePermission)
 );
 
-/**
- * @route   POST /api/partner-permissions/admin/:partnerId/apply-role
- * @desc    Apply role template to partner (Admin only)
- * @access  Private (Admin only)
- */
+
 router.post(
   '/admin/:partnerId/apply-role',
   [

@@ -1,9 +1,4 @@
-/**
- * @fileoverview Sell Question Routes
- * @description Routes for managing sell questions including CRUD operations
- * @author Cashify Development Team
- * @version 1.0.0
- */
+
 
 const express = require('express');
 const { body, param, query } = require('express-validator');
@@ -23,7 +18,7 @@ const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Validation middleware
+
 const questionValidation = [
   body('categoryId')
     .isMongoId()
@@ -151,7 +146,7 @@ const optionValidation = [
   body('showIf').optional().isObject().withMessage('showIf must be an object'),
 ];
 
-// Public routes for customers
+
 router.get(
   '/customer',
   query('productId')
@@ -164,11 +159,11 @@ router.get(
   getCustomerQuestions
 );
 
-// Protected routes
+
 router.use(protect);
 router.use(authorize('admin'));
 
-// Reorder questions (must be before /:id routes to avoid matching "reorder" as an ID)
+
 router.put(
   '/reorder',
   body('categoryId')
@@ -185,7 +180,7 @@ router.put(
   reorderQuestions
 );
 
-// CRUD routes
+
 router.post('/', questionValidation, createQuestion);
 router.get('/', getQuestions);
 router.get(
@@ -210,7 +205,7 @@ router.delete(
   deleteQuestion
 );
 
-// Option management routes
+
 router.post(
   '/:id/options',
   param('id')

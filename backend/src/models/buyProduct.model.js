@@ -1,4 +1,4 @@
-// models/BuyProduct.js
+
 const mongoose = require('mongoose');
 
 const CameraSpecSchema = new mongoose.Schema(
@@ -66,7 +66,7 @@ const BuyProductSchema = new mongoose.Schema(
 
     conditionOptions: [
       {
-        label: String, // Fair | Good | Superb
+        label: String, 
         price: Number,
       },
     ],
@@ -124,7 +124,7 @@ const BuyProductSchema = new mongoose.Schema(
       estimatedDelivery: String,
     },
 
-    // Short specs (OBJECT, not array)
+    
     topSpecs: {
       screenSize: String,
       chipset: String,
@@ -133,10 +133,10 @@ const BuyProductSchema = new mongoose.Schema(
       simSlots: String,
     },
 
-    // Full product details
+    
     productDetails: {
-      frontCamera: FrontCameraSchema, // ← now sub-doc
-      rearCamera: RearCameraSchema, // ← now sub-doc
+      frontCamera: FrontCameraSchema, 
+      rearCamera: RearCameraSchema, 
 
       networkConnectivity: {
         wifi: String,
@@ -222,7 +222,7 @@ const BuyProductSchema = new mongoose.Schema(
     partnerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Partner',
-      required: false, // Optional - admin can create without partner
+      required: false, 
     },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -230,18 +230,18 @@ const BuyProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Virtual for display name
+
 BuyProductSchema.virtual('displayName').get(function () {
   return `${this.brand} ${this.name}`;
 });
 
-// Indexes
+
 BuyProductSchema.index({ name: 1, brand: 1 });
 BuyProductSchema.index({ categoryId: 1 });
 BuyProductSchema.index({ isActive: 1 });
 BuyProductSchema.index({ 'rating.average': -1 });
 BuyProductSchema.index({ 'pricing.discountedPrice': 1 });
 
-// IMPORTANT: prevent old compiled schema reuse
+
 module.exports =
   mongoose.models.BuyProduct || mongoose.model('BuyProduct', BuyProductSchema);

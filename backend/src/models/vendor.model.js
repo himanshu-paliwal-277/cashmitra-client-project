@@ -109,7 +109,7 @@ const vendorSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for efficient querying
+
 vendorSchema.index({ user: 1 });
 vendorSchema.index({ isActive: 1 });
 vendorSchema.index({ verificationStatus: 1 });
@@ -117,17 +117,17 @@ vendorSchema.index({ 'contactPerson.email': 1 });
 vendorSchema.index({ 'businessDetails.gstNumber': 1 });
 vendorSchema.index({ createdAt: -1 });
 
-// Virtual for vendor age in days
+
 vendorSchema.virtual('ageInDays').get(function () {
   return Math.floor((Date.now() - this.createdAt) / (1000 * 60 * 60 * 24));
 });
 
-// Method to check if vendor is fully verified
+
 vendorSchema.methods.isFullyVerified = function () {
   return this.isVerified && this.verificationStatus === 'approved';
 };
 
-// Static method to get active vendors
+
 vendorSchema.statics.getActiveVendors = function () {
   return this.find({
     isActive: true,
@@ -135,7 +135,7 @@ vendorSchema.statics.getActiveVendors = function () {
   }).populate('user', 'name email');
 };
 
-// Static method to get vendors by status
+
 vendorSchema.statics.getByStatus = function (status) {
   return this.find({ verificationStatus: status }).populate(
     'user',

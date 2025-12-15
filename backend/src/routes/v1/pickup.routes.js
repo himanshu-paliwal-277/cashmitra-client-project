@@ -1,9 +1,4 @@
-/**
- * @fileoverview Pickup Routes
- * @description Routes for managing pickup services and scheduling
- * @author Cashify Development Team
- * @version 1.0.0
- */
+
 
 const express = require('express');
 const { body, param, query } = require('express-validator');
@@ -12,7 +7,7 @@ const pickupController = require('../../controllers/pickup.controller');
 
 const router = express.Router();
 
-// Validation middleware
+
 const schedulePickupValidation = [
   body('orderId')
     .isMongoId()
@@ -25,7 +20,7 @@ const schedulePickupValidation = [
   body('city')
     .optional()
     .custom((value, { req }) => {
-      // Skip validation for buy orders as they have nested address structure
+      
       if (req.body.orderType === 'buy') {
         return true;
       }
@@ -37,7 +32,7 @@ const schedulePickupValidation = [
   body('pincode')
     .optional()
     .custom((value, { req }) => {
-      // Skip validation for buy orders as they have nested address structure
+      
       if (req.body.orderType === 'buy') {
         return true;
       }
@@ -49,7 +44,7 @@ const schedulePickupValidation = [
   body('preferredDate')
     .optional()
     .custom((value, { req }) => {
-      // Skip validation for buy orders as they use scheduledDate
+      
       if (req.body.orderType === 'buy') {
         return true;
       }
@@ -65,7 +60,7 @@ const schedulePickupValidation = [
   body('contactNumber')
     .optional()
     .custom((value, { req }) => {
-      // Skip validation for buy orders as they have nested customer structure
+      
       if (req.body.orderType === 'buy') {
         return true;
       }
@@ -114,10 +109,10 @@ const getPickupsValidation = [
     .withMessage('Date must be a valid date'),
 ];
 
-// Apply authentication middleware
+
 router.use(protect);
 
-// Public routes (authenticated users)
+
 router.post(
   '/schedule',
   schedulePickupValidation,
@@ -133,7 +128,7 @@ router.get(
   pickupController.getPickupById
 );
 
-// Admin routes
+
 router.use(authorize('admin'));
 router.get('/', getPickupsValidation, pickupController.getPickups);
 router.post('/', schedulePickupValidation, pickupController.createPickup);

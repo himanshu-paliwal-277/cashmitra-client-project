@@ -11,7 +11,7 @@ const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
 
 const router = express.Router();
 
-// Vendor authentication routes
+
 router.post(
   '/login',
   authLimiter,
@@ -23,7 +23,7 @@ router.post(
   asyncHandler(vendorController.loginVendor)
 );
 
-// Vendor profile routes
+
 router.get(
   '/profile',
   protect,
@@ -38,7 +38,7 @@ router.get(
   asyncHandler(vendorController.getVendorPermissions)
 );
 
-// Admin routes for vendor management
+
 router.get(
   '/admin/vendors',
   protect,

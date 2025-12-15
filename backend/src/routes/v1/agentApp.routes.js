@@ -1,7 +1,4 @@
-/**
- * @fileoverview Agent App Routes
- * @description Routes for agent mobile app operations
- */
+
 
 const express = require('express');
 const { check } = require('express-validator');
@@ -15,11 +12,7 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-/**
- * @route   POST /api/agent-app/login
- * @desc    Agent login
- * @access  Public
- */
+
 router.post(
   '/login',
   [
@@ -33,39 +26,23 @@ router.post(
   asyncHandler(agentAppController.login)
 );
 
-// Protected routes - require authentication
+
 router.use(protect);
 router.use(authorize('agent'));
 
-/**
- * @route   GET /api/agent-app/profile
- * @desc    Get agent profile
- * @access  Private (Agent)
- */
+
 router.get('/profile', asyncHandler(agentAppController.getProfile));
 
-/**
- * @route   GET /api/agent-app/orders/today
- * @desc    Get today's assigned orders
- * @access  Private (Agent)
- */
+
 router.get('/orders/today', asyncHandler(agentAppController.getTodayOrders));
 
-/**
- * @route   GET /api/agent-app/orders/tomorrow
- * @desc    Get tomorrow's assigned orders
- * @access  Private (Agent)
- */
+
 router.get(
   '/orders/tomorrow',
   asyncHandler(agentAppController.getTomorrowOrders)
 );
 
-/**
- * @route   GET /api/agent-app/orders/past
- * @desc    Get past orders
- * @access  Private (Agent)
- */
+
 router.get(
   '/orders/past',
   [
@@ -82,44 +59,28 @@ router.get(
   asyncHandler(agentAppController.getPastOrders)
 );
 
-/**
- * @route   GET /api/agent-app/orders/:orderId
- * @desc    Get order details
- * @access  Private (Agent)
- */
+
 router.get(
   '/orders/:orderId',
   validateObjectId('orderId'),
   asyncHandler(agentAppController.getOrderDetails)
 );
 
-/**
- * @route   PUT /api/agent-app/pickups/:pickupId/start
- * @desc    Start a pickup (mark as in progress)
- * @access  Private (Agent)
- */
+
 router.put(
   '/pickups/:pickupId/start',
   validateObjectId('pickupId'),
   asyncHandler(agentAppController.startPickup)
 );
 
-/**
- * @route   GET /api/agent-app/evaluation/questions/:productId
- * @desc    Get evaluation questions for a product
- * @access  Private (Agent)
- */
+
 router.get(
   '/evaluation/questions/:productId',
   validateObjectId('productId'),
   asyncHandler(agentAppController.getEvaluationQuestions)
 );
 
-/**
- * @route   POST /api/agent-app/evaluation/calculate-price
- * @desc    Calculate final price based on evaluation
- * @access  Private (Agent)
- */
+
 router.post(
   '/evaluation/calculate-price',
   [
@@ -137,11 +98,7 @@ router.post(
   asyncHandler(agentAppController.calculatePrice)
 );
 
-/**
- * @route   PUT /api/agent-app/pickups/:pickupId/complete-evaluation
- * @desc    Complete evaluation and update final price
- * @access  Private (Agent)
- */
+
 router.put(
   '/pickups/:pickupId/complete-evaluation',
   validateObjectId('pickupId'),
@@ -168,11 +125,7 @@ router.put(
   asyncHandler(agentAppController.completeEvaluation)
 );
 
-/**
- * @route   PUT /api/agent-app/orders/:orderId/payment
- * @desc    Complete payment collection
- * @access  Private (Agent)
- */
+
 router.put(
   '/orders/:orderId/payment',
   validateObjectId('orderId'),
@@ -194,18 +147,10 @@ router.put(
   asyncHandler(agentAppController.completePayment)
 );
 
-/**
- * @route   GET /api/agent-app/statistics
- * @desc    Get agent statistics
- * @access  Private (Agent)
- */
+
 router.get('/statistics', asyncHandler(agentAppController.getStatistics));
 
-/**
- * @route   PUT /api/agent-app/location
- * @desc    Update agent current location
- * @access  Private (Agent)
- */
+
 router.put(
   '/location',
   [
@@ -220,11 +165,7 @@ router.put(
   asyncHandler(agentAppController.updateLocation)
 );
 
-/**
- * @route   POST /api/agent-app/orders/:orderId/customer-selfie
- * @desc    Upload customer selfie (face detect)
- * @access  Private (Agent)
- */
+
 router.post(
   '/orders/:orderId/customer-selfie',
   validateObjectId('orderId'),
@@ -233,22 +174,14 @@ router.post(
   asyncHandler(agentAppController.uploadCustomerSelfie)
 );
 
-/**
- * @route   POST /api/agent-app/orders/:orderId/gadget-images
- * @desc    Upload gadget images (device photos)
- * @access  Private (Agent)
- */
+
 router.post(
   '/orders/:orderId/gadget-images',
   validateObjectId('orderId'),
   asyncHandler(agentAppController.uploadGadgetImages)
 );
 
-/**
- * @route   POST /api/agent-app/orders/:orderId/imei-scan
- * @desc    Scan and upload IMEI number
- * @access  Private (Agent)
- */
+
 router.post(
   '/orders/:orderId/imei-scan',
   validateObjectId('orderId'),
@@ -269,11 +202,7 @@ router.post(
   asyncHandler(agentAppController.uploadIMEIScan)
 );
 
-/**
- * @route   POST /api/agent-app/orders/:orderId/re-evaluate
- * @desc    Re-evaluate device with updated assessment
- * @access  Private (Agent)
- */
+
 router.post(
   '/orders/:orderId/re-evaluate',
   validateObjectId('orderId'),
@@ -304,11 +233,7 @@ router.post(
   asyncHandler(agentAppController.reEvaluateDevice)
 );
 
-/**
- * @route   GET /api/agent-app/orders/:orderId/complete
- * @desc    Get complete order details with all images
- * @access  Private (Agent)
- */
+
 router.get(
   '/orders/:orderId/complete',
   validateObjectId('orderId'),

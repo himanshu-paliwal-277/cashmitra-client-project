@@ -49,12 +49,12 @@ const buyCategorySchema = new mongoose.Schema(
   }
 );
 
-// Virtual for display name
+
 buyCategorySchema.virtual('displayName').get(function () {
   return this.name;
 });
 
-// Pre-save middleware to generate slug
+
 buyCategorySchema.pre('save', function (next) {
   if (this.isModified('name') && !this.slug) {
     this.slug = this.name

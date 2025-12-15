@@ -1,9 +1,7 @@
-/**
- * Security configuration for the application
- */
+
 
 const securityConfig = {
-  // CORS configuration
+  
   cors: {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -12,7 +10,7 @@ const securityConfig = {
     credentials: true,
   },
 
-  // Helmet configuration for HTTP security headers
+  
   helmet: {
     contentSecurityPolicy: {
       directives: {
@@ -32,10 +30,10 @@ const securityConfig = {
     referrerPolicy: { policy: 'same-origin' },
   },
 
-  // Rate limiting configuration
+  
   rateLimit: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000, 
+    max: 100, 
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -44,10 +42,10 @@ const securityConfig = {
     },
   },
 
-  // Authentication rate limiting (for login/register)
+  
   authRateLimit: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 50, // limit each IP to 5 requests per windowMs
+    windowMs: 15 * 60 * 1000, 
+    max: 50, 
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -56,7 +54,7 @@ const securityConfig = {
     },
   },
 
-  // Session configuration
+  
   session: {
     secret: require('./serverConfig').SESSION_SECRET,
     resave: false,
@@ -65,11 +63,11 @@ const securityConfig = {
       secure: require('./serverConfig').isProduction(),
       httpOnly: true,
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: 24 * 60 * 60 * 1000, 
     },
   },
 
-  // JWT configuration
+  
   jwt: {
     secret: require('./serverConfig').JWT_SECRET,
     expiresIn: require('./serverConfig').JWT_EXPIRES_IN,

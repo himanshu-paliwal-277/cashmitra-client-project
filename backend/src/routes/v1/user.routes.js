@@ -7,17 +7,17 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-// Apply authentication middleware to all routes
+
 router.use(protect);
 
-// @route   GET /api/user/profile
-// @desc    Get user profile
-// @access  Private
+
+
+
 router.get('/profile', asyncHandler(userController.getUserProfile));
 
-// @route   PUT /api/user/profile
-// @desc    Update user profile
-// @access  Private
+
+
+
 router.put(
   '/profile',
   [
@@ -55,24 +55,24 @@ router.put(
   asyncHandler(userController.updateUserProfile)
 );
 
-// @route   GET /api/user/orders
-// @desc    Get user orders with pagination and filtering
-// @access  Private
+
+
+
 router.get('/orders', asyncHandler(userController.getUserOrders));
 
-// @route   GET /api/user/orders/:id
-// @desc    Get single order by ID
-// @access  Private
+
+
+
 router.get('/orders/:id', asyncHandler(userController.getOrderById));
 
-// @route   GET /api/user/addresses
-// @desc    Get user addresses
-// @access  Private
+
+
+
 router.get('/addresses', asyncHandler(userController.getUserAddresses));
 
-// @route   POST /api/user/addresses
-// @desc    Add new address
-// @access  Private
+
+
+
 router.post(
   '/addresses',
   [
@@ -96,9 +96,9 @@ router.post(
   asyncHandler(userController.addAddress)
 );
 
-// @route   PUT /api/user/addresses/:id
-// @desc    Update address
-// @access  Private
+
+
+
 router.put(
   '/addresses/:id',
   [
@@ -133,14 +133,14 @@ router.put(
   asyncHandler(userController.updateAddress)
 );
 
-// @route   DELETE /api/user/addresses/:id
-// @desc    Delete address
-// @access  Private
+
+
+
 router.delete('/addresses/:id', asyncHandler(userController.deleteAddress));
 
-// @route   PUT /api/user/addresses/:id/default
-// @desc    Set default address
-// @access  Private
+
+
+
 router.put(
   '/addresses/:id/default',
   asyncHandler(userController.setDefaultAddress)

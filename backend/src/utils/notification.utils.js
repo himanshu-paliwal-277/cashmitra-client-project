@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-// Email transporter configuration
+
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
   port: process.env.EMAIL_PORT || 587,
@@ -11,9 +11,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/**
- * Send OTP via Email
- */
+
 exports.sendOTPEmail = async (
   email,
   otp,
@@ -78,40 +76,25 @@ exports.sendOTPEmail = async (
   }
 };
 
-/**
- * Send OTP via SMS
- * Note: You need to integrate with SMS gateway like Twilio, MSG91, etc.
- */
+
 exports.sendOTPSMS = async (phone, otp) => {
   try {
-    // TODO: Integrate with SMS gateway
-    // Example for Twilio:
-    /*
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const client = require('twilio')(accountSid, authToken);
-
-    await client.messages.create({
-      body: `Your Cashify verification OTP is: ${otp}. Valid for 5 minutes. Do not share this OTP with anyone.`,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: phone
-    });
-    */
+    
+    
+    
 
     console.log(`OTP SMS would be sent to ${phone}: ${otp}`);
 
-    // For now, just log the OTP (in production, use actual SMS service)
+    
     return true;
   } catch (error) {
     console.error('Error sending OTP SMS:', error);
-    // Don't throw error to allow email-only OTP
+    
     return false;
   }
 };
 
-/**
- * Send Email Notification
- */
+
 exports.sendEmail = async (to, subject, html) => {
   try {
     const mailOptions = {
@@ -129,12 +112,10 @@ exports.sendEmail = async (to, subject, html) => {
   }
 };
 
-/**
- * Send SMS Notification
- */
+
 exports.sendSMS = async (phone, message) => {
   try {
-    // TODO: Integrate with SMS gateway
+    
     console.log(`SMS to ${phone}: ${message}`);
     return true;
   } catch (error) {
@@ -143,12 +124,10 @@ exports.sendSMS = async (phone, message) => {
   }
 };
 
-/**
- * Send Push Notification
- */
+
 exports.sendPushNotification = async (userId, title, body, data = {}) => {
   try {
-    // TODO: Integrate with Firebase Cloud Messaging or similar
+    
     console.log(`Push notification to user ${userId}: ${title} - ${body}`);
     return true;
   } catch (error) {

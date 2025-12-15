@@ -67,7 +67,7 @@ const inventorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create indexes for efficient querying
+
 inventorySchema.index({ partner: 1 });
 inventorySchema.index({ product: 1 });
 inventorySchema.index({ condition: 1, price: 1 });

@@ -10,11 +10,11 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-// Public routes for product browsing
+
 router.get('/products', asyncHandler(buyController.searchProducts));
 router.get('/products/:id', asyncHandler(buyController.getProductDetails));
 
-// Protected routes for cart and checkout
+
 router.post(
   '/cart',
   protect,
@@ -61,49 +61,49 @@ router.post(
   asyncHandler(buyController.checkout)
 );
 
-// Order management routes
+
 router.get('/orders', protect, asyncHandler(buyController.getOrderHistory));
 router.get('/orders/:id', protect, asyncHandler(buyController.getOrderDetails));
 
-// Get all product categories
+
 router.get('/categories', asyncHandler(buyController.getCategories));
 
-// Get brands by category
+
 router.get(
   '/brands/:categoryId',
   validateObjectId('categoryId'),
   asyncHandler(buyController.getBrandsByCategory)
 );
 
-// Get series by brand
+
 router.get(
   '/series/:brandId',
   validateObjectId('brandId'),
   asyncHandler(buyController.getSeriesByBrand)
 );
 
-// Get models by series
+
 router.get(
   '/models/:seriesId',
   validateObjectId('seriesId'),
   asyncHandler(buyController.getModelsBySeries)
 );
 
-// Get variants by model
+
 router.get(
   '/variants/:modelId',
   validateObjectId('modelId'),
   asyncHandler(buyController.getVariantsByModel)
 );
 
-// Get variant details
+
 router.get(
   '/variant/:variantId',
   validateObjectId('variantId'),
   asyncHandler(buyController.getVariantDetails)
 );
 
-// Search products
+
 router.get(
   '/search',
   [
@@ -141,7 +141,7 @@ router.get(
   asyncHandler(buyController.searchProducts)
 );
 
-// Create order
+
 router.post(
   '/orders',
   protect,
@@ -157,10 +157,10 @@ router.post(
   asyncHandler(buyController.createOrder)
 );
 
-// Get user orders
+
 router.get('/orders', protect, asyncHandler(buyController.getUserOrders));
 
-// Get order details
+
 router.get(
   '/orders/:orderId',
   protect,

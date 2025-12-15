@@ -20,7 +20,7 @@ const {
 
 const router = express.Router();
 
-// Validation middleware for product reviews
+
 const validateProductReview = [
   body('rating')
     .isInt({ min: 1, max: 5 })
@@ -37,13 +37,13 @@ const validateProductReview = [
     .withMessage('Reviewer name must be between 2 and 50 characters'),
 ];
 
-// Public routes (no authentication required)
+
 router.get('/', getBuyProducts);
 router.get('/stats', getBuyProductStats);
 router.get('/category/:category', getBuyProductsByCategory);
 router.get('/:id', getBuyProductById);
 
-// Temporarily moved POST route for testing (no authentication)
+
 router.post(
   '/',
   validateCreateBuyProduct,
@@ -51,14 +51,14 @@ router.post(
   createBuyProduct
 );
 
-// Protected routes (authentication required)
+
 router.use(protect);
 
-// 🔒 Import and apply partner middleware for data isolation
+
 const { attachPartner } = require('../../middlewares/partner.middleware');
 router.use(attachPartner);
 
-// Admin and Partner routes (both can manage buy products)
+
 router.put(
   '/:id',
   authorize('admin', 'partner'),
@@ -69,7 +69,7 @@ router.put(
 router.delete('/:id', authorize('admin', 'partner'), deleteBuyProduct);
 router.patch('/:id/toggle-status', authorize('admin'), toggleProductStatus);
 
-// Review routes (authenticated users can add reviews)
+
 router.post('/:id/reviews', validateProductReview, addProductReview);
 
 module.exports = router;

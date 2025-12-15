@@ -1,10 +1,7 @@
 const Partner = require('../models/partner.model');
 const { ApiError } = require('./errorHandler.middleware');
 
-/**
- * Get partner ID from authenticated user
- * Middleware to attach partnerId to request
- */
+
 exports.attachPartner = async (req, res, next) => {
   try {
     if (req.user.role !== 'partner') {
@@ -29,9 +26,7 @@ exports.attachPartner = async (req, res, next) => {
   }
 };
 
-/**
- * Check if user is a verified partner
- */
+
 exports.requirePartner = (req, res, next) => {
   if (req.user.role !== 'partner') {
     throw new ApiError(403, 'Access denied. Partner role required.');
@@ -44,18 +39,16 @@ exports.requirePartner = (req, res, next) => {
   next();
 };
 
-/**
- * Check if resource belongs to partner
- */
+
 exports.checkResourceOwnership = (Model, resourceIdParam = 'id') => {
   return async (req, res, next) => {
     try {
-      // Admins can access everything
+      
       if (req.user.role === 'admin') {
         return next();
       }
 
-      // Partners can only access their own resources
+      
       if (req.user.role === 'partner') {
         const resourceId = req.params[resourceIdParam];
         const resource = await Model.findById(resourceId);

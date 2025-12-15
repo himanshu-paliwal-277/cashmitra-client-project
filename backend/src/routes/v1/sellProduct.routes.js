@@ -1,9 +1,4 @@
-/**
- * @fileoverview Sell Product Routes
- * @description Routes for managing sell products including CRUD operations and variants
- * @author Cashify Development Team
- * @version 1.0.0
- */
+
 
 const express = require('express');
 const { body, param, query } = require('express-validator');
@@ -25,7 +20,7 @@ const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Validation middleware
+
 const productValidation = [
   body('categoryId')
     .isMongoId()
@@ -146,7 +141,7 @@ const queryValidation = [
     .withMessage('SortOrder must be either asc or desc'),
 ];
 
-// Public routes for customers
+
 router.get('/customer', queryValidation, getCustomerProducts);
 router.get('/category/:category', getSellProductsByCategory);
 router.get(
@@ -157,19 +152,19 @@ router.get(
   getProduct
 );
 
-// Protected routes - require authentication
+
 router.use(protect);
 
-// Import partner middleware
+
 const { attachPartner } = require('../../middlewares/partner.middleware');
 
-// Attach partner info if user is partner
+
 router.use(attachPartner);
 
-// Admin and Partner routes - require admin or partner role
+
 router.use(authorize('admin', 'partner'));
 
-// Product CRUD routes
+
 router.post('/', productValidation, createProduct);
 router.get('/', queryValidation, getProducts);
 router.get('/stats', getProductStats);
@@ -189,7 +184,7 @@ router.delete(
   deleteProduct
 );
 
-// Variant management routes
+
 router.get(
   '/:id/variants',
   param('id')

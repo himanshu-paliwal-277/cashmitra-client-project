@@ -12,7 +12,10 @@
       "Bash(ls:*)",
       "Bash(xargs:*)",
       "Bash(rm:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npm install:*)",
+      "Bash(strip-comments:*)",
+      "Bash(node remove-comments.js:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,4 +1,4 @@
-// sellQuestionSchema.js
+
 const mongoose = require('mongoose');
 
 const sellQuestionSchema = new mongoose.Schema(
@@ -79,7 +79,7 @@ const sellQuestionSchema = new mongoose.Schema(
     },
     options: [
       {
-        _id: false, // Disable automatic _id field for options
+        _id: false, 
         key: {
           type: String,
           required: [true, 'Option key is required'],
@@ -151,7 +151,7 @@ const sellQuestionSchema = new mongoose.Schema(
   }
 );
 
-// Pre-save middleware to transform null showIf to undefined
+
 sellQuestionSchema.pre('save', function (next) {
   this.options = this.options.map((opt) => ({
     ...opt,
@@ -160,21 +160,21 @@ sellQuestionSchema.pre('save', function (next) {
   next();
 });
 
-// Compound index for unique key per category
+
 sellQuestionSchema.index({ categoryId: 1, key: 1 }, { unique: true });
 
-// Index for querying by category and section
+
 sellQuestionSchema.index({ categoryId: 1, section: 1, order: 1 });
 
-// Index for active questions
+
 sellQuestionSchema.index({ categoryId: 1, isActive: 1 });
 
-// Virtual for active options
+
 sellQuestionSchema.virtual('activeOptions').get(function () {
   return this.options.filter((option) => option.isActive !== false);
 });
 
-// Method to get questions for specific category
+
 sellQuestionSchema.statics.getForCategory = function (categoryId) {
   const query = {
     categoryId,
@@ -184,21 +184,21 @@ sellQuestionSchema.statics.getForCategory = function (categoryId) {
   return this.find(query).sort({ section: 1, order: 1 });
 };
 
-// Method to get questions for specific product variants
-// Since questions are linked to categories, we need to get the product's category first
+
+
 sellQuestionSchema.statics.getForVariants = async function (
   productId,
   variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
 
-  // Get the product to find its categoryId
+  
   const product = await SellProduct.findById(productId).select('categoryId');
   if (!product) {
     return [];
   }
 
-  // Get questions for the product's category
+  
   return this.getForCategory(product.categoryId);
 };
 

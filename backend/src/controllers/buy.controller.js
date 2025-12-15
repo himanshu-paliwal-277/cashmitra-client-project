@@ -9,37 +9,33 @@ const Wallet = require('../models/wallet.model');
 const Transaction = require('../models/transaction.model');
 const mongoose = require('mongoose');
 
-/**
- * @desc    Search products by category, brand, or model
- * @route   GET /api/buy/search
- * @access  Public
- */
+
 const searchProducts = async (req, res) => {
   try {
     const { query, category, condition, minPrice, maxPrice, pincode } =
       req.query;
 
-    // Build search filter
+    
     const filter = { isAvailable: true };
 
-    // Add category filter if provided
+    
     if (category) {
       filter['product.category'] = category;
     }
 
-    // Add condition filter if provided
+    
     if (condition) {
       filter.condition = condition;
     }
 
-    // Add price range filter if provided
+    
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
-    // Find partners in the specified pincode if provided
+    
     let partnerIds = [];
     if (pincode) {
       const partners = await Partner.find({
@@ -59,10 +55,10 @@ const searchProducts = async (req, res) => {
       filter.partner = { $in: partnerIds };
     }
 
-    // Text search if query is provided
+    
     let inventoryItems;
     if (query) {
-      // First find products matching the query
+      
       const products = await Product.find(
         { $text: { $search: query } },
         { score: { $meta: 'textScore' } }
@@ -70,16 +66,16 @@ const searchProducts = async (req, res) => {
 
       const productIds = products.map((product) => product._id);
 
-      // Then find inventory items with those products
+      
       if (productIds.length > 0) {
         filter.product = { $in: productIds };
       } else {
-        // If no products match, return empty result
+        
         return res.json({ products: [], total: 0 });
       }
     }
 
-    // Fetch inventory items with pagination
+    
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -104,11 +100,7 @@ const searchProducts = async (req, res) => {
   }
 };
 
-/**
- * @desc    Get product details
- * @route   GET /api/buy/product/:id
- * @access  Public
- */
+
 const getProductDetails = async (req, res) => {
   try {
     const product = await BuyProduct.findById(req.params.id).populate(
@@ -120,7 +112,7 @@ const getProductDetails = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Find similar products from the same partner
+    
     const similarProducts = await BuyProduct.find({
       partner: product.partner._id,
       category: product.category,
@@ -138,11 +130,7 @@ const getProductDetails = async (req, res) => {
   }
 };
 
-/**
- * @desc    Add product to cart
- * @route   POST /api/buy/cart
- * @access  Private
- */
+
 const addToCart = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -153,7 +141,7 @@ const addToCart = async (req, res) => {
     const { productId, quantity } = req.body;
     const userId = req.user.id;
 
-    // Check if product exists and is available
+    
     const product = await BuyProduct.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
@@ -163,13 +151,13 @@ const addToCart = async (req, res) => {
       return res.status(400).json({ message: 'Product is not available' });
     }
 
-    // Find or create user's cart
+    
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
       cart = new Cart({ user: userId, items: [] });
     }
 
-    // Check if product is already in cart
+    
     const existingItemIndex = cart.items.findIndex(
       (item) => item.productId.toString() === productId
     );
@@ -177,7 +165,7 @@ const addToCart = async (req, res) => {
     if (existingItemIndex !== -1) {
       cart.items[existingItemIndex].quantity += quantity;
     } else {
-      // Add new item to cart
+      
       cart.items.push({
         productId,
         quantity,
@@ -186,7 +174,7 @@ const addToCart = async (req, res) => {
 
     await cart.save();
 
-    // Fetch details for each cart item (same as getCart)
+    
     const cartItemsPromises = cart.items.map(async (item) => {
       const product = await BuyProduct.findById(item.productId);
 
@@ -214,7 +202,7 @@ const addToCart = async (req, res) => {
     let cartItems = await Promise.all(cartItemsPromises);
     cartItems = cartItems.filter((item) => item !== null);
 
-    // Calculate total
+    
     const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
     res.json({
@@ -228,28 +216,24 @@ const addToCart = async (req, res) => {
   }
 };
 
-/**
- * @desc    Get cart items
- * @route   GET /api/buy/cart
- * @access  Private
- */
+
 const getCart = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Find user's cart
+    
     const cart = await Cart.findOne({ user: userId });
 
     if (!cart || cart.items.length === 0) {
       return res.json({ cart: [], total: 0 });
     }
 
-    // Fetch details for each cart item
+    
     const cartItemsPromises = cart.items.map(async (item) => {
       const product = await BuyProduct.findById(item.productId);
 
       if (!product) {
-        return null; // Item no longer exists
+        return null; 
       }
 
       return {
@@ -271,10 +255,10 @@ const getCart = async (req, res) => {
 
     let cartItems = await Promise.all(cartItemsPromises);
 
-    // Filter out null items (those that no longer exist)
+    
     cartItems = cartItems.filter((item) => item !== null);
 
-    // Update cart to remove items that no longer exist
+    
     cart.items = cart.items.filter((item) =>
       cartItems.some(
         (cartItem) =>
@@ -287,7 +271,7 @@ const getCart = async (req, res) => {
       await cart.save();
     }
 
-    // Calculate total
+    
     const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
     res.json({
@@ -300,11 +284,7 @@ const getCart = async (req, res) => {
   }
 };
 
-/**
- * @desc    Update cart item quantity
- * @route   PUT /api/buy/cart/:productId
- * @access  Private
- */
+
 const updateCartItem = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -313,17 +293,17 @@ const updateCartItem = async (req, res) => {
 
   try {
     const { itemId } = req.params;
-    const productId = itemId; // itemId is actually the productId
+    const productId = itemId; 
     const { quantity } = req.body;
     const userId = req.user.id;
 
-    // Find user's cart
+    
     const cart = await Cart.findOne({ user: userId });
     if (!cart) {
       return res.status(404).json({ message: 'Cart is empty' });
     }
 
-    // Find the item in the cart
+    
     const itemIndex = cart.items.findIndex(
       (item) => item.productId.toString() === productId
     );
@@ -332,10 +312,10 @@ const updateCartItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not found in cart' });
     }
 
-    // Check product availability
+    
     const product = await BuyProduct.findById(productId);
     if (!product) {
-      // Remove item from cart if it no longer exists
+      
       cart.items.splice(itemIndex, 1);
       await cart.save();
       return res.status(404).json({ message: 'Product no longer exists' });
@@ -345,9 +325,9 @@ const updateCartItem = async (req, res) => {
       return res.status(400).json({ message: 'Product is not available' });
     }
 
-    // Update quantity
+    
     if (quantity <= 0) {
-      // Remove item if quantity is 0 or negative
+      
       cart.items.splice(itemIndex, 1);
     } else {
       cart.items[itemIndex].quantity = quantity;
@@ -365,24 +345,20 @@ const updateCartItem = async (req, res) => {
   }
 };
 
-/**
- * @desc    Remove item from cart
- * @route   DELETE /api/buy/cart/:productId
- * @access  Private
- */
+
 const removeCartItem = async (req, res) => {
   try {
     const { itemId } = req.params;
-    const productId = itemId; // itemId is actually the productId
+    const productId = itemId; 
     const userId = req.user.id;
 
-    // Find user's cart
+    
     const cart = await Cart.findOne({ user: userId });
     if (!cart) {
       return res.status(404).json({ message: 'Cart is empty' });
     }
 
-    // Find the item in the cart
+    
     const itemIndex = cart.items.findIndex(
       (item) => item.productId.toString() === productId
     );
@@ -391,7 +367,7 @@ const removeCartItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not found in cart' });
     }
 
-    // Remove item from cart
+    
     cart.items.splice(itemIndex, 1);
     await cart.save();
 
@@ -405,11 +381,7 @@ const removeCartItem = async (req, res) => {
   }
 };
 
-/**
- * @desc    Create buy order (checkout)
- * @route   POST /api/buy/checkout
- * @access  Private
- */
+
 const checkout = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -420,16 +392,16 @@ const checkout = async (req, res) => {
     const { shippingAddress, paymentMethod } = req.body;
     const userId = req.user.id;
 
-    // Find user's cart
+    
     const cart = await Cart.findOne({ user: userId });
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: 'Cart is empty' });
     }
 
-    // Group cart items by partner
+    
     const partnerItems = {};
 
-    // Validate all items and group by partner
+    
     for (const item of cart.items) {
       const product = await BuyProduct.findById(item.productId).populate(
         'partner'
@@ -463,23 +435,23 @@ const checkout = async (req, res) => {
       });
     }
 
-    // Create orders for each partner
+    
     const orders = [];
 
     for (const partnerId in partnerItems) {
       const partnerData = partnerItems[partnerId];
 
-      // Calculate total amount for this partner's items
+      
       const totalAmount = partnerData.items.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0
       );
 
-      // Calculate commission (5% of the total amount)
+      
       const commissionRate = 5;
       const commissionAmount = (totalAmount * commissionRate) / 100;
 
-      // Create order
+      
       const order = new Order({
         orderType: 'buy',
         user: req.user._id,
@@ -512,7 +484,7 @@ const checkout = async (req, res) => {
       orders.push(order);
     }
 
-    // Clear the cart after successful checkout
+    
     cart.items = [];
     await cart.save();
 
@@ -531,11 +503,7 @@ const checkout = async (req, res) => {
   }
 };
 
-/**
- * @desc    Get buy order details
- * @route   GET /api/buy/order/:id
- * @access  Private
- */
+
 const getBuyOrderDetails = async (req, res) => {
   try {
     const order = await Order.findOne({
@@ -563,11 +531,7 @@ const getBuyOrderDetails = async (req, res) => {
   }
 };
 
-/**
- * @desc    Get user's buy orders
- * @route   GET /api/buy/orders
- * @access  Private
- */
+
 const getUserBuyOrders = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;

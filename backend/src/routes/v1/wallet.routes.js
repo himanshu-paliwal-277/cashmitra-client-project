@@ -10,8 +10,8 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-// Partner wallet routes
-// Get wallet details
+
+
 router.get(
   '/',
   protect,
@@ -19,7 +19,7 @@ router.get(
   asyncHandler(walletController.getWallet)
 );
 
-// Get wallet transactions
+
 router.get(
   '/transactions',
   protect,
@@ -53,7 +53,7 @@ router.get(
   asyncHandler(walletController.getTransactions)
 );
 
-// Request payout
+
 router.post(
   '/payout',
   protect,
@@ -96,7 +96,7 @@ router.post(
   asyncHandler(walletController.requestPayout)
 );
 
-// Update payout settings
+
 router.put(
   '/settings',
   protect,
@@ -124,7 +124,7 @@ router.put(
   asyncHandler(walletController.updatePayoutSettings)
 );
 
-// Get payout history
+
 router.get(
   '/payouts',
   protect,
@@ -147,7 +147,7 @@ router.get(
   asyncHandler(walletController.getPayoutHistory)
 );
 
-// Get wallet analytics
+
 router.get(
   '/analytics',
   protect,
@@ -162,8 +162,8 @@ router.get(
   asyncHandler(walletController.getWalletAnalytics)
 );
 
-// Admin routes for payout management
-// Get all pending payouts (Admin only)
+
+
 router.get(
   '/admin/payouts/pending',
   protect,
@@ -182,7 +182,7 @@ router.get(
   asyncHandler(walletController.getPendingPayouts)
 );
 
-// Get all payouts with optional status filter (Admin only)
+
 router.get(
   '/admin/payouts/all',
   protect,
@@ -205,7 +205,7 @@ router.get(
   asyncHandler(walletController.getAllPayouts)
 );
 
-// Process payout (approve/reject) - Admin only
+
 router.put(
   '/admin/payouts/:transactionId',
   protect,

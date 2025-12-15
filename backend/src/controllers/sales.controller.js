@@ -10,15 +10,11 @@ const {
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
 
-/**
- * @desc    Create a new order (Buy transaction)
- * @route   POST /api/sales/orders
- * @access  Private
- */
-exports.createOrder = asyncHandler(async (req, res) => {
-  // console.log('items: ', req.body);
 
-  // Convert items object to array if necessary
+exports.createOrder = asyncHandler(async (req, res) => {
+  
+
+  
   if (
     req.body.items &&
     typeof req.body.items === 'object' &&
@@ -40,14 +36,14 @@ exports.createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Order must contain at least one item');
   }
 
-  // Validate and process each item
+  
   const processedItems = [];
   let totalAmount = 0;
 
   for (const item of items) {
     const { inventoryId, quantity } = item;
 
-    // Find product directly using inventoryId as productId
+    
     const product = await Product.findById(inventoryId);
     console.log('product: ', product);
 
@@ -55,9 +51,9 @@ exports.createOrder = asyncHandler(async (req, res) => {
       throw new ApiError(404, `Product ${inventoryId} not found`);
     }
 
-    // Validate product basePrice
+    
 
-    // Use product basePrice for calculation
+    
     const itemTotal = product.pricing.mrp * quantity;
     totalAmount += itemTotal;
 
@@ -72,32 +68,32 @@ exports.createOrder = asyncHandler(async (req, res) => {
     processedItems.push(processedItem);
   }
 
-  // Calculate commission (assuming 10% platform commission)
+  
   const commissionRate = 0.1;
   const totalCommission = totalAmount * commissionRate;
   const partnerAmount = totalAmount - totalCommission;
 
-  // Apply coupon if provided
+  
   let discountAmount = 0;
   if (couponCode) {
-    // TODO: Implement coupon validation and discount calculation
-    // const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
-    // if (coupon && coupon.isValid()) {
-    //   discountAmount = coupon.calculateDiscount(totalAmount);
-    //   totalAmount -= discountAmount;
-    // }
+    
+    
+    
+    
+    
+    
   }
 
-  // Ensure totalAmount is valid
+  
   if (isNaN(totalAmount) || totalAmount <= 0) {
     throw new ApiError(400, 'Invalid total amount calculated');
   }
 
-  // Create order
+  
   const order = new Order({
     orderType: 'buy',
     user: userId,
-    partner: userId, // Using user as partner for direct product sales
+    partner: userId, 
     items: processedItems,
     totalAmount,
     discountAmount,
@@ -106,7 +102,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
       amount: totalCommission,
     },
     paymentDetails: {
-      method: paymentMethod === 'card' ? 'UPI' : paymentMethod, // Map card to UPI
+      method: paymentMethod === 'card' ? 'UPI' : paymentMethod, 
       status: 'pending',
     },
     shippingDetails: {
@@ -121,9 +117,9 @@ exports.createOrder = asyncHandler(async (req, res) => {
 
   await order.save();
 
-  // Note: Inventory management removed as we're working directly with products
+  
 
-  // Populate order for response
+  
   await order.populate([
     { path: 'user', select: 'name email phone' },
     {
@@ -142,11 +138,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Process payment for an order
- * @route   POST /api/sales/orders/:orderId/payment
- * @access  Private
- */
+
 exports.processPayment = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -166,12 +158,12 @@ exports.processPayment = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Order payment has already been processed');
   }
 
-  // TODO: Integrate with actual payment gateway
-  // For now, simulate payment processing
-  const paymentSuccess = true; // This would come from payment gateway
+  
+  
+  const paymentSuccess = true; 
 
   if (paymentSuccess) {
-    // Update order status
+    
     order.paymentDetails = {
       ...order.paymentDetails,
       ...paymentDetails,
@@ -184,7 +176,7 @@ exports.processPayment = asyncHandler(async (req, res) => {
 
     await order.save();
 
-    // Update transactions
+    
     await Transaction.updateMany(
       { order: orderId },
       {
@@ -193,7 +185,7 @@ exports.processPayment = asyncHandler(async (req, res) => {
       }
     );
 
-    // Update partner wallets
+    
     const transactions = await Transaction.find({ order: orderId });
     for (const transaction of transactions) {
       let wallet = await Wallet.findOne({ partner: transaction.partner });
@@ -209,7 +201,7 @@ exports.processPayment = asyncHandler(async (req, res) => {
       await wallet.save();
     }
 
-    // Note: Inventory management removed as we're working directly with products
+    
 
     res.json({
       success: true,
@@ -220,7 +212,7 @@ exports.processPayment = asyncHandler(async (req, res) => {
       },
     });
   } else {
-    // Note: Inventory restoration removed as we're working directly with products
+    
 
     order.paymentDetails.status = 'failed';
     order.status = 'cancelled';
@@ -230,11 +222,7 @@ exports.processPayment = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * @desc    Get order details
- * @route   GET /api/sales/orders/:orderId
- * @access  Private
- */
+
 exports.getOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const userId = req.user.id;
@@ -252,7 +240,7 @@ exports.getOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  // Get related transactions
+  
   const transactions = await Transaction.find({ order: orderId }).populate(
     'partner',
     'shopName'
@@ -267,11 +255,7 @@ exports.getOrder = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get user's orders
- * @route   GET /api/sales/orders
- * @access  Private
- */
+
 exports.getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const {
@@ -314,11 +298,7 @@ exports.getUserOrders = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Cancel an order
- * @route   PATCH /api/sales/orders/:orderId/cancel
- * @access  Private
- */
+
 exports.cancelOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { reason } = req.body;
@@ -333,9 +313,9 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Order cannot be cancelled at this stage');
   }
 
-  // Note: Inventory restoration removed as we're working directly with products
+  
 
-  // Update order status
+  
   order.status = 'cancelled';
   order.metadata = {
     ...order.metadata,
@@ -344,7 +324,7 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
   };
   await order.save();
 
-  // Update transactions
+  
   await Transaction.updateMany(
     { order: orderId },
     {
@@ -353,9 +333,9 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
     }
   );
 
-  // Process refund if payment was completed
+  
   if (order.paymentDetails.status === 'completed') {
-    // TODO: Implement refund processing
+    
     order.paymentDetails.refundStatus = 'pending';
     await order.save();
   }
@@ -367,22 +347,18 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Update order shipping status (Partner only)
- * @route   PATCH /api/sales/orders/:orderId/shipping
- * @access  Private (Partner)
- */
+
 exports.updateShippingStatus = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { status, trackingNumber, estimatedDelivery } = req.body;
-  const partnerId = req.user.partnerId; // Assuming partner middleware sets this
+  const partnerId = req.user.partnerId; 
 
   const order = await Order.findById(orderId);
   if (!order) {
     throw new ApiError(404, 'Order not found');
   }
 
-  // Verify partner has items in this order
+  
   const hasPartnerItems = order.items.some(
     (item) => item.partner.toString() === partnerId
   );
@@ -391,7 +367,7 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Not authorized to update this order');
   }
 
-  // Update shipping details
+  
   order.shippingDetails = {
     ...order.shippingDetails,
     status,
@@ -400,14 +376,14 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
     updatedAt: new Date(),
   };
 
-  // Update order status based on shipping status
+  
   if (status === 'shipped') {
     order.status = 'shipped';
   } else if (status === 'delivered') {
     order.status = 'delivered';
     order.deliveredAt = new Date();
 
-    // Release partner payments
+    
     await Transaction.updateMany(
       { order: orderId, partner: partnerId },
       { status: 'completed' }
@@ -423,11 +399,7 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get sales analytics
- * @route   GET /api/sales/analytics
- * @access  Private (Admin)
- */
+
 exports.getSalesAnalytics = asyncHandler(async (req, res) => {
   const { startDate, endDate, groupBy = 'day' } = req.query;
 
@@ -442,7 +414,7 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
     if (endDate) matchStage.createdAt.$lte = new Date(endDate);
   }
 
-  // Sales over time
+  
   const salesOverTime = await Order.aggregate([
     { $match: matchStage },
     {
@@ -461,7 +433,7 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
     { $sort: { _id: 1 } },
   ]);
 
-  // Top selling products
+  
   const topProducts = await Order.aggregate([
     { $match: matchStage },
     { $unwind: '$items' },
@@ -496,7 +468,7 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
     { $limit: 10 },
   ]);
 
-  // Overall statistics
+  
   const overallStats = await Order.aggregate([
     { $match: matchStage },
     {

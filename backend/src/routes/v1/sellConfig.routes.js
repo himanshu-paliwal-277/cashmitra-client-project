@@ -1,9 +1,4 @@
-/**
- * @fileoverview Sell Config Routes
- * @description Routes for managing sell configurations including pricing rules
- * @author Cashify Development Team
- * @version 1.0.0
- */
+
 
 const express = require('express');
 const { body, param, query } = require('express-validator');
@@ -21,7 +16,7 @@ const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Validation middleware
+
 const configValidation = [
   body('productId')
     .isMongoId()
@@ -113,7 +108,7 @@ const testPricingValidation = [
     .withMessage('Adjustments must be a number'),
 ];
 
-// Public routes for customers
+
 router.get(
   '/customer/:productId',
   param('productId')
@@ -122,11 +117,11 @@ router.get(
   getCustomerConfig
 );
 
-// Protected routes
+
 router.use(protect);
 router.use(authorize('admin'));
 
-// CRUD routes
+
 router.post('/', configValidation, createOrUpdateConfig);
 router.get(
   '/:productId',
@@ -143,7 +138,7 @@ router.delete(
   deleteConfig
 );
 
-// Update specific parts
+
 router.put(
   '/:productId/steps',
   param('productId')
@@ -161,7 +156,7 @@ router.put(
   updateRules
 );
 
-// Reset to default
+
 router.post(
   '/:productId/reset',
   param('productId')
@@ -170,7 +165,7 @@ router.post(
   resetToDefault
 );
 
-// Test pricing
+
 router.post(
   '/:productId/test-pricing',
   param('productId')

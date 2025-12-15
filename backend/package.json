@@ -32,8 +32,10 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
+    "decomment": "^0.9.5",
     "nodemon": "^3.0.1",
-    "prettier": "^3.7.4"
+    "prettier": "^3.7.4",
+    "strip-comments": "^2.0.1"
   },
   "keywords": [
     "nodejs",

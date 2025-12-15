@@ -11,10 +11,10 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-// Apply auth rate limiter to all auth routes
+
 router.use(authLimiter);
 
-// Register a new user
+
 router.post(
   '/register',
   [
@@ -33,7 +33,7 @@ router.post(
   asyncHandler(authController.registerUser)
 );
 
-// Register a new partner
+
 router.post(
   '/partner/register',
   [
@@ -53,7 +53,7 @@ router.post(
   asyncHandler(authController.registerPartner)
 );
 
-// Login user
+
 router.post(
   '/login',
   [
@@ -64,7 +64,7 @@ router.post(
   asyncHandler(authController.loginUser)
 );
 
-// Login partner
+
 router.post(
   '/partner/login',
   [
@@ -75,17 +75,17 @@ router.post(
   asyncHandler(authController.loginPartner)
 );
 
-// Get current user profile
+
 router.get('/me', protect, asyncHandler(authController.getCurrentUser));
 
-// Get current partner profile
+
 router.get(
   '/partner/me',
   protect,
   asyncHandler(authController.getCurrentPartner)
 );
 
-// Update user profile
+
 router.put(
   '/me',
   protect,
@@ -104,7 +104,7 @@ router.put(
   asyncHandler(authController.updateUserProfile)
 );
 
-// Update partner profile
+
 router.put(
   '/partner/me',
   protect,

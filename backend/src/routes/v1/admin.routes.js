@@ -8,13 +8,13 @@ const { validateRequest } = require('../../middlewares/validation.middleware');
 const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 const { authRateLimiter } = require('../../middlewares/rateLimiter.middleware');
 
-// Configure multer for file uploads (using memory storage for Cloudinary)
+
 const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 5 * 1024 * 1024, 
   },
   fileFilter: function (req, file, cb) {
     if (file.mimetype.startsWith('image/')) {
@@ -27,10 +27,10 @@ const upload = multer({
 
 const router = express.Router();
 
-// Apply auth rate limiter to admin login route
-// router.use('/login', authLimiter);
 
-// Admin login (CSRF protection disabled for this endpoint)
+
+
+
 router.post(
   '/login',
   [
@@ -39,14 +39,14 @@ router.post(
   ],
   validateRequest,
   (req, res, next) => {
-    // Skip CSRF validation for admin login
+    
     req.skipCSRF = true;
     next();
   },
   asyncHandler(adminController.loginAdmin)
 );
 
-// Get admin profile
+
 router.get(
   '/profile',
   protect,
@@ -54,7 +54,7 @@ router.get(
   asyncHandler(adminController.getAdminProfile)
 );
 
-// Create a new admin user
+
 router.post(
   '/create',
   [
@@ -73,8 +73,8 @@ router.post(
   asyncHandler(adminController.createAdmin)
 );
 
-// Partner Management Routes
-// Get all partners
+
+
 router.get(
   '/partners',
   protect,
@@ -82,7 +82,7 @@ router.get(
   asyncHandler(adminController.getAllPartners)
 );
 
-// Get partner by ID
+
 router.get(
   '/partners/:id',
   protect,
@@ -90,13 +90,13 @@ router.get(
   asyncHandler(adminController.getPartnerById)
 );
 
-// Create new partner
+
 router.post(
   '/partners',
   [
-    // Custom validation to ensure either userId OR user details are provided
+    
     check('userId').custom((value, { req }) => {
-      // If userId is provided, it must be a valid MongoDB ID
+      
       if (value && value.trim()) {
         if (!value.match(/^[0-9a-fA-F]{24}$/)) {
           throw new Error('Valid user ID is required');
@@ -104,7 +104,7 @@ router.post(
         return true;
       }
 
-      // If no userId, then user details are required
+      
       const { name, email, phone, password } = req.body;
       if (!name || !email || !phone || !password) {
         throw new Error(
@@ -115,9 +115,9 @@ router.post(
       return true;
     }),
 
-    // User details (required when userId is not provided)
+    
     check('name').custom((value, { req }) => {
-      // Only validate if userId is not provided
+      
       if (!req.body.userId || !req.body.userId.trim()) {
         if (!value || value.trim().length < 2 || value.trim().length > 100) {
           throw new Error('Name must be between 2 and 100 characters');
@@ -127,7 +127,7 @@ router.post(
     }),
 
     check('email').custom((value, { req }) => {
-      // Only validate if userId is not provided
+      
       if (!req.body.userId || !req.body.userId.trim()) {
         if (!value || !/\S+@\S+\.\S+/.test(value)) {
           throw new Error('Valid email is required');
@@ -137,7 +137,7 @@ router.post(
     }),
 
     check('phone').custom((value, { req }) => {
-      // Only validate if userId is not provided
+      
       if (!req.body.userId || !req.body.userId.trim()) {
         if (!value || value.length < 10) {
           throw new Error('Valid phone number is required');
@@ -147,7 +147,7 @@ router.post(
     }),
 
     check('password').custom((value, { req }) => {
-      // Only validate if userId is not provided
+      
       if (!req.body.userId || !req.body.userId.trim()) {
         if (!value || value.length < 6) {
           throw new Error('Password must be at least 6 characters long');
@@ -156,7 +156,7 @@ router.post(
       return true;
     }),
 
-    // Partner details (always required)
+    
     check('shopName')
       .trim()
       .isLength({ min: 2, max: 100 })
@@ -183,7 +183,7 @@ router.post(
   asyncHandler(adminController.createPartner)
 );
 
-// Update partner
+
 router.put(
   '/partners/:id',
   [
@@ -208,14 +208,14 @@ router.put(
       .optional()
       .isLength({ min: 6, max: 6 })
       .withMessage('Pincode must be 6 digits'),
-    // check('gstNumber').optional().matches(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/).withMessage('Invalid GST number format'),
-    // check('shopPhone').optional().isMobilePhone('en-IN').withMessage('Valid Indian phone number is required'),
+    
+    
     check('shopEmail')
       .optional()
       .isEmail()
       .withMessage('Valid email is required'),
-    // check('bankDetails.accountNumber').optional().isLength({ min: 9, max: 18 }).withMessage('Invalid account number'),
-    // check('bankDetails.ifscCode').optional().matches(/^[A-Z]{4}0[A-Z0-9]{6}$/).withMessage('Invalid IFSC code'),
+    
+    
     check('upiId')
       .optional()
       .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/)
@@ -237,7 +237,7 @@ router.put(
   asyncHandler(adminController.updatePartner)
 );
 
-// Delete partner
+
 router.delete(
   '/partners/:id',
   protect,
@@ -245,7 +245,7 @@ router.delete(
   asyncHandler(adminController.deletePartner)
 );
 
-// Verify/Reject partner
+
 router.put(
   '/partners/:id/verify',
   [
@@ -260,7 +260,7 @@ router.put(
   asyncHandler(adminController.verifyPartner)
 );
 
-// Update partner wallet balance
+
 router.post(
   '/partners/:id/wallet/update',
   [
@@ -276,8 +276,8 @@ router.post(
   asyncHandler(adminController.updatePartnerWallet)
 );
 
-// Order Management Routes
-// Get all orders
+
+
 router.get(
   '/orders',
   protect,
@@ -285,7 +285,7 @@ router.get(
   asyncHandler(adminController.getAllOrders)
 );
 
-// Get single order by ID
+
 router.get(
   '/orders/:id',
   protect,
@@ -293,8 +293,8 @@ router.get(
   asyncHandler(adminController.getOrderById)
 );
 
-// Analytics Routes
-// Get dashboard analytics
+
+
 router.get(
   '/analytics',
   protect,
@@ -302,8 +302,8 @@ router.get(
   asyncHandler(adminController.getDashboardAnalytics)
 );
 
-// Product Catalog Management Routes
-// Get catalog
+
+
 router.get(
   '/catalog',
   protect,
@@ -311,7 +311,7 @@ router.get(
   asyncHandler(adminController.getCatalog)
 );
 
-// Get product by ID
+
 router.get(
   '/catalog/:id',
   protect,
@@ -319,25 +319,25 @@ router.get(
   asyncHandler(adminController.getProductById)
 );
 
-// Upload product images
+
 router.post(
   '/catalog/upload-images',
   protect,
   authorize('admin'),
-  upload.array('images', 10), // Allow up to 10 images
+  upload.array('images', 10), 
   asyncHandler(adminController.uploadProductImages)
 );
 
-// Add product to catalog
+
 router.post(
   '/catalog',
   [
     check('category').notEmpty().withMessage('Category is required'),
     check('brand').notEmpty().withMessage('Brand is required'),
-    // check('series').notEmpty().withMessage('Series is required'),
+    
     check('model').notEmpty().withMessage('Model is required'),
-    // check('basePrice').isNumeric().withMessage('Base price must be a number'),
-    // check('depreciationRate').isNumeric().withMessage('Depreciation rate must be a number')
+    
+    
   ],
   protect,
   authorize('admin'),
@@ -345,7 +345,7 @@ router.post(
   asyncHandler(adminController.addProduct)
 );
 
-// Update product in catalog
+
 router.put(
   '/catalog/:id',
   protect,
@@ -353,7 +353,7 @@ router.put(
   asyncHandler(adminController.updateProduct)
 );
 
-// Update product status
+
 router.patch(
   '/catalog/:id/status',
   [
@@ -367,7 +367,7 @@ router.patch(
   asyncHandler(adminController.updateProductStatus)
 );
 
-// Delete product from catalog
+
 router.delete(
   '/catalog/:id',
   protect,
@@ -375,8 +375,8 @@ router.delete(
   asyncHandler(adminController.deleteProduct)
 );
 
-// Commission Management Routes
-// Get commission settings
+
+
 router.get(
   '/commission',
   protect,
@@ -384,7 +384,7 @@ router.get(
   asyncHandler(adminController.getCommissionSettings)
 );
 
-// Update commission settings
+
 router.put(
   '/commission',
   protect,
@@ -392,8 +392,8 @@ router.put(
   asyncHandler(adminController.updateCommissionSettings)
 );
 
-// User Management Routes
-// Get all users
+
+
 router.get(
   '/users',
   protect,
@@ -401,7 +401,7 @@ router.get(
   asyncHandler(adminController.getAllUsers)
 );
 
-// Get user by ID
+
 router.get(
   '/users/:id',
   protect,
@@ -409,7 +409,7 @@ router.get(
   asyncHandler(adminController.getUserById)
 );
 
-// Create new user
+
 router.post(
   '/users',
   [
@@ -432,7 +432,7 @@ router.post(
   asyncHandler(adminController.createUser)
 );
 
-// Update user
+
 router.put(
   '/users/:id',
   [
@@ -456,7 +456,7 @@ router.put(
   asyncHandler(adminController.updateUser)
 );
 
-// Update user password
+
 router.put(
   '/users/:id/password',
   [
@@ -470,7 +470,7 @@ router.put(
   asyncHandler(adminController.updateUserPassword)
 );
 
-// Delete user
+
 router.delete(
   '/users/:id',
   protect,
@@ -478,7 +478,7 @@ router.delete(
   asyncHandler(adminController.deleteUser)
 );
 
-// Toggle user active status
+
 router.put(
   '/users/:id/status',
   [check('isActive').isBoolean().withMessage('isActive must be a boolean')],
@@ -488,7 +488,7 @@ router.put(
   asyncHandler(adminController.toggleUserStatus)
 );
 
-// Category Management Routes
+
 router.get('/categories', asyncHandler(categoryController.getCategories));
 
 router.post(
@@ -561,7 +561,7 @@ router.get(
   asyncHandler(categoryController.getCategoryStats)
 );
 
-// Sell Orders Routes
+
 router.get(
   '/sell-orders',
   protect,
@@ -569,7 +569,7 @@ router.get(
   asyncHandler(adminController.getSellOrders)
 );
 
-// Buy Orders Routes
+
 router.get(
   '/buy-orders',
   protect,
@@ -577,7 +577,7 @@ router.get(
   asyncHandler(adminController.getBuyOrders)
 );
 
-// Update Order Status
+
 router.put(
   '/orders/:id/status',
   [
@@ -603,7 +603,7 @@ router.put(
   asyncHandler(adminController.updateOrderStatus)
 );
 
-// Get Partner Suggestions for Order Assignment
+
 router.get(
   '/orders/:id/partner-suggestions',
   protect,
@@ -611,7 +611,7 @@ router.get(
   asyncHandler(adminController.getPartnerSuggestionsForOrder)
 );
 
-// Assign Partner to Order
+
 router.put(
   '/orders/:id/assign-partner',
   [
@@ -625,7 +625,7 @@ router.put(
   asyncHandler(adminController.assignPartnerToOrder)
 );
 
-// Brand Management Routes
+
 router.get(
   '/brands',
   protect,
@@ -671,7 +671,7 @@ router.delete(
   asyncHandler(adminController.deleteBrand)
 );
 
-// Model Management Routes
+
 router.get(
   '/models',
   protect,
@@ -752,7 +752,7 @@ router.put(
       .optional()
       .isBoolean()
       .withMessage('isActive must be a boolean'),
-    // check('variants').optional().isArray().withMessage('Variants must be an array')
+    
   ],
   protect,
   authorize('admin'),
@@ -767,9 +767,9 @@ router.delete(
   asyncHandler(adminController.deleteModelByName)
 );
 
-// ===== CONDITION QUESTIONNAIRE ROUTES =====
 
-// Get all condition questionnaires
+
+
 router.get(
   '/questionnaires',
   protect,
@@ -777,7 +777,7 @@ router.get(
   asyncHandler(adminController.getConditionQuestionnaires)
 );
 
-// Get condition questionnaire by ID
+
 router.get(
   '/questionnaires/:id',
   protect,
@@ -785,7 +785,7 @@ router.get(
   asyncHandler(adminController.getConditionQuestionnaireById)
 );
 
-// Get questionnaires by category
+
 router.get(
   '/questionnaires/category/:category',
   protect,
@@ -793,7 +793,7 @@ router.get(
   asyncHandler(adminController.getQuestionnairesByCategory)
 );
 
-// Create new condition questionnaire
+
 router.post(
   '/questionnaires',
   [
@@ -825,7 +825,7 @@ router.post(
       .withMessage('Subcategory must be a string'),
     check('brand').optional().isString().withMessage('Brand must be a string'),
     check('model').optional().isString().withMessage('Model must be a string'),
-    // check('questions').isArray({ min: 1 }).withMessage('At least one question is required'),
+    
     check('questions.*.id').notEmpty().withMessage('Question ID is required'),
     check('questions.*.title')
       .trim()
@@ -845,8 +845,8 @@ router.post(
       .optional()
       .isBoolean()
       .withMessage('Required field must be boolean'),
-    // check('questions.*.options').optional().isArray().withMessage('Options must be an array'),
-    // check('version').optional().matches(/^\d+\.\d+\.\d+$/).withMessage('Version must be in semantic versioning format (e.g., 1.0.0)'),
+    
+    
     check('isActive')
       .optional()
       .isBoolean()
@@ -863,7 +863,7 @@ router.post(
       .optional()
       .isIn(['easy', 'medium', 'hard'])
       .withMessage('Difficulty must be easy, medium, or hard'),
-    // check('metadata.tags').optional().isArray().withMessage('Tags must be an array'),
+    
     check('metadata.instructions')
       .optional()
       .isString()
@@ -875,7 +875,7 @@ router.post(
   asyncHandler(adminController.createConditionQuestionnaire)
 );
 
-// Update condition questionnaire
+
 router.put(
   '/questionnaires/:id',
   [
@@ -941,7 +941,7 @@ router.put(
       .optional()
       .isArray()
       .withMessage('Options must be an array'),
-    // check('version').optional().matches(/^\d+\.\d+\.\d+$/).withMessage('Version must be in semantic versioning format (e.g., 1.0.0)'),
+    
     check('isActive')
       .optional()
       .isBoolean()
@@ -973,7 +973,7 @@ router.put(
   asyncHandler(adminController.updateConditionQuestionnaire)
 );
 
-// Delete condition questionnaire
+
 router.delete(
   '/questionnaires/:id',
   [
@@ -988,8 +988,8 @@ router.delete(
   asyncHandler(adminController.deleteConditionQuestionnaire)
 );
 
-// Agent Management Routes
-// Get all agents
+
+
 router.get(
   '/agents',
   protect,
@@ -997,7 +997,7 @@ router.get(
   asyncHandler(adminController.getAgents)
 );
 
-// Approve agent
+
 router.put(
   '/agents/:id/approve',
   protect,
@@ -1005,7 +1005,7 @@ router.put(
   asyncHandler(adminController.approveAgent)
 );
 
-// Reject agent
+
 router.put(
   '/agents/:id/reject',
   [check('reason').notEmpty().withMessage('Rejection reason is required')],
@@ -1015,7 +1015,7 @@ router.put(
   asyncHandler(adminController.rejectAgent)
 );
 
-// Toggle agent status
+
 router.put(
   '/agents/:id/status',
   [check('isActive').isBoolean().withMessage('isActive must be a boolean')],
