@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const session = require('express-session');
@@ -13,9 +12,7 @@ const {
 } = require('./middlewares/csrf.middleware');
 const { sanitizeData } = require('./utils/security.utils');
 const securityConfig = require('./config/security.config');
-
-// Load environment variables
-dotenv.config();
+const { PORT, NODE_ENV, MONGODB_URI } = require('./config/serverConfig');
 
 // Create Express app
 const app = express();
@@ -59,7 +56,7 @@ app.get('/', (req, res) => {
 // MongoDB connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(MONGODB_URI);
     console.log('MongoDB connected successfully');
   } catch (error) {
     console.error('MongoDB connection error:', error.message);
@@ -71,9 +68,9 @@ const connectDB = async () => {
 connectDB();
 
 // Start server
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${NODE_ENV}`);
 });
 
 // Error handling middleware (must be after routes)

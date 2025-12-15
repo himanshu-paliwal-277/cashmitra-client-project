@@ -58,11 +58,11 @@ const securityConfig = {
 
   // Session configuration
   session: {
-    secret: process.env.SESSION_SECRET || 'cashify-secret-key',
+    secret: require('./serverConfig').SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: require('./serverConfig').isProduction(),
       httpOnly: true,
       sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
@@ -71,8 +71,8 @@ const securityConfig = {
 
   // JWT configuration
   jwt: {
-    secret: process.env.JWT_SECRET || 'cashify-jwt-secret',
-    expiresIn: '1d',
+    secret: require('./serverConfig').JWT_SECRET,
+    expiresIn: require('./serverConfig').JWT_EXPIRES_IN,
   },
 };
 
