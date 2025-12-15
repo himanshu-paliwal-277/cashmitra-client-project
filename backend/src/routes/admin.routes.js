@@ -8,27 +8,8 @@ const { validateRequest } = require('../middlewares/validation.middleware');
 const { asyncHandler } = require('../middlewares/errorHandler.middleware');
 const { authRateLimiter } = require('../middlewares/rateLimiter.middleware');
 
-// Import new route modules
-const leadsRoutes = require('./leads.routes');
-const pricingRoutes = require('./pricing.routes');
-const financeRoutes = require('./finance.routes');
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/temp');
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      Date.now() +
-        '-' +
-        Math.round(Math.random() * 1e9) +
-        '.' +
-        file.originalname.split('.').pop()
-    );
-  },
-});
+// Configure multer for file uploads (using memory storage for Cloudinary)
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
@@ -1043,10 +1024,5 @@ router.put(
   validateRequest,
   asyncHandler(adminController.toggleAgentStatus)
 );
-
-// Use sub-routes
-router.use('/leads', leadsRoutes);
-router.use('/pricing', pricingRoutes);
-router.use('/finance', financeRoutes);
 
 module.exports = router;

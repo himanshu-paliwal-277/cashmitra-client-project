@@ -5,7 +5,6 @@ const dotenv = require('dotenv');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const session = require('express-session');
-const http = require('http');
 const { errorHandler } = require('./middlewares/errorHandler.middleware');
 const { apiLimiter } = require('./middlewares/rateLimiter.middleware');
 const {
@@ -14,7 +13,6 @@ const {
 } = require('./middlewares/csrf.middleware');
 const { sanitizeData } = require('./utils/security.utils');
 const securityConfig = require('./config/security.config');
-const WebSocketServer = require('./websocket/websocketServer');
 
 // Load environment variables
 dotenv.config();
@@ -99,7 +97,6 @@ app.use('/api/sales', salesRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/contact', contactRoutes);
-app.use('/api/realtime', require('./routes/realtime.routes'));
 
 // Sell module routes
 app.use('/api/sell-products', sellProductRoutes);
@@ -132,17 +129,10 @@ const connectDB = async () => {
 // Connect to MongoDB
 connectDB();
 
-// Create HTTP server
-const server = http.createServer(app);
-
-// Initialize WebSocket server
-const wsServer = new WebSocketServer(server);
-
 // Start server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`WebSocket server available at ws://localhost:${PORT}/ws`);
 });
 
 // Error handling middleware (must be after routes)

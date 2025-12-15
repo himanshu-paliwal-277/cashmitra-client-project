@@ -9,19 +9,8 @@ const path = require('path');
 
 const router = express.Router();
 
-// Configure multer for image uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/temp/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname)
-    );
-  },
-});
+// Configure multer for image uploads (using memory storage for Cloudinary)
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
