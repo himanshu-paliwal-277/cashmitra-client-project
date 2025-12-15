@@ -1,9 +1,10 @@
 import express from 'express';
-import {check} from 'express-validator';
+import { check } from 'express-validator';
+
 import userController from '../../controllers/user.controller';
-import {protect} from '../../middlewares/auth.middleware';
-import {validateRequest} from '../../middlewares/validation.middleware';
-import {asyncHandler} from '../../middlewares/errorHandler.middleware';
+import { protect } from '../../middlewares/auth.middleware';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware';
+import { validateRequest } from '../../middlewares/validation.middleware';
 
 const router = express.Router();
 

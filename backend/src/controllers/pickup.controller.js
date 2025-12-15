@@ -1,10 +1,11 @@
+import { validationResult } from 'express-validator';
+
+import { asyncHandler } from '../middlewares/errorHandler.middleware';
+import { Order } from '../models/order.model';
 import Pickup from '../models/pickup.model';
-import {Order} from '../models/order.model';
 import SellOrder from '../models/sellOrder.model';
 import User from '../models/user.model';
-import {asyncHandler} from '../middlewares/errorHandler.middleware';
 import ApiError from '../utils/apiError';
-import {validationResult} from 'express-validator';
 
 export var createPickup = asyncHandler(async (req, res) => {
   const errors = validationResult(req);

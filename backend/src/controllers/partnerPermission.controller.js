@@ -1,9 +1,9 @@
-import {PartnerPermission} from '../models/partnerPermission.model';
 import Partner from '../models/partner.model';
-import User from '../models/user.model';
+import { PartnerPermission } from '../models/partnerPermission.model';
 import RoleTemplate from '../models/roleTemplate.model';
+import User from '../models/user.model';
 import ApiError from '../utils/apiError';
-import {sanitizeData} from '../utils/security.utils';
+import { sanitizeData } from '../utils/security.utils';
 
 export async function getPartnerPermissions(req, res) {
   try {

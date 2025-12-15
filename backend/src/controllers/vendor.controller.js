@@ -1,8 +1,8 @@
+import { validationResult } from 'express-validator';
+
 import User from '../models/user.model';
 import VendorPermission from '../models/vendorPermission.model';
-import {generateToken} from '../utils/jwt.utils';
-import {validationResult} from 'express-validator';
-import mongoose from 'mongoose';
+import { generateToken } from '../utils/jwt.utils';
 
 const loginVendor = async (req, res) => {
   try {

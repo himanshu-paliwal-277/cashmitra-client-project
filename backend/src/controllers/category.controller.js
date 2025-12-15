@@ -1,6 +1,7 @@
-import {validationResult} from 'express-validator';
+import { validationResult } from 'express-validator';
+
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
 import Category from '../models/category.model';
-import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
 export var createCategory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);

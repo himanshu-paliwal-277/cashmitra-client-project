@@ -1,19 +1,18 @@
 import express from 'express';
-import {param, query, body} from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import {
-  getProducts,
-  getProduct,
-  getProductSuggestions,
-  getProductCategories,
-  getProductBrands,
-  getProductFilters,
   createProduct,
-  updateProduct,
   deleteProduct,
+  getProduct,
+  getProductBrands,
+  getProductCategories,
+  getProductFilters,
+  getProducts,
+  getProductSuggestions,
+  updateProduct,
 } from '../../controllers/product.controller';
-
-import {protect} from '../../middlewares/auth.middleware';
+import { protect } from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 

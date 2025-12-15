@@ -1,19 +1,18 @@
 import express from 'express';
-import {body, param, query} from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import {
+  bulkCreateAccessories,
   createAccessory,
+  deleteAccessory,
   getAccessories,
   getAccessory,
-  updateAccessory,
-  deleteAccessory,
-  bulkCreateAccessories,
+  getCustomerAccessories,
   reorderAccessories,
   toggleAccessoryStatus,
-  getCustomerAccessories,
+  updateAccessory,
 } from '../../controllers/sellAccessory.controller';
-
-import {protect, authorize} from '../../middlewares/auth.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -144,7 +143,10 @@ router.put(
   reorderAccessories
 );
 
-import {reindexAccessoryOrders, migrateAndReindexAccessories} from '../../controllers/sellAccessory.controller';
+import {
+  migrateAndReindexAccessories,
+  reindexAccessoryOrders,
+} from '../../controllers/sellAccessory.controller';
 router.post('/reindex-orders', reindexAccessoryOrders);
 router.post('/migrate-and-reindex', migrateAndReindexAccessories);
 

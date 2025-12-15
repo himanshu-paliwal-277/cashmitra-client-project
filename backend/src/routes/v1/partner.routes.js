@@ -1,10 +1,14 @@
 import express from 'express';
-import {check} from 'express-validator';
+import { check } from 'express-validator';
+
 import partnerController from '../../controllers/partner.controller';
-import {protect, authorize} from '../../middlewares/auth.middleware';
-import {validateRequest, validateObjectId} from '../../middlewares/validation.middleware';
-import {asyncHandler} from '../../middlewares/errorHandler.middleware';
-import {authLimiter} from '../../middlewares/rateLimiter.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware';
+import { authLimiter } from '../../middlewares/rateLimiter.middleware';
+import {
+  validateObjectId,
+  validateRequest,
+} from '../../middlewares/validation.middleware';
 
 const router = express.Router();
 
@@ -220,7 +224,10 @@ router.get(
   asyncHandler(partnerController.getDashboardStats)
 );
 
-import {attachPartner, requirePartner} from '../../middlewares/partner.middleware';
+import {
+  attachPartner,
+  requirePartner,
+} from '../../middlewares/partner.middleware';
 
 router.use(
   '/dashboard-sellbuy',

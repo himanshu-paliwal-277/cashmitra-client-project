@@ -1,11 +1,12 @@
-import {validationResult} from 'express-validator';
-import {Order} from '../models/order.model';
-import Inventory from '../models/inventory.model';
+import { validationResult } from 'express-validator';
+
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
 import Product from '../models/buyProduct.model';
+import Inventory from '../models/inventory.model';
+import { Order } from '../models/order.model';
 import Partner from '../models/partner.model';
 import Transaction from '../models/transaction.model';
 import Wallet from '../models/wallet.model';
-import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
 export var createOrder = asyncHandler(async (req, res) => {
   if (

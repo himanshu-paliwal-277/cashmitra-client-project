@@ -1,6 +1,6 @@
-import SellSuperCategory from '../models/sellSuperCategory.model';
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
 import Category from '../models/category.model';
-import {asyncHandler, ApiError} from '../middlewares/errorHandler.middleware';
+import SellSuperCategory from '../models/sellSuperCategory.model';
 
 export var getPublicSuperCategories = asyncHandler(async (req, res) => {
   const superCategories = await SellSuperCategory.find({ isActive: true })

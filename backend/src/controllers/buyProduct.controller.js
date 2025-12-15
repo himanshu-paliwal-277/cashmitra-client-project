@@ -1,7 +1,8 @@
-import BuyProduct from '../models/buyProduct.model';
+import { validationResult } from 'express-validator';
+
 import BuyCategory from '../models/buyCategory.model';
-import {validationResult} from 'express-validator';
-import {processArrayFields} from '../utils/dataProcessing.utils';
+import BuyProduct from '../models/buyProduct.model';
+import { processArrayFields } from '../utils/dataProcessing.utils';
 
 const getBuyProducts = async (req, res) => {
   try {

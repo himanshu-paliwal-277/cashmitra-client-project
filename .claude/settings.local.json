@@ -16,7 +16,8 @@
       "Bash(npm install:*)",
       "Bash(strip-comments:*)",
       "Bash(node remove-comments.js:*)",
-      "Bash(lebab:*)"
+      "Bash(lebab:*)",
+      "Bash(npm run lint:fix:*)"
     ],
     "deny": [],
     "ask": []

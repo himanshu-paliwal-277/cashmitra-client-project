@@ -1,18 +1,17 @@
 import express from 'express';
-import {body, param, query} from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import {
   createOrUpdateConfig,
+  deleteConfig,
   getConfig,
   getCustomerConfig,
-  updateSteps,
-  updateRules,
-  deleteConfig,
   resetToDefault,
   testPricing,
+  updateRules,
+  updateSteps,
 } from '../../controllers/sellConfig.controller';
-
-import {protect, authorize} from '../../middlewares/auth.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 

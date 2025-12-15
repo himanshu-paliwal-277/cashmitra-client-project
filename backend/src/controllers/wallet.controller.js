@@ -1,9 +1,10 @@
-import Wallet from '../models/wallet.model';
-import Transaction from '../models/transaction.model';
-import Partner from '../models/partner.model';
-import {Order} from '../models/order.model';
-import {validationResult} from 'express-validator';
+import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
+
+import { Order } from '../models/order.model';
+import Partner from '../models/partner.model';
+import Transaction from '../models/transaction.model';
+import Wallet from '../models/wallet.model';
 
 export async function getWallet(req, res) {
   try {
@@ -90,7 +91,11 @@ export async function getTransactions(req, res) {
   }
 }
 
-export async function processCommission(orderId, commissionAmount, commissionRate) {
+export async function processCommission(
+  orderId,
+  commissionAmount,
+  commissionRate
+) {
   const session = await mongoose.startSession();
   session.startTransaction();
 

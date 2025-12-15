@@ -1,24 +1,23 @@
 import express from 'express';
-import {body, param, query} from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import {
-  createOrder,
-  getOrder,
-  getUserOrders,
-  getAllOrders,
-  updateOrderStatus,
   assignOrder,
-  updatePickupDetails,
-  getOrdersByStatus,
-  getOrderStats,
-  deleteOrder,
   cancelOrder,
-  rescheduleOrder,
+  createOrder,
+  deleteOrder,
+  getAllOrders,
+  getOrder,
   getOrderPickupDetails,
+  getOrdersByStatus,
   getOrdersForPickup,
+  getOrderStats,
+  getUserOrders,
+  rescheduleOrder,
+  updateOrderStatus,
+  updatePickupDetails,
 } from '../../controllers/sellOrder.controller';
-
-import {protect, authorize} from '../../middlewares/auth.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 

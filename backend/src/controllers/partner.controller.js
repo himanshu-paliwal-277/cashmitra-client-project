@@ -1,12 +1,12 @@
-import Partner from '../models/partner.model';
-import User from '../models/user.model';
 import Agent from '../models/agent.model';
-import Inventory from '../models/inventory.model';
-import {Order} from '../models/order.model';
-import Product from '../models/product.model';
 import BuyProduct from '../models/buyProduct.model';
+import Inventory from '../models/inventory.model';
+import { Order } from '../models/order.model';
+import Partner from '../models/partner.model';
+import Product from '../models/product.model';
+import User from '../models/user.model';
 import ApiError from '../utils/apiError';
-import {sanitizeData} from '../utils/security.utils';
+import { sanitizeData } from '../utils/security.utils';
 
 export async function registerPartnerShop(req, res) {
   const userId = req.user.id;
@@ -1082,8 +1082,8 @@ export async function getDashboardStats(req, res) {
   }
 }
 
-import SellProduct from '../models/sellProduct.model';
 import SellOrder from '../models/sellOrder.model';
+import SellProduct from '../models/sellProduct.model';
 
 export async function getDashboardSellBuy(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });

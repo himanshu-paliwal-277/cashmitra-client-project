@@ -1,9 +1,10 @@
 import express from 'express';
-import {check, param, query} from 'express-validator';
+import { check, param, query } from 'express-validator';
+
 import partnerPermissionController from '../../controllers/partnerPermission.controller';
-import {protect, authorize} from '../../middlewares/auth.middleware';
-import {validateRequest} from '../../middlewares/validation.middleware';
-import {asyncHandler} from '../../middlewares/errorHandler.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware';
+import { validateRequest } from '../../middlewares/validation.middleware';
 
 const router = express.Router();
 

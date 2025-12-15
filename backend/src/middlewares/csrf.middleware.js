@@ -1,4 +1,4 @@
-import {generateCSRFToken, validateCSRFToken} from '../utils/security.utils';
+import { generateCSRFToken, validateCSRFToken } from '../utils/security.utils';
 
 const generateToken = (req, res, next) => {
   const csrfToken = generateCSRFToken();

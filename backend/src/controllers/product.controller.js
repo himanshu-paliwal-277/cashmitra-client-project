@@ -1,9 +1,10 @@
-import {validationResult} from 'express-validator';
-import Product from '../models/product.model';
-import Inventory from '../models/inventory.model';
+import { validationResult } from 'express-validator';
+
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
 import Category from '../models/category.model';
+import Inventory from '../models/inventory.model';
 import Partner from '../models/partner.model';
-import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
+import Product from '../models/product.model';
 
 export var getProducts = asyncHandler(async (req, res) => {
   const {

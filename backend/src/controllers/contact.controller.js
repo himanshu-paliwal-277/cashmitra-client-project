@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
-import {asyncHandler, ApiError} from '../middlewares/errorHandler.middleware';
+
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
 
 const createTransporter = () => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {

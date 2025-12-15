@@ -1,9 +1,13 @@
 import express from 'express';
-import {check} from 'express-validator';
+import { check } from 'express-validator';
+
 import agentAppController from '../../controllers/agentApp.controller';
-import {protect, authorize} from '../../middlewares/auth.middleware';
-import {validateRequest, validateObjectId} from '../../middlewares/validation.middleware';
-import {asyncHandler} from '../../middlewares/errorHandler.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware';
+import {
+  validateObjectId,
+  validateRequest,
+} from '../../middlewares/validation.middleware';
 
 const router = express.Router();
 

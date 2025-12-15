@@ -10,7 +10,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function sendOTPEmail(email, otp, customerName, subject = 'Your OTP for Device Collection') {
+export async function sendOTPEmail(
+  email,
+  otp,
+  customerName,
+  subject = 'Your OTP for Device Collection'
+) {
   try {
     const mailOptions = {
       from: `"Cashify" <${process.env.EMAIL_USER}>`,

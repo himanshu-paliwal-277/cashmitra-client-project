@@ -1,10 +1,11 @@
+import crypto from 'crypto';
+
+import cloudinary from '../config/cloudinary.config';
 import Pickup from '../models/pickup.model';
 import SellOrder from '../models/sellOrder.model';
 import User from '../models/user.model';
-import {generateToken} from '../utils/jwt.utils';
-import {sendOTPEmail, sendOTPSMS} from '../utils/notification.utils';
-import cloudinary from '../config/cloudinary.config';
-import crypto from 'crypto';
+import { generateToken } from '../utils/jwt.utils';
+import { sendOTPEmail, sendOTPSMS } from '../utils/notification.utils';
 
 const otpStore = new Map();
 

@@ -1,20 +1,19 @@
 import express from 'express';
-import {body, param, query} from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import {
-  createQuestion,
-  getQuestions,
-  getQuestion,
-  updateQuestion,
-  deleteQuestion,
   addOption,
-  updateOption,
+  createQuestion,
   deleteOption,
-  reorderQuestions,
+  deleteQuestion,
   getCustomerQuestions,
+  getQuestion,
+  getQuestions,
+  reorderQuestions,
+  updateOption,
+  updateQuestion,
 } from '../../controllers/sellQuestion.controller';
-
-import {protect, authorize} from '../../middlewares/auth.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 

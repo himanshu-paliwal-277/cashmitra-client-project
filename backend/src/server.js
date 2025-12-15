@@ -1,15 +1,16 @@
-import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
+import express from 'express';
 import session from 'express-session';
-import {errorHandler} from './middlewares/errorHandler.middleware';
-import {apiLimiter} from './middlewares/rateLimiter.middleware';
-import {generateToken, validateToken} from './middlewares/csrf.middleware';
-import {sanitizeData} from './utils/security.utils';
+import helmet from 'helmet';
+import mongoose from 'mongoose';
+import morgan from 'morgan';
+
 import securityConfig from './config/security.config';
-import {PORT, NODE_ENV, MONGODB_URI} from './config/serverConfig';
+import { MONGODB_URI, NODE_ENV, PORT } from './config/serverConfig';
+import { generateToken, validateToken } from './middlewares/csrf.middleware';
+import { errorHandler } from './middlewares/errorHandler.middleware';
+import { apiLimiter } from './middlewares/rateLimiter.middleware';
+import { sanitizeData } from './utils/security.utils';
 
 const app = express();
 

@@ -1,10 +1,11 @@
+import cors from 'cors';
+import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import mongoSanitize from 'express-mongo-sanitize';
-import xss from 'xss-clean';
 import hpp from 'hpp';
-import cors from 'cors';
-import {RateLimitError} from './errorHandler';
+import xss from 'xss-clean';
+
+import { RateLimitError } from './errorHandler';
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

@@ -1,20 +1,23 @@
 import express from 'express';
-import {body} from 'express-validator';
+import { body } from 'express-validator';
 
 import {
-  getBuyProducts,
-  getBuyProductById,
-  getBuyProductsByCategory,
-  createBuyProduct,
-  updateBuyProduct,
-  deleteBuyProduct,
-  getBuyProductStats,
   addProductReview,
+  createBuyProduct,
+  deleteBuyProduct,
+  getBuyProductById,
+  getBuyProducts,
+  getBuyProductsByCategory,
+  getBuyProductStats,
   toggleProductStatus,
+  updateBuyProduct,
 } from '../../controllers/buyProduct.controller';
-
-import {protect, authorize} from '../../middlewares/auth.middleware';
-import {validateCreateBuyProduct, validateUpdateBuyProduct, handleValidationErrors} from '../../middlewares/buyProductValidation.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
+import {
+  handleValidationErrors,
+  validateCreateBuyProduct,
+  validateUpdateBuyProduct,
+} from '../../middlewares/buyProductValidation.middleware';
 
 const router = express.Router();
 
@@ -48,7 +51,7 @@ router.post(
 
 router.use(protect);
 
-import {attachPartner} from '../../middlewares/partner.middleware';
+import { attachPartner } from '../../middlewares/partner.middleware';
 router.use(attachPartner);
 
 router.put(

@@ -1,10 +1,11 @@
-import {validationResult} from 'express-validator';
+import { validationResult } from 'express-validator';
+
+import Category from '../models/category.model';
+import { Order } from '../models/order.model';
+import Partner from '../models/partner.model';
 import Product from '../models/product.model';
 import SellProduct from '../models/sellProduct.model';
-import Category from '../models/category.model';
 import SellSuperCategory from '../models/sellSuperCategory.model';
-import Partner from '../models/partner.model';
-import {Order} from '../models/order.model';
 import Transaction from '../models/transaction.model';
 import Wallet from '../models/wallet.model';
 

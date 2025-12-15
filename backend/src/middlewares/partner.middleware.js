@@ -1,5 +1,5 @@
 import Partner from '../models/partner.model';
-import {ApiError} from './errorHandler.middleware';
+import { ApiError } from './errorHandler.middleware';
 
 export async function attachPartner(req, res, next) {
   try {

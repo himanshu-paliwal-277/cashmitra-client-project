@@ -1,5 +1,5 @@
-import xss from 'xss';
 import crypto from 'crypto';
+import xss from 'xss';
 
 const sanitizeData = (data) => {
   if (typeof data === 'string') {

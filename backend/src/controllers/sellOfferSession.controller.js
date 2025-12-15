@@ -1,10 +1,11 @@
-import {validationResult} from 'express-validator';
+import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
+
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
+import SellAccessory from '../models/sellAccessory.model';
+import SellDefect from '../models/sellDefect.model';
 import SellOfferSession from '../models/sellOfferSession.model';
 import SellProduct from '../models/sellProduct.model';
-import SellDefect from '../models/sellDefect.model';
-import SellAccessory from '../models/sellAccessory.model';
-import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
 export var createSession = asyncHandler(async (req, res) => {
   const errors = validationResult(req);

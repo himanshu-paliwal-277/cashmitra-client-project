@@ -1,5 +1,6 @@
 require('dotenv').config();
 import mongoose from 'mongoose';
+
 import Product from '../models/product.model';
 import User from '../models/user.model';
 

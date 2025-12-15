@@ -1,15 +1,16 @@
-import User from '../models/user.model';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
 import Agent from '../models/agent.model';
-import SellOrder from '../models/sellOrder.model';
+import Pickup from '../models/pickup.model';
+import SellAccessory from '../models/sellAccessory.model';
+import SellDefect from '../models/sellDefect.model';
 import SellOfferSession from '../models/sellOfferSession.model';
+import SellOrder from '../models/sellOrder.model';
 import SellProduct from '../models/sellProduct.model';
 import SellQuestion from '../models/sellQuestion.model';
-import SellDefect from '../models/sellDefect.model';
-import SellAccessory from '../models/sellAccessory.model';
-import Pickup from '../models/pickup.model';
-import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+import User from '../models/user.model';
 
 export var login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;

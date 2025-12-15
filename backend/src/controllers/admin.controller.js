@@ -1,16 +1,17 @@
-import User from '../models/user.model';
+import { validationResult } from 'express-validator';
+import mongoose from 'mongoose';
+
+import Agent from '../models/agent.model';
+import ConditionQuestionnaire from '../models/conditionQuestionnaire.model';
+import Inventory from '../models/inventory.model';
+import { Order } from '../models/order.model';
 import Partner from '../models/partner.model';
 import Product from '../models/product.model';
-import Agent from '../models/agent.model';
-import {Order} from '../models/order.model';
 import Transaction from '../models/transaction.model';
-import Inventory from '../models/inventory.model';
+import User from '../models/user.model';
 import Wallet from '../models/wallet.model';
-import ConditionQuestionnaire from '../models/conditionQuestionnaire.model';
 import ApiError from '../utils/apiError';
-import {generateToken} from '../utils/jwt.utils';
-import {validationResult} from 'express-validator';
-import mongoose from 'mongoose';
+import { generateToken } from '../utils/jwt.utils';
 
 const loginAdmin = async (req, res) => {
   try {

@@ -1,22 +1,21 @@
 import express from 'express';
-import {body} from 'express-validator';
+import { body } from 'express-validator';
 
 import {
+  cleanupExpiredSessions,
   createSession,
+  deleteSession,
+  extendSession,
+  getAllSessions,
+  getCurrentPrice,
   getSession,
+  getUserSessions,
+  updateAccessories,
   updateAnswers,
   updateDefects,
-  updateAccessories,
-  getCurrentPrice,
-  extendSession,
-  deleteSession,
-  getUserSessions,
-  getAllSessions,
   updateSessionStatus,
-  cleanupExpiredSessions,
 } from '../../controllers/sellOfferSession.controller';
-
-import {protect, authorize} from '../../middlewares/auth.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 

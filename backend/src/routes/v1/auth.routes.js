@@ -1,10 +1,14 @@
 import express from 'express';
-import {check} from 'express-validator';
+import { check } from 'express-validator';
+
 import authController from '../../controllers/auth.controller';
-import {protect} from '../../middlewares/auth.middleware';
-import {validateRequest, validatePasswordStrength} from '../../middlewares/validation.middleware';
-import {authLimiter} from '../../middlewares/rateLimiter.middleware';
-import {asyncHandler} from '../../middlewares/errorHandler.middleware';
+import { protect } from '../../middlewares/auth.middleware';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware';
+import { authLimiter } from '../../middlewares/rateLimiter.middleware';
+import {
+  validatePasswordStrength,
+  validateRequest,
+} from '../../middlewares/validation.middleware';
 
 const router = express.Router();
 

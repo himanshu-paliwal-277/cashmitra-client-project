@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import sellSuperCategoryController from '../../controllers/sellSuperCategory.controller';
-import {protect, authorize} from '../../middlewares/auth.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
 
 router.get('/public', sellSuperCategoryController.getPublicSuperCategories);
 

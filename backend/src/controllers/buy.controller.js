@@ -1,13 +1,14 @@
-import {validationResult} from 'express-validator';
+import { validationResult } from 'express-validator';
+import mongoose from 'mongoose';
+
 import BuyProduct from '../models/buyProduct.model';
-import Order from '../models/order.model';
 import Cart from '../models/cart.model';
-import User from '../models/user.model';
+import Order from '../models/order.model';
 import Partner from '../models/partner.model';
 import Product from '../models/product.model';
-import Wallet from '../models/wallet.model';
 import Transaction from '../models/transaction.model';
-import mongoose from 'mongoose';
+import User from '../models/user.model';
+import Wallet from '../models/wallet.model';
 
 const searchProducts = async (req, res) => {
   try {

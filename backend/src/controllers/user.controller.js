@@ -1,7 +1,8 @@
-import User from '../models/user.model';
-import {Order} from '../models/order.model';
+import { validationResult } from 'express-validator';
+
 import Address from '../models/address.model';
-import {validationResult} from 'express-validator';
+import { Order } from '../models/order.model';
+import User from '../models/user.model';
 
 const getUserProfile = async (req, res) => {
   try {

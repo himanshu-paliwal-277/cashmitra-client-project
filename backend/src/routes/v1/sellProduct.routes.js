@@ -1,22 +1,21 @@
 import express from 'express';
-import {body, param, query} from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import {
-  createProduct,
-  getProducts,
-  getProduct,
-  updateProduct,
-  deleteProduct,
-  getProductStats,
-  getVariants,
   addVariant,
-  updateVariant,
+  createProduct,
+  deleteProduct,
   deleteVariant,
   getCustomerProducts,
+  getProduct,
+  getProducts,
+  getProductStats,
   getSellProductsByCategory,
+  getVariants,
+  updateProduct,
+  updateVariant,
 } from '../../controllers/sellProduct.controller';
-
-import {protect, authorize} from '../../middlewares/auth.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -152,7 +151,7 @@ router.get(
 
 router.use(protect);
 
-import {attachPartner} from '../../middlewares/partner.middleware';
+import { attachPartner } from '../../middlewares/partner.middleware';
 
 router.use(attachPartner);
 

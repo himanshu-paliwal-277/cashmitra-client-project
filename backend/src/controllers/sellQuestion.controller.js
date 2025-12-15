@@ -1,9 +1,10 @@
-import {validationResult} from 'express-validator';
-import SellQuestion from '../models/sellQuestion.model';
-import SellProduct from '../models/sellProduct.model';
+import { validationResult } from 'express-validator';
+
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
 import Category from '../models/category.model';
+import SellProduct from '../models/sellProduct.model';
+import SellQuestion from '../models/sellQuestion.model';
 import SellSuperCategory from '../models/sellSuperCategory.model';
-import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
 export var createQuestion = asyncHandler(async (req, res) => {
   const errors = validationResult(req);

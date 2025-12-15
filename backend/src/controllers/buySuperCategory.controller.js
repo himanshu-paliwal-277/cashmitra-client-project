@@ -1,6 +1,6 @@
-import BuySuperCategory from '../models/buySuperCategory.model';
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
 import BuyCategory from '../models/buyCategory.model';
-import {asyncHandler, ApiError} from '../middlewares/errorHandler.middleware';
+import BuySuperCategory from '../models/buySuperCategory.model';
 
 export var getAllSuperCategories = asyncHandler(async (req, res) => {
   const { isActive, search, sort = 'sortOrder' } = req.query;
@@ -174,25 +174,27 @@ export var getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-export var getPublicCategoriesBySuperCategory = asyncHandler(async (req, res) => {
-  const superCategory = await BuySuperCategory.findById(req.params.id);
+export var getPublicCategoriesBySuperCategory = asyncHandler(
+  async (req, res) => {
+    const superCategory = await BuySuperCategory.findById(req.params.id);
 
-  if (!superCategory) {
-    throw new ApiError(404, 'Super category not found');
+    if (!superCategory) {
+      throw new ApiError(404, 'Super category not found');
+    }
+
+    if (!superCategory.isActive) {
+      throw new ApiError(404, 'Super category is not active');
+    }
+
+    const categories = await BuyCategory.find({
+      superCategory: req.params.id,
+      isActive: true,
+    }).sort('sortOrder');
+
+    res.status(200).json({
+      success: true,
+      count: categories.length,
+      data: categories,
+    });
   }
-
-  if (!superCategory.isActive) {
-    throw new ApiError(404, 'Super category is not active');
-  }
-
-  const categories = await BuyCategory.find({
-    superCategory: req.params.id,
-    isActive: true,
-  }).sort('sortOrder');
-
-  res.status(200).json({
-    success: true,
-    count: categories.length,
-    data: categories,
-  });
-});
+);

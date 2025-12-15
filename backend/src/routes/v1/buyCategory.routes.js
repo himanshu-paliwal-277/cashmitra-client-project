@@ -1,16 +1,15 @@
 import express from 'express';
-import {body, param, query} from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 import {
   createBuyCategory,
+  deleteBuyCategory,
   getBuyCategories,
   getBuyCategory,
-  updateBuyCategory,
-  deleteBuyCategory,
   getBuyCategoryStats,
+  updateBuyCategory,
 } from '../../controllers/buyCategory.controller';
-
-import {protect, authorize} from '../../middlewares/auth.middleware';
+import { authorize, protect } from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 

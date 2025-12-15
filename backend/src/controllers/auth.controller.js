@@ -1,7 +1,8 @@
-import User from '../models/user.model';
+import { validationResult } from 'express-validator';
+
 import Partner from '../models/partner.model';
-import {generateToken} from '../utils/jwt.utils';
-import {validationResult} from 'express-validator';
+import User from '../models/user.model';
+import { generateToken } from '../utils/jwt.utils';
 
 const registerUser = async (req, res) => {
   try {

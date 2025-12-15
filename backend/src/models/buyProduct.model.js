@@ -237,4 +237,5 @@ BuyProductSchema.index({ isActive: 1 });
 BuyProductSchema.index({ 'rating.average': -1 });
 BuyProductSchema.index({ 'pricing.discountedPrice': 1 });
 
-export default mongoose.models.BuyProduct || mongoose.model('BuyProduct', BuyProductSchema);
+export default mongoose.models.BuyProduct ||
+  mongoose.model('BuyProduct', BuyProductSchema);
