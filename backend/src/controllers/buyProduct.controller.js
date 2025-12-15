@@ -1,10 +1,10 @@
 import { validationResult } from 'express-validator';
 
-import BuyCategory from '../models/buyCategory.model';
-import BuyProduct from '../models/buyProduct.model';
-import { processArrayFields } from '../utils/dataProcessing.utils';
+import { BuyCategory } from '../models/buyCategory.model.js';
+import { BuyProduct } from '../models/buyProduct.model.js';
+import { processArrayFields } from '../utils/dataProcessing.utils.js';
 
-const getBuyProducts = async (req, res) => {
+export const getBuyProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -72,7 +72,7 @@ const getBuyProducts = async (req, res) => {
   }
 };
 
-const deleteBuyProduct = async (req, res) => {
+export const deleteBuyProduct = async (req, res) => {
   try {
     const product = await BuyProduct.findById(req.params.id);
 
@@ -111,7 +111,7 @@ const deleteBuyProduct = async (req, res) => {
   }
 };
 
-const getBuyProductById = async (req, res) => {
+export const getBuyProductById = async (req, res) => {
   try {
     const product = await BuyProduct.findById(req.params.id)
       .populate('categoryId', 'name')
@@ -255,7 +255,7 @@ function normalizeBuyProductInput(input = {}) {
 }
 
 // ✅ Updated createBuyProduct
-const createBuyProduct = async (req, res) => {
+export const createBuyProduct = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -307,7 +307,7 @@ const createBuyProduct = async (req, res) => {
   }
 };
 
-const updateBuyProduct = async (req, res) => {
+export const updateBuyProduct = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -378,7 +378,7 @@ const updateBuyProduct = async (req, res) => {
   }
 };
 
-const getBuyProductStats = async (req, res) => {
+export const getBuyProductStats = async (req, res) => {
   try {
     const totalProducts = await BuyProduct.countDocuments();
     const activeProducts = await BuyProduct.countDocuments({ isActive: true });
@@ -449,7 +449,7 @@ const getBuyProductStats = async (req, res) => {
   }
 };
 
-const addProductReview = async (req, res) => {
+export const addProductReview = async (req, res) => {
   try {
     const { rating, comment, reviewer } = req.body;
     const productId = req.params.id;
@@ -504,7 +504,7 @@ const addProductReview = async (req, res) => {
   }
 };
 
-const toggleProductStatus = async (req, res) => {
+export const toggleProductStatus = async (req, res) => {
   try {
     const product = await BuyProduct.findById(req.params.id);
     if (!product) {
@@ -533,7 +533,7 @@ const toggleProductStatus = async (req, res) => {
   }
 };
 
-const getBuyProductsByCategory = async (req, res) => {
+export const getBuyProductsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
     const page = parseInt(req.query.page) || 1;
@@ -609,14 +609,3 @@ const getBuyProductsByCategory = async (req, res) => {
   }
 };
 
-export default {
-  getBuyProducts,
-  getBuyProductById,
-  getBuyProductsByCategory,
-  createBuyProduct,
-  updateBuyProduct,
-  deleteBuyProduct,
-  getBuyProductStats,
-  addProductReview,
-  toggleProductStatus,
-};

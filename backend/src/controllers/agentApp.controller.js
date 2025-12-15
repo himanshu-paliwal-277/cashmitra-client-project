@@ -1,16 +1,26 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
-import Agent from '../models/agent.model';
-import Pickup from '../models/pickup.model';
-import SellAccessory from '../models/sellAccessory.model';
-import SellDefect from '../models/sellDefect.model';
-import SellOfferSession from '../models/sellOfferSession.model';
-import SellOrder from '../models/sellOrder.model';
-import SellProduct from '../models/sellProduct.model';
-import SellQuestion from '../models/sellQuestion.model';
-import User from '../models/user.model';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
+// import { Agent } from '../models/agent.model.js';
+// import { Pickup } from '../models/pickup.model.js';
+// import { SellAccessory } from '../models/sellAccessory.model.js';
+// import { SellDefect } from '../models/sellDefect.model.js';
+// import { SellOrder } from '../models/sellOrder.model.js';
+import Agent from '../models/agent.model.js';
+import SellAccessory from '../models/sellAccessory.model.js';
+import Pickup from '../models/pickup.model.js';
+import SellDefect from '../models/sellDefect.model.js';
+import SellProduct from '../models/sellProduct.model.js';
+import SellOrder from '../models/sellOrder.model.js';
+import SellQuestion from '../models/sellQuestion.model.js';
+// import { SellProduct } from '../models/sellProduct.model.js';
+// import { SellQuestion } from '../models/sellQuestion.model.js';
+// import { User } from '../models/user.model.js';
+// import Pickup from '../models/pickup.model.js';
 
 export var login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;

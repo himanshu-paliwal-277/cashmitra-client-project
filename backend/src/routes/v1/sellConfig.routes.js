@@ -10,8 +10,8 @@ import {
   testPricing,
   updateRules,
   updateSteps,
-} from '../../controllers/sellConfig.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
+} from '../../controllers/sellConfig.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 

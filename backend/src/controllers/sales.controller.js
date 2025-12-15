@@ -1,12 +1,12 @@
 import { validationResult } from 'express-validator';
 
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
-import Product from '../models/buyProduct.model';
-import Inventory from '../models/inventory.model';
-import { Order } from '../models/order.model';
-import Partner from '../models/partner.model';
-import Transaction from '../models/transaction.model';
-import Wallet from '../models/wallet.model';
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import { Product } from '../models/buyProduct.model.js';
+import { Inventory } from '../models/inventory.model.js';
+import { Order } from '../models/order.model.js';
+import { Partner } from '../models/partner.model.js';
+import { Transaction } from '../models/transaction.model.js';
+import { Wallet } from '../models/wallet.model.js';
 
 export var createOrder = asyncHandler(async (req, res) => {
   if (
@@ -62,8 +62,8 @@ export var createOrder = asyncHandler(async (req, res) => {
   const partnerAmount = totalAmount - totalCommission;
 
   let discountAmount = 0;
-  if (couponCode) {
-  }
+  // if (couponCode) {
+  // }
 
   if (isNaN(totalAmount) || totalAmount <= 0) {
     throw new ApiError(400, 'Invalid total amount calculated');

@@ -14,8 +14,8 @@ import {
   updateAnswers,
   updateDefects,
   updateSessionStatus,
-} from '../../controllers/sellOfferSession.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
+} from '../../controllers/sellOfferSession.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 

@@ -1,10 +1,10 @@
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
-import { Order } from '../models/order.model';
-import Partner from '../models/partner.model';
-import Transaction from '../models/transaction.model';
-import Wallet from '../models/wallet.model';
+import { Order } from '../models/order.model.js';
+import { Partner } from '../models/partner.model.js';
+import { Transaction } from '../models/transaction.model.js';
+import { Wallet } from '../models/wallet.model.js';
 
 export async function getWallet(req, res) {
   try {

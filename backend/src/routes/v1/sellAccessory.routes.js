@@ -11,8 +11,8 @@ import {
   reorderAccessories,
   toggleAccessoryStatus,
   updateAccessory,
-} from '../../controllers/sellAccessory.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
+} from '../../controllers/sellAccessory.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -146,7 +146,7 @@ router.put(
 import {
   migrateAndReindexAccessories,
   reindexAccessoryOrders,
-} from '../../controllers/sellAccessory.controller';
+} from '../../controllers/sellAccessory.controller.js';
 router.post('/reindex-orders', reindexAccessoryOrders);
 router.post('/migrate-and-reindex', migrateAndReindexAccessories);
 

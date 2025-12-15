@@ -1,6 +1,6 @@
 import { body, validationResult } from 'express-validator';
 
-const validateCreateBuyProduct = [
+export const validateCreateBuyProduct = [
   body('categoryId')
     .notEmpty()
     .withMessage('Category ID is required')
@@ -440,7 +440,7 @@ const validateCreateBuyProduct = [
     .withMessage('Sort order must be an integer'),
 ];
 
-const validateUpdateBuyProduct = [
+export const validateUpdateBuyProduct = [
   body('categoryId')
     .optional()
     .isMongoId()
@@ -468,7 +468,7 @@ const validateUpdateBuyProduct = [
   }),
 ];
 
-const handleValidationErrors = (req, res, next) => {
+export const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -484,8 +484,3 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-export default {
-  validateCreateBuyProduct,
-  validateUpdateBuyProduct,
-  handleValidationErrors,
-};

@@ -5,12 +5,12 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 
-import securityConfig from './config/security.config';
-import { MONGODB_URI, NODE_ENV, PORT } from './config/serverConfig';
-import { generateToken, validateToken } from './middlewares/csrf.middleware';
-import { errorHandler } from './middlewares/errorHandler.middleware';
-import { apiLimiter } from './middlewares/rateLimiter.middleware';
-import { sanitizeData } from './utils/security.utils';
+import securityConfig from './config/security.config.js';
+import { MONGODB_URI, NODE_ENV, PORT } from './config/serverConfig.js';
+import { generateToken, validateToken } from './middlewares/csrf.middleware.js';
+import { errorHandler } from './middlewares/errorHandler.middleware.js';
+import { apiLimiter } from './middlewares/rateLimiter.middleware.js';
+import { sanitizeData } from './utils/security.utils.js';
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   next();
 });
 
-import apiRouter from './routes/apiRouter.routes';
+import apiRouter from './routes/apiRouter.routes.js';
 
 app.use('/api', apiRouter);
 

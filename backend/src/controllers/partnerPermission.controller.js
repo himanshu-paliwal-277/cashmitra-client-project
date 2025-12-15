@@ -1,9 +1,9 @@
-import Partner from '../models/partner.model';
-import { PartnerPermission } from '../models/partnerPermission.model';
-import RoleTemplate from '../models/roleTemplate.model';
-import User from '../models/user.model';
-import ApiError from '../utils/apiError';
-import { sanitizeData } from '../utils/security.utils';
+import { Partner } from '../models/partner.model.js';
+import { PartnerPermission } from '../models/partnerPermission.model.js';
+import { RoleTemplate } from '../models/roleTemplate.model.js';
+import { User } from '../models/user.model.js';
+import ApiError from '../utils/apiError.js';
+import { sanitizeData } from '../utils/security.utils.js';
 
 export async function getPartnerPermissions(req, res) {
   try {
@@ -311,7 +311,7 @@ export async function updatePartnerPermissions(req, res) {
     }
 
     if (notes) {
-      permissions.notes = sanitizeXSS(notes);
+      permissions.notes = sanitizeData(notes);
     }
 
     if (businessLimits) {

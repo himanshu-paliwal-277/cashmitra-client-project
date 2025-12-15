@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const PARTNER_MENU_ITEMS = {
+export const PARTNER_MENU_ITEMS = {
   dashboard: {
     name: 'Dashboard',
     path: '/partner/dashboard',
@@ -458,9 +458,8 @@ partnerPermissionSchema.statics.createDefaultPermissions = function (
   });
 };
 
-const PartnerPermission = mongoose.model(
+export const PartnerPermission = mongoose.model(
   'PartnerPermission',
   partnerPermissionSchema
 );
 
-export default { PartnerPermission, PARTNER_MENU_ITEMS };

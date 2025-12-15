@@ -2,12 +2,12 @@ import express from 'express';
 import { check } from 'express-validator';
 import multer from 'multer';
 
-import adminController from '../../controllers/admin.controller';
-import categoryController from '../../controllers/category.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
-import { asyncHandler } from '../../middlewares/errorHandler.middleware';
-import { authRateLimiter } from '../../middlewares/rateLimiter.middleware';
-import { validateRequest } from '../../middlewares/validation.middleware';
+import * as adminController from '../../controllers/admin.controller.js';
+import * as categoryController from '../../controllers/category.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
+import { authLimiter } from '../../middlewares/rateLimiter.middleware.js';
+import { validateRequest } from '../../middlewares/validation.middleware.js';
 
 const storage = multer.memoryStorage();
 

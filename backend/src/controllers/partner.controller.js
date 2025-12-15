@@ -1,12 +1,12 @@
-import Agent from '../models/agent.model';
-import BuyProduct from '../models/buyProduct.model';
-import Inventory from '../models/inventory.model';
-import { Order } from '../models/order.model';
-import Partner from '../models/partner.model';
-import Product from '../models/product.model';
-import User from '../models/user.model';
-import ApiError from '../utils/apiError';
-import { sanitizeData } from '../utils/security.utils';
+import { Agent } from '../models/agent.model.js';
+import { BuyProduct } from '../models/buyProduct.model.js';
+import { Inventory } from '../models/inventory.model.js';
+import { Order } from '../models/order.model.js';
+import { Partner } from '../models/partner.model.js';
+import { Product } from '../models/product.model.js';
+import { User } from '../models/user.model.js';
+import ApiError from '../utils/apiError.js';
+import { sanitizeData } from '../utils/security.utils.js';
 
 export async function registerPartnerShop(req, res) {
   const userId = req.user.id;
@@ -1082,8 +1082,8 @@ export async function getDashboardStats(req, res) {
   }
 }
 
-import SellOrder from '../models/sellOrder.model';
-import SellProduct from '../models/sellProduct.model';
+import { SellOrder } from '../models/sellOrder.model.js';
+import { SellProduct } from '../models/sellProduct.model.js';
 
 export async function getDashboardSellBuy(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });

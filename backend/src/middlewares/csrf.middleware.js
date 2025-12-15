@@ -1,6 +1,6 @@
-import { generateCSRFToken, validateCSRFToken } from '../utils/security.utils';
+import { generateCSRFToken, validateCSRFToken } from '../utils/security.utils.js';
 
-const generateToken = (req, res, next) => {
+export const generateToken = (req, res, next) => {
   const csrfToken = generateCSRFToken();
 
   req.session.csrfToken = csrfToken;
@@ -10,7 +10,7 @@ const generateToken = (req, res, next) => {
   next();
 };
 
-const validateToken = (req, res, next) => {
+export const validateToken = (req, res, next) => {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
     return next();
   }
@@ -33,7 +33,3 @@ const validateToken = (req, res, next) => {
   next();
 };
 
-export default {
-  generateToken,
-  validateToken,
-};

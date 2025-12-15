@@ -1,10 +1,13 @@
 import { validationResult } from 'express-validator';
 
-import Partner from '../models/partner.model';
-import User from '../models/user.model';
-import { generateToken } from '../utils/jwt.utils';
+// import { Partner } from '../models/partner.model.js';
+// import { User } from '../models/user.model.js';
+// import { generateToken } from '../utils/jwt.utils.js';
+import Partner from '../models/partner.model.js';
+import User from '../models/user.model.js';
+import { generateToken } from '../utils/jwt.utils.js';
 
-const registerUser = async (req, res) => {
+export const registerUser = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -43,7 +46,7 @@ const registerUser = async (req, res) => {
   }
 };
 
-const loginPartner = async (req, res) => {
+export const loginPartner = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -90,7 +93,7 @@ const loginPartner = async (req, res) => {
   }
 };
 
-const registerPartner = async (req, res) => {
+export const registerPartner = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -130,7 +133,7 @@ const registerPartner = async (req, res) => {
   }
 };
 
-const loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -159,7 +162,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-const getUserProfile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
@@ -184,7 +187,7 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-const updateUserProfile = async (req, res) => {
+export const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
@@ -228,13 +231,4 @@ const updateUserProfile = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
-};
-
-export default {
-  registerUser,
-  registerPartner,
-  loginUser,
-  loginPartner,
-  getUserProfile,
-  updateUserProfile,
 };

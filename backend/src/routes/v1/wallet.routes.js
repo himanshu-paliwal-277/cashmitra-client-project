@@ -1,13 +1,13 @@
 import express from 'express';
 import { check } from 'express-validator';
 
-import walletController from '../../controllers/wallet.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
-import { asyncHandler } from '../../middlewares/errorHandler.middleware';
+import * as walletController from '../../controllers/wallet.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import {
   validateObjectId,
   validateRequest,
-} from '../../middlewares/validation.middleware';
+} from '../../middlewares/validation.middleware.js';
 
 const router = express.Router();
 

@@ -1,16 +1,16 @@
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
-import BuyProduct from '../models/buyProduct.model';
-import Cart from '../models/cart.model';
-import Order from '../models/order.model';
-import Partner from '../models/partner.model';
-import Product from '../models/product.model';
-import Transaction from '../models/transaction.model';
-import User from '../models/user.model';
-import Wallet from '../models/wallet.model';
+import { BuyProduct } from '../models/buyProduct.model.js';
+import { Cart } from '../models/cart.model.js';
+import { Order } from '../models/order.model.js';
+import { Partner } from '../models/partner.model.js';
+import { Product } from '../models/product.model.js';
+import { Transaction } from '../models/transaction.model.js';
+import { User } from '../models/user.model.js';
+import { Wallet } from '../models/wallet.model.js';
 
-const searchProducts = async (req, res) => {
+export const searchProducts = async (req, res) => {
   try {
     const { query, category, condition, minPrice, maxPrice, pincode } =
       req.query;
@@ -90,7 +90,7 @@ const searchProducts = async (req, res) => {
   }
 };
 
-const getProductDetails = async (req, res) => {
+export const getProductDetails = async (req, res) => {
   try {
     const product = await BuyProduct.findById(req.params.id).populate(
       'partner',
@@ -118,7 +118,7 @@ const getProductDetails = async (req, res) => {
   }
 };
 
-const addToCart = async (req, res) => {
+export const addToCart = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -197,7 +197,7 @@ const addToCart = async (req, res) => {
   }
 };
 
-const getCart = async (req, res) => {
+export const getCart = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -259,7 +259,7 @@ const getCart = async (req, res) => {
   }
 };
 
-const updateCartItem = async (req, res) => {
+export const updateCartItem = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -313,7 +313,7 @@ const updateCartItem = async (req, res) => {
   }
 };
 
-const removeCartItem = async (req, res) => {
+export const removeCartItem = async (req, res) => {
   try {
     const { itemId } = req.params;
     const productId = itemId;
@@ -345,7 +345,7 @@ const removeCartItem = async (req, res) => {
   }
 };
 
-const checkout = async (req, res) => {
+export const checkout = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -458,7 +458,7 @@ const checkout = async (req, res) => {
   }
 };
 
-const getBuyOrderDetails = async (req, res) => {
+export const getBuyOrderDetails = async (req, res) => {
   try {
     const order = await Order.findOne({
       _id: req.params.id,
@@ -485,7 +485,7 @@ const getBuyOrderDetails = async (req, res) => {
   }
 };
 
-const getUserBuyOrders = async (req, res) => {
+export const getUserBuyOrders = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -517,14 +517,3 @@ const getUserBuyOrders = async (req, res) => {
   }
 };
 
-export default {
-  searchProducts,
-  getProductDetails,
-  addToCart,
-  getCart,
-  updateCartItem,
-  removeCartItem,
-  checkout,
-  getBuyOrderDetails,
-  getUserBuyOrders,
-};

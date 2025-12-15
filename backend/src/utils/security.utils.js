@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import xss from 'xss';
 
-const sanitizeData = (data) => {
+export const sanitizeData = (data) => {
   if (typeof data === 'string') {
     return xss(data);
   }
@@ -21,29 +21,21 @@ const sanitizeData = (data) => {
   return data;
 };
 
-const generateSecureToken = (bytes = 32) => {
+export const generateSecureToken = (bytes = 32) => {
   return crypto.randomBytes(bytes).toString('hex');
 };
 
-const hashData = (data) => {
+export const hashData = (data) => {
   return crypto.createHash('sha256').update(data).digest('hex');
 };
 
-const generateCSRFToken = () => {
+export const generateCSRFToken = () => {
   return generateSecureToken();
 };
 
-const validateCSRFToken = (token, storedToken) => {
+export const validateCSRFToken = (token, storedToken) => {
   if (!token || !storedToken) {
     return false;
   }
   return token === storedToken;
-};
-
-export default {
-  sanitizeData,
-  generateSecureToken,
-  hashData,
-  generateCSRFToken,
-  validateCSRFToken,
 };

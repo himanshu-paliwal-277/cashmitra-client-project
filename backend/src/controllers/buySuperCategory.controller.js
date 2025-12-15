@@ -1,6 +1,6 @@
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
-import BuyCategory from '../models/buyCategory.model';
-import BuySuperCategory from '../models/buySuperCategory.model';
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import { BuyCategory } from '../models/buyCategory.model.js';
+import { BuySuperCategory } from '../models/buySuperCategory.model.js';
 
 export var getAllSuperCategories = asyncHandler(async (req, res) => {
   const { isActive, search, sort = 'sortOrder' } = req.query;

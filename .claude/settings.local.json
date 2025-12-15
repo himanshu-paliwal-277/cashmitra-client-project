@@ -17,7 +17,16 @@
       "Bash(strip-comments:*)",
       "Bash(node remove-comments.js:*)",
       "Bash(lebab:*)",
-      "Bash(npm run lint:fix:*)"
+      "Bash(npm run lint:fix:*)",
+      "Bash(node fix-imports.js:*)",
+      "Bash(node src/server.js:*)",
+      "Bash(timeout 5 node:*)",
+      "Bash(node fix-exports.js:*)",
+      "Bash(node fix-all-exports.js:*)",
+      "Bash(timeout 8 node:*)",
+      "Bash(timeout 10 node:*)",
+      "Bash(node fix-controller-imports.js:*)",
+      "Bash(node fix-model-imports.js:*)"
     ],
     "deny": [],
     "ask": []

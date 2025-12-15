@@ -161,4 +161,4 @@ orderSchema.index({ assessmentId: 1 });
 
 const Order = mongoose.model('Order', orderSchema);
 
-export default { Order };
+export { Order };

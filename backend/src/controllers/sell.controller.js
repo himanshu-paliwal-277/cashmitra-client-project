@@ -1,15 +1,15 @@
 import { validationResult } from 'express-validator';
 
-import Category from '../models/category.model';
-import { Order } from '../models/order.model';
-import Partner from '../models/partner.model';
-import Product from '../models/product.model';
-import SellProduct from '../models/sellProduct.model';
-import SellSuperCategory from '../models/sellSuperCategory.model';
-import Transaction from '../models/transaction.model';
-import Wallet from '../models/wallet.model';
+import { Category } from '../models/category.model.js';
+import { Order } from '../models/order.model.js';
+import { Partner } from '../models/partner.model.js';
+import { Product } from '../models/product.model.js';
+import { SellProduct } from '../models/sellProduct.model.js';
+import { SellSuperCategory } from '../models/sellSuperCategory.model.js';
+import { Transaction } from '../models/transaction.model.js';
+import { Wallet } from '../models/wallet.model.js';
 
-const getProductCategories = async (req, res) => {
+export const getProductCategories = async (req, res) => {
   try {
     const categories = await Category.find({ isActive: true })
       .populate('superCategory', 'name displayName image')
@@ -30,7 +30,7 @@ const getProductCategories = async (req, res) => {
   }
 };
 
-const getBrandsByCategory = async (req, res) => {
+export const getBrandsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
 
@@ -59,7 +59,7 @@ const getBrandsByCategory = async (req, res) => {
   }
 };
 
-const getSeriesByBrand = async (req, res) => {
+export const getSeriesByBrand = async (req, res) => {
   try {
     const { category, brand } = req.params;
 
@@ -72,7 +72,7 @@ const getSeriesByBrand = async (req, res) => {
   }
 };
 
-const getModelsBySeries = async (req, res) => {
+export const getModelsBySeries = async (req, res) => {
   try {
     const { category, brand, series } = req.params;
 
@@ -85,7 +85,7 @@ const getModelsBySeries = async (req, res) => {
   }
 };
 
-const getVariantsByModel = async (req, res) => {
+export const getVariantsByModel = async (req, res) => {
   try {
     const { category, brand, series, model } = req.params;
 
@@ -107,7 +107,7 @@ const getVariantsByModel = async (req, res) => {
   }
 };
 
-const calculatePrice = async (req, res) => {
+export const calculatePrice = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -332,7 +332,7 @@ const generatePriceRecommendations = (product, condition) => {
   return recommendations;
 };
 
-const createSellOrder = async (req, res) => {
+export const createSellOrder = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -446,7 +446,7 @@ const createSellOrder = async (req, res) => {
   }
 };
 
-const getSellOrderStatus = async (req, res) => {
+export const getSellOrderStatus = async (req, res) => {
   try {
     const order = await Order.findOne({
       _id: req.params.id,
@@ -479,7 +479,7 @@ const getSellOrderStatus = async (req, res) => {
   }
 };
 
-const updateSellOrderStatus = async (req, res) => {
+export const updateSellOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, note } = req.body;
@@ -558,7 +558,7 @@ const updateSellOrderStatus = async (req, res) => {
   }
 };
 
-const getPriceQuote = async (req, res) => {
+export const getPriceQuote = async (req, res) => {
   try {
     const { assessmentId } = req.params;
 
@@ -614,7 +614,7 @@ const getPriceQuote = async (req, res) => {
   }
 };
 
-const refreshPriceQuote = async (req, res) => {
+export const refreshPriceQuote = async (req, res) => {
   try {
     const { assessmentId } = req.params;
 
@@ -662,7 +662,7 @@ const refreshPriceQuote = async (req, res) => {
   }
 };
 
-const submitAssessment = async (req, res) => {
+export const submitAssessment = async (req, res) => {
   try {
     let { category, brand, model, answers, productDetails } = req.body;
 
@@ -817,7 +817,7 @@ const submitAssessment = async (req, res) => {
   }
 };
 
-const findProductsByModel = async (req, res) => {
+export const findProductsByModel = async (req, res) => {
   try {
     const { category, brand, model } = req.query;
 
@@ -874,18 +874,3 @@ const findProductsByModel = async (req, res) => {
   }
 };
 
-export default {
-  getProductCategories,
-  getBrandsByCategory,
-  getSeriesByBrand,
-  getModelsBySeries,
-  getVariantsByModel,
-  calculatePrice,
-  createSellOrder,
-  getSellOrderStatus,
-  updateSellOrderStatus,
-  getPriceQuote,
-  refreshPriceQuote,
-  submitAssessment,
-  findProductsByModel,
-};

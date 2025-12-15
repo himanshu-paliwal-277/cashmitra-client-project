@@ -1,3 +1,10 @@
+import {
+  isProduction,
+  JWT_EXPIRES_IN,
+  JWT_SECRET,
+  SESSION_SECRET,
+} from './serverConfig.js';
+
 const securityConfig = {
   cors: {
     origin: '*',
@@ -49,11 +56,11 @@ const securityConfig = {
   },
 
   session: {
-    secret: require('./serverConfig').SESSION_SECRET,
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: require('./serverConfig').isProduction(),
+      secure: isProduction(),
       httpOnly: true,
       sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000,
@@ -61,8 +68,8 @@ const securityConfig = {
   },
 
   jwt: {
-    secret: require('./serverConfig').JWT_SECRET,
-    expiresIn: require('./serverConfig').JWT_EXPIRES_IN,
+    secret: JWT_SECRET,
+    expiresIn: JWT_EXPIRES_IN,
   },
 };
 

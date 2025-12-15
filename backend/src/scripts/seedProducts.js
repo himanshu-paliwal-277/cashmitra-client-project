@@ -1,8 +1,8 @@
 require('dotenv').config();
 import mongoose from 'mongoose';
 
-import Product from '../models/product.model';
-import User from '../models/user.model';
+import { Product } from '../models/product.model.js';
+import { User } from '../models/user.model.js';
 
 const connectDB = async () => {
   try {

@@ -329,7 +329,8 @@ conditionQuestionnaireSchema.methods.duplicate = function (
   return duplicated;
 };
 
-export default mongoose.model(
+const ConditionQuestionnaire = mongoose.model(
   'ConditionQuestionnaire',
   conditionQuestionnaireSchema
 );
+export default ConditionQuestionnaire;

@@ -1,14 +1,14 @@
 import express from 'express';
 import { check } from 'express-validator';
 
-import vendorController from '../../controllers/vendor.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
-import { asyncHandler } from '../../middlewares/errorHandler.middleware';
-import { authLimiter } from '../../middlewares/rateLimiter.middleware';
+import * as vendorController from '../../controllers/vendor.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
+import { authLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import {
   validateObjectId,
   validateRequest,
-} from '../../middlewares/validation.middleware';
+} from '../../middlewares/validation.middleware.js';
 
 const router = express.Router();
 

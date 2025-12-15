@@ -5,9 +5,9 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import xss from 'xss-clean';
 
-import { RateLimitError } from './errorHandler';
+import { RateLimitError } from './errorHandler.js';
 
-const generalLimiter = rateLimit({
+export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
   message: {
@@ -27,7 +27,7 @@ const generalLimiter = rateLimit({
   },
 });
 
-const authLimiter = rateLimit({
+export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
   message: {
@@ -46,7 +46,7 @@ const authLimiter = rateLimit({
   },
 });
 
-const searchLimiter = rateLimit({
+export const searchLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 50,
   message: {
@@ -64,7 +64,7 @@ const searchLimiter = rateLimit({
   },
 });
 
-const uploadLimiter = rateLimit({
+export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 20,
   message: {
@@ -82,7 +82,7 @@ const uploadLimiter = rateLimit({
   },
 });
 
-const corsOptions = {
+export const corsOptions = {
   origin: function (origin, callback) {
     return callback(null, true);
   },
@@ -101,7 +101,7 @@ const corsOptions = {
   ],
 };
 
-const helmetOptions = {
+export const helmetOptions = {
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
@@ -123,7 +123,7 @@ const helmetOptions = {
   },
 };
 
-const sanitizeInput = (req, res, next) => {
+export const sanitizeInput = (req, res, next) => {
   if (req.body) {
     req.body = sanitizeObject(req.body);
   }
@@ -183,7 +183,7 @@ const sanitizeObject = (obj) => {
  * @param {Object} res - Express response object
  * @param {Function} next - Express next function
  */
-const limitRequestSize = (req, res, next) => {
+export const limitRequestSize = (req, res, next) => {
   const maxSize = 10 * 1024 * 1024; // 10MB
 
   if (
@@ -200,7 +200,7 @@ const limitRequestSize = (req, res, next) => {
   next();
 };
 
-const ipWhitelist = (allowedIPs = []) => {
+export const ipWhitelist = (allowedIPs = []) => {
   return (req, res, next) => {
     if (process.env.NODE_ENV === 'development') {
       return next();
@@ -220,7 +220,7 @@ const ipWhitelist = (allowedIPs = []) => {
   };
 };
 
-const requestLogger = (req, res, next) => {
+export const requestLogger = (req, res, next) => {
   const start = Date.now();
 
   console.log(
@@ -238,7 +238,7 @@ const requestLogger = (req, res, next) => {
   next();
 };
 
-const securityHeaders = (req, res, next) => {
+export const securityHeaders = (req, res, next) => {
   res.removeHeader('X-Powered-By');
 
   res.setHeader('X-API-Version', '1.0.0');
@@ -247,7 +247,7 @@ const securityHeaders = (req, res, next) => {
   next();
 };
 
-const validateContentType = (allowedTypes = ['application/json']) => {
+export const validateContentType = (allowedTypes = ['application/json']) => {
   return (req, res, next) => {
     if (req.method === 'GET') {
       return next();
@@ -279,7 +279,7 @@ const validateContentType = (allowedTypes = ['application/json']) => {
   };
 };
 
-const applySecurity = (app) => {
+export const applySecurity = (app) => {
   app.set('trust proxy', 1);
 
   app.use(helmet(helmetOptions));
@@ -305,21 +305,3 @@ const applySecurity = (app) => {
   );
 };
 
-export default {
-  generalLimiter,
-  authLimiter,
-  searchLimiter,
-  uploadLimiter,
-
-  sanitizeInput,
-  limitRequestSize,
-  ipWhitelist,
-  requestLogger,
-  securityHeaders,
-  validateContentType,
-
-  corsOptions,
-  helmetOptions,
-
-  applySecurity,
-};

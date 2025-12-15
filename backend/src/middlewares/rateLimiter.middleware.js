@@ -1,12 +1,8 @@
 import rateLimit from 'express-rate-limit';
 
-import securityConfig from '../config/security.config';
+import securityConfig from '../config/security.config.js';
 
-const apiLimiter = rateLimit(securityConfig.rateLimit);
+export const apiLimiter = rateLimit(securityConfig.rateLimit);
 
-const authLimiter = rateLimit(securityConfig.authRateLimit);
+export const authLimiter = rateLimit(securityConfig.authRateLimit);
 
-export default {
-  apiLimiter,
-  authLimiter,
-};

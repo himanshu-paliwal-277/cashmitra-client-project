@@ -1,14 +1,14 @@
 import express from 'express';
 import { check } from 'express-validator';
 
-import sellController from '../../controllers/sell.controller';
-import { protect } from '../../middlewares/auth.middleware';
-import { asyncHandler } from '../../middlewares/errorHandler.middleware';
+import * as sellController from '../../controllers/sell.controller.js';
+import { protect } from '../../middlewares/auth.middleware.js';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import {
   validateAssessmentId,
   validateObjectId,
   validateRequest,
-} from '../../middlewares/validation.middleware';
+} from '../../middlewares/validation.middleware.js';
 
 const router = express.Router();
 

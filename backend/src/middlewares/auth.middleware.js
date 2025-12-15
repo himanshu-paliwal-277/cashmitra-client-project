@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken';
 
-import { JWT_SECRET } from '../config/serverConfig';
-import User from '../models/user.model';
+import { JWT_SECRET } from '../config/serverConfig.js';
+import User from '../models/user.model.js';
+// import { User } from '../models/user.model.js';
 
-const protect = async (req, res, next) => {
+export const protect = async (req, res, next) => {
   let token;
 
   if (
@@ -29,7 +30,7 @@ const protect = async (req, res, next) => {
   }
 };
 
-const authorize = (...roles) => {
+export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Not authenticated' });
@@ -43,5 +44,3 @@ const authorize = (...roles) => {
     next();
   };
 };
-
-export default { protect, authorize };

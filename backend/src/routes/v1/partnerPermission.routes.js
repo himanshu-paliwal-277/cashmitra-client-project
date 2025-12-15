@@ -1,10 +1,10 @@
 import express from 'express';
 import { check, param, query } from 'express-validator';
 
-import partnerPermissionController from '../../controllers/partnerPermission.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
-import { asyncHandler } from '../../middlewares/errorHandler.middleware';
-import { validateRequest } from '../../middlewares/validation.middleware';
+import * as partnerPermissionController from '../../controllers/partnerPermission.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
+import { validateRequest } from '../../middlewares/validation.middleware.js';
 
 const router = express.Router();
 
@@ -215,7 +215,7 @@ router.post(
       .optional()
       .isString()
       .trim()
-      .matches(/^\/[a-zA-Z0-9\/_-]*$/)
+      .matches(/^\/[a-zA-Z0-9/_-]*$/)
       .withMessage('Path must be a valid URL path'),
     check('icon')
       .optional()

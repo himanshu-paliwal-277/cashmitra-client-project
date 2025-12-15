@@ -1,8 +1,8 @@
 import { validationResult } from 'express-validator';
 
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
-import SellAccessory from '../models/sellAccessory.model';
-import SellProduct from '../models/sellProduct.model';
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import { SellAccessory } from '../models/sellAccessory.model.js';
+import { SellProduct } from '../models/sellProduct.model.js';
 
 export var createAccessory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);

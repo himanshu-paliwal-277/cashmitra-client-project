@@ -12,8 +12,8 @@ import {
   reorderQuestions,
   updateOption,
   updateQuestion,
-} from '../../controllers/sellQuestion.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
+} from '../../controllers/sellQuestion.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 

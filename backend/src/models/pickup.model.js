@@ -285,4 +285,6 @@ pickupSchema.methods.addNote = function (content, addedBy) {
   return this.save();
 };
 
-export default mongoose.model('Pickup', pickupSchema);
+const Pickup = mongoose.model('Pickup', pickupSchema);
+
+export default Pickup;

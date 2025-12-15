@@ -1,8 +1,8 @@
 import { validationResult } from 'express-validator';
 
-import validationUtils from '../utils/validation.utils';
+import { isValidObjectId, validatePassword } from '../utils/validation.utils.js';
 
-const validateRequest = (req, res, next) => {
+export const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -16,10 +16,10 @@ const validateRequest = (req, res, next) => {
   next();
 };
 
-const validateObjectId = (paramName) => {
+export const validateObjectId = (paramName) => {
   return (req, res, next) => {
     const id = req.params[paramName];
-    if (!validationUtils.isValidObjectId(id)) {
+    if (!isValidObjectId(id)) {
       return res.status(400).json({
         success: false,
         message: `Invalid ${paramName} format`,
@@ -29,11 +29,11 @@ const validateObjectId = (paramName) => {
   };
 };
 
-const validateAssessmentId = (paramName) => {
+export const validateAssessmentId = (paramName) => {
   return (req, res, next) => {
     const id = req.params[paramName];
 
-    if (validationUtils.isValidObjectId(id)) {
+    if (isValidObjectId(id)) {
       return next();
     }
 
@@ -49,9 +49,9 @@ const validateAssessmentId = (paramName) => {
   };
 };
 
-const validatePasswordStrength = (req, res, next) => {
+export const validatePasswordStrength = (req, res, next) => {
   const { password } = req.body;
-  const validation = validationUtils.validatePassword(password);
+  const validation = validatePassword(password);
 
   if (!validation.isValid) {
     return res.status(400).json({
@@ -63,9 +63,3 @@ const validatePasswordStrength = (req, res, next) => {
   next();
 };
 
-export default {
-  validateRequest,
-  validateObjectId,
-  validateAssessmentId,
-  validatePasswordStrength,
-};

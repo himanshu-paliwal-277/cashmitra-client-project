@@ -11,8 +11,8 @@ import {
   getProducts,
   getProductSuggestions,
   updateProduct,
-} from '../../controllers/product.controller';
-import { protect } from '../../middlewares/auth.middleware';
+} from '../../controllers/product.controller.js';
+import { protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 

@@ -1,8 +1,8 @@
 import { validationResult } from 'express-validator';
 
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware';
-import Category from '../models/category.model';
-import SellDefect from '../models/sellDefect.model';
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import { Category } from '../models/category.model.js';
+import { SellDefect } from '../models/sellDefect.model.js';
 
 export var createDefect = asyncHandler(async (req, res) => {
   const errors = validationResult(req);

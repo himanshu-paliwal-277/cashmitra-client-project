@@ -1,8 +1,8 @@
 import express from 'express';
 import multer from 'multer';
 
-import cloudinary from '../../config/cloudinary.config';
-import { protect } from '../../middlewares/auth.middleware';
+import cloudinary from '../../config/cloudinary.config.js';
+import { protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 

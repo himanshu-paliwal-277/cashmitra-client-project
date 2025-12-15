@@ -1,8 +1,8 @@
 import express from 'express';
 import { body, param, query } from 'express-validator';
 
-import pickupController from '../../controllers/pickup.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
+import * as pickupController from '../../controllers/pickup.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 

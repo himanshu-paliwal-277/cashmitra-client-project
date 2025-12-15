@@ -8,8 +8,8 @@ import {
   getBuyCategory,
   getBuyCategoryStats,
   updateBuyCategory,
-} from '../../controllers/buyCategory.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
+} from '../../controllers/buyCategory.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 

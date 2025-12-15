@@ -1,4 +1,4 @@
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(statusCode, message, errors = []) {
     super(message);
     this.statusCode = statusCode;
@@ -8,7 +8,7 @@ class ApiError extends Error {
   }
 }
 
-const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Something went wrong';
   let errors = err.errors || [];
@@ -67,14 +67,9 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-const asyncHandler = (fn) => {
+export const asyncHandler = (fn) => {
   return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };
 
-export default {
-  ApiError,
-  errorHandler,
-  asyncHandler,
-};

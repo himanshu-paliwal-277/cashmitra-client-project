@@ -1,10 +1,10 @@
 import { validationResult } from 'express-validator';
 
-import Address from '../models/address.model';
-import { Order } from '../models/order.model';
-import User from '../models/user.model';
+import { Address } from '../models/address.model.js';
+import { Order } from '../models/order.model.js';
+import { User } from '../models/user.model.js';
 
-const getUserProfile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
 
@@ -31,7 +31,7 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-const updateUserProfile = async (req, res) => {
+export const updateUserProfile = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -84,7 +84,7 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-const getUserOrders = async (req, res) => {
+export const getUserOrders = async (req, res) => {
   try {
     const { page = 1, limit = 10, status, orderType } = req.query;
 
@@ -121,7 +121,7 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-const getOrderById = async (req, res) => {
+export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findOne({
       _id: req.params.id,
@@ -142,7 +142,7 @@ const getOrderById = async (req, res) => {
   }
 };
 
-const getUserAddresses = async (req, res) => {
+export const getUserAddresses = async (req, res) => {
   try {
     const addresses = await Address.find({ user: req.user._id }).sort({
       isDefault: -1,
@@ -156,7 +156,7 @@ const getUserAddresses = async (req, res) => {
   }
 };
 
-const addAddress = async (req, res) => {
+export const addAddress = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -178,7 +178,7 @@ const addAddress = async (req, res) => {
   }
 };
 
-const updateAddress = async (req, res) => {
+export const updateAddress = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -209,7 +209,7 @@ const updateAddress = async (req, res) => {
   }
 };
 
-const deleteAddress = async (req, res) => {
+export const deleteAddress = async (req, res) => {
   try {
     const address = await Address.findOne({
       _id: req.params.id,
@@ -229,7 +229,7 @@ const deleteAddress = async (req, res) => {
   }
 };
 
-const setDefaultAddress = async (req, res) => {
+export const setDefaultAddress = async (req, res) => {
   try {
     const address = await Address.findOne({
       _id: req.params.id,
@@ -252,14 +252,3 @@ const setDefaultAddress = async (req, res) => {
   }
 };
 
-export default {
-  getUserProfile,
-  updateUserProfile,
-  getUserOrders,
-  getOrderById,
-  getUserAddresses,
-  addAddress,
-  updateAddress,
-  deleteAddress,
-  setDefaultAddress,
-};

@@ -3,10 +3,10 @@ import { check } from 'express-validator';
 import multer from 'multer';
 import path from 'path';
 
-import agentController from '../../controllers/agent.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
-import { asyncHandler } from '../../middlewares/errorHandler.middleware';
-import { validateRequest } from '../../middlewares/validation.middleware';
+import * as agentController from '../../controllers/agent.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
+import { validateRequest } from '../../middlewares/validation.middleware.js';
 
 const router = express.Router();
 

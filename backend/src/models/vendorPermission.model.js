@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MENU_ITEMS = {
+export const MENU_ITEMS = {
   dashboard: {
     name: 'Dashboard',
     path: '/vendor/dashboard',
@@ -362,9 +362,8 @@ vendorPermissionSchema.statics.getVendorPermissions = function (vendorId) {
     .populate('lastUpdatedBy', 'name email');
 };
 
-const VendorPermission = mongoose.model(
+export const VendorPermission = mongoose.model(
   'VendorPermission',
   vendorPermissionSchema
 );
 
-export default { VendorPermission, MENU_ITEMS };

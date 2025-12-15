@@ -1,19 +1,34 @@
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
-import Agent from '../models/agent.model';
-import ConditionQuestionnaire from '../models/conditionQuestionnaire.model';
-import Inventory from '../models/inventory.model';
-import { Order } from '../models/order.model';
-import Partner from '../models/partner.model';
-import Product from '../models/product.model';
-import Transaction from '../models/transaction.model';
-import User from '../models/user.model';
-import Wallet from '../models/wallet.model';
-import ApiError from '../utils/apiError';
-import { generateToken } from '../utils/jwt.utils';
+import Agent from '../models/agent.model.js';
+import ConditionQuestionnaire from '../models/conditionQuestionnaire.model.js';
+import Inventory from '../models/inventory.model.js';
+import { Order } from '../models/order.model.js';
+import Partner from '../models/partner.model.js';
+import Product from '../models/product.model.js';
+import Transaction from '../models/transaction.model.js';
+import User from '../models/user.model.js';
+import Wallet from '../models/wallet.model.js';
+import ApiError from '../utils/apiError.js';
+import { generateToken } from '../utils/jwt.utils.js';
 
-const loginAdmin = async (req, res) => {
+// // import { Agent } from '../models/agent.model.js';
+// // import { ConditionQuestionnaire } from '../models/conditionQuestionnaire.model.js';
+// // import { Inventory } from '../models/inventory.model.js';
+// import { Order } from '../models/order.model.js';
+// import { Partner } from '../models/partner.model.js';
+// import { Product } from '../models/product.model.js';
+// import { Transaction } from '../models/transaction.model.js';
+// import { User } from '../models/user.model.js';
+// import { Wallet } from '../models/wallet.model.js';
+// import ApiError from '../utils/apiError.js';
+// import { generateToken } from '../utils/jwt.utils.js';
+// import Agent from '../models/agent.model.js';
+// import ConditionQuestionnaire from '../models/conditionQuestionnaire.model.js';
+// import Inventory from '../models/inventory.model.js';
+
+export const loginAdmin = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -43,7 +58,7 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-const getAdminProfile = async (req, res) => {
+export const getAdminProfile = async (req, res) => {
   try {
     const admin = await User.findById(req.user._id);
 
@@ -63,7 +78,7 @@ const getAdminProfile = async (req, res) => {
   }
 };
 
-const createAdmin = async (req, res) => {
+export const createAdmin = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -101,7 +116,7 @@ const createAdmin = async (req, res) => {
   }
 };
 
-const getAllPartners = async (req, res) => {
+export const getAllPartners = async (req, res) => {
   try {
     const { status, page = 1, limit = 10, search } = req.query;
 
@@ -152,7 +167,7 @@ const getAllPartners = async (req, res) => {
   }
 };
 
-const getPartnerById = async (req, res) => {
+export const getPartnerById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -183,7 +198,7 @@ const getPartnerById = async (req, res) => {
   }
 };
 
-const createPartner = async (req, res) => {
+export const createPartner = async (req, res) => {
   try {
     const {
       name,
@@ -298,7 +313,7 @@ const createPartner = async (req, res) => {
   }
 };
 
-const updatePartner = async (req, res) => {
+export const updatePartner = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -341,7 +356,7 @@ const updatePartner = async (req, res) => {
   }
 };
 
-const deletePartner = async (req, res) => {
+export const deletePartner = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -394,7 +409,7 @@ const deletePartner = async (req, res) => {
   }
 };
 
-const verifyPartner = async (req, res) => {
+export const verifyPartner = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, notes } = req.body;
@@ -432,7 +447,7 @@ const verifyPartner = async (req, res) => {
   }
 };
 
-const updatePartnerWallet = async (req, res) => {
+export const updatePartnerWallet = async (req, res) => {
   try {
     const { id } = req.params;
     const { amount, reason, type } = req.body;
@@ -521,7 +536,7 @@ const updatePartnerWallet = async (req, res) => {
   }
 };
 
-const getAllOrders = async (req, res) => {
+export const getAllOrders = async (req, res) => {
   try {
     const {
       type,
@@ -568,7 +583,7 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-const getOrderById = async (req, res) => {
+export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
       .populate('user', 'name email phone')
@@ -836,7 +851,7 @@ const calculateOrderProgress = (status) => {
   return progressMap[status] || 0;
 };
 
-const getDashboardAnalytics = async (req, res) => {
+export const getDashboardAnalytics = async (req, res) => {
   try {
     const { period = '30d' } = req.query;
 
@@ -1025,7 +1040,7 @@ const getDashboardAnalytics = async (req, res) => {
   }
 };
 
-const getCatalog = async (req, res) => {
+export const getCatalog = async (req, res) => {
   try {
     const {
       category,
@@ -1168,7 +1183,7 @@ const getCatalog = async (req, res) => {
   }
 };
 
-const addProduct = async (req, res) => {
+export const addProduct = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -1332,7 +1347,7 @@ const addProduct = async (req, res) => {
   }
 };
 
-const uploadProductImages = async (req, res) => {
+export const uploadProductImages = async (req, res) => {
   try {
     const cloudinary = require('../config/cloudinary.config');
     const uploadedImages = [];
@@ -1372,7 +1387,7 @@ const uploadProductImages = async (req, res) => {
   }
 };
 
-const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -1567,7 +1582,7 @@ const updateProduct = async (req, res) => {
   }
 };
 
-const getProductById = async (req, res) => {
+export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -1587,7 +1602,7 @@ const getProductById = async (req, res) => {
   }
 };
 
-const updateProductStatus = async (req, res) => {
+export const updateProductStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -1623,7 +1638,7 @@ const updateProductStatus = async (req, res) => {
   }
 };
 
-const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const { force = false } = req.query;
@@ -1760,7 +1775,7 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-const getCommissionSettings = async (req, res) => {
+export const getCommissionSettings = async (req, res) => {
   try {
     const commissionSettings = {
       sellCommission: {
@@ -1787,7 +1802,7 @@ const getCommissionSettings = async (req, res) => {
   }
 };
 
-const updateCommissionSettings = async (req, res) => {
+export const updateCommissionSettings = async (req, res) => {
   try {
     res.json({ message: 'Commission settings updated successfully' });
   } catch (error) {
@@ -1796,7 +1811,7 @@ const updateCommissionSettings = async (req, res) => {
   }
 };
 
-const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -1846,7 +1861,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
       .select('-password')
@@ -1866,7 +1881,7 @@ const getUserById = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -1952,7 +1967,7 @@ const createUser = async (req, res) => {
   }
 };
 
-const updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -2039,7 +2054,7 @@ const updateUser = async (req, res) => {
   }
 };
 
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
@@ -2060,7 +2075,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const updateUserPassword = async (req, res) => {
+export const updateUserPassword = async (req, res) => {
   try {
     const { newPassword } = req.body;
     const user = await User.findById(req.params.id);
@@ -2086,7 +2101,7 @@ const updateUserPassword = async (req, res) => {
   }
 };
 
-const getSellOrders = async (req, res) => {
+export const getSellOrders = async (req, res) => {
   try {
     const {
       page = 1,
@@ -2163,7 +2178,7 @@ const getSellOrders = async (req, res) => {
   }
 };
 
-const getBuyOrders = async (req, res) => {
+export const getBuyOrders = async (req, res) => {
   try {
     const {
       page = 1,
@@ -2219,7 +2234,7 @@ const getBuyOrders = async (req, res) => {
   }
 };
 
-const updateOrderStatus = async (req, res) => {
+export const updateOrderStatus = async (req, res) => {
   try {
     const { status, notes } = req.body;
     const orderId = req.params.id;
@@ -2254,7 +2269,7 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-const getPartnerSuggestionsForOrder = async (req, res) => {
+export const getPartnerSuggestionsForOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
 
@@ -2352,7 +2367,7 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
   }
 };
 
-const assignPartnerToOrder = async (req, res) => {
+export const assignPartnerToOrder = async (req, res) => {
   try {
     const { partner } = req.body;
     const orderId = req.params.id;
@@ -2405,7 +2420,7 @@ const assignPartnerToOrder = async (req, res) => {
   }
 };
 
-const getBrands = async (req, res) => {
+export const getBrands = async (req, res) => {
   try {
     const { category, page = 1, limit = 50 } = req.query;
 
@@ -2482,7 +2497,7 @@ const getBrands = async (req, res) => {
   }
 };
 
-const createBrand = async (req, res) => {
+export const createBrand = async (req, res) => {
   try {
     const { brand, category, model, basePrice, variant } = req.body;
 
@@ -2581,7 +2596,7 @@ const createBrand = async (req, res) => {
   }
 };
 
-const updateBrand = async (req, res) => {
+export const updateBrand = async (req, res) => {
   try {
     const { brandName } = req.params;
     const { newBrandName } = req.body;
@@ -2691,7 +2706,7 @@ const updateBrand = async (req, res) => {
   }
 };
 
-const deleteBrand = async (req, res) => {
+export const deleteBrand = async (req, res) => {
   try {
     const { brandName } = req.params;
     const { confirmDeletion } = req.body;
@@ -2769,7 +2784,7 @@ const deleteBrand = async (req, res) => {
   }
 };
 
-const getModels = async (req, res) => {
+export const getModels = async (req, res) => {
   try {
     const { category, brand, page = 1, limit = 50, search } = req.query;
 
@@ -2900,7 +2915,7 @@ const getModels = async (req, res) => {
   }
 };
 
-const createModel = async (req, res) => {
+export const createModel = async (req, res) => {
   try {
     const { brand, category, model, basePrice, variant } = req.body;
 
@@ -3033,7 +3048,7 @@ const createModel = async (req, res) => {
   }
 };
 
-const updateModel = async (req, res) => {
+export const updateModel = async (req, res) => {
   try {
     const { brand, modelName } = req.params;
     const { newModelName, basePrice, variant } = req.body;
@@ -3177,7 +3192,7 @@ const updateModel = async (req, res) => {
   }
 };
 
-const deleteModel = async (req, res) => {
+export const deleteModel = async (req, res) => {
   try {
     const { brand, modelName } = req.params;
     const { confirmDeletion } = req.body;
@@ -3277,7 +3292,7 @@ const deleteModel = async (req, res) => {
   }
 };
 
-const getConditionQuestionnaires = async (req, res) => {
+export const getConditionQuestionnaires = async (req, res) => {
   try {
     const {
       page = 1,
@@ -3376,7 +3391,7 @@ const getConditionQuestionnaires = async (req, res) => {
   }
 };
 
-const getConditionQuestionnaireById = async (req, res) => {
+export const getConditionQuestionnaireById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -3412,7 +3427,7 @@ const getConditionQuestionnaireById = async (req, res) => {
   }
 };
 
-const createConditionQuestionnaire = async (req, res) => {
+export const createConditionQuestionnaire = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -3553,7 +3568,7 @@ const createConditionQuestionnaire = async (req, res) => {
   }
 };
 
-const updateConditionQuestionnaire = async (req, res) => {
+export const updateConditionQuestionnaire = async (req, res) => {
   try {
     const { id } = req.params;
     const errors = validationResult(req);
@@ -3726,7 +3741,7 @@ const updateConditionQuestionnaire = async (req, res) => {
   }
 };
 
-const deleteConditionQuestionnaire = async (req, res) => {
+export const deleteConditionQuestionnaire = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -3792,7 +3807,7 @@ const deleteConditionQuestionnaire = async (req, res) => {
   }
 };
 
-const getQuestionnairesByCategory = async (req, res) => {
+export const getQuestionnairesByCategory = async (req, res) => {
   try {
     const { category } = req.params;
     const { brand, model, isActive = true } = req.query;
@@ -3824,7 +3839,7 @@ const getQuestionnairesByCategory = async (req, res) => {
   }
 };
 
-const updateModelByName = async (req, res) => {
+export const updateModelByName = async (req, res) => {
   try {
     const { modelName } = req.params;
     const updateData = req.body;
@@ -3918,7 +3933,7 @@ const updateModelByName = async (req, res) => {
   }
 };
 
-const deleteModelByName = async (req, res) => {
+export const deleteModelByName = async (req, res) => {
   try {
     const { modelName } = req.params;
 
@@ -3972,7 +3987,7 @@ const deleteModelByName = async (req, res) => {
   }
 };
 
-const getAgents = async (req, res) => {
+export const getAgents = async (req, res) => {
   const { page = 1, limit = 10, status, verified } = req.query;
 
   const query = {};
@@ -4016,7 +4031,7 @@ const getAgents = async (req, res) => {
   });
 };
 
-const approveAgent = async (req, res) => {
+export const approveAgent = async (req, res) => {
   const agentId = req.params.id;
 
   const agent = await Agent.findById(agentId).populate('user');
@@ -4039,7 +4054,7 @@ const approveAgent = async (req, res) => {
   });
 };
 
-const rejectAgent = async (req, res) => {
+export const rejectAgent = async (req, res) => {
   const agentId = req.params.id;
   const { reason } = req.body;
 
@@ -4064,7 +4079,7 @@ const rejectAgent = async (req, res) => {
   });
 };
 
-const toggleAgentStatus = async (req, res) => {
+export const toggleAgentStatus = async (req, res) => {
   const agentId = req.params.id;
   const { isActive } = req.body;
 
@@ -4085,7 +4100,7 @@ const toggleAgentStatus = async (req, res) => {
   });
 };
 
-const toggleUserStatus = async (req, res) => {
+export const toggleUserStatus = async (req, res) => {
   const userId = req.params.id;
   const { isActive } = req.body;
 
@@ -4102,61 +4117,4 @@ const toggleUserStatus = async (req, res) => {
     message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
     data: user,
   });
-};
-
-export default {
-  loginAdmin,
-  getAdminProfile,
-  createAdmin,
-  getAllPartners,
-  getPartnerById,
-  createPartner,
-  updatePartner,
-  deletePartner,
-  verifyPartner,
-  updatePartnerWallet,
-  getAllOrders,
-  getOrderById,
-  getDashboardAnalytics,
-  getCatalog,
-  addProduct,
-  updateProduct,
-  updateProductStatus,
-  deleteProduct,
-  getCommissionSettings,
-  updateCommissionSettings,
-  getAllUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
-  updateUserPassword,
-  uploadProductImages,
-  getProductById,
-  getSellOrders,
-  getBuyOrders,
-  updateOrderStatus,
-  getPartnerSuggestionsForOrder,
-  assignPartnerToOrder,
-  getBrands,
-  createBrand,
-  updateBrand,
-  deleteBrand,
-  getModels,
-  createModel,
-  updateModel,
-  deleteModel,
-  updateModelByName,
-  deleteModelByName,
-  getQuestionnairesByCategory,
-  getConditionQuestionnaires,
-  getConditionQuestionnaireById,
-  createConditionQuestionnaire,
-  updateConditionQuestionnaire,
-  deleteConditionQuestionnaire,
-  getAgents,
-  approveAgent,
-  rejectAgent,
-  toggleAgentStatus,
-  toggleUserStatus,
 };

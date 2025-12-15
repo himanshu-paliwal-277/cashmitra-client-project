@@ -1,10 +1,10 @@
 import { validationResult } from 'express-validator';
 
-import User from '../models/user.model';
-import VendorPermission from '../models/vendorPermission.model';
-import { generateToken } from '../utils/jwt.utils';
+import { User } from '../models/user.model.js';
+import { VendorPermission } from '../models/vendorPermission.model.js';
+import { generateToken } from '../utils/jwt.utils.js';
 
-const loginVendor = async (req, res) => {
+export const loginVendor = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -46,7 +46,7 @@ const loginVendor = async (req, res) => {
   }
 };
 
-const getVendorProfile = async (req, res) => {
+export const getVendorProfile = async (req, res) => {
   try {
     const vendor = await User.findById(req.user._id);
 
@@ -73,7 +73,7 @@ const getVendorProfile = async (req, res) => {
   }
 };
 
-const getVendorPermissions = async (req, res) => {
+export const getVendorPermissions = async (req, res) => {
   try {
     const permissions = await VendorPermission.findOne({
       vendor: req.user._id,
@@ -104,7 +104,7 @@ const getVendorPermissions = async (req, res) => {
   }
 };
 
-const getAllVendors = async (req, res) => {
+export const getAllVendors = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = '', status = 'all' } = req.query;
     const skip = (page - 1) * limit;
@@ -165,7 +165,7 @@ const getAllVendors = async (req, res) => {
   }
 };
 
-const createVendor = async (req, res) => {
+export const createVendor = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -216,7 +216,7 @@ const createVendor = async (req, res) => {
   }
 };
 
-const updateVendorPermissions = async (req, res) => {
+export const updateVendorPermissions = async (req, res) => {
   try {
     const { vendorId } = req.params;
     const { permissions, roleTemplate, notes } = req.body;
@@ -274,7 +274,7 @@ const updateVendorPermissions = async (req, res) => {
   }
 };
 
-const getVendorPermissionsAdmin = async (req, res) => {
+export const getVendorPermissionsAdmin = async (req, res) => {
   try {
     const { vendorId } = req.params;
 
@@ -313,7 +313,7 @@ const getVendorPermissionsAdmin = async (req, res) => {
   }
 };
 
-const toggleVendorStatus = async (req, res) => {
+export const toggleVendorStatus = async (req, res) => {
   try {
     const { vendorId } = req.params;
     const { isActive, notes } = req.body;
@@ -352,7 +352,7 @@ const toggleVendorStatus = async (req, res) => {
   }
 };
 
-const deleteVendor = async (req, res) => {
+export const deleteVendor = async (req, res) => {
   try {
     const { vendorId } = req.params;
 
@@ -372,7 +372,7 @@ const deleteVendor = async (req, res) => {
   }
 };
 
-const getMenuItems = async (req, res) => {
+export const getMenuItems = async (req, res) => {
   try {
     const menuItems = VendorPermission.getMenuItems();
     res.json({ menuItems });
@@ -382,15 +382,3 @@ const getMenuItems = async (req, res) => {
   }
 };
 
-export default {
-  loginVendor,
-  getVendorProfile,
-  getVendorPermissions,
-  getAllVendors,
-  createVendor,
-  updateVendorPermissions,
-  getVendorPermissionsAdmin,
-  toggleVendorStatus,
-  deleteVendor,
-  getMenuItems,
-};

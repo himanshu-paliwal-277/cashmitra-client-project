@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 
-import User from '../models/user.model';
+import { User } from '../models/user.model.js';
 require('dotenv').config();
 
 const sampleUsers = [

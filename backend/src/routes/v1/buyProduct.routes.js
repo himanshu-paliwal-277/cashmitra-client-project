@@ -11,13 +11,13 @@ import {
   getBuyProductStats,
   toggleProductStatus,
   updateBuyProduct,
-} from '../../controllers/buyProduct.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
+} from '../../controllers/buyProduct.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
 import {
   handleValidationErrors,
   validateCreateBuyProduct,
   validateUpdateBuyProduct,
-} from '../../middlewares/buyProductValidation.middleware';
+} from '../../middlewares/buyProductValidation.middleware.js';
 
 const router = express.Router();
 
@@ -51,7 +51,7 @@ router.post(
 
 router.use(protect);
 
-import { attachPartner } from '../../middlewares/partner.middleware';
+import { attachPartner } from '../../middlewares/partner.middleware.js';
 router.use(attachPartner);
 
 router.put(

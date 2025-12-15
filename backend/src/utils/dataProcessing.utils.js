@@ -1,4 +1,4 @@
-const processArrayFields = (data) => {
+export const processArrayFields = (data) => {
   const processedData = { ...data };
 
   const convertToArray = (obj) => {
@@ -220,6 +220,3 @@ const processArrayFields = (data) => {
   return processedData;
 };
 
-export default {
-  processArrayFields,
-};

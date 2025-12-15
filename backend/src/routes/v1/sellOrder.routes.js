@@ -16,8 +16,8 @@ import {
   rescheduleOrder,
   updateOrderStatus,
   updatePickupDetails,
-} from '../../controllers/sellOrder.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
+} from '../../controllers/sellOrder.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 

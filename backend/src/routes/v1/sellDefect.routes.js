@@ -11,8 +11,8 @@ import {
   getDefectsByCategory,
   reorderDefects,
   updateDefect,
-} from '../../controllers/sellDefect.controller';
-import { authorize, protect } from '../../middlewares/auth.middleware';
+} from '../../controllers/sellDefect.controller.js';
+import { authorize, protect } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
