@@ -5,15 +5,13 @@ const { protect } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, 
+    fileSize: 5 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
-    
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
@@ -21,7 +19,6 @@ const upload = multer({
     }
   },
 });
-
 
 router.post('/image', protect, upload.single('image'), async (req, res) => {
   try {
@@ -32,11 +29,9 @@ router.post('/image', protect, upload.single('image'), async (req, res) => {
       });
     }
 
-    
     const base64String = req.file.buffer.toString('base64');
     const dataURI = `data:${req.file.mimetype};base64,${base64String}`;
 
-    
     const result = await cloudinary.uploader.upload(dataURI, {
       folder: 'products',
       resource_type: 'image',
@@ -64,7 +59,6 @@ router.post('/image', protect, upload.single('image'), async (req, res) => {
     });
   }
 });
-
 
 router.post('/images', protect, upload.array('images', 5), async (req, res) => {
   try {

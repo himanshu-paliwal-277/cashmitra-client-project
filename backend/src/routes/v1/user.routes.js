@@ -7,16 +7,9 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-
 router.use(protect);
 
-
-
-
 router.get('/profile', asyncHandler(userController.getUserProfile));
-
-
-
 
 router.put(
   '/profile',
@@ -55,23 +48,11 @@ router.put(
   asyncHandler(userController.updateUserProfile)
 );
 
-
-
-
 router.get('/orders', asyncHandler(userController.getUserOrders));
-
-
-
 
 router.get('/orders/:id', asyncHandler(userController.getOrderById));
 
-
-
-
 router.get('/addresses', asyncHandler(userController.getUserAddresses));
-
-
-
 
 router.post(
   '/addresses',
@@ -95,9 +76,6 @@ router.post(
   validateRequest,
   asyncHandler(userController.addAddress)
 );
-
-
-
 
 router.put(
   '/addresses/:id',
@@ -133,13 +111,7 @@ router.put(
   asyncHandler(userController.updateAddress)
 );
 
-
-
-
 router.delete('/addresses/:id', asyncHandler(userController.deleteAddress));
-
-
-
 
 router.put(
   '/addresses/:id/default',

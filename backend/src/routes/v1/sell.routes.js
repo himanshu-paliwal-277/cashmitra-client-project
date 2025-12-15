@@ -11,7 +11,6 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-
 router.get('/categories', asyncHandler(sellController.getProductCategories));
 router.get(
   '/brands/:category',
@@ -30,12 +29,10 @@ router.get(
   asyncHandler(sellController.getVariantsByModel)
 );
 
-
 router.get(
   '/products/search',
   asyncHandler(sellController.findProductsByModel)
 );
-
 
 router.post(
   '/calculate-price',
@@ -77,7 +74,7 @@ router.post(
       .isIn(['bank_transfer', 'wallet', 'upi'])
       .withMessage('Valid payment method is required'),
   ],
-  
+
   asyncHandler(sellController.createSellOrder)
 );
 
@@ -88,13 +85,11 @@ router.get(
   asyncHandler(sellController.getSellOrderStatus)
 );
 
-
 router.get(
   '/quote/:assessmentId',
   validateAssessmentId('assessmentId'),
   asyncHandler(sellController.getPriceQuote)
 );
-
 
 router.post(
   '/refresh-quote/:assessmentId',
@@ -102,12 +97,10 @@ router.post(
   asyncHandler(sellController.refreshPriceQuote)
 );
 
-
 router.post(
   '/submit-assessment',
   [
     check('category').custom((value, { req }) => {
-      
       if (typeof value === 'string' && value.trim()) {
         return true;
       }
@@ -121,7 +114,6 @@ router.post(
       throw new Error('Category is required');
     }),
     check('brand').custom((value, { req }) => {
-      
       if (typeof value === 'string' && value.trim()) {
         return true;
       }
@@ -136,7 +128,6 @@ router.post(
       throw new Error('Brand is required');
     }),
     check('model').custom((value, { req }) => {
-      
       if (typeof value === 'string' && value.trim()) {
         return true;
       }
@@ -151,7 +142,6 @@ router.post(
       throw new Error('Model is required');
     }),
     check('answers').custom((value, { req }) => {
-      
       if (value && typeof value === 'object' && !Array.isArray(value)) {
         return true;
       }
@@ -162,7 +152,6 @@ router.post(
   validateRequest,
   asyncHandler(sellController.submitAssessment)
 );
-
 
 router.put(
   '/orders/:id/status',

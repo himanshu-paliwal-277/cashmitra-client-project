@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 
-
 const MENU_ITEMS = {
-  
   dashboard: {
     name: 'Dashboard',
     path: '/vendor/dashboard',
@@ -10,7 +8,6 @@ const MENU_ITEMS = {
     section: 'Main',
   },
 
-  
   sell: {
     name: 'Sell',
     path: '/vendor/sell',
@@ -48,7 +45,6 @@ const MENU_ITEMS = {
     section: 'Sales & Orders',
   },
 
-  
   products: {
     name: 'Products',
     path: '/vendor/products',
@@ -86,7 +82,6 @@ const MENU_ITEMS = {
     section: 'Catalog & Products',
   },
 
-  
   partners: {
     name: 'Partners',
     path: '/vendor/partners',
@@ -118,7 +113,6 @@ const MENU_ITEMS = {
     section: 'Partners & Users',
   },
 
-  
   pricing: {
     name: 'Pricing',
     path: '/vendor/pricing',
@@ -162,7 +156,6 @@ const MENU_ITEMS = {
     section: 'Pricing & Finance',
   },
 
-  
   reports: {
     name: 'Reports',
     path: '/vendor/reports',
@@ -170,7 +163,6 @@ const MENU_ITEMS = {
     section: 'Analytics & Reports',
   },
 
-  
   settings: {
     name: 'Settings',
     path: '/vendor/settings',
@@ -204,14 +196,14 @@ const vendorPermissionSchema = new mongoose.Schema(
             default: false,
           },
           timeRestriction: {
-            startTime: String, 
-            endTime: String, 
+            startTime: String,
+            endTime: String,
           },
           dateRestriction: {
             startDate: Date,
             endDate: Date,
           },
-          ipRestriction: [String], 
+          ipRestriction: [String],
         },
         metadata: {
           type: Map,
@@ -220,7 +212,7 @@ const vendorPermissionSchema = new mongoose.Schema(
       },
       default: () => {
         const defaultPermissions = new Map();
-        
+
         Object.keys(MENU_ITEMS).forEach((key) => {
           defaultPermissions.set(key, {
             granted: false,
@@ -229,7 +221,7 @@ const vendorPermissionSchema = new mongoose.Schema(
             },
           });
         });
-        
+
         defaultPermissions.set('dashboard', {
           granted: true,
           grantedAt: new Date(),
@@ -265,12 +257,10 @@ const vendorPermissionSchema = new mongoose.Schema(
   }
 );
 
-
 vendorPermissionSchema.index({ vendor: 1 });
 vendorPermissionSchema.index({ isActive: 1 });
 vendorPermissionSchema.index({ roleTemplate: 1 });
 vendorPermissionSchema.index({ lastUpdatedBy: 1 });
-
 
 vendorPermissionSchema.virtual('grantedPermissions').get(function () {
   const granted = {};
@@ -287,12 +277,10 @@ vendorPermissionSchema.virtual('grantedPermissions').get(function () {
   return granted;
 });
 
-
 vendorPermissionSchema.methods.hasPermission = function (menuItem) {
   const permission = this.permissions.get(menuItem);
   return permission && permission.granted && this.isActive;
 };
-
 
 vendorPermissionSchema.methods.grantPermission = function (
   menuItem,
@@ -313,7 +301,6 @@ vendorPermissionSchema.methods.grantPermission = function (
   this.lastUpdatedBy = grantedBy;
 };
 
-
 vendorPermissionSchema.methods.revokePermission = function (
   menuItem,
   revokedBy
@@ -331,7 +318,6 @@ vendorPermissionSchema.methods.revokePermission = function (
   this.lastUpdatedBy = revokedBy;
 };
 
-
 vendorPermissionSchema.methods.applyRoleTemplate = function (
   template,
   appliedBy
@@ -348,18 +334,16 @@ vendorPermissionSchema.methods.applyRoleTemplate = function (
       'walletPayouts',
       'reports',
     ],
-    manager: Object.keys(MENU_ITEMS).filter((key) => key !== 'settings'), 
-    custom: [], 
+    manager: Object.keys(MENU_ITEMS).filter((key) => key !== 'settings'),
+    custom: [],
   };
 
   const templatePermissions = templates[template] || [];
 
-  
   Object.keys(MENU_ITEMS).forEach((key) => {
     this.revokePermission(key, appliedBy);
   });
 
-  
   templatePermissions.forEach((key) => {
     this.grantPermission(key, appliedBy);
   });
@@ -368,11 +352,9 @@ vendorPermissionSchema.methods.applyRoleTemplate = function (
   this.lastUpdatedBy = appliedBy;
 };
 
-
 vendorPermissionSchema.statics.getMenuItems = function () {
   return MENU_ITEMS;
 };
-
 
 vendorPermissionSchema.statics.getVendorPermissions = function (vendorId) {
   return this.findOne({ vendor: vendorId, isActive: true })

@@ -5,7 +5,6 @@ const sellOfferSessionSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      
     },
     productId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -19,22 +18,22 @@ const sellOfferSessionSchema = new mongoose.Schema(
     partnerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Partner',
-      required: false, 
+      required: false,
     },
     answers: {
       type: Map,
-      of: mongoose.Schema.Types.Mixed, 
+      of: mongoose.Schema.Types.Mixed,
       default: new Map(),
     },
     defects: [
       {
-        type: String, 
+        type: String,
         trim: true,
       },
     ],
     accessories: [
       {
-        type: String, 
+        type: String,
         trim: true,
       },
     ],
@@ -78,11 +77,11 @@ const sellOfferSessionSchema = new mongoose.Schema(
     sessionToken: {
       type: String,
       unique: true,
-      sparse: true, 
+      sparse: true,
     },
     expiresAt: {
       type: Date,
-      default: () => new Date(Date.now() + 24 * 60 * 60 * 1000), 
+      default: () => new Date(Date.now() + 24 * 60 * 60 * 1000),
       index: { expireAfterSeconds: 0 },
     },
     isActive: {
@@ -97,7 +96,6 @@ const sellOfferSessionSchema = new mongoose.Schema(
   }
 );
 
-
 sellOfferSessionSchema.index({ userId: 1, createdAt: -1 });
 sellOfferSessionSchema.index({ productId: 1, variantId: 1 });
 sellOfferSessionSchema.index(
@@ -106,13 +104,11 @@ sellOfferSessionSchema.index(
 );
 sellOfferSessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-
 sellOfferSessionSchema.virtual('totalAdjustments').get(function () {
   return this.breakdown
     .filter((item) => item.type !== 'base')
     .reduce((sum, item) => sum + item.delta, 0);
 });
-
 
 sellOfferSessionSchema.methods.generateSessionToken = function () {
   const crypto = require('crypto');
@@ -120,17 +116,14 @@ sellOfferSessionSchema.methods.generateSessionToken = function () {
   return this.sessionToken;
 };
 
-
 sellOfferSessionSchema.methods.isExpired = function () {
   return new Date() > this.expiresAt;
 };
-
 
 sellOfferSessionSchema.methods.extendExpiry = function (hours = 24) {
   this.expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000);
   return this.save();
 };
-
 
 sellOfferSessionSchema.statics.findActiveSession = function (sessionToken) {
   return this.findOne({
@@ -140,7 +133,6 @@ sellOfferSessionSchema.statics.findActiveSession = function (sessionToken) {
   });
 };
 
-
 sellOfferSessionSchema.statics.findActiveSessions = function (userId) {
   return this.find({
     userId,
@@ -149,13 +141,11 @@ sellOfferSessionSchema.statics.findActiveSessions = function (userId) {
   });
 };
 
-
 sellOfferSessionSchema.statics.cleanupExpired = function () {
   return this.deleteMany({
     expiresAt: { $lt: new Date() },
   });
 };
-
 
 sellOfferSessionSchema.pre('save', function (next) {
   if (

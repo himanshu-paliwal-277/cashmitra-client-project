@@ -8,7 +8,6 @@ const {
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
 
-
 exports.getProducts = asyncHandler(async (req, res) => {
   const {
     page = 1,
@@ -26,10 +25,8 @@ exports.getProducts = asyncHandler(async (req, res) => {
     featured,
   } = req.query;
 
-  
   const pipeline = [];
 
-  
   const matchStage = {};
 
   if (category) {
@@ -54,7 +51,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
 
   pipeline.push({ $match: matchStage });
 
-  
   pipeline.push({
     $lookup: {
       from: 'inventories',
@@ -64,7 +60,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     },
   });
 
-  
   if (availability !== 'all') {
     pipeline.push({
       $match: {
@@ -75,7 +70,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     });
   }
 
-  
   if (condition) {
     pipeline.push({
       $match: {
@@ -84,7 +78,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     });
   }
 
-  
   if (minPrice || maxPrice) {
     const priceFilter = {};
     if (minPrice) priceFilter.$gte = Number(minPrice);
@@ -97,7 +90,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     });
   }
 
-  
   if (pincode) {
     pipeline.push({
       $lookup: {
@@ -117,7 +109,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     });
   }
 
-  
   pipeline.push({
     $addFields: {
       minPrice: { $min: '$inventory.price' },
@@ -136,7 +127,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     },
   });
 
-  
   if (featured === 'true') {
     pipeline.push({
       $match: {
@@ -149,7 +139,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     });
   }
 
-  
   pipeline.push({
     $lookup: {
       from: 'categories',
@@ -166,7 +155,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     },
   });
 
-  
   const sortStage = {};
   const order = sortOrder === 'desc' ? -1 : 1;
 
@@ -193,12 +181,10 @@ exports.getProducts = asyncHandler(async (req, res) => {
 
   pipeline.push({ $sort: sortStage });
 
-  
   const skip = (parseInt(page) - 1) * parseInt(limit);
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: parseInt(limit) });
 
-  
   pipeline.push({
     $project: {
       brand: 1,
@@ -219,11 +205,9 @@ exports.getProducts = asyncHandler(async (req, res) => {
     },
   });
 
-  
   const products = await Product.aggregate(pipeline);
 
-  
-  const countPipeline = pipeline.slice(0, -3); 
+  const countPipeline = pipeline.slice(0, -3);
   countPipeline.push({ $count: 'total' });
   const countResult = await Product.aggregate(countPipeline);
   const total = countResult.length > 0 ? countResult[0].total : 0;
@@ -238,7 +222,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { pincode } = req.query;
@@ -249,10 +232,8 @@ exports.getProduct = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Product not found');
   }
 
-  
   const inventoryFilter = { product: id };
 
-  
   if (pincode) {
     const partners = await Partner.find({
       'address.pincode': pincode,
@@ -262,16 +243,14 @@ exports.getProduct = asyncHandler(async (req, res) => {
     if (partners.length > 0) {
       inventoryFilter.partner = { $in: partners.map((p) => p._id) };
     } else {
-      inventoryFilter.partner = { $in: [] }; 
+      inventoryFilter.partner = { $in: [] };
     }
   }
 
-  
   const inventory = await Inventory.find(inventoryFilter)
     .populate('partner', 'shopName address rating reviewCount')
     .sort({ price: 1, isAvailable: -1 });
 
-  
   const stats = {
     minPrice:
       inventory.length > 0 ? Math.min(...inventory.map((i) => i.price)) : null,
@@ -297,7 +276,6 @@ exports.getProduct = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getProductSuggestions = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { limit = 10 } = req.query;
@@ -307,7 +285,6 @@ exports.getProductSuggestions = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Product not found');
   }
 
-  
   const suggestions = await Product.aggregate([
     {
       $match: {
@@ -374,7 +351,6 @@ exports.getProductSuggestions = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getProductCategories = asyncHandler(async (req, res) => {
   const categories = await Category.aggregate([
     {
@@ -418,7 +394,6 @@ exports.getProductCategories = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getProductBrands = asyncHandler(async (req, res) => {
   const { category } = req.query;
 
@@ -456,7 +431,6 @@ exports.getProductBrands = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getProductFilters = asyncHandler(async (req, res) => {
   const { category } = req.query;
 
@@ -465,7 +439,6 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
     matchStage.category = category;
   }
 
-  
   const priceRange = await Inventory.aggregate([
     {
       $lookup: {
@@ -496,7 +469,6 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
     },
   ]);
 
-  
   const conditions = await Inventory.aggregate([
     {
       $lookup: {
@@ -529,7 +501,6 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
     },
   ]);
 
-  
   const brands = await Product.aggregate([
     { $match: matchStage },
     {
@@ -557,7 +528,6 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.createProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -577,13 +547,11 @@ exports.createProduct = asyncHandler(async (req, res) => {
     description,
   } = req.body;
 
-  
   const categoryExists = await Category.findById(category);
   if (!categoryExists) {
     throw new ApiError(404, 'Category not found');
   }
 
-  
   const product = await Product.create({
     category,
     brand,
@@ -598,7 +566,6 @@ exports.createProduct = asyncHandler(async (req, res) => {
     createdBy: req.user._id,
   });
 
-  
   await product.populate('category', 'name slug');
 
   res.status(201).json({
@@ -607,7 +574,6 @@ exports.createProduct = asyncHandler(async (req, res) => {
     data: product,
   });
 });
-
 
 exports.updateProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -618,13 +584,11 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const updateData = req.body;
 
-  
   const product = await Product.findById(id);
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
-  
   if (
     product.createdBy.toString() !== req.user._id.toString() &&
     req.user.role !== 'admin'
@@ -632,7 +596,6 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Not authorized to update this product');
   }
 
-  
   if (updateData.category) {
     const categoryExists = await Category.findById(updateData.category);
     if (!categoryExists) {
@@ -640,14 +603,12 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     }
   }
 
-  
   if (updateData.specifications) {
     updateData.specifications = new Map(
       Object.entries(updateData.specifications)
     );
   }
 
-  
   const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
     new: true,
     runValidators: true,
@@ -660,17 +621,14 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  
   const product = await Product.findById(id);
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
-  
   if (
     product.createdBy.toString() !== req.user._id.toString() &&
     req.user.role !== 'admin'
@@ -678,7 +636,6 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Not authorized to delete this product');
   }
 
-  
   const inventory = await Inventory.find({ product: id });
   if (inventory.length > 0) {
     throw new ApiError(
@@ -687,7 +644,6 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
     );
   }
 
-  
   await Product.findByIdAndDelete(id);
 
   res.json({

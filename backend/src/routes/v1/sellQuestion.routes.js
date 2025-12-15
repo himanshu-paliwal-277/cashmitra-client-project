@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const { body, param, query } = require('express-validator');
 const {
@@ -17,7 +15,6 @@ const {
 const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
-
 
 const questionValidation = [
   body('categoryId')
@@ -146,7 +143,6 @@ const optionValidation = [
   body('showIf').optional().isObject().withMessage('showIf must be an object'),
 ];
 
-
 router.get(
   '/customer',
   query('productId')
@@ -159,10 +155,8 @@ router.get(
   getCustomerQuestions
 );
 
-
 router.use(protect);
 router.use(authorize('admin'));
-
 
 router.put(
   '/reorder',
@@ -179,7 +173,6 @@ router.put(
     .withMessage('Each question ID must be a valid MongoDB ObjectId'),
   reorderQuestions
 );
-
 
 router.post('/', questionValidation, createQuestion);
 router.get('/', getQuestions);
@@ -204,7 +197,6 @@ router.delete(
     .withMessage('Question ID must be a valid MongoDB ObjectId'),
   deleteQuestion
 );
-
 
 router.post(
   '/:id/options',

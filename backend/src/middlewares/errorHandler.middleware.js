@@ -1,4 +1,3 @@
-
 class ApiError extends Error {
   constructor(statusCode, message, errors = []) {
     super(message);
@@ -9,14 +8,11 @@ class ApiError extends Error {
   }
 }
 
-
 const errorHandler = (err, req, res, next) => {
-  
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Something went wrong';
   let errors = err.errors || [];
 
-  
   if (err.name === 'ValidationError') {
     statusCode = 400;
     message = 'Validation Error';
@@ -26,7 +22,6 @@ const errorHandler = (err, req, res, next) => {
     }));
   }
 
-  
   if (err.name === 'CastError') {
     statusCode = 400;
     message = `Invalid ${err.path}`;
@@ -38,7 +33,6 @@ const errorHandler = (err, req, res, next) => {
     ];
   }
 
-  
   if (err.name === 'JsonWebTokenError') {
     statusCode = 401;
     message = 'Invalid token';
@@ -49,7 +43,6 @@ const errorHandler = (err, req, res, next) => {
     message = 'Token expired';
   }
 
-  
   if (err.code === 11000) {
     statusCode = 400;
     message = 'Duplicate field value';
@@ -62,12 +55,10 @@ const errorHandler = (err, req, res, next) => {
     ];
   }
 
-  
   if (process.env.NODE_ENV === 'development') {
     console.error(err);
   }
 
-  
   res.status(statusCode).json({
     success: false,
     message,
@@ -75,7 +66,6 @@ const errorHandler = (err, req, res, next) => {
     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 };
-
 
 const asyncHandler = (fn) => {
   return (req, res, next) => {

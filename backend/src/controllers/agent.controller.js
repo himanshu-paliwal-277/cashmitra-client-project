@@ -6,14 +6,11 @@ const { sendOTPEmail, sendOTPSMS } = require('../utils/notification.utils');
 const cloudinary = require('../config/cloudinary.config');
 const crypto = require('crypto');
 
-
 const otpStore = new Map();
-
 
 exports.loginAgent = async (req, res) => {
   const { email, password } = req.body;
 
-  
   const user = await User.findOne({ email, role: 'driver' }).select(
     '+password'
   );
@@ -26,7 +23,6 @@ exports.loginAgent = async (req, res) => {
     });
   }
 
-  
   if (!(await user.matchPassword(password))) {
     return res.status(401).json({
       success: false,
@@ -48,13 +44,11 @@ exports.loginAgent = async (req, res) => {
   });
 };
 
-
 exports.getAgentDashboard = async (req, res) => {
   const agentId = req.user._id;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  
   const [pending, inProgress, completed, todayEarnings] = await Promise.all([
     Pickup.countDocuments({
       assignedTo: agentId,
@@ -101,7 +95,6 @@ exports.getAgentDashboard = async (req, res) => {
   });
 };
 
-
 exports.getAgentStats = async (req, res) => {
   const agentId = req.user._id;
 
@@ -121,7 +114,6 @@ exports.getAgentStats = async (req, res) => {
   });
 };
 
-
 exports.getAssignedPickups = async (req, res) => {
   const agentId = req.user._id;
   const { status, date } = req.query;
@@ -131,7 +123,6 @@ exports.getAssignedPickups = async (req, res) => {
   if (status) {
     filter.status = status;
   } else {
-    
     filter.status = {
       $in: ['scheduled', 'confirmed', 'in_transit'],
     };
@@ -160,7 +151,6 @@ exports.getAssignedPickups = async (req, res) => {
   });
 };
 
-
 exports.getPickupDetails = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -184,7 +174,6 @@ exports.getPickupDetails = async (req, res) => {
     data: { pickup },
   });
 };
-
 
 exports.startPickup = async (req, res) => {
   const { pickupId } = req.params;
@@ -213,15 +202,12 @@ exports.startPickup = async (req, res) => {
 
   await pickup.save();
 
-  
-
   res.json({
     success: true,
     message: 'Pickup started successfully',
     data: { pickup },
   });
 };
-
 
 exports.reachedDoorstep = async (req, res) => {
   const { pickupId } = req.params;
@@ -257,7 +243,6 @@ exports.reachedDoorstep = async (req, res) => {
   });
 };
 
-
 exports.uploadAgentSelfie = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -281,7 +266,6 @@ exports.uploadAgentSelfie = async (req, res) => {
     });
   }
 
-  
   const result = await cloudinary.uploader.upload(req.file.path, {
     folder: 'cashify/agent-selfies',
     transformation: [{ width: 500, height: 500, crop: 'fill' }],
@@ -304,7 +288,6 @@ exports.uploadAgentSelfie = async (req, res) => {
   });
 };
 
-
 exports.sendCustomerOTP = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -321,21 +304,17 @@ exports.sendCustomerOTP = async (req, res) => {
     });
   }
 
-  
   const otp = crypto.randomInt(100000, 999999).toString();
 
-  
   otpStore.set(pickupId, {
     otp,
     expiresAt: Date.now() + 5 * 60 * 1000,
   });
 
-  
   if (pickup.customer.email) {
     await sendOTPEmail(pickup.customer.email, otp, pickup.customer.name);
   }
 
-  
   if (pickup.customer.phone) {
     await sendOTPSMS(pickup.customer.phone, otp);
   }
@@ -352,7 +331,6 @@ exports.sendCustomerOTP = async (req, res) => {
     },
   });
 };
-
 
 exports.verifyCustomerOTP = async (req, res) => {
   const { pickupId } = req.params;
@@ -382,7 +360,6 @@ exports.verifyCustomerOTP = async (req, res) => {
     });
   }
 
-  
   otpStore.delete(pickupId);
 
   const pickup = await Pickup.findById(pickupId);
@@ -399,7 +376,6 @@ exports.verifyCustomerOTP = async (req, res) => {
       'Customer verified successfully. You can now proceed with device inspection.',
   });
 };
-
 
 exports.uploadDevicePhotos = async (req, res) => {
   const { pickupId } = req.params;
@@ -426,7 +402,6 @@ exports.uploadDevicePhotos = async (req, res) => {
 
   const uploadedImages = {};
 
-  
   for (const [fieldName, files] of Object.entries(req.files)) {
     const file = files[0];
     const result = await cloudinary.uploader.upload(file.path, {
@@ -456,7 +431,6 @@ exports.uploadDevicePhotos = async (req, res) => {
     data: { devicePhotos: pickup.devicePhotos },
   });
 };
-
 
 exports.verifyIMEI = async (req, res) => {
   const { pickupId } = req.params;
@@ -490,7 +464,6 @@ exports.verifyIMEI = async (req, res) => {
     data: { deviceIMEI: pickup.deviceIMEI },
   });
 };
-
 
 exports.submitDeviceInspection = async (req, res) => {
   const { pickupId } = req.params;
@@ -532,7 +505,6 @@ exports.submitDeviceInspection = async (req, res) => {
   });
 };
 
-
 exports.calculateFinalPrice = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -552,11 +524,9 @@ exports.calculateFinalPrice = async (req, res) => {
   let finalPrice = pickup.orderId.estimatedPrice;
   let deductions = [];
 
-  
   const inspection = pickup.inspectionData;
 
   if (inspection) {
-    
     if (inspection.screenCondition === 'cracked') {
       deductions.push({ reason: 'Cracked screen', amount: 2000 });
       finalPrice -= 2000;
@@ -565,7 +535,6 @@ exports.calculateFinalPrice = async (req, res) => {
       finalPrice -= 500;
     }
 
-    
     if (inspection.deadPixels === 'few') {
       deductions.push({ reason: 'Few dead pixels', amount: 300 });
       finalPrice -= 300;
@@ -574,7 +543,6 @@ exports.calculateFinalPrice = async (req, res) => {
       finalPrice -= 800;
     }
 
-    
     if (!inspection.sim1Working) {
       deductions.push({ reason: 'SIM 1 not working', amount: 500 });
       finalPrice -= 500;
@@ -584,14 +552,12 @@ exports.calculateFinalPrice = async (req, res) => {
       finalPrice -= 300;
     }
 
-    
     if (inspection.batteryHealth < 70) {
       const deduction = (80 - inspection.batteryHealth) * 20;
       deductions.push({ reason: 'Poor battery health', amount: deduction });
       finalPrice -= deduction;
     }
 
-    
     if (inspection.additionalIssues && inspection.additionalIssues.length > 0) {
       const additionalDeduction = inspection.additionalIssues.length * 200;
       deductions.push({
@@ -602,7 +568,6 @@ exports.calculateFinalPrice = async (req, res) => {
     }
   }
 
-  
   finalPrice = Math.max(finalPrice, 1000);
 
   res.json({
@@ -615,7 +580,6 @@ exports.calculateFinalPrice = async (req, res) => {
     },
   });
 };
-
 
 exports.updatePrice = async (req, res) => {
   const { pickupId } = req.params;
@@ -658,7 +622,6 @@ exports.updatePrice = async (req, res) => {
     data: { priceAdjustment: pickup.priceAdjustment },
   });
 };
-
 
 exports.recordCustomerDecision = async (req, res) => {
   const { pickupId } = req.params;
@@ -708,7 +671,6 @@ exports.recordCustomerDecision = async (req, res) => {
   });
 };
 
-
 exports.recordPayment = async (req, res) => {
   const { pickupId } = req.params;
   const { amount, method, transactionId } = req.body;
@@ -751,7 +713,6 @@ exports.recordPayment = async (req, res) => {
   });
 };
 
-
 exports.sendFinalOTP = async (req, res) => {
   const { pickupId } = req.params;
   const agentId = req.user._id;
@@ -768,16 +729,13 @@ exports.sendFinalOTP = async (req, res) => {
     });
   }
 
-  
   const otp = crypto.randomInt(100000, 999999).toString();
 
-  
   otpStore.set(`final_${pickupId}`, {
     otp,
     expiresAt: Date.now() + 5 * 60 * 1000,
   });
 
-  
   if (pickup.customer.email) {
     await sendOTPEmail(
       pickup.customer.email,
@@ -796,7 +754,6 @@ exports.sendFinalOTP = async (req, res) => {
     message: 'Final OTP sent successfully',
   });
 };
-
 
 exports.verifyFinalOTP = async (req, res) => {
   const { pickupId } = req.params;
@@ -826,7 +783,6 @@ exports.verifyFinalOTP = async (req, res) => {
     });
   }
 
-  
   otpStore.delete(`final_${pickupId}`);
 
   res.json({
@@ -834,7 +790,6 @@ exports.verifyFinalOTP = async (req, res) => {
     message: 'Final OTP verified. You can now complete the pickup.',
   });
 };
-
 
 exports.completePickup = async (req, res) => {
   const { pickupId } = req.params;
@@ -861,7 +816,6 @@ exports.completePickup = async (req, res) => {
     note: 'Device collected successfully',
   });
 
-  
   const finalPrice =
     pickup.priceAdjustment?.adjustedPrice || pickup.orderId.estimatedPrice;
   pickup.agentCommission = finalPrice * 0.02;
@@ -877,7 +831,6 @@ exports.completePickup = async (req, res) => {
     },
   });
 };
-
 
 exports.saveCustomerSignature = async (req, res) => {
   const { pickupId } = req.params;
@@ -902,7 +855,6 @@ exports.saveCustomerSignature = async (req, res) => {
     });
   }
 
-  
   const result = await cloudinary.uploader.upload(req.file.path, {
     folder: `cashify/signatures/${pickupId}`,
   });
@@ -920,7 +872,6 @@ exports.saveCustomerSignature = async (req, res) => {
     data: { signatureUrl: result.secure_url },
   });
 };
-
 
 exports.getPickupHistory = async (req, res) => {
   const agentId = req.user._id;
@@ -954,7 +905,6 @@ exports.getPickupHistory = async (req, res) => {
   });
 };
 
-
 exports.getCompletedToday = async (req, res) => {
   const agentId = req.user._id;
   const today = new Date();
@@ -973,7 +923,6 @@ exports.getCompletedToday = async (req, res) => {
     data: { pickups },
   });
 };
-
 
 exports.getDailyReport = async (req, res) => {
   const agentId = req.user._id;
@@ -1023,13 +972,9 @@ exports.getDailyReport = async (req, res) => {
   });
 };
 
-
 exports.submitDailyReport = async (req, res) => {
   const agentId = req.user._id;
   const { notes, issues } = req.body;
-
-  
-  
 
   res.json({
     success: true,

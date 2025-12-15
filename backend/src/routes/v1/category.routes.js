@@ -14,7 +14,6 @@ const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-
 const categoryValidation = [
   body('name')
     .trim()
@@ -80,14 +79,12 @@ const searchValidation = [
     .withMessage('includeInactive must be a boolean'),
 ];
 
-
 router.get('/search', searchValidation, searchCategories);
 router.get('/', getCategories);
 router.get('/:identifier', getCategory);
 
-
-router.use(protect); 
-router.use(authorize('admin')); 
+router.use(protect);
+router.use(authorize('admin'));
 
 router.post('/', categoryValidation, createCategory);
 router.put('/:id', updateCategoryValidation, updateCategory);

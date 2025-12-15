@@ -15,7 +15,6 @@ const { protect } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-
 const productListValidation = [
   query('page')
     .optional()
@@ -196,14 +195,12 @@ const deleteProductValidation = [
     .withMessage('Product ID must be a valid MongoDB ObjectId'),
 ];
 
-
 router.get('/', productListValidation, getProducts);
 router.get('/categories', getProductCategories);
 router.get('/brands', categoryFilterValidation, getProductBrands);
 router.get('/filters', filterValidation, getProductFilters);
 router.get('/:id', productDetailValidation, getProduct);
 router.get('/:id/suggestions', suggestionValidation, getProductSuggestions);
-
 
 router.post('/', protect, createProductValidation, createProduct);
 router.put('/:id', protect, updateProductValidation, updateProduct);

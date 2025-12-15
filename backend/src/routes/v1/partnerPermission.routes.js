@@ -7,16 +7,12 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-
-
-
 router.get(
   '/',
   protect,
   authorize('partner'),
   asyncHandler(partnerPermissionController.getPartnerPermissions)
 );
-
 
 router.get(
   '/check/:menuItem',
@@ -33,16 +29,12 @@ router.get(
   asyncHandler(partnerPermissionController.checkPermission)
 );
 
-
 router.get(
   '/menu-items',
   protect,
   authorize('partner'),
   asyncHandler(partnerPermissionController.getAvailableMenuItems)
 );
-
-
-
 
 router.get(
   '/admin',
@@ -76,14 +68,12 @@ router.get(
   asyncHandler(partnerPermissionController.getAllPartnerPermissions)
 );
 
-
 router.get(
   '/admin/role-templates',
   protect,
   authorize('admin'),
   asyncHandler(partnerPermissionController.getRoleTemplates)
 );
-
 
 router.post(
   '/admin/role-templates',
@@ -131,7 +121,6 @@ router.post(
   asyncHandler(partnerPermissionController.createRoleTemplate)
 );
 
-
 router.put(
   '/admin/role-templates/:templateId',
   [
@@ -169,7 +158,6 @@ router.put(
   asyncHandler(partnerPermissionController.updateRoleTemplate)
 );
 
-
 router.delete(
   '/admin/role-templates/:templateId',
   [param('templateId').notEmpty().withMessage('Template ID is required')],
@@ -179,14 +167,12 @@ router.delete(
   asyncHandler(partnerPermissionController.deleteRoleTemplate)
 );
 
-
 router.get(
   '/admin/menu-items',
   protect,
   authorize('admin'),
   asyncHandler(partnerPermissionController.getMenuItemsStructure)
 );
-
 
 router.post(
   '/admin/create-permission',
@@ -243,7 +229,6 @@ router.post(
   asyncHandler(partnerPermissionController.createPermission)
 );
 
-
 router.get(
   '/admin/:partnerId',
   [param('partnerId').isMongoId().withMessage('Invalid partner ID')],
@@ -252,7 +237,6 @@ router.get(
   validateRequest,
   asyncHandler(partnerPermissionController.getPartnerPermissionsById)
 );
-
 
 router.put(
   '/admin/:partnerId',
@@ -319,7 +303,6 @@ router.put(
   asyncHandler(partnerPermissionController.updatePartnerPermissions)
 );
 
-
 router.post(
   '/admin/:partnerId/grant',
   [
@@ -360,7 +343,6 @@ router.post(
   asyncHandler(partnerPermissionController.grantPermission)
 );
 
-
 router.post(
   '/admin/:partnerId/revoke',
   [
@@ -376,7 +358,6 @@ router.post(
   validateRequest,
   asyncHandler(partnerPermissionController.revokePermission)
 );
-
 
 router.post(
   '/admin/:partnerId/apply-role',

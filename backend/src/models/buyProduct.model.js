@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const CameraSpecSchema = new mongoose.Schema(
@@ -66,7 +65,7 @@ const BuyProductSchema = new mongoose.Schema(
 
     conditionOptions: [
       {
-        label: String, 
+        label: String,
         price: Number,
       },
     ],
@@ -124,7 +123,6 @@ const BuyProductSchema = new mongoose.Schema(
       estimatedDelivery: String,
     },
 
-    
     topSpecs: {
       screenSize: String,
       chipset: String,
@@ -133,10 +131,9 @@ const BuyProductSchema = new mongoose.Schema(
       simSlots: String,
     },
 
-    
     productDetails: {
-      frontCamera: FrontCameraSchema, 
-      rearCamera: RearCameraSchema, 
+      frontCamera: FrontCameraSchema,
+      rearCamera: RearCameraSchema,
 
       networkConnectivity: {
         wifi: String,
@@ -222,7 +219,7 @@ const BuyProductSchema = new mongoose.Schema(
     partnerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Partner',
-      required: false, 
+      required: false,
     },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -230,18 +227,15 @@ const BuyProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
 BuyProductSchema.virtual('displayName').get(function () {
   return `${this.brand} ${this.name}`;
 });
-
 
 BuyProductSchema.index({ name: 1, brand: 1 });
 BuyProductSchema.index({ categoryId: 1 });
 BuyProductSchema.index({ isActive: 1 });
 BuyProductSchema.index({ 'rating.average': -1 });
 BuyProductSchema.index({ 'pricing.discountedPrice': 1 });
-
 
 module.exports =
   mongoose.models.BuyProduct || mongoose.model('BuyProduct', BuyProductSchema);

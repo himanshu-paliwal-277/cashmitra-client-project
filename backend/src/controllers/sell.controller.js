@@ -8,10 +8,8 @@ const { Order } = require('../models/order.model');
 const Transaction = require('../models/transaction.model');
 const Wallet = require('../models/wallet.model');
 
-
 const getProductCategories = async (req, res) => {
   try {
-    
     const categories = await Category.find({ isActive: true })
       .populate('superCategory', 'name displayName image')
       .populate('parentCategory', 'name')
@@ -31,12 +29,10 @@ const getProductCategories = async (req, res) => {
   }
 };
 
-
 const getBrandsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
 
-    
     const superCategory = await SellSuperCategory.findOne({
       name: { $regex: new RegExp(`^${category}$`, 'i') },
       isActive: true,
@@ -46,7 +42,6 @@ const getBrandsByCategory = async (req, res) => {
       return res.status(404).json({ message: 'Category not found' });
     }
 
-    
     const categories = await Category.find({
       superCategory: superCategory._id,
       isActive: true,
@@ -54,7 +49,6 @@ const getBrandsByCategory = async (req, res) => {
       .select('name')
       .sort({ name: 1 });
 
-    
     const brands = categories.map((cat) => cat.name);
 
     res.json({ brands });
@@ -64,12 +58,10 @@ const getBrandsByCategory = async (req, res) => {
   }
 };
 
-
 const getSeriesByBrand = async (req, res) => {
   try {
     const { category, brand } = req.params;
 
-    
     const series = await Product.distinct('series', { category, brand });
 
     res.json({ series });
@@ -79,12 +71,10 @@ const getSeriesByBrand = async (req, res) => {
   }
 };
 
-
 const getModelsBySeries = async (req, res) => {
   try {
     const { category, brand, series } = req.params;
 
-    
     const models = await Product.distinct('model', { category, brand, series });
 
     res.json({ models });
@@ -94,18 +84,15 @@ const getModelsBySeries = async (req, res) => {
   }
 };
 
-
 const getVariantsByModel = async (req, res) => {
   try {
     const { category, brand, series, model } = req.params;
 
-    
     const products = await Product.find(
       { category, brand, series, model },
       'variant.ram variant.storage'
     );
 
-    
     const variants = products.map((product) => ({
       ram: product.variant.ram,
       storage: product.variant.storage,
@@ -118,8 +105,6 @@ const getVariantsByModel = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
 
 const calculatePrice = async (req, res) => {
   const errors = validationResult(req);
@@ -135,46 +120,38 @@ const calculatePrice = async (req, res) => {
       bodyCondition,
       batteryHealth,
       functionalIssues,
-      accessories = [], 
+      accessories = [],
       warrantyStatus = 'expired',
     } = req.body;
 
-    
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    
     const purchaseDateTime = new Date(purchaseDate);
     const currentDate = new Date();
     const ageInDays = Math.floor(
       (currentDate - purchaseDateTime) / (1000 * 60 * 60 * 24)
     );
-    const ageInMonths = ageInDays / 30.44; 
+    const ageInMonths = ageInDays / 30.44;
 
-    
     let depreciationPercentage;
     if (ageInMonths <= 6) {
-      
       depreciationPercentage =
         ageInMonths * (product.depreciation.ratePerMonth * 1.5);
     } else if (ageInMonths <= 24) {
-      
       depreciationPercentage =
         9 + (ageInMonths - 6) * product.depreciation.ratePerMonth;
     } else {
-      
       depreciationPercentage =
         45 + (ageInMonths - 24) * (product.depreciation.ratePerMonth * 0.7);
     }
 
-    
     if (depreciationPercentage > product.depreciation.maxDepreciation) {
       depreciationPercentage = product.depreciation.maxDepreciation;
     }
 
-    
     const screenFactor =
       product.conditionFactors.screenCondition[screenCondition] / 100;
     const bodyFactor =
@@ -184,14 +161,12 @@ const calculatePrice = async (req, res) => {
     const functionalFactor =
       product.conditionFactors.functionalIssues[functionalIssues] / 100;
 
-    
     const weightedConditionFactor =
       screenFactor * 0.35 +
       batteryFactor * 0.35 +
       bodyFactor * 0.2 +
       functionalFactor * 0.1;
 
-    
     const brandDemandFactors = {
       Apple: 1.15,
       Samsung: 1.1,
@@ -209,24 +184,18 @@ const calculatePrice = async (req, res) => {
     };
     const marketDemandFactor = brandDemandFactors[product.brand] || 1.0;
 
-    
     const currentMonth = currentDate.getMonth();
     let seasonalFactor = 1.0;
     if ([9, 10, 11].includes(currentMonth)) {
-      
       seasonalFactor = 1.05;
     } else if ([3, 4, 5].includes(currentMonth)) {
-      
       seasonalFactor = 0.98;
     }
 
-    
-    const accessoryBonus = accessories.length * 0.02; 
+    const accessoryBonus = accessories.length * 0.02;
 
-    
     const warrantyBonus = warrantyStatus === 'active' ? 0.05 : 0;
 
-    
     const storageValue = parseInt(
       product.variant.storage.replace(/[^0-9]/g, '')
     );
@@ -318,7 +287,6 @@ const calculatePrice = async (req, res) => {
   }
 };
 
-
 const generatePriceRecommendations = (product, condition) => {
   const recommendations = [];
 
@@ -363,7 +331,6 @@ const generatePriceRecommendations = (product, condition) => {
   return recommendations;
 };
 
-
 const createSellOrder = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -374,13 +341,11 @@ const createSellOrder = async (req, res) => {
     const { productId, condition, price, paymentMethod, pickupAddress } =
       req.body;
 
-    
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    
     const partnerShop = await Partner.findOne({
       'address.pincode': pickupAddress.pincode,
       isVerified: true,
@@ -392,11 +357,9 @@ const createSellOrder = async (req, res) => {
         .json({ message: 'No partner shop available in your area' });
     }
 
-    
     const commissionRate = 10;
     const commissionAmount = (price * commissionRate) / 100;
 
-    
     const order = new Order({
       orderType: 'sell',
       user: req.user._id,
@@ -434,7 +397,6 @@ const createSellOrder = async (req, res) => {
 
     await order.save();
 
-    
     const transaction = new Transaction({
       type: 'sell_order',
       amount: price,
@@ -483,7 +445,6 @@ const createSellOrder = async (req, res) => {
   }
 };
 
-
 const getSellOrderStatus = async (req, res) => {
   try {
     const order = await Order.findOne({
@@ -517,7 +478,6 @@ const getSellOrderStatus = async (req, res) => {
   }
 };
 
-
 const updateSellOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -528,7 +488,6 @@ const updateSellOrderStatus = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    
     order.status = status;
     order.statusHistory.push({
       status,
@@ -536,11 +495,9 @@ const updateSellOrderStatus = async (req, res) => {
       updatedBy: req.user._id,
     });
 
-    
     if (status === 'completed') {
       const commissionAmount = order.commission.amount;
 
-      
       let wallet = await Wallet.findOne({ partner: order.partner._id });
       if (!wallet) {
         wallet = new Wallet({
@@ -554,7 +511,6 @@ const updateSellOrderStatus = async (req, res) => {
         });
       }
 
-      
       wallet.balance += commissionAmount;
       wallet.transactions.push({
         type: 'commission_earned',
@@ -566,7 +522,6 @@ const updateSellOrderStatus = async (req, res) => {
 
       await wallet.save();
 
-      
       const commissionTransaction = new Transaction({
         type: 'commission',
         amount: commissionAmount,
@@ -583,7 +538,6 @@ const updateSellOrderStatus = async (req, res) => {
 
       await commissionTransaction.save();
 
-      
       order.paymentDetails.status = 'completed';
     }
 
@@ -603,19 +557,15 @@ const updateSellOrderStatus = async (req, res) => {
   }
 };
 
-
 const getPriceQuote = async (req, res) => {
   try {
     const { assessmentId } = req.params;
 
     let order;
 
-    
     if (assessmentId.startsWith('assessment_')) {
-      
       order = await Order.findOne({ assessmentId: assessmentId });
     } else {
-      
       order = await Order.findById(assessmentId);
     }
 
@@ -623,13 +573,12 @@ const getPriceQuote = async (req, res) => {
       return res.status(404).json({ message: 'Assessment not found' });
     }
 
-    
     res.json({
       priceQuote: {
         assessmentId: order._id,
         finalPrice: order.finalPrice || order.estimatedPrice,
         confidence: 95,
-        validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000), 
+        validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000),
         conditionSummary: {
           screen_condition: order.screenCondition || 'good',
           body_condition: order.bodyCondition || 'good',
@@ -664,19 +613,15 @@ const getPriceQuote = async (req, res) => {
   }
 };
 
-
 const refreshPriceQuote = async (req, res) => {
   try {
     const { assessmentId } = req.params;
 
     let order;
 
-    
     if (assessmentId.startsWith('assessment_')) {
-      
       order = await Order.findOne({ assessmentId: assessmentId });
     } else {
-      
       order = await Order.findById(assessmentId);
     }
 
@@ -684,16 +629,13 @@ const refreshPriceQuote = async (req, res) => {
       return res.status(404).json({ message: 'Assessment not found' });
     }
 
-    
-    const priceVariation = Math.random() * 0.1 - 0.05; 
+    const priceVariation = Math.random() * 0.1 - 0.05;
     const newPrice = Math.round(order.estimatedPrice * (1 + priceVariation));
 
-    
     order.finalPrice = newPrice;
     order.updatedAt = new Date();
     await order.save();
 
-    
     res.json({
       priceQuote: {
         assessmentId: order._id,
@@ -719,42 +661,35 @@ const refreshPriceQuote = async (req, res) => {
   }
 };
 
-
 const submitAssessment = async (req, res) => {
   try {
     let { category, brand, model, answers, productDetails } = req.body;
 
-    
     if (typeof category === 'object' && category.category) {
-      
       const categoryObj = category;
       category = categoryObj.category;
       brand = brand || categoryObj.brand;
       model = model || categoryObj.model;
     }
 
-    
     const assessmentId = `assessment_${Date.now()}_${Math.random()
       .toString(36)
       .substr(2, 9)}`;
 
-    
-    let basePrice = 15000; 
+    let basePrice = 15000;
 
-    
     const brandMultipliers = {
       Apple: 1.5,
       Samsung: 1.3,
       OnePlus: 1.2,
       Google: 1.2,
       Xiaomi: 1.0,
-      redmin: 1.0, 
+      redmin: 1.0,
       Realme: 0.9,
       Oppo: 0.9,
       Vivo: 0.9,
     };
 
-    
     const brandKey = Object.keys(brandMultipliers).find(
       (key) => key.toLowerCase() === brand.toLowerCase()
     );
@@ -763,7 +698,6 @@ const submitAssessment = async (req, res) => {
       basePrice *= brandMultipliers[brandKey];
     }
 
-    
     let conditionMultiplier = 1.0;
 
     if (answers.screen_condition) {
@@ -806,18 +740,16 @@ const submitAssessment = async (req, res) => {
       conditionMultiplier *= accessoryMultipliers[answers.accessories] || 0.8;
     }
 
-    
     const finalPrice = Math.round(basePrice * conditionMultiplier);
 
-    
     const order = new Order({
       assessmentId,
       orderType: 'sell',
-      user: req.user ? req.user._id : null, 
-      partner: null, 
+      user: req.user ? req.user._id : null,
+      partner: null,
       items: [
         {
-          product: null, 
+          product: null,
           condition: {
             screenCondition: answers.screen_condition,
             bodyCondition: answers.body_condition,
@@ -830,11 +762,11 @@ const submitAssessment = async (req, res) => {
       ],
       totalAmount: finalPrice,
       commission: {
-        rate: 0.05, 
+        rate: 0.05,
         amount: Math.round(finalPrice * 0.05),
       },
       paymentDetails: {
-        method: 'UPI', 
+        method: 'UPI',
         status: 'pending',
       },
       status: 'pending',
@@ -848,10 +780,8 @@ const submitAssessment = async (req, res) => {
       notes: `Assessment for ${brand} ${model} - Category: ${category}`,
     });
 
-    
     await order.save();
 
-    
     res.json({
       success: true,
       assessmentId,
@@ -865,7 +795,7 @@ const submitAssessment = async (req, res) => {
           functionality: answers.functionality,
           accessories: answers.accessories,
         },
-        validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000), 
+        validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000),
         marketInsights: {
           demand: 'high',
           brandRetention:
@@ -886,15 +816,12 @@ const submitAssessment = async (req, res) => {
   }
 };
 
-
 const findProductsByModel = async (req, res) => {
   try {
     const { category, brand, model } = req.query;
 
-    
     const query = { status: 'active' };
 
-    
     if (category) {
       const superCategory = await SellSuperCategory.findOne({
         name: { $regex: new RegExp(`^${category}$`, 'i') },
@@ -902,7 +829,6 @@ const findProductsByModel = async (req, res) => {
       });
 
       if (superCategory) {
-        
         const categories = await Category.find({
           superCategory: superCategory._id,
           isActive: true,
@@ -913,7 +839,6 @@ const findProductsByModel = async (req, res) => {
       }
     }
 
-    
     if (brand) {
       const brandCategory = await Category.findOne({
         name: { $regex: new RegExp(`^${brand}$`, 'i') },
@@ -925,12 +850,10 @@ const findProductsByModel = async (req, res) => {
       }
     }
 
-    
     if (model) {
       query.name = { $regex: model, $options: 'i' };
     }
 
-    
     const products = await SellProduct.find(query)
       .populate('categoryId', 'name')
       .select('_id name images variants categoryId')

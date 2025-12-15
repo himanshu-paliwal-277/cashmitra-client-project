@@ -1,12 +1,9 @@
-
-
 const express = require('express');
 const { body, param, query } = require('express-validator');
 const { protect, authorize } = require('../../middlewares/auth.middleware');
 const pickupController = require('../../controllers/pickup.controller');
 
 const router = express.Router();
-
 
 const schedulePickupValidation = [
   body('orderId')
@@ -20,7 +17,6 @@ const schedulePickupValidation = [
   body('city')
     .optional()
     .custom((value, { req }) => {
-      
       if (req.body.orderType === 'buy') {
         return true;
       }
@@ -32,7 +28,6 @@ const schedulePickupValidation = [
   body('pincode')
     .optional()
     .custom((value, { req }) => {
-      
       if (req.body.orderType === 'buy') {
         return true;
       }
@@ -44,7 +39,6 @@ const schedulePickupValidation = [
   body('preferredDate')
     .optional()
     .custom((value, { req }) => {
-      
       if (req.body.orderType === 'buy') {
         return true;
       }
@@ -60,7 +54,6 @@ const schedulePickupValidation = [
   body('contactNumber')
     .optional()
     .custom((value, { req }) => {
-      
       if (req.body.orderType === 'buy') {
         return true;
       }
@@ -109,9 +102,7 @@ const getPickupsValidation = [
     .withMessage('Date must be a valid date'),
 ];
 
-
 router.use(protect);
-
 
 router.post(
   '/schedule',
@@ -127,7 +118,6 @@ router.get(
     .withMessage('Pickup ID must be a valid MongoDB ObjectId'),
   pickupController.getPickupById
 );
-
 
 router.use(authorize('admin'));
 router.get('/', getPickupsValidation, pickupController.getPickups);

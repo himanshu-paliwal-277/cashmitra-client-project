@@ -14,9 +14,7 @@ const { sanitizeData } = require('./utils/security.utils');
 const securityConfig = require('./config/security.config');
 const { PORT, NODE_ENV, MONGODB_URI } = require('./config/serverConfig');
 
-
 const app = express();
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -24,16 +22,7 @@ app.use(cors(securityConfig.cors));
 app.use(helmet(securityConfig.helmet));
 app.use(morgan('dev'));
 
-
 app.use(session(securityConfig.session));
-
-
-
-
-
-
-
-
 
 app.use((req, res, next) => {
   if (req.body) req.body = sanitizeData(req.body);
@@ -42,17 +31,13 @@ app.use((req, res, next) => {
   next();
 });
 
-
 const apiRouter = require('./routes/apiRouter.routes');
 
-
 app.use('/api', apiRouter);
-
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Cashify API' });
 });
-
 
 const connectDB = async () => {
   try {
@@ -64,14 +49,11 @@ const connectDB = async () => {
   }
 };
 
-
 connectDB();
-
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${NODE_ENV}`);
 });
-
 
 app.use(errorHandler);

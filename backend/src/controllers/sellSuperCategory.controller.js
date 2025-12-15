@@ -5,15 +5,11 @@ const {
   ApiError,
 } = require('../middlewares/errorHandler.middleware');
 
-
-
-
 exports.getPublicSuperCategories = asyncHandler(async (req, res) => {
   const superCategories = await SellSuperCategory.find({ isActive: true })
     .sort('sortOrder')
     .select('name slug image description');
 
-  
   const superCategoriesWithCategories = await Promise.all(
     superCategories.map(async (superCat) => {
       const categories = await Category.find({
@@ -36,9 +32,6 @@ exports.getPublicSuperCategories = asyncHandler(async (req, res) => {
     data: superCategoriesWithCategories,
   });
 });
-
-
-
 
 exports.getAllSuperCategories = asyncHandler(async (req, res) => {
   const { isActive, search, sort = 'sortOrder' } = req.query;
@@ -67,9 +60,6 @@ exports.getAllSuperCategories = asyncHandler(async (req, res) => {
   });
 });
 
-
-
-
 exports.getSuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await SellSuperCategory.findById(
     req.params.id
@@ -85,13 +75,9 @@ exports.getSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-
-
-
 exports.createSuperCategory = asyncHandler(async (req, res) => {
   const { name, description, image, isActive, sortOrder } = req.body;
 
-  
   if (!image) {
     throw new ApiError(400, 'Please provide an image URL');
   }
@@ -99,7 +85,7 @@ exports.createSuperCategory = asyncHandler(async (req, res) => {
   const superCategoryData = {
     name,
     description,
-    image, 
+    image,
     isActive,
     sortOrder,
     createdBy: req.user._id,
@@ -113,9 +99,6 @@ exports.createSuperCategory = asyncHandler(async (req, res) => {
     data: superCategory,
   });
 });
-
-
-
 
 exports.updateSuperCategory = asyncHandler(async (req, res) => {
   let superCategory = await SellSuperCategory.findById(req.params.id);
@@ -134,7 +117,6 @@ exports.updateSuperCategory = asyncHandler(async (req, res) => {
     updatedBy: req.user._id,
   };
 
-  
   if (image) {
     updateData.image = image;
   }
@@ -155,9 +137,6 @@ exports.updateSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-
-
-
 exports.deleteSuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await SellSuperCategory.findById(req.params.id);
 
@@ -165,7 +144,6 @@ exports.deleteSuperCategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Super category not found');
   }
 
-  
   const categoriesCount = await Category.countDocuments({
     superCategory: req.params.id,
   });
@@ -185,9 +163,6 @@ exports.deleteSuperCategory = asyncHandler(async (req, res) => {
     data: null,
   });
 });
-
-
-
 
 exports.getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await SellSuperCategory.findById(req.params.id);

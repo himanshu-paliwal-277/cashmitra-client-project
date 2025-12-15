@@ -17,21 +17,18 @@ const seedProducts = async () => {
   try {
     await connectDB();
 
-    
     const existingProducts = await Product.find();
     console.log(`\nExisting products (${existingProducts.length}):`);
     existingProducts.forEach((product) => {
       console.log(`- ${product.brand} ${product.model} (${product.category})`);
     });
 
-    
     const adminUser = await User.findOne({ role: 'admin' });
     if (!adminUser) {
       console.error('No admin user found. Please create an admin user first.');
       process.exit(1);
     }
 
-    
     const sampleProducts = [
       {
         category: 'mobile',
@@ -128,7 +125,6 @@ const seedProducts = async () => {
       },
     ];
 
-    
     if (existingProducts.length === 0) {
       console.log('\nCreating sample products...');
       const createdProducts = await Product.insertMany(sampleProducts);

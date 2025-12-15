@@ -12,12 +12,8 @@ const { generateToken } = require('../utils/jwt.utils');
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 
-
-
-
 const loginAdmin = async (req, res) => {
   try {
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -25,12 +21,10 @@ const loginAdmin = async (req, res) => {
 
     const { email, password } = req.body;
 
-    
     const user = await User.findOne({ email, role: 'admin' }).select(
       '+password'
     );
 
-    
     if (user && (await user.matchPassword(password))) {
       res.json({
         _id: user._id,
@@ -47,9 +41,6 @@ const loginAdmin = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
-
-
-
 
 const getAdminProfile = async (req, res) => {
   try {
@@ -71,12 +62,8 @@ const getAdminProfile = async (req, res) => {
   }
 };
 
-
-
-
 const createAdmin = async (req, res) => {
   try {
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -84,13 +71,11 @@ const createAdmin = async (req, res) => {
 
     const { name, email, password, phone } = req.body;
 
-    
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    
     const admin = await User.create({
       name,
       email,
@@ -115,9 +100,6 @@ const createAdmin = async (req, res) => {
   }
 };
 
-
-
-
 const getAllPartners = async (req, res) => {
   try {
     const { status, page = 1, limit = 10, search } = req.query;
@@ -139,13 +121,11 @@ const getAllPartners = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    
     const partnersWithWallet = await Promise.all(
       partners.map(async (partner) => {
         const wallet = await Wallet.findOne({ partner: partner._id });
         const partnerObj = partner.toObject();
 
-        
         if (wallet) {
           partnerObj.wallet = {
             balance: wallet.balance,
@@ -171,9 +151,6 @@ const getAllPartners = async (req, res) => {
   }
 };
 
-
-
-
 const getPartnerById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -186,7 +163,6 @@ const getPartnerById = async (req, res) => {
       return res.status(404).json({ message: 'Partner not found' });
     }
 
-    
     const inventoryCount = await Inventory.countDocuments({ partner: id });
     const orderCount = await Order.countDocuments({ 'items.partner': id });
 
@@ -206,18 +182,14 @@ const getPartnerById = async (req, res) => {
   }
 };
 
-
-
-
 const createPartner = async (req, res) => {
   try {
     const {
-      
       name,
       email,
       phone,
       password,
-      
+
       userId,
       shopName,
       shopAddress,
@@ -233,15 +205,12 @@ const createPartner = async (req, res) => {
     let user;
     let isNewUser = false;
 
-    
     if (userId) {
-      
       user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
 
-      
       const existingPartner = await Partner.findOne({ user: userId });
       if (existingPartner) {
         return res
@@ -249,7 +218,6 @@ const createPartner = async (req, res) => {
           .json({ message: 'User already has a partner profile' });
       }
     } else {
-      
       if (!name || !email || !phone || !password) {
         return res.status(400).json({
           message:
@@ -257,7 +225,6 @@ const createPartner = async (req, res) => {
         });
       }
 
-      
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res
@@ -265,7 +232,6 @@ const createPartner = async (req, res) => {
           .json({ message: 'User with this email already exists' });
       }
 
-      
       user = await User.create({
         name,
         email,
@@ -276,13 +242,11 @@ const createPartner = async (req, res) => {
       isNewUser = true;
     }
 
-    
     const existingGST = await Partner.findOne({ gstNumber });
     if (existingGST) {
       return res.status(400).json({ message: 'GST number already exists' });
     }
 
-    
     const partner = await Partner.create({
       user: user._id,
       shopName,
@@ -298,12 +262,10 @@ const createPartner = async (req, res) => {
       isVerified: false,
     });
 
-    
     if (!isNewUser) {
       await User.findByIdAndUpdate(user._id, { role: 'partner' });
     }
 
-    
     await Wallet.create({
       partner: partner._id,
       balance: 0,
@@ -323,7 +285,6 @@ const createPartner = async (req, res) => {
   } catch (error) {
     console.error('Error creating partner:', error);
     if (error.code === 11000) {
-      
       if (error.keyPattern?.email) {
         return res.status(400).json({ message: 'Email already exists' });
       }
@@ -336,21 +297,16 @@ const createPartner = async (req, res) => {
   }
 };
 
-
-
-
 const updatePartner = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
 
-    
     delete updateData.user;
     delete updateData._id;
     delete updateData.createdAt;
     delete updateData.updatedAt;
 
-    
     if (updateData.gstNumber) {
       const existingGST = await Partner.findOne({
         gstNumber: updateData.gstNumber,
@@ -384,9 +340,6 @@ const updatePartner = async (req, res) => {
   }
 };
 
-
-
-
 const deletePartner = async (req, res) => {
   try {
     const { id } = req.params;
@@ -396,7 +349,6 @@ const deletePartner = async (req, res) => {
       return res.status(404).json({ message: 'Partner not found' });
     }
 
-    
     const activeInventory = await Inventory.countDocuments({
       partner: id,
       isAvailable: true,
@@ -410,7 +362,6 @@ const deletePartner = async (req, res) => {
       });
     }
 
-    
     const pendingOrders = await Order.countDocuments({
       'items.partner': id,
       'items.status': { $in: ['pending', 'processing', 'shipped'] },
@@ -423,16 +374,13 @@ const deletePartner = async (req, res) => {
       });
     }
 
-    
     await Promise.all([
       Inventory.deleteMany({ partner: id }),
       Wallet.deleteOne({ partner: id }),
     ]);
 
-    
     await User.findByIdAndUpdate(partner.user, { role: 'user' });
 
-    
     await Partner.findByIdAndDelete(id);
 
     res.json({
@@ -444,9 +392,6 @@ const deletePartner = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
-
 
 const verifyPartner = async (req, res) => {
   try {
@@ -472,7 +417,6 @@ const verifyPartner = async (req, res) => {
       return res.status(404).json({ message: 'Partner not found' });
     }
 
-    
     if (status === 'approved') {
       const existingWallet = await Wallet.findOne({ partner: partner._id });
       if (!existingWallet) {
@@ -487,21 +431,16 @@ const verifyPartner = async (req, res) => {
   }
 };
 
-
-
-
 const updatePartnerWallet = async (req, res) => {
   try {
     const { id } = req.params;
     const { amount, reason, type } = req.body;
 
-    
     const partner = await Partner.findById(id);
     if (!partner) {
       return res.status(404).json({ message: 'Partner not found' });
     }
 
-    
     let wallet = await Wallet.findOne({ partner: id });
     if (!wallet) {
       wallet = await Wallet.create({
@@ -511,11 +450,9 @@ const updatePartnerWallet = async (req, res) => {
       });
     }
 
-    
     const oldBalance = wallet.balance;
     wallet.balance += amount;
 
-    
     if (wallet.balance < 0) {
       return res.status(400).json({
         message:
@@ -523,10 +460,8 @@ const updatePartnerWallet = async (req, res) => {
       });
     }
 
-    
     partner.wallet.balance = wallet.balance;
 
-    
     const transaction = await Transaction.create({
       partner: id,
       transactionType: amount > 0 ? 'wallet_credit' : 'wallet_debit',
@@ -542,7 +477,6 @@ const updatePartnerWallet = async (req, res) => {
       },
     });
 
-    
     const Finance = require('../models/finance.model');
     await Finance.create({
       transactionType: amount > 0 ? 'deposit' : 'withdrawal',
@@ -552,7 +486,7 @@ const updatePartnerWallet = async (req, res) => {
       paymentMethod: 'wallet',
       category: 'other',
       description: `Admin wallet ${type}: ${reason || 'Manual adjustment'}`,
-      processedBy: req.user?._id || req.user?.id, 
+      processedBy: req.user?._id || req.user?.id,
       processedAt: new Date(),
       metadata: {
         originalAmount: Math.abs(amount),
@@ -564,12 +498,10 @@ const updatePartnerWallet = async (req, res) => {
       },
     });
 
-    
     wallet.transactions.push(transaction._id);
     wallet.lastUpdated = new Date();
     partner.wallet.transactions.push(transaction._id);
 
-    
     await Promise.all([wallet.save(), partner.save()]);
 
     res.json({
@@ -587,9 +519,6 @@ const updatePartnerWallet = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
-
 
 const getAllOrders = async (req, res) => {
   try {
@@ -638,9 +567,6 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-
-
-
 const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
@@ -653,26 +579,20 @@ const getOrderById = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    
     const orderResponse = {
       _id: order._id,
       assessmentId: order.assessmentId,
       orderType: order.orderType,
 
-      
       user: order.user,
 
-      
       partner: order.partner,
 
-      
       items: order.items,
 
-      
       totalAmount: order.totalAmount,
       commission: order.commission,
 
-      
       paymentDetails: {
         method: order.paymentDetails?.method,
         transactionId: order.paymentDetails?.transactionId,
@@ -680,7 +600,6 @@ const getOrderById = async (req, res) => {
         paidAt: order.paymentDetails?.paidAt,
       },
 
-      
       shippingDetails: {
         address: order.shippingDetails?.address,
         contactPhone: order.shippingDetails?.contactPhone,
@@ -690,23 +609,17 @@ const getOrderById = async (req, res) => {
         deliveredAt: order.shippingDetails?.deliveredAt,
       },
 
-      
       status: order.status,
 
-      
       statusHistory: order.statusHistory || [],
 
-      
       notes: order.notes,
 
-      
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
 
-      
       timeline: generateOrderTimeline(order),
 
-      
       progressPercentage: calculateOrderProgress(order.status),
     };
 
@@ -717,11 +630,9 @@ const getOrderById = async (req, res) => {
   }
 };
 
-
 const generateOrderTimeline = (order) => {
   const timeline = [];
 
-  
   timeline.push({
     status: 'created',
     timestamp: order.createdAt,
@@ -730,7 +641,6 @@ const generateOrderTimeline = (order) => {
     completed: true,
   });
 
-  
   if (order.statusHistory && order.statusHistory.length > 0) {
     order.statusHistory.forEach((history) => {
       timeline.push({
@@ -743,7 +653,6 @@ const generateOrderTimeline = (order) => {
     });
   }
 
-  
   const futureSteps = getFutureSteps(order.status);
   futureSteps.forEach((step) => {
     timeline.push({
@@ -764,7 +673,6 @@ const generateOrderTimeline = (order) => {
   });
 };
 
-
 const getStatusTitle = (status) => {
   const statusTitles = {
     pending: 'Order Pending',
@@ -782,7 +690,6 @@ const getStatusTitle = (status) => {
   );
 };
 
-
 const getStatusDescription = (status) => {
   const statusDescriptions = {
     pending: 'Order is awaiting confirmation',
@@ -797,7 +704,6 @@ const getStatusDescription = (status) => {
   };
   return statusDescriptions[status] || `Order status updated to ${status}`;
 };
-
 
 const getFutureSteps = (currentStatus) => {
   const statusFlow = {
@@ -913,7 +819,6 @@ const getFutureSteps = (currentStatus) => {
   return statusFlow[currentStatus] || [];
 };
 
-
 const calculateOrderProgress = (status) => {
   const progressMap = {
     pending: 10,
@@ -930,14 +835,10 @@ const calculateOrderProgress = (status) => {
   return progressMap[status] || 0;
 };
 
-
-
-
 const getDashboardAnalytics = async (req, res) => {
   try {
     const { period = '30d' } = req.query;
 
-    
     const endDate = new Date();
     const startDate = new Date();
 
@@ -958,7 +859,6 @@ const getDashboardAnalytics = async (req, res) => {
         startDate.setDate(endDate.getDate() - 30);
     }
 
-    
     const [totalUsers, totalPartners, totalOrders, totalProducts] =
       await Promise.all([
         User.countDocuments({ role: { $ne: 'admin' } }),
@@ -967,7 +867,6 @@ const getDashboardAnalytics = async (req, res) => {
         Product.countDocuments(),
       ]);
 
-    
     const periodFilter = { createdAt: { $gte: startDate, $lte: endDate } };
 
     const [newUsers, newPartners, newOrders] = await Promise.all([
@@ -976,7 +875,6 @@ const getDashboardAnalytics = async (req, res) => {
       Order.countDocuments(periodFilter),
     ]);
 
-    
     const revenueData = await Order.aggregate([
       {
         $match: {
@@ -994,7 +892,6 @@ const getDashboardAnalytics = async (req, res) => {
       },
     ]);
 
-    
     const orderStatusData = await Order.aggregate([
       { $match: periodFilter },
       {
@@ -1005,7 +902,6 @@ const getDashboardAnalytics = async (req, res) => {
       },
     ]);
 
-    
     const topPartners = await Order.aggregate([
       {
         $match: {
@@ -1034,7 +930,6 @@ const getDashboardAnalytics = async (req, res) => {
       { $limit: 5 },
     ]);
 
-    
     const dailyTrends = await Order.aggregate([
       { $match: periodFilter },
       {
@@ -1051,13 +946,11 @@ const getDashboardAnalytics = async (req, res) => {
       { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } },
     ]);
 
-    
     const [totalQuestionnaires, completedQuestionnaires] = await Promise.all([
       ConditionQuestionnaire.countDocuments(),
       ConditionQuestionnaire.countDocuments({ status: 'active' }),
     ]);
 
-    
     const deviceAnalytics = await Product.aggregate([
       {
         $group: {
@@ -1068,7 +961,6 @@ const getDashboardAnalytics = async (req, res) => {
       { $sort: { count: -1 } },
     ]);
 
-    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const activeToday = await User.countDocuments({
@@ -1076,7 +968,6 @@ const getDashboardAnalytics = async (req, res) => {
       role: { $ne: 'admin' },
     });
 
-    
     const totalVisits = await Order.countDocuments();
     const completedOrders = await Order.countDocuments({ status: 'completed' });
     const conversionRate =
@@ -1133,9 +1024,6 @@ const getDashboardAnalytics = async (req, res) => {
   }
 };
 
-
-
-
 const getCatalog = async (req, res) => {
   try {
     const {
@@ -1152,11 +1040,9 @@ const getCatalog = async (req, res) => {
       maxPrice,
     } = req.query;
 
-    
     const pageNum = Math.max(1, parseInt(page));
-    const limitNum = Math.min(50, Math.max(1, parseInt(limit))); 
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit)));
 
-    
     const filter = {};
 
     if (category && category !== 'all') {
@@ -1168,7 +1054,6 @@ const getCatalog = async (req, res) => {
     }
 
     if (model && model !== 'all') {
-      
       const decodedModel = decodeURIComponent(model);
       filter.model = { $regex: decodedModel.trim(), $options: 'i' };
     }
@@ -1177,7 +1062,6 @@ const getCatalog = async (req, res) => {
       filter.status = status;
     }
 
-    
     if (minPrice || maxPrice) {
       filter.basePrice = {};
       if (minPrice && !isNaN(minPrice)) {
@@ -1188,7 +1072,6 @@ const getCatalog = async (req, res) => {
       }
     }
 
-    
     if (search && search.trim() && !model) {
       const searchRegex = { $regex: search.trim(), $options: 'i' };
       filter.$or = [
@@ -1199,7 +1082,6 @@ const getCatalog = async (req, res) => {
       ];
     }
 
-    
     const sortOptions = {};
     const validSortFields = [
       'createdAt',
@@ -1213,7 +1095,6 @@ const getCatalog = async (req, res) => {
     const sortDirection = sortOrder === 'asc' ? 1 : -1;
     sortOptions[sortField] = sortDirection;
 
-    
     const [products, total, brands, categories, statusCounts] =
       await Promise.all([
         Product.find(filter)
@@ -1228,7 +1109,6 @@ const getCatalog = async (req, res) => {
         Product.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
       ]);
 
-    
     const priceStats = await Product.aggregate([
       {
         $group: {
@@ -1287,12 +1167,8 @@ const getCatalog = async (req, res) => {
   }
 };
 
-
-
-
 const addProduct = async (req, res) => {
   try {
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1316,7 +1192,6 @@ const addProduct = async (req, res) => {
       features,
     } = req.body;
 
-    
     if (!category || !brand || !model || !basePrice) {
       return res.status(400).json({
         success: false,
@@ -1325,7 +1200,6 @@ const addProduct = async (req, res) => {
       });
     }
 
-    
     if (isNaN(basePrice) || parseFloat(basePrice) <= 0) {
       return res.status(400).json({
         success: false,
@@ -1333,7 +1207,6 @@ const addProduct = async (req, res) => {
       });
     }
 
-    
     if (
       depreciationRate &&
       (isNaN(depreciationRate) ||
@@ -1346,7 +1219,6 @@ const addProduct = async (req, res) => {
       });
     }
 
-    
     const existingProduct = await Product.findOne({
       category: category.toLowerCase(),
       brand: brand.toLowerCase(),
@@ -1360,7 +1232,6 @@ const addProduct = async (req, res) => {
       });
     }
 
-    
     let processedImages = [];
     if (images) {
       if (typeof images === 'string') {
@@ -1373,7 +1244,6 @@ const addProduct = async (req, res) => {
         processedImages = images;
       }
 
-      
       processedImages = processedImages
         .map((img) => {
           if (typeof img === 'string') return img.trim();
@@ -1397,7 +1267,6 @@ const addProduct = async (req, res) => {
       }
     }
 
-    
     const productData = {
       category: category.toLowerCase(),
       brand: brand.trim(),
@@ -1433,7 +1302,6 @@ const addProduct = async (req, res) => {
   } catch (error) {
     console.error('Error adding product to catalog:', error);
 
-    
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
@@ -1463,9 +1331,6 @@ const addProduct = async (req, res) => {
   }
 };
 
-
-
-
 const uploadProductImages = async (req, res) => {
   try {
     const cloudinary = require('../config/cloudinary.config');
@@ -1475,7 +1340,6 @@ const uploadProductImages = async (req, res) => {
       return res.status(400).json({ message: 'No images provided' });
     }
 
-    
     for (const file of req.files) {
       try {
         const result = await cloudinary.uploader.upload(file.path, {
@@ -1507,14 +1371,10 @@ const uploadProductImages = async (req, res) => {
   }
 };
 
-
-
-
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
@@ -1522,7 +1382,6 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    
     const existingProduct = await Product.findById(id);
     if (!existingProduct) {
       return res.status(404).json({
@@ -1545,7 +1404,6 @@ const updateProduct = async (req, res) => {
       features,
     } = req.body;
 
-    
     const updateData = {};
 
     if (category !== undefined) {
@@ -1606,7 +1464,6 @@ const updateProduct = async (req, res) => {
       updateData.features = Array.isArray(features) ? features : [];
     }
 
-    
     if (images !== undefined) {
       let processedImages = [];
       if (typeof images === 'string') {
@@ -1643,7 +1500,6 @@ const updateProduct = async (req, res) => {
       updateData.specifications = processedSpecs;
     }
 
-    
     if (category || brand || model) {
       const checkCategory = category
         ? category.toLowerCase()
@@ -1671,10 +1527,8 @@ const updateProduct = async (req, res) => {
       }
     }
 
-    
     updateData.updatedAt = new Date();
 
-    
     const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
@@ -1712,9 +1566,6 @@ const updateProduct = async (req, res) => {
   }
 };
 
-
-
-
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -1735,20 +1586,15 @@ const getProductById = async (req, res) => {
   }
 };
 
-
-
-
 const updateProductStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
 
-    
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid product ID' });
     }
 
-    
     const product = await Product.findByIdAndUpdate(
       id,
       { status },
@@ -1776,15 +1622,11 @@ const updateProductStatus = async (req, res) => {
   }
 };
 
-
-
-
 const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { force = false } = req.query; 
+    const { force = false } = req.query;
 
-    
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
@@ -1792,7 +1634,6 @@ const deleteProduct = async (req, res) => {
       });
     }
 
-    
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({
@@ -1801,9 +1642,7 @@ const deleteProduct = async (req, res) => {
       });
     }
 
-    
     if (!force) {
-      
       const activeOrders = await Order.find({
         'items.product': id,
         status: { $in: ['pending', 'processing', 'shipped', 'confirmed'] },
@@ -1818,7 +1657,6 @@ const deleteProduct = async (req, res) => {
         });
       }
 
-      
       const inventory = await Inventory.find({ product: id });
       if (inventory.length > 0) {
         const totalStock = inventory.reduce(
@@ -1835,7 +1673,6 @@ const deleteProduct = async (req, res) => {
         }
       }
 
-      
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -1855,7 +1692,6 @@ const deleteProduct = async (req, res) => {
       }
     }
 
-    
     const deletedProductInfo = {
       id: product._id,
       category: product.category,
@@ -1864,13 +1700,11 @@ const deleteProduct = async (req, res) => {
       deletedAt: new Date(),
     };
 
-    
     if (product.images && product.images.length > 0) {
       const cloudinary = require('../config/cloudinary.config');
 
       for (const imageUrl of product.images) {
         try {
-          
           const publicId = imageUrl
             .split('/')
             .slice(-2)
@@ -1879,17 +1713,14 @@ const deleteProduct = async (req, res) => {
           await cloudinary.uploader.destroy(`cashify/products/${publicId}`);
         } catch (deleteError) {
           console.error('Error deleting image from Cloudinary:', deleteError);
-          
         }
       }
     }
 
-    
     if (force) {
       await Promise.all([
-        
         Inventory.deleteMany({ product: id }),
-        
+
         Order.updateMany(
           { 'items.product': id },
           { $set: { 'items.$.productDeleted': true } }
@@ -1897,7 +1728,6 @@ const deleteProduct = async (req, res) => {
       ]);
     }
 
-    
     await Product.findByIdAndDelete(id);
 
     res.json({
@@ -1911,7 +1741,6 @@ const deleteProduct = async (req, res) => {
   } catch (error) {
     console.error('Error deleting product:', error);
 
-    
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
@@ -1930,23 +1759,18 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-
-
-
 const getCommissionSettings = async (req, res) => {
   try {
-    
-    
     const commissionSettings = {
       sellCommission: {
-        mobile: 5, 
-        tablet: 4, 
-        laptop: 3, 
+        mobile: 5,
+        tablet: 4,
+        laptop: 3,
       },
       buyCommission: {
-        mobile: 8, 
-        tablet: 7, 
-        laptop: 6, 
+        mobile: 8,
+        tablet: 7,
+        laptop: 6,
       },
       deliveryCharges: {
         local: 50,
@@ -1962,24 +1786,14 @@ const getCommissionSettings = async (req, res) => {
   }
 };
 
-
-
-
 const updateCommissionSettings = async (req, res) => {
   try {
-    
-    
     res.json({ message: 'Commission settings updated successfully' });
   } catch (error) {
     console.error('Error updating commission settings:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-
-
-
-
 
 const getAllUsers = async (req, res) => {
   try {
@@ -2010,7 +1824,6 @@ const getAllUsers = async (req, res) => {
 
     const total = await User.countDocuments(query);
 
-    
     res.set({
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       Pragma: 'no-cache',
@@ -2032,9 +1845,6 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-
-
-
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
@@ -2055,9 +1865,6 @@ const getUserById = async (req, res) => {
   }
 };
 
-
-
-
 const createUser = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -2075,13 +1882,11 @@ const createUser = async (req, res) => {
       roleTemplate,
     } = req.body;
 
-    
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    
     const userData = {
       name,
       email,
@@ -2089,31 +1894,26 @@ const createUser = async (req, res) => {
       phone,
       role,
       address,
-      isVerified: true, 
+      isVerified: true,
     };
 
-    
     if (role === 'partner' && roleTemplate) {
       userData.roleTemplate = roleTemplate;
     }
 
-    
     const user = await User.create(userData);
 
-    
     if (role === 'partner') {
       try {
-        
         const existingPartner = await Partner.findOne({ user: user._id });
 
         if (!existingPartner) {
-          
           await Partner.create({
             user: user._id,
-            shopName: name || 'Partner Shop', 
+            shopName: name || 'Partner Shop',
             shopEmail: email,
             shopPhone: phone || '0000000000',
-            gstNumber: `GST${Date.now()}`, 
+            gstNumber: `GST${Date.now()}`,
             shopAddress: {
               street: address?.street || '',
               city: address?.city || '',
@@ -2128,12 +1928,9 @@ const createUser = async (req, res) => {
         }
       } catch (partnerError) {
         console.error('Error creating partner profile:', partnerError);
-        
-        
       }
     }
 
-    
     const userResponse = await User.findById(user._id)
       .select('-password')
       .populate(
@@ -2154,9 +1951,6 @@ const createUser = async (req, res) => {
   }
 };
 
-
-
-
 const updateUser = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -2172,7 +1966,6 @@ const updateUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    
     if (email && email !== user.email) {
       const emailExists = await User.findOne({ email });
       if (emailExists) {
@@ -2180,10 +1973,8 @@ const updateUser = async (req, res) => {
       }
     }
 
-    
     const oldRole = user.role;
 
-    
     if (name) user.name = name;
     if (email) user.email = email;
     if (phone) user.phone = phone;
@@ -2191,17 +1982,14 @@ const updateUser = async (req, res) => {
     if (address) user.address = { ...user.address, ...address };
     if (typeof isVerified === 'boolean') user.isVerified = isVerified;
 
-    
     if (role === 'partner' && roleTemplate !== undefined) {
       user.roleTemplate = roleTemplate || null;
     } else if (role !== 'partner') {
-      
       user.roleTemplate = null;
     }
 
     const updatedUser = await user.save();
 
-    
     if (role === 'partner' && oldRole !== 'partner') {
       try {
         const existingPartner = await Partner.findOne({
@@ -2250,9 +2038,6 @@ const updateUser = async (req, res) => {
   }
 };
 
-
-
-
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -2261,7 +2046,6 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    
     if (user.role === 'admin') {
       return res.status(400).json({ message: 'Cannot delete admin users' });
     }
@@ -2275,9 +2059,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-
-
-
 const updateUserPassword = async (req, res) => {
   try {
     const { newPassword } = req.body;
@@ -2287,7 +2068,6 @@ const updateUserPassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    
     user.password = newPassword;
     await user.save();
 
@@ -2305,9 +2085,6 @@ const updateUserPassword = async (req, res) => {
   }
 };
 
-
-
-
 const getSellOrders = async (req, res) => {
   try {
     const {
@@ -2324,7 +2101,6 @@ const getSellOrders = async (req, res) => {
     const SellOrder = require('../models/sellOrder.model');
     const query = {};
 
-    
     if (status) query.status = status;
     if (startDate || endDate) {
       query.createdAt = {};
@@ -2332,7 +2108,6 @@ const getSellOrders = async (req, res) => {
       if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
-    
     if (search) {
       query.$or = [
         { orderNumber: { $regex: search, $options: 'i' } },
@@ -2387,9 +2162,6 @@ const getSellOrders = async (req, res) => {
   }
 };
 
-
-
-
 const getBuyOrders = async (req, res) => {
   try {
     const {
@@ -2406,7 +2178,6 @@ const getBuyOrders = async (req, res) => {
 
     const query = { orderType: 'buy' };
 
-    
     if (status) query.status = status;
     if (userId) query.user = userId;
     if (partnerId) query.partner = partnerId;
@@ -2447,9 +2218,6 @@ const getBuyOrders = async (req, res) => {
   }
 };
 
-
-
-
 const updateOrderStatus = async (req, res) => {
   try {
     const { status, notes } = req.body;
@@ -2460,7 +2228,6 @@ const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    
     order.status = status;
     if (notes) {
       order.notes = notes;
@@ -2469,7 +2236,6 @@ const updateOrderStatus = async (req, res) => {
 
     await order.save();
 
-    
     await order.populate([
       { path: 'user', select: 'name email phone' },
       { path: 'partner', select: 'businessName email phone' },
@@ -2487,9 +2253,6 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-
-
-
 const getPartnerSuggestionsForOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
@@ -2499,19 +2262,16 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    
     const partners = await Partner.find({
       isVerified: true,
       verificationStatus: 'approved',
     }).populate('user', 'name email phone isActive');
 
-    
     const partnerSuggestions = await Promise.all(
       partners.map(async (partner) => {
         const partnerObj = partner.toObject();
         partnerObj.inventoryStatus = [];
 
-        
         for (const item of order.items) {
           const inventory = await Inventory.findOne({
             partner: partner._id,
@@ -2532,7 +2292,6 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
           });
         }
 
-        
         const canFulfillAll = partnerObj.inventoryStatus.every(
           (item) => item.canFulfill
         );
@@ -2552,7 +2311,6 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
       })
     );
 
-    
     partnerSuggestions.sort((a, b) => {
       if (
         a.fulfillmentStatus.canFulfillAll &&
@@ -2593,9 +2351,6 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
   }
 };
 
-
-
-
 const assignPartnerToOrder = async (req, res) => {
   try {
     const { partner } = req.body;
@@ -2606,7 +2361,6 @@ const assignPartnerToOrder = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    
     if (partner) {
       const partnerExists = await Partner.findById(partner);
       if (!partnerExists) {
@@ -2614,7 +2368,6 @@ const assignPartnerToOrder = async (req, res) => {
       }
     }
 
-    
     order.partner = partner;
     order.partnerAssignment = {
       assignedAt: new Date(),
@@ -2624,7 +2377,6 @@ const assignPartnerToOrder = async (req, res) => {
       },
     };
 
-    
     order.statusHistory.push({
       status: 'partner_assigned',
       timestamp: new Date(),
@@ -2633,7 +2385,6 @@ const assignPartnerToOrder = async (req, res) => {
 
     await order.save();
 
-    
     await order.populate([
       { path: 'user', select: 'name email phone' },
       { path: 'partner', select: 'businessName shopName email phone' },
@@ -2653,14 +2404,10 @@ const assignPartnerToOrder = async (req, res) => {
   }
 };
 
-
-
-
 const getBrands = async (req, res) => {
   try {
     const { category, page = 1, limit = 50 } = req.query;
 
-    
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
 
@@ -2705,7 +2452,6 @@ const getBrands = async (req, res) => {
       { $limit: limitNum },
     ]);
 
-    
     const totalBrands = await Product.aggregate([
       { $match: matchStage },
       { $group: { _id: '$brand' } },
@@ -2735,14 +2481,10 @@ const getBrands = async (req, res) => {
   }
 };
 
-
-
-
 const createBrand = async (req, res) => {
   try {
     const { brand, category, model, basePrice, variant } = req.body;
 
-    
     const validationErrors = [];
 
     if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
@@ -2769,7 +2511,6 @@ const createBrand = async (req, res) => {
 
     const brandName = brand.trim().toLowerCase();
 
-    
     const existingBrand = await Product.findOne({ brand: brandName });
     if (existingBrand) {
       return res.status(409).json({
@@ -2779,7 +2520,6 @@ const createBrand = async (req, res) => {
       });
     }
 
-    
     const productData = {
       category,
       brand: brandName,
@@ -2810,7 +2550,6 @@ const createBrand = async (req, res) => {
   } catch (error) {
     console.error('Error creating brand:', error);
 
-    
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(
         (err) => err.message
@@ -2841,15 +2580,11 @@ const createBrand = async (req, res) => {
   }
 };
 
-
-
-
 const updateBrand = async (req, res) => {
   try {
     const { brandName } = req.params;
     const { newBrandName } = req.body;
 
-    
     const validationErrors = [];
 
     if (
@@ -2883,7 +2618,6 @@ const updateBrand = async (req, res) => {
     const oldBrandName = brandName.trim().toLowerCase();
     const newBrandNameLower = newBrandName.trim().toLowerCase();
 
-    
     if (oldBrandName === newBrandNameLower) {
       return res.status(400).json({
         success: false,
@@ -2891,7 +2625,6 @@ const updateBrand = async (req, res) => {
       });
     }
 
-    
     const originalBrand = await Product.findOne({ brand: oldBrandName });
     if (!originalBrand) {
       return res.status(404).json({
@@ -2900,7 +2633,6 @@ const updateBrand = async (req, res) => {
       });
     }
 
-    
     const existingBrand = await Product.findOne({ brand: newBrandNameLower });
     if (existingBrand) {
       return res.status(409).json({
@@ -2910,7 +2642,6 @@ const updateBrand = async (req, res) => {
       });
     }
 
-    
     const result = await Product.updateMany(
       { brand: oldBrandName },
       {
@@ -2941,7 +2672,6 @@ const updateBrand = async (req, res) => {
   } catch (error) {
     console.error('Error updating brand:', error);
 
-    
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
@@ -2960,15 +2690,11 @@ const updateBrand = async (req, res) => {
   }
 };
 
-
-
-
 const deleteBrand = async (req, res) => {
   try {
     const { brandName } = req.params;
     const { confirmDeletion } = req.body;
 
-    
     if (
       !brandName ||
       typeof brandName !== 'string' ||
@@ -2981,7 +2707,6 @@ const deleteBrand = async (req, res) => {
       });
     }
 
-    
     if (!confirmDeletion) {
       return res.status(400).json({
         success: false,
@@ -2992,7 +2717,6 @@ const deleteBrand = async (req, res) => {
 
     const brandNameLower = brandName.trim().toLowerCase();
 
-    
     const products = await Product.find({ brand: brandNameLower });
 
     if (products.length === 0) {
@@ -3002,19 +2726,8 @@ const deleteBrand = async (req, res) => {
       });
     }
 
-    
     const productIds = products.map((p) => p._id);
 
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
     const result = await Product.deleteMany({ brand: brandNameLower });
 
     if (result.deletedCount === 0) {
@@ -3037,7 +2750,6 @@ const deleteBrand = async (req, res) => {
   } catch (error) {
     console.error('Error deleting brand:', error);
 
-    
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
@@ -3056,14 +2768,10 @@ const deleteBrand = async (req, res) => {
   }
 };
 
-
-
-
 const getModels = async (req, res) => {
   try {
     const { category, brand, page = 1, limit = 50, search } = req.query;
 
-    
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
 
@@ -3153,7 +2861,6 @@ const getModels = async (req, res) => {
       { $limit: limitNum },
     ]);
 
-    
     const totalModels = await Product.aggregate([
       { $match: matchStage },
       {
@@ -3192,14 +2899,10 @@ const getModels = async (req, res) => {
   }
 };
 
-
-
-
 const createModel = async (req, res) => {
   try {
     const { brand, category, model, basePrice, variant } = req.body;
 
-    
     const validationErrors = [];
 
     if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
@@ -3229,7 +2932,6 @@ const createModel = async (req, res) => {
     const brandName = brand.trim().toLowerCase();
     const modelName = model.trim().toLowerCase();
 
-    
     const existingBrand = await Product.findOne({ brand: brandName });
     if (!existingBrand) {
       return res.status(404).json({
@@ -3239,7 +2941,6 @@ const createModel = async (req, res) => {
       });
     }
 
-    
     const existingModel = await Product.findOne({
       brand: brandName,
       model: modelName,
@@ -3253,7 +2954,6 @@ const createModel = async (req, res) => {
       });
     }
 
-    
     if (variant && typeof variant === 'object') {
       const requiredVariantFields = ['ram', 'storage'];
       const missingFields = requiredVariantFields.filter(
@@ -3270,7 +2970,6 @@ const createModel = async (req, res) => {
       }
     }
 
-    
     const productData = {
       category: category || existingBrand.category,
       brand: brandName,
@@ -3303,7 +3002,6 @@ const createModel = async (req, res) => {
   } catch (error) {
     console.error('Error creating model:', error);
 
-    
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(
         (err) => err.message
@@ -3334,15 +3032,11 @@ const createModel = async (req, res) => {
   }
 };
 
-
-
-
 const updateModel = async (req, res) => {
   try {
     const { brand, modelName } = req.params;
     const { newModelName, basePrice, variant } = req.body;
 
-    
     const validationErrors = [];
 
     if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
@@ -3387,7 +3081,6 @@ const updateModel = async (req, res) => {
     const oldModelLower = modelName.trim().toLowerCase();
     const newModelLower = newModelName.trim().toLowerCase();
 
-    
     if (oldModelLower === newModelLower) {
       return res.status(400).json({
         success: false,
@@ -3395,7 +3088,6 @@ const updateModel = async (req, res) => {
       });
     }
 
-    
     const originalModel = await Product.findOne({
       brand: brandLower,
       model: oldModelLower,
@@ -3408,7 +3100,6 @@ const updateModel = async (req, res) => {
       });
     }
 
-    
     const existingModel = await Product.findOne({
       brand: brandLower,
       model: newModelLower,
@@ -3422,7 +3113,6 @@ const updateModel = async (req, res) => {
       });
     }
 
-    
     const updateData = {
       model: newModelLower,
       updatedAt: new Date(),
@@ -3437,7 +3127,6 @@ const updateModel = async (req, res) => {
       updateData.variant = { ...originalModel.variant, ...variant };
     }
 
-    
     const result = await Product.updateMany(
       {
         brand: brandLower,
@@ -3469,7 +3158,6 @@ const updateModel = async (req, res) => {
   } catch (error) {
     console.error('Error updating model:', error);
 
-    
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
@@ -3488,15 +3176,11 @@ const updateModel = async (req, res) => {
   }
 };
 
-
-
-
 const deleteModel = async (req, res) => {
   try {
     const { brand, modelName } = req.params;
     const { confirmDeletion } = req.body;
 
-    
     const validationErrors = [];
 
     if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
@@ -3523,7 +3207,6 @@ const deleteModel = async (req, res) => {
       });
     }
 
-    
     if (!confirmDeletion) {
       return res.status(400).json({
         success: false,
@@ -3535,7 +3218,6 @@ const deleteModel = async (req, res) => {
     const brandLower = brand.trim().toLowerCase();
     const modelLower = modelName.trim().toLowerCase();
 
-    
     const products = await Product.find({
       brand: brandLower,
       model: modelLower,
@@ -3548,19 +3230,8 @@ const deleteModel = async (req, res) => {
       });
     }
 
-    
     const productIds = products.map((p) => p._id);
 
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
     const result = await Product.deleteMany({
       brand: brandLower,
       model: modelLower,
@@ -3587,7 +3258,6 @@ const deleteModel = async (req, res) => {
   } catch (error) {
     console.error('Error deleting model:', error);
 
-    
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
@@ -3606,9 +3276,6 @@ const deleteModel = async (req, res) => {
   }
 };
 
-
-
-
 const getConditionQuestionnaires = async (req, res) => {
   try {
     const {
@@ -3623,7 +3290,6 @@ const getConditionQuestionnaires = async (req, res) => {
       sortOrder = 'desc',
     } = req.query;
 
-    
     const filter = {};
 
     if (category) filter.category = category.toLowerCase();
@@ -3631,7 +3297,6 @@ const getConditionQuestionnaires = async (req, res) => {
     if (model) filter.model = new RegExp(model, 'i');
     if (isActive !== undefined) filter.isActive = isActive === 'true';
 
-    
     if (search) {
       filter.$or = [
         { title: new RegExp(search, 'i') },
@@ -3640,11 +3305,9 @@ const getConditionQuestionnaires = async (req, res) => {
       ];
     }
 
-    
     const sort = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
-    
     const questionnaires = await ConditionQuestionnaire.find(filter)
       .populate('createdBy', 'name email')
       .populate('updatedBy', 'name email')
@@ -3653,10 +3316,8 @@ const getConditionQuestionnaires = async (req, res) => {
       .skip((page - 1) * limit)
       .lean();
 
-    
     const total = await ConditionQuestionnaire.countDocuments(filter);
 
-    
     const stats = await ConditionQuestionnaire.aggregate([
       { $match: filter },
       {
@@ -3714,7 +3375,6 @@ const getConditionQuestionnaires = async (req, res) => {
   }
 };
 
-
 const getConditionQuestionnaireById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -3751,7 +3411,6 @@ const getConditionQuestionnaireById = async (req, res) => {
   }
 };
 
-
 const createConditionQuestionnaire = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -3778,28 +3437,23 @@ const createConditionQuestionnaire = async (req, res) => {
     } = req.body;
     console.log('req.body: ', req.body);
 
-    
     let questions;
     if (Array.isArray(rawQuestions)) {
       questions = rawQuestions;
     } else if (rawQuestions && typeof rawQuestions === 'object') {
-      
       questions = Object.values(rawQuestions);
     } else {
       questions = [];
     }
 
-    
     let metadata = rawMetadata;
     if (metadata && metadata.tags && !Array.isArray(metadata.tags)) {
       if (typeof metadata.tags === 'object') {
-        
         metadata = {
           ...metadata,
           tags: Object.values(metadata.tags),
         };
       } else {
-        
         metadata = {
           ...metadata,
           tags: [],
@@ -3807,7 +3461,6 @@ const createConditionQuestionnaire = async (req, res) => {
       }
     }
 
-    
     if (!questions || !Array.isArray(questions) || questions.length === 0) {
       return res.status(400).json({
         success: false,
@@ -3815,7 +3468,6 @@ const createConditionQuestionnaire = async (req, res) => {
       });
     }
 
-    
     for (let i = 0; i < questions.length; i++) {
       const question = questions[i];
       if (!question.id || !question.title) {
@@ -3842,7 +3494,6 @@ const createConditionQuestionnaire = async (req, res) => {
       }
     }
 
-    
     if (isDefault) {
       await ConditionQuestionnaire.updateMany(
         { category: category.toLowerCase(), isDefault: true },
@@ -3872,7 +3523,6 @@ const createConditionQuestionnaire = async (req, res) => {
 
     await questionnaire.save();
 
-    
     await questionnaire.populate('createdBy', 'name email');
 
     res.status(201).json({
@@ -3901,7 +3551,6 @@ const createConditionQuestionnaire = async (req, res) => {
     });
   }
 };
-
 
 const updateConditionQuestionnaire = async (req, res) => {
   try {
@@ -3937,30 +3586,25 @@ const updateConditionQuestionnaire = async (req, res) => {
       metadata: rawMetadata,
     } = req.body;
 
-    
     let questions;
     if (rawQuestions !== undefined) {
       if (Array.isArray(rawQuestions)) {
         questions = rawQuestions;
       } else if (rawQuestions && typeof rawQuestions === 'object') {
-        
         questions = Object.values(rawQuestions);
       } else {
         questions = [];
       }
     }
 
-    
     let metadata = rawMetadata;
     if (metadata && metadata.tags && !Array.isArray(metadata.tags)) {
       if (typeof metadata.tags === 'object') {
-        
         metadata = {
           ...metadata,
           tags: Object.values(metadata.tags),
         };
       } else {
-        
         metadata = {
           ...metadata,
           tags: [],
@@ -3968,7 +3612,6 @@ const updateConditionQuestionnaire = async (req, res) => {
       }
     }
 
-    
     const existingQuestionnaire = await ConditionQuestionnaire.findById(id);
     if (!existingQuestionnaire) {
       return res.status(404).json({
@@ -3977,7 +3620,6 @@ const updateConditionQuestionnaire = async (req, res) => {
       });
     }
 
-    
     if (questions) {
       if (!Array.isArray(questions) || questions.length === 0) {
         return res.status(400).json({
@@ -3986,7 +3628,6 @@ const updateConditionQuestionnaire = async (req, res) => {
         });
       }
 
-      
       for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         if (!question.id || !question.title) {
@@ -4014,7 +3655,6 @@ const updateConditionQuestionnaire = async (req, res) => {
       }
     }
 
-    
     if (isDefault === true && category) {
       await ConditionQuestionnaire.updateMany(
         {
@@ -4026,13 +3666,11 @@ const updateConditionQuestionnaire = async (req, res) => {
       );
     }
 
-    
     const updateData = {
       updatedBy: req.user.id,
       updatedAt: new Date(),
     };
 
-    
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
     if (category !== undefined) updateData.category = category.toLowerCase();
@@ -4052,7 +3690,6 @@ const updateConditionQuestionnaire = async (req, res) => {
       };
     }
 
-    
     const updatedQuestionnaire = await ConditionQuestionnaire.findByIdAndUpdate(
       id,
       updateData,
@@ -4088,7 +3725,6 @@ const updateConditionQuestionnaire = async (req, res) => {
   }
 };
 
-
 const deleteConditionQuestionnaire = async (req, res) => {
   try {
     const { id } = req.params;
@@ -4100,7 +3736,6 @@ const deleteConditionQuestionnaire = async (req, res) => {
       });
     }
 
-    
     const questionnaire = await ConditionQuestionnaire.findById(id);
     if (!questionnaire) {
       return res.status(404).json({
@@ -4109,8 +3744,6 @@ const deleteConditionQuestionnaire = async (req, res) => {
       });
     }
 
-    
-    
     const isInUse = await Product.exists({
       'conditionFactors.questionnaireId': id,
     });
@@ -4123,7 +3756,6 @@ const deleteConditionQuestionnaire = async (req, res) => {
       });
     }
 
-    
     const deletedQuestionnaire = await ConditionQuestionnaire.findByIdAndUpdate(
       id,
       {
@@ -4135,7 +3767,6 @@ const deleteConditionQuestionnaire = async (req, res) => {
       { new: true }
     );
 
-    
     if (req.query.force === 'true') {
       await ConditionQuestionnaire.findByIdAndDelete(id);
 
@@ -4159,7 +3790,6 @@ const deleteConditionQuestionnaire = async (req, res) => {
     });
   }
 };
-
 
 const getQuestionnairesByCategory = async (req, res) => {
   try {
@@ -4193,9 +3823,6 @@ const getQuestionnairesByCategory = async (req, res) => {
   }
 };
 
-
-
-
 const updateModelByName = async (req, res) => {
   try {
     const { modelName } = req.params;
@@ -4203,10 +3830,8 @@ const updateModelByName = async (req, res) => {
 
     console.log('Updating model:', modelName, 'with data:', updateData);
 
-    
     const decodedModelName = decodeURIComponent(modelName);
 
-    
     if (!decodedModelName || decodedModelName.trim().length < 2) {
       return res.status(400).json({
         success: false,
@@ -4215,7 +3840,6 @@ const updateModelByName = async (req, res) => {
       });
     }
 
-    
     const existingModel = await Product.findOne({
       model: decodedModelName.trim().toLowerCase(),
     });
@@ -4227,13 +3851,11 @@ const updateModelByName = async (req, res) => {
       });
     }
 
-    
     const updateFields = {
       updatedAt: new Date(),
       updatedBy: req.user?.id,
     };
 
-    
     if (updateData.model && updateData.model !== decodedModelName) {
       updateFields.model = updateData.model.trim().toLowerCase();
     }
@@ -4258,7 +3880,6 @@ const updateModelByName = async (req, res) => {
       updateFields.variants = updateData.variants;
     }
 
-    
     const result = await Product.updateMany(
       { model: decodedModelName.trim().toLowerCase() },
       updateFields
@@ -4296,19 +3917,14 @@ const updateModelByName = async (req, res) => {
   }
 };
 
-
-
-
 const deleteModelByName = async (req, res) => {
   try {
     const { modelName } = req.params;
 
-    
     const decodedModelName = decodeURIComponent(modelName);
 
     console.log('Deleting model:', decodedModelName);
 
-    
     if (!decodedModelName || decodedModelName.trim().length < 2) {
       return res.status(400).json({
         success: false,
@@ -4317,7 +3933,6 @@ const deleteModelByName = async (req, res) => {
       });
     }
 
-    
     const products = await Product.find({
       model: decodedModelName.trim().toLowerCase(),
     });
@@ -4329,7 +3944,6 @@ const deleteModelByName = async (req, res) => {
       });
     }
 
-    
     const result = await Product.deleteMany({
       model: decodedModelName.trim().toLowerCase(),
     });
@@ -4357,7 +3971,6 @@ const deleteModelByName = async (req, res) => {
   }
 };
 
-
 const getAgents = async (req, res) => {
   const { page = 1, limit = 10, status, verified } = req.query;
 
@@ -4380,7 +3993,6 @@ const getAgents = async (req, res) => {
     .limit(limit * 1)
     .skip((page - 1) * limit);
 
-  
   let filteredAgents = agents;
   if (verified !== undefined) {
     const isVerified = verified === 'true';
@@ -4403,7 +4015,6 @@ const getAgents = async (req, res) => {
   });
 };
 
-
 const approveAgent = async (req, res) => {
   const agentId = req.params.id;
 
@@ -4412,13 +4023,11 @@ const approveAgent = async (req, res) => {
     throw new ApiError('Agent not found', 404);
   }
 
-  
   await User.findByIdAndUpdate(agent.user._id, {
     isVerified: true,
     isActive: true,
   });
 
-  
   agent.isActive = true;
   await agent.save();
 
@@ -4429,7 +4038,6 @@ const approveAgent = async (req, res) => {
   });
 };
 
-
 const rejectAgent = async (req, res) => {
   const agentId = req.params.id;
   const { reason } = req.body;
@@ -4439,13 +4047,11 @@ const rejectAgent = async (req, res) => {
     throw new ApiError('Agent not found', 404);
   }
 
-  
   await User.findByIdAndUpdate(agent.user._id, {
     isVerified: false,
     isActive: false,
   });
 
-  
   agent.isActive = false;
   agent.rejectionReason = reason;
   await agent.save();
@@ -4457,7 +4063,6 @@ const rejectAgent = async (req, res) => {
   });
 };
 
-
 const toggleAgentStatus = async (req, res) => {
   const agentId = req.params.id;
   const { isActive } = req.body;
@@ -4467,11 +4072,9 @@ const toggleAgentStatus = async (req, res) => {
     throw new ApiError('Agent not found', 404);
   }
 
-  
   agent.isActive = isActive;
   await agent.save();
 
-  
   await User.findByIdAndUpdate(agent.user._id, { isActive });
 
   res.status(200).json({
@@ -4480,7 +4083,6 @@ const toggleAgentStatus = async (req, res) => {
     data: agent,
   });
 };
-
 
 const toggleUserStatus = async (req, res) => {
   const userId = req.params.id;
@@ -4491,7 +4093,6 @@ const toggleUserStatus = async (req, res) => {
     throw new ApiError('User not found', 404);
   }
 
-  
   user.isActive = isActive;
   await user.save();
 

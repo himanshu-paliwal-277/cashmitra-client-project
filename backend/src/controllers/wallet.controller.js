@@ -5,7 +5,6 @@ const { Order } = require('../models/order.model');
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 
-
 exports.getWallet = async (req, res) => {
   try {
     const partner = await Partner.findOne({ user: req.user.id });
@@ -23,7 +22,6 @@ exports.getWallet = async (req, res) => {
       .populate('partner', 'shopName user');
 
     if (!wallet) {
-      
       wallet = await Wallet.create({
         partner: partnerId,
         balance: 0,
@@ -47,7 +45,6 @@ exports.getWallet = async (req, res) => {
     });
   }
 };
-
 
 exports.getTransactions = async (req, res) => {
   try {
@@ -93,7 +90,6 @@ exports.getTransactions = async (req, res) => {
   }
 };
 
-
 exports.processCommission = async (
   orderId,
   commissionAmount,
@@ -110,7 +106,6 @@ exports.processCommission = async (
 
     const partnerId = order.partner._id;
 
-    
     let wallet = await Wallet.findOne({ partner: partnerId }).session(session);
     if (!wallet) {
       wallet = await Wallet.create(
@@ -125,7 +120,6 @@ exports.processCommission = async (
       wallet = wallet[0];
     }
 
-    
     const transaction = await Transaction.create(
       [
         {
@@ -146,7 +140,6 @@ exports.processCommission = async (
       { session }
     );
 
-    
     wallet.balance += commissionAmount;
     wallet.transactions.push(transaction[0]._id);
     wallet.lastUpdated = new Date();
@@ -161,7 +154,6 @@ exports.processCommission = async (
     session.endSession();
   }
 };
-
 
 exports.requestPayout = async (req, res) => {
   try {
@@ -211,7 +203,6 @@ exports.requestPayout = async (req, res) => {
     session.startTransaction();
 
     try {
-      
       const paymentDetails = {};
       if (paymentMethod === 'Bank Transfer') {
         paymentDetails.bankDetails = bankDetails;
@@ -223,7 +214,7 @@ exports.requestPayout = async (req, res) => {
         [
           {
             transactionType: 'payout',
-            amount: -amount, 
+            amount: -amount,
             partner: partnerId,
             paymentMethod,
             paymentDetails,
@@ -238,7 +229,6 @@ exports.requestPayout = async (req, res) => {
         { session }
       );
 
-      
       wallet.balance -= amount;
       wallet.transactions.push(transaction[0]._id);
       wallet.lastUpdated = new Date();
@@ -269,7 +259,6 @@ exports.requestPayout = async (req, res) => {
     });
   }
 };
-
 
 exports.updatePayoutSettings = async (req, res) => {
   try {
@@ -307,7 +296,6 @@ exports.updatePayoutSettings = async (req, res) => {
       });
     }
 
-    
     if (minimumPayoutAmount !== undefined) {
       wallet.payoutSettings.minimumPayoutAmount = minimumPayoutAmount;
     }
@@ -341,7 +329,6 @@ exports.updatePayoutSettings = async (req, res) => {
     });
   }
 };
-
 
 exports.getPayoutHistory = async (req, res) => {
   try {
@@ -388,7 +375,6 @@ exports.getPayoutHistory = async (req, res) => {
   }
 };
 
-
 exports.getWalletAnalytics = async (req, res) => {
   try {
     const partner = await Partner.findOne({ user: req.user.id });
@@ -400,14 +386,13 @@ exports.getWalletAnalytics = async (req, res) => {
     }
 
     const partnerId = partner._id;
-    const { period = '30' } = req.query; 
+    const { period = '30' } = req.query;
 
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - parseInt(period));
 
     let wallet = await Wallet.findOne({ partner: partnerId });
     if (!wallet) {
-      
       wallet = await Wallet.create({
         partner: partnerId,
         balance: 0,
@@ -419,14 +404,12 @@ exports.getWalletAnalytics = async (req, res) => {
       });
     }
 
-    
     const transactions = await Transaction.find({
       partner: partnerId,
       createdAt: { $gte: startDate },
       status: 'completed',
     });
 
-    
     const totalEarnings = transactions
       .filter((t) => t.transactionType === 'commission')
       .reduce((sum, t) => sum + t.amount, 0);
@@ -446,7 +429,6 @@ exports.getWalletAnalytics = async (req, res) => {
       0
     );
 
-    
     const dailyData = {};
     transactions.forEach((transaction) => {
       const date = transaction.createdAt.toISOString().split('T')[0];
@@ -491,7 +473,6 @@ exports.getWalletAnalytics = async (req, res) => {
   }
 };
 
-
 exports.processPayout = async (req, res) => {
   try {
     const { transactionId } = req.params;
@@ -534,13 +515,11 @@ exports.processPayout = async (req, res) => {
     session.startTransaction();
 
     try {
-      
       transaction.status = status;
       transaction.metadata.set('processedAt', new Date());
       transaction.metadata.set('processedBy', req.user._id);
       if (notes) transaction.metadata.set('adminNotes', notes);
 
-      
       if (status === 'failed') {
         const wallet = await Wallet.findOne({
           partner: transaction.partner._id,
@@ -577,7 +556,6 @@ exports.processPayout = async (req, res) => {
     });
   }
 };
-
 
 exports.getAllPayouts = async (req, res) => {
   try {
@@ -621,7 +599,6 @@ exports.getAllPayouts = async (req, res) => {
     });
   }
 };
-
 
 exports.getPendingPayouts = async (req, res) => {
   try {

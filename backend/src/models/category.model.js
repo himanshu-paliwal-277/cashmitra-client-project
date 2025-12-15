@@ -77,11 +77,9 @@ const categorySchema = new mongoose.Schema(
   }
 );
 
-
 categorySchema.virtual('displayName').get(function () {
   return this.name;
 });
-
 
 categorySchema.pre('save', function (next) {
   if (this.isModified('name') || !this.slug) {

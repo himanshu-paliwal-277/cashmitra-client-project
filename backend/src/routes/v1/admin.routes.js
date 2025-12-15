@@ -8,13 +8,12 @@ const { validateRequest } = require('../../middlewares/validation.middleware');
 const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 const { authRateLimiter } = require('../../middlewares/rateLimiter.middleware');
 
-
 const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, 
+    fileSize: 5 * 1024 * 1024,
   },
   fileFilter: function (req, file, cb) {
     if (file.mimetype.startsWith('image/')) {
@@ -27,10 +26,6 @@ const upload = multer({
 
 const router = express.Router();
 
-
-
-
-
 router.post(
   '/login',
   [
@@ -39,13 +34,11 @@ router.post(
   ],
   validateRequest,
   (req, res, next) => {
-    
     req.skipCSRF = true;
     next();
   },
   asyncHandler(adminController.loginAdmin)
 );
-
 
 router.get(
   '/profile',
@@ -53,7 +46,6 @@ router.get(
   authorize('admin'),
   asyncHandler(adminController.getAdminProfile)
 );
-
 
 router.post(
   '/create',
@@ -73,15 +65,12 @@ router.post(
   asyncHandler(adminController.createAdmin)
 );
 
-
-
 router.get(
   '/partners',
   protect,
   authorize('admin'),
   asyncHandler(adminController.getAllPartners)
 );
-
 
 router.get(
   '/partners/:id',
@@ -90,13 +79,10 @@ router.get(
   asyncHandler(adminController.getPartnerById)
 );
 
-
 router.post(
   '/partners',
   [
-    
     check('userId').custom((value, { req }) => {
-      
       if (value && value.trim()) {
         if (!value.match(/^[0-9a-fA-F]{24}$/)) {
           throw new Error('Valid user ID is required');
@@ -104,7 +90,6 @@ router.post(
         return true;
       }
 
-      
       const { name, email, phone, password } = req.body;
       if (!name || !email || !phone || !password) {
         throw new Error(
@@ -115,9 +100,7 @@ router.post(
       return true;
     }),
 
-    
     check('name').custom((value, { req }) => {
-      
       if (!req.body.userId || !req.body.userId.trim()) {
         if (!value || value.trim().length < 2 || value.trim().length > 100) {
           throw new Error('Name must be between 2 and 100 characters');
@@ -127,7 +110,6 @@ router.post(
     }),
 
     check('email').custom((value, { req }) => {
-      
       if (!req.body.userId || !req.body.userId.trim()) {
         if (!value || !/\S+@\S+\.\S+/.test(value)) {
           throw new Error('Valid email is required');
@@ -137,7 +119,6 @@ router.post(
     }),
 
     check('phone').custom((value, { req }) => {
-      
       if (!req.body.userId || !req.body.userId.trim()) {
         if (!value || value.length < 10) {
           throw new Error('Valid phone number is required');
@@ -147,7 +128,6 @@ router.post(
     }),
 
     check('password').custom((value, { req }) => {
-      
       if (!req.body.userId || !req.body.userId.trim()) {
         if (!value || value.length < 6) {
           throw new Error('Password must be at least 6 characters long');
@@ -156,7 +136,6 @@ router.post(
       return true;
     }),
 
-    
     check('shopName')
       .trim()
       .isLength({ min: 2, max: 100 })
@@ -183,7 +162,6 @@ router.post(
   asyncHandler(adminController.createPartner)
 );
 
-
 router.put(
   '/partners/:id',
   [
@@ -208,14 +186,12 @@ router.put(
       .optional()
       .isLength({ min: 6, max: 6 })
       .withMessage('Pincode must be 6 digits'),
-    
-    
+
     check('shopEmail')
       .optional()
       .isEmail()
       .withMessage('Valid email is required'),
-    
-    
+
     check('upiId')
       .optional()
       .matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/)
@@ -237,14 +213,12 @@ router.put(
   asyncHandler(adminController.updatePartner)
 );
 
-
 router.delete(
   '/partners/:id',
   protect,
   authorize('admin'),
   asyncHandler(adminController.deletePartner)
 );
-
 
 router.put(
   '/partners/:id/verify',
@@ -259,7 +233,6 @@ router.put(
   validateRequest,
   asyncHandler(adminController.verifyPartner)
 );
-
 
 router.post(
   '/partners/:id/wallet/update',
@@ -276,15 +249,12 @@ router.post(
   asyncHandler(adminController.updatePartnerWallet)
 );
 
-
-
 router.get(
   '/orders',
   protect,
   authorize('admin'),
   asyncHandler(adminController.getAllOrders)
 );
-
 
 router.get(
   '/orders/:id',
@@ -293,16 +263,12 @@ router.get(
   asyncHandler(adminController.getOrderById)
 );
 
-
-
 router.get(
   '/analytics',
   protect,
   authorize('admin'),
   asyncHandler(adminController.getDashboardAnalytics)
 );
-
-
 
 router.get(
   '/catalog',
@@ -311,7 +277,6 @@ router.get(
   asyncHandler(adminController.getCatalog)
 );
 
-
 router.get(
   '/catalog/:id',
   protect,
@@ -319,25 +284,21 @@ router.get(
   asyncHandler(adminController.getProductById)
 );
 
-
 router.post(
   '/catalog/upload-images',
   protect,
   authorize('admin'),
-  upload.array('images', 10), 
+  upload.array('images', 10),
   asyncHandler(adminController.uploadProductImages)
 );
-
 
 router.post(
   '/catalog',
   [
     check('category').notEmpty().withMessage('Category is required'),
     check('brand').notEmpty().withMessage('Brand is required'),
-    
+
     check('model').notEmpty().withMessage('Model is required'),
-    
-    
   ],
   protect,
   authorize('admin'),
@@ -345,14 +306,12 @@ router.post(
   asyncHandler(adminController.addProduct)
 );
 
-
 router.put(
   '/catalog/:id',
   protect,
   authorize('admin'),
   asyncHandler(adminController.updateProduct)
 );
-
 
 router.patch(
   '/catalog/:id/status',
@@ -367,15 +326,12 @@ router.patch(
   asyncHandler(adminController.updateProductStatus)
 );
 
-
 router.delete(
   '/catalog/:id',
   protect,
   authorize('admin'),
   asyncHandler(adminController.deleteProduct)
 );
-
-
 
 router.get(
   '/commission',
@@ -384,15 +340,12 @@ router.get(
   asyncHandler(adminController.getCommissionSettings)
 );
 
-
 router.put(
   '/commission',
   protect,
   authorize('admin'),
   asyncHandler(adminController.updateCommissionSettings)
 );
-
-
 
 router.get(
   '/users',
@@ -401,14 +354,12 @@ router.get(
   asyncHandler(adminController.getAllUsers)
 );
 
-
 router.get(
   '/users/:id',
   protect,
   authorize('admin'),
   asyncHandler(adminController.getUserById)
 );
-
 
 router.post(
   '/users',
@@ -431,7 +382,6 @@ router.post(
   validateRequest,
   asyncHandler(adminController.createUser)
 );
-
 
 router.put(
   '/users/:id',
@@ -456,7 +406,6 @@ router.put(
   asyncHandler(adminController.updateUser)
 );
 
-
 router.put(
   '/users/:id/password',
   [
@@ -470,14 +419,12 @@ router.put(
   asyncHandler(adminController.updateUserPassword)
 );
 
-
 router.delete(
   '/users/:id',
   protect,
   authorize('admin'),
   asyncHandler(adminController.deleteUser)
 );
-
 
 router.put(
   '/users/:id/status',
@@ -487,7 +434,6 @@ router.put(
   validateRequest,
   asyncHandler(adminController.toggleUserStatus)
 );
-
 
 router.get('/categories', asyncHandler(categoryController.getCategories));
 
@@ -561,7 +507,6 @@ router.get(
   asyncHandler(categoryController.getCategoryStats)
 );
 
-
 router.get(
   '/sell-orders',
   protect,
@@ -569,14 +514,12 @@ router.get(
   asyncHandler(adminController.getSellOrders)
 );
 
-
 router.get(
   '/buy-orders',
   protect,
   authorize('admin'),
   asyncHandler(adminController.getBuyOrders)
 );
-
 
 router.put(
   '/orders/:id/status',
@@ -603,14 +546,12 @@ router.put(
   asyncHandler(adminController.updateOrderStatus)
 );
 
-
 router.get(
   '/orders/:id/partner-suggestions',
   protect,
   authorize('admin'),
   asyncHandler(adminController.getPartnerSuggestionsForOrder)
 );
-
 
 router.put(
   '/orders/:id/assign-partner',
@@ -624,7 +565,6 @@ router.put(
   validateRequest,
   asyncHandler(adminController.assignPartnerToOrder)
 );
-
 
 router.get(
   '/brands',
@@ -670,7 +610,6 @@ router.delete(
   authorize('admin'),
   asyncHandler(adminController.deleteBrand)
 );
-
 
 router.get(
   '/models',
@@ -752,7 +691,6 @@ router.put(
       .optional()
       .isBoolean()
       .withMessage('isActive must be a boolean'),
-    
   ],
   protect,
   authorize('admin'),
@@ -767,16 +705,12 @@ router.delete(
   asyncHandler(adminController.deleteModelByName)
 );
 
-
-
-
 router.get(
   '/questionnaires',
   protect,
   authorize('admin'),
   asyncHandler(adminController.getConditionQuestionnaires)
 );
-
 
 router.get(
   '/questionnaires/:id',
@@ -785,14 +719,12 @@ router.get(
   asyncHandler(adminController.getConditionQuestionnaireById)
 );
 
-
 router.get(
   '/questionnaires/category/:category',
   protect,
   authorize('admin'),
   asyncHandler(adminController.getQuestionnairesByCategory)
 );
-
 
 router.post(
   '/questionnaires',
@@ -825,7 +757,7 @@ router.post(
       .withMessage('Subcategory must be a string'),
     check('brand').optional().isString().withMessage('Brand must be a string'),
     check('model').optional().isString().withMessage('Model must be a string'),
-    
+
     check('questions.*.id').notEmpty().withMessage('Question ID is required'),
     check('questions.*.title')
       .trim()
@@ -845,8 +777,7 @@ router.post(
       .optional()
       .isBoolean()
       .withMessage('Required field must be boolean'),
-    
-    
+
     check('isActive')
       .optional()
       .isBoolean()
@@ -863,7 +794,7 @@ router.post(
       .optional()
       .isIn(['easy', 'medium', 'hard'])
       .withMessage('Difficulty must be easy, medium, or hard'),
-    
+
     check('metadata.instructions')
       .optional()
       .isString()
@@ -874,7 +805,6 @@ router.post(
   validateRequest,
   asyncHandler(adminController.createConditionQuestionnaire)
 );
-
 
 router.put(
   '/questionnaires/:id',
@@ -941,7 +871,7 @@ router.put(
       .optional()
       .isArray()
       .withMessage('Options must be an array'),
-    
+
     check('isActive')
       .optional()
       .isBoolean()
@@ -973,7 +903,6 @@ router.put(
   asyncHandler(adminController.updateConditionQuestionnaire)
 );
 
-
 router.delete(
   '/questionnaires/:id',
   [
@@ -988,8 +917,6 @@ router.delete(
   asyncHandler(adminController.deleteConditionQuestionnaire)
 );
 
-
-
 router.get(
   '/agents',
   protect,
@@ -997,14 +924,12 @@ router.get(
   asyncHandler(adminController.getAgents)
 );
 
-
 router.put(
   '/agents/:id/approve',
   protect,
   authorize('admin'),
   asyncHandler(adminController.approveAgent)
 );
-
 
 router.put(
   '/agents/:id/reject',
@@ -1014,7 +939,6 @@ router.put(
   validateRequest,
   asyncHandler(adminController.rejectAgent)
 );
-
 
 router.put(
   '/agents/:id/status',

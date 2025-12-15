@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user.model');
 require('dotenv').config();
 
-
 const sampleUsers = [
   {
     name: 'John Doe',
@@ -49,13 +48,11 @@ const sampleUsers = [
 
 async function seedUsers() {
   try {
-    
     await mongoose.connect(
       process.env.MONGO_URI || 'mongodb://localhost:27017/cashify'
     );
     console.log('Connected to MongoDB');
 
-    
     const existingUsers = await User.countDocuments();
     if (existingUsers > 0) {
       console.log(
@@ -64,7 +61,6 @@ async function seedUsers() {
       return;
     }
 
-    
     const usersToCreate = await Promise.all(
       sampleUsers.map(async (user) => {
         const hashedPassword = await bcrypt.hash(user.password, 12);
@@ -75,7 +71,6 @@ async function seedUsers() {
       })
     );
 
-    
     const createdUsers = await User.insertMany(usersToCreate);
     console.log(`Successfully created ${createdUsers.length} users:`);
 
@@ -89,7 +84,6 @@ async function seedUsers() {
     console.log('Database connection closed');
   }
 }
-
 
 if (require.main === module) {
   seedUsers();

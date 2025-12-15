@@ -2,9 +2,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const User = require('../models/user.model');
 
-
 dotenv.config();
-
 
 const connectDB = async () => {
   try {
@@ -17,10 +15,8 @@ const connectDB = async () => {
   }
 };
 
-
 const createAdminUser = async () => {
   try {
-    
     const adminExists = await User.findOne({ role: 'admin' });
 
     if (adminExists) {
@@ -28,11 +24,10 @@ const createAdminUser = async () => {
       return;
     }
 
-    
     const adminUser = await User.create({
       name: 'Admin User',
       email: 'admin@cashify.com',
-      password: 'Admin@123', 
+      password: 'Admin@123',
       phone: '9876543210',
       role: 'admin',
       isVerified: true,
@@ -42,12 +37,10 @@ const createAdminUser = async () => {
   } catch (error) {
     console.error('Error creating admin user:', error.message);
   } finally {
-    
     mongoose.disconnect();
     console.log('MongoDB disconnected');
   }
 };
-
 
 const run = async () => {
   const connected = await connectDB();

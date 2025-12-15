@@ -1,12 +1,9 @@
-
-
 const { validationResult } = require('express-validator');
 const Category = require('../models/category.model');
 const {
   ApiError,
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
-
 
 exports.createCategory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -24,7 +21,6 @@ exports.createCategory = asyncHandler(async (req, res) => {
     metadata,
   } = req.body;
 
-  
   const existingCategory = await Category.findOne({ name: name.trim() });
   if (existingCategory) {
     throw new ApiError(400, 'Category with this name already exists');
@@ -36,7 +32,7 @@ exports.createCategory = asyncHandler(async (req, res) => {
     image,
     icon,
     superCategory: superCategory || null,
-    parentCategory: null, 
+    parentCategory: null,
     specifications,
     metadata,
     createdBy: req.user.id,
@@ -53,13 +49,11 @@ exports.createCategory = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getCategories = asyncHandler(async (req, res) => {
   const { includeInactive } = req.query;
 
   const filter = includeInactive === 'true' ? {} : { isActive: true };
 
-  
   const categories = await Category.find(filter)
     .populate('createdBy', 'name')
     .populate('superCategory', 'name image')
@@ -72,17 +66,13 @@ exports.getCategories = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getCategory = asyncHandler(async (req, res) => {
   const { identifier } = req.params;
 
-  
   let category;
   if (identifier.match(/^[0-9a-fA-F]{24}$/)) {
-    
     category = await Category.findById(identifier);
   } else {
-    
     category = await Category.findOne({ slug: identifier });
   }
 
@@ -97,7 +87,6 @@ exports.getCategory = asyncHandler(async (req, res) => {
     data: category,
   });
 });
-
 
 exports.updateCategory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -122,7 +111,6 @@ exports.updateCategory = asyncHandler(async (req, res) => {
     sortOrder,
   } = req.body;
 
-  
   if (name && name.trim() !== category.name) {
     const existingCategory = await Category.findOne({
       name: name.trim(),
@@ -133,7 +121,6 @@ exports.updateCategory = asyncHandler(async (req, res) => {
     }
   }
 
-  
   const updateFields = {
     updatedBy: req.user.id,
   };
@@ -163,19 +150,11 @@ exports.updateCategory = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.deleteCategory = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
-
-  
-  
-  
-  
-  
-  
 
   await Category.findByIdAndDelete(req.params.id);
 
@@ -185,13 +164,9 @@ exports.deleteCategory = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getCategoryStats = asyncHandler(async (req, res) => {
   const totalCategories = await Category.countDocuments();
   const activeCategories = await Category.countDocuments({ isActive: true });
-
-  
-  
 
   res.json({
     success: true,
@@ -202,7 +177,6 @@ exports.getCategoryStats = asyncHandler(async (req, res) => {
     },
   });
 });
-
 
 exports.bulkUpdateStatus = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -233,7 +207,6 @@ exports.bulkUpdateStatus = asyncHandler(async (req, res) => {
     },
   });
 });
-
 
 exports.searchCategories = asyncHandler(async (req, res) => {
   const { q, limit = 10, includeInactive = false } = req.query;

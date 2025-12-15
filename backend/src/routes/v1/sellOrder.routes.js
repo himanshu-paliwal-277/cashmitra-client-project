@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const { body, param, query } = require('express-validator');
 const {
@@ -21,7 +19,6 @@ const {
 const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
-
 
 const createOrderValidation = [
   body('sessionId')
@@ -68,38 +65,7 @@ const createOrderValidation = [
     .withMessage('Order number must be between 1 and 50 characters'),
 ];
 
-const updateStatusValidation = [
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-];
+const updateStatusValidation = [];
 
 const assignStaffValidation = [
   body('staffId')
@@ -115,7 +81,7 @@ const assignStaffValidation = [
     .trim()
     .isLength({ max: 500 })
     .withMessage('Notes cannot exceed 500 characters'),
-  
+
   body().custom((value, { req }) => {
     if (!req.body.staffId && !req.body.assignedTo) {
       throw new Error('Either staffId or assignedTo must be provided');
@@ -143,7 +109,6 @@ const updatePickupValidation = [
     .isFloat({ min: 0 })
     .withMessage('Final price must be a positive number'),
 ];
-
 
 const getAllOrdersValidation = [
   query('page')
@@ -200,9 +165,7 @@ const getStatisticsValidation = [
     .withMessage('Group by must be day, week, or month'),
 ];
 
-
 router.use(protect);
-
 
 router.post('/', createOrderValidation, createOrder);
 router.get('/my-orders', getUserOrders);
@@ -241,9 +204,7 @@ router.put(
   rescheduleOrder
 );
 
-
 router.use(authorize('admin'));
-
 
 router.get('/pickup/orders-list', getOrdersForPickup);
 router.get(
@@ -253,7 +214,6 @@ router.get(
     .withMessage('Order ID must be a valid MongoDB ObjectId'),
   getOrderPickupDetails
 );
-
 
 router.get('/', getAllOrdersValidation, getAllOrders);
 router.put(

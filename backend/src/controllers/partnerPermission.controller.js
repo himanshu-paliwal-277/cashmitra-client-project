@@ -5,17 +5,14 @@ const RoleTemplate = require('../models/roleTemplate.model');
 const ApiError = require('../utils/apiError');
 const { sanitizeData } = require('../utils/security.utils');
 
-
 exports.getPartnerPermissions = async (req, res) => {
   try {
-    
     const user = await User.findById(req.user.id).populate('roleTemplate');
 
     if (!user) {
       throw new ApiError('User not found', 404);
     }
 
-    
     if (user.role !== 'partner') {
       throw new ApiError('Access denied. User is not a partner', 403);
     }
@@ -25,17 +22,14 @@ exports.getPartnerPermissions = async (req, res) => {
       throw new ApiError('Partner profile not found', 404);
     }
 
-    
     let roleTemplate = user.roleTemplate;
 
-    
     if (!roleTemplate) {
       roleTemplate = await RoleTemplate.findOne({
         name: 'basic',
         isDefault: true,
       });
 
-      
       if (!roleTemplate) {
         const templates = await RoleTemplate.createDefaultTemplates(
           req.user.id
@@ -73,7 +67,6 @@ exports.getPartnerPermissions = async (req, res) => {
   }
 };
 
-
 exports.checkPermission = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate('roleTemplate');
@@ -98,7 +91,6 @@ exports.checkPermission = async (req, res) => {
       });
     }
 
-    
     const hasPermission = roleTemplate.permissions.includes(menuItem);
 
     res.status(200).json({
@@ -118,7 +110,6 @@ exports.checkPermission = async (req, res) => {
     });
   }
 };
-
 
 exports.getAvailableMenuItems = async (req, res) => {
   try {
@@ -170,9 +161,6 @@ exports.getAvailableMenuItems = async (req, res) => {
   }
 };
 
-
-
-
 exports.getAllPartnerPermissions = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, roleTemplate, isActive } = req.query;
@@ -201,7 +189,6 @@ exports.getAllPartnerPermissions = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    
     if (search) {
       const searchRegex = new RegExp(search, 'i');
       permissions = permissions.filter(
@@ -237,7 +224,6 @@ exports.getAllPartnerPermissions = async (req, res) => {
   }
 };
 
-
 exports.getPartnerPermissionsById = async (req, res) => {
   try {
     const { partnerId } = req.params;
@@ -254,7 +240,6 @@ exports.getPartnerPermissionsById = async (req, res) => {
       .populate('lastUpdatedBy', 'name email');
 
     if (!permissions) {
-      
       const partner = await Partner.findById(partnerId);
       if (!partner) {
         throw new ApiError('Partner not found', 404);
@@ -283,7 +268,6 @@ exports.getPartnerPermissionsById = async (req, res) => {
   }
 };
 
-
 exports.updatePartnerPermissions = async (req, res) => {
   try {
     const { partnerId } = req.params;
@@ -299,11 +283,9 @@ exports.updatePartnerPermissions = async (req, res) => {
     let permissions = await PartnerPermission.findOne({ partner: partnerId });
 
     if (!permissions) {
-      
       permissions = await PartnerPermission.createDefaultPermissions(partnerId);
     }
 
-    
     if (newPermissions && typeof newPermissions === 'object') {
       for (const [menuItem, permissionData] of Object.entries(newPermissions)) {
         if (permissionData.granted !== undefined) {
@@ -320,12 +302,10 @@ exports.updatePartnerPermissions = async (req, res) => {
       }
     }
 
-    
     if (roleTemplate && roleTemplate !== permissions.roleTemplate) {
       await permissions.applyRoleTemplate(roleTemplate, req.user.id);
     }
 
-    
     if (isActive !== undefined) {
       permissions.isActive = isActive;
     }
@@ -351,7 +331,6 @@ exports.updatePartnerPermissions = async (req, res) => {
     permissions.lastUpdatedBy = req.user.id;
     await permissions.save();
 
-    
     await permissions.populate([
       {
         path: 'partner',
@@ -377,7 +356,6 @@ exports.updatePartnerPermissions = async (req, res) => {
     });
   }
 };
-
 
 exports.grantPermission = async (req, res) => {
   try {
@@ -416,7 +394,6 @@ exports.grantPermission = async (req, res) => {
   }
 };
 
-
 exports.revokePermission = async (req, res) => {
   try {
     const { partnerId } = req.params;
@@ -453,7 +430,6 @@ exports.revokePermission = async (req, res) => {
   }
 };
 
-
 exports.applyRoleTemplate = async (req, res) => {
   try {
     const { partnerId } = req.params;
@@ -488,18 +464,14 @@ exports.applyRoleTemplate = async (req, res) => {
   }
 };
 
-
 exports.getRoleTemplates = async (req, res) => {
   try {
-    
     let roleTemplates = await RoleTemplate.getActiveTemplates();
 
-    
     if (roleTemplates.length === 0) {
       roleTemplates = await RoleTemplate.createDefaultTemplates(req.user.id);
     }
 
-    
     roleTemplates = await RoleTemplate.populate(roleTemplates, {
       path: 'createdBy',
       select: 'name email',
@@ -519,7 +491,6 @@ exports.getRoleTemplates = async (req, res) => {
   }
 };
 
-
 exports.createRoleTemplate = async (req, res) => {
   try {
     const {
@@ -532,7 +503,6 @@ exports.createRoleTemplate = async (req, res) => {
       limits,
     } = req.body;
 
-    
     if (!name || !displayName) {
       return res.status(400).json({
         success: false,
@@ -547,7 +517,6 @@ exports.createRoleTemplate = async (req, res) => {
       });
     }
 
-    
     const existingTemplate = await RoleTemplate.findOne({
       name: name.toLowerCase().replace(/\s+/g, '_'),
     });
@@ -559,7 +528,6 @@ exports.createRoleTemplate = async (req, res) => {
       });
     }
 
-    
     const newRoleTemplate = await RoleTemplate.create({
       name: name.toLowerCase().replace(/\s+/g, '_'),
       displayName,
@@ -583,7 +551,6 @@ exports.createRoleTemplate = async (req, res) => {
       createdBy: req.user.id,
     });
 
-    
     await newRoleTemplate.populate('createdBy', 'name email');
 
     res.status(201).json({
@@ -594,7 +561,6 @@ exports.createRoleTemplate = async (req, res) => {
   } catch (error) {
     console.error('Error creating role template:', error);
 
-    
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -609,14 +575,12 @@ exports.createRoleTemplate = async (req, res) => {
   }
 };
 
-
 exports.updateRoleTemplate = async (req, res) => {
   try {
     const { templateId } = req.params;
     const { displayName, description, color, permissions, features, limits } =
       req.body;
 
-    
     if (!templateId) {
       return res.status(400).json({
         success: false,
@@ -624,7 +588,6 @@ exports.updateRoleTemplate = async (req, res) => {
       });
     }
 
-    
     let roleTemplate = await RoleTemplate.findOne({
       $or: [{ _id: templateId }, { name: templateId }],
     });
@@ -636,7 +599,6 @@ exports.updateRoleTemplate = async (req, res) => {
       });
     }
 
-    
     if (displayName) roleTemplate.displayName = displayName;
     if (description !== undefined) roleTemplate.description = description;
     if (color) roleTemplate.color = color;
@@ -647,10 +609,8 @@ exports.updateRoleTemplate = async (req, res) => {
 
     roleTemplate.updatedBy = req.user.id;
 
-    
     await roleTemplate.save();
 
-    
     await roleTemplate.populate([
       { path: 'createdBy', select: 'name email' },
       { path: 'updatedBy', select: 'name email' },
@@ -670,12 +630,10 @@ exports.updateRoleTemplate = async (req, res) => {
   }
 };
 
-
 exports.deleteRoleTemplate = async (req, res) => {
   try {
     const { templateId } = req.params;
 
-    
     if (!templateId) {
       return res.status(400).json({
         success: false,
@@ -683,7 +641,6 @@ exports.deleteRoleTemplate = async (req, res) => {
       });
     }
 
-    
     const roleTemplate = await RoleTemplate.findOne({
       $or: [{ _id: templateId }, { name: templateId }],
     });
@@ -695,7 +652,6 @@ exports.deleteRoleTemplate = async (req, res) => {
       });
     }
 
-    
     if (roleTemplate.isDefault) {
       return res.status(400).json({
         success: false,
@@ -703,7 +659,6 @@ exports.deleteRoleTemplate = async (req, res) => {
       });
     }
 
-    
     const partnersUsingTemplate = await PartnerPermission.countDocuments({
       roleTemplate: roleTemplate.name,
     });
@@ -715,7 +670,6 @@ exports.deleteRoleTemplate = async (req, res) => {
       });
     }
 
-    
     await RoleTemplate.deleteOne({ _id: roleTemplate._id });
 
     res.status(200).json({
@@ -731,7 +685,6 @@ exports.deleteRoleTemplate = async (req, res) => {
   }
 };
 
-
 exports.createPermission = async (req, res) => {
   try {
     const {
@@ -744,12 +697,10 @@ exports.createPermission = async (req, res) => {
       requiredPermission,
     } = req.body;
 
-    
     if (!name || !displayName || !category) {
       throw new ApiError('Name, display name, and category are required', 400);
     }
 
-    
     const sanitizedData = {
       name: sanitizeData(name.toLowerCase().replace(/\s+/g, '')), // Convert to camelCase
       displayName: sanitizeData(displayName),
@@ -770,8 +721,6 @@ exports.createPermission = async (req, res) => {
       throw new ApiError('Permission with this name already exists', 400);
     }
 
-    
-    
     const newPermission = {
       name: sanitizedData.displayName,
       path: sanitizedData.path,
@@ -782,11 +731,6 @@ exports.createPermission = async (req, res) => {
       createdBy: req.user.id,
       createdAt: new Date(),
     };
-
-    
-    
-    
-    
 
     res.status(201).json({
       success: true,
@@ -804,7 +748,6 @@ exports.createPermission = async (req, res) => {
     });
   }
 };
-
 
 exports.getMenuItemsStructure = async (req, res) => {
   try {

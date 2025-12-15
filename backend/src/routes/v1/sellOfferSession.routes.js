@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const { body } = require('express-validator');
 const {
@@ -19,7 +17,6 @@ const {
 const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
-
 
 const createSessionValidation = [
   body('userId')
@@ -60,16 +57,13 @@ const updateAccessoriesValidation = [
     .withMessage('Each accessory must be a string'),
 ];
 
-
 router.post('/create', createSessionValidation, createSession);
 router.get('/:sessionId', getSession);
 router.get('/:sessionId/price', getCurrentPrice);
 
-
 router.use(protect);
 
-
-router.post('/', createSessionValidation, createSession); 
+router.post('/', createSessionValidation, createSession);
 router.get('/my-sessions', getUserSessions);
 router.put('/:sessionId/answers', updateAnswersValidation, updateAnswers);
 router.put('/:sessionId/defects', updateDefectsValidation, updateDefects);
@@ -80,7 +74,6 @@ router.put(
 );
 router.post('/:sessionId/extend', extendSession);
 router.delete('/:sessionId', deleteSession);
-
 
 router.get('/admin/all', authorize('admin'), getAllSessions);
 router.patch(

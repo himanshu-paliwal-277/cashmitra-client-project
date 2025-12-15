@@ -1,29 +1,23 @@
-
-
-
 const isValidObjectId = (id) => {
   if (!id) return false;
-  
+
   const objectIdPattern = /^[0-9a-fA-F]{24}$/;
   return objectIdPattern.test(id);
 };
 
-
 const isValidEmail = (email) => {
   if (!email) return false;
-  
+
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailPattern.test(email);
 };
 
-
 const isValidPhone = (phone) => {
   if (!phone) return false;
-  
+
   const phonePattern = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
   return phonePattern.test(phone);
 };
-
 
 const isValidUrl = (url) => {
   if (!url) return false;
@@ -35,7 +29,6 @@ const isValidUrl = (url) => {
   }
 };
 
-
 const isInRange = (value, min, max) => {
   if (value === undefined || value === null) return false;
   const numValue = Number(value);
@@ -43,13 +36,11 @@ const isInRange = (value, min, max) => {
   return numValue >= min && numValue <= max;
 };
 
-
 const isAlphanumeric = (str) => {
   if (!str) return false;
   const alphanumericPattern = /^[a-zA-Z0-9]+$/;
   return alphanumericPattern.test(str);
 };
-
 
 const validatePassword = (password) => {
   if (!password) {

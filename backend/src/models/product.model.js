@@ -13,7 +13,6 @@ const productSchema = new mongoose.Schema(
     },
     series: {
       type: String,
-      
     },
     model: {
       type: String,
@@ -39,16 +38,16 @@ const productSchema = new mongoose.Schema(
     depreciation: {
       ratePerMonth: {
         type: Number,
-        default: 2, 
+        default: 2,
       },
       maxDepreciation: {
         type: Number,
-        default: 70, 
+        default: 70,
       },
     },
     conditionFactors: {
       screenCondition: {
-        perfect: { type: Number, default: 100 }, 
+        perfect: { type: Number, default: 100 },
         minorScratches: { type: Number, default: 90 },
         majorScratches: { type: Number, default: 75 },
         cracked: { type: Number, default: 50 },
@@ -89,7 +88,6 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 
 productSchema.index(
   { category: 1, brand: 1, series: 1, model: 1 },

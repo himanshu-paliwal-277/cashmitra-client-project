@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-
 const questionOptionSchema = new Schema(
   {
     id: {
@@ -18,7 +17,7 @@ const questionOptionSchema = new Schema(
       trim: true,
     },
     icon: {
-      type: String, 
+      type: String,
       trim: true,
     },
     type: {
@@ -28,7 +27,7 @@ const questionOptionSchema = new Schema(
     },
     priceImpact: {
       type: Number,
-      default: 0, 
+      default: 0,
       min: -100,
       max: 100,
     },
@@ -40,16 +39,14 @@ const questionOptionSchema = new Schema(
   { _id: false }
 );
 
-
 const questionSchema = new Schema(
   {
     id: {
       type: String,
-      
     },
     title: {
       type: String,
-      
+
       trim: true,
     },
     description: {
@@ -81,7 +78,6 @@ const questionSchema = new Schema(
   },
   { _id: false }
 );
-
 
 const conditionQuestionnaireSchema = new Schema(
   {
@@ -122,11 +118,11 @@ const conditionQuestionnaireSchema = new Schema(
     },
     brand: {
       type: String,
-      trim: true, 
+      trim: true,
     },
     model: {
       type: String,
-      trim: true, 
+      trim: true,
     },
     questions: {
       type: [questionSchema],
@@ -148,11 +144,11 @@ const conditionQuestionnaireSchema = new Schema(
     },
     isDefault: {
       type: Boolean,
-      default: false, 
+      default: false,
     },
     metadata: {
       estimatedTime: {
-        type: Number, 
+        type: Number,
         default: 5,
         min: 1,
         max: 60,
@@ -180,7 +176,7 @@ const conditionQuestionnaireSchema = new Schema(
         default: 0,
       },
       averageCompletionTime: {
-        type: Number, 
+        type: Number,
         default: 0,
       },
       lastUsed: {
@@ -204,26 +200,21 @@ const conditionQuestionnaireSchema = new Schema(
   }
 );
 
-
 conditionQuestionnaireSchema.index({ category: 1, isActive: 1 });
 conditionQuestionnaireSchema.index({ brand: 1, model: 1 });
 conditionQuestionnaireSchema.index({ isDefault: 1, category: 1 });
 conditionQuestionnaireSchema.index({ createdAt: -1 });
 conditionQuestionnaireSchema.index({ 'metadata.tags': 1 });
 
-
 conditionQuestionnaireSchema.virtual('questionCount').get(function () {
   return this.questions ? this.questions.length : 0;
 });
-
 
 conditionQuestionnaireSchema.virtual('activeQuestionCount').get(function () {
   return this.questions ? this.questions.filter((q) => q.isActive).length : 0;
 });
 
-
 conditionQuestionnaireSchema.pre('save', function (next) {
-  
   if (this.isDefault && this.isModified('isDefault')) {
     this.constructor
       .updateMany(
@@ -237,11 +228,9 @@ conditionQuestionnaireSchema.pre('save', function (next) {
       .exec();
   }
 
-  
   if (this.questions && this.questions.length > 0) {
     this.questions.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-    
     this.questions.forEach((question) => {
       if (question.options && question.options.length > 0) {
         question.options.sort(
@@ -253,7 +242,6 @@ conditionQuestionnaireSchema.pre('save', function (next) {
 
   next();
 });
-
 
 conditionQuestionnaireSchema.statics.findByCategory = function (
   category,
@@ -292,7 +280,6 @@ conditionQuestionnaireSchema.statics.findByBrandModel = function (
     isActive: true,
   }).sort({ brand: -1, model: -1, isDefault: -1, createdAt: -1 });
 };
-
 
 conditionQuestionnaireSchema.methods.incrementUsage = function () {
   this.analytics.totalResponses += 1;
@@ -333,8 +320,8 @@ conditionQuestionnaireSchema.methods.duplicate = function (
     model: this.model,
     questions: this.questions.map((q) => ({ ...q.toObject() })),
     version: '1.0.0',
-    isActive: false, 
-    isDefault: false, 
+    isActive: false,
+    isDefault: false,
     metadata: { ...this.metadata.toObject() },
     createdBy: createdBy,
   });

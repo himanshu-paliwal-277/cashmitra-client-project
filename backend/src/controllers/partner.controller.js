@@ -8,17 +8,14 @@ const BuyProduct = require('../models/buyProduct.model');
 const ApiError = require('../utils/apiError');
 const { sanitizeData } = require('../utils/security.utils');
 
-
 exports.registerPartnerShop = async (req, res) => {
   const userId = req.user.id;
 
-  
   const existingPartner = await Partner.findOne({ user: userId });
   if (existingPartner) {
     throw new ApiError('You already have a registered partner shop', 400);
   }
 
-  
   const sanitizedData = {
     shopName: sanitizeData(req.body.shopName),
     shopAddress: {
@@ -32,16 +29,14 @@ exports.registerPartnerShop = async (req, res) => {
     shopEmail: sanitizeData(req.body.shopEmail),
   };
 
-  
   const partner = await Partner.create({
     user: userId,
     ...sanitizedData,
-    isVerified: false, 
+    isVerified: false,
     verificationStatus: 'pending',
     wallet: { balance: 0 },
   });
 
-  
   await User.findByIdAndUpdate(userId, { $addToSet: { role: 'partner' } });
 
   res.status(201).json({
@@ -50,7 +45,6 @@ exports.registerPartnerShop = async (req, res) => {
     message: 'Partner shop registered successfully. Verification pending.',
   });
 };
-
 
 exports.getPartnerProfile = async (req, res) => {
   const userId = req.user.id;
@@ -70,11 +64,9 @@ exports.getPartnerProfile = async (req, res) => {
   });
 };
 
-
 exports.updatePartnerProfile = async (req, res) => {
   const userId = req.user.id;
 
-  
   const updateData = {};
   if (req.body.shopName) updateData.shopName = sanitizeData(req.body.shopName);
   if (req.body.shopPhone)
@@ -133,7 +125,6 @@ exports.updatePartnerProfile = async (req, res) => {
   });
 };
 
-
 exports.uploadDocuments = async (req, res) => {
   const userId = req.user.id;
 
@@ -154,7 +145,6 @@ exports.uploadDocuments = async (req, res) => {
     );
   }
 
-  
   if (Object.keys(updateData).length > 0) {
     updateData.verificationStatus = 'submitted';
   }
@@ -176,25 +166,22 @@ exports.uploadDocuments = async (req, res) => {
   });
 };
 
-
 exports.getProductsCatalog = async (req, res) => {
   const {
     category,
     brand,
     name,
     page = 1,
-    limit = 50, 
+    limit = 50,
     search,
     sortBy = 'createdAt',
     sortOrder = 'desc',
   } = req.query;
 
-  
   const pageNum = Math.max(1, parseInt(page));
-  const limitNum = Math.min(100, Math.max(1, parseInt(limit))); 
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
 
-  
-  const filter = { isActive: true }; 
+  const filter = { isActive: true };
 
   if (category && category !== 'all') {
     filter['categoryId.name'] = { $regex: category, $options: 'i' };
@@ -209,7 +196,6 @@ exports.getProductsCatalog = async (req, res) => {
     filter.name = { $regex: decodedName.trim(), $options: 'i' };
   }
 
-  
   if (search && search.trim()) {
     const searchRegex = { $regex: search.trim(), $options: 'i' };
     filter.$or = [
@@ -220,11 +206,9 @@ exports.getProductsCatalog = async (req, res) => {
   }
 
   try {
-    
     const sortObj = {};
     sortObj[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
-    
     const products = await BuyProduct.find(filter)
       .populate('categoryId', 'name')
       .sort(sortObj)
@@ -232,16 +216,14 @@ exports.getProductsCatalog = async (req, res) => {
       .skip((pageNum - 1) * limitNum)
       .lean();
 
-    
     const total = await BuyProduct.countDocuments(filter);
 
-    
     const transformedProducts = products.map((product) => ({
       _id: product._id,
       name: product.name,
       brand: product.brand,
       category: product.categoryId?.name || 'Uncategorized',
-      model: product.name, 
+      model: product.name,
       images: product.images || {},
       pricing: product.pricing || {},
       basePrice: product.pricing?.mrp || product.pricing?.discountedPrice || 0,
@@ -256,14 +238,13 @@ exports.getProductsCatalog = async (req, res) => {
       isActive: product.isActive,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
-      
+
       variants: product.variants || [],
       conditionOptions: product.conditionOptions || [],
-      
+
       originalProduct: product,
     }));
 
-    
     const totalPages = Math.ceil(total / limitNum);
     const hasNextPage = pageNum < totalPages;
     const hasPrevPage = pageNum > 1;
@@ -288,19 +269,16 @@ exports.getProductsCatalog = async (req, res) => {
   }
 };
 
-
 exports.addInventory = async (req, res) => {
   const partnerId = await Partner.findOne({ user: req.user.id });
   if (!partnerId) {
     throw new ApiError('Partner profile not found', 404);
   }
 
-  
   if (!partnerId.isVerified) {
     throw new ApiError('Your partner account is not verified yet', 403);
   }
 
-  
   let product = await Product.findById(req.body.productId);
   let productModel = 'Product';
 
@@ -313,7 +291,6 @@ exports.addInventory = async (req, res) => {
     throw new ApiError('Product not found', 404);
   }
 
-  
   const existingInventory = await Inventory.findOne({
     partner: partnerId._id,
     product: req.body.productId,
@@ -327,7 +304,6 @@ exports.addInventory = async (req, res) => {
     );
   }
 
-  
   const inventory = await Inventory.create({
     partner: partnerId._id,
     productModel: productModel,
@@ -348,7 +324,6 @@ exports.addInventory = async (req, res) => {
     message: 'Inventory item added successfully',
   });
 };
-
 
 exports.getInventory = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
@@ -372,10 +347,8 @@ exports.getInventory = async (req, res) => {
   const limitNum = parseInt(limit, 10);
   const skip = (pageNum - 1) * limitNum;
 
-  
   const total = await Inventory.countDocuments(queryObj);
 
-  
   const inventory = await Inventory.find(queryObj)
     .populate({
       path: 'product',
@@ -399,14 +372,12 @@ exports.getInventory = async (req, res) => {
   });
 };
 
-
 exports.updateInventory = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
   }
 
-  
   const inventory = await Inventory.findOne({
     _id: req.params.id,
     partner: partner._id,
@@ -416,7 +387,6 @@ exports.updateInventory = async (req, res) => {
     throw new ApiError('Inventory item not found or not owned by you', 404);
   }
 
-  
   const updateData = {};
   if (req.body.price !== undefined) updateData.price = req.body.price;
   if (req.body.originalPrice !== undefined)
@@ -442,14 +412,12 @@ exports.updateInventory = async (req, res) => {
   });
 };
 
-
 exports.deleteInventory = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
   }
 
-  
   const inventory = await Inventory.findOne({
     _id: req.params.id,
     partner: partner._id,
@@ -459,7 +427,6 @@ exports.deleteInventory = async (req, res) => {
     throw new ApiError('Inventory item not found or not owned by you', 404);
   }
 
-  
   const activeOrders = await Order.countDocuments({
     'items.inventory': req.params.id,
     status: { $nin: ['delivered', 'cancelled'] },
@@ -476,7 +443,6 @@ exports.deleteInventory = async (req, res) => {
     message: 'Inventory item deleted successfully',
   });
 };
-
 
 exports.getOrders = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
@@ -499,7 +465,6 @@ exports.getOrders = async (req, res) => {
   const limitNum = parseInt(limit, 10);
   const skip = (pageNum - 1) * limitNum;
 
-  
   const sortField = sort.startsWith('-') ? sort.substring(1) : sort;
   const sortOrder = sort.startsWith('-') ? -1 : 1;
   const sortObj = { [sortField]: sortOrder };
@@ -507,31 +472,25 @@ exports.getOrders = async (req, res) => {
   let allOrders = [];
   let totalCount = 0;
 
-  
   const dateFilter = {};
   if (startDate || endDate) {
     if (startDate) dateFilter.$gte = new Date(startDate);
     if (endDate) dateFilter.$lte = new Date(endDate);
   }
 
-  
   if (!orderType || orderType === 'buy') {
     const buyQueryObj = { partner: partner._id };
 
-    
     if (status) buyQueryObj.status = status;
     if (Object.keys(dateFilter).length > 0) buyQueryObj.createdAt = dateFilter;
 
-    
     if (search) {
       const searchConditions = [];
 
-      
       if (search.match(/^[0-9a-fA-F]{24}$/)) {
         searchConditions.push({ _id: search });
       }
 
-      
       const User = require('../models/user.model');
       const matchingUsers = await User.find({
         $or: [
@@ -550,16 +509,13 @@ exports.getOrders = async (req, res) => {
       if (searchConditions.length > 0) {
         buyQueryObj.$or = searchConditions;
       } else {
-        
         buyQueryObj._id = null;
       }
     }
 
-    
     const buyOrdersCount = await Order.countDocuments(buyQueryObj);
     totalCount += buyOrdersCount;
 
-    
     if (orderType === 'buy' || !orderType) {
       const buyOrders = await Order.find(buyQueryObj)
         .populate('user', 'name email phone')
@@ -574,11 +530,10 @@ exports.getOrders = async (req, res) => {
         .sort(sortObj)
         .lean();
 
-      
       const buyOrdersWithType = buyOrders.map((order) => ({
         ...order,
         orderType: 'buy',
-        
+
         shippingAddress:
           order.shippingDetails?.address || order.shippingAddress,
         paymentMethod: order.paymentDetails?.method || order.paymentMethod,
@@ -588,33 +543,27 @@ exports.getOrders = async (req, res) => {
     }
   }
 
-  
   if (!orderType || orderType === 'sell') {
     const SellOrder = require('../models/sellOrder.model');
 
     const sellQueryObj = { assignedTo: partner._id };
 
-    
     if (status) sellQueryObj.status = status;
     if (Object.keys(dateFilter).length > 0) sellQueryObj.createdAt = dateFilter;
 
-    
     if (search) {
       const searchConditions = [];
 
-      
       if (search.match(/^[0-9a-fA-F]{24}$/)) {
         searchConditions.push({ _id: search });
       }
 
-      
       if (search.length >= 3) {
         searchConditions.push({
           orderNumber: { $regex: search, $options: 'i' },
         });
       }
 
-      
       searchConditions.push({
         'pickup.address.fullName': { $regex: search, $options: 'i' },
       });
@@ -622,7 +571,6 @@ exports.getOrders = async (req, res) => {
         'pickup.address.phone': { $regex: search, $options: 'i' },
       });
 
-      
       const User = require('../models/user.model');
       const matchingUsers = await User.find({
         $or: [
@@ -641,16 +589,13 @@ exports.getOrders = async (req, res) => {
       if (searchConditions.length > 0) {
         sellQueryObj.$or = searchConditions;
       } else {
-        
         sellQueryObj._id = null;
       }
     }
 
-    
     const sellOrdersCount = await SellOrder.countDocuments(sellQueryObj);
     totalCount += sellOrdersCount;
 
-    
     if (orderType === 'sell' || !orderType) {
       const sellOrders = await SellOrder.find(sellQueryObj)
         .populate('userId', 'name email phone')
@@ -666,7 +611,6 @@ exports.getOrders = async (req, res) => {
         .sort(sortObj)
         .lean();
 
-      
       const sellOrdersWithType = sellOrders.map((order) => ({
         ...order,
         _id: order._id,
@@ -703,7 +647,7 @@ exports.getOrders = async (req, res) => {
             price: order.actualAmount || order.quoteAmount,
           },
         ],
-        
+
         pickupDetails: {
           address: order.pickup?.address,
           slot: order.pickup?.slot,
@@ -717,14 +661,12 @@ exports.getOrders = async (req, res) => {
     }
   }
 
-  
   allOrders.sort((a, b) => {
     const aValue = new Date(a.createdAt);
     const bValue = new Date(b.createdAt);
     return sortOrder * (aValue - bValue);
   });
 
-  
   const paginatedOrders = allOrders.slice(skip, skip + limitNum);
 
   res.status(200).json({
@@ -741,14 +683,13 @@ exports.getOrders = async (req, res) => {
   });
 };
 
-
 exports.respondToOrderAssignment = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
   }
 
-  const { response, reason } = req.body; 
+  const { response, reason } = req.body;
 
   const order = await Order.findById(req.params.id).populate(
     'items.product',
@@ -758,21 +699,17 @@ exports.respondToOrderAssignment = async (req, res) => {
     throw new ApiError('Order not found', 404);
   }
 
-  
   if (!order.partner || order.partner.toString() !== partner._id.toString()) {
     throw new ApiError('Order is not assigned to your shop', 403);
   }
 
-  
   if (order.partnerAssignment.response.status !== 'pending') {
     throw new ApiError('Order assignment has already been responded to', 400);
   }
 
-  
   if (response === 'accepted') {
     const missingItems = [];
 
-    
     for (const item of order.items) {
       const inventory = await Inventory.findOne({
         partner: partner._id,
@@ -806,7 +743,6 @@ exports.respondToOrderAssignment = async (req, res) => {
       }
     }
 
-    
     if (missingItems.length > 0) {
       const missingProductNames = missingItems
         .map((item) =>
@@ -823,7 +759,6 @@ exports.respondToOrderAssignment = async (req, res) => {
     }
   }
 
-  
   order.partnerAssignment.response = {
     status: response,
     respondedAt: new Date(),
@@ -839,7 +774,7 @@ exports.respondToOrderAssignment = async (req, res) => {
       note: `Order accepted by partner: ${reason || 'No reason provided'}`,
     });
   } else if (response === 'rejected') {
-    order.status = 'pending'; 
+    order.status = 'pending';
     order.statusHistory.push({
       status: 'partner_rejected',
       timestamp: new Date(),
@@ -856,7 +791,6 @@ exports.respondToOrderAssignment = async (req, res) => {
   });
 };
 
-
 exports.checkMissingInventory = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
@@ -871,7 +805,6 @@ exports.checkMissingInventory = async (req, res) => {
     throw new ApiError('Order not found', 404);
   }
 
-  
   if (!order.partner || order.partner.toString() !== partner._id.toString()) {
     throw new ApiError('Order is not assigned to your shop', 403);
   }
@@ -879,7 +812,6 @@ exports.checkMissingInventory = async (req, res) => {
   const missingItems = [];
   const availableItems = [];
 
-  
   for (const item of order.items) {
     const inventory = await Inventory.findOne({
       partner: partner._id,
@@ -925,7 +857,6 @@ exports.checkMissingInventory = async (req, res) => {
   });
 };
 
-
 exports.updateOrderStatus = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
@@ -937,12 +868,10 @@ exports.updateOrderStatus = async (req, res) => {
     throw new ApiError('Order not found', 404);
   }
 
-  
   if (!order.partner || order.partner.toString() !== partner._id.toString()) {
     throw new ApiError('Order is not assigned to your shop', 403);
   }
 
-  
   if (
     order.partnerAssignment &&
     order.partnerAssignment.response.status !== 'accepted'
@@ -953,11 +882,9 @@ exports.updateOrderStatus = async (req, res) => {
     );
   }
 
-  
   const oldStatus = order.status;
   order.status = req.body.status;
 
-  
   order.statusHistory.push({
     status: req.body.status,
     timestamp: new Date(),
@@ -978,7 +905,6 @@ exports.updateOrderStatus = async (req, res) => {
   });
 };
 
-
 exports.getDashboardStats = async (req, res) => {
   try {
     console.log('Dashboard request from user:', req.user.id);
@@ -993,7 +919,6 @@ exports.getDashboardStats = async (req, res) => {
       });
     }
 
-    
     const inventoryCount = await Inventory.countDocuments({
       partner: partner._id,
     });
@@ -1003,7 +928,6 @@ exports.getDashboardStats = async (req, res) => {
       quantity: { $gt: 0 },
     });
 
-    
     const buyOrders = await Order.countDocuments({
       partner: partner._id,
     });
@@ -1016,7 +940,6 @@ exports.getDashboardStats = async (req, res) => {
       status: 'delivered',
     });
 
-    
     const SellOrder = require('../models/sellOrder.model');
     const sellOrders = await SellOrder.countDocuments({
       assignedTo: partner._id,
@@ -1030,12 +953,10 @@ exports.getDashboardStats = async (req, res) => {
       status: 'paid',
     });
 
-    
     const totalOrders = buyOrders + sellOrders;
     const pendingOrders = pendingBuyOrders + pendingSellOrders;
     const completedOrders = completedBuyOrders + completedSellOrders;
 
-    
     const orders = await Order.find({
       partner: partner._id,
       status: 'delivered',
@@ -1058,7 +979,6 @@ exports.getDashboardStats = async (req, res) => {
       });
     });
 
-    
     const completedSellOrdersData = await SellOrder.find({
       assignedTo: partner._id,
       status: 'paid',
@@ -1066,14 +986,12 @@ exports.getDashboardStats = async (req, res) => {
 
     completedSellOrdersData.forEach((order) => {
       totalRevenue += order.actualAmount || order.quoteAmount || 0;
-      
-      
+
       const sellCommission =
         (order.actualAmount || order.quoteAmount || 0) * 0.1;
       totalCommission += sellCommission;
     });
 
-    
     const recentBuyOrders = await Order.find({ partner: partner._id })
       .sort('-createdAt')
       .limit(3)
@@ -1095,7 +1013,6 @@ exports.getDashboardStats = async (req, res) => {
       })
       .lean();
 
-    
     const transformedSellOrders = recentSellOrders.map((order) => ({
       ...order,
       orderType: 'sell',
@@ -1126,7 +1043,6 @@ exports.getDashboardStats = async (req, res) => {
       orderType: 'buy',
     }));
 
-    
     const allRecentOrders = [...transformedBuyOrders, ...transformedSellOrders]
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 5);
@@ -1166,11 +1082,8 @@ exports.getDashboardStats = async (req, res) => {
   }
 };
 
-
-
 const SellProduct = require('../models/sellProduct.model');
 const SellOrder = require('../models/sellOrder.model');
-
 
 exports.getDashboardSellBuy = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
@@ -1180,11 +1093,9 @@ exports.getDashboardSellBuy = async (req, res) => {
 
   const partnerId = partner._id;
 
-  
   const sellProductCount = await SellProduct.countDocuments({ partnerId });
   const buyProductCount = await BuyProduct.countDocuments({ partnerId });
 
-  
   const totalOrders = await SellOrder.countDocuments({ assignedTo: partnerId });
   const pendingOrders = await SellOrder.countDocuments({
     assignedTo: partnerId,
@@ -1195,7 +1106,6 @@ exports.getDashboardSellBuy = async (req, res) => {
     status: 'paid',
   });
 
-  
   const revenueData = await SellOrder.aggregate([
     {
       $match: {
@@ -1213,7 +1123,6 @@ exports.getDashboardSellBuy = async (req, res) => {
 
   const totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
 
-  
   const recentOrders = await SellOrder.find({ assignedTo: partnerId })
     .sort({ createdAt: -1 })
     .limit(10)
@@ -1242,7 +1151,6 @@ exports.getDashboardSellBuy = async (req, res) => {
     },
   });
 };
-
 
 exports.getPartnerSellProducts = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
@@ -1288,7 +1196,6 @@ exports.getPartnerSellProducts = async (req, res) => {
   });
 };
 
-
 exports.getPartnerBuyProducts = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
@@ -1332,7 +1239,6 @@ exports.getPartnerBuyProducts = async (req, res) => {
     },
   });
 };
-
 
 exports.getPartnerSellOrders = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
@@ -1379,7 +1285,6 @@ exports.getPartnerSellOrders = async (req, res) => {
   });
 };
 
-
 exports.getPartnerSellOrderDetails = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
@@ -1409,7 +1314,6 @@ exports.getPartnerSellOrderDetails = async (req, res) => {
     data: order,
   });
 };
-
 
 exports.updatePartnerSellOrderStatus = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
@@ -1444,7 +1348,6 @@ exports.updatePartnerSellOrderStatus = async (req, res) => {
   });
 };
 
-
 exports.getPartnerAgents = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
@@ -1478,7 +1381,6 @@ exports.getPartnerAgents = async (req, res) => {
   });
 };
 
-
 exports.createAgent = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
@@ -1498,26 +1400,22 @@ exports.createAgent = async (req, res) => {
     emergencyContact,
   } = req.body;
 
-  
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new ApiError('User with this email already exists', 400);
   }
 
-  
   const user = await User.create({
     name: sanitizeData(name),
     email: sanitizeData(email),
     phone: sanitizeData(phone),
-    role: 'agent', 
-    password: password, 
-    isVerified: false, 
+    role: 'agent',
+    password: password,
+    isVerified: false,
   });
 
-  
   const agentCode = await Agent.generateAgentCode();
 
-  
   const generateEmployeeId = () => {
     const date = new Date();
     const year = date.getFullYear().toString().slice(-2);
@@ -1530,7 +1428,6 @@ exports.createAgent = async (req, res) => {
 
   const employeeId = generateEmployeeId();
 
-  
   const agent = await Agent.create({
     user: user._id,
     agentCode,
@@ -1544,10 +1441,9 @@ exports.createAgent = async (req, res) => {
     },
     bankDetails: bankDetails || {},
     emergencyContact: emergencyContact || {},
-    isActive: false, 
+    isActive: false,
   });
 
-  
   await agent.populate('user', 'name email phone isVerified');
 
   res.status(201).json({
@@ -1556,7 +1452,6 @@ exports.createAgent = async (req, res) => {
     data: agent,
   });
 };
-
 
 exports.updateAgent = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
@@ -1567,7 +1462,6 @@ exports.updateAgent = async (req, res) => {
   const agentId = req.params.agentId;
   const updateData = req.body;
 
-  
   const agent = await Agent.findOne({
     _id: agentId,
     assignedPartner: partner._id,
@@ -1577,7 +1471,6 @@ exports.updateAgent = async (req, res) => {
     throw new ApiError('Agent not found or access denied', 404);
   }
 
-  
   if (updateData.name || updateData.phone) {
     const userUpdateData = {};
     if (updateData.name) userUpdateData.name = sanitizeData(updateData.name);
@@ -1586,7 +1479,6 @@ exports.updateAgent = async (req, res) => {
     await User.findByIdAndUpdate(agent.user._id, userUpdateData);
   }
 
-  
   const agentUpdateData = {};
   if (updateData.coverageAreas) {
     agentUpdateData.coverageAreas = updateData.coverageAreas.map((area) =>
@@ -1610,7 +1502,6 @@ exports.updateAgent = async (req, res) => {
   });
 };
 
-
 exports.deleteAgent = async (req, res) => {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
@@ -1619,7 +1510,6 @@ exports.deleteAgent = async (req, res) => {
 
   const agentId = req.params.agentId;
 
-  
   const agent = await Agent.findOne({
     _id: agentId,
     assignedPartner: partner._id,
@@ -1629,11 +1519,9 @@ exports.deleteAgent = async (req, res) => {
     throw new ApiError('Agent not found or access denied', 404);
   }
 
-  
   agent.isActive = false;
   await agent.save();
 
-  
   await User.findByIdAndUpdate(agent.user, { isActive: false });
 
   res.status(200).json({

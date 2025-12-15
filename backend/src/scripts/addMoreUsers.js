@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user.model');
 require('dotenv').config();
 
-
 const additionalUsers = [
   {
     name: 'Alice Brown',
@@ -49,13 +48,11 @@ const additionalUsers = [
 
 async function addMoreUsers() {
   try {
-    
     await mongoose.connect(
       process.env.MONGO_URI || 'mongodb://localhost:27017/cashify'
     );
     console.log('Connected to MongoDB');
 
-    
     const existingUsers = await User.find({}, 'name email role isVerified');
     console.log(`\nExisting users (${existingUsers.length}):`);
     existingUsers.forEach((user) => {
@@ -64,7 +61,6 @@ async function addMoreUsers() {
       );
     });
 
-    
     const usersToCreate = await Promise.all(
       additionalUsers.map(async (user) => {
         const hashedPassword = await bcrypt.hash(user.password, 12);
@@ -75,7 +71,6 @@ async function addMoreUsers() {
       })
     );
 
-    
     const createdUsers = await User.insertMany(usersToCreate);
     console.log(`\nSuccessfully created ${createdUsers.length} new users:`);
 
@@ -83,7 +78,6 @@ async function addMoreUsers() {
       console.log(`- ${user.name} (${user.email}) - Role: ${user.role}`);
     });
 
-    
     const totalUsers = await User.countDocuments();
     console.log(`\nTotal users in database: ${totalUsers}`);
   } catch (error) {
@@ -93,7 +87,6 @@ async function addMoreUsers() {
     console.log('Database connection closed');
   }
 }
-
 
 if (require.main === module) {
   addMoreUsers();

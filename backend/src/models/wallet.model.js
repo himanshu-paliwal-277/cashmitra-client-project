@@ -57,7 +57,6 @@ const walletSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
 walletSchema.index({ partner: 1 }, { unique: true });
 
 const Wallet = mongoose.model('Wallet', walletSchema);

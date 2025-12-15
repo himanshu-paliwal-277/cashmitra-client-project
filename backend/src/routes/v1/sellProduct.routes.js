@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const { body, param, query } = require('express-validator');
 const {
@@ -19,7 +17,6 @@ const {
 const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
-
 
 const productValidation = [
   body('categoryId')
@@ -141,7 +138,6 @@ const queryValidation = [
     .withMessage('SortOrder must be either asc or desc'),
 ];
 
-
 router.get('/customer', queryValidation, getCustomerProducts);
 router.get('/category/:category', getSellProductsByCategory);
 router.get(
@@ -152,18 +148,13 @@ router.get(
   getProduct
 );
 
-
 router.use(protect);
-
 
 const { attachPartner } = require('../../middlewares/partner.middleware');
 
-
 router.use(attachPartner);
 
-
 router.use(authorize('admin', 'partner'));
-
 
 router.post('/', productValidation, createProduct);
 router.get('/', queryValidation, getProducts);
@@ -183,7 +174,6 @@ router.delete(
     .withMessage('Product ID must be a valid MongoDB ObjectId'),
   deleteProduct
 );
-
 
 router.get(
   '/:id/variants',

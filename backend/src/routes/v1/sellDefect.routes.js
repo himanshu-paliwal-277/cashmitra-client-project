@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const { body, param, query } = require('express-validator');
 const {
@@ -16,7 +14,6 @@ const {
 const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
-
 
 const defectValidation = [
   body('categoryId')
@@ -72,7 +69,6 @@ const defectValidation = [
     .withMessage('isActive must be a boolean'),
 ];
 
-
 router.get(
   '/category/:categoryId',
   param('categoryId')
@@ -82,10 +78,8 @@ router.get(
 );
 router.get('/categories', getDefectCategories);
 
-
 router.use(protect);
 router.use(authorize('admin'));
-
 
 router.post('/', defectValidation, createDefect);
 router.get('/', getDefects);
@@ -111,7 +105,6 @@ router.delete(
     .withMessage('Defect ID must be a valid MongoDB ObjectId'),
   deleteDefect
 );
-
 
 router.post(
   '/bulk',

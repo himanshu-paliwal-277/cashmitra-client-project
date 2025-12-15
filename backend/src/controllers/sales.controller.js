@@ -10,11 +10,7 @@ const {
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
 
-
 exports.createOrder = asyncHandler(async (req, res) => {
-  
-
-  
   if (
     req.body.items &&
     typeof req.body.items === 'object' &&
@@ -36,14 +32,12 @@ exports.createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Order must contain at least one item');
   }
 
-  
   const processedItems = [];
   let totalAmount = 0;
 
   for (const item of items) {
     const { inventoryId, quantity } = item;
 
-    
     const product = await Product.findById(inventoryId);
     console.log('product: ', product);
 
@@ -51,9 +45,6 @@ exports.createOrder = asyncHandler(async (req, res) => {
       throw new ApiError(404, `Product ${inventoryId} not found`);
     }
 
-    
-
-    
     const itemTotal = product.pricing.mrp * quantity;
     totalAmount += itemTotal;
 
@@ -68,32 +59,22 @@ exports.createOrder = asyncHandler(async (req, res) => {
     processedItems.push(processedItem);
   }
 
-  
   const commissionRate = 0.1;
   const totalCommission = totalAmount * commissionRate;
   const partnerAmount = totalAmount - totalCommission;
 
-  
   let discountAmount = 0;
   if (couponCode) {
-    
-    
-    
-    
-    
-    
   }
 
-  
   if (isNaN(totalAmount) || totalAmount <= 0) {
     throw new ApiError(400, 'Invalid total amount calculated');
   }
 
-  
   const order = new Order({
     orderType: 'buy',
     user: userId,
-    partner: userId, 
+    partner: userId,
     items: processedItems,
     totalAmount,
     discountAmount,
@@ -102,7 +83,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
       amount: totalCommission,
     },
     paymentDetails: {
-      method: paymentMethod === 'card' ? 'UPI' : paymentMethod, 
+      method: paymentMethod === 'card' ? 'UPI' : paymentMethod,
       status: 'pending',
     },
     shippingDetails: {
@@ -117,9 +98,6 @@ exports.createOrder = asyncHandler(async (req, res) => {
 
   await order.save();
 
-  
-
-  
   await order.populate([
     { path: 'user', select: 'name email phone' },
     {
@@ -137,7 +115,6 @@ exports.createOrder = asyncHandler(async (req, res) => {
     },
   });
 });
-
 
 exports.processPayment = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -158,12 +135,9 @@ exports.processPayment = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Order payment has already been processed');
   }
 
-  
-  
-  const paymentSuccess = true; 
+  const paymentSuccess = true;
 
   if (paymentSuccess) {
-    
     order.paymentDetails = {
       ...order.paymentDetails,
       ...paymentDetails,
@@ -176,7 +150,6 @@ exports.processPayment = asyncHandler(async (req, res) => {
 
     await order.save();
 
-    
     await Transaction.updateMany(
       { order: orderId },
       {
@@ -185,7 +158,6 @@ exports.processPayment = asyncHandler(async (req, res) => {
       }
     );
 
-    
     const transactions = await Transaction.find({ order: orderId });
     for (const transaction of transactions) {
       let wallet = await Wallet.findOne({ partner: transaction.partner });
@@ -201,8 +173,6 @@ exports.processPayment = asyncHandler(async (req, res) => {
       await wallet.save();
     }
 
-    
-
     res.json({
       success: true,
       message: 'Payment processed successfully',
@@ -212,8 +182,6 @@ exports.processPayment = asyncHandler(async (req, res) => {
       },
     });
   } else {
-    
-
     order.paymentDetails.status = 'failed';
     order.status = 'cancelled';
     await order.save();
@@ -221,7 +189,6 @@ exports.processPayment = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Payment processing failed');
   }
 });
-
 
 exports.getOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
@@ -240,7 +207,6 @@ exports.getOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const transactions = await Transaction.find({ order: orderId }).populate(
     'partner',
     'shopName'
@@ -254,7 +220,6 @@ exports.getOrder = asyncHandler(async (req, res) => {
     },
   });
 });
-
 
 exports.getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user.id;
@@ -298,7 +263,6 @@ exports.getUserOrders = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.cancelOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { reason } = req.body;
@@ -313,9 +277,6 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Order cannot be cancelled at this stage');
   }
 
-  
-
-  
   order.status = 'cancelled';
   order.metadata = {
     ...order.metadata,
@@ -324,7 +285,6 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
   };
   await order.save();
 
-  
   await Transaction.updateMany(
     { order: orderId },
     {
@@ -333,9 +293,7 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
     }
   );
 
-  
   if (order.paymentDetails.status === 'completed') {
-    
     order.paymentDetails.refundStatus = 'pending';
     await order.save();
   }
@@ -347,18 +305,16 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateShippingStatus = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { status, trackingNumber, estimatedDelivery } = req.body;
-  const partnerId = req.user.partnerId; 
+  const partnerId = req.user.partnerId;
 
   const order = await Order.findById(orderId);
   if (!order) {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const hasPartnerItems = order.items.some(
     (item) => item.partner.toString() === partnerId
   );
@@ -367,7 +323,6 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Not authorized to update this order');
   }
 
-  
   order.shippingDetails = {
     ...order.shippingDetails,
     status,
@@ -376,14 +331,12 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
     updatedAt: new Date(),
   };
 
-  
   if (status === 'shipped') {
     order.status = 'shipped';
   } else if (status === 'delivered') {
     order.status = 'delivered';
     order.deliveredAt = new Date();
 
-    
     await Transaction.updateMany(
       { order: orderId, partner: partnerId },
       { status: 'completed' }
@@ -399,7 +352,6 @@ exports.updateShippingStatus = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getSalesAnalytics = asyncHandler(async (req, res) => {
   const { startDate, endDate, groupBy = 'day' } = req.query;
 
@@ -414,7 +366,6 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
     if (endDate) matchStage.createdAt.$lte = new Date(endDate);
   }
 
-  
   const salesOverTime = await Order.aggregate([
     { $match: matchStage },
     {
@@ -433,7 +384,6 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
     { $sort: { _id: 1 } },
   ]);
 
-  
   const topProducts = await Order.aggregate([
     { $match: matchStage },
     { $unwind: '$items' },
@@ -468,7 +418,6 @@ exports.getSalesAnalytics = asyncHandler(async (req, res) => {
     { $limit: 10 },
   ]);
 
-  
   const overallStats = await Order.aggregate([
     { $match: matchStage },
     {

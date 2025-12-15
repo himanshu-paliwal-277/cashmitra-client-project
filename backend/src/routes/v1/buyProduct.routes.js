@@ -20,7 +20,6 @@ const {
 
 const router = express.Router();
 
-
 const validateProductReview = [
   body('rating')
     .isInt({ min: 1, max: 5 })
@@ -37,12 +36,10 @@ const validateProductReview = [
     .withMessage('Reviewer name must be between 2 and 50 characters'),
 ];
 
-
 router.get('/', getBuyProducts);
 router.get('/stats', getBuyProductStats);
 router.get('/category/:category', getBuyProductsByCategory);
 router.get('/:id', getBuyProductById);
-
 
 router.post(
   '/',
@@ -51,13 +48,10 @@ router.post(
   createBuyProduct
 );
 
-
 router.use(protect);
-
 
 const { attachPartner } = require('../../middlewares/partner.middleware');
 router.use(attachPartner);
-
 
 router.put(
   '/:id',
@@ -68,7 +62,6 @@ router.put(
 );
 router.delete('/:id', authorize('admin', 'partner'), deleteBuyProduct);
 router.patch('/:id/toggle-status', authorize('admin'), toggleProductStatus);
-
 
 router.post('/:id/reviews', validateProductReview, addProductReview);
 

@@ -1,12 +1,9 @@
-
-
 const { validationResult } = require('express-validator');
 const BuyCategory = require('../models/buyCategory.model');
 const {
   ApiError,
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
-
 
 exports.createBuyCategory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -16,17 +13,14 @@ exports.createBuyCategory = asyncHandler(async (req, res) => {
 
   const { name, image, superCategory } = req.body;
 
-  
   if (!superCategory) {
     throw new ApiError(400, 'Super category is required');
   }
 
-  
   if (!image) {
     throw new ApiError(400, 'Category image is required');
   }
 
-  
   const existingCategory = await BuyCategory.findOne({ name: name.trim() });
   if (existingCategory) {
     throw new ApiError(400, 'Buy category with this name already exists');
@@ -53,7 +47,6 @@ exports.createBuyCategory = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getBuyCategories = asyncHandler(async (req, res) => {
   const { includeInactive, superCategory } = req.query;
 
@@ -75,7 +68,6 @@ exports.getBuyCategories = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getBuyCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -94,7 +86,6 @@ exports.getBuyCategory = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateBuyCategory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -109,7 +100,6 @@ exports.updateBuyCategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Buy category not found');
   }
 
-  
   if (name && name.trim() !== category.name) {
     const existingCategory = await BuyCategory.findOne({
       name: name.trim(),
@@ -153,7 +143,6 @@ exports.updateBuyCategory = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.deleteBuyCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -169,7 +158,6 @@ exports.deleteBuyCategory = asyncHandler(async (req, res) => {
     message: 'Buy category deleted successfully',
   });
 });
-
 
 exports.getBuyCategoryStats = asyncHandler(async (req, res) => {
   const totalCategories = await BuyCategory.countDocuments();

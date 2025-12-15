@@ -1,5 +1,3 @@
-
-
 const User = require('../models/user.model');
 const Agent = require('../models/agent.model');
 const SellOrder = require('../models/sellOrder.model');
@@ -16,16 +14,13 @@ const {
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  
   if (!email || !password) {
     throw new ApiError(400, 'Email and password are required');
   }
 
-  
   const user = await User.findOne({
     email: email.toLowerCase(),
     role: 'agent',
@@ -35,7 +30,6 @@ exports.login = asyncHandler(async (req, res) => {
     throw new ApiError(401, 'Invalid credentials');
   }
 
-  
   console.log('🔍 DEBUG - User found:', {
     email: user.email,
     role: user.role,
@@ -45,7 +39,6 @@ exports.login = asyncHandler(async (req, res) => {
     hasPassword: !!user.password,
   });
 
-  
   if (!user.isActive) {
     throw new ApiError(
       403,
@@ -53,21 +46,18 @@ exports.login = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
     throw new ApiError(401, 'Invalid credentials');
   }
 
-  
   const agent = await Agent.findOne({ user: user._id });
 
   if (!agent) {
     throw new ApiError(404, 'Agent profile not found');
   }
 
-  
   const token = jwt.sign(
     {
       id: user._id,
@@ -78,7 +68,6 @@ exports.login = asyncHandler(async (req, res) => {
     { expiresIn: '30d' }
   );
 
-  
   user.lastLogin = new Date();
   await user.save();
 
@@ -103,7 +92,6 @@ exports.login = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getProfile = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id })
     .populate('user', 'name email phone')
@@ -119,7 +107,6 @@ exports.getProfile = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getTodayOrders = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -131,7 +118,6 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
   console.log('Agent Profile ID:', agent._id);
   console.log('Agent User ID:', req.user.id);
 
-  
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
 
@@ -141,7 +127,6 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
   console.log('Date Range - Start:', startOfDay.toISOString());
   console.log('Date Range - End:', endOfDay.toISOString());
 
-  
   const todayPickups = await Pickup.find({
     agent: agent._id,
     scheduledDate: { $gte: startOfDay, $lte: endOfDay },
@@ -161,11 +146,10 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
 
   console.log('Pickups found:', todayPickups.length);
 
-  
   const todaySellOrders = await SellOrder.find({
-    assignedTo: req.user.id, 
+    assignedTo: req.user.id,
     'pickup.slot.date': { $gte: startOfDay, $lte: endOfDay },
-    status: { $in: ['draft', 'confirmed', 'picked', 'paid'] }, 
+    status: { $in: ['draft', 'confirmed', 'picked', 'paid'] },
   })
     .populate('sessionId')
     .populate({
@@ -178,10 +162,9 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
 
   console.log('Sell Orders found (today):', todaySellOrders.length);
 
-  
   const allAssignedSellOrders = await SellOrder.find({
     assignedTo: req.user.id,
-    status: { $nin: ['cancelled'] }, 
+    status: { $nin: ['cancelled'] },
   })
     .populate('sessionId')
     .populate({
@@ -191,14 +174,13 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
     .populate('userId', 'name email phone')
     .populate('assignedTo', 'name phone email')
     .sort({ 'pickup.slot.date': -1 })
-    .limit(50); 
+    .limit(50);
 
   console.log(
     'All assigned sell orders (any date):',
     allAssignedSellOrders.length
   );
 
-  
   if (allAssignedSellOrders.length > 0) {
     console.log('Assigned order dates:');
     allAssignedSellOrders.forEach((order) => {
@@ -208,7 +190,6 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
     });
   }
 
-  
   const pickupOrders = todayPickups.map((pickup) => ({
     pickupId: pickup._id,
     orderId: pickup.order._id,
@@ -231,7 +212,6 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
     sourceType: 'pickup',
   }));
 
-  
   const sellOrders = todaySellOrders.map((order) => ({
     orderId: order._id,
     orderNumber: order.orderNumber,
@@ -261,7 +241,6 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
     sourceType: 'sellOrder',
   }));
 
-  
   let allOrders = [...pickupOrders, ...sellOrders];
 
   if (allOrders.length === 0 && allAssignedSellOrders.length > 0) {
@@ -314,7 +293,6 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getTomorrowOrders = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -322,7 +300,6 @@ exports.getTomorrowOrders = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Agent profile not found');
   }
 
-  
   const startOfTomorrow = new Date();
   startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
   startOfTomorrow.setHours(0, 0, 0, 0);
@@ -331,7 +308,6 @@ exports.getTomorrowOrders = asyncHandler(async (req, res) => {
   endOfTomorrow.setDate(endOfTomorrow.getDate() + 1);
   endOfTomorrow.setHours(23, 59, 59, 999);
 
-  
   const tomorrowPickups = await Pickup.find({
     agent: agent._id,
     scheduledDate: { $gte: startOfTomorrow, $lte: endOfTomorrow },
@@ -349,7 +325,6 @@ exports.getTomorrowOrders = asyncHandler(async (req, res) => {
     })
     .sort({ scheduledTime: 1 });
 
-  
   const orders = tomorrowPickups.map((pickup) => ({
     pickupId: pickup._id,
     orderId: pickup.order._id,
@@ -376,7 +351,6 @@ exports.getTomorrowOrders = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getPastOrders = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -387,11 +361,9 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
   const { page = 1, limit = 20, status } = req.query;
   const skip = (page - 1) * limit;
 
-  
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  
   const filter = {
     agent: agent._id,
     $or: [
@@ -404,7 +376,6 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
     filter.status = status;
   }
 
-  
   const pastPickups = await Pickup.find(filter)
     .populate({
       path: 'order',
@@ -422,7 +393,6 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
 
   const total = await Pickup.countDocuments(filter);
 
-  
   const orders = pastPickups.map((pickup) => ({
     pickupId: pickup._id,
     orderId: pickup.order._id,
@@ -455,7 +425,6 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getOrderDetails = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -465,7 +434,6 @@ exports.getOrderDetails = asyncHandler(async (req, res) => {
 
   const { orderId } = req.params;
 
-  
   const order = await SellOrder.findById(orderId)
     .populate({
       path: 'sessionId',
@@ -486,14 +454,12 @@ exports.getOrderDetails = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
 
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
 
-  
   const orderDetails = {
     orderId: order._id,
     orderNumber: order.orderNumber,
@@ -562,7 +528,6 @@ exports.getOrderDetails = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.startPickup = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -596,7 +561,6 @@ exports.startPickup = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getEvaluationQuestions = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
@@ -606,13 +570,11 @@ exports.getEvaluationQuestions = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Product not found');
   }
 
-  
   const questions = await SellQuestion.find({
     categoryId: product.categoryId._id,
     isActive: true,
   }).sort({ order: 1 });
 
-  
   const defects = await SellDefect.find({
     categoryId: product.categoryId._id,
     isActive: true,
@@ -648,7 +610,6 @@ exports.getEvaluationQuestions = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.calculatePrice = asyncHandler(async (req, res) => {
   const { orderId, answers, selectedDefects, physicalInspection } = req.body;
 
@@ -658,7 +619,6 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Agent profile not found');
   }
 
-  
   const order = await SellOrder.findById(orderId).populate({
     path: 'sessionId',
     populate: { path: 'productId', select: 'name variants' },
@@ -668,14 +628,12 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
 
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
 
-  
   const variant = order.sessionId.productId.variants.find(
     (v) => v.label === order.sessionId.selectedVariant
   );
@@ -686,7 +644,6 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
 
   let finalPrice = variant.basePrice;
 
-  
   if (answers && answers.length > 0) {
     for (const answer of answers) {
       const question = await SellQuestion.findById(answer.questionId);
@@ -707,7 +664,6 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
     }
   }
 
-  
   if (selectedDefects && selectedDefects.length > 0) {
     for (const defectId of selectedDefects) {
       const defect = await SellDefect.findById(defectId);
@@ -722,23 +678,20 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
     }
   }
 
-  
   if (physicalInspection) {
     if (physicalInspection.screenCondition === 'cracked') {
-      finalPrice *= 0.8; 
+      finalPrice *= 0.8;
     }
     if (physicalInspection.bodyCondition === 'damaged') {
-      finalPrice *= 0.9; 
+      finalPrice *= 0.9;
     }
     if (physicalInspection.functionalIssues) {
-      finalPrice *= 0.85; 
+      finalPrice *= 0.85;
     }
   }
 
-  
-  finalPrice = Math.max(finalPrice, variant.basePrice * 0.3); 
+  finalPrice = Math.max(finalPrice, variant.basePrice * 0.3);
 
-  
   finalPrice = Math.round(finalPrice / 10) * 10;
 
   res.json({
@@ -756,7 +709,6 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
     },
   });
 });
-
 
 exports.completeEvaluation = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
@@ -789,7 +741,6 @@ exports.completeEvaluation = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const order = await SellOrder.findById(pickup.order._id);
   order.finalPrice = finalPrice;
   order.adjustmentReason = adjustmentReason || 'Physical inspection completed';
@@ -803,7 +754,6 @@ exports.completeEvaluation = asyncHandler(async (req, res) => {
 
   await order.save();
 
-  
   pickup.status = 'picked';
   pickup.evaluationCompleted = true;
   pickup.evaluationData = {
@@ -815,7 +765,6 @@ exports.completeEvaluation = asyncHandler(async (req, res) => {
   pickup.completedAt = new Date();
   await pickup.save();
 
-  
   agent.performanceMetrics.totalPickups += 1;
   agent.performanceMetrics.completedPickups += 1;
   await agent.save();
@@ -835,7 +784,6 @@ exports.completeEvaluation = asyncHandler(async (req, res) => {
     },
   });
 });
-
 
 exports.completePayment = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
@@ -857,7 +805,6 @@ exports.completePayment = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
 
   if (!pickup) {
@@ -868,7 +815,6 @@ exports.completePayment = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Order must be evaluated before payment');
   }
 
-  
   order.paymentStatus = 'paid';
   order.paymentMethod = paymentMethod;
   order.transactionId = transactionId;
@@ -877,7 +823,6 @@ exports.completePayment = asyncHandler(async (req, res) => {
   order.status = 'completed';
   await order.save();
 
-  
   pickup.status = 'completed';
   pickup.paymentCollected = true;
   await pickup.save();
@@ -896,7 +841,6 @@ exports.completePayment = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getStatistics = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -904,7 +848,6 @@ exports.getStatistics = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Agent profile not found');
   }
 
-  
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -920,7 +863,6 @@ exports.getStatistics = asyncHandler(async (req, res) => {
     status: 'completed',
   });
 
-  
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
   const monthlyPickups = await Pickup.countDocuments({
@@ -929,7 +871,6 @@ exports.getStatistics = asyncHandler(async (req, res) => {
     status: 'completed',
   });
 
-  
   const monthlyOrders = await SellOrder.find({
     evaluatedBy: agent._id,
     evaluatedAt: { $gte: startOfMonth },
@@ -962,7 +903,6 @@ exports.getStatistics = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateLocation = asyncHandler(async (req, res) => {
   const { latitude, longitude } = req.body;
 
@@ -993,7 +933,6 @@ exports.updateLocation = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.uploadCustomerSelfie = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -1014,14 +953,12 @@ exports.uploadCustomerSelfie = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
 
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
 
-  
   if (!order.evaluationData) {
     order.evaluationData = {};
   }
@@ -1044,7 +981,6 @@ exports.uploadCustomerSelfie = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.uploadGadgetImages = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -1061,14 +997,12 @@ exports.uploadGadgetImages = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
 
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
 
-  
   if (!order.evaluationData) {
     order.evaluationData = {};
   }
@@ -1105,7 +1039,6 @@ exports.uploadGadgetImages = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.uploadIMEIScan = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -1126,14 +1059,12 @@ exports.uploadIMEIScan = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
 
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
 
-  
   if (!order.evaluationData) {
     order.evaluationData = {};
   }
@@ -1161,7 +1092,6 @@ exports.uploadIMEIScan = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.reEvaluateDevice = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -1180,17 +1110,14 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
 
   if (!pickup) {
     throw new ApiError(403, 'This order is not assigned to you');
   }
 
-  
   const originalSession = order.offerSession;
 
-  
   const product = await SellProduct.findById(order.product._id);
   const variant = product.variants.find(
     (v) => v._id.toString() === order.variant.toString()
@@ -1200,7 +1127,6 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Variant not found');
   }
 
-  
   let basePrice = variant.basePrice;
   let percentDelta = 0;
   let absDelta = 0;
@@ -1212,7 +1138,6 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
     },
   ];
 
-  
   if (answers && typeof answers === 'object') {
     for (const [, answerData] of Object.entries(answers)) {
       if (answerData && answerData.delta) {
@@ -1240,7 +1165,6 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
     }
   }
 
-  
   if (defects && defects.length > 0) {
     const allDefects = await SellDefect.getForVariants(order.product._id, [
       order.variant,
@@ -1274,7 +1198,6 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
     }
   }
 
-  
   if (accessories && accessories.length > 0) {
     const allAccessories = await SellAccessory.getActiveForCategory(
       product.categoryId
@@ -1308,12 +1231,10 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
     }
   }
 
-  
   let reEvaluatedPrice = Math.round(
     basePrice * (1 + percentDelta / 100) + absDelta
   );
 
-  
   let negotiationAmount = 0;
   if (negotiation && typeof negotiation === 'number') {
     negotiationAmount = negotiation;
@@ -1326,7 +1247,6 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
 
   const finalPrice = reEvaluatedPrice + negotiationAmount;
 
-  
   order.evaluationData = {
     ...order.evaluationData,
     agentAnswers: answers,
@@ -1354,11 +1274,9 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
 
   await order.save();
 
-  
   pickup.status = 'picked';
   await pickup.save();
 
-  
   const priceComparison = {
     original: {
       quotedPrice: originalSession?.finalPrice || order.quotedPrice,
@@ -1389,7 +1307,6 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getCompleteOrderDetails = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
@@ -1409,7 +1326,6 @@ exports.getCompleteOrderDetails = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const pickup = await Pickup.findOne({ order: order._id, agent: agent._id });
 
   if (!pickup) {

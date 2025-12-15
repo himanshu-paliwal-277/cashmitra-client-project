@@ -1,5 +1,3 @@
-
-
 const { validationResult } = require('express-validator');
 const SellAccessory = require('../models/sellAccessory.model');
 const SellProduct = require('../models/sellProduct.model');
@@ -7,7 +5,6 @@ const {
   ApiError,
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
-
 
 exports.createAccessory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -17,14 +14,12 @@ exports.createAccessory = asyncHandler(async (req, res) => {
 
   const { categoryId, key, title, delta } = req.body;
 
-  
   const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  
   const existingAccessory = await SellAccessory.findOne({ categoryId, key });
   if (existingAccessory) {
     throw new ApiError(
@@ -33,7 +28,6 @@ exports.createAccessory = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const lastAccessory = await SellAccessory.findOne({ categoryId }).sort({
     order: -1,
   });
@@ -57,7 +51,6 @@ exports.createAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getAccessories = asyncHandler(async (req, res) => {
   const { categoryId, isActive } = req.query;
 
@@ -77,7 +70,6 @@ exports.getAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getAccessoriesForCustomer = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
 
@@ -89,7 +81,6 @@ exports.getAccessoriesForCustomer = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getCustomerAccessories = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -98,14 +89,12 @@ exports.getCustomerAccessories = asyncHandler(async (req, res) => {
 
   const { categoryId } = req.query;
 
-  
   const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  
   const accessories = await SellAccessory.find({
     categoryId,
     isActive: true,
@@ -116,7 +105,6 @@ exports.getCustomerAccessories = asyncHandler(async (req, res) => {
     data: accessories,
   });
 });
-
 
 exports.getAccessory = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id)
@@ -133,7 +121,6 @@ exports.getAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateAccessory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -147,7 +134,6 @@ exports.updateAccessory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Accessory not found');
   }
 
-  
   if (key && key !== accessory.key) {
     const existingAccessory = await SellAccessory.findOne({
       categoryId: accessory.categoryId,
@@ -177,13 +163,10 @@ exports.updateAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
   try {
-    
     const accessories = await SellAccessory.find({});
 
-    
     const byCategory = {};
     accessories.forEach((acc) => {
       const catId = acc.categoryId ? acc.categoryId.toString() : 'null';
@@ -195,22 +178,19 @@ exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
 
     let updatedCount = 0;
 
-    
     for (const categoryId in byCategory) {
       const categoryAccessories = byCategory[categoryId];
 
-      
       categoryAccessories.sort(
         (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
 
-      
       for (let i = 0; i < categoryAccessories.length; i++) {
         await SellAccessory.findByIdAndUpdate(
           categoryAccessories[i]._id,
           { order: i + 1 },
-          { runValidators: false } 
+          { runValidators: false }
         );
         updatedCount++;
       }
@@ -229,29 +209,23 @@ exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
   }
 });
 
-
 exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
   try {
     const SellProduct = require('../models/sellProduct.model');
     const mongoose = require('mongoose');
 
-    
     const accessories = await SellAccessory.find({}).lean();
 
     let migratedCount = 0;
 
-    
     for (const acc of accessories) {
-      
       if ('productId' in acc) {
         if (acc.productId && !acc.categoryId) {
-          
           const product = await SellProduct.findById(acc.productId).select(
             'categoryId'
           );
 
           if (product && product.categoryId) {
-            
             await mongoose.connection.collection('sellaccessories').updateOne(
               { _id: acc._id },
               {
@@ -262,7 +236,6 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
             migratedCount++;
           }
         } else if (!acc.productId && !acc.categoryId) {
-          
           await mongoose.connection
             .collection('sellaccessories')
             .updateOne({ _id: acc._id }, { $unset: { productId: 1 } });
@@ -270,7 +243,6 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
       }
     }
 
-    
     const updatedAccessories = await SellAccessory.find({});
     const byCategory = {};
 
@@ -308,7 +280,6 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
   }
 });
 
-
 exports.deleteAccessory = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
@@ -323,18 +294,15 @@ exports.deleteAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
   const { categoryId, accessories } = req.body;
 
-  
   const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  
   if (!Array.isArray(accessories) || accessories.length === 0) {
     throw new ApiError(
       400,
@@ -342,7 +310,6 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const keys = accessories.map((acc) => acc.key);
   const duplicateKeys = keys.filter(
     (key, index) => keys.indexOf(key) !== index
@@ -354,7 +321,6 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const existingAccessories = await SellAccessory.find({
     categoryId,
     key: { $in: keys },
@@ -370,13 +336,11 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const lastAccessory = await SellAccessory.findOne({ categoryId }).sort({
     order: -1,
   });
   let nextOrder = lastAccessory ? lastAccessory.order + 1 : 1;
 
-  
   const accessoriesToCreate = accessories.map((accessory) => ({
     categoryId,
     key: accessory.key,
@@ -387,7 +351,6 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
     createdBy: req.user._id,
   }));
 
-  
   const createdAccessories =
     await SellAccessory.insertMany(accessoriesToCreate);
 
@@ -398,18 +361,15 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.reorderAccessories = asyncHandler(async (req, res) => {
   const { categoryId, accessoryIds } = req.body;
 
-  
   const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  
   if (!Array.isArray(accessoryIds) || accessoryIds.length === 0) {
     throw new ApiError(
       400,
@@ -417,7 +377,6 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const accessories = await SellAccessory.find({
     _id: { $in: accessoryIds },
     categoryId,
@@ -430,7 +389,6 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const updatePromises = accessoryIds.map((accessoryId, index) =>
     SellAccessory.findByIdAndUpdate(
       accessoryId,
@@ -447,7 +405,6 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
     data: updatedAccessories,
   });
 });
-
 
 exports.toggleAccessoryStatus = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id);

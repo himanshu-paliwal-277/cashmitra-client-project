@@ -56,15 +56,11 @@ const sellAccessorySchema = new mongoose.Schema(
   }
 );
 
-
 sellAccessorySchema.index({ categoryId: 1, key: 1 }, { unique: true });
-
 
 sellAccessorySchema.index({ categoryId: 1, order: 1 });
 
-
 sellAccessorySchema.index({ categoryId: 1, isActive: 1 });
-
 
 sellAccessorySchema.statics.getActiveForCategory = function (categoryId) {
   return this.find({

@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const { body, param, query } = require('express-validator');
 const {
@@ -16,7 +14,6 @@ const {
 const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
-
 
 const createAccessoryValidation = [
   body('categoryId')
@@ -52,7 +49,6 @@ const createAccessoryValidation = [
     .isBoolean()
     .withMessage('isActive must be a boolean'),
 ];
-
 
 const updateAccessoryValidation = [
   body('categoryId')
@@ -95,7 +91,6 @@ const updateAccessoryValidation = [
     .withMessage('isActive must be a boolean'),
 ];
 
-
 router.get(
   '/customer',
   query('categoryId')
@@ -104,10 +99,8 @@ router.get(
   getCustomerAccessories
 );
 
-
 router.use(protect);
 router.use(authorize('admin'));
-
 
 router.post('/', createAccessoryValidation, createAccessory);
 router.get('/', getAccessories);
@@ -134,7 +127,6 @@ router.delete(
   deleteAccessory
 );
 
-
 router.post(
   '/bulk',
   body('accessories')
@@ -150,14 +142,12 @@ router.put(
   reorderAccessories
 );
 
-
 const {
   reindexAccessoryOrders,
   migrateAndReindexAccessories,
 } = require('../../controllers/sellAccessory.controller');
 router.post('/reindex-orders', reindexAccessoryOrders);
 router.post('/migrate-and-reindex', migrateAndReindexAccessories);
-
 
 router.patch(
   '/:id/toggle-status',

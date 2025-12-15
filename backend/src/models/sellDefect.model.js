@@ -74,15 +74,11 @@ const sellDefectSchema = new mongoose.Schema(
   }
 );
 
-
 sellDefectSchema.index({ categoryId: 1, key: 1 }, { unique: true });
-
 
 sellDefectSchema.index({ categoryId: 1, section: 1, order: 1 });
 
-
 sellDefectSchema.index({ categoryId: 1, isActive: 1 });
-
 
 sellDefectSchema.statics.getForCategory = function (categoryId) {
   const query = {
@@ -92,7 +88,6 @@ sellDefectSchema.statics.getForCategory = function (categoryId) {
 
   return this.find(query).sort({ section: 1, order: 1 });
 };
-
 
 sellDefectSchema.statics.getGroupedBySection = function (categoryId) {
   return this.aggregate([
@@ -117,24 +112,19 @@ sellDefectSchema.statics.getGroupedBySection = function (categoryId) {
   ]);
 };
 
-
-
 sellDefectSchema.statics.getForVariants = async function (
   productId,
   variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
 
-  
   const product = await SellProduct.findById(productId).select('categoryId');
   if (!product) {
     return [];
   }
 
-  
   return this.getForCategory(product.categoryId);
 };
-
 
 sellDefectSchema.statics.getGroupedByCategory = async function (
   productId,
@@ -142,13 +132,11 @@ sellDefectSchema.statics.getGroupedByCategory = async function (
 ) {
   const SellProduct = require('./sellProduct.model');
 
-  
   const product = await SellProduct.findById(productId).select('categoryId');
   if (!product) {
     return [];
   }
 
-  
   return this.getGroupedBySection(product.categoryId);
 };
 

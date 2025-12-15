@@ -36,7 +36,7 @@ const roleTemplateSchema = new mongoose.Schema(
       apiAccess: { type: Boolean, default: false },
     },
     limits: {
-      maxInventoryItems: { type: Number, default: -1 }, 
+      maxInventoryItems: { type: Number, default: -1 },
       maxMonthlyTransactions: { type: Number, default: -1 },
       maxPayoutAmount: { type: Number, default: -1 },
     },
@@ -63,16 +63,13 @@ const roleTemplateSchema = new mongoose.Schema(
   }
 );
 
-
 roleTemplateSchema.index({ name: 1 });
 roleTemplateSchema.index({ isActive: 1 });
 roleTemplateSchema.index({ isDefault: 1 });
 
-
 roleTemplateSchema.methods.canBeDeleted = function () {
   return !this.isDefault;
 };
-
 
 roleTemplateSchema.statics.createDefaultTemplates = async function (
   adminUserId
@@ -214,7 +211,6 @@ roleTemplateSchema.statics.createDefaultTemplates = async function (
 
   return createdTemplates;
 };
-
 
 roleTemplateSchema.statics.getActiveTemplates = async function () {
   return this.find({ isActive: true }).sort({ isDefault: -1, name: 1 });

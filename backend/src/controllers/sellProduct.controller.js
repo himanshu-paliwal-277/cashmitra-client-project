@@ -1,5 +1,3 @@
-
-
 const { validationResult } = require('express-validator');
 const SellProduct = require('../models/sellProduct.model');
 const SellConfig = require('../models/sellConfig.model');
@@ -9,7 +7,6 @@ const {
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
 
-
 exports.createProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -18,13 +15,11 @@ exports.createProduct = asyncHandler(async (req, res) => {
 
   const { categoryId, name, images, variants, tags } = req.body;
 
-  
   const existingProduct = await SellProduct.findOne({ name: name.trim() });
   if (existingProduct) {
     throw new ApiError(400, 'Product with this name already exists');
   }
 
-  
   let partnerId = null;
   if (req.user.role === 'partner' && req.partnerId) {
     partnerId = req.partnerId;
@@ -36,13 +31,12 @@ exports.createProduct = asyncHandler(async (req, res) => {
     images: images || [],
     variants: variants || [],
     tags: tags || [],
-    partnerId: partnerId, 
+    partnerId: partnerId,
     createdBy: req.user.id,
   });
 
   await product.save();
 
-  
   try {
     await SellConfig.createDefaultForProduct(product._id, req.user.id);
   } catch (error) {
@@ -56,17 +50,14 @@ exports.createProduct = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getProducts = asyncHandler(async (req, res) => {
   const { status, categoryId, search } = req.query;
 
   const query = {};
 
-  
   if (req.user.role === 'partner' && req.partnerId) {
     query.partnerId = req.partnerId;
   }
-  
 
   if (status) query.status = status;
   if (categoryId) query.categoryId = categoryId;
@@ -88,7 +79,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getProduct = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id)
     .populate('categoryId', 'name')
@@ -104,7 +94,6 @@ exports.getProduct = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -118,7 +107,6 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Product not found');
   }
 
-  
   if (name && name.trim() !== product.name) {
     const existingProduct = await SellProduct.findOne({
       name: name.trim(),
@@ -129,7 +117,6 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     }
   }
 
-  
   if (name) product.name = name.trim();
   if (categoryId) product.categoryId = categoryId;
   if (images !== undefined) product.images = images;
@@ -146,7 +133,6 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.deleteProduct = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id);
   if (!product) {
@@ -161,7 +147,6 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getVariants = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id);
   if (!product) {
@@ -174,7 +159,6 @@ exports.getVariants = asyncHandler(async (req, res) => {
     variants: product.variants,
   });
 });
-
 
 exports.addVariant = asyncHandler(async (req, res) => {
   const { label, basePrice } = req.body;
@@ -203,7 +187,6 @@ exports.addVariant = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateVariant = asyncHandler(async (req, res) => {
   const { label, basePrice, isActive } = req.body;
 
@@ -230,7 +213,6 @@ exports.updateVariant = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.deleteVariant = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id);
   if (!product) {
@@ -251,7 +233,6 @@ exports.deleteVariant = asyncHandler(async (req, res) => {
     data: product,
   });
 });
-
 
 exports.getProductStats = asyncHandler(async (req, res) => {
   const stats = await SellProduct.aggregate([
@@ -279,7 +260,6 @@ exports.getProductStats = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getCustomerProducts = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -295,7 +275,6 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
     sortOrder = 'asc',
   } = req.query;
 
-  
   const query = { status: 'active' };
 
   if (search) {
@@ -309,7 +288,6 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
     query.categoryId = category;
   }
 
-  
   const sort = {};
   sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
@@ -325,7 +303,6 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
     SellProduct.countDocuments(query),
   ]);
 
-  
   const customerProducts = products.map((product) => ({
     ...product.toObject(),
     variants: product.variants.filter((variant) => variant.isActive),
@@ -345,7 +322,6 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
   const { category } = req.params;
   const {
@@ -355,7 +331,6 @@ exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
     sortOrder = 'asc',
   } = req.query;
 
-  
   const categoryDoc = await Category.findOne({
     name: { $regex: new RegExp(`^${category}$`, 'i') },
     isActive: true,
@@ -365,13 +340,11 @@ exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Category not found');
   }
 
-  
   const query = {
     status: 'active',
     categoryId: categoryDoc._id,
   };
 
-  
   const sort = {};
   sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
@@ -387,7 +360,6 @@ exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
     SellProduct.countDocuments(query),
   ]);
 
-  
   const customerProducts = products.map((product) => ({
     ...product.toObject(),
     variants: product.variants.filter((variant) => variant.isActive),

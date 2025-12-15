@@ -3,22 +3,18 @@ const BuyCategory = require('../models/buyCategory.model');
 const { validationResult } = require('express-validator');
 const { processArrayFields } = require('../utils/dataProcessing.utils');
 
-
 const getBuyProducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    
     const filter = {};
 
-    
     if (req.query.categoryId) {
       filter.categoryId = req.query.categoryId;
     }
 
-    
     if (req.query.category) {
       const categoryDoc = await BuyCategory.findOne({
         name: new RegExp(`^${req.query.category}$`, 'i'),
@@ -39,7 +35,6 @@ const getBuyProducts = async (req, res) => {
       ];
     }
 
-    
     let sort = { createdAt: -1 };
     if (req.query.sortBy) {
       const sortField = req.query.sortBy;
@@ -76,10 +71,8 @@ const getBuyProducts = async (req, res) => {
   }
 };
 
-
 const deleteBuyProduct = async (req, res) => {
   try {
-    
     const product = await BuyProduct.findById(req.params.id);
 
     if (!product) {
@@ -89,7 +82,6 @@ const deleteBuyProduct = async (req, res) => {
       });
     }
 
-    
     if (req.user && req.user.role === 'partner' && req.partnerId) {
       if (
         product.partnerId &&
@@ -102,7 +94,6 @@ const deleteBuyProduct = async (req, res) => {
       }
     }
 
-    
     await BuyProduct.findByIdAndDelete(req.params.id);
 
     res.json({
@@ -118,9 +109,6 @@ const deleteBuyProduct = async (req, res) => {
     });
   }
 };
-
-
-
 
 const getBuyProductById = async (req, res) => {
   try {
@@ -150,7 +138,6 @@ const getBuyProductById = async (req, res) => {
   }
 };
 
-
 function normalizeBuyProductInput(input = {}) {
   const body = JSON.parse(JSON.stringify(input));
 
@@ -158,7 +145,6 @@ function normalizeBuyProductInput(input = {}) {
   delete body.createdAt;
   delete body.updatedAt;
 
-  
   if (Array.isArray(body.topSpecs)) {
     const [
       screenSize = '',
@@ -215,7 +201,6 @@ function normalizeBuyProductInput(input = {}) {
     delete body.productDetails.cameras;
   }
 
-  
   if (
     body.productDetails.network &&
     typeof body.productDetails.network === 'object'
@@ -241,7 +226,6 @@ function normalizeBuyProductInput(input = {}) {
   if (typeof body.productDetails.rearCamera !== 'object')
     body.productDetails.rearCamera = {};
 
-  
   if (body.paymentOptions && typeof body.paymentOptions === 'object') {
     const p = body.paymentOptions;
     const methods = [];
@@ -257,7 +241,6 @@ function normalizeBuyProductInput(input = {}) {
     };
   }
 
-  
   if (body.availability && typeof body.availability === 'object') {
     const a = body.availability;
     body.availability = {
@@ -290,7 +273,6 @@ const createBuyProduct = async (req, res) => {
       });
     }
 
-    
     const normalizedData = normalizeBuyProductInput(req.body);
 
     const productData = {
@@ -298,7 +280,6 @@ const createBuyProduct = async (req, res) => {
       createdBy: req.user ? req.user.id : null,
     };
 
-    
     if (req.user && req.user.role === 'partner' && req.partnerId) {
       productData.partnerId = req.partnerId;
     }
@@ -336,7 +317,6 @@ const updateBuyProduct = async (req, res) => {
       });
     }
 
-    
     if (req.body.categoryId) {
       const category = await BuyCategory.findById(req.body.categoryId);
       if (!category) {
@@ -347,7 +327,6 @@ const updateBuyProduct = async (req, res) => {
       }
     }
 
-    
     const existingProduct = await BuyProduct.findById(req.params.id);
 
     if (!existingProduct) {
@@ -357,7 +336,6 @@ const updateBuyProduct = async (req, res) => {
       });
     }
 
-    
     if (req.user && req.user.role === 'partner' && req.partnerId) {
       if (
         existingProduct.partnerId &&
@@ -370,7 +348,6 @@ const updateBuyProduct = async (req, res) => {
       }
     }
 
-    
     const processedData = processArrayFields(req.body);
 
     const updateData = {
@@ -400,7 +377,6 @@ const updateBuyProduct = async (req, res) => {
   }
 };
 
-
 const getBuyProductStats = async (req, res) => {
   try {
     const totalProducts = await BuyProduct.countDocuments();
@@ -412,7 +388,6 @@ const getBuyProductStats = async (req, res) => {
       isRefurbished: true,
     });
 
-    
     const productsByCategory = await BuyProduct.aggregate([
       {
         $lookup: {
@@ -436,7 +411,6 @@ const getBuyProductStats = async (req, res) => {
       },
     ]);
 
-    
     const topRatedProducts = await BuyProduct.find({
       'rating.average': { $gte: 4 },
     })
@@ -444,7 +418,6 @@ const getBuyProductStats = async (req, res) => {
       .sort({ 'rating.average': -1 })
       .limit(5);
 
-    
     const recentProducts = await BuyProduct.find()
       .populate('categoryId', 'name')
       .select('name brand createdAt categoryId')
@@ -475,7 +448,6 @@ const getBuyProductStats = async (req, res) => {
   }
 };
 
-
 const addProductReview = async (req, res) => {
   try {
     const { rating, comment, reviewer } = req.body;
@@ -489,7 +461,6 @@ const addProductReview = async (req, res) => {
       });
     }
 
-    
     const newReview = {
       reviewer: reviewer || 'Anonymous',
       rating,
@@ -499,12 +470,10 @@ const addProductReview = async (req, res) => {
 
     product.reviews.push(newReview);
 
-    
     const ratingKey = `${rating}star`;
     product.rating.breakdown[ratingKey] += 1;
     product.rating.totalReviews += 1;
 
-    
     const totalRating =
       product.rating.breakdown['5star'] * 5 +
       product.rating.breakdown['4star'] * 4 +
@@ -533,7 +502,6 @@ const addProductReview = async (req, res) => {
     });
   }
 };
-
 
 const toggleProductStatus = async (req, res) => {
   try {
@@ -564,7 +532,6 @@ const toggleProductStatus = async (req, res) => {
   }
 };
 
-
 const getBuyProductsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
@@ -572,7 +539,6 @@ const getBuyProductsByCategory = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
-    
     const categoryDoc = await BuyCategory.findOne({
       name: new RegExp(`^${category}$`, 'i'),
       isActive: true,
@@ -585,13 +551,11 @@ const getBuyProductsByCategory = async (req, res) => {
       });
     }
 
-    
     const filter = {
       categoryId: categoryDoc._id,
       isActive: true,
     };
 
-    
     if (req.query.search) {
       filter.$or = [
         { name: new RegExp(req.query.search, 'i') },
@@ -600,12 +564,10 @@ const getBuyProductsByCategory = async (req, res) => {
       ];
     }
 
-    
     if (req.query.brand) {
       filter.brand = new RegExp(req.query.brand, 'i');
     }
 
-    
     let sort = { createdAt: -1 };
     if (req.query.sortBy) {
       const sortField = req.query.sortBy;

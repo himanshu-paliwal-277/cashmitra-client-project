@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const sellQuestionSchema = new mongoose.Schema(
@@ -79,7 +78,7 @@ const sellQuestionSchema = new mongoose.Schema(
     },
     options: [
       {
-        _id: false, 
+        _id: false,
         key: {
           type: String,
           required: [true, 'Option key is required'],
@@ -151,7 +150,6 @@ const sellQuestionSchema = new mongoose.Schema(
   }
 );
 
-
 sellQuestionSchema.pre('save', function (next) {
   this.options = this.options.map((opt) => ({
     ...opt,
@@ -160,20 +158,15 @@ sellQuestionSchema.pre('save', function (next) {
   next();
 });
 
-
 sellQuestionSchema.index({ categoryId: 1, key: 1 }, { unique: true });
-
 
 sellQuestionSchema.index({ categoryId: 1, section: 1, order: 1 });
 
-
 sellQuestionSchema.index({ categoryId: 1, isActive: 1 });
-
 
 sellQuestionSchema.virtual('activeOptions').get(function () {
   return this.options.filter((option) => option.isActive !== false);
 });
-
 
 sellQuestionSchema.statics.getForCategory = function (categoryId) {
   const query = {
@@ -184,21 +177,17 @@ sellQuestionSchema.statics.getForCategory = function (categoryId) {
   return this.find(query).sort({ section: 1, order: 1 });
 };
 
-
-
 sellQuestionSchema.statics.getForVariants = async function (
   productId,
   variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
 
-  
   const product = await SellProduct.findById(productId).select('categoryId');
   if (!product) {
     return [];
   }
 
-  
   return this.getForCategory(product.categoryId);
 };
 

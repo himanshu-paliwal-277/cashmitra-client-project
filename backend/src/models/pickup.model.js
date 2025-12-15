@@ -68,22 +68,22 @@ const pickupSchema = new mongoose.Schema(
     address: {
       street: {
         type: String,
-        
+
         trim: true,
       },
       city: {
         type: String,
-        
+
         trim: true,
       },
       state: {
         type: String,
-        
+
         trim: true,
       },
       zipCode: {
         type: String,
-        
+
         trim: true,
       },
       landmark: {
@@ -124,7 +124,7 @@ const pickupSchema = new mongoose.Schema(
     },
     pickupImages: [
       {
-        type: String, 
+        type: String,
       },
     ],
     communication: [
@@ -194,14 +194,12 @@ const pickupSchema = new mongoose.Schema(
   }
 );
 
-
 pickupSchema.index({ orderId: 1 });
 pickupSchema.index({ assignedTo: 1 });
 pickupSchema.index({ status: 1 });
 pickupSchema.index({ scheduledDate: 1 });
 pickupSchema.index({ 'customer.phone': 1 });
 pickupSchema.index({ orderNumber: 1 });
-
 
 pickupSchema.virtual('formattedScheduledTime').get(function () {
   if (!this.scheduledDate || !this.scheduledTimeSlot) return null;
@@ -211,14 +209,12 @@ pickupSchema.virtual('formattedScheduledTime').get(function () {
   return `${date} ${timeSlot}`;
 });
 
-
 pickupSchema.virtual('pickupDuration').get(function () {
   if (!this.actualPickupTime || !this.completedAt) return null;
 
   const duration = this.completedAt - this.actualPickupTime;
-  return Math.round(duration / (1000 * 60)); 
+  return Math.round(duration / (1000 * 60));
 });
-
 
 pickupSchema.pre('save', function (next) {
   if (this.isModified('status')) {
@@ -239,7 +235,6 @@ pickupSchema.pre('save', function (next) {
   next();
 });
 
-
 pickupSchema.statics.getPickupStats = async function (filters = {}) {
   const pipeline = [
     { $match: filters },
@@ -253,7 +248,6 @@ pickupSchema.statics.getPickupStats = async function (filters = {}) {
 
   const stats = await this.aggregate(pipeline);
 
-  
   const result = {
     total: 0,
     scheduled: 0,
@@ -272,7 +266,6 @@ pickupSchema.statics.getPickupStats = async function (filters = {}) {
   return result;
 };
 
-
 pickupSchema.methods.addCommunication = function (type, message, sentBy) {
   this.communication.push({
     type,
@@ -282,7 +275,6 @@ pickupSchema.methods.addCommunication = function (type, message, sentBy) {
   });
   return this.save();
 };
-
 
 pickupSchema.methods.addNote = function (content, addedBy) {
   this.notes.push({

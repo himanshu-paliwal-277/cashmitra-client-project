@@ -68,14 +68,11 @@ const sellConfigSchema = new mongoose.Schema(
   }
 );
 
-
 sellConfigSchema.index({ productId: 1 }, { unique: true });
-
 
 sellConfigSchema.virtual('orderedSteps').get(function () {
   return this.steps.sort((a, b) => a.order - b.order);
 });
-
 
 sellConfigSchema.statics.getDefaultConfig = function () {
   return {
@@ -95,7 +92,6 @@ sellConfigSchema.statics.getDefaultConfig = function () {
   };
 };
 
-
 sellConfigSchema.statics.createDefaultForProduct = function (
   productId,
   createdBy
@@ -108,7 +104,6 @@ sellConfigSchema.statics.createDefaultForProduct = function (
   });
 };
 
-
 sellConfigSchema.methods.applyPricingRules = function (
   basePrice,
   calculatedPrice
@@ -116,7 +111,6 @@ sellConfigSchema.methods.applyPricingRules = function (
   const { rules } = this;
   let finalPrice = calculatedPrice;
 
-  
   if (rules.minPercent !== undefined) {
     const minPrice = basePrice * (1 + rules.minPercent / 100);
     finalPrice = Math.max(finalPrice, minPrice);
@@ -127,23 +121,20 @@ sellConfigSchema.methods.applyPricingRules = function (
     finalPrice = Math.min(finalPrice, maxPrice);
   }
 
-  
   if (rules.floorPrice !== undefined) {
     finalPrice = Math.max(finalPrice, rules.floorPrice);
   }
 
-  
   if (rules.capPrice !== undefined) {
     finalPrice = Math.min(finalPrice, rules.capPrice);
   }
 
-  
   if (rules.roundToNearest && rules.roundToNearest > 0) {
     finalPrice =
       Math.round(finalPrice / rules.roundToNearest) * rules.roundToNearest;
   }
 
-  return Math.max(0, finalPrice); 
+  return Math.max(0, finalPrice);
 };
 
 const SellConfig = mongoose.model('SellConfig', sellConfigSchema);

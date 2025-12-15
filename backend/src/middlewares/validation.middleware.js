@@ -1,7 +1,6 @@
 const { validationResult } = require('express-validator');
 const validationUtils = require('../utils/validation.utils');
 
-
 const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -16,7 +15,6 @@ const validateRequest = (req, res, next) => {
   next();
 };
 
-
 const validateObjectId = (paramName) => {
   return (req, res, next) => {
     const id = req.params[paramName];
@@ -30,17 +28,14 @@ const validateObjectId = (paramName) => {
   };
 };
 
-
 const validateAssessmentId = (paramName) => {
   return (req, res, next) => {
     const id = req.params[paramName];
 
-    
     if (validationUtils.isValidObjectId(id)) {
       return next();
     }
 
-    
     const assessmentPattern = /^assessment_\d+_[a-zA-Z0-9]+$/;
     if (assessmentPattern.test(id)) {
       return next();
@@ -52,7 +47,6 @@ const validateAssessmentId = (paramName) => {
     });
   };
 };
-
 
 const validatePasswordStrength = (req, res, next) => {
   const { password } = req.body;

@@ -1,5 +1,3 @@
-
-
 const { validationResult } = require('express-validator');
 const SellQuestion = require('../models/sellQuestion.model');
 const SellProduct = require('../models/sellProduct.model');
@@ -9,7 +7,6 @@ const {
   ApiError,
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
-
 
 exports.createQuestion = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -28,7 +25,6 @@ exports.createQuestion = asyncHandler(async (req, res) => {
     options,
   } = req.body;
 
-  
   let category = await Category.findById(categoryId);
   if (!category) {
     category = await SellSuperCategory.findById(categoryId);
@@ -37,7 +33,6 @@ exports.createQuestion = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Category not found');
   }
 
-  
   const existingQuestion = await SellQuestion.findOne({ categoryId, key });
   if (existingQuestion) {
     throw new ApiError(
@@ -46,7 +41,6 @@ exports.createQuestion = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const lastQuestion = await SellQuestion.findOne({ categoryId, section }).sort(
     { order: -1 }
   );
@@ -74,7 +68,6 @@ exports.createQuestion = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getQuestions = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -83,27 +76,23 @@ exports.getQuestions = asyncHandler(async (req, res) => {
 
   const { categoryId, section } = req.query;
 
-  
   const query = { isActive: true };
   if (categoryId) query.categoryId = categoryId;
   if (section) query.section = section;
 
-  
   const questions = await SellQuestion.find(query).sort({
     section: 1,
     order: 1,
   });
 
-  
   const populatedQuestions = await Promise.all(
     questions.map(async (question) => {
       const questionObj = question.toObject();
       if (questionObj.categoryId) {
-        
         let category = await Category.findById(questionObj.categoryId).select(
           '_id name displayName'
         );
-        
+
         if (!category) {
           category = await SellSuperCategory.findById(
             questionObj.categoryId
@@ -121,20 +110,16 @@ exports.getQuestions = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getQuestionsForCustomer = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
 
-  
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  
   const questions = await SellQuestion.getForCategory(categoryId);
 
-  
   const groupedQuestions = questions.reduce((acc, question) => {
     if (!acc[question.section]) {
       acc[question.section] = [];
@@ -143,7 +128,6 @@ exports.getQuestionsForCustomer = asyncHandler(async (req, res) => {
     return acc;
   }, {});
 
-  
   Object.keys(groupedQuestions).forEach((section) => {
     groupedQuestions[section].sort((a, b) => a.order - b.order);
   });
@@ -153,7 +137,6 @@ exports.getQuestionsForCustomer = asyncHandler(async (req, res) => {
     data: groupedQuestions,
   });
 });
-
 
 exports.getCustomerQuestions = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -163,7 +146,6 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
 
   const { productId, variantId } = req.query;
 
-  
   const product = await SellProduct.findById(productId);
   if (!product) {
     throw new ApiError(404, 'Product not found');
@@ -171,16 +153,13 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
 
   const categoryId = product.categoryId;
 
-  
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  
   const questions = await SellQuestion.getForCategory(categoryId);
 
-  
   const groupedQuestions = questions.reduce((acc, question) => {
     if (!acc[question.section]) {
       acc[question.section] = [];
@@ -189,7 +168,6 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
     return acc;
   }, {});
 
-  
   Object.keys(groupedQuestions).forEach((section) => {
     groupedQuestions[section].sort((a, b) => a.order - b.order);
   });
@@ -199,7 +177,6 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
     data: groupedQuestions,
   });
 });
-
 
 exports.getQuestion = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id)
@@ -215,7 +192,6 @@ exports.getQuestion = asyncHandler(async (req, res) => {
     data: question,
   });
 });
-
 
 exports.updateQuestion = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -243,7 +219,6 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Question not found');
   }
 
-  
   if (key && key !== question.key) {
     const existingQuestion = await SellQuestion.findOne({
       categoryId: question.categoryId,
@@ -258,15 +233,12 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
     }
   }
 
-  
   const transformedOptions = options?.map(({ tempId, ...opt }) => ({
     ...opt,
     showIf: opt.showIf === null ? undefined : opt.showIf,
   }));
 
-  
   if (categoryId !== undefined) {
-    
     let category = await Category.findById(categoryId);
     if (!category) {
       category = await SellSuperCategory.findById(categoryId);
@@ -298,7 +270,6 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.deleteQuestion = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
@@ -313,7 +284,6 @@ exports.deleteQuestion = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.addOption = asyncHandler(async (req, res) => {
   const { key, label, value, delta, showIf } = req.body;
 
@@ -326,7 +296,6 @@ exports.addOption = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Question not found');
   }
 
-  
   const existingOption = question.options.find((opt) => opt.key === key);
   if (existingOption) {
     throw new ApiError(400, 'Option with this key already exists');
@@ -349,7 +318,6 @@ exports.addOption = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateOption = asyncHandler(async (req, res) => {
   const { key, label, value, delta, showIf } = req.body;
 
@@ -358,7 +326,6 @@ exports.updateOption = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Question not found');
   }
 
-  
   const optionIndex = question.options.findIndex(
     (opt) => opt.key === req.params.optionId
   );
@@ -368,7 +335,6 @@ exports.updateOption = asyncHandler(async (req, res) => {
 
   const option = question.options[optionIndex];
 
-  
   if (key && key !== option.key) {
     const existingOption = question.options.find((opt) => opt.key === key);
     if (existingOption) {
@@ -392,14 +358,12 @@ exports.updateOption = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.deleteOption = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
     throw new ApiError(404, 'Question not found');
   }
 
-  
   const optionIndex = question.options.findIndex(
     (opt) => opt.key === req.params.optionId
   );
@@ -417,7 +381,6 @@ exports.deleteOption = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.reorderQuestions = asyncHandler(async (req, res) => {
   const { categoryId, section, questionIds } = req.body;
 
@@ -425,13 +388,12 @@ exports.reorderQuestions = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Section and question IDs array are required');
   }
 
-  
   if (categoryId) {
     let category = await Category.findById(categoryId);
     if (!category) {
       category = await SellSuperCategory.findById(categoryId);
     }
-    
+
     if (!category) {
       console.warn(
         `Warning: Category ${categoryId} not found in either Category or SellSuperCategory collections. Proceeding with reorder anyway.`
@@ -439,7 +401,6 @@ exports.reorderQuestions = asyncHandler(async (req, res) => {
     }
   }
 
-  
   const questions = await SellQuestion.find({
     _id: { $in: questionIds },
   });
@@ -448,7 +409,6 @@ exports.reorderQuestions = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Some question IDs are invalid');
   }
 
-  
   const allSameSection = questions.every((q) => q.section === section);
 
   let allSameCategory = true;
@@ -468,7 +428,6 @@ exports.reorderQuestions = asyncHandler(async (req, res) => {
     );
   }
 
-  
   const [firstQuestion, secondQuestion] = questions;
   const tempOrder = firstQuestion.order;
 

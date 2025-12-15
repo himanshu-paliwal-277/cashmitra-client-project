@@ -12,7 +12,6 @@ const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
-
 const buyCategoryValidation = [
   body('name')
     .trim()
@@ -21,7 +20,6 @@ const buyCategoryValidation = [
     .notEmpty()
     .withMessage('Buy category name is required'),
 ];
-
 
 const updateBuyCategoryValidation = [
   param('id')
@@ -42,7 +40,6 @@ const updateBuyCategoryValidation = [
     .withMessage('Sort order must be a non-negative integer'),
 ];
 
-
 router.get('/', getBuyCategories);
 router.get(
   '/:id',
@@ -52,9 +49,8 @@ router.get(
   getBuyCategory
 );
 
-
-router.use(protect); 
-router.use(authorize('admin')); 
+router.use(protect);
+router.use(authorize('admin'));
 
 router.post('/', buyCategoryValidation, createBuyCategory);
 router.put('/:id', updateBuyCategoryValidation, updateBuyCategory);

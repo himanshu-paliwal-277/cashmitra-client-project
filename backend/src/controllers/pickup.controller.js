@@ -6,7 +6,6 @@ const { asyncHandler } = require('../middlewares/errorHandler.middleware');
 const ApiError = require('../utils/apiError');
 const { validationResult } = require('express-validator');
 
-
 exports.createPickup = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -27,7 +26,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
     specialInstructions,
   } = req.body;
 
-  
   let order;
   let orderAddress = {};
 
@@ -43,7 +41,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
       .populate('userId', 'name phone email');
 
     if (order) {
-      
       orderAddress = {
         street: order.pickup?.address?.street || '',
         city: order.pickup?.address?.city || '',
@@ -55,7 +52,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
     order = await Order.findById(orderId).populate('user', 'name phone email');
 
     if (order) {
-      
       orderAddress = {
         street: order.shippingDetails?.address?.street || '',
         city: order.shippingDetails?.address?.city || '',
@@ -69,11 +65,9 @@ exports.createPickup = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const finalAddress =
     address && Object.keys(address).length > 0 ? address : orderAddress;
 
-  
   const agent = await User.findById(assignedTo);
   if (!agent) {
     throw new ApiError(404, 'Assigned agent not found');
@@ -83,7 +77,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Invalid agent role for pickup assignment');
   }
 
-  
   const existingPickup = await Pickup.findOne({ orderId, orderType });
   if (existingPickup) {
     throw new ApiError(400, 'Pickup already exists for this order');
@@ -98,7 +91,7 @@ exports.createPickup = asyncHandler(async (req, res) => {
     scheduledDate,
     scheduledTimeSlot,
     customer,
-    address: finalAddress, 
+    address: finalAddress,
     items,
     priority: priority || 'medium',
     specialInstructions,
@@ -113,7 +106,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
 
   await pickup.save();
 
-  
   await pickup.populate([
     { path: 'assignedTo', select: 'name email phone' },
     { path: 'assignedBy', select: 'name email' },
@@ -125,7 +117,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
     data: pickup,
   });
 });
-
 
 exports.getPickups = asyncHandler(async (req, res) => {
   const {
@@ -142,20 +133,17 @@ exports.getPickups = asyncHandler(async (req, res) => {
 
   const query = {};
 
-  
   if (status) query.status = status;
   if (assignedTo) query.assignedTo = assignedTo;
   if (priority) query.priority = priority;
   if (pincode) query['address.pincode'] = pincode;
 
-  
   if (startDate || endDate) {
     query.scheduledDate = {};
     if (startDate) query.scheduledDate.$gte = new Date(startDate);
     if (endDate) query.scheduledDate.$lte = new Date(endDate);
   }
 
-  
   if (search) {
     query.$or = [
       { orderNumber: { $regex: search, $options: 'i' } },
@@ -166,7 +154,6 @@ exports.getPickups = asyncHandler(async (req, res) => {
     ];
   }
 
-  
   if (['pickup_agent', 'driver'].includes(req.user.role)) {
     query.assignedTo = req.user.id;
   }
@@ -175,11 +162,9 @@ exports.getPickups = asyncHandler(async (req, res) => {
   const limitNum = parseInt(limit);
   const skip = (pageNum - 1) * limitNum;
 
-  
   const totalDocs = await Pickup.countDocuments(query);
   const totalPages = Math.ceil(totalDocs / limitNum);
 
-  
   const docs = await Pickup.find(query)
     .sort({ scheduledDate: 1, priority: -1, createdAt: -1 })
     .skip(skip)
@@ -188,7 +173,6 @@ exports.getPickups = asyncHandler(async (req, res) => {
     .populate('assignedBy', 'name email')
     .exec();
 
-  
   const pickups = {
     docs,
     totalDocs,
@@ -208,7 +192,6 @@ exports.getPickups = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getPickupById = asyncHandler(async (req, res) => {
   const pickup = await Pickup.findById(req.params.id)
     .populate('assignedTo', 'name email phone')
@@ -223,7 +206,6 @@ exports.getPickupById = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  
   if (
     ['pickup_agent', 'driver'].includes(req.user.role) &&
     pickup.assignedTo._id.toString() !== req.user.id
@@ -237,7 +219,6 @@ exports.getPickupById = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updatePickupStatus = asyncHandler(async (req, res) => {
   const { status, notes, location } = req.body;
 
@@ -246,7 +227,6 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  
   if (
     ['pickup_agent', 'driver'].includes(req.user.role) &&
     pickup.assignedTo.toString() !== req.user.id
@@ -254,7 +234,6 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Access denied');
   }
 
-  
   const validTransitions = {
     assigned: ['confirmed', 'cancelled'],
     confirmed: ['in_transit', 'rescheduled', 'cancelled'],
@@ -274,10 +253,8 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
     );
   }
 
-  
   await pickup.addStatusUpdate(status, req.user.id, notes, location);
 
-  
   if (status === 'picked_up') {
     pickup.actualPickupDate = new Date();
     pickup.actualPickupTime = new Date().toLocaleTimeString('en-IN');
@@ -304,7 +281,6 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.reschedulePickup = asyncHandler(async (req, res) => {
   const { newDate, newTimeSlot, reason } = req.body;
 
@@ -313,7 +289,6 @@ exports.reschedulePickup = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  
   if (
     ['pickup_agent', 'driver'].includes(req.user.role) &&
     pickup.assignedTo.toString() !== req.user.id
@@ -339,7 +314,6 @@ exports.reschedulePickup = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.cancelPickup = asyncHandler(async (req, res) => {
   const { reason } = req.body;
 
@@ -348,7 +322,6 @@ exports.cancelPickup = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  
   if (
     req.user.role !== 'admin' &&
     pickup.assignedTo.toString() !== req.user.id
@@ -374,7 +347,6 @@ exports.cancelPickup = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.reassignPickup = asyncHandler(async (req, res) => {
   const { newAgentId, reason } = req.body;
 
@@ -383,7 +355,6 @@ exports.reassignPickup = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  
   const newAgent = await User.findById(newAgentId);
   if (!newAgent) {
     throw new ApiError(404, 'New agent not found');
@@ -420,7 +391,6 @@ exports.reassignPickup = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getPickupAnalytics = asyncHandler(async (req, res) => {
   const { startDate, endDate, agentId } = req.query;
 
@@ -434,7 +404,6 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
   const agentFilter = agentId ? { assignedTo: agentId } : {};
   const combinedFilter = { ...dateFilter, ...agentFilter };
 
-  
   const totalPickups = await Pickup.countDocuments(combinedFilter);
   const completedPickups = await Pickup.countDocuments({
     ...combinedFilter,
@@ -453,21 +422,18 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
     status: 'cancelled',
   });
 
-  
   const statusDistribution = await Pickup.aggregate([
     { $match: combinedFilter },
     { $group: { _id: '$status', count: { $sum: 1 } } },
     { $sort: { count: -1 } },
   ]);
 
-  
   const priorityDistribution = await Pickup.aggregate([
     { $match: combinedFilter },
     { $group: { _id: '$priority', count: { $sum: 1 } } },
     { $sort: { count: -1 } },
   ]);
 
-  
   const agentPerformance = await Pickup.aggregate([
     { $match: combinedFilter },
     {
@@ -512,7 +478,6 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
     { $sort: { successRate: -1 } },
   ]);
 
-  
   const dailyTrends = await Pickup.aggregate([
     { $match: combinedFilter },
     {
@@ -554,12 +519,10 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getAgentPickups = asyncHandler(async (req, res) => {
   const { agentId } = req.params;
   const { status, date } = req.query;
 
-  
   if (
     ['pickup_agent', 'driver'].includes(req.user.role) &&
     req.user.id !== agentId
@@ -569,7 +532,6 @@ exports.getAgentPickups = asyncHandler(async (req, res) => {
 
   const pickups = await Pickup.getPickupsByAgent(agentId, status);
 
-  
   let filteredPickups = pickups;
   if (date) {
     const targetDate = new Date(date);
@@ -587,7 +549,6 @@ exports.getAgentPickups = asyncHandler(async (req, res) => {
     data: filteredPickups,
   });
 });
-
 
 exports.addCommunication = asyncHandler(async (req, res) => {
   const { type, message, status } = req.body;
@@ -613,14 +574,12 @@ exports.addCommunication = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.uploadPickupImages = asyncHandler(async (req, res) => {
   const pickup = await Pickup.findById(req.params.id);
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  
   if (
     ['pickup_agent', 'driver'].includes(req.user.role) &&
     pickup.assignedTo.toString() !== req.user.id
@@ -628,7 +587,6 @@ exports.uploadPickupImages = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Access denied');
   }
 
-  
   if (!req.files || req.files.length === 0) {
     throw new ApiError(400, 'No images uploaded');
   }
@@ -645,11 +603,9 @@ exports.uploadPickupImages = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getPickupSlots = asyncHandler(async (req, res) => {
   const { date } = req.query;
 
-  
   const timeSlots = [
     { id: 1, slot: '09:00-12:00', label: 'Morning (9 AM - 12 PM)' },
     { id: 2, slot: '12:00-15:00', label: 'Afternoon (12 PM - 3 PM)' },
@@ -657,26 +613,22 @@ exports.getPickupSlots = asyncHandler(async (req, res) => {
     { id: 4, slot: '18:00-21:00', label: 'Night (6 PM - 9 PM)' },
   ];
 
-  
   if (date) {
     const selectedDate = new Date(date);
     const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
     const endOfDay = new Date(selectedDate.setHours(23, 59, 59, 999));
 
-    
     const existingPickups = await Pickup.find({
       scheduledDate: { $gte: startOfDay, $lte: endOfDay },
       status: { $nin: ['cancelled', 'completed'] },
     });
 
-    
     const slotCounts = {};
     existingPickups.forEach((pickup) => {
       const slot = pickup.scheduledTimeSlot;
       slotCounts[slot] = (slotCounts[slot] || 0) + 1;
     });
 
-    
     const availableSlots = timeSlots.map((slot) => ({
       ...slot,
       available: (slotCounts[slot.slot] || 0) < 10,
@@ -694,7 +646,6 @@ exports.getPickupSlots = asyncHandler(async (req, res) => {
     data: { slots: timeSlots },
   });
 });
-
 
 exports.updatePickup = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -718,7 +669,6 @@ exports.updatePickup = asyncHandler(async (req, res) => {
     specialInstructions,
   } = req.body;
 
-  
   if (assignedTo) {
     const agent = await User.findById(assignedTo);
     if (!agent) {

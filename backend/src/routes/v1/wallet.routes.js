@@ -10,15 +10,12 @@ const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 
-
-
 router.get(
   '/',
   protect,
   authorize('partner'),
   asyncHandler(walletController.getWallet)
 );
-
 
 router.get(
   '/transactions',
@@ -52,7 +49,6 @@ router.get(
   validateRequest,
   asyncHandler(walletController.getTransactions)
 );
-
 
 router.post(
   '/payout',
@@ -96,7 +92,6 @@ router.post(
   asyncHandler(walletController.requestPayout)
 );
 
-
 router.put(
   '/settings',
   protect,
@@ -124,7 +119,6 @@ router.put(
   asyncHandler(walletController.updatePayoutSettings)
 );
 
-
 router.get(
   '/payouts',
   protect,
@@ -147,7 +141,6 @@ router.get(
   asyncHandler(walletController.getPayoutHistory)
 );
 
-
 router.get(
   '/analytics',
   protect,
@@ -161,8 +154,6 @@ router.get(
   validateRequest,
   asyncHandler(walletController.getWalletAnalytics)
 );
-
-
 
 router.get(
   '/admin/payouts/pending',
@@ -181,7 +172,6 @@ router.get(
   validateRequest,
   asyncHandler(walletController.getPendingPayouts)
 );
-
 
 router.get(
   '/admin/payouts/all',
@@ -204,7 +194,6 @@ router.get(
   validateRequest,
   asyncHandler(walletController.getAllPayouts)
 );
-
 
 router.put(
   '/admin/payouts/:transactionId',

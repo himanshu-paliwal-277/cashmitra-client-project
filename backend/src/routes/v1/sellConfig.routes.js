@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const { body, param, query } = require('express-validator');
 const {
@@ -15,7 +13,6 @@ const {
 const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
-
 
 const configValidation = [
   body('productId')
@@ -108,7 +105,6 @@ const testPricingValidation = [
     .withMessage('Adjustments must be a number'),
 ];
 
-
 router.get(
   '/customer/:productId',
   param('productId')
@@ -117,10 +113,8 @@ router.get(
   getCustomerConfig
 );
 
-
 router.use(protect);
 router.use(authorize('admin'));
-
 
 router.post('/', configValidation, createOrUpdateConfig);
 router.get(
@@ -137,7 +131,6 @@ router.delete(
     .withMessage('Product ID must be a valid MongoDB ObjectId'),
   deleteConfig
 );
-
 
 router.put(
   '/:productId/steps',
@@ -156,7 +149,6 @@ router.put(
   updateRules
 );
 
-
 router.post(
   '/:productId/reset',
   param('productId')
@@ -164,7 +156,6 @@ router.post(
     .withMessage('Product ID must be a valid MongoDB ObjectId'),
   resetToDefault
 );
-
 
 router.post(
   '/:productId/test-pricing',

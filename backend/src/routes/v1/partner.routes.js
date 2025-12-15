@@ -11,7 +11,6 @@ const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
 
 const router = express.Router();
 
-
 router.post(
   '/register',
   protect,
@@ -31,7 +30,6 @@ router.post(
   validateRequest,
   asyncHandler(partnerController.registerPartnerShop)
 );
-
 
 router.get(
   '/profile',
@@ -70,7 +68,6 @@ router.put(
   asyncHandler(partnerController.updatePartnerProfile)
 );
 
-
 router.put(
   '/documents',
   protect,
@@ -97,7 +94,6 @@ router.put(
   asyncHandler(partnerController.uploadDocuments)
 );
 
-
 router.post(
   '/inventory',
   protect,
@@ -122,7 +118,6 @@ router.post(
   validateRequest,
   asyncHandler(partnerController.addInventory)
 );
-
 
 router.get(
   '/products',
@@ -170,14 +165,12 @@ router.delete(
   asyncHandler(partnerController.removeInventory)
 );
 
-
 router.get(
   '/orders',
   protect,
   authorize('partner'),
   asyncHandler(partnerController.getOrders)
 );
-
 
 router.get(
   '/orders/:id/missing-inventory',
@@ -186,7 +179,6 @@ router.get(
   validateObjectId('id'),
   asyncHandler(partnerController.checkMissingInventory)
 );
-
 
 router.put(
   '/orders/:id/respond',
@@ -224,7 +216,6 @@ router.put(
   asyncHandler(partnerController.updateOrderStatus)
 );
 
-
 router.get(
   '/dashboard',
   protect,
@@ -232,13 +223,10 @@ router.get(
   asyncHandler(partnerController.getDashboardStats)
 );
 
-
-
 const {
   attachPartner,
   requirePartner,
 } = require('../../middlewares/partner.middleware');
-
 
 router.use(
   '/dashboard-sellbuy',
@@ -269,24 +257,20 @@ router.use(
   requirePartner
 );
 
-
 router.get(
   '/dashboard-sellbuy',
   asyncHandler(partnerController.getDashboardSellBuy)
 );
-
 
 router.get(
   '/sell-products',
   asyncHandler(partnerController.getPartnerSellProducts)
 );
 
-
 router.get(
   '/buy-products',
   asyncHandler(partnerController.getPartnerBuyProducts)
 );
-
 
 router.get(
   '/sell-orders',
@@ -310,15 +294,12 @@ router.put(
   asyncHandler(partnerController.updatePartnerSellOrderStatus)
 );
 
-
-
 router.get(
   '/agents',
   protect,
   authorize('partner'),
   asyncHandler(partnerController.getPartnerAgents)
 );
-
 
 router.post(
   '/agents',
@@ -342,7 +323,6 @@ router.post(
   asyncHandler(partnerController.createAgent)
 );
 
-
 router.put(
   '/agents/:agentId',
   protect,
@@ -365,7 +345,6 @@ router.put(
   validateRequest,
   asyncHandler(partnerController.updateAgent)
 );
-
 
 router.delete(
   '/agents/:agentId',

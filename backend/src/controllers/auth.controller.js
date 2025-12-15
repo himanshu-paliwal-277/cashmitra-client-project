@@ -3,12 +3,8 @@ const Partner = require('../models/partner.model');
 const { generateToken } = require('../utils/jwt.utils');
 const { validationResult } = require('express-validator');
 
-
-
-
 const registerUser = async (req, res) => {
   try {
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -16,13 +12,11 @@ const registerUser = async (req, res) => {
 
     const { name, email, password, phone } = req.body;
 
-    
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    
     const user = await User.create({
       name,
       email,
@@ -48,12 +42,8 @@ const registerUser = async (req, res) => {
   }
 };
 
-
-
-
 const loginPartner = async (req, res) => {
   try {
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -61,7 +51,6 @@ const loginPartner = async (req, res) => {
 
     const { email, password } = req.body;
 
-    
     const user = await User.findOne({ email, role: 'partner' }).select(
       '+password'
     );
@@ -70,9 +59,7 @@ const loginPartner = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    
     if (await user.matchPassword(password)) {
-      
       const partner = await Partner.findOne({ user: user._id }).populate(
         'user'
       );
@@ -102,12 +89,8 @@ const loginPartner = async (req, res) => {
   }
 };
 
-
-
-
 const registerPartner = async (req, res) => {
   try {
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -115,13 +98,11 @@ const registerPartner = async (req, res) => {
 
     const { name, email, password, phone } = req.body;
 
-    
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    
     const user = await User.create({
       name,
       email,
@@ -148,12 +129,8 @@ const registerPartner = async (req, res) => {
   }
 };
 
-
-
-
 const loginUser = async (req, res) => {
   try {
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -161,10 +138,8 @@ const loginUser = async (req, res) => {
 
     const { email, password } = req.body;
 
-    
     const user = await User.findOne({ email }).select('+password');
 
-    
     if (user && (await user.matchPassword(password))) {
       res.json({
         _id: user._id,
@@ -182,9 +157,6 @@ const loginUser = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
-
-
-
 
 const getUserProfile = async (req, res) => {
   try {
@@ -210,9 +182,6 @@ const getUserProfile = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
-
-
-
 
 const updateUserProfile = async (req, res) => {
   try {

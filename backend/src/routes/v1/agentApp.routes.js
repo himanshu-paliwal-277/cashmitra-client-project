@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const { check } = require('express-validator');
 const agentAppController = require('../../controllers/agentApp.controller');
@@ -11,7 +9,6 @@ const {
 const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
-
 
 router.post(
   '/login',
@@ -26,22 +23,17 @@ router.post(
   asyncHandler(agentAppController.login)
 );
 
-
 router.use(protect);
 router.use(authorize('agent'));
 
-
 router.get('/profile', asyncHandler(agentAppController.getProfile));
 
-
 router.get('/orders/today', asyncHandler(agentAppController.getTodayOrders));
-
 
 router.get(
   '/orders/tomorrow',
   asyncHandler(agentAppController.getTomorrowOrders)
 );
-
 
 router.get(
   '/orders/past',
@@ -59,13 +51,11 @@ router.get(
   asyncHandler(agentAppController.getPastOrders)
 );
 
-
 router.get(
   '/orders/:orderId',
   validateObjectId('orderId'),
   asyncHandler(agentAppController.getOrderDetails)
 );
-
 
 router.put(
   '/pickups/:pickupId/start',
@@ -73,13 +63,11 @@ router.put(
   asyncHandler(agentAppController.startPickup)
 );
 
-
 router.get(
   '/evaluation/questions/:productId',
   validateObjectId('productId'),
   asyncHandler(agentAppController.getEvaluationQuestions)
 );
-
 
 router.post(
   '/evaluation/calculate-price',
@@ -97,7 +85,6 @@ router.post(
   validateRequest,
   asyncHandler(agentAppController.calculatePrice)
 );
-
 
 router.put(
   '/pickups/:pickupId/complete-evaluation',
@@ -125,7 +112,6 @@ router.put(
   asyncHandler(agentAppController.completeEvaluation)
 );
 
-
 router.put(
   '/orders/:orderId/payment',
   validateObjectId('orderId'),
@@ -147,9 +133,7 @@ router.put(
   asyncHandler(agentAppController.completePayment)
 );
 
-
 router.get('/statistics', asyncHandler(agentAppController.getStatistics));
-
 
 router.put(
   '/location',
@@ -165,7 +149,6 @@ router.put(
   asyncHandler(agentAppController.updateLocation)
 );
 
-
 router.post(
   '/orders/:orderId/customer-selfie',
   validateObjectId('orderId'),
@@ -174,13 +157,11 @@ router.post(
   asyncHandler(agentAppController.uploadCustomerSelfie)
 );
 
-
 router.post(
   '/orders/:orderId/gadget-images',
   validateObjectId('orderId'),
   asyncHandler(agentAppController.uploadGadgetImages)
 );
-
 
 router.post(
   '/orders/:orderId/imei-scan',
@@ -201,7 +182,6 @@ router.post(
   validateRequest,
   asyncHandler(agentAppController.uploadIMEIScan)
 );
-
 
 router.post(
   '/orders/:orderId/re-evaluate',
@@ -232,7 +212,6 @@ router.post(
   validateRequest,
   asyncHandler(agentAppController.reEvaluateDevice)
 );
-
 
 router.get(
   '/orders/:orderId/complete',

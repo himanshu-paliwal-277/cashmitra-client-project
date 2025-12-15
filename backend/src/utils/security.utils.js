@@ -1,7 +1,6 @@
 const xss = require('xss');
 const crypto = require('crypto');
 
-
 const sanitizeData = (data) => {
   if (typeof data === 'string') {
     return xss(data);
@@ -22,21 +21,17 @@ const sanitizeData = (data) => {
   return data;
 };
 
-
 const generateSecureToken = (bytes = 32) => {
   return crypto.randomBytes(bytes).toString('hex');
 };
-
 
 const hashData = (data) => {
   return crypto.createHash('sha256').update(data).digest('hex');
 };
 
-
 const generateCSRFToken = () => {
   return generateSecureToken();
 };
-
 
 const validateCSRFToken = (token, storedToken) => {
   if (!token || !storedToken) {

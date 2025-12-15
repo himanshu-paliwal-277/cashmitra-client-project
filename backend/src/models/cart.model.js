@@ -36,12 +36,10 @@ const cartSchema = new mongoose.Schema(
   }
 );
 
-
 cartSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
-
 
 cartSchema.index({ user: 1 });
 cartSchema.index({ 'items.productId': 1 });

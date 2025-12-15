@@ -49,11 +49,9 @@ const buyCategorySchema = new mongoose.Schema(
   }
 );
 
-
 buyCategorySchema.virtual('displayName').get(function () {
   return this.name;
 });
-
 
 buyCategorySchema.pre('save', function (next) {
   if (this.isModified('name') && !this.slug) {

@@ -1,5 +1,3 @@
-
-
 const { validationResult } = require('express-validator');
 const SellConfig = require('../models/sellConfig.model');
 const SellProduct = require('../models/sellProduct.model');
@@ -7,7 +5,6 @@ const {
   ApiError,
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
-
 
 exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -17,17 +14,14 @@ exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
 
   const { productId, steps, rules } = req.body;
 
-  
   const product = await SellProduct.findById(productId);
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
-  
   let config = await SellConfig.findOne({ productId });
 
   if (config) {
-    
     if (steps) config.steps = steps;
     if (rules) config.rules = { ...config.rules, ...rules };
     await config.save();
@@ -38,7 +32,6 @@ exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
       data: config,
     });
   } else {
-    
     config = new SellConfig({
       productId,
       steps: steps || [
@@ -67,7 +60,6 @@ exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
   }
 });
 
-
 exports.getConfig = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
@@ -76,7 +68,6 @@ exports.getConfig = asyncHandler(async (req, res) => {
     .populate('createdBy', 'name email');
 
   if (!config) {
-    
     config = SellConfig.getDefaultConfig();
     config.productId = productId;
   }
@@ -86,7 +77,6 @@ exports.getConfig = asyncHandler(async (req, res) => {
     data: config,
   });
 });
-
 
 exports.getConfigForCustomer = asyncHandler(async (req, res) => {
   const { productId } = req.params;
@@ -106,7 +96,6 @@ exports.getConfigForCustomer = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getCustomerConfig = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -115,7 +104,6 @@ exports.getCustomerConfig = asyncHandler(async (req, res) => {
 
   const { productId } = req.params;
 
-  
   const product = await SellProduct.findById(productId);
   if (!product) {
     throw new ApiError(404, 'Product not found');
@@ -136,7 +124,6 @@ exports.getCustomerConfig = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateSteps = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { steps } = req.body;
@@ -148,7 +135,6 @@ exports.updateSteps = asyncHandler(async (req, res) => {
   let config = await SellConfig.findOne({ productId });
 
   if (!config) {
-    
     config = await SellConfig.createDefaultForProduct(productId, req.user.id);
   }
 
@@ -162,7 +148,6 @@ exports.updateSteps = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateRules = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { rules } = req.body;
@@ -174,7 +159,6 @@ exports.updateRules = asyncHandler(async (req, res) => {
   let config = await SellConfig.findOne({ productId });
 
   if (!config) {
-    
     config = await SellConfig.createDefaultForProduct(productId, req.user.id);
   }
 
@@ -187,7 +171,6 @@ exports.updateRules = asyncHandler(async (req, res) => {
     data: config,
   });
 });
-
 
 exports.deleteConfig = asyncHandler(async (req, res) => {
   const { productId } = req.params;
@@ -205,20 +188,16 @@ exports.deleteConfig = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.resetToDefault = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
-  
   const product = await SellProduct.findById(productId);
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
-  
   await SellConfig.deleteOne({ productId });
 
-  
   const config = await SellConfig.createDefaultForProduct(
     productId,
     req.user.id
@@ -230,7 +209,6 @@ exports.resetToDefault = asyncHandler(async (req, res) => {
     data: config,
   });
 });
-
 
 exports.testPricing = asyncHandler(async (req, res) => {
   const { productId } = req.params;
@@ -246,7 +224,6 @@ exports.testPricing = asyncHandler(async (req, res) => {
     config = SellConfig.getDefaultConfig();
   }
 
-  
   let totalAdjustment = 0;
   const breakdown = [];
 
@@ -268,7 +245,6 @@ exports.testPricing = asyncHandler(async (req, res) => {
     });
   }
 
-  
   const rawPrice = basePrice + totalAdjustment;
   const finalPrice = config.applyPricingRules(basePrice, rawPrice);
 
@@ -284,7 +260,6 @@ exports.testPricing = asyncHandler(async (req, res) => {
     },
   });
 });
-
 
 exports.getAllConfigs = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;

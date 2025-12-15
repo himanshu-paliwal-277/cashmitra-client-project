@@ -65,7 +65,6 @@ const transactionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
 transactionSchema.index({ transactionType: 1 });
 transactionSchema.index({ user: 1 });
 transactionSchema.index({ partner: 1 });

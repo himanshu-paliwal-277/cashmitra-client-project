@@ -4,11 +4,9 @@ const salesController = require('../../controllers/sales.controller');
 const { protect, authorize } = require('../../middlewares/auth.middleware');
 const router = express.Router();
 
-
 const validateCreateOrder = [
   body('items')
     .custom((value) => {
-      
       if (Array.isArray(value)) {
         return value.length > 0;
       }
@@ -133,11 +131,7 @@ const validateAnalytics = [
     .withMessage('Group by must be day, week, or month'),
 ];
 
-
-
-
 router.use(protect);
-
 
 router.post('/orders', validateCreateOrder, salesController.createOrder);
 router.get('/orders', validateGetOrders, salesController.getUserOrders);
@@ -153,14 +147,12 @@ router.patch(
   salesController.cancelOrder
 );
 
-
 router.patch(
   '/orders/:orderId/shipping',
   authorize('partner', 'admin'),
   validateUpdateShipping,
   salesController.updateShippingStatus
 );
-
 
 router.get(
   '/analytics',

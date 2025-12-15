@@ -5,7 +5,7 @@ const orderSchema = new mongoose.Schema(
     assessmentId: {
       type: String,
       unique: true,
-      sparse: true, 
+      sparse: true,
     },
     orderType: {
       type: String,
@@ -15,12 +15,12 @@ const orderSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: false, 
+      required: false,
     },
     partner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Partner',
-      required: false, 
+      required: false,
     },
     items: [
       {
@@ -151,7 +151,6 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 
 orderSchema.index({ user: 1 });
 orderSchema.index({ partner: 1 });

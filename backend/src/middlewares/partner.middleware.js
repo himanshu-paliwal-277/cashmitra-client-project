@@ -1,7 +1,6 @@
 const Partner = require('../models/partner.model');
 const { ApiError } = require('./errorHandler.middleware');
 
-
 exports.attachPartner = async (req, res, next) => {
   try {
     if (req.user.role !== 'partner') {
@@ -26,7 +25,6 @@ exports.attachPartner = async (req, res, next) => {
   }
 };
 
-
 exports.requirePartner = (req, res, next) => {
   if (req.user.role !== 'partner') {
     throw new ApiError(403, 'Access denied. Partner role required.');
@@ -39,16 +37,13 @@ exports.requirePartner = (req, res, next) => {
   next();
 };
 
-
 exports.checkResourceOwnership = (Model, resourceIdParam = 'id') => {
   return async (req, res, next) => {
     try {
-      
       if (req.user.role === 'admin') {
         return next();
       }
 
-      
       if (req.user.role === 'partner') {
         const resourceId = req.params[resourceIdParam];
         const resource = await Model.findById(resourceId);

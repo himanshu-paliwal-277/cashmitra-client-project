@@ -1,5 +1,3 @@
-
-
 const { validationResult } = require('express-validator');
 const SellOrder = require('../models/sellOrder.model');
 const SellOfferSession = require('../models/sellOfferSession.model');
@@ -7,7 +5,6 @@ const {
   ApiError,
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
-
 
 exports.createOrder = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -18,7 +15,6 @@ exports.createOrder = asyncHandler(async (req, res) => {
   const { sessionId, pickup, payment, orderNumber } = req.body;
   const userId = req.user.id;
 
-  
   const session = await SellOfferSession.findById(sessionId);
   if (!session) {
     throw new ApiError(404, 'Session not found');
@@ -28,18 +24,15 @@ exports.createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Session does not belong to user');
   }
 
-  
   if (session.expiresAt < new Date()) {
     throw new ApiError(410, 'Session has expired');
   }
 
-  
   const existingOrder = await SellOrder.findOne({ sessionId });
   if (existingOrder) {
     throw new ApiError(400, 'Order already exists for this session');
   }
 
-  
   const finalOrderNumber =
     orderNumber ||
     `ORD${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
@@ -62,7 +55,6 @@ exports.createOrder = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const userId = req.user.id;
@@ -83,8 +75,6 @@ exports.getOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
-  
   const orderUserId = order.userId._id || order.userId;
   if (!isAdmin && orderUserId.toString() !== userId) {
     throw new ApiError(403, 'Access denied');
@@ -95,7 +85,6 @@ exports.getOrder = asyncHandler(async (req, res) => {
     data: order,
   });
 });
-
 
 exports.getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user.id;
@@ -134,7 +123,6 @@ exports.getUserOrders = asyncHandler(async (req, res) => {
     },
   });
 });
-
 
 exports.getAllOrders = asyncHandler(async (req, res) => {
   const {
@@ -201,7 +189,6 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateOrderStatus = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { status, notes, actualAmount, assignedTo } = req.body;
@@ -211,7 +198,6 @@ exports.updateOrderStatus = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   switch (status) {
     case 'confirmed':
       await order.confirm();
@@ -247,10 +233,9 @@ exports.updateOrderStatus = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.assignOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
-  
+
   const staffId = req.body.staffId || req.body.assignedTo;
 
   if (!staffId) {
@@ -262,7 +247,6 @@ exports.assignOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const Partner = require('../models/partner.model');
   const partner = await Partner.findById(staffId).populate(
     'user',
@@ -301,7 +285,6 @@ exports.assignOrder = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updatePickupDetails = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { pickup } = req.body;
@@ -313,12 +296,10 @@ exports.updatePickupDetails = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   if (!isAdmin && order.userId.toString() !== userId) {
     throw new ApiError(403, 'Access denied');
   }
 
-  
   if (!['draft', 'confirmed'].includes(order.status)) {
     throw new ApiError(
       400,
@@ -335,7 +316,6 @@ exports.updatePickupDetails = asyncHandler(async (req, res) => {
     data: order,
   });
 });
-
 
 exports.getOrdersByStatus = asyncHandler(async (req, res) => {
   const { status } = req.params;
@@ -371,7 +351,6 @@ exports.getOrdersByStatus = asyncHandler(async (req, res) => {
     },
   });
 });
-
 
 exports.getOrderStats = asyncHandler(async (req, res) => {
   const { period = '30d' } = req.query;
@@ -428,7 +407,6 @@ exports.getOrderStats = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.cancelOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { reason } = req.body;
@@ -440,7 +418,6 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   if (!isAdmin && order.userId.toString() !== userId) {
     throw new ApiError(403, 'Access denied');
   }
@@ -454,7 +431,6 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.deleteOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
 
@@ -463,7 +439,6 @@ exports.deleteOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   if (!['draft', 'cancelled'].includes(order.status)) {
     throw new ApiError(400, 'Cannot delete order with current status');
   }
@@ -475,7 +450,6 @@ exports.deleteOrder = asyncHandler(async (req, res) => {
     message: 'Order deleted successfully',
   });
 });
-
 
 exports.getOrderPickupDetails = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
@@ -495,7 +469,6 @@ exports.getOrderPickupDetails = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   const addressInfo = {
     orderNumber: order.orderNumber,
     orderId: order._id,
@@ -524,7 +497,6 @@ exports.getOrderPickupDetails = asyncHandler(async (req, res) => {
     data: addressInfo,
   });
 });
-
 
 exports.getOrdersForPickup = asyncHandler(async (req, res) => {
   const { status = 'confirmed' } = req.query;
@@ -566,7 +538,6 @@ exports.getOrdersForPickup = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.rescheduleOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { newDate, newTimeWindow } = req.body;
@@ -578,17 +549,14 @@ exports.rescheduleOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  
   if (!isAdmin && order.userId.toString() !== userId) {
     throw new ApiError(403, 'Access denied');
   }
 
-  
   if (!['confirmed', 'draft'].includes(order.status)) {
     throw new ApiError(400, 'Cannot reschedule order with current status');
   }
 
-  
   order.pickup.slot = {
     date: new Date(newDate),
     window: newTimeWindow,

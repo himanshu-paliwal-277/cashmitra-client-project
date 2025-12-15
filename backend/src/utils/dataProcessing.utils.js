@@ -1,10 +1,6 @@
-
-
-
 const processArrayFields = (data) => {
   const processedData = { ...data };
 
-  
   const convertToArray = (obj) => {
     if (!obj) return [];
     if (Array.isArray(obj)) {
@@ -22,7 +18,6 @@ const processArrayFields = (data) => {
     return [];
   };
 
-  
   const convertStringArray = (obj) => {
     if (!obj) return [];
     if (Array.isArray(obj)) {
@@ -50,7 +45,6 @@ const processArrayFields = (data) => {
     });
   };
 
-  
   if (processedData.images) {
     processedData.images = convertStringArray(processedData.images);
   }
@@ -61,7 +55,6 @@ const processArrayFields = (data) => {
     );
   }
 
-  
   if (processedData.variants) {
     const variantsArray = Array.isArray(processedData.variants)
       ? processedData.variants
@@ -76,7 +69,6 @@ const processArrayFields = (data) => {
     );
   }
 
-  
   if (processedData.addOns) {
     const addOnsArray = Array.isArray(processedData.addOns)
       ? processedData.addOns
@@ -117,7 +109,6 @@ const processArrayFields = (data) => {
     );
   }
 
-  
   if (processedData.paymentOptions) {
     if (processedData.paymentOptions.emiPlans) {
       processedData.paymentOptions.emiPlans = filterEmptyObjects(
@@ -131,11 +122,9 @@ const processArrayFields = (data) => {
     }
   }
 
-  
   if (processedData.productDetails) {
     const details = processedData.productDetails;
 
-    
     if (details.rearCamera) {
       if (details.rearCamera.features) {
         details.rearCamera.features = convertStringArray(
@@ -187,17 +176,14 @@ const processArrayFields = (data) => {
       }
     }
 
-    
     if (details.display && details.display.features) {
       details.display.features = convertStringArray(details.display.features);
     }
 
-    
     if (details.design && details.design.colors) {
       details.design.colors = convertStringArray(details.design.colors);
     }
 
-    
     if (details.networkConnectivity) {
       if (details.networkConnectivity.wifiFeatures) {
         details.networkConnectivity.wifiFeatures = convertStringArray(
@@ -211,14 +197,12 @@ const processArrayFields = (data) => {
       }
     }
 
-    
     if (details.memoryStorage && details.memoryStorage.phoneVariants) {
       details.memoryStorage.phoneVariants = convertStringArray(
         details.memoryStorage.phoneVariants
       );
     }
 
-    
     if (details.sensorsMisc && details.sensorsMisc.sensors) {
       details.sensorsMisc.sensors = convertStringArray(
         details.sensorsMisc.sensors
@@ -229,7 +213,6 @@ const processArrayFields = (data) => {
     }
   }
 
-  
   if (processedData.sortOrder !== undefined) {
     processedData.sortOrder = Number(processedData.sortOrder) || 0;
   }

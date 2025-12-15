@@ -1,7 +1,4 @@
-
-
 const securityConfig = {
-  
   cors: {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -10,7 +7,6 @@ const securityConfig = {
     credentials: true,
   },
 
-  
   helmet: {
     contentSecurityPolicy: {
       directives: {
@@ -30,10 +26,9 @@ const securityConfig = {
     referrerPolicy: { policy: 'same-origin' },
   },
 
-  
   rateLimit: {
-    windowMs: 15 * 60 * 1000, 
-    max: 100, 
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -42,10 +37,9 @@ const securityConfig = {
     },
   },
 
-  
   authRateLimit: {
-    windowMs: 15 * 60 * 1000, 
-    max: 50, 
+    windowMs: 15 * 60 * 1000,
+    max: 50,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -54,7 +48,6 @@ const securityConfig = {
     },
   },
 
-  
   session: {
     secret: require('./serverConfig').SESSION_SECRET,
     resave: false,
@@ -63,11 +56,10 @@ const securityConfig = {
       secure: require('./serverConfig').isProduction(),
       httpOnly: true,
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000, 
+      maxAge: 24 * 60 * 60 * 1000,
     },
   },
 
-  
   jwt: {
     secret: require('./serverConfig').JWT_SECRET,
     expiresIn: require('./serverConfig').JWT_EXPIRES_IN,

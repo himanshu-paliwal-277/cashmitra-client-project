@@ -1,5 +1,3 @@
-
-
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 const SellOfferSession = require('../models/sellOfferSession.model');
@@ -10,7 +8,6 @@ const {
   ApiError,
   asyncHandler,
 } = require('../middlewares/errorHandler.middleware');
-
 
 exports.createSession = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -31,20 +28,17 @@ exports.createSession = asyncHandler(async (req, res) => {
     accessoriesLength: accessories ? accessories.length : 0,
   });
 
-  
   const finalUserId = req.user?.id || userId;
 
   if (!finalUserId) {
     throw new ApiError(400, 'User ID is required');
   }
 
-  
   const product = await SellProduct.findById(productId);
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
-  
   const variant = product.variants.find(
     (v) => v._id.toString() === variantId.toString()
   );
@@ -56,28 +50,20 @@ exports.createSession = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Selected variant is not available');
   }
 
-  
-  
-  
   let processedAnswers = new Map();
   if (answers && typeof answers === 'object') {
     Object.entries(answers).forEach(([key, value]) => {
       if (value && typeof value === 'object') {
-        
         processedAnswers.set(key, value);
       } else if (value) {
-        
         processedAnswers.set(key, Array.isArray(value) ? value : [value]);
       }
     });
   }
 
-  
-  
   const processedDefects = defects || [];
   const processedAccessories = accessories || [];
 
-  
   const session = new SellOfferSession({
     userId: finalUserId,
     productId,
@@ -97,15 +83,12 @@ exports.createSession = asyncHandler(async (req, res) => {
     ],
   });
 
-  
   await recalculateSessionPrice(session);
 
-  
   session.generateSessionToken();
 
   await session.save();
 
-  
   await session.populate('productId', 'name images categoryId');
 
   res.status(201).json({
@@ -144,7 +127,6 @@ exports.createSession = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.query;
@@ -157,12 +139,10 @@ exports.getSession = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  
   if (sessionToken && !session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
 
-  
   if (session.expiresAt < new Date()) {
     throw new ApiError(410, 'Session has expired');
   }
@@ -173,7 +153,6 @@ exports.getSession = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateAnswers = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { answers, sessionToken } = req.body;
@@ -183,15 +162,12 @@ exports.updateAnswers = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
 
-  
   session.answers = new Map(Object.entries(answers || {}));
 
-  
   await recalculateSessionPrice(session);
   await session.save();
 
@@ -205,7 +181,6 @@ exports.updateAnswers = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateDefects = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { defects, sessionToken } = req.body;
@@ -215,15 +190,12 @@ exports.updateDefects = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
 
-  
   session.defects = defects || [];
 
-  
   await recalculateSessionPrice(session);
   await session.save();
 
@@ -237,7 +209,6 @@ exports.updateDefects = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateAccessories = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { accessories, sessionToken } = req.body;
@@ -247,15 +218,12 @@ exports.updateAccessories = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
 
-  
   session.accessories = accessories || [];
 
-  
   await recalculateSessionPrice(session);
   await session.save();
 
@@ -269,7 +237,6 @@ exports.updateAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getCurrentPrice = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.query;
@@ -279,7 +246,6 @@ exports.getCurrentPrice = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
@@ -297,7 +263,6 @@ exports.getCurrentPrice = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.extendSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.body;
@@ -307,7 +272,6 @@ exports.extendSession = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
@@ -324,7 +288,6 @@ exports.extendSession = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getUserActiveSessions = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
@@ -332,11 +295,9 @@ exports.getUserActiveSessions = asyncHandler(async (req, res) => {
     .populate('productId', 'name images variants')
     .sort({ updatedAt: -1 });
 
-  
   const transformedSessions = sessions.map((session) => {
     const sessionObj = session.toObject();
 
-    
     if (
       sessionObj.productId &&
       sessionObj.productId.variants &&
@@ -356,7 +317,6 @@ exports.getUserActiveSessions = asyncHandler(async (req, res) => {
       }
     }
 
-    
     if (sessionObj.productId && sessionObj.productId.variants) {
       sessionObj.productId.activeVariants =
         sessionObj.productId.variants.filter((v) => v.isActive);
@@ -371,9 +331,7 @@ exports.getUserActiveSessions = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getUserSessions = exports.getUserActiveSessions;
-
 
 exports.deleteSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
@@ -384,7 +342,6 @@ exports.deleteSession = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Session not found');
   }
 
-  
   if (!session.verifyToken(sessionToken)) {
     throw new ApiError(401, 'Invalid session token');
   }
@@ -396,7 +353,6 @@ exports.deleteSession = asyncHandler(async (req, res) => {
     message: 'Session deleted successfully',
   });
 });
-
 
 exports.getAllSessions = asyncHandler(async (req, res) => {
   const {
@@ -411,7 +367,6 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
 
   const query = {};
 
-  
   if (search) {
     const users = await mongoose
       .model('User')
@@ -428,7 +383,6 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
     query.userId = { $in: userIds };
   }
 
-  
   const now = new Date();
   if (status === 'active') {
     query.isActive = true;
@@ -439,11 +393,9 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
     query.isActive = false;
   }
 
-  
   const skip = (parseInt(page) - 1) * parseInt(limit);
   const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
-  
   const sessions = await SellOfferSession.find(query)
     .populate('userId', 'name email phone')
     .populate('productId', 'name images categoryId')
@@ -453,12 +405,10 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
 
   const total = await SellOfferSession.countDocuments(query);
 
-  
   const transformedSessions = await Promise.all(
     sessions.map(async (session) => {
       const sessionObj = session.toObject();
 
-      
       if (sessionObj.productId && sessionObj.productId._id) {
         const product = await mongoose
           .model('SellProduct')
@@ -493,7 +443,6 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.updateSessionStatus = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { isActive } = req.body;
@@ -513,7 +462,6 @@ exports.updateSessionStatus = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.cleanupExpiredSessions = asyncHandler(async (req, res) => {
   const result = await SellOfferSession.cleanupExpired();
 
@@ -523,7 +471,6 @@ exports.cleanupExpiredSessions = asyncHandler(async (req, res) => {
     data: { deletedCount: result.deletedCount },
   });
 });
-
 
 async function recalculateSessionPrice(session) {
   const breakdown = [
@@ -544,12 +491,9 @@ async function recalculateSessionPrice(session) {
     accessoriesCount: session.accessories?.length || 0,
   });
 
-  
-  
   if (session.answers && session.answers.size > 0) {
     try {
       for (const [, answerData] of session.answers) {
-        
         if (answerData && typeof answerData === 'object' && answerData.delta) {
           const adjust = answerData.delta.sign === '-' ? -1 : 1;
 
@@ -586,7 +530,6 @@ async function recalculateSessionPrice(session) {
     }
   }
 
-  
   if (session.defects && session.defects.length > 0) {
     try {
       const defects = await SellDefect.getForVariants(session.productId, [
@@ -628,10 +571,8 @@ async function recalculateSessionPrice(session) {
     }
   }
 
-  
   if (session.accessories && session.accessories.length > 0) {
     try {
-      
       const product = await SellProduct.findById(session.productId);
       if (product && product.categoryId) {
         const accessories = await SellAccessory.getActiveForCategory(
@@ -674,8 +615,6 @@ async function recalculateSessionPrice(session) {
     }
   }
 
-  
-  
   const finalPrice = Math.round(
     session.basePrice * (1 + percentDelta / 100) + absDelta
   );
@@ -688,7 +627,6 @@ async function recalculateSessionPrice(session) {
     breakdownItems: breakdown.length,
   });
 
-  
   session.breakdown = breakdown;
   session.finalPrice = finalPrice;
 }

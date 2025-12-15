@@ -9,12 +9,11 @@ const path = require('path');
 
 const router = express.Router();
 
-
 const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, 
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png/;
     const extname = allowedTypes.test(
@@ -30,7 +29,6 @@ const upload = multer({
   },
 });
 
-
 router.post(
   '/login',
   [
@@ -41,21 +39,17 @@ router.post(
   asyncHandler(agentController.loginAgent)
 );
 
-
 router.use(protect);
 router.use(authorize('driver', 'admin'));
 
-
 router.get('/dashboard', asyncHandler(agentController.getAgentDashboard));
 router.get('/stats', asyncHandler(agentController.getAgentStats));
-
 
 router.get('/pickups', asyncHandler(agentController.getAssignedPickups));
 router.get(
   '/pickups/:pickupId',
   asyncHandler(agentController.getPickupDetails)
 );
-
 
 router.put(
   '/pickups/:pickupId/start',
@@ -67,13 +61,11 @@ router.put(
   asyncHandler(agentController.reachedDoorstep)
 );
 
-
 router.post(
   '/pickups/:pickupId/selfie',
   upload.single('selfie'),
   asyncHandler(agentController.uploadAgentSelfie)
 );
-
 
 router.post(
   '/pickups/:pickupId/send-otp',
@@ -91,7 +83,6 @@ router.post(
   asyncHandler(agentController.verifyCustomerOTP)
 );
 
-
 router.post(
   '/pickups/:pickupId/device-photos',
   upload.fields([
@@ -104,7 +95,6 @@ router.post(
   ]),
   asyncHandler(agentController.uploadDevicePhotos)
 );
-
 
 router.post(
   '/pickups/:pickupId/imei',
@@ -120,7 +110,6 @@ router.post(
   validateRequest,
   asyncHandler(agentController.verifyIMEI)
 );
-
 
 router.post(
   '/pickups/:pickupId/inspection',
@@ -140,12 +129,10 @@ router.post(
   asyncHandler(agentController.submitDeviceInspection)
 );
 
-
 router.get(
   '/pickups/:pickupId/final-price',
   asyncHandler(agentController.calculateFinalPrice)
 );
-
 
 router.put(
   '/pickups/:pickupId/price',
@@ -161,7 +148,6 @@ router.put(
   asyncHandler(agentController.updatePrice)
 );
 
-
 router.post(
   '/pickups/:pickupId/customer-decision',
   [
@@ -171,7 +157,6 @@ router.post(
   validateRequest,
   asyncHandler(agentController.recordCustomerDecision)
 );
-
 
 router.post(
   '/pickups/:pickupId/payment',
@@ -185,7 +170,6 @@ router.post(
   validateRequest,
   asyncHandler(agentController.recordPayment)
 );
-
 
 router.post(
   '/pickups/:pickupId/send-final-otp',
@@ -208,17 +192,14 @@ router.post(
   asyncHandler(agentController.completePickup)
 );
 
-
 router.post(
   '/pickups/:pickupId/signature',
   upload.single('signature'),
   asyncHandler(agentController.saveCustomerSignature)
 );
 
-
 router.get('/history', asyncHandler(agentController.getPickupHistory));
 router.get('/completed-today', asyncHandler(agentController.getCompletedToday));
-
 
 router.get('/daily-report', asyncHandler(agentController.getDailyReport));
 router.post(

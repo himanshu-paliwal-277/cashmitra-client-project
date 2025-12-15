@@ -1,5 +1,3 @@
-
-
 const mongoose = require('mongoose');
 
 const agentSchema = new mongoose.Schema(
@@ -108,16 +106,13 @@ const agentSchema = new mongoose.Schema(
   }
 );
 
-
 agentSchema.index({ currentLocation: '2dsphere' });
-
 
 agentSchema.index({ user: 1 });
 agentSchema.index({ agentCode: 1 });
 agentSchema.index({ assignedPartner: 1 });
 agentSchema.index({ isActive: 1 });
 agentSchema.index({ coverageAreas: 1 });
-
 
 agentSchema.virtual('completionRate').get(function () {
   if (this.performanceMetrics.totalPickups === 0) return 0;
@@ -128,13 +123,11 @@ agentSchema.virtual('completionRate').get(function () {
   ).toFixed(2);
 });
 
-
 agentSchema.statics.generateAgentCode = async function () {
   const date = new Date();
   const year = date.getFullYear().toString().substr(-2);
   const month = String(date.getMonth() + 1).padStart(2, '0');
 
-  
   const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
   const count = await this.countDocuments({
     createdAt: { $gte: startOfMonth },
@@ -143,7 +136,6 @@ agentSchema.statics.generateAgentCode = async function () {
   const sequence = String(count + 1).padStart(4, '0');
   return `AGT${year}${month}${sequence}`;
 };
-
 
 agentSchema.methods.updateLocation = function (latitude, longitude) {
   this.currentLocation = {
@@ -154,9 +146,8 @@ agentSchema.methods.updateLocation = function (latitude, longitude) {
   return this.save();
 };
 
-
 agentSchema.methods.distanceFrom = function (latitude, longitude) {
-  const R = 6371; 
+  const R = 6371;
   const dLat =
     ((latitude - this.currentLocation.coordinates[1]) * Math.PI) / 180;
   const dLon =
@@ -170,9 +161,8 @@ agentSchema.methods.distanceFrom = function (latitude, longitude) {
       Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; 
+  return R * c;
 };
-
 
 agentSchema.methods.updateMetrics = async function (updateData) {
   if (updateData.completed) {
@@ -199,7 +189,6 @@ agentSchema.methods.updateMetrics = async function (updateData) {
   return this.save();
 };
 
-
 agentSchema.statics.findNearby = function (
   latitude,
   longitude,
@@ -213,12 +202,11 @@ agentSchema.statics.findNearby = function (
           type: 'Point',
           coordinates: [longitude, latitude],
         },
-        $maxDistance: maxDistance, 
+        $maxDistance: maxDistance,
       },
     },
   });
 };
-
 
 agentSchema.statics.findByCoverageArea = function (area) {
   return this.find({

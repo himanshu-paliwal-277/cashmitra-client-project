@@ -100,7 +100,6 @@ const financeSchema = new mongoose.Schema(
   }
 );
 
-
 financeSchema.index({ transactionType: 1 });
 financeSchema.index({ order: 1 });
 financeSchema.index({ user: 1 });
@@ -110,14 +109,12 @@ financeSchema.index({ category: 1 });
 financeSchema.index({ createdAt: -1 });
 financeSchema.index({ processedAt: -1 });
 
-
 financeSchema.virtual('netAmount').get(function () {
   if (this.commission && this.commission.amount) {
     return this.amount - this.commission.amount;
   }
   return this.amount;
 });
-
 
 financeSchema.pre('save', function (next) {
   if (this.isModified('amount') || this.isModified('commission.rate')) {
@@ -134,14 +131,12 @@ financeSchema.pre('save', function (next) {
   next();
 });
 
-
 financeSchema.methods.processTransaction = function (processedBy) {
   this.status = 'processed';
   this.processedBy = processedBy;
   this.processedAt = new Date();
   return this.save();
 };
-
 
 financeSchema.statics.getCommissionSummary = function (startDate, endDate) {
   const matchStage = {
@@ -172,7 +167,6 @@ financeSchema.statics.getCommissionSummary = function (startDate, endDate) {
     },
   ]);
 };
-
 
 financeSchema.statics.getPartnerEarnings = function (
   partnerId,

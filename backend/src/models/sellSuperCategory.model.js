@@ -49,18 +49,15 @@ const sellSuperCategorySchema = new mongoose.Schema(
   }
 );
 
-
 sellSuperCategorySchema.virtual('displayName').get(function () {
   return this.name;
 });
-
 
 sellSuperCategorySchema.virtual('categories', {
   ref: 'Category',
   localField: '_id',
   foreignField: 'superCategory',
 });
-
 
 sellSuperCategorySchema.pre('save', function (next) {
   if (this.isModified('name') && !this.slug) {

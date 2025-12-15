@@ -3,9 +3,6 @@ const { Order } = require('../models/order.model');
 const Address = require('../models/address.model');
 const { validationResult } = require('express-validator');
 
-
-
-
 const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
@@ -33,9 +30,6 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-
-
-
 const updateUserProfile = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -49,7 +43,6 @@ const updateUserProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    
     if (req.body.name) user.name = req.body.name;
     if (req.body.email) user.email = req.body.email;
     if (req.body.phone) user.phone = req.body.phone;
@@ -90,9 +83,6 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-
-
-
 const getUserOrders = async (req, res) => {
   try {
     const { page = 1, limit = 10, status, orderType } = req.query;
@@ -130,9 +120,6 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-
-
-
 const getOrderById = async (req, res) => {
   try {
     const order = await Order.findOne({
@@ -154,9 +141,6 @@ const getOrderById = async (req, res) => {
   }
 };
 
-
-
-
 const getUserAddresses = async (req, res) => {
   try {
     const addresses = await Address.find({ user: req.user._id }).sort({
@@ -170,9 +154,6 @@ const getUserAddresses = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
-
-
-
 
 const addAddress = async (req, res) => {
   try {
@@ -196,9 +177,6 @@ const addAddress = async (req, res) => {
   }
 };
 
-
-
-
 const updateAddress = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -215,7 +193,6 @@ const updateAddress = async (req, res) => {
       return res.status(404).json({ message: 'Address not found' });
     }
 
-    
     Object.keys(req.body).forEach((key) => {
       if (req.body[key] !== undefined) {
         address[key] = req.body[key];
@@ -230,9 +207,6 @@ const updateAddress = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
-
-
-
 
 const deleteAddress = async (req, res) => {
   try {
@@ -254,9 +228,6 @@ const deleteAddress = async (req, res) => {
   }
 };
 
-
-
-
 const setDefaultAddress = async (req, res) => {
   try {
     const address = await Address.findOne({
@@ -268,10 +239,8 @@ const setDefaultAddress = async (req, res) => {
       return res.status(404).json({ message: 'Address not found' });
     }
 
-    
     await Address.updateMany({ user: req.user._id }, { isDefault: false });
 
-    
     address.isDefault = true;
     await address.save();
 

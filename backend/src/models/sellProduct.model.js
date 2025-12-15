@@ -14,7 +14,7 @@ const sellProductSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      
+
       unique: true,
       lowercase: true,
       trim: true,
@@ -61,7 +61,7 @@ const sellProductSchema = new mongoose.Schema(
     partnerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Partner',
-      required: false, 
+      required: false,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -76,18 +76,15 @@ const sellProductSchema = new mongoose.Schema(
   }
 );
 
-
 sellProductSchema.index({ categoryId: 1, status: 1 });
 sellProductSchema.index({ slug: 1 }, { unique: true });
 sellProductSchema.index({ name: 'text', tags: 'text' });
-
 
 sellProductSchema.virtual('activeVariants').get(function () {
   return this.variants
     ? this.variants.filter((variant) => variant.isActive)
     : [];
 });
-
 
 sellProductSchema.pre('save', function (next) {
   if (!this.slug && this.name) {

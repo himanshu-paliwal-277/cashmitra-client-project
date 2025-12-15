@@ -1,8 +1,6 @@
 const { body, validationResult } = require('express-validator');
 
-
 const validateCreateBuyProduct = [
-  
   body('categoryId')
     .notEmpty()
     .withMessage('Category ID is required')
@@ -23,18 +21,16 @@ const validateCreateBuyProduct = [
     .isLength({ min: 2, max: 100 })
     .withMessage('Brand must be between 2 and 100 characters'),
 
-  
   body('isRefurbished')
     .optional()
     .isBoolean()
     .withMessage('isRefurbished must be a boolean'),
 
-  
   body('images')
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -43,7 +39,6 @@ const validateCreateBuyProduct = [
     .isURL()
     .withMessage('Each image must be a valid URL'),
 
-  
   body('badges.qualityChecks')
     .optional()
     .isString()
@@ -61,7 +56,6 @@ const validateCreateBuyProduct = [
     .isString()
     .withMessage('Assurance badge must be a string'),
 
-  
   body('pricing.mrp')
     .optional()
     .isNumeric()
@@ -93,12 +87,11 @@ const validateCreateBuyProduct = [
       return true;
     }),
 
-  
   body('conditionOptions')
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -111,12 +104,11 @@ const validateCreateBuyProduct = [
     .isNumeric()
     .withMessage('Condition price must be a number'),
 
-  
   body('variants')
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -141,12 +133,11 @@ const validateCreateBuyProduct = [
     .isBoolean()
     .withMessage('Stock must be a boolean'),
 
-  
   body('addOns')
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -163,12 +154,11 @@ const validateCreateBuyProduct = [
     .isString()
     .withMessage('Add-on description must be a string'),
 
-  
   body('offers')
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -185,7 +175,6 @@ const validateCreateBuyProduct = [
     .isString()
     .withMessage('Offer conditions must be a string'),
 
-  
   body('rating.average')
     .optional()
     .isNumeric()
@@ -201,12 +190,11 @@ const validateCreateBuyProduct = [
     .isInt({ min: 0 })
     .withMessage('Total reviews must be a non-negative integer'),
 
-  
   body('reviews')
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -223,7 +211,6 @@ const validateCreateBuyProduct = [
     .isString()
     .withMessage('Review comment must be a string'),
 
-  
   body('paymentOptions.emiAvailable')
     .optional()
     .isBoolean()
@@ -232,7 +219,7 @@ const validateCreateBuyProduct = [
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -240,12 +227,11 @@ const validateCreateBuyProduct = [
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
 
-  
   body('availability.inStock')
     .optional()
     .isBoolean()
@@ -259,7 +245,6 @@ const validateCreateBuyProduct = [
     .isString()
     .withMessage('Estimated delivery must be a string'),
 
-  
   body('topSpecs.screenSize')
     .optional()
     .isString()
@@ -281,7 +266,6 @@ const validateCreateBuyProduct = [
     .isString()
     .withMessage('SIM slots must be a string'),
 
-  
   body('productDetails.frontCamera.resolution')
     .optional()
     .isString()
@@ -290,7 +274,7 @@ const validateCreateBuyProduct = [
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -303,7 +287,7 @@ const validateCreateBuyProduct = [
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -316,7 +300,7 @@ const validateCreateBuyProduct = [
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -347,7 +331,7 @@ const validateCreateBuyProduct = [
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -374,7 +358,7 @@ const validateCreateBuyProduct = [
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -391,12 +375,11 @@ const validateCreateBuyProduct = [
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
 
-  
   body('description')
     .optional()
     .isString()
@@ -404,7 +387,6 @@ const validateCreateBuyProduct = [
     .isLength({ max: 2000 })
     .withMessage('Description must not exceed 2000 characters'),
 
-  
   body('trustMetrics.devicesSold')
     .optional()
     .isInt({ min: 0 })
@@ -414,12 +396,11 @@ const validateCreateBuyProduct = [
     .isInt({ min: 0 })
     .withMessage('Quality checks must be a non-negative integer'),
 
-  
   body('relatedProducts')
     .optional()
     .custom((value) => {
       if (value && typeof value === 'object') {
-        return true; 
+        return true;
       }
       return true;
     }),
@@ -436,7 +417,6 @@ const validateCreateBuyProduct = [
     .isNumeric()
     .withMessage('Related product price must be a number'),
 
-  
   body('legal.terms')
     .optional()
     .isString()
@@ -450,7 +430,6 @@ const validateCreateBuyProduct = [
     .isString()
     .withMessage('Copyright must be a string'),
 
-  
   body('isActive')
     .optional()
     .isBoolean()
@@ -460,7 +439,6 @@ const validateCreateBuyProduct = [
     .isInt()
     .withMessage('Sort order must be an integer'),
 ];
-
 
 const validateUpdateBuyProduct = [
   body('categoryId')
@@ -480,9 +458,7 @@ const validateUpdateBuyProduct = [
     .isLength({ min: 2, max: 100 })
     .withMessage('Brand must be between 2 and 100 characters'),
 
-  
   ...validateCreateBuyProduct.map((validation) => {
-    
     if (validation.builder && validation.builder.fields) {
       validation.builder.fields.forEach((field) => {
         field.optional = true;
@@ -491,7 +467,6 @@ const validateUpdateBuyProduct = [
     return validation;
   }),
 ];
-
 
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);

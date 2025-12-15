@@ -1,6 +1,5 @@
 const nodemailer = require('nodemailer');
 
-
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
   port: process.env.EMAIL_PORT || 587,
@@ -10,7 +9,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASSWORD,
   },
 });
-
 
 exports.sendOTPEmail = async (
   email,
@@ -76,24 +74,17 @@ exports.sendOTPEmail = async (
   }
 };
 
-
 exports.sendOTPSMS = async (phone, otp) => {
   try {
-    
-    
-    
-
     console.log(`OTP SMS would be sent to ${phone}: ${otp}`);
 
-    
     return true;
   } catch (error) {
     console.error('Error sending OTP SMS:', error);
-    
+
     return false;
   }
 };
-
 
 exports.sendEmail = async (to, subject, html) => {
   try {
@@ -112,10 +103,8 @@ exports.sendEmail = async (to, subject, html) => {
   }
 };
 
-
 exports.sendSMS = async (phone, message) => {
   try {
-    
     console.log(`SMS to ${phone}: ${message}`);
     return true;
   } catch (error) {
@@ -124,10 +113,8 @@ exports.sendSMS = async (phone, message) => {
   }
 };
 
-
 exports.sendPushNotification = async (userId, title, body, data = {}) => {
   try {
-    
     console.log(`Push notification to user ${userId}: ${title} - ${body}`);
     return true;
   } catch (error) {

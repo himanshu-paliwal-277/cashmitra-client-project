@@ -1,5 +1,3 @@
-
-
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -8,18 +6,17 @@ const hpp = require('hpp');
 const cors = require('cors');
 const { RateLimitError } = require('./errorHandler');
 
-
 const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100, 
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.',
     code: 'RATE_LIMIT_EXCEEDED',
     retryAfter: 900,
   },
-  standardHeaders: true, 
-  legacyHeaders: false, 
+  standardHeaders: true,
+  legacyHeaders: false,
   handler: (req, res, next) => {
     const error = new RateLimitError(
       'Too many requests from this IP, please try again later.',
@@ -29,17 +26,16 @@ const generalLimiter = rateLimit({
   },
 });
 
-
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 5, 
+  windowMs: 15 * 60 * 1000,
+  max: 5,
   message: {
     success: false,
     message: 'Too many authentication attempts, please try again later.',
     code: 'AUTH_RATE_LIMIT_EXCEEDED',
     retryAfter: 900,
   },
-  skipSuccessfulRequests: true, 
+  skipSuccessfulRequests: true,
   handler: (req, res, next) => {
     const error = new RateLimitError(
       'Too many authentication attempts, please try again later.',
@@ -49,10 +45,9 @@ const authLimiter = rateLimit({
   },
 });
 
-
 const searchLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 50, 
+  windowMs: 15 * 60 * 1000,
+  max: 50,
   message: {
     success: false,
     message: 'Too many search requests, please try again later.',
@@ -68,10 +63,9 @@ const searchLimiter = rateLimit({
   },
 });
 
-
 const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, 
-  max: 20, 
+  windowMs: 60 * 60 * 1000,
+  max: 20,
   message: {
     success: false,
     message: 'Too many file uploads, please try again later.',
@@ -87,10 +81,8 @@ const uploadLimiter = rateLimit({
   },
 });
 
-
 const corsOptions = {
   origin: function (origin, callback) {
-    
     return callback(null, true);
   },
 
@@ -108,7 +100,6 @@ const corsOptions = {
   ],
 };
 
-
 const helmetOptions = {
   contentSecurityPolicy: {
     directives: {
@@ -123,7 +114,7 @@ const helmetOptions = {
       frameSrc: ["'none'"],
     },
   },
-  crossOriginEmbedderPolicy: false, 
+  crossOriginEmbedderPolicy: false,
   hsts: {
     maxAge: 31536000,
     includeSubDomains: true,
@@ -131,26 +122,21 @@ const helmetOptions = {
   },
 };
 
-
 const sanitizeInput = (req, res, next) => {
-  
   if (req.body) {
     req.body = sanitizeObject(req.body);
   }
 
-  
   if (req.query) {
     req.query = sanitizeObject(req.query);
   }
 
-  
   if (req.params) {
     req.params = sanitizeObject(req.params);
   }
 
   next();
 };
-
 
 const sanitizeObject = (obj) => {
   if (typeof obj !== 'object' || obj === null) {
@@ -161,13 +147,11 @@ const sanitizeObject = (obj) => {
     return obj.map((item) => sanitizeObject(item));
   }
 
-  
   const keys = Object.keys(obj);
   const isArrayLikeObject =
     keys.length > 0 && keys.every((key) => /^\d+$/.test(key));
 
   if (isArrayLikeObject) {
-    
     const sortedKeys = keys.sort((a, b) => parseInt(a) - parseInt(b));
     return sortedKeys.map((key) => sanitizeObject(obj[key]));
   }
@@ -175,13 +159,11 @@ const sanitizeObject = (obj) => {
   const sanitized = {};
 
   for (const [key, value] of Object.entries(obj)) {
-    
     if (key.startsWith('$') || key.includes('.')) {
       continue;
     }
 
     if (typeof value === 'string') {
-      
       sanitized[key] = value
         .replace(/<script[^>]*>.*?<\/script>/gi, '')
         .replace(/<[^>]*>/g, '')
@@ -217,10 +199,8 @@ const limitRequestSize = (req, res, next) => {
   next();
 };
 
-
 const ipWhitelist = (allowedIPs = []) => {
   return (req, res, next) => {
-    
     if (process.env.NODE_ENV === 'development') {
       return next();
     }
@@ -239,16 +219,13 @@ const ipWhitelist = (allowedIPs = []) => {
   };
 };
 
-
 const requestLogger = (req, res, next) => {
   const start = Date.now();
 
-  
   console.log(
     `${new Date().toISOString()} - ${req.method} ${req.originalUrl} - IP: ${req.ip}`
   );
 
-  
   res.on('finish', () => {
     const duration = Date.now() - start;
     console.log(
@@ -260,22 +237,17 @@ const requestLogger = (req, res, next) => {
   next();
 };
 
-
 const securityHeaders = (req, res, next) => {
-  
   res.removeHeader('X-Powered-By');
 
-  
   res.setHeader('X-API-Version', '1.0.0');
   res.setHeader('X-Request-ID', req.id || 'unknown');
 
   next();
 };
 
-
 const validateContentType = (allowedTypes = ['application/json']) => {
   return (req, res, next) => {
-    
     if (req.method === 'GET') {
       return next();
     }
@@ -306,35 +278,26 @@ const validateContentType = (allowedTypes = ['application/json']) => {
   };
 };
 
-
 const applySecurity = (app) => {
-  
   app.set('trust proxy', 1);
 
-  
   app.use(helmet(helmetOptions));
 
-  
   app.use(cors(corsOptions));
 
-  
   if (process.env.NODE_ENV !== 'test') {
     app.use(requestLogger);
   }
 
-  
   app.use(limitRequestSize);
 
-  
-  app.use(mongoSanitize()); 
-  app.use(xss()); 
-  app.use(hpp()); 
+  app.use(mongoSanitize());
+  app.use(xss());
+  app.use(hpp());
   app.use(sanitizeInput);
 
-  
   app.use(securityHeaders);
 
-  
   app.use(
     '/api',
     validateContentType(['application/json', 'multipart/form-data'])
@@ -342,13 +305,11 @@ const applySecurity = (app) => {
 };
 
 module.exports = {
-  
   generalLimiter,
   authLimiter,
   searchLimiter,
   uploadLimiter,
 
-  
   sanitizeInput,
   limitRequestSize,
   ipWhitelist,
@@ -356,10 +317,8 @@ module.exports = {
   securityHeaders,
   validateContentType,
 
-  
   corsOptions,
   helmetOptions,
 
-  
   applySecurity,
 };

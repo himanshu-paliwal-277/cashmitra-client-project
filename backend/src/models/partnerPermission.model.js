@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 
-
 const PARTNER_MENU_ITEMS = {
-  
   dashboard: {
     name: 'Dashboard',
     path: '/partner/dashboard',
@@ -10,7 +8,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Main',
   },
 
-  
   inventory: {
     name: 'My Inventory',
     path: '/partner/inventory',
@@ -30,7 +27,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Inventory & Products',
   },
 
-  
   orders: {
     name: 'Orders',
     path: '/partner/orders',
@@ -50,7 +46,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Sales & Orders',
   },
 
-  
   wallet: {
     name: 'Wallet',
     path: '/partner/wallet',
@@ -76,7 +71,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Finance & Payouts',
   },
 
-  
   kyc: {
     name: 'KYC Verification',
     path: '/partner/kyc',
@@ -90,7 +84,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'KYC & Verification',
   },
 
-  
   analytics: {
     name: 'Analytics',
     path: '/partner/analytics',
@@ -104,7 +97,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Analytics & Reports',
   },
 
-  
   support: {
     name: 'Support',
     path: '/partner/support',
@@ -118,7 +110,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Support & Communication',
   },
 
-  
   profile: {
     name: 'Profile Settings',
     path: '/partner/profile',
@@ -165,8 +156,8 @@ const partnerPermissionSchema = new mongoose.Schema(
             default: false,
           },
           timeRestriction: {
-            startTime: String, 
-            endTime: String, 
+            startTime: String,
+            endTime: String,
           },
           dateRestriction: {
             startDate: Date,
@@ -174,11 +165,11 @@ const partnerPermissionSchema = new mongoose.Schema(
           },
           maxTransactionAmount: {
             type: Number,
-            default: null, 
+            default: null,
           },
           maxDailyTransactions: {
             type: Number,
-            default: null, 
+            default: null,
           },
         },
         metadata: {
@@ -188,7 +179,7 @@ const partnerPermissionSchema = new mongoose.Schema(
       },
       default: () => {
         const defaultPermissions = new Map();
-        
+
         Object.keys(PARTNER_MENU_ITEMS).forEach((key) => {
           defaultPermissions.set(key, {
             granted: false,
@@ -197,7 +188,7 @@ const partnerPermissionSchema = new mongoose.Schema(
             },
           });
         });
-        
+
         ['dashboard', 'profile', 'kyc'].forEach((key) => {
           defaultPermissions.set(key, {
             granted: true,
@@ -227,19 +218,19 @@ const partnerPermissionSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    
+
     businessLimits: {
       maxInventoryItems: {
         type: Number,
-        default: 100, 
+        default: 100,
       },
       maxMonthlyTransactions: {
         type: Number,
-        default: 50, 
+        default: 50,
       },
       maxPayoutAmount: {
         type: Number,
-        default: 50000, 
+        default: 50000,
       },
     },
     features: {
@@ -268,12 +259,10 @@ const partnerPermissionSchema = new mongoose.Schema(
   }
 );
 
-
 partnerPermissionSchema.index({ partner: 1 });
 partnerPermissionSchema.index({ isActive: 1 });
 partnerPermissionSchema.index({ roleTemplate: 1 });
 partnerPermissionSchema.index({ lastUpdatedBy: 1 });
-
 
 partnerPermissionSchema.virtual('grantedPermissions').get(function () {
   const granted = {};
@@ -290,12 +279,10 @@ partnerPermissionSchema.virtual('grantedPermissions').get(function () {
   return granted;
 });
 
-
 partnerPermissionSchema.methods.hasPermission = function (menuItem) {
   const permission = this.permissions.get(menuItem);
   return permission && permission.granted && this.isActive;
 };
-
 
 partnerPermissionSchema.methods.grantPermission = function (
   menuItem,
@@ -316,7 +303,6 @@ partnerPermissionSchema.methods.grantPermission = function (
   this.lastUpdatedBy = grantedBy;
 };
 
-
 partnerPermissionSchema.methods.revokePermission = function (
   menuItem,
   revokedBy
@@ -333,7 +319,6 @@ partnerPermissionSchema.methods.revokePermission = function (
   this.permissions.set(menuItem, permission);
   this.lastUpdatedBy = revokedBy;
 };
-
 
 partnerPermissionSchema.methods.applyRoleTemplate = function (
   template,
@@ -404,11 +389,11 @@ partnerPermissionSchema.methods.applyRoleTemplate = function (
       },
     },
     enterprise: {
-      permissions: Object.keys(PARTNER_MENU_ITEMS), 
+      permissions: Object.keys(PARTNER_MENU_ITEMS),
       limits: {
-        maxInventoryItems: null, 
-        maxMonthlyTransactions: null, 
-        maxPayoutAmount: null, 
+        maxInventoryItems: null,
+        maxMonthlyTransactions: null,
+        maxPayoutAmount: null,
       },
       features: {
         bulkUpload: true,
@@ -418,7 +403,7 @@ partnerPermissionSchema.methods.applyRoleTemplate = function (
       },
     },
     custom: {
-      permissions: [], 
+      permissions: [],
       limits: {
         maxInventoryItems: 100,
         maxMonthlyTransactions: 50,
@@ -435,38 +420,31 @@ partnerPermissionSchema.methods.applyRoleTemplate = function (
 
   const templateConfig = templates[template] || templates.basic;
 
-  
   Object.keys(PARTNER_MENU_ITEMS).forEach((key) => {
     this.revokePermission(key, appliedBy);
   });
 
-  
   templateConfig.permissions.forEach((key) => {
     this.grantPermission(key, appliedBy);
   });
 
-  
   this.businessLimits = { ...this.businessLimits, ...templateConfig.limits };
 
-  
   this.features = { ...this.features, ...templateConfig.features };
 
   this.roleTemplate = template;
   this.lastUpdatedBy = appliedBy;
 };
 
-
 partnerPermissionSchema.statics.getMenuItems = function () {
   return PARTNER_MENU_ITEMS;
 };
-
 
 partnerPermissionSchema.statics.getPartnerPermissions = function (partnerId) {
   return this.findOne({ partner: partnerId, isActive: true })
     .populate('partner', 'shopName shopEmail isVerified')
     .populate('lastUpdatedBy', 'name email');
 };
-
 
 partnerPermissionSchema.statics.createDefaultPermissions = function (
   partnerId,

@@ -5,7 +5,6 @@ const sellOrderSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      
     },
     sessionId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -15,7 +14,7 @@ const sellOrderSchema = new mongoose.Schema(
     partnerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Partner',
-      required: false, 
+      required: false,
     },
     orderNumber: {
       type: String,
@@ -106,7 +105,7 @@ const sellOrderSchema = new mongoose.Schema(
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Partner', 
+      ref: 'Partner',
     },
     pickedAt: {
       type: Date,
@@ -126,26 +125,22 @@ const sellOrderSchema = new mongoose.Schema(
   }
 );
 
-
 sellOrderSchema.index({ userId: 1, createdAt: -1 });
 sellOrderSchema.index({ orderNumber: 1 }, { unique: true });
 sellOrderSchema.index({ status: 1, createdAt: -1 });
 sellOrderSchema.index({ 'pickup.slot.date': 1, status: 1 });
 sellOrderSchema.index({ assignedTo: 1, status: 1 });
 
-
 sellOrderSchema.virtual('formattedAddress').get(function () {
   const addr = this.pickup.address;
   return `${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode}`;
 });
-
 
 sellOrderSchema.virtual('pickupSlotDisplay').get(function () {
   const slot = this.pickup.slot;
   const date = new Date(slot.date).toLocaleDateString('en-IN');
   return `${date} (${slot.window})`;
 });
-
 
 sellOrderSchema.pre('save', async function (next) {
   if (this.isNew && !this.orderNumber) {
@@ -154,7 +149,6 @@ sellOrderSchema.pre('save', async function (next) {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
 
-    
     const prefix = `SO${year}${month}${day}`;
     const lastOrder = await this.constructor
       .findOne({
@@ -173,12 +167,10 @@ sellOrderSchema.pre('save', async function (next) {
   next();
 });
 
-
 sellOrderSchema.methods.confirm = function () {
   this.status = 'confirmed';
   return this.save();
 };
-
 
 sellOrderSchema.methods.cancel = function (reason) {
   this.status = 'cancelled';
@@ -186,7 +178,6 @@ sellOrderSchema.methods.cancel = function (reason) {
   this.cancellationReason = reason;
   return this.save();
 };
-
 
 sellOrderSchema.methods.markPicked = function (actualAmount, assignedTo) {
   this.status = 'picked';
@@ -196,7 +187,6 @@ sellOrderSchema.methods.markPicked = function (actualAmount, assignedTo) {
   return this.save();
 };
 
-
 sellOrderSchema.methods.markPaid = function (transactionId) {
   this.payment.status = 'success';
   this.payment.paidAt = new Date();
@@ -204,7 +194,6 @@ sellOrderSchema.methods.markPaid = function (transactionId) {
   this.status = 'paid';
   return this.save();
 };
-
 
 sellOrderSchema.statics.getByStatus = function (status, limit = 50, skip = 0) {
   return this.find({ status })

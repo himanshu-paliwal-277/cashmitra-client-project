@@ -9,33 +9,27 @@ const Wallet = require('../models/wallet.model');
 const Transaction = require('../models/transaction.model');
 const mongoose = require('mongoose');
 
-
 const searchProducts = async (req, res) => {
   try {
     const { query, category, condition, minPrice, maxPrice, pincode } =
       req.query;
 
-    
     const filter = { isAvailable: true };
 
-    
     if (category) {
       filter['product.category'] = category;
     }
 
-    
     if (condition) {
       filter.condition = condition;
     }
 
-    
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
-    
     let partnerIds = [];
     if (pincode) {
       const partners = await Partner.find({
@@ -55,10 +49,8 @@ const searchProducts = async (req, res) => {
       filter.partner = { $in: partnerIds };
     }
 
-    
     let inventoryItems;
     if (query) {
-      
       const products = await Product.find(
         { $text: { $search: query } },
         { score: { $meta: 'textScore' } }
@@ -66,16 +58,13 @@ const searchProducts = async (req, res) => {
 
       const productIds = products.map((product) => product._id);
 
-      
       if (productIds.length > 0) {
         filter.product = { $in: productIds };
       } else {
-        
         return res.json({ products: [], total: 0 });
       }
     }
 
-    
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -100,7 +89,6 @@ const searchProducts = async (req, res) => {
   }
 };
 
-
 const getProductDetails = async (req, res) => {
   try {
     const product = await BuyProduct.findById(req.params.id).populate(
@@ -112,7 +100,6 @@ const getProductDetails = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    
     const similarProducts = await BuyProduct.find({
       partner: product.partner._id,
       category: product.category,
@@ -130,7 +117,6 @@ const getProductDetails = async (req, res) => {
   }
 };
 
-
 const addToCart = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -141,7 +127,6 @@ const addToCart = async (req, res) => {
     const { productId, quantity } = req.body;
     const userId = req.user.id;
 
-    
     const product = await BuyProduct.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
@@ -151,13 +136,11 @@ const addToCart = async (req, res) => {
       return res.status(400).json({ message: 'Product is not available' });
     }
 
-    
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
       cart = new Cart({ user: userId, items: [] });
     }
 
-    
     const existingItemIndex = cart.items.findIndex(
       (item) => item.productId.toString() === productId
     );
@@ -165,7 +148,6 @@ const addToCart = async (req, res) => {
     if (existingItemIndex !== -1) {
       cart.items[existingItemIndex].quantity += quantity;
     } else {
-      
       cart.items.push({
         productId,
         quantity,
@@ -174,7 +156,6 @@ const addToCart = async (req, res) => {
 
     await cart.save();
 
-    
     const cartItemsPromises = cart.items.map(async (item) => {
       const product = await BuyProduct.findById(item.productId);
 
@@ -202,7 +183,6 @@ const addToCart = async (req, res) => {
     let cartItems = await Promise.all(cartItemsPromises);
     cartItems = cartItems.filter((item) => item !== null);
 
-    
     const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
     res.json({
@@ -216,24 +196,21 @@ const addToCart = async (req, res) => {
   }
 };
 
-
 const getCart = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    
     const cart = await Cart.findOne({ user: userId });
 
     if (!cart || cart.items.length === 0) {
       return res.json({ cart: [], total: 0 });
     }
 
-    
     const cartItemsPromises = cart.items.map(async (item) => {
       const product = await BuyProduct.findById(item.productId);
 
       if (!product) {
-        return null; 
+        return null;
       }
 
       return {
@@ -255,10 +232,8 @@ const getCart = async (req, res) => {
 
     let cartItems = await Promise.all(cartItemsPromises);
 
-    
     cartItems = cartItems.filter((item) => item !== null);
 
-    
     cart.items = cart.items.filter((item) =>
       cartItems.some(
         (cartItem) =>
@@ -271,7 +246,6 @@ const getCart = async (req, res) => {
       await cart.save();
     }
 
-    
     const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
     res.json({
@@ -284,7 +258,6 @@ const getCart = async (req, res) => {
   }
 };
 
-
 const updateCartItem = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -293,17 +266,15 @@ const updateCartItem = async (req, res) => {
 
   try {
     const { itemId } = req.params;
-    const productId = itemId; 
+    const productId = itemId;
     const { quantity } = req.body;
     const userId = req.user.id;
 
-    
     const cart = await Cart.findOne({ user: userId });
     if (!cart) {
       return res.status(404).json({ message: 'Cart is empty' });
     }
 
-    
     const itemIndex = cart.items.findIndex(
       (item) => item.productId.toString() === productId
     );
@@ -312,10 +283,8 @@ const updateCartItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not found in cart' });
     }
 
-    
     const product = await BuyProduct.findById(productId);
     if (!product) {
-      
       cart.items.splice(itemIndex, 1);
       await cart.save();
       return res.status(404).json({ message: 'Product no longer exists' });
@@ -325,9 +294,7 @@ const updateCartItem = async (req, res) => {
       return res.status(400).json({ message: 'Product is not available' });
     }
 
-    
     if (quantity <= 0) {
-      
       cart.items.splice(itemIndex, 1);
     } else {
       cart.items[itemIndex].quantity = quantity;
@@ -345,20 +312,17 @@ const updateCartItem = async (req, res) => {
   }
 };
 
-
 const removeCartItem = async (req, res) => {
   try {
     const { itemId } = req.params;
-    const productId = itemId; 
+    const productId = itemId;
     const userId = req.user.id;
 
-    
     const cart = await Cart.findOne({ user: userId });
     if (!cart) {
       return res.status(404).json({ message: 'Cart is empty' });
     }
 
-    
     const itemIndex = cart.items.findIndex(
       (item) => item.productId.toString() === productId
     );
@@ -367,7 +331,6 @@ const removeCartItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not found in cart' });
     }
 
-    
     cart.items.splice(itemIndex, 1);
     await cart.save();
 
@@ -381,7 +344,6 @@ const removeCartItem = async (req, res) => {
   }
 };
 
-
 const checkout = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -392,16 +354,13 @@ const checkout = async (req, res) => {
     const { shippingAddress, paymentMethod } = req.body;
     const userId = req.user.id;
 
-    
     const cart = await Cart.findOne({ user: userId });
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ message: 'Cart is empty' });
     }
 
-    
     const partnerItems = {};
 
-    
     for (const item of cart.items) {
       const product = await BuyProduct.findById(item.productId).populate(
         'partner'
@@ -435,23 +394,19 @@ const checkout = async (req, res) => {
       });
     }
 
-    
     const orders = [];
 
     for (const partnerId in partnerItems) {
       const partnerData = partnerItems[partnerId];
 
-      
       const totalAmount = partnerData.items.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0
       );
 
-      
       const commissionRate = 5;
       const commissionAmount = (totalAmount * commissionRate) / 100;
 
-      
       const order = new Order({
         orderType: 'buy',
         user: req.user._id,
@@ -484,7 +439,6 @@ const checkout = async (req, res) => {
       orders.push(order);
     }
 
-    
     cart.items = [];
     await cart.save();
 
@@ -502,7 +456,6 @@ const checkout = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 
 const getBuyOrderDetails = async (req, res) => {
   try {
@@ -530,7 +483,6 @@ const getBuyOrderDetails = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 
 const getUserBuyOrders = async (req, res) => {
   try {
