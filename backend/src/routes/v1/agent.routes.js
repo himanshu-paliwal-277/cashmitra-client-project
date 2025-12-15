@@ -1,11 +1,11 @@
-const express = require('express');
-const { check } = require('express-validator');
-const agentController = require('../../controllers/agent.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
-const { validateRequest } = require('../../middlewares/validation.middleware');
-const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
-const multer = require('multer');
-const path = require('path');
+import express from 'express';
+import {check} from 'express-validator';
+import agentController from '../../controllers/agent.controller';
+import {protect, authorize} from '../../middlewares/auth.middleware';
+import {validateRequest} from '../../middlewares/validation.middleware';
+import {asyncHandler} from '../../middlewares/errorHandler.middleware';
+import multer from 'multer';
+import path from 'path';
 
 const router = express.Router();
 
@@ -207,4 +207,4 @@ router.post(
   asyncHandler(agentController.submitDailyReport)
 );
 
-module.exports = router;
+export default router;

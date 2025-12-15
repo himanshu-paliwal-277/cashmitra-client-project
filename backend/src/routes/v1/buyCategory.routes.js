@@ -1,14 +1,16 @@
-const express = require('express');
-const { body, param, query } = require('express-validator');
-const {
+import express from 'express';
+import {body, param, query} from 'express-validator';
+
+import {
   createBuyCategory,
   getBuyCategories,
   getBuyCategory,
   updateBuyCategory,
   deleteBuyCategory,
   getBuyCategoryStats,
-} = require('../../controllers/buyCategory.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
+} from '../../controllers/buyCategory.controller';
+
+import {protect, authorize} from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -63,4 +65,4 @@ router.delete(
 );
 router.get('/admin/stats', getBuyCategoryStats);
 
-module.exports = router;
+export default router;

@@ -1,6 +1,7 @@
-const express = require('express');
-const { param, query, body } = require('express-validator');
-const {
+import express from 'express';
+import {param, query, body} from 'express-validator';
+
+import {
   getProducts,
   getProduct,
   getProductSuggestions,
@@ -10,8 +11,9 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-} = require('../../controllers/product.controller');
-const { protect } = require('../../middlewares/auth.middleware');
+} from '../../controllers/product.controller';
+
+import {protect} from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -206,4 +208,4 @@ router.post('/', protect, createProductValidation, createProduct);
 router.put('/:id', protect, updateProductValidation, updateProduct);
 router.delete('/:id', protect, deleteProductValidation, deleteProduct);
 
-module.exports = router;
+export default router;

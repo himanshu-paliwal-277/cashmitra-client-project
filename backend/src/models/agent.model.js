@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const agentSchema = new mongoose.Schema(
   {
@@ -217,4 +217,4 @@ agentSchema.statics.findByCoverageArea = function (area) {
 
 const Agent = mongoose.model('Agent', agentSchema);
 
-module.exports = Agent;
+export default Agent;

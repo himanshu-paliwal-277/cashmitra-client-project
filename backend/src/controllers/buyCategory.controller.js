@@ -1,11 +1,8 @@
-const { validationResult } = require('express-validator');
-const BuyCategory = require('../models/buyCategory.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import {validationResult} from 'express-validator';
+import BuyCategory from '../models/buyCategory.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
-exports.createBuyCategory = asyncHandler(async (req, res) => {
+export var createBuyCategory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -47,7 +44,7 @@ exports.createBuyCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getBuyCategories = asyncHandler(async (req, res) => {
+export var getBuyCategories = asyncHandler(async (req, res) => {
   const { includeInactive, superCategory } = req.query;
 
   const filter = includeInactive === 'true' ? {} : { isActive: true };
@@ -68,7 +65,7 @@ exports.getBuyCategories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getBuyCategory = asyncHandler(async (req, res) => {
+export var getBuyCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   const category = await BuyCategory.findById(id)
@@ -86,7 +83,7 @@ exports.getBuyCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateBuyCategory = asyncHandler(async (req, res) => {
+export var updateBuyCategory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -143,7 +140,7 @@ exports.updateBuyCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteBuyCategory = asyncHandler(async (req, res) => {
+export var deleteBuyCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   const category = await BuyCategory.findById(id);
@@ -159,7 +156,7 @@ exports.deleteBuyCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getBuyCategoryStats = asyncHandler(async (req, res) => {
+export var getBuyCategoryStats = asyncHandler(async (req, res) => {
   const totalCategories = await BuyCategory.countDocuments();
   const activeCategories = await BuyCategory.countDocuments({ isActive: true });
   const inactiveCategories = totalCategories - activeCategories;

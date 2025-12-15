@@ -1,6 +1,7 @@
-const express = require('express');
-const { body, param, query } = require('express-validator');
-const {
+import express from 'express';
+import {body, param, query} from 'express-validator';
+
+import {
   createOrUpdateConfig,
   getConfig,
   getCustomerConfig,
@@ -9,8 +10,9 @@ const {
   deleteConfig,
   resetToDefault,
   testPricing,
-} = require('../../controllers/sellConfig.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
+} from '../../controllers/sellConfig.controller';
+
+import {protect, authorize} from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -166,4 +168,4 @@ router.post(
   testPricing
 );
 
-module.exports = router;
+export default router;

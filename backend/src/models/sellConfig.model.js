@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const sellConfigSchema = new mongoose.Schema(
   {
@@ -139,4 +139,4 @@ sellConfigSchema.methods.applyPricingRules = function (
 
 const SellConfig = mongoose.model('SellConfig', sellConfigSchema);
 
-module.exports = SellConfig;
+export default SellConfig;

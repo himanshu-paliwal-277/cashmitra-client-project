@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const cartItemSchema = new mongoose.Schema({
   productId: {
@@ -44,4 +44,4 @@ cartSchema.pre('save', function (next) {
 cartSchema.index({ user: 1 });
 cartSchema.index({ 'items.productId': 1 });
 
-module.exports = mongoose.model('Cart', cartSchema);
+export default mongoose.model('Cart', cartSchema);

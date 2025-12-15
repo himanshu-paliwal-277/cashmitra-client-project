@@ -1,6 +1,7 @@
-const express = require('express');
-const { body, param, query } = require('express-validator');
-const {
+import express from 'express';
+import {body, param, query} from 'express-validator';
+
+import {
   createAccessory,
   getAccessories,
   getAccessory,
@@ -10,8 +11,9 @@ const {
   reorderAccessories,
   toggleAccessoryStatus,
   getCustomerAccessories,
-} = require('../../controllers/sellAccessory.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
+} from '../../controllers/sellAccessory.controller';
+
+import {protect, authorize} from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -142,10 +144,7 @@ router.put(
   reorderAccessories
 );
 
-const {
-  reindexAccessoryOrders,
-  migrateAndReindexAccessories,
-} = require('../../controllers/sellAccessory.controller');
+import {reindexAccessoryOrders, migrateAndReindexAccessories} from '../../controllers/sellAccessory.controller';
 router.post('/reindex-orders', reindexAccessoryOrders);
 router.post('/migrate-and-reindex', migrateAndReindexAccessories);
 
@@ -157,4 +156,4 @@ router.patch(
   toggleAccessoryStatus
 );
 
-module.exports = router;
+export default router;

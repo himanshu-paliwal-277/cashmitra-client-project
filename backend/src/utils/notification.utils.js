@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
@@ -10,12 +10,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-exports.sendOTPEmail = async (
-  email,
-  otp,
-  customerName,
-  subject = 'Your OTP for Device Collection'
-) => {
+export async function sendOTPEmail(email, otp, customerName, subject = 'Your OTP for Device Collection') {
   try {
     const mailOptions = {
       from: `"Cashify" <${process.env.EMAIL_USER}>`,
@@ -72,9 +67,9 @@ exports.sendOTPEmail = async (
     console.error('Error sending OTP email:', error);
     throw new Error('Failed to send OTP email');
   }
-};
+}
 
-exports.sendOTPSMS = async (phone, otp) => {
+export async function sendOTPSMS(phone, otp) {
   try {
     console.log(`OTP SMS would be sent to ${phone}: ${otp}`);
 
@@ -84,9 +79,9 @@ exports.sendOTPSMS = async (phone, otp) => {
 
     return false;
   }
-};
+}
 
-exports.sendEmail = async (to, subject, html) => {
+export async function sendEmail(to, subject, html) {
   try {
     const mailOptions = {
       from: `"Cashify" <${process.env.EMAIL_USER}>`,
@@ -101,9 +96,9 @@ exports.sendEmail = async (to, subject, html) => {
     console.error('Error sending email:', error);
     throw new Error('Failed to send email');
   }
-};
+}
 
-exports.sendSMS = async (phone, message) => {
+export async function sendSMS(phone, message) {
   try {
     console.log(`SMS to ${phone}: ${message}`);
     return true;
@@ -111,9 +106,9 @@ exports.sendSMS = async (phone, message) => {
     console.error('Error sending SMS:', error);
     return false;
   }
-};
+}
 
-exports.sendPushNotification = async (userId, title, body, data = {}) => {
+export async function sendPushNotification(userId, title, body, data = {}) {
   try {
     console.log(`Push notification to user ${userId}: ${title} - ${body}`);
     return true;
@@ -121,4 +116,4 @@ exports.sendPushNotification = async (userId, title, body, data = {}) => {
     console.error('Error sending push notification:', error);
     return false;
   }
-};
+}

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const MENU_ITEMS = {
   dashboard: {
@@ -367,4 +367,4 @@ const VendorPermission = mongoose.model(
   vendorPermissionSchema
 );
 
-module.exports = { VendorPermission, MENU_ITEMS };
+export default { VendorPermission, MENU_ITEMS };

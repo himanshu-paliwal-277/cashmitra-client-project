@@ -1,12 +1,9 @@
-const { validationResult } = require('express-validator');
-const SellConfig = require('../models/sellConfig.model');
-const SellProduct = require('../models/sellProduct.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import {validationResult} from 'express-validator';
+import SellConfig from '../models/sellConfig.model';
+import SellProduct from '../models/sellProduct.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
-exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
+export var createOrUpdateConfig = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -60,7 +57,7 @@ exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
   }
 });
 
-exports.getConfig = asyncHandler(async (req, res) => {
+export var getConfig = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   let config = await SellConfig.findOne({ productId })
@@ -78,7 +75,7 @@ exports.getConfig = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getConfigForCustomer = asyncHandler(async (req, res) => {
+export var getConfigForCustomer = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   let config = await SellConfig.findOne({ productId }).select('steps rules');
@@ -96,7 +93,7 @@ exports.getConfigForCustomer = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getCustomerConfig = asyncHandler(async (req, res) => {
+export var getCustomerConfig = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -124,7 +121,7 @@ exports.getCustomerConfig = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateSteps = asyncHandler(async (req, res) => {
+export var updateSteps = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { steps } = req.body;
 
@@ -148,7 +145,7 @@ exports.updateSteps = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateRules = asyncHandler(async (req, res) => {
+export var updateRules = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { rules } = req.body;
 
@@ -172,7 +169,7 @@ exports.updateRules = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteConfig = asyncHandler(async (req, res) => {
+export var deleteConfig = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   const config = await SellConfig.findOne({ productId });
@@ -188,7 +185,7 @@ exports.deleteConfig = asyncHandler(async (req, res) => {
   });
 });
 
-exports.resetToDefault = asyncHandler(async (req, res) => {
+export var resetToDefault = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   const product = await SellProduct.findById(productId);
@@ -210,7 +207,7 @@ exports.resetToDefault = asyncHandler(async (req, res) => {
   });
 });
 
-exports.testPricing = asyncHandler(async (req, res) => {
+export var testPricing = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { basePrice, adjustments } = req.body;
 
@@ -261,7 +258,7 @@ exports.testPricing = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getAllConfigs = asyncHandler(async (req, res) => {
+export var getAllConfigs = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
   const options = {

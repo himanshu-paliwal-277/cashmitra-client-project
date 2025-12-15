@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const sellOrderSchema = new mongoose.Schema(
   {
@@ -214,4 +214,4 @@ sellOrderSchema.statics.getByStatus = function (status, limit = 50, skip = 0) {
 
 const SellOrder = mongoose.model('SellOrder', sellOrderSchema);
 
-module.exports = SellOrder;
+export default SellOrder;

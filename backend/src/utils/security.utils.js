@@ -1,5 +1,5 @@
-const xss = require('xss');
-const crypto = require('crypto');
+import xss from 'xss';
+import crypto from 'crypto';
 
 const sanitizeData = (data) => {
   if (typeof data === 'string') {
@@ -40,7 +40,7 @@ const validateCSRFToken = (token, storedToken) => {
   return token === storedToken;
 };
 
-module.exports = {
+export default {
   sanitizeData,
   generateSecureToken,
   hashData,

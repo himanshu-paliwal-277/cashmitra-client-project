@@ -73,7 +73,7 @@ const asyncHandler = (fn) => {
   };
 };
 
-module.exports = {
+export default {
   ApiError,
   errorHandler,
   asyncHandler,

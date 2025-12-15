@@ -1,6 +1,7 @@
-const express = require('express');
-const { body, param, query } = require('express-validator');
-const {
+import express from 'express';
+import {body, param, query} from 'express-validator';
+
+import {
   createCategory,
   getCategories,
   getCategory,
@@ -9,8 +10,9 @@ const {
   getCategoryStats,
   bulkUpdateStatus,
   searchCategories,
-} = require('../../controllers/category.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
+} from '../../controllers/category.controller';
+
+import {protect, authorize} from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -98,4 +100,4 @@ router.delete(
 router.get('/admin/stats', getCategoryStats);
 router.patch('/bulk-status', bulkStatusValidation, bulkUpdateStatus);
 
-module.exports = router;
+export default router;

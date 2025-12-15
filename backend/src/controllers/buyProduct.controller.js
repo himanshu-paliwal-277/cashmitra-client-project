@@ -1,7 +1,7 @@
-const BuyProduct = require('../models/buyProduct.model');
-const BuyCategory = require('../models/buyCategory.model');
-const { validationResult } = require('express-validator');
-const { processArrayFields } = require('../utils/dataProcessing.utils');
+import BuyProduct from '../models/buyProduct.model';
+import BuyCategory from '../models/buyCategory.model';
+import {validationResult} from 'express-validator';
+import {processArrayFields} from '../utils/dataProcessing.utils';
 
 const getBuyProducts = async (req, res) => {
   try {
@@ -608,7 +608,7 @@ const getBuyProductsByCategory = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   getBuyProducts,
   getBuyProductById,
   getBuyProductsByCategory,

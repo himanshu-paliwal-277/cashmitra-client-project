@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const buySuperCategorySchema = new mongoose.Schema(
   {
@@ -79,4 +79,4 @@ const BuySuperCategory = mongoose.model(
   buySuperCategorySchema
 );
 
-module.exports = BuySuperCategory;
+export default BuySuperCategory;

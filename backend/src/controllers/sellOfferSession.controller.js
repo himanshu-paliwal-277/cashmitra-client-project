@@ -1,15 +1,12 @@
-const { validationResult } = require('express-validator');
-const mongoose = require('mongoose');
-const SellOfferSession = require('../models/sellOfferSession.model');
-const SellProduct = require('../models/sellProduct.model');
-const SellDefect = require('../models/sellDefect.model');
-const SellAccessory = require('../models/sellAccessory.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import {validationResult} from 'express-validator';
+import mongoose from 'mongoose';
+import SellOfferSession from '../models/sellOfferSession.model';
+import SellProduct from '../models/sellProduct.model';
+import SellDefect from '../models/sellDefect.model';
+import SellAccessory from '../models/sellAccessory.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
-exports.createSession = asyncHandler(async (req, res) => {
+export var createSession = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -127,7 +124,7 @@ exports.createSession = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getSession = asyncHandler(async (req, res) => {
+export var getSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.query;
 
@@ -153,7 +150,7 @@ exports.getSession = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateAnswers = asyncHandler(async (req, res) => {
+export var updateAnswers = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { answers, sessionToken } = req.body;
 
@@ -181,7 +178,7 @@ exports.updateAnswers = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateDefects = asyncHandler(async (req, res) => {
+export var updateDefects = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { defects, sessionToken } = req.body;
 
@@ -209,7 +206,7 @@ exports.updateDefects = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateAccessories = asyncHandler(async (req, res) => {
+export var updateAccessories = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { accessories, sessionToken } = req.body;
 
@@ -237,7 +234,7 @@ exports.updateAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getCurrentPrice = asyncHandler(async (req, res) => {
+export var getCurrentPrice = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.query;
 
@@ -263,7 +260,7 @@ exports.getCurrentPrice = asyncHandler(async (req, res) => {
   });
 });
 
-exports.extendSession = asyncHandler(async (req, res) => {
+export var extendSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.body;
 
@@ -288,7 +285,7 @@ exports.extendSession = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getUserActiveSessions = asyncHandler(async (req, res) => {
+export var getUserActiveSessions = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
   const sessions = await SellOfferSession.findActiveSessions(userId)
@@ -331,9 +328,9 @@ exports.getUserActiveSessions = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getUserSessions = exports.getUserActiveSessions;
+export var getUserSessions = exports.getUserActiveSessions;
 
-exports.deleteSession = asyncHandler(async (req, res) => {
+export var deleteSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { sessionToken } = req.body;
 
@@ -354,7 +351,7 @@ exports.deleteSession = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getAllSessions = asyncHandler(async (req, res) => {
+export var getAllSessions = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 10,
@@ -443,7 +440,7 @@ exports.getAllSessions = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateSessionStatus = asyncHandler(async (req, res) => {
+export var updateSessionStatus = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;
   const { isActive } = req.body;
 
@@ -462,7 +459,7 @@ exports.updateSessionStatus = asyncHandler(async (req, res) => {
   });
 });
 
-exports.cleanupExpiredSessions = asyncHandler(async (req, res) => {
+export var cleanupExpiredSessions = asyncHandler(async (req, res) => {
   const result = await SellOfferSession.cleanupExpired();
 
   res.json({

@@ -1,7 +1,7 @@
-const Partner = require('../models/partner.model');
-const { ApiError } = require('./errorHandler.middleware');
+import Partner from '../models/partner.model';
+import {ApiError} from './errorHandler.middleware';
 
-exports.attachPartner = async (req, res, next) => {
+export async function attachPartner(req, res, next) {
   try {
     if (req.user.role !== 'partner') {
       return next();
@@ -23,9 +23,9 @@ exports.attachPartner = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+}
 
-exports.requirePartner = (req, res, next) => {
+export function requirePartner(req, res, next) {
   if (req.user.role !== 'partner') {
     throw new ApiError(403, 'Access denied. Partner role required.');
   }
@@ -35,9 +35,9 @@ exports.requirePartner = (req, res, next) => {
   }
 
   next();
-};
+}
 
-exports.checkResourceOwnership = (Model, resourceIdParam = 'id') => {
+export function checkResourceOwnership(Model, resourceIdParam = 'id') {
   return async (req, res, next) => {
     try {
       if (req.user.role === 'admin') {
@@ -65,4 +65,4 @@ exports.checkResourceOwnership = (Model, resourceIdParam = 'id') => {
       next(error);
     }
   };
-};
+}

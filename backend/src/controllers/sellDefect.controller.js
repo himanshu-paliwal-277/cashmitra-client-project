@@ -1,12 +1,9 @@
-const { validationResult } = require('express-validator');
-const SellDefect = require('../models/sellDefect.model');
-const Category = require('../models/category.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import {validationResult} from 'express-validator';
+import SellDefect from '../models/sellDefect.model';
+import Category from '../models/category.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
-exports.createDefect = asyncHandler(async (req, res) => {
+export var createDefect = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -52,7 +49,7 @@ exports.createDefect = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getDefectsByCategory = asyncHandler(async (req, res) => {
+export var getDefectsByCategory = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
 
   const category = await Category.findById(categoryId);
@@ -68,7 +65,7 @@ exports.getDefectsByCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getDefectsForCustomer = asyncHandler(async (req, res) => {
+export var getDefectsForCustomer = asyncHandler(async (req, res) => {
   const { productId, variantId } = req.params;
 
   const defects = await SellDefect.getForVariants(productId, [variantId]);
@@ -85,7 +82,7 @@ exports.getDefectsForCustomer = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getDefects = asyncHandler(async (req, res) => {
+export var getDefects = asyncHandler(async (req, res) => {
   const { categoryId, section, isActive } = req.query;
 
   const query = {};
@@ -105,7 +102,7 @@ exports.getDefects = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getDefect = asyncHandler(async (req, res) => {
+export var getDefect = asyncHandler(async (req, res) => {
   const defect = await SellDefect.findById(req.params.id)
     .populate('productId', 'name')
     .populate('createdBy', 'name email');
@@ -120,7 +117,7 @@ exports.getDefect = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateDefect = asyncHandler(async (req, res) => {
+export var updateDefect = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -185,7 +182,7 @@ exports.updateDefect = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteDefect = asyncHandler(async (req, res) => {
+export var deleteDefect = asyncHandler(async (req, res) => {
   const defect = await SellDefect.findById(req.params.id);
   if (!defect) {
     throw new ApiError(404, 'Defect not found');
@@ -199,7 +196,7 @@ exports.deleteDefect = asyncHandler(async (req, res) => {
   });
 });
 
-exports.bulkCreateDefects = asyncHandler(async (req, res) => {
+export var bulkCreateDefects = asyncHandler(async (req, res) => {
   const { categoryId, defects } = req.body;
 
   if (!categoryId || !Array.isArray(defects) || defects.length === 0) {
@@ -251,7 +248,7 @@ exports.bulkCreateDefects = asyncHandler(async (req, res) => {
   });
 });
 
-exports.reorderDefects = asyncHandler(async (req, res) => {
+export var reorderDefects = asyncHandler(async (req, res) => {
   const { productId, category, defectIds } = req.body;
 
   if (!productId || !category || !Array.isArray(defectIds)) {
@@ -273,7 +270,7 @@ exports.reorderDefects = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getDefectCategories = asyncHandler(async (req, res) => {
+export var getDefectCategories = asyncHandler(async (req, res) => {
   const categories = [
     'screen',
     'body',

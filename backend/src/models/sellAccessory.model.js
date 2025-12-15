@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const sellAccessorySchema = new mongoose.Schema(
   {
@@ -71,4 +71,4 @@ sellAccessorySchema.statics.getActiveForCategory = function (categoryId) {
 
 const SellAccessory = mongoose.model('SellAccessory', sellAccessorySchema);
 
-module.exports = SellAccessory;
+export default SellAccessory;

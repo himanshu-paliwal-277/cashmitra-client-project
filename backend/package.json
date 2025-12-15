@@ -2,6 +2,7 @@
   "name": "cashify-backend",
   "version": "1.0.0",
   "description": "Backend API for Cashify - Device Trading Platform",
+  "type": "module",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

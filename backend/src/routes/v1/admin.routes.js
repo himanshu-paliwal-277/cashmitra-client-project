@@ -1,12 +1,12 @@
-const express = require('express');
-const { check } = require('express-validator');
-const multer = require('multer');
-const adminController = require('../../controllers/admin.controller');
-const categoryController = require('../../controllers/category.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
-const { validateRequest } = require('../../middlewares/validation.middleware');
-const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
-const { authRateLimiter } = require('../../middlewares/rateLimiter.middleware');
+import express from 'express';
+import {check} from 'express-validator';
+import multer from 'multer';
+import adminController from '../../controllers/admin.controller';
+import categoryController from '../../controllers/category.controller';
+import {protect, authorize} from '../../middlewares/auth.middleware';
+import {validateRequest} from '../../middlewares/validation.middleware';
+import {asyncHandler} from '../../middlewares/errorHandler.middleware';
+import {authRateLimiter} from '../../middlewares/rateLimiter.middleware';
 
 const storage = multer.memoryStorage();
 
@@ -949,4 +949,4 @@ router.put(
   asyncHandler(adminController.toggleAgentStatus)
 );
 
-module.exports = router;
+export default router;

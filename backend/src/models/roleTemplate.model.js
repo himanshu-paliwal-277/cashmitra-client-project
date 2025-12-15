@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const roleTemplateSchema = new mongoose.Schema(
   {
@@ -218,4 +218,4 @@ roleTemplateSchema.statics.getActiveTemplates = async function () {
 
 const RoleTemplate = mongoose.model('RoleTemplate', roleTemplateSchema);
 
-module.exports = RoleTemplate;
+export default RoleTemplate;

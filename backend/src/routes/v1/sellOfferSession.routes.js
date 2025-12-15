@@ -1,6 +1,7 @@
-const express = require('express');
-const { body } = require('express-validator');
-const {
+import express from 'express';
+import {body} from 'express-validator';
+
+import {
   createSession,
   getSession,
   updateAnswers,
@@ -13,8 +14,9 @@ const {
   getAllSessions,
   updateSessionStatus,
   cleanupExpiredSessions,
-} = require('../../controllers/sellOfferSession.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
+} from '../../controllers/sellOfferSession.controller';
+
+import {protect, authorize} from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -83,4 +85,4 @@ router.patch(
 );
 router.post('/admin/cleanup', authorize('admin'), cleanupExpiredSessions);
 
-module.exports = router;
+export default router;

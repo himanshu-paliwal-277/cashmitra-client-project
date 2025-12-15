@@ -1,12 +1,9 @@
-const express = require('express');
-const { check } = require('express-validator');
-const buyController = require('../../controllers/buy.controller');
-const { protect } = require('../../middlewares/auth.middleware');
-const {
-  validateRequest,
-  validateObjectId,
-} = require('../../middlewares/validation.middleware');
-const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
+import express from 'express';
+import {check} from 'express-validator';
+import buyController from '../../controllers/buy.controller';
+import {protect} from '../../middlewares/auth.middleware';
+import {validateRequest, validateObjectId} from '../../middlewares/validation.middleware';
+import {asyncHandler} from '../../middlewares/errorHandler.middleware';
 
 const router = express.Router();
 
@@ -155,4 +152,4 @@ router.get(
   asyncHandler(buyController.getOrderById)
 );
 
-module.exports = router;
+export default router;

@@ -1,11 +1,8 @@
-const SellSuperCategory = require('../models/sellSuperCategory.model');
-const Category = require('../models/category.model');
-const {
-  asyncHandler,
-  ApiError,
-} = require('../middlewares/errorHandler.middleware');
+import SellSuperCategory from '../models/sellSuperCategory.model';
+import Category from '../models/category.model';
+import {asyncHandler, ApiError} from '../middlewares/errorHandler.middleware';
 
-exports.getPublicSuperCategories = asyncHandler(async (req, res) => {
+export var getPublicSuperCategories = asyncHandler(async (req, res) => {
   const superCategories = await SellSuperCategory.find({ isActive: true })
     .sort('sortOrder')
     .select('name slug image description');
@@ -33,7 +30,7 @@ exports.getPublicSuperCategories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getAllSuperCategories = asyncHandler(async (req, res) => {
+export var getAllSuperCategories = asyncHandler(async (req, res) => {
   const { isActive, search, sort = 'sortOrder' } = req.query;
 
   const filter = {};
@@ -60,7 +57,7 @@ exports.getAllSuperCategories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getSuperCategory = asyncHandler(async (req, res) => {
+export var getSuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await SellSuperCategory.findById(
     req.params.id
   ).populate('categories');
@@ -75,7 +72,7 @@ exports.getSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.createSuperCategory = asyncHandler(async (req, res) => {
+export var createSuperCategory = asyncHandler(async (req, res) => {
   const { name, description, image, isActive, sortOrder } = req.body;
 
   if (!image) {
@@ -100,7 +97,7 @@ exports.createSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateSuperCategory = asyncHandler(async (req, res) => {
+export var updateSuperCategory = asyncHandler(async (req, res) => {
   let superCategory = await SellSuperCategory.findById(req.params.id);
 
   if (!superCategory) {
@@ -137,7 +134,7 @@ exports.updateSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteSuperCategory = asyncHandler(async (req, res) => {
+export var deleteSuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await SellSuperCategory.findById(req.params.id);
 
   if (!superCategory) {
@@ -164,7 +161,7 @@ exports.deleteSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
+export var getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await SellSuperCategory.findById(req.params.id);
 
   if (!superCategory) {

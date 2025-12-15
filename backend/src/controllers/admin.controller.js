@@ -1,16 +1,16 @@
-const User = require('../models/user.model');
-const Partner = require('../models/partner.model');
-const Product = require('../models/product.model');
-const Agent = require('../models/agent.model');
-const { Order } = require('../models/order.model');
-const Transaction = require('../models/transaction.model');
-const Inventory = require('../models/inventory.model');
-const Wallet = require('../models/wallet.model');
-const ConditionQuestionnaire = require('../models/conditionQuestionnaire.model');
-const ApiError = require('../utils/apiError');
-const { generateToken } = require('../utils/jwt.utils');
-const { validationResult } = require('express-validator');
-const mongoose = require('mongoose');
+import User from '../models/user.model';
+import Partner from '../models/partner.model';
+import Product from '../models/product.model';
+import Agent from '../models/agent.model';
+import {Order} from '../models/order.model';
+import Transaction from '../models/transaction.model';
+import Inventory from '../models/inventory.model';
+import Wallet from '../models/wallet.model';
+import ConditionQuestionnaire from '../models/conditionQuestionnaire.model';
+import ApiError from '../utils/apiError';
+import {generateToken} from '../utils/jwt.utils';
+import {validationResult} from 'express-validator';
+import mongoose from 'mongoose';
 
 const loginAdmin = async (req, res) => {
   try {
@@ -4103,7 +4103,7 @@ const toggleUserStatus = async (req, res) => {
   });
 };
 
-module.exports = {
+export default {
   loginAdmin,
   getAdminProfile,
   createAdmin,

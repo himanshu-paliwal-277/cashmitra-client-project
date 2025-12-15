@@ -85,7 +85,7 @@ const validatePassword = (password) => {
   return { isValid: true, message: 'Password is valid' };
 };
 
-module.exports = {
+export default {
   isValidObjectId,
   isValidEmail,
   isValidPhone,

@@ -1,8 +1,8 @@
-const User = require('../models/user.model');
-const VendorPermission = require('../models/vendorPermission.model');
-const { generateToken } = require('../utils/jwt.utils');
-const { validationResult } = require('express-validator');
-const mongoose = require('mongoose');
+import User from '../models/user.model';
+import VendorPermission from '../models/vendorPermission.model';
+import {generateToken} from '../utils/jwt.utils';
+import {validationResult} from 'express-validator';
+import mongoose from 'mongoose';
 
 const loginVendor = async (req, res) => {
   try {
@@ -382,7 +382,7 @@ const getMenuItems = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   loginVendor,
   getVendorProfile,
   getVendorPermissions,

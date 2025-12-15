@@ -1,12 +1,12 @@
-const Pickup = require('../models/pickup.model');
-const { Order } = require('../models/order.model');
-const SellOrder = require('../models/sellOrder.model');
-const User = require('../models/user.model');
-const { asyncHandler } = require('../middlewares/errorHandler.middleware');
-const ApiError = require('../utils/apiError');
-const { validationResult } = require('express-validator');
+import Pickup from '../models/pickup.model';
+import {Order} from '../models/order.model';
+import SellOrder from '../models/sellOrder.model';
+import User from '../models/user.model';
+import {asyncHandler} from '../middlewares/errorHandler.middleware';
+import ApiError from '../utils/apiError';
+import {validationResult} from 'express-validator';
 
-exports.createPickup = asyncHandler(async (req, res) => {
+export var createPickup = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError('Validation failed', 400, errors.array());
@@ -118,7 +118,7 @@ exports.createPickup = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getPickups = asyncHandler(async (req, res) => {
+export var getPickups = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 10,
@@ -192,7 +192,7 @@ exports.getPickups = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getPickupById = asyncHandler(async (req, res) => {
+export var getPickupById = asyncHandler(async (req, res) => {
   const pickup = await Pickup.findById(req.params.id)
     .populate('assignedTo', 'name email phone')
     .populate('assignedBy', 'name email')
@@ -219,7 +219,7 @@ exports.getPickupById = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updatePickupStatus = asyncHandler(async (req, res) => {
+export var updatePickupStatus = asyncHandler(async (req, res) => {
   const { status, notes, location } = req.body;
 
   const pickup = await Pickup.findById(req.params.id);
@@ -281,7 +281,7 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
   });
 });
 
-exports.reschedulePickup = asyncHandler(async (req, res) => {
+export var reschedulePickup = asyncHandler(async (req, res) => {
   const { newDate, newTimeSlot, reason } = req.body;
 
   const pickup = await Pickup.findById(req.params.id);
@@ -314,7 +314,7 @@ exports.reschedulePickup = asyncHandler(async (req, res) => {
   });
 });
 
-exports.cancelPickup = asyncHandler(async (req, res) => {
+export var cancelPickup = asyncHandler(async (req, res) => {
   const { reason } = req.body;
 
   const pickup = await Pickup.findById(req.params.id);
@@ -347,7 +347,7 @@ exports.cancelPickup = asyncHandler(async (req, res) => {
   });
 });
 
-exports.reassignPickup = asyncHandler(async (req, res) => {
+export var reassignPickup = asyncHandler(async (req, res) => {
   const { newAgentId, reason } = req.body;
 
   const pickup = await Pickup.findById(req.params.id);
@@ -391,7 +391,7 @@ exports.reassignPickup = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getPickupAnalytics = asyncHandler(async (req, res) => {
+export var getPickupAnalytics = asyncHandler(async (req, res) => {
   const { startDate, endDate, agentId } = req.query;
 
   const dateFilter = {};
@@ -519,7 +519,7 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getAgentPickups = asyncHandler(async (req, res) => {
+export var getAgentPickups = asyncHandler(async (req, res) => {
   const { agentId } = req.params;
   const { status, date } = req.query;
 
@@ -550,7 +550,7 @@ exports.getAgentPickups = asyncHandler(async (req, res) => {
   });
 });
 
-exports.addCommunication = asyncHandler(async (req, res) => {
+export var addCommunication = asyncHandler(async (req, res) => {
   const { type, message, status } = req.body;
 
   const pickup = await Pickup.findById(req.params.id);
@@ -574,7 +574,7 @@ exports.addCommunication = asyncHandler(async (req, res) => {
   });
 });
 
-exports.uploadPickupImages = asyncHandler(async (req, res) => {
+export var uploadPickupImages = asyncHandler(async (req, res) => {
   const pickup = await Pickup.findById(req.params.id);
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found');
@@ -603,7 +603,7 @@ exports.uploadPickupImages = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getPickupSlots = asyncHandler(async (req, res) => {
+export var getPickupSlots = asyncHandler(async (req, res) => {
   const { date } = req.query;
 
   const timeSlots = [
@@ -647,7 +647,7 @@ exports.getPickupSlots = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updatePickup = asyncHandler(async (req, res) => {
+export var updatePickup = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError('Validation failed', 400, errors.array());

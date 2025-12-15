@@ -1,13 +1,13 @@
-const { validationResult } = require('express-validator');
-const BuyProduct = require('../models/buyProduct.model');
-const Order = require('../models/order.model');
-const Cart = require('../models/cart.model');
-const User = require('../models/user.model');
-const Partner = require('../models/partner.model');
-const Product = require('../models/product.model');
-const Wallet = require('../models/wallet.model');
-const Transaction = require('../models/transaction.model');
-const mongoose = require('mongoose');
+import {validationResult} from 'express-validator';
+import BuyProduct from '../models/buyProduct.model';
+import Order from '../models/order.model';
+import Cart from '../models/cart.model';
+import User from '../models/user.model';
+import Partner from '../models/partner.model';
+import Product from '../models/product.model';
+import Wallet from '../models/wallet.model';
+import Transaction from '../models/transaction.model';
+import mongoose from 'mongoose';
 
 const searchProducts = async (req, res) => {
   try {
@@ -516,7 +516,7 @@ const getUserBuyOrders = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   searchProducts,
   getProductDetails,
   addToCart,

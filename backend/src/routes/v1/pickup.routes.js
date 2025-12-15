@@ -1,7 +1,7 @@
-const express = require('express');
-const { body, param, query } = require('express-validator');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
-const pickupController = require('../../controllers/pickup.controller');
+import express from 'express';
+import {body, param, query} from 'express-validator';
+import {protect, authorize} from '../../middlewares/auth.middleware';
+import pickupController from '../../controllers/pickup.controller';
 
 const router = express.Router();
 
@@ -196,4 +196,4 @@ router.post(
   pickupController.uploadPickupImages
 );
 
-module.exports = router;
+export default router;

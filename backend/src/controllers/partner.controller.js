@@ -1,14 +1,14 @@
-const Partner = require('../models/partner.model');
-const User = require('../models/user.model');
-const Agent = require('../models/agent.model');
-const Inventory = require('../models/inventory.model');
-const { Order } = require('../models/order.model');
-const Product = require('../models/product.model');
-const BuyProduct = require('../models/buyProduct.model');
-const ApiError = require('../utils/apiError');
-const { sanitizeData } = require('../utils/security.utils');
+import Partner from '../models/partner.model';
+import User from '../models/user.model';
+import Agent from '../models/agent.model';
+import Inventory from '../models/inventory.model';
+import {Order} from '../models/order.model';
+import Product from '../models/product.model';
+import BuyProduct from '../models/buyProduct.model';
+import ApiError from '../utils/apiError';
+import {sanitizeData} from '../utils/security.utils';
 
-exports.registerPartnerShop = async (req, res) => {
+export async function registerPartnerShop(req, res) {
   const userId = req.user.id;
 
   const existingPartner = await Partner.findOne({ user: userId });
@@ -44,9 +44,9 @@ exports.registerPartnerShop = async (req, res) => {
     data: partner,
     message: 'Partner shop registered successfully. Verification pending.',
   });
-};
+}
 
-exports.getPartnerProfile = async (req, res) => {
+export async function getPartnerProfile(req, res) {
   const userId = req.user.id;
 
   const partner = await Partner.findOne({ user: userId }).populate(
@@ -62,9 +62,9 @@ exports.getPartnerProfile = async (req, res) => {
     success: true,
     data: partner,
   });
-};
+}
 
-exports.updatePartnerProfile = async (req, res) => {
+export async function updatePartnerProfile(req, res) {
   const userId = req.user.id;
 
   const updateData = {};
@@ -123,9 +123,9 @@ exports.updatePartnerProfile = async (req, res) => {
     data: partner,
     message: 'Partner profile updated successfully',
   });
-};
+}
 
-exports.uploadDocuments = async (req, res) => {
+export async function uploadDocuments(req, res) {
   const userId = req.user.id;
 
   const updateData = {};
@@ -164,9 +164,9 @@ exports.uploadDocuments = async (req, res) => {
     data: partner,
     message: 'Documents uploaded successfully',
   });
-};
+}
 
-exports.getProductsCatalog = async (req, res) => {
+export async function getProductsCatalog(req, res) {
   const {
     category,
     brand,
@@ -267,9 +267,9 @@ exports.getProductsCatalog = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-exports.addInventory = async (req, res) => {
+export async function addInventory(req, res) {
   const partnerId = await Partner.findOne({ user: req.user.id });
   if (!partnerId) {
     throw new ApiError('Partner profile not found', 404);
@@ -323,9 +323,9 @@ exports.addInventory = async (req, res) => {
     data: inventory,
     message: 'Inventory item added successfully',
   });
-};
+}
 
-exports.getInventory = async (req, res) => {
+export async function getInventory(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -370,9 +370,9 @@ exports.getInventory = async (req, res) => {
       hasPrevPage: pageNum > 1,
     },
   });
-};
+}
 
-exports.updateInventory = async (req, res) => {
+export async function updateInventory(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -410,9 +410,9 @@ exports.updateInventory = async (req, res) => {
     data: updatedInventory,
     message: 'Inventory item updated successfully',
   });
-};
+}
 
-exports.deleteInventory = async (req, res) => {
+export async function deleteInventory(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -442,9 +442,9 @@ exports.deleteInventory = async (req, res) => {
     success: true,
     message: 'Inventory item deleted successfully',
   });
-};
+}
 
-exports.getOrders = async (req, res) => {
+export async function getOrders(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -681,9 +681,9 @@ exports.getOrders = async (req, res) => {
       hasPrevPage: pageNum > 1,
     },
   });
-};
+}
 
-exports.respondToOrderAssignment = async (req, res) => {
+export async function respondToOrderAssignment(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -789,9 +789,9 @@ exports.respondToOrderAssignment = async (req, res) => {
     message: `Order ${response} successfully`,
     data: order,
   });
-};
+}
 
-exports.checkMissingInventory = async (req, res) => {
+export async function checkMissingInventory(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -855,9 +855,9 @@ exports.checkMissingInventory = async (req, res) => {
           : 'You have all required products in inventory',
     },
   });
-};
+}
 
-exports.updateOrderStatus = async (req, res) => {
+export async function updateOrderStatus(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -903,9 +903,9 @@ exports.updateOrderStatus = async (req, res) => {
     success: true,
     message: 'Order status updated successfully',
   });
-};
+}
 
-exports.getDashboardStats = async (req, res) => {
+export async function getDashboardStats(req, res) {
   try {
     console.log('Dashboard request from user:', req.user.id);
 
@@ -1080,12 +1080,12 @@ exports.getDashboardStats = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-const SellProduct = require('../models/sellProduct.model');
-const SellOrder = require('../models/sellOrder.model');
+import SellProduct from '../models/sellProduct.model';
+import SellOrder from '../models/sellOrder.model';
 
-exports.getDashboardSellBuy = async (req, res) => {
+export async function getDashboardSellBuy(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1150,9 +1150,9 @@ exports.getDashboardSellBuy = async (req, res) => {
       recentOrders,
     },
   });
-};
+}
 
-exports.getPartnerSellProducts = async (req, res) => {
+export async function getPartnerSellProducts(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1194,9 +1194,9 @@ exports.getPartnerSellProducts = async (req, res) => {
       pages: Math.ceil(total / limit),
     },
   });
-};
+}
 
-exports.getPartnerBuyProducts = async (req, res) => {
+export async function getPartnerBuyProducts(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1238,9 +1238,9 @@ exports.getPartnerBuyProducts = async (req, res) => {
       pages: Math.ceil(total / limit),
     },
   });
-};
+}
 
-exports.getPartnerSellOrders = async (req, res) => {
+export async function getPartnerSellOrders(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1283,9 +1283,9 @@ exports.getPartnerSellOrders = async (req, res) => {
       pages: Math.ceil(total / limit),
     },
   });
-};
+}
 
-exports.getPartnerSellOrderDetails = async (req, res) => {
+export async function getPartnerSellOrderDetails(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1313,9 +1313,9 @@ exports.getPartnerSellOrderDetails = async (req, res) => {
     success: true,
     data: order,
   });
-};
+}
 
-exports.updatePartnerSellOrderStatus = async (req, res) => {
+export async function updatePartnerSellOrderStatus(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1346,9 +1346,9 @@ exports.updatePartnerSellOrderStatus = async (req, res) => {
     message: 'Order status updated successfully',
     data: order,
   });
-};
+}
 
-exports.getPartnerAgents = async (req, res) => {
+export async function getPartnerAgents(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1379,9 +1379,9 @@ exports.getPartnerAgents = async (req, res) => {
       pages: Math.ceil(total / limit),
     },
   });
-};
+}
 
-exports.createAgent = async (req, res) => {
+export async function createAgent(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1451,9 +1451,9 @@ exports.createAgent = async (req, res) => {
     message: 'Agent created successfully. Awaiting admin approval.',
     data: agent,
   });
-};
+}
 
-exports.updateAgent = async (req, res) => {
+export async function updateAgent(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1500,9 +1500,9 @@ exports.updateAgent = async (req, res) => {
     message: 'Agent updated successfully',
     data: updatedAgent,
   });
-};
+}
 
-exports.deleteAgent = async (req, res) => {
+export async function deleteAgent(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1528,4 +1528,4 @@ exports.deleteAgent = async (req, res) => {
     success: true,
     message: 'Agent deactivated successfully',
   });
-};
+}

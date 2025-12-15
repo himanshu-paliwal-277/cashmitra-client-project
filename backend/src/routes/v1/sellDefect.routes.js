@@ -1,6 +1,7 @@
-const express = require('express');
-const { body, param, query } = require('express-validator');
-const {
+import express from 'express';
+import {body, param, query} from 'express-validator';
+
+import {
   createDefect,
   getDefects,
   getDefect,
@@ -10,8 +11,9 @@ const {
   reorderDefects,
   getDefectCategories,
   getDefectsByCategory,
-} = require('../../controllers/sellDefect.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
+} from '../../controllers/sellDefect.controller';
+
+import {protect, authorize} from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -117,4 +119,4 @@ router.put(
   reorderDefects
 );
 
-module.exports = router;
+export default router;

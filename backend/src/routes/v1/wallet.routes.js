@@ -1,12 +1,9 @@
-const express = require('express');
-const { check } = require('express-validator');
-const walletController = require('../../controllers/wallet.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
-const {
-  validateRequest,
-  validateObjectId,
-} = require('../../middlewares/validation.middleware');
-const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
+import express from 'express';
+import {check} from 'express-validator';
+import walletController from '../../controllers/wallet.controller';
+import {protect, authorize} from '../../middlewares/auth.middleware';
+import {validateRequest, validateObjectId} from '../../middlewares/validation.middleware';
+import {asyncHandler} from '../../middlewares/errorHandler.middleware';
 
 const router = express.Router();
 
@@ -210,4 +207,4 @@ router.put(
   asyncHandler(walletController.processPayout)
 );
 
-module.exports = router;
+export default router;

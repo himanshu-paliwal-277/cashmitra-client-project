@@ -1,13 +1,10 @@
-const { validationResult } = require('express-validator');
-const SellProduct = require('../models/sellProduct.model');
-const SellConfig = require('../models/sellConfig.model');
-const Category = require('../models/category.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import {validationResult} from 'express-validator';
+import SellProduct from '../models/sellProduct.model';
+import SellConfig from '../models/sellConfig.model';
+import Category from '../models/category.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
-exports.createProduct = asyncHandler(async (req, res) => {
+export var createProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -50,7 +47,7 @@ exports.createProduct = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getProducts = asyncHandler(async (req, res) => {
+export var getProducts = asyncHandler(async (req, res) => {
   const { status, categoryId, search } = req.query;
 
   const query = {};
@@ -79,7 +76,7 @@ exports.getProducts = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getProduct = asyncHandler(async (req, res) => {
+export var getProduct = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id)
     .populate('categoryId', 'name')
     .populate('createdBy', 'name email');
@@ -94,7 +91,7 @@ exports.getProduct = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateProduct = asyncHandler(async (req, res) => {
+export var updateProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -133,7 +130,7 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteProduct = asyncHandler(async (req, res) => {
+export var deleteProduct = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id);
   if (!product) {
     throw new ApiError(404, 'Product not found');
@@ -147,7 +144,7 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getVariants = asyncHandler(async (req, res) => {
+export var getVariants = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id);
   if (!product) {
     throw new ApiError(404, 'Product not found');
@@ -160,7 +157,7 @@ exports.getVariants = asyncHandler(async (req, res) => {
   });
 });
 
-exports.addVariant = asyncHandler(async (req, res) => {
+export var addVariant = asyncHandler(async (req, res) => {
   const { label, basePrice } = req.body;
 
   if (!label || !basePrice) {
@@ -187,7 +184,7 @@ exports.addVariant = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateVariant = asyncHandler(async (req, res) => {
+export var updateVariant = asyncHandler(async (req, res) => {
   const { label, basePrice, isActive } = req.body;
 
   const product = await SellProduct.findById(req.params.id);
@@ -213,7 +210,7 @@ exports.updateVariant = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteVariant = asyncHandler(async (req, res) => {
+export var deleteVariant = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id);
   if (!product) {
     throw new ApiError(404, 'Product not found');
@@ -234,7 +231,7 @@ exports.deleteVariant = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getProductStats = asyncHandler(async (req, res) => {
+export var getProductStats = asyncHandler(async (req, res) => {
   const stats = await SellProduct.aggregate([
     {
       $group: {
@@ -260,7 +257,7 @@ exports.getProductStats = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getCustomerProducts = asyncHandler(async (req, res) => {
+export var getCustomerProducts = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -322,7 +319,7 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
+export var getSellProductsByCategory = asyncHandler(async (req, res) => {
   const { category } = req.params;
   const {
     page = 1,

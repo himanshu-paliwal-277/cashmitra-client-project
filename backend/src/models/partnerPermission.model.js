@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const PARTNER_MENU_ITEMS = {
   dashboard: {
@@ -463,4 +463,4 @@ const PartnerPermission = mongoose.model(
   partnerPermissionSchema
 );
 
-module.exports = { PartnerPermission, PARTNER_MENU_ITEMS };
+export default { PartnerPermission, PARTNER_MENU_ITEMS };

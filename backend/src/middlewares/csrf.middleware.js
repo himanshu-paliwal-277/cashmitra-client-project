@@ -1,7 +1,4 @@
-const {
-  generateCSRFToken,
-  validateCSRFToken,
-} = require('../utils/security.utils');
+import {generateCSRFToken, validateCSRFToken} from '../utils/security.utils';
 
 const generateToken = (req, res, next) => {
   const csrfToken = generateCSRFToken();
@@ -36,7 +33,7 @@ const validateToken = (req, res, next) => {
   next();
 };
 
-module.exports = {
+export default {
   generateToken,
   validateToken,
 };

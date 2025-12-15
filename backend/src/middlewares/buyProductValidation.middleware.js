@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+import {body, validationResult} from 'express-validator';
 
 const validateCreateBuyProduct = [
   body('categoryId')
@@ -484,7 +484,7 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-module.exports = {
+export default {
   validateCreateBuyProduct,
   validateUpdateBuyProduct,
   handleValidationErrors,

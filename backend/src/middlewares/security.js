@@ -1,10 +1,10 @@
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
-const hpp = require('hpp');
-const cors = require('cors');
-const { RateLimitError } = require('./errorHandler');
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
+import hpp from 'hpp';
+import cors from 'cors';
+import {RateLimitError} from './errorHandler';
 
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -304,7 +304,7 @@ const applySecurity = (app) => {
   );
 };
 
-module.exports = {
+export default {
   generalLimiter,
   authLimiter,
   searchLimiter,

@@ -220,6 +220,6 @@ const processArrayFields = (data) => {
   return processedData;
 };
 
-module.exports = {
+export default {
   processArrayFields,
 };

@@ -1,14 +1,14 @@
-const Pickup = require('../models/pickup.model');
-const SellOrder = require('../models/sellOrder.model');
-const User = require('../models/user.model');
-const { generateToken } = require('../utils/jwt.utils');
-const { sendOTPEmail, sendOTPSMS } = require('../utils/notification.utils');
-const cloudinary = require('../config/cloudinary.config');
-const crypto = require('crypto');
+import Pickup from '../models/pickup.model';
+import SellOrder from '../models/sellOrder.model';
+import User from '../models/user.model';
+import {generateToken} from '../utils/jwt.utils';
+import {sendOTPEmail, sendOTPSMS} from '../utils/notification.utils';
+import cloudinary from '../config/cloudinary.config';
+import crypto from 'crypto';
 
 const otpStore = new Map();
 
-exports.loginAgent = async (req, res) => {
+export async function loginAgent(req, res) {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email, role: 'driver' }).select(
@@ -42,9 +42,9 @@ exports.loginAgent = async (req, res) => {
       token: generateToken(user._id, user.role),
     },
   });
-};
+}
 
-exports.getAgentDashboard = async (req, res) => {
+export async function getAgentDashboard(req, res) {
   const agentId = req.user._id;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -93,9 +93,9 @@ exports.getAgentDashboard = async (req, res) => {
       },
     },
   });
-};
+}
 
-exports.getAgentStats = async (req, res) => {
+export async function getAgentStats(req, res) {
   const agentId = req.user._id;
 
   const stats = await Pickup.aggregate([
@@ -112,9 +112,9 @@ exports.getAgentStats = async (req, res) => {
     success: true,
     data: { stats },
   });
-};
+}
 
-exports.getAssignedPickups = async (req, res) => {
+export async function getAssignedPickups(req, res) {
   const agentId = req.user._id;
   const { status, date } = req.query;
 
@@ -149,9 +149,9 @@ exports.getAssignedPickups = async (req, res) => {
     success: true,
     data: { pickups },
   });
-};
+}
 
-exports.getPickupDetails = async (req, res) => {
+export async function getPickupDetails(req, res) {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
@@ -173,9 +173,9 @@ exports.getPickupDetails = async (req, res) => {
     success: true,
     data: { pickup },
   });
-};
+}
 
-exports.startPickup = async (req, res) => {
+export async function startPickup(req, res) {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
@@ -207,9 +207,9 @@ exports.startPickup = async (req, res) => {
     message: 'Pickup started successfully',
     data: { pickup },
   });
-};
+}
 
-exports.reachedDoorstep = async (req, res) => {
+export async function reachedDoorstep(req, res) {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
@@ -241,9 +241,9 @@ exports.reachedDoorstep = async (req, res) => {
     message: 'Marked as reached doorstep',
     data: { pickup },
   });
-};
+}
 
-exports.uploadAgentSelfie = async (req, res) => {
+export async function uploadAgentSelfie(req, res) {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
@@ -286,9 +286,9 @@ exports.uploadAgentSelfie = async (req, res) => {
       selfieUrl: result.secure_url,
     },
   });
-};
+}
 
-exports.sendCustomerOTP = async (req, res) => {
+export async function sendCustomerOTP(req, res) {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
@@ -330,9 +330,9 @@ exports.sendCustomerOTP = async (req, res) => {
       ),
     },
   });
-};
+}
 
-exports.verifyCustomerOTP = async (req, res) => {
+export async function verifyCustomerOTP(req, res) {
   const { pickupId } = req.params;
   const { otp } = req.body;
 
@@ -375,9 +375,9 @@ exports.verifyCustomerOTP = async (req, res) => {
     message:
       'Customer verified successfully. You can now proceed with device inspection.',
   });
-};
+}
 
-exports.uploadDevicePhotos = async (req, res) => {
+export async function uploadDevicePhotos(req, res) {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
@@ -430,9 +430,9 @@ exports.uploadDevicePhotos = async (req, res) => {
     message: 'Device photos uploaded successfully',
     data: { devicePhotos: pickup.devicePhotos },
   });
-};
+}
 
-exports.verifyIMEI = async (req, res) => {
+export async function verifyIMEI(req, res) {
   const { pickupId } = req.params;
   const { imei1, imei2 } = req.body;
   const agentId = req.user._id;
@@ -463,9 +463,9 @@ exports.verifyIMEI = async (req, res) => {
     message: 'IMEI verified successfully',
     data: { deviceIMEI: pickup.deviceIMEI },
   });
-};
+}
 
-exports.submitDeviceInspection = async (req, res) => {
+export async function submitDeviceInspection(req, res) {
   const { pickupId } = req.params;
   const { inspectionData } = req.body;
   const agentId = req.user._id;
@@ -503,9 +503,9 @@ exports.submitDeviceInspection = async (req, res) => {
     message: 'Inspection data saved successfully',
     data: { inspection: pickup.inspectionData },
   });
-};
+}
 
-exports.calculateFinalPrice = async (req, res) => {
+export async function calculateFinalPrice(req, res) {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
@@ -579,9 +579,9 @@ exports.calculateFinalPrice = async (req, res) => {
       totalDeduction: pickup.orderId.estimatedPrice - finalPrice,
     },
   });
-};
+}
 
-exports.updatePrice = async (req, res) => {
+export async function updatePrice(req, res) {
   const { pickupId } = req.params;
   const { adjustedPrice, reason } = req.body;
   const agentId = req.user._id;
@@ -621,9 +621,9 @@ exports.updatePrice = async (req, res) => {
     message: 'Price updated successfully',
     data: { priceAdjustment: pickup.priceAdjustment },
   });
-};
+}
 
-exports.recordCustomerDecision = async (req, res) => {
+export async function recordCustomerDecision(req, res) {
   const { pickupId } = req.params;
   const { accepted, rejectionReason } = req.body;
   const agentId = req.user._id;
@@ -669,9 +669,9 @@ exports.recordCustomerDecision = async (req, res) => {
       : 'Pickup cancelled',
     data: { pickup },
   });
-};
+}
 
-exports.recordPayment = async (req, res) => {
+export async function recordPayment(req, res) {
   const { pickupId } = req.params;
   const { amount, method, transactionId } = req.body;
   const agentId = req.user._id;
@@ -711,9 +711,9 @@ exports.recordPayment = async (req, res) => {
     message: 'Payment recorded successfully',
     data: { payment: pickup.payment },
   });
-};
+}
 
-exports.sendFinalOTP = async (req, res) => {
+export async function sendFinalOTP(req, res) {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
@@ -753,9 +753,9 @@ exports.sendFinalOTP = async (req, res) => {
     success: true,
     message: 'Final OTP sent successfully',
   });
-};
+}
 
-exports.verifyFinalOTP = async (req, res) => {
+export async function verifyFinalOTP(req, res) {
   const { pickupId } = req.params;
   const { otp } = req.body;
 
@@ -789,9 +789,9 @@ exports.verifyFinalOTP = async (req, res) => {
     success: true,
     message: 'Final OTP verified. You can now complete the pickup.',
   });
-};
+}
 
-exports.completePickup = async (req, res) => {
+export async function completePickup(req, res) {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
@@ -830,9 +830,9 @@ exports.completePickup = async (req, res) => {
       commission: pickup.agentCommission,
     },
   });
-};
+}
 
-exports.saveCustomerSignature = async (req, res) => {
+export async function saveCustomerSignature(req, res) {
   const { pickupId } = req.params;
   const agentId = req.user._id;
 
@@ -871,9 +871,9 @@ exports.saveCustomerSignature = async (req, res) => {
     message: 'Customer signature saved successfully',
     data: { signatureUrl: result.secure_url },
   });
-};
+}
 
-exports.getPickupHistory = async (req, res) => {
+export async function getPickupHistory(req, res) {
   const agentId = req.user._id;
   const { page = 1, limit = 20 } = req.query;
 
@@ -903,9 +903,9 @@ exports.getPickupHistory = async (req, res) => {
       },
     },
   });
-};
+}
 
-exports.getCompletedToday = async (req, res) => {
+export async function getCompletedToday(req, res) {
   const agentId = req.user._id;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -922,9 +922,9 @@ exports.getCompletedToday = async (req, res) => {
     success: true,
     data: { pickups },
   });
-};
+}
 
-exports.getDailyReport = async (req, res) => {
+export async function getDailyReport(req, res) {
   const agentId = req.user._id;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -970,9 +970,9 @@ exports.getDailyReport = async (req, res) => {
       },
     },
   });
-};
+}
 
-exports.submitDailyReport = async (req, res) => {
+export async function submitDailyReport(req, res) {
   const agentId = req.user._id;
   const { notes, issues } = req.body;
 
@@ -980,4 +980,4 @@ exports.submitDailyReport = async (req, res) => {
     success: true,
     message: 'Daily report submitted successfully',
   });
-};
+}

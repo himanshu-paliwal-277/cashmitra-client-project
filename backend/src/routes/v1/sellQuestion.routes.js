@@ -1,6 +1,7 @@
-const express = require('express');
-const { body, param, query } = require('express-validator');
-const {
+import express from 'express';
+import {body, param, query} from 'express-validator';
+
+import {
   createQuestion,
   getQuestions,
   getQuestion,
@@ -11,8 +12,9 @@ const {
   deleteOption,
   reorderQuestions,
   getCustomerQuestions,
-} = require('../../controllers/sellQuestion.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
+} from '../../controllers/sellQuestion.controller';
+
+import {protect, authorize} from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -228,4 +230,4 @@ router.delete(
   deleteOption
 );
 
-module.exports = router;
+export default router;

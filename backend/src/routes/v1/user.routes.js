@@ -1,9 +1,9 @@
-const express = require('express');
-const { check } = require('express-validator');
-const userController = require('../../controllers/user.controller');
-const { protect } = require('../../middlewares/auth.middleware');
-const { validateRequest } = require('../../middlewares/validation.middleware');
-const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
+import express from 'express';
+import {check} from 'express-validator';
+import userController from '../../controllers/user.controller';
+import {protect} from '../../middlewares/auth.middleware';
+import {validateRequest} from '../../middlewares/validation.middleware';
+import {asyncHandler} from '../../middlewares/errorHandler.middleware';
 
 const router = express.Router();
 
@@ -118,4 +118,4 @@ router.put(
   asyncHandler(userController.setDefaultAddress)
 );
 
-module.exports = router;
+export default router;

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const buyCategorySchema = new mongoose.Schema(
   {
@@ -70,4 +70,4 @@ buyCategorySchema.index({ isActive: 1, sortOrder: 1 });
 
 const BuyCategory = mongoose.model('BuyCategory', buyCategorySchema);
 
-module.exports = BuyCategory;
+export default BuyCategory;

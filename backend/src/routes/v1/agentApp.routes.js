@@ -1,12 +1,9 @@
-const express = require('express');
-const { check } = require('express-validator');
-const agentAppController = require('../../controllers/agentApp.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
-const {
-  validateRequest,
-  validateObjectId,
-} = require('../../middlewares/validation.middleware');
-const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
+import express from 'express';
+import {check} from 'express-validator';
+import agentAppController from '../../controllers/agentApp.controller';
+import {protect, authorize} from '../../middlewares/auth.middleware';
+import {validateRequest, validateObjectId} from '../../middlewares/validation.middleware';
+import {asyncHandler} from '../../middlewares/errorHandler.middleware';
 
 const router = express.Router();
 
@@ -219,4 +216,4 @@ router.get(
   asyncHandler(agentAppController.getCompleteOrderDetails)
 );
 
-module.exports = router;
+export default router;

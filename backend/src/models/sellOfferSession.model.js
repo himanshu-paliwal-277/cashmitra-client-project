@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const sellOfferSessionSchema = new mongoose.Schema(
   {
@@ -163,4 +163,4 @@ const SellOfferSession = mongoose.model(
   sellOfferSessionSchema
 );
 
-module.exports = SellOfferSession;
+export default SellOfferSession;

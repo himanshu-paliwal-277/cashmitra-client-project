@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const User = require('../models/user.model');
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import User from '../models/user.model';
 
 dotenv.config();
 

@@ -1,7 +1,7 @@
-const express = require('express');
-const { body, param, query } = require('express-validator');
-const salesController = require('../../controllers/sales.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
+import express from 'express';
+import {body, param, query} from 'express-validator';
+import salesController from '../../controllers/sales.controller';
+import {protect, authorize} from '../../middlewares/auth.middleware';
 const router = express.Router();
 
 const validateCreateOrder = [
@@ -161,4 +161,4 @@ router.get(
   salesController.getSalesAnalytics
 );
 
-module.exports = router;
+export default router;

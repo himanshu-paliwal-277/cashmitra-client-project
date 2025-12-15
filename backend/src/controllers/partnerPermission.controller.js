@@ -1,11 +1,11 @@
-const { PartnerPermission } = require('../models/partnerPermission.model');
-const Partner = require('../models/partner.model');
-const User = require('../models/user.model');
-const RoleTemplate = require('../models/roleTemplate.model');
-const ApiError = require('../utils/apiError');
-const { sanitizeData } = require('../utils/security.utils');
+import {PartnerPermission} from '../models/partnerPermission.model';
+import Partner from '../models/partner.model';
+import User from '../models/user.model';
+import RoleTemplate from '../models/roleTemplate.model';
+import ApiError from '../utils/apiError';
+import {sanitizeData} from '../utils/security.utils';
 
-exports.getPartnerPermissions = async (req, res) => {
+export async function getPartnerPermissions(req, res) {
   try {
     const user = await User.findById(req.user.id).populate('roleTemplate');
 
@@ -65,9 +65,9 @@ exports.getPartnerPermissions = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.checkPermission = async (req, res) => {
+export async function checkPermission(req, res) {
   try {
     const user = await User.findById(req.user.id).populate('roleTemplate');
 
@@ -109,9 +109,9 @@ exports.checkPermission = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.getAvailableMenuItems = async (req, res) => {
+export async function getAvailableMenuItems(req, res) {
   try {
     const user = await User.findById(req.user.id).populate('roleTemplate');
 
@@ -159,9 +159,9 @@ exports.getAvailableMenuItems = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.getAllPartnerPermissions = async (req, res) => {
+export async function getAllPartnerPermissions(req, res) {
   try {
     const { page = 1, limit = 10, search, roleTemplate, isActive } = req.query;
 
@@ -222,9 +222,9 @@ exports.getAllPartnerPermissions = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.getPartnerPermissionsById = async (req, res) => {
+export async function getPartnerPermissionsById(req, res) {
   try {
     const { partnerId } = req.params;
 
@@ -266,9 +266,9 @@ exports.getPartnerPermissionsById = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.updatePartnerPermissions = async (req, res) => {
+export async function updatePartnerPermissions(req, res) {
   try {
     const { partnerId } = req.params;
     const {
@@ -355,9 +355,9 @@ exports.updatePartnerPermissions = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.grantPermission = async (req, res) => {
+export async function grantPermission(req, res) {
   try {
     const { partnerId } = req.params;
     const { menuItem, restrictions = {} } = req.body;
@@ -392,9 +392,9 @@ exports.grantPermission = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.revokePermission = async (req, res) => {
+export async function revokePermission(req, res) {
   try {
     const { partnerId } = req.params;
     const { menuItem } = req.body;
@@ -428,9 +428,9 @@ exports.revokePermission = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.applyRoleTemplate = async (req, res) => {
+export async function applyRoleTemplate(req, res) {
   try {
     const { partnerId } = req.params;
     const { roleTemplate } = req.body;
@@ -462,9 +462,9 @@ exports.applyRoleTemplate = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.getRoleTemplates = async (req, res) => {
+export async function getRoleTemplates(req, res) {
   try {
     let roleTemplates = await RoleTemplate.getActiveTemplates();
 
@@ -489,9 +489,9 @@ exports.getRoleTemplates = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.createRoleTemplate = async (req, res) => {
+export async function createRoleTemplate(req, res) {
   try {
     const {
       name,
@@ -573,9 +573,9 @@ exports.createRoleTemplate = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.updateRoleTemplate = async (req, res) => {
+export async function updateRoleTemplate(req, res) {
   try {
     const { templateId } = req.params;
     const { displayName, description, color, permissions, features, limits } =
@@ -628,9 +628,9 @@ exports.updateRoleTemplate = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.deleteRoleTemplate = async (req, res) => {
+export async function deleteRoleTemplate(req, res) {
   try {
     const { templateId } = req.params;
 
@@ -683,9 +683,9 @@ exports.deleteRoleTemplate = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.createPermission = async (req, res) => {
+export async function createPermission(req, res) {
   try {
     const {
       name,
@@ -747,9 +747,9 @@ exports.createPermission = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-exports.getMenuItemsStructure = async (req, res) => {
+export async function getMenuItemsStructure(req, res) {
   try {
     const menuItems = PartnerPermission.getMenuItems();
 
@@ -765,4 +765,4 @@ exports.getMenuItemsStructure = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}

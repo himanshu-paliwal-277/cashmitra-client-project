@@ -1,11 +1,11 @@
-const Wallet = require('../models/wallet.model');
-const Transaction = require('../models/transaction.model');
-const Partner = require('../models/partner.model');
-const { Order } = require('../models/order.model');
-const { validationResult } = require('express-validator');
-const mongoose = require('mongoose');
+import Wallet from '../models/wallet.model';
+import Transaction from '../models/transaction.model';
+import Partner from '../models/partner.model';
+import {Order} from '../models/order.model';
+import {validationResult} from 'express-validator';
+import mongoose from 'mongoose';
 
-exports.getWallet = async (req, res) => {
+export async function getWallet(req, res) {
   try {
     const partner = await Partner.findOne({ user: req.user.id });
     if (!partner) {
@@ -44,9 +44,9 @@ exports.getWallet = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-exports.getTransactions = async (req, res) => {
+export async function getTransactions(req, res) {
   try {
     const partner = await Partner.findOne({ user: req.user.id });
     if (!partner) {
@@ -88,13 +88,9 @@ exports.getTransactions = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-exports.processCommission = async (
-  orderId,
-  commissionAmount,
-  commissionRate
-) => {
+export async function processCommission(orderId, commissionAmount, commissionRate) {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -153,9 +149,9 @@ exports.processCommission = async (
   } finally {
     session.endSession();
   }
-};
+}
 
-exports.requestPayout = async (req, res) => {
+export async function requestPayout(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -258,9 +254,9 @@ exports.requestPayout = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-exports.updatePayoutSettings = async (req, res) => {
+export async function updatePayoutSettings(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -328,9 +324,9 @@ exports.updatePayoutSettings = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-exports.getPayoutHistory = async (req, res) => {
+export async function getPayoutHistory(req, res) {
   try {
     const partner = await Partner.findOne({ user: req.user.id });
     if (!partner) {
@@ -373,9 +369,9 @@ exports.getPayoutHistory = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-exports.getWalletAnalytics = async (req, res) => {
+export async function getWalletAnalytics(req, res) {
   try {
     const partner = await Partner.findOne({ user: req.user.id });
     if (!partner) {
@@ -471,9 +467,9 @@ exports.getWalletAnalytics = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-exports.processPayout = async (req, res) => {
+export async function processPayout(req, res) {
   try {
     const { transactionId } = req.params;
     const { status, notes } = req.body;
@@ -555,9 +551,9 @@ exports.processPayout = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-exports.getAllPayouts = async (req, res) => {
+export async function getAllPayouts(req, res) {
   try {
     const { page = 1, limit = 10, status } = req.query;
 
@@ -598,9 +594,9 @@ exports.getAllPayouts = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-exports.getPendingPayouts = async (req, res) => {
+export async function getPendingPayouts(req, res) {
   try {
     const { page = 1, limit = 10 } = req.query;
 
@@ -642,4 +638,4 @@ exports.getPendingPayouts = async (req, res) => {
       error: error.message,
     });
   }
-};
+}

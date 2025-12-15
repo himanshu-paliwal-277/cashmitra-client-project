@@ -1,11 +1,8 @@
-const { validationResult } = require('express-validator');
-const Category = require('../models/category.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import {validationResult} from 'express-validator';
+import Category from '../models/category.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
-exports.createCategory = asyncHandler(async (req, res) => {
+export var createCategory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -49,7 +46,7 @@ exports.createCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getCategories = asyncHandler(async (req, res) => {
+export var getCategories = asyncHandler(async (req, res) => {
   const { includeInactive } = req.query;
 
   const filter = includeInactive === 'true' ? {} : { isActive: true };
@@ -66,7 +63,7 @@ exports.getCategories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getCategory = asyncHandler(async (req, res) => {
+export var getCategory = asyncHandler(async (req, res) => {
   const { identifier } = req.params;
 
   let category;
@@ -88,7 +85,7 @@ exports.getCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateCategory = asyncHandler(async (req, res) => {
+export var updateCategory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -150,7 +147,7 @@ exports.updateCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteCategory = asyncHandler(async (req, res) => {
+export var deleteCategory = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id);
   if (!category) {
     throw new ApiError(404, 'Category not found');
@@ -164,7 +161,7 @@ exports.deleteCategory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getCategoryStats = asyncHandler(async (req, res) => {
+export var getCategoryStats = asyncHandler(async (req, res) => {
   const totalCategories = await Category.countDocuments();
   const activeCategories = await Category.countDocuments({ isActive: true });
 
@@ -178,7 +175,7 @@ exports.getCategoryStats = asyncHandler(async (req, res) => {
   });
 });
 
-exports.bulkUpdateStatus = asyncHandler(async (req, res) => {
+export var bulkUpdateStatus = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -208,7 +205,7 @@ exports.bulkUpdateStatus = asyncHandler(async (req, res) => {
   });
 });
 
-exports.searchCategories = asyncHandler(async (req, res) => {
+export var searchCategories = asyncHandler(async (req, res) => {
   const { q, limit = 10, includeInactive = false } = req.query;
 
   if (!q || q.trim().length < 2) {

@@ -1,14 +1,11 @@
-const { validationResult } = require('express-validator');
-const Product = require('../models/product.model');
-const Inventory = require('../models/inventory.model');
-const Category = require('../models/category.model');
-const Partner = require('../models/partner.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import {validationResult} from 'express-validator';
+import Product from '../models/product.model';
+import Inventory from '../models/inventory.model';
+import Category from '../models/category.model';
+import Partner from '../models/partner.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
-exports.getProducts = asyncHandler(async (req, res) => {
+export var getProducts = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 20,
@@ -222,7 +219,7 @@ exports.getProducts = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getProduct = asyncHandler(async (req, res) => {
+export var getProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { pincode } = req.query;
 
@@ -276,7 +273,7 @@ exports.getProduct = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getProductSuggestions = asyncHandler(async (req, res) => {
+export var getProductSuggestions = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { limit = 10 } = req.query;
 
@@ -351,7 +348,7 @@ exports.getProductSuggestions = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getProductCategories = asyncHandler(async (req, res) => {
+export var getProductCategories = asyncHandler(async (req, res) => {
   const categories = await Category.aggregate([
     {
       $lookup: {
@@ -394,7 +391,7 @@ exports.getProductCategories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getProductBrands = asyncHandler(async (req, res) => {
+export var getProductBrands = asyncHandler(async (req, res) => {
   const { category } = req.query;
 
   const matchStage = {};
@@ -431,7 +428,7 @@ exports.getProductBrands = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getProductFilters = asyncHandler(async (req, res) => {
+export var getProductFilters = asyncHandler(async (req, res) => {
   const { category } = req.query;
 
   const matchStage = {};
@@ -528,7 +525,7 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
   });
 });
 
-exports.createProduct = asyncHandler(async (req, res) => {
+export var createProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation failed', errors.array());
@@ -575,7 +572,7 @@ exports.createProduct = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateProduct = asyncHandler(async (req, res) => {
+export var updateProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation failed', errors.array());
@@ -621,7 +618,7 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteProduct = asyncHandler(async (req, res) => {
+export var deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   const product = await Product.findById(id);

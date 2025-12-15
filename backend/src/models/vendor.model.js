@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const vendorSchema = new mongoose.Schema(
   {
@@ -140,4 +140,4 @@ vendorSchema.statics.getByStatus = function (status) {
 
 const Vendor = mongoose.model('Vendor', vendorSchema);
 
-module.exports = Vendor;
+export default Vendor;

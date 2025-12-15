@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const categorySchema = new mongoose.Schema(
   {
@@ -98,4 +98,4 @@ categorySchema.index({ isActive: 1, sortOrder: 1 });
 
 const Category = mongoose.model('Category', categorySchema);
 
-module.exports = Category;
+export default Category;

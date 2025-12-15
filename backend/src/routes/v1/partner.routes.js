@@ -1,13 +1,10 @@
-const express = require('express');
-const { check } = require('express-validator');
-const partnerController = require('../../controllers/partner.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
-const {
-  validateRequest,
-  validateObjectId,
-} = require('../../middlewares/validation.middleware');
-const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
-const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
+import express from 'express';
+import {check} from 'express-validator';
+import partnerController from '../../controllers/partner.controller';
+import {protect, authorize} from '../../middlewares/auth.middleware';
+import {validateRequest, validateObjectId} from '../../middlewares/validation.middleware';
+import {asyncHandler} from '../../middlewares/errorHandler.middleware';
+import {authLimiter} from '../../middlewares/rateLimiter.middleware';
 
 const router = express.Router();
 
@@ -223,10 +220,7 @@ router.get(
   asyncHandler(partnerController.getDashboardStats)
 );
 
-const {
-  attachPartner,
-  requirePartner,
-} = require('../../middlewares/partner.middleware');
+import {attachPartner, requirePartner} from '../../middlewares/partner.middleware';
 
 router.use(
   '/dashboard-sellbuy',
@@ -354,4 +348,4 @@ router.delete(
   asyncHandler(partnerController.deleteAgent)
 );
 
-module.exports = router;
+export default router;

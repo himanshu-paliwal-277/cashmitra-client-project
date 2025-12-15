@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const sellQuestionSchema = new mongoose.Schema(
   {
@@ -193,4 +193,4 @@ sellQuestionSchema.statics.getForVariants = async function (
 
 const SellQuestion = mongoose.model('SellQuestion', sellQuestionSchema);
 
-module.exports = SellQuestion;
+export default SellQuestion;

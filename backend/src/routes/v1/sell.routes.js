@@ -1,13 +1,9 @@
-const express = require('express');
-const { check } = require('express-validator');
-const sellController = require('../../controllers/sell.controller');
-const { protect } = require('../../middlewares/auth.middleware');
-const {
-  validateRequest,
-  validateObjectId,
-  validateAssessmentId,
-} = require('../../middlewares/validation.middleware');
-const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
+import express from 'express';
+import {check} from 'express-validator';
+import sellController from '../../controllers/sell.controller';
+import {protect} from '../../middlewares/auth.middleware';
+import {validateRequest, validateObjectId, validateAssessmentId} from '../../middlewares/validation.middleware';
+import {asyncHandler} from '../../middlewares/errorHandler.middleware';
 
 const router = express.Router();
 
@@ -174,4 +170,4 @@ router.put(
   asyncHandler(sellController.updateSellOrderStatus)
 );
 
-module.exports = router;
+export default router;

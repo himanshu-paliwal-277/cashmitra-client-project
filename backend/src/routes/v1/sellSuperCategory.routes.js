@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const sellSuperCategoryController = require('../../controllers/sellSuperCategory.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
+import sellSuperCategoryController from '../../controllers/sellSuperCategory.controller';
+import {protect, authorize} from '../../middlewares/auth.middleware';
 
 router.get('/public', sellSuperCategoryController.getPublicSuperCategories);
 
@@ -24,4 +24,4 @@ router.put('/:id', sellSuperCategoryController.updateSuperCategory);
 
 router.delete('/:id', sellSuperCategoryController.deleteSuperCategory);
 
-module.exports = router;
+export default router;

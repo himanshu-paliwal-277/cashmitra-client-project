@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const User = require('../models/user.model');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import User from '../models/user.model';
 require('dotenv').config();
 
 const additionalUsers = [
@@ -92,4 +92,4 @@ if (require.main === module) {
   addMoreUsers();
 }
 
-module.exports = addMoreUsers;
+export default addMoreUsers;

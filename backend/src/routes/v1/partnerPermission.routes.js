@@ -1,9 +1,9 @@
-const express = require('express');
-const { check, param, query } = require('express-validator');
-const partnerPermissionController = require('../../controllers/partnerPermission.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
-const { validateRequest } = require('../../middlewares/validation.middleware');
-const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
+import express from 'express';
+import {check, param, query} from 'express-validator';
+import partnerPermissionController from '../../controllers/partnerPermission.controller';
+import {protect, authorize} from '../../middlewares/auth.middleware';
+import {validateRequest} from '../../middlewares/validation.middleware';
+import {asyncHandler} from '../../middlewares/errorHandler.middleware';
 
 const router = express.Router();
 
@@ -375,4 +375,4 @@ router.post(
   asyncHandler(partnerPermissionController.applyRoleTemplate)
 );
 
-module.exports = router;
+export default router;

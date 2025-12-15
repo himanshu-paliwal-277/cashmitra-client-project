@@ -1,12 +1,9 @@
-const { validationResult } = require('express-validator');
-const SellAccessory = require('../models/sellAccessory.model');
-const SellProduct = require('../models/sellProduct.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import {validationResult} from 'express-validator';
+import SellAccessory from '../models/sellAccessory.model';
+import SellProduct from '../models/sellProduct.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
-exports.createAccessory = asyncHandler(async (req, res) => {
+export var createAccessory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -51,7 +48,7 @@ exports.createAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getAccessories = asyncHandler(async (req, res) => {
+export var getAccessories = asyncHandler(async (req, res) => {
   const { categoryId, isActive } = req.query;
 
   const query = {};
@@ -70,7 +67,7 @@ exports.getAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getAccessoriesForCustomer = asyncHandler(async (req, res) => {
+export var getAccessoriesForCustomer = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
 
   const accessories = await SellAccessory.getActiveForCategory(categoryId);
@@ -81,7 +78,7 @@ exports.getAccessoriesForCustomer = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getCustomerAccessories = asyncHandler(async (req, res) => {
+export var getCustomerAccessories = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -106,7 +103,7 @@ exports.getCustomerAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getAccessory = asyncHandler(async (req, res) => {
+export var getAccessory = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id)
     .populate('categoryId', 'name')
     .populate('createdBy', 'name email');
@@ -121,7 +118,7 @@ exports.getAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateAccessory = asyncHandler(async (req, res) => {
+export var updateAccessory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -163,7 +160,7 @@ exports.updateAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
+export var reindexAccessoryOrders = asyncHandler(async (req, res) => {
   try {
     const accessories = await SellAccessory.find({});
 
@@ -209,7 +206,7 @@ exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
   }
 });
 
-exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
+export var migrateAndReindexAccessories = asyncHandler(async (req, res) => {
   try {
     const SellProduct = require('../models/sellProduct.model');
     const mongoose = require('mongoose');
@@ -280,7 +277,7 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
   }
 });
 
-exports.deleteAccessory = asyncHandler(async (req, res) => {
+export var deleteAccessory = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
     throw new ApiError(404, 'Accessory not found');
@@ -294,7 +291,7 @@ exports.deleteAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
+export var bulkCreateAccessories = asyncHandler(async (req, res) => {
   const { categoryId, accessories } = req.body;
 
   const Category = require('../models/category.model');
@@ -361,7 +358,7 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.reorderAccessories = asyncHandler(async (req, res) => {
+export var reorderAccessories = asyncHandler(async (req, res) => {
   const { categoryId, accessoryIds } = req.body;
 
   const Category = require('../models/category.model');
@@ -406,7 +403,7 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.toggleAccessoryStatus = asyncHandler(async (req, res) => {
+export var toggleAccessoryStatus = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
     throw new ApiError(404, 'Accessory not found');

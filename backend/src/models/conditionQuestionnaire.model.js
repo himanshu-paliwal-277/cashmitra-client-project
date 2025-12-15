@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const questionOptionSchema = new Schema(
@@ -329,7 +329,7 @@ conditionQuestionnaireSchema.methods.duplicate = function (
   return duplicated;
 };
 
-module.exports = mongoose.model(
+export default mongoose.model(
   'ConditionQuestionnaire',
   conditionQuestionnaireSchema
 );

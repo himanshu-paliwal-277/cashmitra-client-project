@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const pickupSchema = new mongoose.Schema(
   {
@@ -285,4 +285,4 @@ pickupSchema.methods.addNote = function (content, addedBy) {
   return this.save();
 };
 
-module.exports = mongoose.model('Pickup', pickupSchema);
+export default mongoose.model('Pickup', pickupSchema);

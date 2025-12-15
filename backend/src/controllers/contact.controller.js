@@ -1,8 +1,5 @@
-const nodemailer = require('nodemailer');
-const {
-  asyncHandler,
-  ApiError,
-} = require('../middlewares/errorHandler.middleware');
+import nodemailer from 'nodemailer';
+import {asyncHandler, ApiError} from '../middlewares/errorHandler.middleware';
 
 const createTransporter = () => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -24,7 +21,7 @@ const createTransporter = () => {
   });
 };
 
-exports.sendContactEmail = asyncHandler(async (req, res) => {
+export var sendContactEmail = asyncHandler(async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
 
   if (!name || !email || !subject || !message) {
@@ -192,7 +189,7 @@ exports.sendContactEmail = asyncHandler(async (req, res) => {
   }
 });
 
-exports.getContactInfo = asyncHandler(async (req, res) => {
+export var getContactInfo = asyncHandler(async (req, res) => {
   const contactInfo = {
     phone: '1800-123-4567',
     email: 'support@cashmitra.com',

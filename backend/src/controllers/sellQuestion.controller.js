@@ -1,14 +1,11 @@
-const { validationResult } = require('express-validator');
-const SellQuestion = require('../models/sellQuestion.model');
-const SellProduct = require('../models/sellProduct.model');
-const Category = require('../models/category.model');
-const SellSuperCategory = require('../models/sellSuperCategory.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import {validationResult} from 'express-validator';
+import SellQuestion from '../models/sellQuestion.model';
+import SellProduct from '../models/sellProduct.model';
+import Category from '../models/category.model';
+import SellSuperCategory from '../models/sellSuperCategory.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
-exports.createQuestion = asyncHandler(async (req, res) => {
+export var createQuestion = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -68,7 +65,7 @@ exports.createQuestion = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getQuestions = asyncHandler(async (req, res) => {
+export var getQuestions = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -110,7 +107,7 @@ exports.getQuestions = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getQuestionsForCustomer = asyncHandler(async (req, res) => {
+export var getQuestionsForCustomer = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
 
   const category = await Category.findById(categoryId);
@@ -138,7 +135,7 @@ exports.getQuestionsForCustomer = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getCustomerQuestions = asyncHandler(async (req, res) => {
+export var getCustomerQuestions = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -178,7 +175,7 @@ exports.getCustomerQuestions = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getQuestion = asyncHandler(async (req, res) => {
+export var getQuestion = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id)
     .populate('categoryId', 'name')
     .populate('createdBy', 'name email');
@@ -193,7 +190,7 @@ exports.getQuestion = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateQuestion = asyncHandler(async (req, res) => {
+export var updateQuestion = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -270,7 +267,7 @@ exports.updateQuestion = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteQuestion = asyncHandler(async (req, res) => {
+export var deleteQuestion = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
     throw new ApiError(404, 'Question not found');
@@ -284,7 +281,7 @@ exports.deleteQuestion = asyncHandler(async (req, res) => {
   });
 });
 
-exports.addOption = asyncHandler(async (req, res) => {
+export var addOption = asyncHandler(async (req, res) => {
   const { key, label, value, delta, showIf } = req.body;
 
   if (!key || !label || !value) {
@@ -318,7 +315,7 @@ exports.addOption = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateOption = asyncHandler(async (req, res) => {
+export var updateOption = asyncHandler(async (req, res) => {
   const { key, label, value, delta, showIf } = req.body;
 
   const question = await SellQuestion.findById(req.params.id);
@@ -358,7 +355,7 @@ exports.updateOption = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteOption = asyncHandler(async (req, res) => {
+export var deleteOption = asyncHandler(async (req, res) => {
   const question = await SellQuestion.findById(req.params.id);
   if (!question) {
     throw new ApiError(404, 'Question not found');
@@ -381,7 +378,7 @@ exports.deleteOption = asyncHandler(async (req, res) => {
   });
 });
 
-exports.reorderQuestions = asyncHandler(async (req, res) => {
+export var reorderQuestions = asyncHandler(async (req, res) => {
   const { categoryId, section, questionIds } = req.body;
 
   if (!section || !Array.isArray(questionIds)) {

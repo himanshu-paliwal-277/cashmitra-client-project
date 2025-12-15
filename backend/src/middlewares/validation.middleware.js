@@ -1,5 +1,5 @@
-const { validationResult } = require('express-validator');
-const validationUtils = require('../utils/validation.utils');
+import {validationResult} from 'express-validator';
+import validationUtils from '../utils/validation.utils';
 
 const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
@@ -62,7 +62,7 @@ const validatePasswordStrength = (req, res, next) => {
   next();
 };
 
-module.exports = {
+export default {
   validateRequest,
   validateObjectId,
   validateAssessmentId,

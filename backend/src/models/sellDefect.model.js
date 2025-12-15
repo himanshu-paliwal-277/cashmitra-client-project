@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const sellDefectSchema = new mongoose.Schema(
   {
@@ -142,4 +142,4 @@ sellDefectSchema.statics.getGroupedByCategory = async function (
 
 const SellDefect = mongoose.model('SellDefect', sellDefectSchema);
 
-module.exports = SellDefect;
+export default SellDefect;

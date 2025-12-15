@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/serverConfig');
+import jwt from 'jsonwebtoken';
+import {JWT_SECRET, JWT_EXPIRES_IN} from '../config/serverConfig';
 
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, JWT_SECRET, {
@@ -11,7 +11,7 @@ const verifyToken = (token) => {
   return jwt.verify(token, JWT_SECRET);
 };
 
-module.exports = {
+export default {
   generateToken,
   verifyToken,
 };

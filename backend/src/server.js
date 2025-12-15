@@ -1,18 +1,15 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const session = require('express-session');
-const { errorHandler } = require('./middlewares/errorHandler.middleware');
-const { apiLimiter } = require('./middlewares/rateLimiter.middleware');
-const {
-  generateToken,
-  validateToken,
-} = require('./middlewares/csrf.middleware');
-const { sanitizeData } = require('./utils/security.utils');
-const securityConfig = require('./config/security.config');
-const { PORT, NODE_ENV, MONGODB_URI } = require('./config/serverConfig');
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import session from 'express-session';
+import {errorHandler} from './middlewares/errorHandler.middleware';
+import {apiLimiter} from './middlewares/rateLimiter.middleware';
+import {generateToken, validateToken} from './middlewares/csrf.middleware';
+import {sanitizeData} from './utils/security.utils';
+import securityConfig from './config/security.config';
+import {PORT, NODE_ENV, MONGODB_URI} from './config/serverConfig';
 
 const app = express();
 
@@ -31,7 +28,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const apiRouter = require('./routes/apiRouter.routes');
+import apiRouter from './routes/apiRouter.routes';
 
 app.use('/api', apiRouter);
 

@@ -1,12 +1,12 @@
-const { validationResult } = require('express-validator');
-const Product = require('../models/product.model');
-const SellProduct = require('../models/sellProduct.model');
-const Category = require('../models/category.model');
-const SellSuperCategory = require('../models/sellSuperCategory.model');
-const Partner = require('../models/partner.model');
-const { Order } = require('../models/order.model');
-const Transaction = require('../models/transaction.model');
-const Wallet = require('../models/wallet.model');
+import {validationResult} from 'express-validator';
+import Product from '../models/product.model';
+import SellProduct from '../models/sellProduct.model';
+import Category from '../models/category.model';
+import SellSuperCategory from '../models/sellSuperCategory.model';
+import Partner from '../models/partner.model';
+import {Order} from '../models/order.model';
+import Transaction from '../models/transaction.model';
+import Wallet from '../models/wallet.model';
 
 const getProductCategories = async (req, res) => {
   try {
@@ -873,7 +873,7 @@ const findProductsByModel = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   getProductCategories,
   getBrandsByCategory,
   getSeriesByBrand,

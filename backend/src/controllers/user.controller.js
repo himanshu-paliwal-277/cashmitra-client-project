@@ -1,7 +1,7 @@
-const User = require('../models/user.model');
-const { Order } = require('../models/order.model');
-const Address = require('../models/address.model');
-const { validationResult } = require('express-validator');
+import User from '../models/user.model';
+import {Order} from '../models/order.model';
+import Address from '../models/address.model';
+import {validationResult} from 'express-validator';
 
 const getUserProfile = async (req, res) => {
   try {
@@ -251,7 +251,7 @@ const setDefaultAddress = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   getUserProfile,
   updateUserProfile,
   getUserOrders,

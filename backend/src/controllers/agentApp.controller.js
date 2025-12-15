@@ -1,20 +1,17 @@
-const User = require('../models/user.model');
-const Agent = require('../models/agent.model');
-const SellOrder = require('../models/sellOrder.model');
-const SellOfferSession = require('../models/sellOfferSession.model');
-const SellProduct = require('../models/sellProduct.model');
-const SellQuestion = require('../models/sellQuestion.model');
-const SellDefect = require('../models/sellDefect.model');
-const SellAccessory = require('../models/sellAccessory.model');
-const Pickup = require('../models/pickup.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+import User from '../models/user.model';
+import Agent from '../models/agent.model';
+import SellOrder from '../models/sellOrder.model';
+import SellOfferSession from '../models/sellOfferSession.model';
+import SellProduct from '../models/sellProduct.model';
+import SellQuestion from '../models/sellQuestion.model';
+import SellDefect from '../models/sellDefect.model';
+import SellAccessory from '../models/sellAccessory.model';
+import Pickup from '../models/pickup.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
-exports.login = asyncHandler(async (req, res) => {
+export var login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -92,7 +89,7 @@ exports.login = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getProfile = asyncHandler(async (req, res) => {
+export var getProfile = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id })
     .populate('user', 'name email phone')
     .populate('assignedPartner', 'shopName shopEmail');
@@ -107,7 +104,7 @@ exports.getProfile = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getTodayOrders = asyncHandler(async (req, res) => {
+export var getTodayOrders = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -293,7 +290,7 @@ exports.getTodayOrders = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getTomorrowOrders = asyncHandler(async (req, res) => {
+export var getTomorrowOrders = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -351,7 +348,7 @@ exports.getTomorrowOrders = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getPastOrders = asyncHandler(async (req, res) => {
+export var getPastOrders = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -425,7 +422,7 @@ exports.getPastOrders = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getOrderDetails = asyncHandler(async (req, res) => {
+export var getOrderDetails = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -528,7 +525,7 @@ exports.getOrderDetails = asyncHandler(async (req, res) => {
   });
 });
 
-exports.startPickup = asyncHandler(async (req, res) => {
+export var startPickup = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -561,7 +558,7 @@ exports.startPickup = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getEvaluationQuestions = asyncHandler(async (req, res) => {
+export var getEvaluationQuestions = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   const product = await SellProduct.findById(productId).populate('categoryId');
@@ -610,7 +607,7 @@ exports.getEvaluationQuestions = asyncHandler(async (req, res) => {
   });
 });
 
-exports.calculatePrice = asyncHandler(async (req, res) => {
+export var calculatePrice = asyncHandler(async (req, res) => {
   const { orderId, answers, selectedDefects, physicalInspection } = req.body;
 
   const agent = await Agent.findOne({ user: req.user.id });
@@ -710,7 +707,7 @@ exports.calculatePrice = asyncHandler(async (req, res) => {
   });
 });
 
-exports.completeEvaluation = asyncHandler(async (req, res) => {
+export var completeEvaluation = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -785,7 +782,7 @@ exports.completeEvaluation = asyncHandler(async (req, res) => {
   });
 });
 
-exports.completePayment = asyncHandler(async (req, res) => {
+export var completePayment = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -841,7 +838,7 @@ exports.completePayment = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getStatistics = asyncHandler(async (req, res) => {
+export var getStatistics = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -903,7 +900,7 @@ exports.getStatistics = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateLocation = asyncHandler(async (req, res) => {
+export var updateLocation = asyncHandler(async (req, res) => {
   const { latitude, longitude } = req.body;
 
   if (!latitude || !longitude) {
@@ -933,7 +930,7 @@ exports.updateLocation = asyncHandler(async (req, res) => {
   });
 });
 
-exports.uploadCustomerSelfie = asyncHandler(async (req, res) => {
+export var uploadCustomerSelfie = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -981,7 +978,7 @@ exports.uploadCustomerSelfie = asyncHandler(async (req, res) => {
   });
 });
 
-exports.uploadGadgetImages = asyncHandler(async (req, res) => {
+export var uploadGadgetImages = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -1039,7 +1036,7 @@ exports.uploadGadgetImages = asyncHandler(async (req, res) => {
   });
 });
 
-exports.uploadIMEIScan = asyncHandler(async (req, res) => {
+export var uploadIMEIScan = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -1092,7 +1089,7 @@ exports.uploadIMEIScan = asyncHandler(async (req, res) => {
   });
 });
 
-exports.reEvaluateDevice = asyncHandler(async (req, res) => {
+export var reEvaluateDevice = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {
@@ -1307,7 +1304,7 @@ exports.reEvaluateDevice = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getCompleteOrderDetails = asyncHandler(async (req, res) => {
+export var getCompleteOrderDetails = asyncHandler(async (req, res) => {
   const agent = await Agent.findOne({ user: req.user.id });
 
   if (!agent) {

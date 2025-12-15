@@ -66,4 +66,4 @@ const securityConfig = {
   },
 };
 
-module.exports = securityConfig;
+export default securityConfig;

@@ -1,12 +1,9 @@
-const { validationResult } = require('express-validator');
-const SellOrder = require('../models/sellOrder.model');
-const SellOfferSession = require('../models/sellOfferSession.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import {validationResult} from 'express-validator';
+import SellOrder from '../models/sellOrder.model';
+import SellOfferSession from '../models/sellOfferSession.model';
+import {ApiError, asyncHandler} from '../middlewares/errorHandler.middleware';
 
-exports.createOrder = asyncHandler(async (req, res) => {
+export var createOrder = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -55,7 +52,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getOrder = asyncHandler(async (req, res) => {
+export var getOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const userId = req.user.id;
   const isAdmin = req.user.role === 'admin';
@@ -86,7 +83,7 @@ exports.getOrder = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getUserOrders = asyncHandler(async (req, res) => {
+export var getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const { page = 1, limit = 10, status } = req.query;
 
@@ -124,7 +121,7 @@ exports.getUserOrders = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getAllOrders = asyncHandler(async (req, res) => {
+export var getAllOrders = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 10,
@@ -189,7 +186,7 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateOrderStatus = asyncHandler(async (req, res) => {
+export var updateOrderStatus = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { status, notes, actualAmount, assignedTo } = req.body;
 
@@ -233,7 +230,7 @@ exports.updateOrderStatus = asyncHandler(async (req, res) => {
   });
 });
 
-exports.assignOrder = asyncHandler(async (req, res) => {
+export var assignOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
 
   const staffId = req.body.staffId || req.body.assignedTo;
@@ -285,7 +282,7 @@ exports.assignOrder = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updatePickupDetails = asyncHandler(async (req, res) => {
+export var updatePickupDetails = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { pickup } = req.body;
   const userId = req.user.id;
@@ -317,7 +314,7 @@ exports.updatePickupDetails = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getOrdersByStatus = asyncHandler(async (req, res) => {
+export var getOrdersByStatus = asyncHandler(async (req, res) => {
   const { status } = req.params;
   const { page = 1, limit = 10 } = req.query;
 
@@ -352,7 +349,7 @@ exports.getOrdersByStatus = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getOrderStats = asyncHandler(async (req, res) => {
+export var getOrderStats = asyncHandler(async (req, res) => {
   const { period = '30d' } = req.query;
 
   let dateFilter = {};
@@ -407,7 +404,7 @@ exports.getOrderStats = asyncHandler(async (req, res) => {
   });
 });
 
-exports.cancelOrder = asyncHandler(async (req, res) => {
+export var cancelOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { reason } = req.body;
   const userId = req.user.id;
@@ -431,7 +428,7 @@ exports.cancelOrder = asyncHandler(async (req, res) => {
   });
 });
 
-exports.deleteOrder = asyncHandler(async (req, res) => {
+export var deleteOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
 
   const order = await SellOrder.findById(orderId);
@@ -451,7 +448,7 @@ exports.deleteOrder = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getOrderPickupDetails = asyncHandler(async (req, res) => {
+export var getOrderPickupDetails = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
 
   const order = await SellOrder.findById(orderId)
@@ -498,7 +495,7 @@ exports.getOrderPickupDetails = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getOrdersForPickup = asyncHandler(async (req, res) => {
+export var getOrdersForPickup = asyncHandler(async (req, res) => {
   const { status = 'confirmed' } = req.query;
 
   const orders = await SellOrder.find({
@@ -538,7 +535,7 @@ exports.getOrdersForPickup = asyncHandler(async (req, res) => {
   });
 });
 
-exports.rescheduleOrder = asyncHandler(async (req, res) => {
+export var rescheduleOrder = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { newDate, newTimeWindow } = req.body;
   const userId = req.user.id;

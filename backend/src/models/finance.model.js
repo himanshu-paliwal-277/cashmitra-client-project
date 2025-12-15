@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const financeSchema = new mongoose.Schema(
   {
@@ -199,4 +199,4 @@ financeSchema.statics.getPartnerEarnings = function (
   ]);
 };
 
-module.exports = mongoose.model('Finance', financeSchema);
+export default mongoose.model('Finance', financeSchema);

@@ -1,13 +1,10 @@
-const express = require('express');
-const { check } = require('express-validator');
-const authController = require('../../controllers/auth.controller');
-const { protect } = require('../../middlewares/auth.middleware');
-const {
-  validateRequest,
-  validatePasswordStrength,
-} = require('../../middlewares/validation.middleware');
-const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
-const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
+import express from 'express';
+import {check} from 'express-validator';
+import authController from '../../controllers/auth.controller';
+import {protect} from '../../middlewares/auth.middleware';
+import {validateRequest, validatePasswordStrength} from '../../middlewares/validation.middleware';
+import {authLimiter} from '../../middlewares/rateLimiter.middleware';
+import {asyncHandler} from '../../middlewares/errorHandler.middleware';
 
 const router = express.Router();
 
@@ -121,4 +118,4 @@ router.put(
   asyncHandler(authController.updatePartnerProfile)
 );
 
-module.exports = router;
+export default router;

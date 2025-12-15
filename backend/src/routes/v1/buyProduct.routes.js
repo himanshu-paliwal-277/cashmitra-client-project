@@ -1,6 +1,7 @@
-const express = require('express');
-const { body } = require('express-validator');
-const {
+import express from 'express';
+import {body} from 'express-validator';
+
+import {
   getBuyProducts,
   getBuyProductById,
   getBuyProductsByCategory,
@@ -10,13 +11,10 @@ const {
   getBuyProductStats,
   addProductReview,
   toggleProductStatus,
-} = require('../../controllers/buyProduct.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
-const {
-  validateCreateBuyProduct,
-  validateUpdateBuyProduct,
-  handleValidationErrors,
-} = require('../../middlewares/buyProductValidation.middleware');
+} from '../../controllers/buyProduct.controller';
+
+import {protect, authorize} from '../../middlewares/auth.middleware';
+import {validateCreateBuyProduct, validateUpdateBuyProduct, handleValidationErrors} from '../../middlewares/buyProductValidation.middleware';
 
 const router = express.Router();
 
@@ -50,7 +48,7 @@ router.post(
 
 router.use(protect);
 
-const { attachPartner } = require('../../middlewares/partner.middleware');
+import {attachPartner} from '../../middlewares/partner.middleware';
 router.use(attachPartner);
 
 router.put(
@@ -65,4 +63,4 @@ router.patch('/:id/toggle-status', authorize('admin'), toggleProductStatus);
 
 router.post('/:id/reviews', validateProductReview, addProductReview);
 
-module.exports = router;
+export default router;

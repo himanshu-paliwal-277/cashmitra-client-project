@@ -1,6 +1,7 @@
-const express = require('express');
-const { body, param, query } = require('express-validator');
-const {
+import express from 'express';
+import {body, param, query} from 'express-validator';
+
+import {
   createOrder,
   getOrder,
   getUserOrders,
@@ -15,8 +16,9 @@ const {
   rescheduleOrder,
   getOrderPickupDetails,
   getOrdersForPickup,
-} = require('../../controllers/sellOrder.controller');
-const { protect, authorize } = require('../../middlewares/auth.middleware');
+} from '../../controllers/sellOrder.controller';
+
+import {protect, authorize} from '../../middlewares/auth.middleware';
 
 const router = express.Router();
 
@@ -256,4 +258,4 @@ router.delete(
   deleteOrder
 );
 
-module.exports = router;
+export default router;

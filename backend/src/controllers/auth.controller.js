@@ -1,7 +1,7 @@
-const User = require('../models/user.model');
-const Partner = require('../models/partner.model');
-const { generateToken } = require('../utils/jwt.utils');
-const { validationResult } = require('express-validator');
+import User from '../models/user.model';
+import Partner from '../models/partner.model';
+import {generateToken} from '../utils/jwt.utils';
+import {validationResult} from 'express-validator';
 
 const registerUser = async (req, res) => {
   try {
@@ -229,7 +229,7 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-module.exports = {
+export default {
   registerUser,
   registerPartner,
   loginUser,

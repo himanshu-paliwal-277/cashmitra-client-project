@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/user.model');
-const { JWT_SECRET } = require('../config/serverConfig');
+import jwt from 'jsonwebtoken';
+import User from '../models/user.model';
+import {JWT_SECRET} from '../config/serverConfig';
 
 const protect = async (req, res, next) => {
   let token;
@@ -43,4 +43,4 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = { protect, authorize };
+export default { protect, authorize };
