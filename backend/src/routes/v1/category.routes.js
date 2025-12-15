@@ -9,8 +9,8 @@ const {
   getCategoryStats,
   bulkUpdateStatus,
   searchCategories,
-} = require('../controllers/category.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+} = require('../../controllers/category.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 

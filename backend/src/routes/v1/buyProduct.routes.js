@@ -10,13 +10,13 @@ const {
   getBuyProductStats,
   addProductReview,
   toggleProductStatus,
-} = require('../controllers/buyProduct.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+} = require('../../controllers/buyProduct.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 const {
   validateCreateBuyProduct,
   validateUpdateBuyProduct,
   handleValidationErrors,
-} = require('../middlewares/buyProductValidation.middleware');
+} = require('../../middlewares/buyProductValidation.middleware');
 
 const router = express.Router();
 
@@ -55,7 +55,7 @@ router.post(
 router.use(protect);
 
 // 🔒 Import and apply partner middleware for data isolation
-const { attachPartner } = require('../middlewares/partner.middleware');
+const { attachPartner } = require('../../middlewares/partner.middleware');
 router.use(attachPartner);
 
 // Admin and Partner routes (both can manage buy products)

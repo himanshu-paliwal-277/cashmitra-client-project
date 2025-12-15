@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const sellSuperCategoryController = require('../controllers/sellSuperCategory.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+const sellSuperCategoryController = require('../../controllers/sellSuperCategory.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 // Public route - must be before auth middleware
 router.get('/public', sellSuperCategoryController.getPublicSuperCategories);

@@ -18,8 +18,8 @@ const {
   deleteOption,
   reorderQuestions,
   getCustomerQuestions,
-} = require('../controllers/sellQuestion.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+} = require('../../controllers/sellQuestion.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 

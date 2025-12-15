@@ -17,8 +17,8 @@ const {
   reorderAccessories,
   toggleAccessoryStatus,
   getCustomerAccessories,
-} = require('../controllers/sellAccessory.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+} = require('../../controllers/sellAccessory.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
@@ -159,7 +159,7 @@ router.put(
 const {
   reindexAccessoryOrders,
   migrateAndReindexAccessories,
-} = require('../controllers/sellAccessory.controller');
+} = require('../../controllers/sellAccessory.controller');
 router.post('/reindex-orders', reindexAccessoryOrders);
 router.post('/migrate-and-reindex', migrateAndReindexAccessories);
 

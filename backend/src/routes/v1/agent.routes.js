@@ -1,9 +1,9 @@
 const express = require('express');
 const { check } = require('express-validator');
-const agentController = require('../controllers/agent.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
-const { validateRequest } = require('../middlewares/validation.middleware');
-const { asyncHandler } = require('../middlewares/errorHandler.middleware');
+const agentController = require('../../controllers/agent.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
+const { validateRequest } = require('../../middlewares/validation.middleware');
+const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 const multer = require('multer');
 const path = require('path');
 

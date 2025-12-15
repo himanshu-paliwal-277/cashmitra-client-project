@@ -1,13 +1,13 @@
 const express = require('express');
 const { check } = require('express-validator');
-const authController = require('../controllers/auth.controller');
-const { protect } = require('../middlewares/auth.middleware');
+const authController = require('../../controllers/auth.controller');
+const { protect } = require('../../middlewares/auth.middleware');
 const {
   validateRequest,
   validatePasswordStrength,
-} = require('../middlewares/validation.middleware');
-const { authLimiter } = require('../middlewares/rateLimiter.middleware');
-const { asyncHandler } = require('../middlewares/errorHandler.middleware');
+} = require('../../middlewares/validation.middleware');
+const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
+const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 

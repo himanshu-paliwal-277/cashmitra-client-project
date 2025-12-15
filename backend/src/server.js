@@ -45,70 +45,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Import routes
-const authRoutes = require('./routes/auth.routes');
-const categoryRoutes = require('./routes/category.routes');
-const buySuperCategoryRoutes = require('./routes/buySuperCategory.routes');
-const sellSuperCategoryRoutes = require('./routes/sellSuperCategory.routes');
-const buyCategoryRoutes = require('./routes/buyCategory.routes');
-const buyProductRoutes = require('./routes/buyProduct.routes');
-const userRoutes = require('./routes/user.routes');
-const productRoutes = require('./routes/product.routes');
-const partnerRoutes = require('./routes/partner.routes');
-const partnerPermissionRoutes = require('./routes/partnerPermission.routes');
-const adminRoutes = require('./routes/admin.routes');
-const vendorRoutes = require('./routes/vendor.routes');
-const sellRoutes = require('./routes/sell.routes');
-const buyRoutes = require('./routes/buy.routes');
-const salesRoutes = require('./routes/sales.routes');
-const walletRoutes = require('./routes/wallet.routes');
-const uploadRoutes = require('./routes/upload.routes');
+// Import API router
+const apiRouter = require('./routes/apiRouter.routes');
 
-// Sell module routes
-const sellProductRoutes = require('./routes/sellProduct.routes');
-const sellQuestionRoutes = require('./routes/sellQuestion.routes');
-const sellDefectRoutes = require('./routes/sellDefect.routes');
-const sellAccessoryRoutes = require('./routes/sellAccessory.routes');
-const sellConfigRoutes = require('./routes/sellConfig.routes');
-const sellOfferSessionRoutes = require('./routes/sellOfferSession.routes');
-const sellOrderRoutes = require('./routes/sellOrder.routes');
-const pickupRoutes = require('./routes/pickup.routes');
-const agentRoutes = require('./routes/agent.routes');
-const agentAppRoutes = require('./routes/agentApp.routes');
-const contactRoutes = require('./routes/contact.routes');
-
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/buy-super-categories', buySuperCategoryRoutes);
-app.use('/api/sell-super-categories', sellSuperCategoryRoutes);
-app.use('/api/buy-categories', buyCategoryRoutes);
-app.use('/api/buy-products', buyProductRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/partners', partnerRoutes);
-app.use('/api/partner', partnerRoutes); // Add singular form for partner dashboard
-app.use('/api/partner-permissions', partnerPermissionRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/vendor', vendorRoutes);
-app.use('/api/sell', sellRoutes);
-app.use('/api/buy', buyRoutes);
-app.use('/api/sales', salesRoutes);
-app.use('/api/wallet', walletRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api/contact', contactRoutes);
-
-// Sell module routes
-app.use('/api/sell-products', sellProductRoutes);
-app.use('/api/sell-questions', sellQuestionRoutes);
-app.use('/api/sell-defects', sellDefectRoutes);
-app.use('/api/sell-accessories', sellAccessoryRoutes);
-app.use('/api/sell-config', sellConfigRoutes);
-app.use('/api/sell-sessions', sellOfferSessionRoutes);
-app.use('/api/sell-orders', sellOrderRoutes);
-app.use('/api/pickups', pickupRoutes);
-app.use('/api/agent', agentRoutes);
-app.use('/api/agent-app', agentAppRoutes);
+// Mount API routes
+app.use('/api', apiRouter);
 
 // Root route
 app.get('/', (req, res) => {

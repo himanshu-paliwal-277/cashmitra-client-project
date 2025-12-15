@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const buySuperCategoryController = require('../controllers/buySuperCategory.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+const buySuperCategoryController = require('../../controllers/buySuperCategory.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 // Public route: Get active super categories
 router.get('/public', buySuperCategoryController.getPublicSuperCategories);
 
 // Public route: Get categories by super category
-router.get('/public/:id/categories', buySuperCategoryController.getPublicCategoriesBySuperCategory);
+router.get(
+  '/public/:id/categories',
+  buySuperCategoryController.getPublicCategoriesBySuperCategory
+);
 
 // Protect all routes
 router.use(protect);

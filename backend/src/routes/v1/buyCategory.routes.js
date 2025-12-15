@@ -7,8 +7,8 @@ const {
   updateBuyCategory,
   deleteBuyCategory,
   getBuyCategoryStats,
-} = require('../controllers/buyCategory.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+} = require('../../controllers/buyCategory.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 

@@ -17,8 +17,8 @@ const {
   reorderDefects,
   getDefectCategories,
   getDefectsByCategory,
-} = require('../controllers/sellDefect.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+} = require('../../controllers/sellDefect.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 

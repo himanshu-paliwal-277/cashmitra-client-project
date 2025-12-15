@@ -1,13 +1,13 @@
 const express = require('express');
 const { check } = require('express-validator');
-const sellController = require('../controllers/sell.controller');
-const { protect } = require('../middlewares/auth.middleware');
+const sellController = require('../../controllers/sell.controller');
+const { protect } = require('../../middlewares/auth.middleware');
 const {
   validateRequest,
   validateObjectId,
   validateAssessmentId,
-} = require('../middlewares/validation.middleware');
-const { asyncHandler } = require('../middlewares/errorHandler.middleware');
+} = require('../../middlewares/validation.middleware');
+const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
 
 const router = express.Router();
 

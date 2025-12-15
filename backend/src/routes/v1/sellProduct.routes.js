@@ -20,8 +20,8 @@ const {
   deleteVariant,
   getCustomerProducts,
   getSellProductsByCategory,
-} = require('../controllers/sellProduct.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+} = require('../../controllers/sellProduct.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
@@ -161,7 +161,7 @@ router.get(
 router.use(protect);
 
 // Import partner middleware
-const { attachPartner } = require('../middlewares/partner.middleware');
+const { attachPartner } = require('../../middlewares/partner.middleware');
 
 // Attach partner info if user is partner
 router.use(attachPartner);

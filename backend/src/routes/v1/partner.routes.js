@@ -1,13 +1,13 @@
 const express = require('express');
 const { check } = require('express-validator');
-const partnerController = require('../controllers/partner.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+const partnerController = require('../../controllers/partner.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 const {
   validateRequest,
   validateObjectId,
-} = require('../middlewares/validation.middleware');
-const { asyncHandler } = require('../middlewares/errorHandler.middleware');
-const { authLimiter } = require('../middlewares/rateLimiter.middleware');
+} = require('../../middlewares/validation.middleware');
+const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
+const { authLimiter } = require('../../middlewares/rateLimiter.middleware');
 
 const router = express.Router();
 
@@ -237,7 +237,7 @@ router.get(
 const {
   attachPartner,
   requirePartner,
-} = require('../middlewares/partner.middleware');
+} = require('../../middlewares/partner.middleware');
 
 // Apply partner middleware to all sell/buy routes
 router.use(

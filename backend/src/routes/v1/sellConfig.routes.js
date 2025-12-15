@@ -16,8 +16,8 @@ const {
   deleteConfig,
   resetToDefault,
   testPricing,
-} = require('../controllers/sellConfig.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+} = require('../../controllers/sellConfig.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 

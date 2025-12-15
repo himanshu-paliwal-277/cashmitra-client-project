@@ -7,8 +7,8 @@
 
 const express = require('express');
 const { body, param, query } = require('express-validator');
-const { protect, authorize } = require('../middlewares/auth.middleware');
-const pickupController = require('../controllers/pickup.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
+const pickupController = require('../../controllers/pickup.controller');
 
 const router = express.Router();
 

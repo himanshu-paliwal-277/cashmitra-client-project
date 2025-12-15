@@ -20,8 +20,8 @@ const {
   getAllSessions,
   updateSessionStatus,
   cleanupExpiredSessions,
-} = require('../controllers/sellOfferSession.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+} = require('../../controllers/sellOfferSession.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 

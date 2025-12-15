@@ -1,12 +1,12 @@
 const express = require('express');
 const { check } = require('express-validator');
 const multer = require('multer');
-const adminController = require('../controllers/admin.controller');
-const categoryController = require('../controllers/category.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
-const { validateRequest } = require('../middlewares/validation.middleware');
-const { asyncHandler } = require('../middlewares/errorHandler.middleware');
-const { authRateLimiter } = require('../middlewares/rateLimiter.middleware');
+const adminController = require('../../controllers/admin.controller');
+const categoryController = require('../../controllers/category.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
+const { validateRequest } = require('../../middlewares/validation.middleware');
+const { asyncHandler } = require('../../middlewares/errorHandler.middleware');
+const { authRateLimiter } = require('../../middlewares/rateLimiter.middleware');
 
 // Configure multer for file uploads (using memory storage for Cloudinary)
 const storage = multer.memoryStorage();

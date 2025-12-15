@@ -10,8 +10,8 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-} = require('../controllers/product.controller');
-const { protect } = require('../middlewares/auth.middleware');
+} = require('../../controllers/product.controller');
+const { protect } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 

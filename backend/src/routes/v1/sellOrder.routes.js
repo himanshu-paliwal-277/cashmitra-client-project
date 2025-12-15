@@ -22,8 +22,8 @@ const {
   rescheduleOrder,
   getOrderPickupDetails,
   getOrdersForPickup,
-} = require('../controllers/sellOrder.controller');
-const { protect, authorize } = require('../middlewares/auth.middleware');
+} = require('../../controllers/sellOrder.controller');
+const { protect, authorize } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 

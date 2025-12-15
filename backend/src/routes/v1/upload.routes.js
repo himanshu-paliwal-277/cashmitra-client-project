@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
-const cloudinary = require('../config/cloudinary.config');
-const { protect } = require('../middlewares/auth.middleware');
+const cloudinary = require('../../config/cloudinary.config');
+const { protect } = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
