@@ -1,7 +1,7 @@
 import { validationResult } from 'express-validator';
 
 import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
-import { Product } from '../models/buyProduct.model.js';
+import { BuyProduct } from '../models/buyProduct.model.js';
 import { Inventory } from '../models/inventory.model.js';
 import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
@@ -36,7 +36,7 @@ export var createOrder = asyncHandler(async (req, res) => {
   for (const item of items) {
     const { inventoryId, quantity } = item;
 
-    const product = await Product.findById(inventoryId);
+    const product = await BuyProduct.findById(inventoryId);
     console.log('product: ', product);
 
     if (!product) {

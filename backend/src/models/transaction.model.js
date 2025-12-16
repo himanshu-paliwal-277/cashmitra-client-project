@@ -72,6 +72,6 @@ transactionSchema.index({ order: 1 });
 transactionSchema.index({ status: 1 });
 transactionSchema.index({ createdAt: -1 });
 
-const Transaction = mongoose.model('Transaction', transactionSchema);
+export const Transaction = mongoose.model('Transaction', transactionSchema);
 
-export default Transaction;
+

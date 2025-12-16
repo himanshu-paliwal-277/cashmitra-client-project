@@ -212,6 +212,6 @@ sellOrderSchema.statics.getByStatus = function (status, limit = 50, skip = 0) {
     .skip(skip);
 };
 
-const SellOrder = mongoose.model('SellOrder', sellOrderSchema);
+export const SellOrder = mongoose.model('SellOrder', sellOrderSchema);
 
-export default SellOrder;
+

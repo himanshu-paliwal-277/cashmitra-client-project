@@ -68,6 +68,6 @@ buyCategorySchema.index({ name: 1 });
 buyCategorySchema.index({ slug: 1 });
 buyCategorySchema.index({ isActive: 1, sortOrder: 1 });
 
-const BuyCategory = mongoose.model('BuyCategory', buyCategorySchema);
+export const BuyCategory = mongoose.model('BuyCategory', buyCategorySchema);
 
-export default BuyCategory;
+

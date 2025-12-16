@@ -1,15 +1,15 @@
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
-import Agent from '../models/agent.model.js';
-import ConditionQuestionnaire from '../models/conditionQuestionnaire.model.js';
-import Inventory from '../models/inventory.model.js';
+import { Agent } from '../models/agent.model.js';
+import { ConditionQuestionnaire } from '../models/conditionQuestionnaire.model.js';
+import { Inventory } from '../models/inventory.model.js';
 import { Order } from '../models/order.model.js';
-import Partner from '../models/partner.model.js';
-import Product from '../models/product.model.js';
-import Transaction from '../models/transaction.model.js';
-import User from '../models/user.model.js';
-import Wallet from '../models/wallet.model.js';
+import { Partner } from '../models/partner.model.js';
+import { Product } from '../models/product.model.js';
+import { Transaction } from '../models/transaction.model.js';
+import { User } from '../models/user.model.js';
+import { Wallet } from '../models/wallet.model.js';
 import ApiError from '../utils/apiError.js';
 import { generateToken } from '../utils/jwt.utils.js';
 

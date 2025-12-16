@@ -329,7 +329,7 @@ export var getUserActiveSessions = asyncHandler(async (req, res) => {
   });
 });
 
-export var getUserSessions = exports.getUserActiveSessions;
+export { getUserActiveSessions as getUserSessions };
 
 export var deleteSession = asyncHandler(async (req, res) => {
   const { sessionId } = req.params;

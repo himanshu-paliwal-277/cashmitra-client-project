@@ -199,4 +199,4 @@ financeSchema.statics.getPartnerEarnings = function (
   ]);
 };
 
-export default mongoose.model('Finance', financeSchema);
+export const Finance = mongoose.model('Finance', financeSchema);

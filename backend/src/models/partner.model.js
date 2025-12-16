@@ -108,6 +108,6 @@ const partnerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Partner = mongoose.model('Partner', partnerSchema);
+export const Partner = mongoose.model('Partner', partnerSchema);
 
-export default Partner;
+

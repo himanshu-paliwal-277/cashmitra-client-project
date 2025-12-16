@@ -1,12 +1,12 @@
 import crypto from 'crypto';
 
 import cloudinary from '../config/cloudinary.config.js';
+import { Pickup } from '../models/pickup.model.js';
+import { User } from '../models/user.model.js';
 // import { Pickup } from '../models/pickup.model.js';
 // import { User } from '../models/user.model.js';
 import { generateToken } from '../utils/jwt.utils.js';
 import { sendOTPEmail, sendOTPSMS } from '../utils/notification.utils.js';
-import Pickup from '../models/pickup.model.js';
-import User from '../models/user.model.js';
 
 const otpStore = new Map();
 

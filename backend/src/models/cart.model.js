@@ -44,4 +44,4 @@ cartSchema.pre('save', function (next) {
 cartSchema.index({ user: 1 });
 cartSchema.index({ 'items.productId': 1 });
 
-export default mongoose.model('Cart', cartSchema);
+export const Cart = mongoose.model('Cart', cartSchema);

@@ -1,14 +1,10 @@
 import { validationResult } from 'express-validator';
-import mongoose from 'mongoose';
 
 import { BuyProduct } from '../models/buyProduct.model.js';
 import { Cart } from '../models/cart.model.js';
 import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
 import { Product } from '../models/product.model.js';
-import { Transaction } from '../models/transaction.model.js';
-import { User } from '../models/user.model.js';
-import { Wallet } from '../models/wallet.model.js';
 
 export const searchProducts = async (req, res) => {
   try {
@@ -516,4 +512,3 @@ export const getUserBuyOrders = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-

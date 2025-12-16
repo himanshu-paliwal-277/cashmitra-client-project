@@ -2,14 +2,13 @@ import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
-import mongoose from 'mongoose';
 import morgan from 'morgan';
 
+import connectDB from './config/dbConfig.js';
 import securityConfig from './config/security.config.js';
-import { MONGODB_URI, NODE_ENV, PORT } from './config/serverConfig.js';
-import { generateToken, validateToken } from './middlewares/csrf.middleware.js';
+import { NODE_ENV, PORT } from './config/serverConfig.js';
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
-import { apiLimiter } from './middlewares/rateLimiter.middleware.js';
+import apiRouter from './routes/apiRouter.routes.js';
 import { sanitizeData } from './utils/security.utils.js';
 
 const app = express();
@@ -29,29 +28,16 @@ app.use((req, res, next) => {
   next();
 });
 
-import apiRouter from './routes/apiRouter.routes.js';
-
 app.use('/api', apiRouter);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Cashify API' });
 });
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(MONGODB_URI);
-    console.log('MongoDB connected successfully');
-  } catch (error) {
-    console.error('MongoDB connection error:', error.message);
-    process.exit(1);
-  }
-};
-
-connectDB();
-
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server is up and running at: http://localhost:${PORT}`);
   console.log(`Environment: ${NODE_ENV}`);
+  connectDB();  
 });
 
 app.use(errorHandler);

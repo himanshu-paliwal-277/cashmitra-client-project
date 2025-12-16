@@ -72,6 +72,6 @@ inventorySchema.index({ product: 1 });
 inventorySchema.index({ condition: 1, price: 1 });
 inventorySchema.index({ isAvailable: 1 });
 
-const Inventory = mongoose.model('Inventory', inventorySchema);
+export const Inventory = mongoose.model('Inventory', inventorySchema);
 
-export default Inventory;
+

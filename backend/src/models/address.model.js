@@ -84,6 +84,4 @@ addressSchema.pre('save', async function (next) {
   next();
 });
 
-const Address = mongoose.model('Address', addressSchema);
-
-export default Address;
+export const Address = mongoose.model('Address', addressSchema);

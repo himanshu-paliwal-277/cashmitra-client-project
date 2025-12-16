@@ -140,6 +140,6 @@ sellDefectSchema.statics.getGroupedByCategory = async function (
   return this.getGroupedBySection(product.categoryId);
 };
 
-const SellDefect = mongoose.model('SellDefect', sellDefectSchema);
+export const SellDefect = mongoose.model('SellDefect', sellDefectSchema);
 
-export default SellDefect;
+

@@ -216,6 +216,6 @@ roleTemplateSchema.statics.getActiveTemplates = async function () {
   return this.find({ isActive: true }).sort({ isDefault: -1, name: 1 });
 };
 
-const RoleTemplate = mongoose.model('RoleTemplate', roleTemplateSchema);
+export const RoleTemplate = mongoose.model('RoleTemplate', roleTemplateSchema);
 
-export default RoleTemplate;
+

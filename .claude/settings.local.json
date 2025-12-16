@@ -26,7 +26,12 @@
       "Bash(timeout 8 node:*)",
       "Bash(timeout 10 node:*)",
       "Bash(node fix-controller-imports.js:*)",
-      "Bash(node fix-model-imports.js:*)"
+      "Bash(node fix-model-imports.js:*)",
+      "Bash(grep:*)",
+      "Bash(done)",
+      "Bash(node:*)",
+      "Bash(for f in *.model.js)",
+      "Bash(do sed -i '/^export { \\w\\+ };/d' \"$f\")"
     ],
     "deny": [],
     "ask": []

@@ -191,6 +191,6 @@ sellQuestionSchema.statics.getForVariants = async function (
   return this.getForCategory(product.categoryId);
 };
 
-const SellQuestion = mongoose.model('SellQuestion', sellQuestionSchema);
+export const SellQuestion = mongoose.model('SellQuestion', sellQuestionSchema);
 
-export default SellQuestion;
+

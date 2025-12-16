@@ -215,6 +215,6 @@ agentSchema.statics.findByCoverageArea = function (area) {
   });
 };
 
-const Agent = mongoose.model('Agent', agentSchema);
+export const Agent = mongoose.model('Agent', agentSchema);
 
-export default Agent;
+

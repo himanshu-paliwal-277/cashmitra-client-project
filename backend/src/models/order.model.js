@@ -159,6 +159,4 @@ orderSchema.index({ status: 1 });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ assessmentId: 1 });
 
-const Order = mongoose.model('Order', orderSchema);
-
-export { Order };
+export const Order = mongoose.model('Order', orderSchema);

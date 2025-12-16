@@ -74,9 +74,9 @@ buySuperCategorySchema.index({ name: 1 });
 buySuperCategorySchema.index({ slug: 1 });
 buySuperCategorySchema.index({ isActive: 1, sortOrder: 1 });
 
-const BuySuperCategory = mongoose.model(
+export const BuySuperCategory = mongoose.model(
   'BuySuperCategory',
   buySuperCategorySchema
 );
 
-export default BuySuperCategory;
+

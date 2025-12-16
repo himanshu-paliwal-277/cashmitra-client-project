@@ -158,9 +158,9 @@ sellOfferSessionSchema.pre('save', function (next) {
   next();
 });
 
-const SellOfferSession = mongoose.model(
+export const SellOfferSession = mongoose.model(
   'SellOfferSession',
   sellOfferSessionSchema
 );
 
-export default SellOfferSession;
+

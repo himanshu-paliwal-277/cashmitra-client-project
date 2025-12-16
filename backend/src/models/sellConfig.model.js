@@ -137,6 +137,6 @@ sellConfigSchema.methods.applyPricingRules = function (
   return Math.max(0, finalPrice);
 };
 
-const SellConfig = mongoose.model('SellConfig', sellConfigSchema);
+export const SellConfig = mongoose.model('SellConfig', sellConfigSchema);
 
-export default SellConfig;
+

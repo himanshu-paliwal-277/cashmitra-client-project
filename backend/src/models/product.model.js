@@ -94,6 +94,6 @@ productSchema.index(
   { name: 'product_search_index' }
 );
 
-const Product = mongoose.model('Product', productSchema);
+export const Product = mongoose.model('Product', productSchema);
 
-export default Product;
+

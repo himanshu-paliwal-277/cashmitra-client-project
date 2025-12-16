@@ -74,9 +74,9 @@ sellSuperCategorySchema.index({ name: 1 });
 sellSuperCategorySchema.index({ slug: 1 });
 sellSuperCategorySchema.index({ isActive: 1, sortOrder: 1 });
 
-const SellSuperCategory = mongoose.model(
+export const SellSuperCategory = mongoose.model(
   'SellSuperCategory',
   sellSuperCategorySchema
 );
 
-export default SellSuperCategory;
+

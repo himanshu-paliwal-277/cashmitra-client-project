@@ -457,15 +457,6 @@ export const validateUpdateBuyProduct = [
     .trim()
     .isLength({ min: 2, max: 100 })
     .withMessage('Brand must be between 2 and 100 characters'),
-
-  ...validateCreateBuyProduct.map((validation) => {
-    if (validation.builder && validation.builder.fields) {
-      validation.builder.fields.forEach((field) => {
-        field.optional = true;
-      });
-    }
-    return validation;
-  }),
 ];
 
 export const handleValidationErrors = (req, res, next) => {

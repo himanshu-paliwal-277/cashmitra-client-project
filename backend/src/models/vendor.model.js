@@ -138,6 +138,6 @@ vendorSchema.statics.getByStatus = function (status) {
   );
 };
 
-const Vendor = mongoose.model('Vendor', vendorSchema);
+export const Vendor = mongoose.model('Vendor', vendorSchema);
 
-export default Vendor;
+

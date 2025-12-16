@@ -4,7 +4,7 @@ import {
   ApiError,
   asyncHandler,
 } from '../middlewares/errorHandler.middleware.js';
-import Category from '../models/category.model.js';
+import { Category } from '../models/category.model.js';
 // import { Category } from '../models/category.model.js';
 
 export var createCategory = asyncHandler(async (req, res) => {

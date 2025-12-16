@@ -98,6 +98,6 @@ sellProductSchema.pre('save', function (next) {
   next();
 });
 
-const SellProduct = mongoose.model('SellProduct', sellProductSchema);
+export const SellProduct = mongoose.model('SellProduct', sellProductSchema);
 
-export default SellProduct;
+
