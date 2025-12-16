@@ -1,8 +1,5 @@
 import { validationResult } from 'express-validator';
 
-// import { Partner } from '../models/partner.model.js';
-// import { User } from '../models/user.model.js';
-// import { generateToken } from '../utils/jwt.utils.js';
 import { Partner } from '../models/partner.model.js';
 import { User } from '../models/user.model.js';
 import { generateToken } from '../utils/jwt.utils.js';

@@ -62,8 +62,8 @@ export var createOrder = asyncHandler(async (req, res) => {
   const partnerAmount = totalAmount - totalCommission;
 
   let discountAmount = 0;
-  // if (couponCode) {
-  // }
+  
+  
 
   if (isNaN(totalAmount) || totalAmount <= 0) {
     throw new ApiError(400, 'Invalid total amount calculated');
