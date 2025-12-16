@@ -8,7 +8,8 @@
       "Bash(find:*)",
       "Bash(npm run build:*)",
       "Bash(test -f:*)",
-      "Bash(node -c:*)"
+      "Bash(node -c:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

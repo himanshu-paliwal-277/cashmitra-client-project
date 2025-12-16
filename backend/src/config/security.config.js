@@ -6,10 +6,10 @@ const securityConfig = {
   // CORS configuration
   cors: {
     origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
     exposedHeaders: ['X-CSRF-Token'],
-    credentials: true,
+    credentials: false,
   },
 
   // Helmet configuration for HTTP security headers
@@ -76,4 +76,4 @@ const securityConfig = {
   },
 };
 
-module.exports = securityConfig;
+export default securityConfig;
