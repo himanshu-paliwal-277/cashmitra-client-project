@@ -126,6 +126,11 @@ const PriceQuote = () => {
 
       const response = await createSellOfferSession(offerData);
       setOfferSessionData(response.data);
+
+      // Store sessionId in localStorage as backup
+      if (response.data?.sessionId) {
+        localStorage.setItem('currentSessionId', response.data.sessionId);
+      }
     } catch (error) {
       console.error('Error creating sell offer session:', error);
     } finally {

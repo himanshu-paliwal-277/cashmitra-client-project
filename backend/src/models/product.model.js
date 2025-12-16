@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema(
   {
@@ -13,7 +13,6 @@ const productSchema = new mongoose.Schema(
     },
     series: {
       type: String,
-      // required: [true, 'Series is required'],
     },
     model: {
       type: String,
@@ -39,16 +38,16 @@ const productSchema = new mongoose.Schema(
     depreciation: {
       ratePerMonth: {
         type: Number,
-        default: 2, // 2% per month
+        default: 2,
       },
       maxDepreciation: {
         type: Number,
-        default: 70, // 70% maximum depreciation
+        default: 70,
       },
     },
     conditionFactors: {
       screenCondition: {
-        perfect: { type: Number, default: 100 }, // percentage of value
+        perfect: { type: Number, default: 100 },
         minorScratches: { type: Number, default: 90 },
         majorScratches: { type: Number, default: 75 },
         cracked: { type: Number, default: 50 },
@@ -90,12 +89,11 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create a compound index for efficient searching
 productSchema.index(
   { category: 1, brand: 1, series: 1, model: 1 },
   { name: 'product_search_index' }
 );
 
-const Product = mongoose.model('Product', productSchema);
+export const Product = mongoose.model('Product', productSchema);
 
-module.exports = Product;
+

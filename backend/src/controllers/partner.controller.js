@@ -1,28 +1,21 @@
-const Partner = require('../models/partner.model');
-const User = require('../models/user.model');
-const Agent = require('../models/agent.model');
-const Inventory = require('../models/inventory.model');
-const { Order } = require('../models/order.model');
-const Product = require('../models/product.model');
-const BuyProduct = require('../models/buyProduct.model');
-const ApiError = require('../utils/apiError');
-const { sanitizeData } = require('../utils/security.utils');
+import { Agent } from '../models/agent.model.js';
+import { BuyProduct } from '../models/buyProduct.model.js';
+import { Inventory } from '../models/inventory.model.js';
+import { Order } from '../models/order.model.js';
+import { Partner } from '../models/partner.model.js';
+import { Product } from '../models/product.model.js';
+import { User } from '../models/user.model.js';
+import ApiError from '../utils/apiError.js';
+import { sanitizeData } from '../utils/security.utils.js';
 
-/**
- * Register a new partner shop
- * @route POST /api/partner/register
- * @access Private (User must be logged in)
- */
-exports.registerPartnerShop = async (req, res) => {
+export async function registerPartnerShop(req, res) {
   const userId = req.user.id;
 
-  // Check if user already has a partner shop
   const existingPartner = await Partner.findOne({ user: userId });
   if (existingPartner) {
     throw new ApiError('You already have a registered partner shop', 400);
   }
 
-  // Sanitize inputs
   const sanitizedData = {
     shopName: sanitizeData(req.body.shopName),
     shopAddress: {
@@ -36,16 +29,14 @@ exports.registerPartnerShop = async (req, res) => {
     shopEmail: sanitizeData(req.body.shopEmail),
   };
 
-  // Create partner shop
   const partner = await Partner.create({
     user: userId,
     ...sanitizedData,
-    isVerified: false, // Requires admin verification
+    isVerified: false,
     verificationStatus: 'pending',
     wallet: { balance: 0 },
   });
 
-  // Update user role to include partner
   await User.findByIdAndUpdate(userId, { $addToSet: { role: 'partner' } });
 
   res.status(201).json({
@@ -53,14 +44,9 @@ exports.registerPartnerShop = async (req, res) => {
     data: partner,
     message: 'Partner shop registered successfully. Verification pending.',
   });
-};
+}
 
-/**
- * Get partner profile
- * @route GET /api/partner/profile
- * @access Private (Partner only)
- */
-exports.getPartnerProfile = async (req, res) => {
+export async function getPartnerProfile(req, res) {
   const userId = req.user.id;
 
   const partner = await Partner.findOne({ user: userId }).populate(
@@ -76,17 +62,11 @@ exports.getPartnerProfile = async (req, res) => {
     success: true,
     data: partner,
   });
-};
+}
 
-/**
- * Update partner profile
- * @route PUT /api/partner/profile
- * @access Private (Partner only)
- */
-exports.updatePartnerProfile = async (req, res) => {
+export async function updatePartnerProfile(req, res) {
   const userId = req.user.id;
 
-  // Sanitize inputs
   const updateData = {};
   if (req.body.shopName) updateData.shopName = sanitizeData(req.body.shopName);
   if (req.body.shopPhone)
@@ -143,14 +123,9 @@ exports.updatePartnerProfile = async (req, res) => {
     data: partner,
     message: 'Partner profile updated successfully',
   });
-};
+}
 
-/**
- * Upload partner documents
- * @route PUT /api/partner/documents
- * @access Private (Partner only)
- */
-exports.uploadDocuments = async (req, res) => {
+export async function uploadDocuments(req, res) {
   const userId = req.user.id;
 
   const updateData = {};
@@ -170,7 +145,6 @@ exports.uploadDocuments = async (req, res) => {
     );
   }
 
-  // Update verification status if documents are being uploaded
   if (Object.keys(updateData).length > 0) {
     updateData.verificationStatus = 'submitted';
   }
@@ -190,31 +164,24 @@ exports.uploadDocuments = async (req, res) => {
     data: partner,
     message: 'Documents uploaded successfully',
   });
-};
+}
 
-/**
- * Get products catalog for inventory selection (Buy Products)
- * @route GET /api/partner/products
- * @access Private (Partner only)
- */
-exports.getProductsCatalog = async (req, res) => {
+export async function getProductsCatalog(req, res) {
   const {
     category,
     brand,
     name,
     page = 1,
-    limit = 50, // Higher default limit for partners
+    limit = 50,
     search,
     sortBy = 'createdAt',
     sortOrder = 'desc',
   } = req.query;
 
-  // Validate pagination parameters
   const pageNum = Math.max(1, parseInt(page));
-  const limitNum = Math.min(100, Math.max(1, parseInt(limit))); // Max 100 items per page for partners
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
 
-  // Build filter object for BuyProduct collection
-  const filter = { isActive: true }; // Only show active products
+  const filter = { isActive: true };
 
   if (category && category !== 'all') {
     filter['categoryId.name'] = { $regex: category, $options: 'i' };
@@ -229,7 +196,6 @@ exports.getProductsCatalog = async (req, res) => {
     filter.name = { $regex: decodedName.trim(), $options: 'i' };
   }
 
-  // Search filter
   if (search && search.trim()) {
     const searchRegex = { $regex: search.trim(), $options: 'i' };
     filter.$or = [
@@ -240,11 +206,9 @@ exports.getProductsCatalog = async (req, res) => {
   }
 
   try {
-    // Build sort object
     const sortObj = {};
     sortObj[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
-    // Get BuyProducts with category population
     const products = await BuyProduct.find(filter)
       .populate('categoryId', 'name')
       .sort(sortObj)
@@ -252,16 +216,14 @@ exports.getProductsCatalog = async (req, res) => {
       .skip((pageNum - 1) * limitNum)
       .lean();
 
-    // Get total count for pagination
     const total = await BuyProduct.countDocuments(filter);
 
-    // Transform products to match expected structure
     const transformedProducts = products.map((product) => ({
       _id: product._id,
       name: product.name,
       brand: product.brand,
       category: product.categoryId?.name || 'Uncategorized',
-      model: product.name, // Use name as model for compatibility
+      model: product.name,
       images: product.images || {},
       pricing: product.pricing || {},
       basePrice: product.pricing?.mrp || product.pricing?.discountedPrice || 0,
@@ -276,14 +238,13 @@ exports.getProductsCatalog = async (req, res) => {
       isActive: product.isActive,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
-      // Include additional fields for better display
+
       variants: product.variants || [],
       conditionOptions: product.conditionOptions || [],
-      // Include original buy product fields
+
       originalProduct: product,
     }));
 
-    // Calculate pagination info
     const totalPages = Math.ceil(total / limitNum);
     const hasNextPage = pageNum < totalPages;
     const hasPrevPage = pageNum > 1;
@@ -306,25 +267,18 @@ exports.getProductsCatalog = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-/**
- * Add inventory item
- * @route POST /api/partner/inventory
- * @access Private (Partner only)
- */
-exports.addInventory = async (req, res) => {
+export async function addInventory(req, res) {
   const partnerId = await Partner.findOne({ user: req.user.id });
   if (!partnerId) {
     throw new ApiError('Partner profile not found', 404);
   }
 
-  // Check if partner is verified
   if (!partnerId.isVerified) {
     throw new ApiError('Your partner account is not verified yet', 403);
   }
 
-  // Check if product exists (check both Product and BuyProduct models)
   let product = await Product.findById(req.body.productId);
   let productModel = 'Product';
 
@@ -337,7 +291,6 @@ exports.addInventory = async (req, res) => {
     throw new ApiError('Product not found', 404);
   }
 
-  // Check if inventory already exists for this product
   const existingInventory = await Inventory.findOne({
     partner: partnerId._id,
     product: req.body.productId,
@@ -351,7 +304,6 @@ exports.addInventory = async (req, res) => {
     );
   }
 
-  // Create inventory item
   const inventory = await Inventory.create({
     partner: partnerId._id,
     productModel: productModel,
@@ -371,14 +323,9 @@ exports.addInventory = async (req, res) => {
     data: inventory,
     message: 'Inventory item added successfully',
   });
-};
+}
 
-/**
- * Get partner inventory
- * @route GET /api/partner/inventory
- * @access Private (Partner only)
- */
-exports.getInventory = async (req, res) => {
+export async function getInventory(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -400,10 +347,8 @@ exports.getInventory = async (req, res) => {
   const limitNum = parseInt(limit, 10);
   const skip = (pageNum - 1) * limitNum;
 
-  // Get total count for pagination
   const total = await Inventory.countDocuments(queryObj);
 
-  // Get inventory items with dynamic population based on productModel
   const inventory = await Inventory.find(queryObj)
     .populate({
       path: 'product',
@@ -425,20 +370,14 @@ exports.getInventory = async (req, res) => {
       hasPrevPage: pageNum > 1,
     },
   });
-};
+}
 
-/**
- * Update inventory item
- * @route PUT /api/partner/inventory/:id
- * @access Private (Partner only)
- */
-exports.updateInventory = async (req, res) => {
+export async function updateInventory(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
   }
 
-  // Find inventory and check ownership
   const inventory = await Inventory.findOne({
     _id: req.params.id,
     partner: partner._id,
@@ -448,7 +387,6 @@ exports.updateInventory = async (req, res) => {
     throw new ApiError('Inventory item not found or not owned by you', 404);
   }
 
-  // Update fields
   const updateData = {};
   if (req.body.price !== undefined) updateData.price = req.body.price;
   if (req.body.originalPrice !== undefined)
@@ -472,20 +410,14 @@ exports.updateInventory = async (req, res) => {
     data: updatedInventory,
     message: 'Inventory item updated successfully',
   });
-};
+}
 
-/**
- * Delete inventory item
- * @route DELETE /api/partner/inventory/:id
- * @access Private (Partner only)
- */
-exports.deleteInventory = async (req, res) => {
+export async function deleteInventory(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
   }
 
-  // Find inventory and check ownership
   const inventory = await Inventory.findOne({
     _id: req.params.id,
     partner: partner._id,
@@ -495,7 +427,6 @@ exports.deleteInventory = async (req, res) => {
     throw new ApiError('Inventory item not found or not owned by you', 404);
   }
 
-  // Check if there are any active orders for this inventory
   const activeOrders = await Order.countDocuments({
     'items.inventory': req.params.id,
     status: { $nin: ['delivered', 'cancelled'] },
@@ -511,14 +442,9 @@ exports.deleteInventory = async (req, res) => {
     success: true,
     message: 'Inventory item deleted successfully',
   });
-};
+}
 
-/**
- * Get partner orders
- * @route GET /api/partner/orders
- * @access Private (Partner only)
- */
-exports.getOrders = async (req, res) => {
+export async function getOrders(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -539,7 +465,6 @@ exports.getOrders = async (req, res) => {
   const limitNum = parseInt(limit, 10);
   const skip = (pageNum - 1) * limitNum;
 
-  // Parse sort parameter
   const sortField = sort.startsWith('-') ? sort.substring(1) : sort;
   const sortOrder = sort.startsWith('-') ? -1 : 1;
   const sortObj = { [sortField]: sortOrder };
@@ -547,31 +472,25 @@ exports.getOrders = async (req, res) => {
   let allOrders = [];
   let totalCount = 0;
 
-  // Build date filter if provided
   const dateFilter = {};
   if (startDate || endDate) {
     if (startDate) dateFilter.$gte = new Date(startDate);
     if (endDate) dateFilter.$lte = new Date(endDate);
   }
 
-  // Fetch buy orders (from Order model)
   if (!orderType || orderType === 'buy') {
     const buyQueryObj = { partner: partner._id };
 
-    // Apply filters
     if (status) buyQueryObj.status = status;
     if (Object.keys(dateFilter).length > 0) buyQueryObj.createdAt = dateFilter;
 
-    // Search filter for buy orders
     if (search) {
       const searchConditions = [];
 
-      // Search by order ID (exact match if it's a valid ObjectId)
       if (search.match(/^[0-9a-fA-F]{24}$/)) {
         searchConditions.push({ _id: search });
       }
 
-      // Search in user fields - we'll need to find users first
       const User = require('../models/user.model');
       const matchingUsers = await User.find({
         $or: [
@@ -590,16 +509,13 @@ exports.getOrders = async (req, res) => {
       if (searchConditions.length > 0) {
         buyQueryObj.$or = searchConditions;
       } else {
-        // If no valid search conditions, return empty results
         buyQueryObj._id = null;
       }
     }
 
-    // Get total count for buy orders
     const buyOrdersCount = await Order.countDocuments(buyQueryObj);
     totalCount += buyOrdersCount;
 
-    // If we need buy orders for this page
     if (orderType === 'buy' || !orderType) {
       const buyOrders = await Order.find(buyQueryObj)
         .populate('user', 'name email phone')
@@ -614,11 +530,10 @@ exports.getOrders = async (req, res) => {
         .sort(sortObj)
         .lean();
 
-      // Add orderType field to buy orders
       const buyOrdersWithType = buyOrders.map((order) => ({
         ...order,
         orderType: 'buy',
-        // Normalize address structure
+
         shippingAddress:
           order.shippingDetails?.address || order.shippingAddress,
         paymentMethod: order.paymentDetails?.method || order.paymentMethod,
@@ -628,33 +543,27 @@ exports.getOrders = async (req, res) => {
     }
   }
 
-  // Fetch sell orders (from SellOrder model)
   if (!orderType || orderType === 'sell') {
     const SellOrder = require('../models/sellOrder.model');
 
     const sellQueryObj = { assignedTo: partner._id };
 
-    // Apply filters
     if (status) sellQueryObj.status = status;
     if (Object.keys(dateFilter).length > 0) sellQueryObj.createdAt = dateFilter;
 
-    // Search filter for sell orders
     if (search) {
       const searchConditions = [];
 
-      // Search by order ID (exact match if it's a valid ObjectId)
       if (search.match(/^[0-9a-fA-F]{24}$/)) {
         searchConditions.push({ _id: search });
       }
 
-      // Search by order number (if it exists)
       if (search.length >= 3) {
         searchConditions.push({
           orderNumber: { $regex: search, $options: 'i' },
         });
       }
 
-      // Search in pickup address fields
       searchConditions.push({
         'pickup.address.fullName': { $regex: search, $options: 'i' },
       });
@@ -662,7 +571,6 @@ exports.getOrders = async (req, res) => {
         'pickup.address.phone': { $regex: search, $options: 'i' },
       });
 
-      // Search in user fields - we'll need to find users first
       const User = require('../models/user.model');
       const matchingUsers = await User.find({
         $or: [
@@ -681,16 +589,13 @@ exports.getOrders = async (req, res) => {
       if (searchConditions.length > 0) {
         sellQueryObj.$or = searchConditions;
       } else {
-        // If no valid search conditions, return empty results
         sellQueryObj._id = null;
       }
     }
 
-    // Get total count for sell orders
     const sellOrdersCount = await SellOrder.countDocuments(sellQueryObj);
     totalCount += sellOrdersCount;
 
-    // If we need sell orders for this page
     if (orderType === 'sell' || !orderType) {
       const sellOrders = await SellOrder.find(sellQueryObj)
         .populate('userId', 'name email phone')
@@ -706,7 +611,6 @@ exports.getOrders = async (req, res) => {
         .sort(sortObj)
         .lean();
 
-      // Transform sell orders to match buy order structure
       const sellOrdersWithType = sellOrders.map((order) => ({
         ...order,
         _id: order._id,
@@ -743,7 +647,7 @@ exports.getOrders = async (req, res) => {
             price: order.actualAmount || order.quoteAmount,
           },
         ],
-        // Add pickup-specific fields
+
         pickupDetails: {
           address: order.pickup?.address,
           slot: order.pickup?.slot,
@@ -757,14 +661,12 @@ exports.getOrders = async (req, res) => {
     }
   }
 
-  // Sort all orders together by creation date
   allOrders.sort((a, b) => {
     const aValue = new Date(a.createdAt);
     const bValue = new Date(b.createdAt);
     return sortOrder * (aValue - bValue);
   });
 
-  // Apply pagination to combined results
   const paginatedOrders = allOrders.slice(skip, skip + limitNum);
 
   res.status(200).json({
@@ -779,20 +681,15 @@ exports.getOrders = async (req, res) => {
       hasPrevPage: pageNum > 1,
     },
   });
-};
+}
 
-/**
- * Respond to order assignment (accept/reject)
- * @route PUT /api/partner/orders/:id/respond
- * @access Private (Partner only)
- */
-exports.respondToOrderAssignment = async (req, res) => {
+export async function respondToOrderAssignment(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
   }
 
-  const { response, reason } = req.body; // response: 'accepted' or 'rejected'
+  const { response, reason } = req.body;
 
   const order = await Order.findById(req.params.id).populate(
     'items.product',
@@ -802,21 +699,17 @@ exports.respondToOrderAssignment = async (req, res) => {
     throw new ApiError('Order not found', 404);
   }
 
-  // Check if order is assigned to this partner
   if (!order.partner || order.partner.toString() !== partner._id.toString()) {
     throw new ApiError('Order is not assigned to your shop', 403);
   }
 
-  // Check if response is still pending
   if (order.partnerAssignment.response.status !== 'pending') {
     throw new ApiError('Order assignment has already been responded to', 400);
   }
 
-  // If accepting, validate inventory availability
   if (response === 'accepted') {
     const missingItems = [];
 
-    // Check each product in the order
     for (const item of order.items) {
       const inventory = await Inventory.findOne({
         partner: partner._id,
@@ -850,7 +743,6 @@ exports.respondToOrderAssignment = async (req, res) => {
       }
     }
 
-    // If there are missing items, reject the acceptance
     if (missingItems.length > 0) {
       const missingProductNames = missingItems
         .map((item) =>
@@ -867,7 +759,6 @@ exports.respondToOrderAssignment = async (req, res) => {
     }
   }
 
-  // Update partner response
   order.partnerAssignment.response = {
     status: response,
     respondedAt: new Date(),
@@ -883,7 +774,7 @@ exports.respondToOrderAssignment = async (req, res) => {
       note: `Order accepted by partner: ${reason || 'No reason provided'}`,
     });
   } else if (response === 'rejected') {
-    order.status = 'pending'; // Back to pending for reassignment
+    order.status = 'pending';
     order.statusHistory.push({
       status: 'partner_rejected',
       timestamp: new Date(),
@@ -898,14 +789,9 @@ exports.respondToOrderAssignment = async (req, res) => {
     message: `Order ${response} successfully`,
     data: order,
   });
-};
+}
 
-/**
- * Check missing inventory for assigned order
- * @route GET /api/partner/orders/:id/missing-inventory
- * @access Private (Partner only)
- */
-exports.checkMissingInventory = async (req, res) => {
+export async function checkMissingInventory(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -919,7 +805,6 @@ exports.checkMissingInventory = async (req, res) => {
     throw new ApiError('Order not found', 404);
   }
 
-  // Check if order is assigned to this partner
   if (!order.partner || order.partner.toString() !== partner._id.toString()) {
     throw new ApiError('Order is not assigned to your shop', 403);
   }
@@ -927,7 +812,6 @@ exports.checkMissingInventory = async (req, res) => {
   const missingItems = [];
   const availableItems = [];
 
-  // Check each product in the order
   for (const item of order.items) {
     const inventory = await Inventory.findOne({
       partner: partner._id,
@@ -971,14 +855,9 @@ exports.checkMissingInventory = async (req, res) => {
           : 'You have all required products in inventory',
     },
   });
-};
+}
 
-/**
- * Update order status
- * @route PUT /api/partner/orders/:id
- * @access Private (Partner only)
- */
-exports.updateOrderStatus = async (req, res) => {
+export async function updateOrderStatus(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -989,12 +868,10 @@ exports.updateOrderStatus = async (req, res) => {
     throw new ApiError('Order not found', 404);
   }
 
-  // Check if order is assigned to this partner
   if (!order.partner || order.partner.toString() !== partner._id.toString()) {
     throw new ApiError('Order is not assigned to your shop', 403);
   }
 
-  // Check if order has been accepted by partner
   if (
     order.partnerAssignment &&
     order.partnerAssignment.response.status !== 'accepted'
@@ -1005,11 +882,9 @@ exports.updateOrderStatus = async (req, res) => {
     );
   }
 
-  // Update order status
   const oldStatus = order.status;
   order.status = req.body.status;
 
-  // Add to status history
   order.statusHistory.push({
     status: req.body.status,
     timestamp: new Date(),
@@ -1028,14 +903,9 @@ exports.updateOrderStatus = async (req, res) => {
     success: true,
     message: 'Order status updated successfully',
   });
-};
+}
 
-/**
- * Get dashboard statistics
- * @route GET /api/partner/dashboard
- * @access Private (Partner only)
- */
-exports.getDashboardStats = async (req, res) => {
+export async function getDashboardStats(req, res) {
   try {
     console.log('Dashboard request from user:', req.user.id);
 
@@ -1049,7 +919,6 @@ exports.getDashboardStats = async (req, res) => {
       });
     }
 
-    // Get inventory stats
     const inventoryCount = await Inventory.countDocuments({
       partner: partner._id,
     });
@@ -1059,7 +928,6 @@ exports.getDashboardStats = async (req, res) => {
       quantity: { $gt: 0 },
     });
 
-    // Get buy order stats
     const buyOrders = await Order.countDocuments({
       partner: partner._id,
     });
@@ -1072,7 +940,6 @@ exports.getDashboardStats = async (req, res) => {
       status: 'delivered',
     });
 
-    // Get sell order stats
     const SellOrder = require('../models/sellOrder.model');
     const sellOrders = await SellOrder.countDocuments({
       assignedTo: partner._id,
@@ -1086,12 +953,10 @@ exports.getDashboardStats = async (req, res) => {
       status: 'paid',
     });
 
-    // Combined order stats
     const totalOrders = buyOrders + sellOrders;
     const pendingOrders = pendingBuyOrders + pendingSellOrders;
     const completedOrders = completedBuyOrders + completedSellOrders;
 
-    // Get revenue stats from buy orders
     const orders = await Order.find({
       partner: partner._id,
       status: 'delivered',
@@ -1114,7 +979,6 @@ exports.getDashboardStats = async (req, res) => {
       });
     });
 
-    // Add revenue from sell orders
     const completedSellOrdersData = await SellOrder.find({
       assignedTo: partner._id,
       status: 'paid',
@@ -1122,14 +986,12 @@ exports.getDashboardStats = async (req, res) => {
 
     completedSellOrdersData.forEach((order) => {
       totalRevenue += order.actualAmount || order.quoteAmount || 0;
-      // Sell orders might have different commission structure
-      // For now, we'll assume a 10% commission on sell orders
+
       const sellCommission =
         (order.actualAmount || order.quoteAmount || 0) * 0.1;
       totalCommission += sellCommission;
     });
 
-    // Get recent orders (both buy and sell)
     const recentBuyOrders = await Order.find({ partner: partner._id })
       .sort('-createdAt')
       .limit(3)
@@ -1151,7 +1013,6 @@ exports.getDashboardStats = async (req, res) => {
       })
       .lean();
 
-    // Transform sell orders to match buy order structure for frontend
     const transformedSellOrders = recentSellOrders.map((order) => ({
       ...order,
       orderType: 'sell',
@@ -1182,7 +1043,6 @@ exports.getDashboardStats = async (req, res) => {
       orderType: 'buy',
     }));
 
-    // Combine and sort by creation date
     const allRecentOrders = [...transformedBuyOrders, ...transformedSellOrders]
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 5);
@@ -1220,19 +1080,12 @@ exports.getDashboardStats = async (req, res) => {
       error: error.message,
     });
   }
-};
+}
 
-// ==================== NEW METHODS FOR SELL/BUY PRODUCTS CRM ====================
+import { SellOrder } from '../models/sellOrder.model.js';
+import { SellProduct } from '../models/sellProduct.model.js';
 
-const SellProduct = require('../models/sellProduct.model');
-const SellOrder = require('../models/sellOrder.model');
-
-/**
- * Get partner dashboard for sell/buy products
- * @route GET /api/partner/dashboard-sellbuy
- * @access Private (Partner only)
- */
-exports.getDashboardSellBuy = async (req, res) => {
+export async function getDashboardSellBuy(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1240,11 +1093,9 @@ exports.getDashboardSellBuy = async (req, res) => {
 
   const partnerId = partner._id;
 
-  // Get product counts
   const sellProductCount = await SellProduct.countDocuments({ partnerId });
   const buyProductCount = await BuyProduct.countDocuments({ partnerId });
 
-  // Get order counts
   const totalOrders = await SellOrder.countDocuments({ assignedTo: partnerId });
   const pendingOrders = await SellOrder.countDocuments({
     assignedTo: partnerId,
@@ -1255,7 +1106,6 @@ exports.getDashboardSellBuy = async (req, res) => {
     status: 'paid',
   });
 
-  // Calculate revenue
   const revenueData = await SellOrder.aggregate([
     {
       $match: {
@@ -1273,7 +1123,6 @@ exports.getDashboardSellBuy = async (req, res) => {
 
   const totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
 
-  // Get recent orders
   const recentOrders = await SellOrder.find({ assignedTo: partnerId })
     .sort({ createdAt: -1 })
     .limit(10)
@@ -1301,14 +1150,9 @@ exports.getDashboardSellBuy = async (req, res) => {
       recentOrders,
     },
   });
-};
+}
 
-/**
- * Get partner's sell products
- * @route GET /api/partner/sell-products
- * @access Private (Partner only)
- */
-exports.getPartnerSellProducts = async (req, res) => {
+export async function getPartnerSellProducts(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1350,14 +1194,9 @@ exports.getPartnerSellProducts = async (req, res) => {
       pages: Math.ceil(total / limit),
     },
   });
-};
+}
 
-/**
- * Get partner's buy products
- * @route GET /api/partner/buy-products
- * @access Private (Partner only)
- */
-exports.getPartnerBuyProducts = async (req, res) => {
+export async function getPartnerBuyProducts(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1399,14 +1238,9 @@ exports.getPartnerBuyProducts = async (req, res) => {
       pages: Math.ceil(total / limit),
     },
   });
-};
+}
 
-/**
- * Get partner's sell orders
- * @route GET /api/partner/sell-orders
- * @access Private (Partner only)
- */
-exports.getPartnerSellOrders = async (req, res) => {
+export async function getPartnerSellOrders(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1449,14 +1283,9 @@ exports.getPartnerSellOrders = async (req, res) => {
       pages: Math.ceil(total / limit),
     },
   });
-};
+}
 
-/**
- * Get single sell order details
- * @route GET /api/partner/sell-orders/:id
- * @access Private (Partner only)
- */
-exports.getPartnerSellOrderDetails = async (req, res) => {
+export async function getPartnerSellOrderDetails(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1484,14 +1313,9 @@ exports.getPartnerSellOrderDetails = async (req, res) => {
     success: true,
     data: order,
   });
-};
+}
 
-/**
- * Update sell order status
- * @route PUT /api/partner/sell-orders/:id/status
- * @access Private (Partner only)
- */
-exports.updatePartnerSellOrderStatus = async (req, res) => {
+export async function updatePartnerSellOrderStatus(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1522,14 +1346,9 @@ exports.updatePartnerSellOrderStatus = async (req, res) => {
     message: 'Order status updated successfully',
     data: order,
   });
-};
+}
 
-/**
- * Get partner's agents
- * @route GET /api/partner/agents
- * @access Private (Partner only)
- */
-exports.getPartnerAgents = async (req, res) => {
+export async function getPartnerAgents(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1560,14 +1379,9 @@ exports.getPartnerAgents = async (req, res) => {
       pages: Math.ceil(total / limit),
     },
   });
-};
+}
 
-/**
- * Create new agent
- * @route POST /api/partner/agents
- * @access Private (Partner only)
- */
-exports.createAgent = async (req, res) => {
+export async function createAgent(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1586,26 +1400,22 @@ exports.createAgent = async (req, res) => {
     emergencyContact,
   } = req.body;
 
-  // Check if user with email already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new ApiError('User with this email already exists', 400);
   }
 
-  // Create user account for agent
   const user = await User.create({
     name: sanitizeData(name),
     email: sanitizeData(email),
     phone: sanitizeData(phone),
-    role: 'agent', // Agents have agent role
-    password: password, // Use password provided by partner
-    isVerified: false, // Will be verified by admin
+    role: 'agent',
+    password: password,
+    isVerified: false,
   });
 
-  // Generate agent code
   const agentCode = await Agent.generateAgentCode();
 
-  // Generate employee ID automatically
   const generateEmployeeId = () => {
     const date = new Date();
     const year = date.getFullYear().toString().slice(-2);
@@ -1618,7 +1428,6 @@ exports.createAgent = async (req, res) => {
 
   const employeeId = generateEmployeeId();
 
-  // Create agent profile
   const agent = await Agent.create({
     user: user._id,
     agentCode,
@@ -1632,10 +1441,9 @@ exports.createAgent = async (req, res) => {
     },
     bankDetails: bankDetails || {},
     emergencyContact: emergencyContact || {},
-    isActive: false, // Will be activated by admin after approval
+    isActive: false,
   });
 
-  // Populate user data for response
   await agent.populate('user', 'name email phone isVerified');
 
   res.status(201).json({
@@ -1643,14 +1451,9 @@ exports.createAgent = async (req, res) => {
     message: 'Agent created successfully. Awaiting admin approval.',
     data: agent,
   });
-};
+}
 
-/**
- * Update agent
- * @route PUT /api/partner/agents/:agentId
- * @access Private (Partner only)
- */
-exports.updateAgent = async (req, res) => {
+export async function updateAgent(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1659,7 +1462,6 @@ exports.updateAgent = async (req, res) => {
   const agentId = req.params.agentId;
   const updateData = req.body;
 
-  // Find agent and verify it belongs to this partner
   const agent = await Agent.findOne({
     _id: agentId,
     assignedPartner: partner._id,
@@ -1669,7 +1471,6 @@ exports.updateAgent = async (req, res) => {
     throw new ApiError('Agent not found or access denied', 404);
   }
 
-  // Update user data if provided
   if (updateData.name || updateData.phone) {
     const userUpdateData = {};
     if (updateData.name) userUpdateData.name = sanitizeData(updateData.name);
@@ -1678,7 +1479,6 @@ exports.updateAgent = async (req, res) => {
     await User.findByIdAndUpdate(agent.user._id, userUpdateData);
   }
 
-  // Update agent data (employeeId is auto-generated and cannot be updated)
   const agentUpdateData = {};
   if (updateData.coverageAreas) {
     agentUpdateData.coverageAreas = updateData.coverageAreas.map((area) =>
@@ -1700,14 +1500,9 @@ exports.updateAgent = async (req, res) => {
     message: 'Agent updated successfully',
     data: updatedAgent,
   });
-};
+}
 
-/**
- * Delete agent
- * @route DELETE /api/partner/agents/:agentId
- * @access Private (Partner only)
- */
-exports.deleteAgent = async (req, res) => {
+export async function deleteAgent(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -1715,7 +1510,6 @@ exports.deleteAgent = async (req, res) => {
 
   const agentId = req.params.agentId;
 
-  // Find agent and verify it belongs to this partner
   const agent = await Agent.findOne({
     _id: agentId,
     assignedPartner: partner._id,
@@ -1725,15 +1519,13 @@ exports.deleteAgent = async (req, res) => {
     throw new ApiError('Agent not found or access denied', 404);
   }
 
-  // Soft delete - deactivate instead of removing
   agent.isActive = false;
   await agent.save();
 
-  // Also deactivate the user account
   await User.findByIdAndUpdate(agent.user, { isActive: false });
 
   res.status(200).json({
     success: true,
     message: 'Agent deactivated successfully',
   });
-};
+}

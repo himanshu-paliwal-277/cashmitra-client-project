@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const sellConfigSchema = new mongoose.Schema(
   {
@@ -68,15 +68,12 @@ const sellConfigSchema = new mongoose.Schema(
   }
 );
 
-// Index for product lookup
 sellConfigSchema.index({ productId: 1 }, { unique: true });
 
-// Virtual for ordered steps
 sellConfigSchema.virtual('orderedSteps').get(function () {
   return this.steps.sort((a, b) => a.order - b.order);
 });
 
-// Method to get default configuration
 sellConfigSchema.statics.getDefaultConfig = function () {
   return {
     steps: [
@@ -95,7 +92,6 @@ sellConfigSchema.statics.getDefaultConfig = function () {
   };
 };
 
-// Method to create default config for a product
 sellConfigSchema.statics.createDefaultForProduct = function (
   productId,
   createdBy
@@ -108,7 +104,6 @@ sellConfigSchema.statics.createDefaultForProduct = function (
   });
 };
 
-// Method to apply pricing rules
 sellConfigSchema.methods.applyPricingRules = function (
   basePrice,
   calculatedPrice
@@ -116,7 +111,6 @@ sellConfigSchema.methods.applyPricingRules = function (
   const { rules } = this;
   let finalPrice = calculatedPrice;
 
-  // Apply percentage bounds
   if (rules.minPercent !== undefined) {
     const minPrice = basePrice * (1 + rules.minPercent / 100);
     finalPrice = Math.max(finalPrice, minPrice);
@@ -127,25 +121,22 @@ sellConfigSchema.methods.applyPricingRules = function (
     finalPrice = Math.min(finalPrice, maxPrice);
   }
 
-  // Apply floor price
   if (rules.floorPrice !== undefined) {
     finalPrice = Math.max(finalPrice, rules.floorPrice);
   }
 
-  // Apply cap price
   if (rules.capPrice !== undefined) {
     finalPrice = Math.min(finalPrice, rules.capPrice);
   }
 
-  // Apply rounding
   if (rules.roundToNearest && rules.roundToNearest > 0) {
     finalPrice =
       Math.round(finalPrice / rules.roundToNearest) * rules.roundToNearest;
   }
 
-  return Math.max(0, finalPrice); // Ensure non-negative
+  return Math.max(0, finalPrice);
 };
 
-const SellConfig = mongoose.model('SellConfig', sellConfigSchema);
+export const SellConfig = mongoose.model('SellConfig', sellConfigSchema);
 
-module.exports = SellConfig;
+

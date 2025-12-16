@@ -1,8 +1,6 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-// Define all available menu items and their hierarchical structure
-const MENU_ITEMS = {
-  // Main Dashboard
+export const MENU_ITEMS = {
   dashboard: {
     name: 'Dashboard',
     path: '/vendor/dashboard',
@@ -10,7 +8,6 @@ const MENU_ITEMS = {
     section: 'Main',
   },
 
-  // Sales & Orders Section
   sell: {
     name: 'Sell',
     path: '/vendor/sell',
@@ -48,7 +45,6 @@ const MENU_ITEMS = {
     section: 'Sales & Orders',
   },
 
-  // Catalog & Products Section
   products: {
     name: 'Products',
     path: '/vendor/products',
@@ -86,7 +82,6 @@ const MENU_ITEMS = {
     section: 'Catalog & Products',
   },
 
-  // Partners & Users Section
   partners: {
     name: 'Partners',
     path: '/vendor/partners',
@@ -118,7 +113,6 @@ const MENU_ITEMS = {
     section: 'Partners & Users',
   },
 
-  // Pricing & Finance Section
   pricing: {
     name: 'Pricing',
     path: '/vendor/pricing',
@@ -162,7 +156,6 @@ const MENU_ITEMS = {
     section: 'Pricing & Finance',
   },
 
-  // Analytics & Reports Section
   reports: {
     name: 'Reports',
     path: '/vendor/reports',
@@ -170,7 +163,6 @@ const MENU_ITEMS = {
     section: 'Analytics & Reports',
   },
 
-  // System Section
   settings: {
     name: 'Settings',
     path: '/vendor/settings',
@@ -204,14 +196,14 @@ const vendorPermissionSchema = new mongoose.Schema(
             default: false,
           },
           timeRestriction: {
-            startTime: String, // HH:MM format
-            endTime: String, // HH:MM format
+            startTime: String,
+            endTime: String,
           },
           dateRestriction: {
             startDate: Date,
             endDate: Date,
           },
-          ipRestriction: [String], // Array of allowed IP addresses
+          ipRestriction: [String],
         },
         metadata: {
           type: Map,
@@ -220,7 +212,7 @@ const vendorPermissionSchema = new mongoose.Schema(
       },
       default: () => {
         const defaultPermissions = new Map();
-        // Initialize all menu items with default denied access
+
         Object.keys(MENU_ITEMS).forEach((key) => {
           defaultPermissions.set(key, {
             granted: false,
@@ -229,7 +221,7 @@ const vendorPermissionSchema = new mongoose.Schema(
             },
           });
         });
-        // Grant dashboard access by default
+
         defaultPermissions.set('dashboard', {
           granted: true,
           grantedAt: new Date(),
@@ -265,13 +257,11 @@ const vendorPermissionSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for efficient querying
 vendorPermissionSchema.index({ vendor: 1 });
 vendorPermissionSchema.index({ isActive: 1 });
 vendorPermissionSchema.index({ roleTemplate: 1 });
 vendorPermissionSchema.index({ lastUpdatedBy: 1 });
 
-// Virtual to get granted permissions only
 vendorPermissionSchema.virtual('grantedPermissions').get(function () {
   const granted = {};
   for (const [key, value] of this.permissions) {
@@ -287,13 +277,11 @@ vendorPermissionSchema.virtual('grantedPermissions').get(function () {
   return granted;
 });
 
-// Method to check if vendor has specific permission
 vendorPermissionSchema.methods.hasPermission = function (menuItem) {
   const permission = this.permissions.get(menuItem);
   return permission && permission.granted && this.isActive;
 };
 
-// Method to grant permission
 vendorPermissionSchema.methods.grantPermission = function (
   menuItem,
   grantedBy,
@@ -313,7 +301,6 @@ vendorPermissionSchema.methods.grantPermission = function (
   this.lastUpdatedBy = grantedBy;
 };
 
-// Method to revoke permission
 vendorPermissionSchema.methods.revokePermission = function (
   menuItem,
   revokedBy
@@ -331,7 +318,6 @@ vendorPermissionSchema.methods.revokePermission = function (
   this.lastUpdatedBy = revokedBy;
 };
 
-// Method to apply role template
 vendorPermissionSchema.methods.applyRoleTemplate = function (
   template,
   appliedBy
@@ -348,18 +334,16 @@ vendorPermissionSchema.methods.applyRoleTemplate = function (
       'walletPayouts',
       'reports',
     ],
-    manager: Object.keys(MENU_ITEMS).filter((key) => key !== 'settings'), // All except settings
-    custom: [], // No default permissions for custom role
+    manager: Object.keys(MENU_ITEMS).filter((key) => key !== 'settings'),
+    custom: [],
   };
 
   const templatePermissions = templates[template] || [];
 
-  // Reset all permissions
   Object.keys(MENU_ITEMS).forEach((key) => {
     this.revokePermission(key, appliedBy);
   });
 
-  // Grant template permissions
   templatePermissions.forEach((key) => {
     this.grantPermission(key, appliedBy);
   });
@@ -368,21 +352,18 @@ vendorPermissionSchema.methods.applyRoleTemplate = function (
   this.lastUpdatedBy = appliedBy;
 };
 
-// Static method to get menu items structure
 vendorPermissionSchema.statics.getMenuItems = function () {
   return MENU_ITEMS;
 };
 
-// Static method to get permissions by vendor
 vendorPermissionSchema.statics.getVendorPermissions = function (vendorId) {
   return this.findOne({ vendor: vendorId, isActive: true })
     .populate('vendor', 'companyName contactPerson')
     .populate('lastUpdatedBy', 'name email');
 };
 
-const VendorPermission = mongoose.model(
+export const VendorPermission = mongoose.model(
   'VendorPermission',
   vendorPermissionSchema
 );
 
-module.exports = { VendorPermission, MENU_ITEMS };

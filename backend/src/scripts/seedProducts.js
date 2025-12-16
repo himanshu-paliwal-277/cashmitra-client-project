@@ -1,7 +1,8 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
-const Product = require('../models/product.model');
-const User = require('../models/user.model');
+import mongoose from 'mongoose';
+
+import { Product } from '../models/product.model.js';
+import { User } from '../models/user.model.js';
 
 const connectDB = async () => {
   try {
@@ -17,21 +18,18 @@ const seedProducts = async () => {
   try {
     await connectDB();
 
-    // Check if products already exist
     const existingProducts = await Product.find();
     console.log(`\nExisting products (${existingProducts.length}):`);
     existingProducts.forEach((product) => {
       console.log(`- ${product.brand} ${product.model} (${product.category})`);
     });
 
-    // Get an admin user to assign as creator
     const adminUser = await User.findOne({ role: 'admin' });
     if (!adminUser) {
       console.error('No admin user found. Please create an admin user first.');
       process.exit(1);
     }
 
-    // Sample products data
     const sampleProducts = [
       {
         category: 'mobile',
@@ -128,7 +126,6 @@ const seedProducts = async () => {
       },
     ];
 
-    // Insert products if none exist
     if (existingProducts.length === 0) {
       console.log('\nCreating sample products...');
       const createdProducts = await Product.insertMany(sampleProducts);

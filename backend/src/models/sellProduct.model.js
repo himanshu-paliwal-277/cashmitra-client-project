@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const sellProductSchema = new mongoose.Schema(
   {
@@ -14,7 +14,7 @@ const sellProductSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      // required: [true, 'Product slug is required'],
+
       unique: true,
       lowercase: true,
       trim: true,
@@ -61,7 +61,7 @@ const sellProductSchema = new mongoose.Schema(
     partnerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Partner',
-      required: false, // Optional - admin can create without partner
+      required: false,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -76,19 +76,16 @@ const sellProductSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for better performance
 sellProductSchema.index({ categoryId: 1, status: 1 });
 sellProductSchema.index({ slug: 1 }, { unique: true });
 sellProductSchema.index({ name: 'text', tags: 'text' });
 
-// Virtual for active variants
 sellProductSchema.virtual('activeVariants').get(function () {
   return this.variants
     ? this.variants.filter((variant) => variant.isActive)
     : [];
 });
 
-// Pre-save middleware to generate slug if not provided
 sellProductSchema.pre('save', function (next) {
   if (!this.slug && this.name) {
     this.slug = this.name
@@ -101,6 +98,6 @@ sellProductSchema.pre('save', function (next) {
   next();
 });
 
-const SellProduct = mongoose.model('SellProduct', sellProductSchema);
+export const SellProduct = mongoose.model('SellProduct', sellProductSchema);
 
-module.exports = SellProduct;
+

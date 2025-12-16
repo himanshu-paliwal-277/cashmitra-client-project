@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const cartItemSchema = new mongoose.Schema({
   productId: {
@@ -36,14 +36,12 @@ const cartSchema = new mongoose.Schema(
   }
 );
 
-// Update the updatedAt field before saving
 cartSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-// Index for faster queries
 cartSchema.index({ user: 1 });
 cartSchema.index({ 'items.productId': 1 });
 
-module.exports = mongoose.model('Cart', cartSchema);
+export const Cart = mongoose.model('Cart', cartSchema);

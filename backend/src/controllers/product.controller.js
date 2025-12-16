@@ -1,19 +1,12 @@
-const { validationResult } = require('express-validator');
-const Product = require('../models/product.model');
-const Inventory = require('../models/inventory.model');
-const Category = require('../models/category.model');
-const Partner = require('../models/partner.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import { validationResult } from 'express-validator';
 
-/**
- * @desc    Get all products with advanced filtering and search
- * @route   GET /api/products
- * @access  Public
- */
-exports.getProducts = asyncHandler(async (req, res) => {
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import { Category } from '../models/category.model.js';
+import { Inventory } from '../models/inventory.model.js';
+import { Partner } from '../models/partner.model.js';
+import { Product } from '../models/product.model.js';
+
+export var getProducts = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 20,
@@ -30,10 +23,8 @@ exports.getProducts = asyncHandler(async (req, res) => {
     featured,
   } = req.query;
 
-  // Build aggregation pipeline
   const pipeline = [];
 
-  // Match stage for basic product filtering
   const matchStage = {};
 
   if (category) {
@@ -58,7 +49,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
 
   pipeline.push({ $match: matchStage });
 
-  // Lookup inventory data
   pipeline.push({
     $lookup: {
       from: 'inventories',
@@ -68,7 +58,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     },
   });
 
-  // Filter by availability
   if (availability !== 'all') {
     pipeline.push({
       $match: {
@@ -79,7 +68,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     });
   }
 
-  // Filter by condition if specified
   if (condition) {
     pipeline.push({
       $match: {
@@ -88,7 +76,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     });
   }
 
-  // Filter by price range
   if (minPrice || maxPrice) {
     const priceFilter = {};
     if (minPrice) priceFilter.$gte = Number(minPrice);
@@ -101,7 +88,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     });
   }
 
-  // Filter by pincode if specified
   if (pincode) {
     pipeline.push({
       $lookup: {
@@ -121,7 +107,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     });
   }
 
-  // Add calculated fields
   pipeline.push({
     $addFields: {
       minPrice: { $min: '$inventory.price' },
@@ -140,7 +125,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     },
   });
 
-  // Filter featured products if requested
   if (featured === 'true') {
     pipeline.push({
       $match: {
@@ -153,7 +137,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     });
   }
 
-  // Populate category information
   pipeline.push({
     $lookup: {
       from: 'categories',
@@ -170,7 +153,6 @@ exports.getProducts = asyncHandler(async (req, res) => {
     },
   });
 
-  // Sort stage
   const sortStage = {};
   const order = sortOrder === 'desc' ? -1 : 1;
 
@@ -197,12 +179,10 @@ exports.getProducts = asyncHandler(async (req, res) => {
 
   pipeline.push({ $sort: sortStage });
 
-  // Pagination
   const skip = (parseInt(page) - 1) * parseInt(limit);
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: parseInt(limit) });
 
-  // Project final fields
   pipeline.push({
     $project: {
       brand: 1,
@@ -223,11 +203,9 @@ exports.getProducts = asyncHandler(async (req, res) => {
     },
   });
 
-  // Execute aggregation
   const products = await Product.aggregate(pipeline);
 
-  // Get total count for pagination
-  const countPipeline = pipeline.slice(0, -3); // Remove skip, limit, and project stages
+  const countPipeline = pipeline.slice(0, -3);
   countPipeline.push({ $count: 'total' });
   const countResult = await Product.aggregate(countPipeline);
   const total = countResult.length > 0 ? countResult[0].total : 0;
@@ -242,12 +220,7 @@ exports.getProducts = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get single product with all inventory options
- * @route   GET /api/products/:id
- * @access  Public
- */
-exports.getProduct = asyncHandler(async (req, res) => {
+export var getProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { pincode } = req.query;
 
@@ -257,10 +230,8 @@ exports.getProduct = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Product not found');
   }
 
-  // Build inventory filter
   const inventoryFilter = { product: id };
 
-  // Filter by pincode if provided
   if (pincode) {
     const partners = await Partner.find({
       'address.pincode': pincode,
@@ -270,16 +241,14 @@ exports.getProduct = asyncHandler(async (req, res) => {
     if (partners.length > 0) {
       inventoryFilter.partner = { $in: partners.map((p) => p._id) };
     } else {
-      inventoryFilter.partner = { $in: [] }; // No partners in this pincode
+      inventoryFilter.partner = { $in: [] };
     }
   }
 
-  // Get inventory options
   const inventory = await Inventory.find(inventoryFilter)
     .populate('partner', 'shopName address rating reviewCount')
     .sort({ price: 1, isAvailable: -1 });
 
-  // Calculate product statistics
   const stats = {
     minPrice:
       inventory.length > 0 ? Math.min(...inventory.map((i) => i.price)) : null,
@@ -305,12 +274,7 @@ exports.getProduct = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get product suggestions/recommendations
- * @route   GET /api/products/:id/suggestions
- * @access  Public
- */
-exports.getProductSuggestions = asyncHandler(async (req, res) => {
+export var getProductSuggestions = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { limit = 10 } = req.query;
 
@@ -319,7 +283,6 @@ exports.getProductSuggestions = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Product not found');
   }
 
-  // Find similar products based on category, brand, or specifications
   const suggestions = await Product.aggregate([
     {
       $match: {
@@ -386,12 +349,7 @@ exports.getProductSuggestions = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get product categories with product counts
- * @route   GET /api/products/categories
- * @access  Public
- */
-exports.getProductCategories = asyncHandler(async (req, res) => {
+export var getProductCategories = asyncHandler(async (req, res) => {
   const categories = await Category.aggregate([
     {
       $lookup: {
@@ -434,12 +392,7 @@ exports.getProductCategories = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get product brands with product counts
- * @route   GET /api/products/brands
- * @access  Public
- */
-exports.getProductBrands = asyncHandler(async (req, res) => {
+export var getProductBrands = asyncHandler(async (req, res) => {
   const { category } = req.query;
 
   const matchStage = {};
@@ -476,12 +429,7 @@ exports.getProductBrands = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get product filters (for filter UI)
- * @route   GET /api/products/filters
- * @access  Public
- */
-exports.getProductFilters = asyncHandler(async (req, res) => {
+export var getProductFilters = asyncHandler(async (req, res) => {
   const { category } = req.query;
 
   const matchStage = {};
@@ -489,7 +437,6 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
     matchStage.category = category;
   }
 
-  // Get price range
   const priceRange = await Inventory.aggregate([
     {
       $lookup: {
@@ -520,7 +467,6 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
     },
   ]);
 
-  // Get available conditions
   const conditions = await Inventory.aggregate([
     {
       $lookup: {
@@ -553,7 +499,6 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
     },
   ]);
 
-  // Get brands
   const brands = await Product.aggregate([
     { $match: matchStage },
     {
@@ -581,12 +526,7 @@ exports.getProductFilters = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Create a new product
- * @route   POST /api/products
- * @access  Private
- */
-exports.createProduct = asyncHandler(async (req, res) => {
+export var createProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation failed', errors.array());
@@ -605,13 +545,11 @@ exports.createProduct = asyncHandler(async (req, res) => {
     description,
   } = req.body;
 
-  // Check if category exists
   const categoryExists = await Category.findById(category);
   if (!categoryExists) {
     throw new ApiError(404, 'Category not found');
   }
 
-  // Create product
   const product = await Product.create({
     category,
     brand,
@@ -626,7 +564,6 @@ exports.createProduct = asyncHandler(async (req, res) => {
     createdBy: req.user._id,
   });
 
-  // Populate category information
   await product.populate('category', 'name slug');
 
   res.status(201).json({
@@ -636,12 +573,7 @@ exports.createProduct = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Update a product
- * @route   PUT /api/products/:id
- * @access  Private
- */
-exports.updateProduct = asyncHandler(async (req, res) => {
+export var updateProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation failed', errors.array());
@@ -650,13 +582,11 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const updateData = req.body;
 
-  // Find the product
   const product = await Product.findById(id);
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
-  // Check if user owns the product or is admin
   if (
     product.createdBy.toString() !== req.user._id.toString() &&
     req.user.role !== 'admin'
@@ -664,7 +594,6 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Not authorized to update this product');
   }
 
-  // If category is being updated, check if it exists
   if (updateData.category) {
     const categoryExists = await Category.findById(updateData.category);
     if (!categoryExists) {
@@ -672,14 +601,12 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     }
   }
 
-  // Convert specifications to Map if provided
   if (updateData.specifications) {
     updateData.specifications = new Map(
       Object.entries(updateData.specifications)
     );
   }
 
-  // Update the product
   const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
     new: true,
     runValidators: true,
@@ -692,21 +619,14 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Delete a product
- * @route   DELETE /api/products/:id
- * @access  Private
- */
-exports.deleteProduct = asyncHandler(async (req, res) => {
+export var deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  // Find the product
   const product = await Product.findById(id);
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
-  // Check if user owns the product or is admin
   if (
     product.createdBy.toString() !== req.user._id.toString() &&
     req.user.role !== 'admin'
@@ -714,7 +634,6 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Not authorized to delete this product');
   }
 
-  // Check if product has any inventory
   const inventory = await Inventory.find({ product: id });
   if (inventory.length > 0) {
     throw new ApiError(
@@ -723,7 +642,6 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
     );
   }
 
-  // Delete the product
   await Product.findByIdAndDelete(id);
 
   res.json({

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const inventorySchema = new mongoose.Schema(
   {
@@ -67,12 +67,11 @@ const inventorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create indexes for efficient querying
 inventorySchema.index({ partner: 1 });
 inventorySchema.index({ product: 1 });
 inventorySchema.index({ condition: 1, price: 1 });
 inventorySchema.index({ isAvailable: 1 });
 
-const Inventory = mongoose.model('Inventory', inventorySchema);
+export const Inventory = mongoose.model('Inventory', inventorySchema);
 
-module.exports = Inventory;
+

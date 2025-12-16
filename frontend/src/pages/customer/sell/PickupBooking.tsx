@@ -1,7 +1,7 @@
 // PickupBooking.jsx - Updated with booking- prefixed classNames and no navbar
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './PickupBooking.css'; 
+import './PickupBooking.css';
 import sellService from '../../../services/sellService';
 import {
   MapPin,
@@ -210,8 +210,17 @@ const PickupBooking = () => {
         const userData = getUserFromLocalStorage();
 
         // Create the sell order with correct payload structure for /api/sell-orders
+        const finalSessionId =
+          sessionId || location.state?.sessionId || localStorage.getItem('currentSessionId');
+
+        if (!finalSessionId) {
+          throw new Error(
+            'Session ID is required to create order. Please restart the sell process.'
+          );
+        }
+
         const orderData = {
-          sessionId: sessionId || location.state?.sessionId,
+          sessionId: finalSessionId,
           orderNumber: `ORD${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
           pickup: {
             address: {
@@ -234,12 +243,21 @@ const PickupBooking = () => {
         };
 
         console.log('orderData for /api/sell-orders:', orderData);
+        console.log('sessionId sources:', {
+          fromState: sessionId,
+          fromLocationState: location.state?.sessionId,
+          fromLocalStorage: localStorage.getItem('currentSessionId'),
+          finalSessionId: finalSessionId,
+        });
 
         // Call the API to create the sell order using the correct endpoint
         const response = await sellService.createSellOrderCorrect(orderData);
 
         // Extract the actual order data from response
         const orderResponseData = response.data || response;
+
+        // Clear the sessionId from localStorage after successful order creation
+        localStorage.removeItem('currentSessionId');
 
         // Create booking data for confirmation page using backend response
         const bookingData = {

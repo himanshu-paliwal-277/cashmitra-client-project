@@ -1,8 +1,6 @@
-const nodemailer = require('nodemailer');
-const {
-  asyncHandler,
-  ApiError,
-} = require('../middlewares/errorHandler.middleware');
+import nodemailer from 'nodemailer';
+
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
 
 const createTransporter = () => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -24,7 +22,7 @@ const createTransporter = () => {
   });
 };
 
-exports.sendContactEmail = asyncHandler(async (req, res) => {
+export var sendContactEmail = asyncHandler(async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
 
   if (!name || !email || !subject || !message) {
@@ -62,7 +60,7 @@ exports.sendContactEmail = asyncHandler(async (req, res) => {
 
     const adminMailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // Admin email
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
       subject: `New Contact Form Submission: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
@@ -192,7 +190,7 @@ exports.sendContactEmail = asyncHandler(async (req, res) => {
   }
 });
 
-exports.getContactInfo = asyncHandler(async (req, res) => {
+export var getContactInfo = asyncHandler(async (req, res) => {
   const contactInfo = {
     phone: '1800-123-4567',
     email: 'support@cashmitra.com',

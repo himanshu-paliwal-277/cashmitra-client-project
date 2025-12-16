@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const User = require('../models/user.model');
+import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
+
+import { User } from '../models/user.model.js';
 require('dotenv').config();
 
-// Sample users data
 const sampleUsers = [
   {
     name: 'John Doe',
@@ -49,13 +49,11 @@ const sampleUsers = [
 
 async function seedUsers() {
   try {
-    // Connect to MongoDB
     await mongoose.connect(
       process.env.MONGO_URI || 'mongodb://localhost:27017/cashify'
     );
     console.log('Connected to MongoDB');
 
-    // Check if users already exist
     const existingUsers = await User.countDocuments();
     if (existingUsers > 0) {
       console.log(
@@ -64,7 +62,6 @@ async function seedUsers() {
       return;
     }
 
-    // Hash passwords and create users
     const usersToCreate = await Promise.all(
       sampleUsers.map(async (user) => {
         const hashedPassword = await bcrypt.hash(user.password, 12);
@@ -75,7 +72,6 @@ async function seedUsers() {
       })
     );
 
-    // Insert users
     const createdUsers = await User.insertMany(usersToCreate);
     console.log(`Successfully created ${createdUsers.length} users:`);
 
@@ -90,9 +86,8 @@ async function seedUsers() {
   }
 }
 
-// Run the seed function
 if (require.main === module) {
   seedUsers();
 }
 
-module.exports = seedUsers;
+export default seedUsers;

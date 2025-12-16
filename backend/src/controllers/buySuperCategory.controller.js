@@ -1,14 +1,8 @@
-const BuySuperCategory = require('../models/buySuperCategory.model');
-const BuyCategory = require('../models/buyCategory.model');
-const {
-  asyncHandler,
-  ApiError,
-} = require('../middlewares/errorHandler.middleware');
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import { BuyCategory } from '../models/buyCategory.model.js';
+import { BuySuperCategory } from '../models/buySuperCategory.model.js';
 
-// @desc    Get all super categories
-// @route   GET /api/buy-super-categories
-// @access  Private/Admin
-exports.getAllSuperCategories = asyncHandler(async (req, res) => {
+export var getAllSuperCategories = asyncHandler(async (req, res) => {
   const { isActive, search, sort = 'sortOrder' } = req.query;
 
   const filter = {};
@@ -35,10 +29,7 @@ exports.getAllSuperCategories = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get active super categories (public)
-// @route   GET /api/buy-super-categories/public
-// @access  Public
-exports.getPublicSuperCategories = asyncHandler(async (req, res) => {
+export var getPublicSuperCategories = asyncHandler(async (req, res) => {
   const { search, sort = 'sortOrder' } = req.query;
 
   const filter = { isActive: true };
@@ -61,10 +52,7 @@ exports.getPublicSuperCategories = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get single super category
-// @route   GET /api/buy-super-categories/:id
-// @access  Private/Admin
-exports.getSuperCategory = asyncHandler(async (req, res) => {
+export var getSuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await BuySuperCategory.findById(req.params.id).populate(
     'categories'
   );
@@ -79,13 +67,9 @@ exports.getSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Create super category
-// @route   POST /api/buy-super-categories
-// @access  Private/Admin
-exports.createSuperCategory = asyncHandler(async (req, res) => {
+export var createSuperCategory = asyncHandler(async (req, res) => {
   const { name, description, image, isActive, sortOrder } = req.body;
 
-  // Check if image URL is provided
   if (!image) {
     throw new ApiError(400, 'Please provide an image URL');
   }
@@ -93,7 +77,7 @@ exports.createSuperCategory = asyncHandler(async (req, res) => {
   const superCategoryData = {
     name,
     description,
-    image, // Cloudinary URL from frontend
+    image,
     isActive,
     sortOrder,
     createdBy: req.user._id,
@@ -108,10 +92,7 @@ exports.createSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Update super category
-// @route   PUT /api/buy-super-categories/:id
-// @access  Private/Admin
-exports.updateSuperCategory = asyncHandler(async (req, res) => {
+export var updateSuperCategory = asyncHandler(async (req, res) => {
   let superCategory = await BuySuperCategory.findById(req.params.id);
 
   if (!superCategory) {
@@ -128,7 +109,6 @@ exports.updateSuperCategory = asyncHandler(async (req, res) => {
     updatedBy: req.user._id,
   };
 
-  // Update image if new URL is provided
   if (image) {
     updateData.image = image;
   }
@@ -149,17 +129,13 @@ exports.updateSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Delete super category
-// @route   DELETE /api/buy-super-categories/:id
-// @access  Private/Admin
-exports.deleteSuperCategory = asyncHandler(async (req, res) => {
+export var deleteSuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await BuySuperCategory.findById(req.params.id);
 
   if (!superCategory) {
     throw new ApiError(404, 'Super category not found');
   }
 
-  // Check if there are categories linked to this super category
   const categoriesCount = await BuyCategory.countDocuments({
     superCategory: req.params.id,
   });
@@ -180,10 +156,7 @@ exports.deleteSuperCategory = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get categories by super category
-// @route   GET /api/buy-super-categories/:id/categories
-// @access  Private/Admin
-exports.getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
+export var getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
   const superCategory = await BuySuperCategory.findById(req.params.id);
 
   if (!superCategory) {
@@ -200,28 +173,28 @@ exports.getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
     data: categories,
   });
 });
-// @desc    Get categories by super category (public)
-// @route   GET /api/buy-super-categories/public/:id/categories
-// @access  Public
-exports.getPublicCategoriesBySuperCategory = asyncHandler(async (req, res) => {
-  const superCategory = await BuySuperCategory.findById(req.params.id);
 
-  if (!superCategory) {
-    throw new ApiError(404, 'Super category not found');
+export var getPublicCategoriesBySuperCategory = asyncHandler(
+  async (req, res) => {
+    const superCategory = await BuySuperCategory.findById(req.params.id);
+
+    if (!superCategory) {
+      throw new ApiError(404, 'Super category not found');
+    }
+
+    if (!superCategory.isActive) {
+      throw new ApiError(404, 'Super category is not active');
+    }
+
+    const categories = await BuyCategory.find({
+      superCategory: req.params.id,
+      isActive: true,
+    }).sort('sortOrder');
+
+    res.status(200).json({
+      success: true,
+      count: categories.length,
+      data: categories,
+    });
   }
-
-  if (!superCategory.isActive) {
-    throw new ApiError(404, 'Super category is not active');
-  }
-
-  const categories = await BuyCategory.find({
-    superCategory: req.params.id,
-    isActive: true, // Only return active categories for public endpoint
-  }).sort('sortOrder');
-
-  res.status(200).json({
-    success: true,
-    count: categories.length,
-    data: categories,
-  });
-});
+);

@@ -1,6 +1,5 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
-// Email transporter configuration
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
   port: process.env.EMAIL_PORT || 587,
@@ -11,15 +10,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-/**
- * Send OTP via Email
- */
-exports.sendOTPEmail = async (
+export async function sendOTPEmail(
   email,
   otp,
   customerName,
   subject = 'Your OTP for Device Collection'
-) => {
+) {
   try {
     const mailOptions = {
       from: `"Cashify" <${process.env.EMAIL_USER}>`,
@@ -76,43 +72,21 @@ exports.sendOTPEmail = async (
     console.error('Error sending OTP email:', error);
     throw new Error('Failed to send OTP email');
   }
-};
+}
 
-/**
- * Send OTP via SMS
- * Note: You need to integrate with SMS gateway like Twilio, MSG91, etc.
- */
-exports.sendOTPSMS = async (phone, otp) => {
+export async function sendOTPSMS(phone, otp) {
   try {
-    // TODO: Integrate with SMS gateway
-    // Example for Twilio:
-    /*
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const client = require('twilio')(accountSid, authToken);
-
-    await client.messages.create({
-      body: `Your Cashify verification OTP is: ${otp}. Valid for 5 minutes. Do not share this OTP with anyone.`,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: phone
-    });
-    */
-
     console.log(`OTP SMS would be sent to ${phone}: ${otp}`);
 
-    // For now, just log the OTP (in production, use actual SMS service)
     return true;
   } catch (error) {
     console.error('Error sending OTP SMS:', error);
-    // Don't throw error to allow email-only OTP
+
     return false;
   }
-};
+}
 
-/**
- * Send Email Notification
- */
-exports.sendEmail = async (to, subject, html) => {
+export async function sendEmail(to, subject, html) {
   try {
     const mailOptions = {
       from: `"Cashify" <${process.env.EMAIL_USER}>`,
@@ -127,32 +101,24 @@ exports.sendEmail = async (to, subject, html) => {
     console.error('Error sending email:', error);
     throw new Error('Failed to send email');
   }
-};
+}
 
-/**
- * Send SMS Notification
- */
-exports.sendSMS = async (phone, message) => {
+export async function sendSMS(phone, message) {
   try {
-    // TODO: Integrate with SMS gateway
     console.log(`SMS to ${phone}: ${message}`);
     return true;
   } catch (error) {
     console.error('Error sending SMS:', error);
     return false;
   }
-};
+}
 
-/**
- * Send Push Notification
- */
-exports.sendPushNotification = async (userId, title, body, data = {}) => {
+export async function sendPushNotification(userId, title, body, data = {}) {
   try {
-    // TODO: Integrate with Firebase Cloud Messaging or similar
     console.log(`Push notification to user ${userId}: ${title} - ${body}`);
     return true;
   } catch (error) {
     console.error('Error sending push notification:', error);
     return false;
   }
-};
+}

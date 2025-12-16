@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const transactionSchema = new mongoose.Schema(
   {
@@ -65,7 +65,6 @@ const transactionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create indexes for efficient querying
 transactionSchema.index({ transactionType: 1 });
 transactionSchema.index({ user: 1 });
 transactionSchema.index({ partner: 1 });
@@ -73,6 +72,6 @@ transactionSchema.index({ order: 1 });
 transactionSchema.index({ status: 1 });
 transactionSchema.index({ createdAt: -1 });
 
-const Transaction = mongoose.model('Transaction', transactionSchema);
+export const Transaction = mongoose.model('Transaction', transactionSchema);
 
-module.exports = Transaction;
+

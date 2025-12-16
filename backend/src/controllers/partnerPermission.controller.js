@@ -1,25 +1,18 @@
-const { PartnerPermission } = require('../models/partnerPermission.model');
-const Partner = require('../models/partner.model');
-const User = require('../models/user.model');
-const RoleTemplate = require('../models/roleTemplate.model');
-const ApiError = require('../utils/apiError');
-const { sanitizeData } = require('../utils/security.utils');
+import { Partner } from '../models/partner.model.js';
+import { PartnerPermission } from '../models/partnerPermission.model.js';
+import { RoleTemplate } from '../models/roleTemplate.model.js';
+import { User } from '../models/user.model.js';
+import ApiError from '../utils/apiError.js';
+import { sanitizeData } from '../utils/security.utils.js';
 
-/**
- * Get partner permissions
- * @route GET /api/partner/permissions
- * @access Private (Partner only)
- */
-exports.getPartnerPermissions = async (req, res) => {
+export async function getPartnerPermissions(req, res) {
   try {
-    // Find the user with their role template
     const user = await User.findById(req.user.id).populate('roleTemplate');
 
     if (!user) {
       throw new ApiError('User not found', 404);
     }
 
-    // Check if user is a partner
     if (user.role !== 'partner') {
       throw new ApiError('Access denied. User is not a partner', 403);
     }
@@ -29,17 +22,14 @@ exports.getPartnerPermissions = async (req, res) => {
       throw new ApiError('Partner profile not found', 404);
     }
 
-    // Get role template or use default
     let roleTemplate = user.roleTemplate;
 
-    // If no role template assigned, get the basic default
     if (!roleTemplate) {
       roleTemplate = await RoleTemplate.findOne({
         name: 'basic',
         isDefault: true,
       });
 
-      // If still no template, create default templates
       if (!roleTemplate) {
         const templates = await RoleTemplate.createDefaultTemplates(
           req.user.id
@@ -75,14 +65,9 @@ exports.getPartnerPermissions = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Check specific permission for partner
- * @route GET /api/partner/permissions/check/:menuItem
- * @access Private (Partner only)
- */
-exports.checkPermission = async (req, res) => {
+export async function checkPermission(req, res) {
   try {
     const user = await User.findById(req.user.id).populate('roleTemplate');
 
@@ -106,7 +91,6 @@ exports.checkPermission = async (req, res) => {
       });
     }
 
-    // Check if the permission exists in the role template
     const hasPermission = roleTemplate.permissions.includes(menuItem);
 
     res.status(200).json({
@@ -125,14 +109,9 @@ exports.checkPermission = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Get available menu items for partner
- * @route GET /api/partner/menu-items
- * @access Private (Partner only)
- */
-exports.getAvailableMenuItems = async (req, res) => {
+export async function getAvailableMenuItems(req, res) {
   try {
     const user = await User.findById(req.user.id).populate('roleTemplate');
 
@@ -180,16 +159,9 @@ exports.getAvailableMenuItems = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-// ============ ADMIN FUNCTIONS ============
-
-/**
- * Get all partner permissions (Admin only)
- * @route GET /api/admin/partner-permissions
- * @access Private (Admin only)
- */
-exports.getAllPartnerPermissions = async (req, res) => {
+export async function getAllPartnerPermissions(req, res) {
   try {
     const { page = 1, limit = 10, search, roleTemplate, isActive } = req.query;
 
@@ -217,7 +189,6 @@ exports.getAllPartnerPermissions = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    // Apply search filter if provided
     if (search) {
       const searchRegex = new RegExp(search, 'i');
       permissions = permissions.filter(
@@ -251,14 +222,9 @@ exports.getAllPartnerPermissions = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Get partner permissions by ID (Admin only)
- * @route GET /api/admin/partner-permissions/:partnerId
- * @access Private (Admin only)
- */
-exports.getPartnerPermissionsById = async (req, res) => {
+export async function getPartnerPermissionsById(req, res) {
   try {
     const { partnerId } = req.params;
 
@@ -274,7 +240,6 @@ exports.getPartnerPermissionsById = async (req, res) => {
       .populate('lastUpdatedBy', 'name email');
 
     if (!permissions) {
-      // Create default permissions if none exist
       const partner = await Partner.findById(partnerId);
       if (!partner) {
         throw new ApiError('Partner not found', 404);
@@ -301,14 +266,9 @@ exports.getPartnerPermissionsById = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Update partner permissions (Admin only)
- * @route PUT /api/admin/partner-permissions/:partnerId
- * @access Private (Admin only)
- */
-exports.updatePartnerPermissions = async (req, res) => {
+export async function updatePartnerPermissions(req, res) {
   try {
     const { partnerId } = req.params;
     const {
@@ -323,11 +283,9 @@ exports.updatePartnerPermissions = async (req, res) => {
     let permissions = await PartnerPermission.findOne({ partner: partnerId });
 
     if (!permissions) {
-      // Create new permissions if none exist
       permissions = await PartnerPermission.createDefaultPermissions(partnerId);
     }
 
-    // Update individual permissions if provided
     if (newPermissions && typeof newPermissions === 'object') {
       for (const [menuItem, permissionData] of Object.entries(newPermissions)) {
         if (permissionData.granted !== undefined) {
@@ -344,18 +302,16 @@ exports.updatePartnerPermissions = async (req, res) => {
       }
     }
 
-    // Apply role template if provided
     if (roleTemplate && roleTemplate !== permissions.roleTemplate) {
       await permissions.applyRoleTemplate(roleTemplate, req.user.id);
     }
 
-    // Update other fields
     if (isActive !== undefined) {
       permissions.isActive = isActive;
     }
 
     if (notes) {
-      permissions.notes = sanitizeXSS(notes);
+      permissions.notes = sanitizeData(notes);
     }
 
     if (businessLimits) {
@@ -375,7 +331,6 @@ exports.updatePartnerPermissions = async (req, res) => {
     permissions.lastUpdatedBy = req.user.id;
     await permissions.save();
 
-    // Populate the response
     await permissions.populate([
       {
         path: 'partner',
@@ -400,14 +355,9 @@ exports.updatePartnerPermissions = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Grant specific permission to partner (Admin only)
- * @route POST /api/admin/partner-permissions/:partnerId/grant
- * @access Private (Admin only)
- */
-exports.grantPermission = async (req, res) => {
+export async function grantPermission(req, res) {
   try {
     const { partnerId } = req.params;
     const { menuItem, restrictions = {} } = req.body;
@@ -442,14 +392,9 @@ exports.grantPermission = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Revoke specific permission from partner (Admin only)
- * @route POST /api/admin/partner-permissions/:partnerId/revoke
- * @access Private (Admin only)
- */
-exports.revokePermission = async (req, res) => {
+export async function revokePermission(req, res) {
   try {
     const { partnerId } = req.params;
     const { menuItem } = req.body;
@@ -483,14 +428,9 @@ exports.revokePermission = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Apply role template to partner (Admin only)
- * @route POST /api/admin/partner-permissions/:partnerId/apply-role
- * @access Private (Admin only)
- */
-exports.applyRoleTemplate = async (req, res) => {
+export async function applyRoleTemplate(req, res) {
   try {
     const { partnerId } = req.params;
     const { roleTemplate } = req.body;
@@ -522,24 +462,16 @@ exports.applyRoleTemplate = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Get available role templates (Admin only)
- * @route GET /api/admin/partner-permissions/role-templates
- * @access Private (Admin only)
- */
-exports.getRoleTemplates = async (req, res) => {
+export async function getRoleTemplates(req, res) {
   try {
-    // Get all active templates from database
     let roleTemplates = await RoleTemplate.getActiveTemplates();
 
-    // If no templates exist, create default ones
     if (roleTemplates.length === 0) {
       roleTemplates = await RoleTemplate.createDefaultTemplates(req.user.id);
     }
 
-    // Populate createdBy field
     roleTemplates = await RoleTemplate.populate(roleTemplates, {
       path: 'createdBy',
       select: 'name email',
@@ -557,14 +489,9 @@ exports.getRoleTemplates = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Create new role template (Admin only)
- * @route POST /api/admin/partner-permissions/role-templates
- * @access Private (Admin only)
- */
-exports.createRoleTemplate = async (req, res) => {
+export async function createRoleTemplate(req, res) {
   try {
     const {
       name,
@@ -576,7 +503,6 @@ exports.createRoleTemplate = async (req, res) => {
       limits,
     } = req.body;
 
-    // Validate required fields
     if (!name || !displayName) {
       return res.status(400).json({
         success: false,
@@ -591,7 +517,6 @@ exports.createRoleTemplate = async (req, res) => {
       });
     }
 
-    // Check if template with this name already exists
     const existingTemplate = await RoleTemplate.findOne({
       name: name.toLowerCase().replace(/\s+/g, '_'),
     });
@@ -603,7 +528,6 @@ exports.createRoleTemplate = async (req, res) => {
       });
     }
 
-    // Create the new role template in database
     const newRoleTemplate = await RoleTemplate.create({
       name: name.toLowerCase().replace(/\s+/g, '_'),
       displayName,
@@ -627,7 +551,6 @@ exports.createRoleTemplate = async (req, res) => {
       createdBy: req.user.id,
     });
 
-    // Populate createdBy field
     await newRoleTemplate.populate('createdBy', 'name email');
 
     res.status(201).json({
@@ -638,7 +561,6 @@ exports.createRoleTemplate = async (req, res) => {
   } catch (error) {
     console.error('Error creating role template:', error);
 
-    // Handle unique constraint error
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -651,20 +573,14 @@ exports.createRoleTemplate = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Update role template (Admin only)
- * @route PUT /api/admin/partner-permissions/role-templates/:templateId
- * @access Private (Admin only)
- */
-exports.updateRoleTemplate = async (req, res) => {
+export async function updateRoleTemplate(req, res) {
   try {
     const { templateId } = req.params;
     const { displayName, description, color, permissions, features, limits } =
       req.body;
 
-    // Validate template ID
     if (!templateId) {
       return res.status(400).json({
         success: false,
@@ -672,7 +588,6 @@ exports.updateRoleTemplate = async (req, res) => {
       });
     }
 
-    // Find the template in database by _id or name
     let roleTemplate = await RoleTemplate.findOne({
       $or: [{ _id: templateId }, { name: templateId }],
     });
@@ -684,7 +599,6 @@ exports.updateRoleTemplate = async (req, res) => {
       });
     }
 
-    // Update fields if provided
     if (displayName) roleTemplate.displayName = displayName;
     if (description !== undefined) roleTemplate.description = description;
     if (color) roleTemplate.color = color;
@@ -695,10 +609,8 @@ exports.updateRoleTemplate = async (req, res) => {
 
     roleTemplate.updatedBy = req.user.id;
 
-    // Save to database
     await roleTemplate.save();
 
-    // Populate fields
     await roleTemplate.populate([
       { path: 'createdBy', select: 'name email' },
       { path: 'updatedBy', select: 'name email' },
@@ -716,18 +628,12 @@ exports.updateRoleTemplate = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Delete role template (Admin only)
- * @route DELETE /api/admin/partner-permissions/role-templates/:templateId
- * @access Private (Admin only)
- */
-exports.deleteRoleTemplate = async (req, res) => {
+export async function deleteRoleTemplate(req, res) {
   try {
     const { templateId } = req.params;
 
-    // Validate template ID
     if (!templateId) {
       return res.status(400).json({
         success: false,
@@ -735,7 +641,6 @@ exports.deleteRoleTemplate = async (req, res) => {
       });
     }
 
-    // Find the template in database by _id or name
     const roleTemplate = await RoleTemplate.findOne({
       $or: [{ _id: templateId }, { name: templateId }],
     });
@@ -747,7 +652,6 @@ exports.deleteRoleTemplate = async (req, res) => {
       });
     }
 
-    // Check if it's a default template (shouldn't be deleted)
     if (roleTemplate.isDefault) {
       return res.status(400).json({
         success: false,
@@ -755,7 +659,6 @@ exports.deleteRoleTemplate = async (req, res) => {
       });
     }
 
-    // Check if any partners are using this template
     const partnersUsingTemplate = await PartnerPermission.countDocuments({
       roleTemplate: roleTemplate.name,
     });
@@ -767,7 +670,6 @@ exports.deleteRoleTemplate = async (req, res) => {
       });
     }
 
-    // Delete from database
     await RoleTemplate.deleteOne({ _id: roleTemplate._id });
 
     res.status(200).json({
@@ -781,14 +683,9 @@ exports.deleteRoleTemplate = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Create new permission type (Admin only)
- * @route POST /api/admin/partner-permissions/create-permission
- * @access Private (Admin only)
- */
-exports.createPermission = async (req, res) => {
+export async function createPermission(req, res) {
   try {
     const {
       name,
@@ -800,12 +697,10 @@ exports.createPermission = async (req, res) => {
       requiredPermission,
     } = req.body;
 
-    // Validate required fields
     if (!name || !displayName || !category) {
       throw new ApiError('Name, display name, and category are required', 400);
     }
 
-    // Sanitize inputs
     const sanitizedData = {
       name: sanitizeData(name.toLowerCase().replace(/\s+/g, '')), // Convert to camelCase
       displayName: sanitizeData(displayName),
@@ -826,8 +721,6 @@ exports.createPermission = async (req, res) => {
       throw new ApiError('Permission with this name already exists', 400);
     }
 
-    // Here you would typically save to a permissions configuration file or database
-    // For now, we'll simulate the creation and return the new permission structure
     const newPermission = {
       name: sanitizedData.displayName,
       path: sanitizedData.path,
@@ -838,11 +731,6 @@ exports.createPermission = async (req, res) => {
       createdBy: req.user.id,
       createdAt: new Date(),
     };
-
-    // In a real implementation, you would:
-    // 1. Save the new permission to a configuration file or database
-    // 2. Update the MENU_ITEMS constant in the model
-    // 3. Possibly restart the application or reload the configuration
 
     res.status(201).json({
       success: true,
@@ -859,14 +747,9 @@ exports.createPermission = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}
 
-/**
- * Get menu items structure (Admin only)
- * @route GET /api/admin/partner-permissions/menu-items
- * @access Private (Admin only)
- */
-exports.getMenuItemsStructure = async (req, res) => {
+export async function getMenuItemsStructure(req, res) {
   try {
     const menuItems = PartnerPermission.getMenuItems();
 
@@ -882,4 +765,4 @@ exports.getMenuItemsStructure = async (req, res) => {
       message: error.message || 'Server error',
     });
   }
-};
+}

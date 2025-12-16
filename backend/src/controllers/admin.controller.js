@@ -1,23 +1,35 @@
-const User = require('../models/user.model');
-const Partner = require('../models/partner.model');
-const Product = require('../models/product.model');
-const Agent = require('../models/agent.model');
-const { Order } = require('../models/order.model');
-const Transaction = require('../models/transaction.model');
-const Inventory = require('../models/inventory.model');
-const Wallet = require('../models/wallet.model');
-const ConditionQuestionnaire = require('../models/conditionQuestionnaire.model');
-const ApiError = require('../utils/apiError');
-const { generateToken } = require('../utils/jwt.utils');
-const { validationResult } = require('express-validator');
-const mongoose = require('mongoose');
+import { validationResult } from 'express-validator';
+import mongoose from 'mongoose';
 
-// @desc    Admin login
-// @route   POST /api/admin/login
-// @access  Public
-const loginAdmin = async (req, res) => {
+import { Agent } from '../models/agent.model.js';
+import { ConditionQuestionnaire } from '../models/conditionQuestionnaire.model.js';
+import { Inventory } from '../models/inventory.model.js';
+import { Order } from '../models/order.model.js';
+import { Partner } from '../models/partner.model.js';
+import { Product } from '../models/product.model.js';
+import { Transaction } from '../models/transaction.model.js';
+import { User } from '../models/user.model.js';
+import { Wallet } from '../models/wallet.model.js';
+import ApiError from '../utils/apiError.js';
+import { generateToken } from '../utils/jwt.utils.js';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const loginAdmin = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -25,12 +37,10 @@ const loginAdmin = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find user by email
     const user = await User.findOne({ email, role: 'admin' }).select(
       '+password'
     );
 
-    // Check if user exists and password matches
     if (user && (await user.matchPassword(password))) {
       res.json({
         _id: user._id,
@@ -48,10 +58,7 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-// @desc    Get admin profile
-// @route   GET /api/admin/profile
-// @access  Private/Admin
-const getAdminProfile = async (req, res) => {
+export const getAdminProfile = async (req, res) => {
   try {
     const admin = await User.findById(req.user._id);
 
@@ -71,12 +78,8 @@ const getAdminProfile = async (req, res) => {
   }
 };
 
-// @desc    Create a new admin user
-// @route   POST /api/admin/create
-// @access  Private/Admin
-const createAdmin = async (req, res) => {
+export const createAdmin = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -84,13 +87,11 @@ const createAdmin = async (req, res) => {
 
     const { name, email, password, phone } = req.body;
 
-    // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create new admin user
     const admin = await User.create({
       name,
       email,
@@ -115,10 +116,7 @@ const createAdmin = async (req, res) => {
   }
 };
 
-// @desc    Get all partners with verification status
-// @route   GET /api/admin/partners
-// @access  Private/Admin
-const getAllPartners = async (req, res) => {
+export const getAllPartners = async (req, res) => {
   try {
     const { status, page = 1, limit = 10, search } = req.query;
 
@@ -139,13 +137,11 @@ const getAllPartners = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    // Fetch wallet data for each partner
     const partnersWithWallet = await Promise.all(
       partners.map(async (partner) => {
         const wallet = await Wallet.findOne({ partner: partner._id });
         const partnerObj = partner.toObject();
 
-        // Update wallet data with actual wallet from Wallet collection
         if (wallet) {
           partnerObj.wallet = {
             balance: wallet.balance,
@@ -171,10 +167,7 @@ const getAllPartners = async (req, res) => {
   }
 };
 
-// @desc    Get partner by ID
-// @route   GET /api/admin/partners/:id
-// @access  Private/Admin
-const getPartnerById = async (req, res) => {
+export const getPartnerById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -186,7 +179,6 @@ const getPartnerById = async (req, res) => {
       return res.status(404).json({ message: 'Partner not found' });
     }
 
-    // Get additional stats
     const inventoryCount = await Inventory.countDocuments({ partner: id });
     const orderCount = await Order.countDocuments({ 'items.partner': id });
 
@@ -206,18 +198,14 @@ const getPartnerById = async (req, res) => {
   }
 };
 
-// @desc    Create new partner
-// @route   POST /api/admin/partners
-// @access  Private/Admin
-const createPartner = async (req, res) => {
+export const createPartner = async (req, res) => {
   try {
     const {
-      // User details (for new partner creation)
       name,
       email,
       phone,
       password,
-      // Partner details
+
       userId,
       shopName,
       shopAddress,
@@ -233,15 +221,12 @@ const createPartner = async (req, res) => {
     let user;
     let isNewUser = false;
 
-    // Check if this is a new partner creation (with user details) or existing user
     if (userId) {
-      // Existing user flow
       user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Check if user already has a partner profile
       const existingPartner = await Partner.findOne({ user: userId });
       if (existingPartner) {
         return res
@@ -249,7 +234,6 @@ const createPartner = async (req, res) => {
           .json({ message: 'User already has a partner profile' });
       }
     } else {
-      // New user creation flow
       if (!name || !email || !phone || !password) {
         return res.status(400).json({
           message:
@@ -257,7 +241,6 @@ const createPartner = async (req, res) => {
         });
       }
 
-      // Check if user with email already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res
@@ -265,7 +248,6 @@ const createPartner = async (req, res) => {
           .json({ message: 'User with this email already exists' });
       }
 
-      // Create new user
       user = await User.create({
         name,
         email,
@@ -276,13 +258,11 @@ const createPartner = async (req, res) => {
       isNewUser = true;
     }
 
-    // Check if GST number is unique
     const existingGST = await Partner.findOne({ gstNumber });
     if (existingGST) {
       return res.status(400).json({ message: 'GST number already exists' });
     }
 
-    // Create partner
     const partner = await Partner.create({
       user: user._id,
       shopName,
@@ -298,12 +278,10 @@ const createPartner = async (req, res) => {
       isVerified: false,
     });
 
-    // Update user role to partner (if not already set for new users)
     if (!isNewUser) {
       await User.findByIdAndUpdate(user._id, { role: 'partner' });
     }
 
-    // Create wallet for the new partner
     await Wallet.create({
       partner: partner._id,
       balance: 0,
@@ -323,7 +301,6 @@ const createPartner = async (req, res) => {
   } catch (error) {
     console.error('Error creating partner:', error);
     if (error.code === 11000) {
-      // Handle duplicate key errors
       if (error.keyPattern?.email) {
         return res.status(400).json({ message: 'Email already exists' });
       }
@@ -336,21 +313,16 @@ const createPartner = async (req, res) => {
   }
 };
 
-// @desc    Update partner
-// @route   PUT /api/admin/partners/:id
-// @access  Private/Admin
-const updatePartner = async (req, res) => {
+export const updatePartner = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
 
-    // Remove fields that shouldn't be updated directly
     delete updateData.user;
     delete updateData._id;
     delete updateData.createdAt;
     delete updateData.updatedAt;
 
-    // If GST number is being updated, check uniqueness
     if (updateData.gstNumber) {
       const existingGST = await Partner.findOne({
         gstNumber: updateData.gstNumber,
@@ -384,10 +356,7 @@ const updatePartner = async (req, res) => {
   }
 };
 
-// @desc    Delete partner
-// @route   DELETE /api/admin/partners/:id
-// @access  Private/Admin
-const deletePartner = async (req, res) => {
+export const deletePartner = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -396,7 +365,6 @@ const deletePartner = async (req, res) => {
       return res.status(404).json({ message: 'Partner not found' });
     }
 
-    // Check for active inventory
     const activeInventory = await Inventory.countDocuments({
       partner: id,
       isAvailable: true,
@@ -410,7 +378,6 @@ const deletePartner = async (req, res) => {
       });
     }
 
-    // Check for pending orders
     const pendingOrders = await Order.countDocuments({
       'items.partner': id,
       'items.status': { $in: ['pending', 'processing', 'shipped'] },
@@ -423,16 +390,13 @@ const deletePartner = async (req, res) => {
       });
     }
 
-    // Delete related data
     await Promise.all([
       Inventory.deleteMany({ partner: id }),
       Wallet.deleteOne({ partner: id }),
     ]);
 
-    // Update user role back to 'user'
     await User.findByIdAndUpdate(partner.user, { role: 'user' });
 
-    // Delete partner
     await Partner.findByIdAndDelete(id);
 
     res.json({
@@ -445,10 +409,7 @@ const deletePartner = async (req, res) => {
   }
 };
 
-// @desc    Verify/Reject partner
-// @route   PUT /api/admin/partners/:id/verify
-// @access  Private/Admin
-const verifyPartner = async (req, res) => {
+export const verifyPartner = async (req, res) => {
   try {
     const { id } = req.params;
     const { status, notes } = req.body;
@@ -472,7 +433,6 @@ const verifyPartner = async (req, res) => {
       return res.status(404).json({ message: 'Partner not found' });
     }
 
-    // Create wallet for approved partner
     if (status === 'approved') {
       const existingWallet = await Wallet.findOne({ partner: partner._id });
       if (!existingWallet) {
@@ -487,21 +447,16 @@ const verifyPartner = async (req, res) => {
   }
 };
 
-// @desc    Update partner wallet balance
-// @route   POST /api/admin/partners/:id/wallet/update
-// @access  Private/Admin
-const updatePartnerWallet = async (req, res) => {
+export const updatePartnerWallet = async (req, res) => {
   try {
     const { id } = req.params;
     const { amount, reason, type } = req.body;
 
-    // Find partner
     const partner = await Partner.findById(id);
     if (!partner) {
       return res.status(404).json({ message: 'Partner not found' });
     }
 
-    // Find or create wallet
     let wallet = await Wallet.findOne({ partner: id });
     if (!wallet) {
       wallet = await Wallet.create({
@@ -511,11 +466,9 @@ const updatePartnerWallet = async (req, res) => {
       });
     }
 
-    // Update balance
     const oldBalance = wallet.balance;
     wallet.balance += amount;
 
-    // Ensure balance doesn't go negative
     if (wallet.balance < 0) {
       return res.status(400).json({
         message:
@@ -523,10 +476,8 @@ const updatePartnerWallet = async (req, res) => {
       });
     }
 
-    // Also update the partner's embedded wallet balance
     partner.wallet.balance = wallet.balance;
 
-    // Create transaction record
     const transaction = await Transaction.create({
       partner: id,
       transactionType: amount > 0 ? 'wallet_credit' : 'wallet_debit',
@@ -542,7 +493,6 @@ const updatePartnerWallet = async (req, res) => {
       },
     });
 
-    // Also create a finance record for the admin finance dashboard
     const Finance = require('../models/finance.model');
     await Finance.create({
       transactionType: amount > 0 ? 'deposit' : 'withdrawal',
@@ -552,7 +502,7 @@ const updatePartnerWallet = async (req, res) => {
       paymentMethod: 'wallet',
       category: 'other',
       description: `Admin wallet ${type}: ${reason || 'Manual adjustment'}`,
-      processedBy: req.user?._id || req.user?.id, // Admin who performed the action
+      processedBy: req.user?._id || req.user?.id,
       processedAt: new Date(),
       metadata: {
         originalAmount: Math.abs(amount),
@@ -564,12 +514,10 @@ const updatePartnerWallet = async (req, res) => {
       },
     });
 
-    // Add transaction to wallet and partner
     wallet.transactions.push(transaction._id);
     wallet.lastUpdated = new Date();
     partner.wallet.transactions.push(transaction._id);
 
-    // Save both wallet and partner
     await Promise.all([wallet.save(), partner.save()]);
 
     res.json({
@@ -588,10 +536,7 @@ const updatePartnerWallet = async (req, res) => {
   }
 };
 
-// @desc    Get all orders with filtering
-// @route   GET /api/admin/orders
-// @access  Private/Admin
-const getAllOrders = async (req, res) => {
+export const getAllOrders = async (req, res) => {
   try {
     const {
       type,
@@ -638,10 +583,7 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-// @desc    Get single order by ID
-// @route   GET /api/admin/orders/:id
-// @access  Private/Admin
-const getOrderById = async (req, res) => {
+export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
       .populate('user', 'name email phone')
@@ -653,26 +595,20 @@ const getOrderById = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Enhanced order response with complete tracking details
     const orderResponse = {
       _id: order._id,
       assessmentId: order.assessmentId,
       orderType: order.orderType,
 
-      // User details
       user: order.user,
 
-      // Partner details
       partner: order.partner,
 
-      // Items with complete details
       items: order.items,
 
-      // Financial details
       totalAmount: order.totalAmount,
       commission: order.commission,
 
-      // Payment tracking
       paymentDetails: {
         method: order.paymentDetails?.method,
         transactionId: order.paymentDetails?.transactionId,
@@ -680,7 +616,6 @@ const getOrderById = async (req, res) => {
         paidAt: order.paymentDetails?.paidAt,
       },
 
-      // Shipping and delivery tracking
       shippingDetails: {
         address: order.shippingDetails?.address,
         contactPhone: order.shippingDetails?.contactPhone,
@@ -690,23 +625,17 @@ const getOrderById = async (req, res) => {
         deliveredAt: order.shippingDetails?.deliveredAt,
       },
 
-      // Current status
       status: order.status,
 
-      // Complete status history for tracking
       statusHistory: order.statusHistory || [],
 
-      // Additional notes
       notes: order.notes,
 
-      // Timestamps
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
 
-      // Order timeline for better tracking visualization
       timeline: generateOrderTimeline(order),
 
-      // Order progress percentage
       progressPercentage: calculateOrderProgress(order.status),
     };
 
@@ -717,11 +646,9 @@ const getOrderById = async (req, res) => {
   }
 };
 
-// Helper function to generate order timeline
 const generateOrderTimeline = (order) => {
   const timeline = [];
 
-  // Add creation event
   timeline.push({
     status: 'created',
     timestamp: order.createdAt,
@@ -730,7 +657,6 @@ const generateOrderTimeline = (order) => {
     completed: true,
   });
 
-  // Add status history events
   if (order.statusHistory && order.statusHistory.length > 0) {
     order.statusHistory.forEach((history) => {
       timeline.push({
@@ -743,7 +669,6 @@ const generateOrderTimeline = (order) => {
     });
   }
 
-  // Add future steps based on current status
   const futureSteps = getFutureSteps(order.status);
   futureSteps.forEach((step) => {
     timeline.push({
@@ -764,7 +689,6 @@ const generateOrderTimeline = (order) => {
   });
 };
 
-// Helper function to get status title
 const getStatusTitle = (status) => {
   const statusTitles = {
     pending: 'Order Pending',
@@ -782,7 +706,6 @@ const getStatusTitle = (status) => {
   );
 };
 
-// Helper function to get status description
 const getStatusDescription = (status) => {
   const statusDescriptions = {
     pending: 'Order is awaiting confirmation',
@@ -798,7 +721,6 @@ const getStatusDescription = (status) => {
   return statusDescriptions[status] || `Order status updated to ${status}`;
 };
 
-// Helper function to get future steps
 const getFutureSteps = (currentStatus) => {
   const statusFlow = {
     pending: [
@@ -913,7 +835,6 @@ const getFutureSteps = (currentStatus) => {
   return statusFlow[currentStatus] || [];
 };
 
-// Helper function to calculate order progress percentage
 const calculateOrderProgress = (status) => {
   const progressMap = {
     pending: 10,
@@ -930,14 +851,10 @@ const calculateOrderProgress = (status) => {
   return progressMap[status] || 0;
 };
 
-// @desc    Get dashboard analytics
-// @route   GET /api/admin/analytics
-// @access  Private/Admin
-const getDashboardAnalytics = async (req, res) => {
+export const getDashboardAnalytics = async (req, res) => {
   try {
     const { period = '30d' } = req.query;
 
-    // Calculate date range
     const endDate = new Date();
     const startDate = new Date();
 
@@ -958,7 +875,6 @@ const getDashboardAnalytics = async (req, res) => {
         startDate.setDate(endDate.getDate() - 30);
     }
 
-    // Get basic counts
     const [totalUsers, totalPartners, totalOrders, totalProducts] =
       await Promise.all([
         User.countDocuments({ role: { $ne: 'admin' } }),
@@ -967,7 +883,6 @@ const getDashboardAnalytics = async (req, res) => {
         Product.countDocuments(),
       ]);
 
-    // Get period-specific data
     const periodFilter = { createdAt: { $gte: startDate, $lte: endDate } };
 
     const [newUsers, newPartners, newOrders] = await Promise.all([
@@ -976,7 +891,6 @@ const getDashboardAnalytics = async (req, res) => {
       Order.countDocuments(periodFilter),
     ]);
 
-    // Revenue analytics
     const revenueData = await Order.aggregate([
       {
         $match: {
@@ -994,7 +908,6 @@ const getDashboardAnalytics = async (req, res) => {
       },
     ]);
 
-    // Order status distribution
     const orderStatusData = await Order.aggregate([
       { $match: periodFilter },
       {
@@ -1005,7 +918,6 @@ const getDashboardAnalytics = async (req, res) => {
       },
     ]);
 
-    // Top performing partners
     const topPartners = await Order.aggregate([
       {
         $match: {
@@ -1034,7 +946,6 @@ const getDashboardAnalytics = async (req, res) => {
       { $limit: 5 },
     ]);
 
-    // Daily order trends
     const dailyTrends = await Order.aggregate([
       { $match: periodFilter },
       {
@@ -1051,13 +962,11 @@ const getDashboardAnalytics = async (req, res) => {
       { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } },
     ]);
 
-    // Condition Questionnaire analytics
     const [totalQuestionnaires, completedQuestionnaires] = await Promise.all([
       ConditionQuestionnaire.countDocuments(),
       ConditionQuestionnaire.countDocuments({ status: 'active' }),
     ]);
 
-    // Device category analytics
     const deviceAnalytics = await Product.aggregate([
       {
         $group: {
@@ -1068,7 +977,6 @@ const getDashboardAnalytics = async (req, res) => {
       { $sort: { count: -1 } },
     ]);
 
-    // Activity analytics (users active today)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const activeToday = await User.countDocuments({
@@ -1076,7 +984,6 @@ const getDashboardAnalytics = async (req, res) => {
       role: { $ne: 'admin' },
     });
 
-    // Performance metrics
     const totalVisits = await Order.countDocuments();
     const completedOrders = await Order.countDocuments({ status: 'completed' });
     const conversionRate =
@@ -1133,10 +1040,7 @@ const getDashboardAnalytics = async (req, res) => {
   }
 };
 
-// @desc    Manage product catalog
-// @route   GET /api/admin/catalog
-// @access  Private/Admin
-const getCatalog = async (req, res) => {
+export const getCatalog = async (req, res) => {
   try {
     const {
       category,
@@ -1152,11 +1056,9 @@ const getCatalog = async (req, res) => {
       maxPrice,
     } = req.query;
 
-    // Validate pagination parameters
     const pageNum = Math.max(1, parseInt(page));
-    const limitNum = Math.min(50, Math.max(1, parseInt(limit))); // Max 50 items per page
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit)));
 
-    // Build filter object
     const filter = {};
 
     if (category && category !== 'all') {
@@ -1168,7 +1070,6 @@ const getCatalog = async (req, res) => {
     }
 
     if (model && model !== 'all') {
-      // Handle model filtering with case-insensitive matching and URL decoding
       const decodedModel = decodeURIComponent(model);
       filter.model = { $regex: decodedModel.trim(), $options: 'i' };
     }
@@ -1177,7 +1078,6 @@ const getCatalog = async (req, res) => {
       filter.status = status;
     }
 
-    // Price range filter
     if (minPrice || maxPrice) {
       filter.basePrice = {};
       if (minPrice && !isNaN(minPrice)) {
@@ -1188,7 +1088,6 @@ const getCatalog = async (req, res) => {
       }
     }
 
-    // Search filter (only if no specific model is provided)
     if (search && search.trim() && !model) {
       const searchRegex = { $regex: search.trim(), $options: 'i' };
       filter.$or = [
@@ -1199,7 +1098,6 @@ const getCatalog = async (req, res) => {
       ];
     }
 
-    // Build sort object
     const sortOptions = {};
     const validSortFields = [
       'createdAt',
@@ -1213,7 +1111,6 @@ const getCatalog = async (req, res) => {
     const sortDirection = sortOrder === 'asc' ? 1 : -1;
     sortOptions[sortField] = sortDirection;
 
-    // Execute queries in parallel for better performance
     const [products, total, brands, categories, statusCounts] =
       await Promise.all([
         Product.find(filter)
@@ -1228,7 +1125,6 @@ const getCatalog = async (req, res) => {
         Product.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
       ]);
 
-    // Calculate price range
     const priceStats = await Product.aggregate([
       {
         $group: {
@@ -1287,12 +1183,8 @@ const getCatalog = async (req, res) => {
   }
 };
 
-// @desc    Add new product to catalog
-// @route   POST /api/admin/catalog
-// @access  Private/Admin
-const addProduct = async (req, res) => {
+export const addProduct = async (req, res) => {
   try {
-    // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -1316,7 +1208,6 @@ const addProduct = async (req, res) => {
       features,
     } = req.body;
 
-    // Required field validation
     if (!category || !brand || !model || !basePrice) {
       return res.status(400).json({
         success: false,
@@ -1325,7 +1216,6 @@ const addProduct = async (req, res) => {
       });
     }
 
-    // Validate price
     if (isNaN(basePrice) || parseFloat(basePrice) <= 0) {
       return res.status(400).json({
         success: false,
@@ -1333,7 +1223,6 @@ const addProduct = async (req, res) => {
       });
     }
 
-    // Validate depreciation rate
     if (
       depreciationRate &&
       (isNaN(depreciationRate) ||
@@ -1346,7 +1235,6 @@ const addProduct = async (req, res) => {
       });
     }
 
-    // Check for duplicate product
     const existingProduct = await Product.findOne({
       category: category.toLowerCase(),
       brand: brand.toLowerCase(),
@@ -1360,7 +1248,6 @@ const addProduct = async (req, res) => {
       });
     }
 
-    // Process images
     let processedImages = [];
     if (images) {
       if (typeof images === 'string') {
@@ -1373,7 +1260,6 @@ const addProduct = async (req, res) => {
         processedImages = images;
       }
 
-      // Validate and clean image URLs
       processedImages = processedImages
         .map((img) => {
           if (typeof img === 'string') return img.trim();
@@ -1397,7 +1283,6 @@ const addProduct = async (req, res) => {
       }
     }
 
-    // Create product data
     const productData = {
       category: category.toLowerCase(),
       brand: brand.trim(),
@@ -1433,7 +1318,6 @@ const addProduct = async (req, res) => {
   } catch (error) {
     console.error('Error adding product to catalog:', error);
 
-    // Handle specific MongoDB errors
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
@@ -1463,10 +1347,7 @@ const addProduct = async (req, res) => {
   }
 };
 
-// @desc    Upload product images to Cloudinary
-// @route   POST /api/admin/catalog/upload-images
-// @access  Private/Admin
-const uploadProductImages = async (req, res) => {
+export const uploadProductImages = async (req, res) => {
   try {
     const cloudinary = require('../config/cloudinary.config');
     const uploadedImages = [];
@@ -1475,7 +1356,6 @@ const uploadProductImages = async (req, res) => {
       return res.status(400).json({ message: 'No images provided' });
     }
 
-    // Upload each image to Cloudinary
     for (const file of req.files) {
       try {
         const result = await cloudinary.uploader.upload(file.path, {
@@ -1507,14 +1387,10 @@ const uploadProductImages = async (req, res) => {
   }
 };
 
-// @desc    Update product in catalog
-// @route   PUT /api/admin/catalog/:id
-// @access  Private/Admin
-const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate product ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
@@ -1522,7 +1398,6 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    // Check if product exists
     const existingProduct = await Product.findById(id);
     if (!existingProduct) {
       return res.status(404).json({
@@ -1545,7 +1420,6 @@ const updateProduct = async (req, res) => {
       features,
     } = req.body;
 
-    // Build update object with only provided fields
     const updateData = {};
 
     if (category !== undefined) {
@@ -1606,7 +1480,6 @@ const updateProduct = async (req, res) => {
       updateData.features = Array.isArray(features) ? features : [];
     }
 
-    // Process images if provided
     if (images !== undefined) {
       let processedImages = [];
       if (typeof images === 'string') {
@@ -1643,7 +1516,6 @@ const updateProduct = async (req, res) => {
       updateData.specifications = processedSpecs;
     }
 
-    // Check for duplicate if category, brand, or model is being updated
     if (category || brand || model) {
       const checkCategory = category
         ? category.toLowerCase()
@@ -1671,10 +1543,8 @@ const updateProduct = async (req, res) => {
       }
     }
 
-    // Add updated timestamp
     updateData.updatedAt = new Date();
 
-    // Update the product
     const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
@@ -1712,10 +1582,7 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// @desc    Get product by ID
-// @route   GET /api/admin/catalog/:id
-// @access  Private/Admin
-const getProductById = async (req, res) => {
+export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -1735,20 +1602,15 @@ const getProductById = async (req, res) => {
   }
 };
 
-// @desc    Update product status
-// @route   PATCH /api/admin/catalog/:id/status
-// @access  Private/Admin
-const updateProductStatus = async (req, res) => {
+export const updateProductStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
 
-    // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid product ID' });
     }
 
-    // Find and update the product status
     const product = await Product.findByIdAndUpdate(
       id,
       { status },
@@ -1776,15 +1638,11 @@ const updateProductStatus = async (req, res) => {
   }
 };
 
-// @desc    Delete product from catalog
-// @route   DELETE /api/admin/catalog/:id
-// @access  Private/Admin
-const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { force = false } = req.query; // Allow force delete with query param
+    const { force = false } = req.query;
 
-    // Validate product ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
@@ -1792,7 +1650,6 @@ const deleteProduct = async (req, res) => {
       });
     }
 
-    // Check if product exists
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({
@@ -1801,9 +1658,7 @@ const deleteProduct = async (req, res) => {
       });
     }
 
-    // Safety checks before deletion (unless force delete)
     if (!force) {
-      // Check if product has any active orders
       const activeOrders = await Order.find({
         'items.product': id,
         status: { $in: ['pending', 'processing', 'shipped', 'confirmed'] },
@@ -1818,7 +1673,6 @@ const deleteProduct = async (req, res) => {
         });
       }
 
-      // Check if product has inventory
       const inventory = await Inventory.find({ product: id });
       if (inventory.length > 0) {
         const totalStock = inventory.reduce(
@@ -1835,7 +1689,6 @@ const deleteProduct = async (req, res) => {
         }
       }
 
-      // Check if product has recent transactions (last 30 days)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -1855,7 +1708,6 @@ const deleteProduct = async (req, res) => {
       }
     }
 
-    // Store product info for response
     const deletedProductInfo = {
       id: product._id,
       category: product.category,
@@ -1864,13 +1716,11 @@ const deleteProduct = async (req, res) => {
       deletedAt: new Date(),
     };
 
-    // Delete images from Cloudinary if they exist
     if (product.images && product.images.length > 0) {
       const cloudinary = require('../config/cloudinary.config');
 
       for (const imageUrl of product.images) {
         try {
-          // Extract public_id from Cloudinary URL
           const publicId = imageUrl
             .split('/')
             .slice(-2)
@@ -1879,17 +1729,14 @@ const deleteProduct = async (req, res) => {
           await cloudinary.uploader.destroy(`cashify/products/${publicId}`);
         } catch (deleteError) {
           console.error('Error deleting image from Cloudinary:', deleteError);
-          // Continue with product deletion even if image deletion fails
         }
       }
     }
 
-    // If force delete, clean up related data
     if (force) {
       await Promise.all([
-        // Remove from inventory
         Inventory.deleteMany({ product: id }),
-        // Update orders to mark product as deleted
+
         Order.updateMany(
           { 'items.product': id },
           { $set: { 'items.$.productDeleted': true } }
@@ -1897,7 +1744,6 @@ const deleteProduct = async (req, res) => {
       ]);
     }
 
-    // Delete the product
     await Product.findByIdAndDelete(id);
 
     res.json({
@@ -1911,7 +1757,6 @@ const deleteProduct = async (req, res) => {
   } catch (error) {
     console.error('Error deleting product:', error);
 
-    // Handle specific errors
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
@@ -1930,23 +1775,18 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-// @desc    Get commission settings
-// @route   GET /api/admin/commission
-// @access  Private/Admin
-const getCommissionSettings = async (req, res) => {
+export const getCommissionSettings = async (req, res) => {
   try {
-    // This would typically come from a settings collection
-    // For now, returning default values
     const commissionSettings = {
       sellCommission: {
-        mobile: 5, // 5%
-        tablet: 4, // 4%
-        laptop: 3, // 3%
+        mobile: 5,
+        tablet: 4,
+        laptop: 3,
       },
       buyCommission: {
-        mobile: 8, // 8%
-        tablet: 7, // 7%
-        laptop: 6, // 6%
+        mobile: 8,
+        tablet: 7,
+        laptop: 6,
       },
       deliveryCharges: {
         local: 50,
@@ -1962,13 +1802,8 @@ const getCommissionSettings = async (req, res) => {
   }
 };
 
-// @desc    Update commission settings
-// @route   PUT /api/admin/commission
-// @access  Private/Admin
-const updateCommissionSettings = async (req, res) => {
+export const updateCommissionSettings = async (req, res) => {
   try {
-    // This would typically update a settings collection
-    // For now, just returning success
     res.json({ message: 'Commission settings updated successfully' });
   } catch (error) {
     console.error('Error updating commission settings:', error);
@@ -1976,12 +1811,7 @@ const updateCommissionSettings = async (req, res) => {
   }
 };
 
-// User Management Controllers
-
-// @desc    Get all users
-// @route   GET /api/admin/users
-// @access  Private/Admin
-const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -2010,7 +1840,6 @@ const getAllUsers = async (req, res) => {
 
     const total = await User.countDocuments(query);
 
-    // Set cache control headers to prevent 304 responses
     res.set({
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       Pragma: 'no-cache',
@@ -2032,10 +1861,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-// @desc    Get user by ID
-// @route   GET /api/admin/users/:id
-// @access  Private/Admin
-const getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
       .select('-password')
@@ -2055,10 +1881,7 @@ const getUserById = async (req, res) => {
   }
 };
 
-// @desc    Create new user
-// @route   POST /api/admin/users
-// @access  Private/Admin
-const createUser = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -2075,13 +1898,11 @@ const createUser = async (req, res) => {
       roleTemplate,
     } = req.body;
 
-    // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Prepare user data
     const userData = {
       name,
       email,
@@ -2089,31 +1910,26 @@ const createUser = async (req, res) => {
       phone,
       role,
       address,
-      isVerified: true, // Admin created users are verified by default
+      isVerified: true,
     };
 
-    // Add roleTemplate only if role is partner and a template is selected
     if (role === 'partner' && roleTemplate) {
       userData.roleTemplate = roleTemplate;
     }
 
-    // Create new user
     const user = await User.create(userData);
 
-    // If role is partner, create Partner profile automatically
     if (role === 'partner') {
       try {
-        // Check if partner profile already exists
         const existingPartner = await Partner.findOne({ user: user._id });
 
         if (!existingPartner) {
-          // Create basic partner profile with minimal required fields
           await Partner.create({
             user: user._id,
-            shopName: name || 'Partner Shop', // Use user's name as default shop name
+            shopName: name || 'Partner Shop',
             shopEmail: email,
             shopPhone: phone || '0000000000',
-            gstNumber: `GST${Date.now()}`, // Generate temporary GST number
+            gstNumber: `GST${Date.now()}`,
             shopAddress: {
               street: address?.street || '',
               city: address?.city || '',
@@ -2128,12 +1944,9 @@ const createUser = async (req, res) => {
         }
       } catch (partnerError) {
         console.error('Error creating partner profile:', partnerError);
-        // Don't fail the user creation if partner profile creation fails
-        // Partner can complete their profile later
       }
     }
 
-    // Return user without password, with populated roleTemplate
     const userResponse = await User.findById(user._id)
       .select('-password')
       .populate(
@@ -2154,10 +1967,7 @@ const createUser = async (req, res) => {
   }
 };
 
-// @desc    Update user
-// @route   PUT /api/admin/users/:id
-// @access  Private/Admin
-const updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -2172,7 +1982,6 @@ const updateUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Check if email is being changed and if it already exists
     if (email && email !== user.email) {
       const emailExists = await User.findOne({ email });
       if (emailExists) {
@@ -2180,10 +1989,8 @@ const updateUser = async (req, res) => {
       }
     }
 
-    // Store old role to check if it changed
     const oldRole = user.role;
 
-    // Update user fields
     if (name) user.name = name;
     if (email) user.email = email;
     if (phone) user.phone = phone;
@@ -2191,17 +1998,14 @@ const updateUser = async (req, res) => {
     if (address) user.address = { ...user.address, ...address };
     if (typeof isVerified === 'boolean') user.isVerified = isVerified;
 
-    // Update roleTemplate for partner users
     if (role === 'partner' && roleTemplate !== undefined) {
       user.roleTemplate = roleTemplate || null;
     } else if (role !== 'partner') {
-      // Clear roleTemplate if role is changed from partner to something else
       user.roleTemplate = null;
     }
 
     const updatedUser = await user.save();
 
-    // If role changed to partner, create Partner profile if it doesn't exist
     if (role === 'partner' && oldRole !== 'partner') {
       try {
         const existingPartner = await Partner.findOne({
@@ -2250,10 +2054,7 @@ const updateUser = async (req, res) => {
   }
 };
 
-// @desc    Delete user
-// @route   DELETE /api/admin/users/:id
-// @access  Private/Admin
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
 
@@ -2261,7 +2062,6 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Prevent deletion of admin users
     if (user.role === 'admin') {
       return res.status(400).json({ message: 'Cannot delete admin users' });
     }
@@ -2275,10 +2075,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// @desc    Update user password
-// @route   PUT /api/admin/users/:id/password
-// @access  Private/Admin
-const updateUserPassword = async (req, res) => {
+export const updateUserPassword = async (req, res) => {
   try {
     const { newPassword } = req.body;
     const user = await User.findById(req.params.id);
@@ -2287,7 +2084,6 @@ const updateUserPassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Update password (will be hashed by pre-save middleware)
     user.password = newPassword;
     await user.save();
 
@@ -2305,10 +2101,7 @@ const updateUserPassword = async (req, res) => {
   }
 };
 
-// @desc    Get all sell orders
-// @route   GET /api/admin/sell-orders
-// @access  Private/Admin
-const getSellOrders = async (req, res) => {
+export const getSellOrders = async (req, res) => {
   try {
     const {
       page = 1,
@@ -2324,7 +2117,6 @@ const getSellOrders = async (req, res) => {
     const SellOrder = require('../models/sellOrder.model');
     const query = {};
 
-    // Apply filters
     if (status) query.status = status;
     if (startDate || endDate) {
       query.createdAt = {};
@@ -2332,7 +2124,6 @@ const getSellOrders = async (req, res) => {
       if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
-    // Search functionality
     if (search) {
       query.$or = [
         { orderNumber: { $regex: search, $options: 'i' } },
@@ -2387,10 +2178,7 @@ const getSellOrders = async (req, res) => {
   }
 };
 
-// @desc    Get all buy orders
-// @route   GET /api/admin/buy-orders
-// @access  Private/Admin
-const getBuyOrders = async (req, res) => {
+export const getBuyOrders = async (req, res) => {
   try {
     const {
       page = 1,
@@ -2406,7 +2194,6 @@ const getBuyOrders = async (req, res) => {
 
     const query = { orderType: 'buy' };
 
-    // Apply filters
     if (status) query.status = status;
     if (userId) query.user = userId;
     if (partnerId) query.partner = partnerId;
@@ -2447,10 +2234,7 @@ const getBuyOrders = async (req, res) => {
   }
 };
 
-// @desc    Update order status
-// @route   PUT /api/admin/orders/:id/status
-// @access  Private/Admin
-const updateOrderStatus = async (req, res) => {
+export const updateOrderStatus = async (req, res) => {
   try {
     const { status, notes } = req.body;
     const orderId = req.params.id;
@@ -2460,7 +2244,6 @@ const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Update order status
     order.status = status;
     if (notes) {
       order.notes = notes;
@@ -2469,7 +2252,6 @@ const updateOrderStatus = async (req, res) => {
 
     await order.save();
 
-    // Populate order details for response
     await order.populate([
       { path: 'user', select: 'name email phone' },
       { path: 'partner', select: 'businessName email phone' },
@@ -2487,10 +2269,7 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-// @desc    Get partner suggestions for order assignment
-// @route   GET /api/admin/orders/:id/partner-suggestions
-// @access  Private/Admin
-const getPartnerSuggestionsForOrder = async (req, res) => {
+export const getPartnerSuggestionsForOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
 
@@ -2499,19 +2278,16 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Get all verified partners
     const partners = await Partner.find({
       isVerified: true,
       verificationStatus: 'approved',
     }).populate('user', 'name email phone isActive');
 
-    // Check inventory status for each partner
     const partnerSuggestions = await Promise.all(
       partners.map(async (partner) => {
         const partnerObj = partner.toObject();
         partnerObj.inventoryStatus = [];
 
-        // Check each product in the order
         for (const item of order.items) {
           const inventory = await Inventory.findOne({
             partner: partner._id,
@@ -2532,7 +2308,6 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
           });
         }
 
-        // Calculate overall fulfillment capability
         const canFulfillAll = partnerObj.inventoryStatus.every(
           (item) => item.canFulfill
         );
@@ -2552,7 +2327,6 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
       })
     );
 
-    // Sort partners by fulfillment capability
     partnerSuggestions.sort((a, b) => {
       if (
         a.fulfillmentStatus.canFulfillAll &&
@@ -2593,10 +2367,7 @@ const getPartnerSuggestionsForOrder = async (req, res) => {
   }
 };
 
-// @desc    Assign partner to order
-// @route   PUT /api/admin/orders/:id/assign-partner
-// @access  Private/Admin
-const assignPartnerToOrder = async (req, res) => {
+export const assignPartnerToOrder = async (req, res) => {
   try {
     const { partner } = req.body;
     const orderId = req.params.id;
@@ -2606,7 +2377,6 @@ const assignPartnerToOrder = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Verify partner exists
     if (partner) {
       const partnerExists = await Partner.findById(partner);
       if (!partnerExists) {
@@ -2614,7 +2384,6 @@ const assignPartnerToOrder = async (req, res) => {
       }
     }
 
-    // Update order with partner assignment tracking
     order.partner = partner;
     order.partnerAssignment = {
       assignedAt: new Date(),
@@ -2624,7 +2393,6 @@ const assignPartnerToOrder = async (req, res) => {
       },
     };
 
-    // Add to status history
     order.statusHistory.push({
       status: 'partner_assigned',
       timestamp: new Date(),
@@ -2633,7 +2401,6 @@ const assignPartnerToOrder = async (req, res) => {
 
     await order.save();
 
-    // Populate order details for response
     await order.populate([
       { path: 'user', select: 'name email phone' },
       { path: 'partner', select: 'businessName shopName email phone' },
@@ -2653,14 +2420,10 @@ const assignPartnerToOrder = async (req, res) => {
   }
 };
 
-// @desc    Get all brands for admin
-// @route   GET /api/admin/brands
-// @access  Private/Admin
-const getBrands = async (req, res) => {
+export const getBrands = async (req, res) => {
   try {
     const { category, page = 1, limit = 50 } = req.query;
 
-    // Validate pagination parameters
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
 
@@ -2705,7 +2468,6 @@ const getBrands = async (req, res) => {
       { $limit: limitNum },
     ]);
 
-    // Get total count for pagination
     const totalBrands = await Product.aggregate([
       { $match: matchStage },
       { $group: { _id: '$brand' } },
@@ -2735,14 +2497,10 @@ const getBrands = async (req, res) => {
   }
 };
 
-// @desc    Create a new brand by adding a product with that brand
-// @route   POST /api/admin/brands
-// @access  Private/Admin
-const createBrand = async (req, res) => {
+export const createBrand = async (req, res) => {
   try {
     const { brand, category, model, basePrice, variant } = req.body;
 
-    // Comprehensive input validation
     const validationErrors = [];
 
     if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
@@ -2769,7 +2527,6 @@ const createBrand = async (req, res) => {
 
     const brandName = brand.trim().toLowerCase();
 
-    // Check if brand already exists
     const existingBrand = await Product.findOne({ brand: brandName });
     if (existingBrand) {
       return res.status(409).json({
@@ -2779,7 +2536,6 @@ const createBrand = async (req, res) => {
       });
     }
 
-    // Create a new product with the brand (placeholder product for brand creation)
     const productData = {
       category,
       brand: brandName,
@@ -2810,7 +2566,6 @@ const createBrand = async (req, res) => {
   } catch (error) {
     console.error('Error creating brand:', error);
 
-    // Handle specific MongoDB errors
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(
         (err) => err.message
@@ -2841,15 +2596,11 @@ const createBrand = async (req, res) => {
   }
 };
 
-// @desc    Update brand name across all products
-// @route   PUT /api/admin/brands/:brandName
-// @access  Private/Admin
-const updateBrand = async (req, res) => {
+export const updateBrand = async (req, res) => {
   try {
     const { brandName } = req.params;
     const { newBrandName } = req.body;
 
-    // Input validation
     const validationErrors = [];
 
     if (
@@ -2883,7 +2634,6 @@ const updateBrand = async (req, res) => {
     const oldBrandName = brandName.trim().toLowerCase();
     const newBrandNameLower = newBrandName.trim().toLowerCase();
 
-    // Check if trying to update to the same name
     if (oldBrandName === newBrandNameLower) {
       return res.status(400).json({
         success: false,
@@ -2891,7 +2641,6 @@ const updateBrand = async (req, res) => {
       });
     }
 
-    // Check if the original brand exists
     const originalBrand = await Product.findOne({ brand: oldBrandName });
     if (!originalBrand) {
       return res.status(404).json({
@@ -2900,7 +2649,6 @@ const updateBrand = async (req, res) => {
       });
     }
 
-    // Check if new brand name already exists
     const existingBrand = await Product.findOne({ brand: newBrandNameLower });
     if (existingBrand) {
       return res.status(409).json({
@@ -2910,7 +2658,6 @@ const updateBrand = async (req, res) => {
       });
     }
 
-    // Update all products with the old brand name
     const result = await Product.updateMany(
       { brand: oldBrandName },
       {
@@ -2941,7 +2688,6 @@ const updateBrand = async (req, res) => {
   } catch (error) {
     console.error('Error updating brand:', error);
 
-    // Handle specific MongoDB errors
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
@@ -2960,15 +2706,11 @@ const updateBrand = async (req, res) => {
   }
 };
 
-// @desc    Delete brand and all associated products
-// @route   DELETE /api/admin/brands/:brandName
-// @access  Private/Admin
-const deleteBrand = async (req, res) => {
+export const deleteBrand = async (req, res) => {
   try {
     const { brandName } = req.params;
     const { confirmDeletion } = req.body;
 
-    // Input validation
     if (
       !brandName ||
       typeof brandName !== 'string' ||
@@ -2981,7 +2723,6 @@ const deleteBrand = async (req, res) => {
       });
     }
 
-    // Require explicit confirmation for deletion
     if (!confirmDeletion) {
       return res.status(400).json({
         success: false,
@@ -2992,7 +2733,6 @@ const deleteBrand = async (req, res) => {
 
     const brandNameLower = brandName.trim().toLowerCase();
 
-    // Find all products with this brand
     const products = await Product.find({ brand: brandNameLower });
 
     if (products.length === 0) {
@@ -3002,19 +2742,8 @@ const deleteBrand = async (req, res) => {
       });
     }
 
-    // Check for active orders or dependencies before deletion
     const productIds = products.map((p) => p._id);
 
-    // You might want to check for active orders here
-    // const activeOrders = await Order.find({ productId: { $in: productIds }, status: { $in: ['pending', 'processing'] } });
-    // if (activeOrders.length > 0) {
-    //   return res.status(409).json({
-    //     success: false,
-    //     message: `Cannot delete brand. ${activeOrders.length} active orders found for products of this brand`
-    //   });
-    // }
-
-    // Delete all products with this brand
     const result = await Product.deleteMany({ brand: brandNameLower });
 
     if (result.deletedCount === 0) {
@@ -3037,7 +2766,6 @@ const deleteBrand = async (req, res) => {
   } catch (error) {
     console.error('Error deleting brand:', error);
 
-    // Handle specific MongoDB errors
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
@@ -3056,14 +2784,10 @@ const deleteBrand = async (req, res) => {
   }
 };
 
-// @desc    Get all models for admin
-// @route   GET /api/admin/models
-// @access  Private/Admin
-const getModels = async (req, res) => {
+export const getModels = async (req, res) => {
   try {
     const { category, brand, page = 1, limit = 50, search } = req.query;
 
-    // Validate pagination parameters
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
 
@@ -3153,7 +2877,6 @@ const getModels = async (req, res) => {
       { $limit: limitNum },
     ]);
 
-    // Get total count for pagination
     const totalModels = await Product.aggregate([
       { $match: matchStage },
       {
@@ -3192,14 +2915,10 @@ const getModels = async (req, res) => {
   }
 };
 
-// @desc    Create a new model by adding a product with that model
-// @route   POST /api/admin/models
-// @access  Private/Admin
-const createModel = async (req, res) => {
+export const createModel = async (req, res) => {
   try {
     const { brand, category, model, basePrice, variant } = req.body;
 
-    // Comprehensive input validation
     const validationErrors = [];
 
     if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
@@ -3229,7 +2948,6 @@ const createModel = async (req, res) => {
     const brandName = brand.trim().toLowerCase();
     const modelName = model.trim().toLowerCase();
 
-    // Check if brand exists and get its category
     const existingBrand = await Product.findOne({ brand: brandName });
     if (!existingBrand) {
       return res.status(404).json({
@@ -3239,7 +2957,6 @@ const createModel = async (req, res) => {
       });
     }
 
-    // Check if model already exists for this brand
     const existingModel = await Product.findOne({
       brand: brandName,
       model: modelName,
@@ -3253,7 +2970,6 @@ const createModel = async (req, res) => {
       });
     }
 
-    // Validate variant structure if provided
     if (variant && typeof variant === 'object') {
       const requiredVariantFields = ['ram', 'storage'];
       const missingFields = requiredVariantFields.filter(
@@ -3270,7 +2986,6 @@ const createModel = async (req, res) => {
       }
     }
 
-    // Create a new product with the model
     const productData = {
       category: category || existingBrand.category,
       brand: brandName,
@@ -3303,7 +3018,6 @@ const createModel = async (req, res) => {
   } catch (error) {
     console.error('Error creating model:', error);
 
-    // Handle specific MongoDB errors
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(
         (err) => err.message
@@ -3334,15 +3048,11 @@ const createModel = async (req, res) => {
   }
 };
 
-// @desc    Update model name across all products
-// @route   PUT /api/admin/models/:brand/:modelName
-// @access  Private/Admin
-const updateModel = async (req, res) => {
+export const updateModel = async (req, res) => {
   try {
     const { brand, modelName } = req.params;
     const { newModelName, basePrice, variant } = req.body;
 
-    // Input validation
     const validationErrors = [];
 
     if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
@@ -3387,7 +3097,6 @@ const updateModel = async (req, res) => {
     const oldModelLower = modelName.trim().toLowerCase();
     const newModelLower = newModelName.trim().toLowerCase();
 
-    // Check if trying to update to the same name
     if (oldModelLower === newModelLower) {
       return res.status(400).json({
         success: false,
@@ -3395,7 +3104,6 @@ const updateModel = async (req, res) => {
       });
     }
 
-    // Check if the original model exists
     const originalModel = await Product.findOne({
       brand: brandLower,
       model: oldModelLower,
@@ -3408,7 +3116,6 @@ const updateModel = async (req, res) => {
       });
     }
 
-    // Check if new model name already exists for this brand
     const existingModel = await Product.findOne({
       brand: brandLower,
       model: newModelLower,
@@ -3422,7 +3129,6 @@ const updateModel = async (req, res) => {
       });
     }
 
-    // Prepare update data
     const updateData = {
       model: newModelLower,
       updatedAt: new Date(),
@@ -3437,7 +3143,6 @@ const updateModel = async (req, res) => {
       updateData.variant = { ...originalModel.variant, ...variant };
     }
 
-    // Update all products with the old model name
     const result = await Product.updateMany(
       {
         brand: brandLower,
@@ -3469,7 +3174,6 @@ const updateModel = async (req, res) => {
   } catch (error) {
     console.error('Error updating model:', error);
 
-    // Handle specific MongoDB errors
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
@@ -3488,15 +3192,11 @@ const updateModel = async (req, res) => {
   }
 };
 
-// @desc    Delete model and all associated products
-// @route   DELETE /api/admin/models/:brand/:modelName
-// @access  Private/Admin
-const deleteModel = async (req, res) => {
+export const deleteModel = async (req, res) => {
   try {
     const { brand, modelName } = req.params;
     const { confirmDeletion } = req.body;
 
-    // Input validation
     const validationErrors = [];
 
     if (!brand || typeof brand !== 'string' || brand.trim().length < 2) {
@@ -3523,7 +3223,6 @@ const deleteModel = async (req, res) => {
       });
     }
 
-    // Require explicit confirmation for deletion
     if (!confirmDeletion) {
       return res.status(400).json({
         success: false,
@@ -3535,7 +3234,6 @@ const deleteModel = async (req, res) => {
     const brandLower = brand.trim().toLowerCase();
     const modelLower = modelName.trim().toLowerCase();
 
-    // Find all products with this brand and model
     const products = await Product.find({
       brand: brandLower,
       model: modelLower,
@@ -3548,19 +3246,8 @@ const deleteModel = async (req, res) => {
       });
     }
 
-    // Check for active orders or dependencies before deletion
     const productIds = products.map((p) => p._id);
 
-    // You might want to check for active orders here
-    // const activeOrders = await Order.find({ productId: { $in: productIds }, status: { $in: ['pending', 'processing'] } });
-    // if (activeOrders.length > 0) {
-    //   return res.status(409).json({
-    //     success: false,
-    //     message: `Cannot delete model. ${activeOrders.length} active orders found for this model`
-    //   });
-    // }
-
-    // Delete all products with this brand and model
     const result = await Product.deleteMany({
       brand: brandLower,
       model: modelLower,
@@ -3587,7 +3274,6 @@ const deleteModel = async (req, res) => {
   } catch (error) {
     console.error('Error deleting model:', error);
 
-    // Handle specific MongoDB errors
     if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
@@ -3606,10 +3292,7 @@ const deleteModel = async (req, res) => {
   }
 };
 
-// ===== CONDITION QUESTIONNAIRE CRUD OPERATIONS =====
-
-// Get all condition questionnaires
-const getConditionQuestionnaires = async (req, res) => {
+export const getConditionQuestionnaires = async (req, res) => {
   try {
     const {
       page = 1,
@@ -3623,7 +3306,6 @@ const getConditionQuestionnaires = async (req, res) => {
       sortOrder = 'desc',
     } = req.query;
 
-    // Build filter object
     const filter = {};
 
     if (category) filter.category = category.toLowerCase();
@@ -3631,7 +3313,6 @@ const getConditionQuestionnaires = async (req, res) => {
     if (model) filter.model = new RegExp(model, 'i');
     if (isActive !== undefined) filter.isActive = isActive === 'true';
 
-    // Add search functionality
     if (search) {
       filter.$or = [
         { title: new RegExp(search, 'i') },
@@ -3640,11 +3321,9 @@ const getConditionQuestionnaires = async (req, res) => {
       ];
     }
 
-    // Build sort object
     const sort = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
-    // Execute query with pagination
     const questionnaires = await ConditionQuestionnaire.find(filter)
       .populate('createdBy', 'name email')
       .populate('updatedBy', 'name email')
@@ -3653,10 +3332,8 @@ const getConditionQuestionnaires = async (req, res) => {
       .skip((page - 1) * limit)
       .lean();
 
-    // Get total count for pagination
     const total = await ConditionQuestionnaire.countDocuments(filter);
 
-    // Calculate statistics
     const stats = await ConditionQuestionnaire.aggregate([
       { $match: filter },
       {
@@ -3714,8 +3391,7 @@ const getConditionQuestionnaires = async (req, res) => {
   }
 };
 
-// Get condition questionnaire by ID
-const getConditionQuestionnaireById = async (req, res) => {
+export const getConditionQuestionnaireById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -3751,8 +3427,7 @@ const getConditionQuestionnaireById = async (req, res) => {
   }
 };
 
-// Create new condition questionnaire
-const createConditionQuestionnaire = async (req, res) => {
+export const createConditionQuestionnaire = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -3778,28 +3453,23 @@ const createConditionQuestionnaire = async (req, res) => {
     } = req.body;
     console.log('req.body: ', req.body);
 
-    // Transform questions from object to array if needed
     let questions;
     if (Array.isArray(rawQuestions)) {
       questions = rawQuestions;
     } else if (rawQuestions && typeof rawQuestions === 'object') {
-      // Convert object to array (for frontend compatibility)
       questions = Object.values(rawQuestions);
     } else {
       questions = [];
     }
 
-    // Transform metadata tags from object to array if needed
     let metadata = rawMetadata;
     if (metadata && metadata.tags && !Array.isArray(metadata.tags)) {
       if (typeof metadata.tags === 'object') {
-        // Convert object to array
         metadata = {
           ...metadata,
           tags: Object.values(metadata.tags),
         };
       } else {
-        // Set to empty array if not valid
         metadata = {
           ...metadata,
           tags: [],
@@ -3807,7 +3477,6 @@ const createConditionQuestionnaire = async (req, res) => {
       }
     }
 
-    // Validate questions structure
     if (!questions || !Array.isArray(questions) || questions.length === 0) {
       return res.status(400).json({
         success: false,
@@ -3815,7 +3484,6 @@ const createConditionQuestionnaire = async (req, res) => {
       });
     }
 
-    // Validate each question
     for (let i = 0; i < questions.length; i++) {
       const question = questions[i];
       if (!question.id || !question.title) {
@@ -3842,7 +3510,6 @@ const createConditionQuestionnaire = async (req, res) => {
       }
     }
 
-    // Check if setting as default and handle existing defaults
     if (isDefault) {
       await ConditionQuestionnaire.updateMany(
         { category: category.toLowerCase(), isDefault: true },
@@ -3872,7 +3539,6 @@ const createConditionQuestionnaire = async (req, res) => {
 
     await questionnaire.save();
 
-    // Populate the created questionnaire
     await questionnaire.populate('createdBy', 'name email');
 
     res.status(201).json({
@@ -3902,8 +3568,7 @@ const createConditionQuestionnaire = async (req, res) => {
   }
 };
 
-// Update condition questionnaire
-const updateConditionQuestionnaire = async (req, res) => {
+export const updateConditionQuestionnaire = async (req, res) => {
   try {
     const { id } = req.params;
     const errors = validationResult(req);
@@ -3937,30 +3602,25 @@ const updateConditionQuestionnaire = async (req, res) => {
       metadata: rawMetadata,
     } = req.body;
 
-    // Transform questions from object to array if needed
     let questions;
     if (rawQuestions !== undefined) {
       if (Array.isArray(rawQuestions)) {
         questions = rawQuestions;
       } else if (rawQuestions && typeof rawQuestions === 'object') {
-        // Convert object to array (for frontend compatibility)
         questions = Object.values(rawQuestions);
       } else {
         questions = [];
       }
     }
 
-    // Transform metadata tags from object to array if needed
     let metadata = rawMetadata;
     if (metadata && metadata.tags && !Array.isArray(metadata.tags)) {
       if (typeof metadata.tags === 'object') {
-        // Convert object to array
         metadata = {
           ...metadata,
           tags: Object.values(metadata.tags),
         };
       } else {
-        // Set to empty array if not valid
         metadata = {
           ...metadata,
           tags: [],
@@ -3968,7 +3628,6 @@ const updateConditionQuestionnaire = async (req, res) => {
       }
     }
 
-    // Check if questionnaire exists
     const existingQuestionnaire = await ConditionQuestionnaire.findById(id);
     if (!existingQuestionnaire) {
       return res.status(404).json({
@@ -3977,7 +3636,6 @@ const updateConditionQuestionnaire = async (req, res) => {
       });
     }
 
-    // Validate questions structure if provided
     if (questions) {
       if (!Array.isArray(questions) || questions.length === 0) {
         return res.status(400).json({
@@ -3986,7 +3644,6 @@ const updateConditionQuestionnaire = async (req, res) => {
         });
       }
 
-      // Validate each question
       for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         if (!question.id || !question.title) {
@@ -4014,7 +3671,6 @@ const updateConditionQuestionnaire = async (req, res) => {
       }
     }
 
-    // Handle default questionnaire logic
     if (isDefault === true && category) {
       await ConditionQuestionnaire.updateMany(
         {
@@ -4026,13 +3682,11 @@ const updateConditionQuestionnaire = async (req, res) => {
       );
     }
 
-    // Prepare update object
     const updateData = {
       updatedBy: req.user.id,
       updatedAt: new Date(),
     };
 
-    // Add fields to update if provided
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
     if (category !== undefined) updateData.category = category.toLowerCase();
@@ -4052,7 +3706,6 @@ const updateConditionQuestionnaire = async (req, res) => {
       };
     }
 
-    // Update the questionnaire
     const updatedQuestionnaire = await ConditionQuestionnaire.findByIdAndUpdate(
       id,
       updateData,
@@ -4088,8 +3741,7 @@ const updateConditionQuestionnaire = async (req, res) => {
   }
 };
 
-// Delete condition questionnaire
-const deleteConditionQuestionnaire = async (req, res) => {
+export const deleteConditionQuestionnaire = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -4100,7 +3752,6 @@ const deleteConditionQuestionnaire = async (req, res) => {
       });
     }
 
-    // Check if questionnaire exists
     const questionnaire = await ConditionQuestionnaire.findById(id);
     if (!questionnaire) {
       return res.status(404).json({
@@ -4109,8 +3760,6 @@ const deleteConditionQuestionnaire = async (req, res) => {
       });
     }
 
-    // Check if questionnaire is being used in any products or orders
-    // This is a safety check to prevent deletion of questionnaires in use
     const isInUse = await Product.exists({
       'conditionFactors.questionnaireId': id,
     });
@@ -4123,7 +3772,6 @@ const deleteConditionQuestionnaire = async (req, res) => {
       });
     }
 
-    // Soft delete by setting isActive to false and adding deletion metadata
     const deletedQuestionnaire = await ConditionQuestionnaire.findByIdAndUpdate(
       id,
       {
@@ -4135,7 +3783,6 @@ const deleteConditionQuestionnaire = async (req, res) => {
       { new: true }
     );
 
-    // If force delete is requested and questionnaire is not in use
     if (req.query.force === 'true') {
       await ConditionQuestionnaire.findByIdAndDelete(id);
 
@@ -4160,8 +3807,7 @@ const deleteConditionQuestionnaire = async (req, res) => {
   }
 };
 
-// Get questionnaires by category
-const getQuestionnairesByCategory = async (req, res) => {
+export const getQuestionnairesByCategory = async (req, res) => {
   try {
     const { category } = req.params;
     const { brand, model, isActive = true } = req.query;
@@ -4193,20 +3839,15 @@ const getQuestionnairesByCategory = async (req, res) => {
   }
 };
 
-// @desc    Update model by model name (simplified for frontend)
-// @route   PUT /api/admin/models/:modelName
-// @access  Private/Admin
-const updateModelByName = async (req, res) => {
+export const updateModelByName = async (req, res) => {
   try {
     const { modelName } = req.params;
     const updateData = req.body;
 
     console.log('Updating model:', modelName, 'with data:', updateData);
 
-    // Decode URL-encoded model name
     const decodedModelName = decodeURIComponent(modelName);
 
-    // Input validation
     if (!decodedModelName || decodedModelName.trim().length < 2) {
       return res.status(400).json({
         success: false,
@@ -4215,7 +3856,6 @@ const updateModelByName = async (req, res) => {
       });
     }
 
-    // Find the model first to check if it exists
     const existingModel = await Product.findOne({
       model: decodedModelName.trim().toLowerCase(),
     });
@@ -4227,13 +3867,11 @@ const updateModelByName = async (req, res) => {
       });
     }
 
-    // Prepare update data
     const updateFields = {
       updatedAt: new Date(),
       updatedBy: req.user?.id,
     };
 
-    // Map frontend fields to backend fields
     if (updateData.model && updateData.model !== decodedModelName) {
       updateFields.model = updateData.model.trim().toLowerCase();
     }
@@ -4258,7 +3896,6 @@ const updateModelByName = async (req, res) => {
       updateFields.variants = updateData.variants;
     }
 
-    // Update all products with this model name
     const result = await Product.updateMany(
       { model: decodedModelName.trim().toLowerCase() },
       updateFields
@@ -4296,19 +3933,14 @@ const updateModelByName = async (req, res) => {
   }
 };
 
-// @desc    Delete model by model name (simplified for frontend)
-// @route   DELETE /api/admin/models/:modelName
-// @access  Private/Admin
-const deleteModelByName = async (req, res) => {
+export const deleteModelByName = async (req, res) => {
   try {
     const { modelName } = req.params;
 
-    // Decode URL-encoded model name
     const decodedModelName = decodeURIComponent(modelName);
 
     console.log('Deleting model:', decodedModelName);
 
-    // Input validation
     if (!decodedModelName || decodedModelName.trim().length < 2) {
       return res.status(400).json({
         success: false,
@@ -4317,7 +3949,6 @@ const deleteModelByName = async (req, res) => {
       });
     }
 
-    // Find all products with this model name
     const products = await Product.find({
       model: decodedModelName.trim().toLowerCase(),
     });
@@ -4329,7 +3960,6 @@ const deleteModelByName = async (req, res) => {
       });
     }
 
-    // Delete all products with this model name
     const result = await Product.deleteMany({
       model: decodedModelName.trim().toLowerCase(),
     });
@@ -4357,12 +3987,7 @@ const deleteModelByName = async (req, res) => {
   }
 };
 
-/**
- * Get all agents
- * @route GET /api/admin/agents
- * @access Private (Admin only)
- */
-const getAgents = async (req, res) => {
+export const getAgents = async (req, res) => {
   const { page = 1, limit = 10, status, verified } = req.query;
 
   const query = {};
@@ -4384,7 +4009,6 @@ const getAgents = async (req, res) => {
     .limit(limit * 1)
     .skip((page - 1) * limit);
 
-  // Filter by verification status if specified
   let filteredAgents = agents;
   if (verified !== undefined) {
     const isVerified = verified === 'true';
@@ -4407,12 +4031,7 @@ const getAgents = async (req, res) => {
   });
 };
 
-/**
- * Approve agent
- * @route PUT /api/admin/agents/:id/approve
- * @access Private (Admin only)
- */
-const approveAgent = async (req, res) => {
+export const approveAgent = async (req, res) => {
   const agentId = req.params.id;
 
   const agent = await Agent.findById(agentId).populate('user');
@@ -4420,13 +4039,11 @@ const approveAgent = async (req, res) => {
     throw new ApiError('Agent not found', 404);
   }
 
-  // Update user verification status
   await User.findByIdAndUpdate(agent.user._id, {
     isVerified: true,
     isActive: true,
   });
 
-  // Update agent status
   agent.isActive = true;
   await agent.save();
 
@@ -4437,12 +4054,7 @@ const approveAgent = async (req, res) => {
   });
 };
 
-/**
- * Reject agent
- * @route PUT /api/admin/agents/:id/reject
- * @access Private (Admin only)
- */
-const rejectAgent = async (req, res) => {
+export const rejectAgent = async (req, res) => {
   const agentId = req.params.id;
   const { reason } = req.body;
 
@@ -4451,13 +4063,11 @@ const rejectAgent = async (req, res) => {
     throw new ApiError('Agent not found', 404);
   }
 
-  // Update user verification status
   await User.findByIdAndUpdate(agent.user._id, {
     isVerified: false,
     isActive: false,
   });
 
-  // Update agent status and add rejection reason
   agent.isActive = false;
   agent.rejectionReason = reason;
   await agent.save();
@@ -4469,12 +4079,7 @@ const rejectAgent = async (req, res) => {
   });
 };
 
-/**
- * Toggle agent status
- * @route PUT /api/admin/agents/:id/status
- * @access Private (Admin only)
- */
-const toggleAgentStatus = async (req, res) => {
+export const toggleAgentStatus = async (req, res) => {
   const agentId = req.params.id;
   const { isActive } = req.body;
 
@@ -4483,11 +4088,9 @@ const toggleAgentStatus = async (req, res) => {
     throw new ApiError('Agent not found', 404);
   }
 
-  // Update agent status
   agent.isActive = isActive;
   await agent.save();
 
-  // Also update user active status
   await User.findByIdAndUpdate(agent.user._id, { isActive });
 
   res.status(200).json({
@@ -4497,12 +4100,7 @@ const toggleAgentStatus = async (req, res) => {
   });
 };
 
-/**
- * Toggle user status
- * @route PUT /api/admin/users/:id/status
- * @access Private (Admin only)
- */
-const toggleUserStatus = async (req, res) => {
+export const toggleUserStatus = async (req, res) => {
   const userId = req.params.id;
   const { isActive } = req.body;
 
@@ -4511,7 +4109,6 @@ const toggleUserStatus = async (req, res) => {
     throw new ApiError('User not found', 404);
   }
 
-  // Update user active status
   user.isActive = isActive;
   await user.save();
 
@@ -4520,61 +4117,4 @@ const toggleUserStatus = async (req, res) => {
     message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
     data: user,
   });
-};
-
-module.exports = {
-  loginAdmin,
-  getAdminProfile,
-  createAdmin,
-  getAllPartners,
-  getPartnerById,
-  createPartner,
-  updatePartner,
-  deletePartner,
-  verifyPartner,
-  updatePartnerWallet,
-  getAllOrders,
-  getOrderById,
-  getDashboardAnalytics,
-  getCatalog,
-  addProduct,
-  updateProduct,
-  updateProductStatus,
-  deleteProduct,
-  getCommissionSettings,
-  updateCommissionSettings,
-  getAllUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
-  updateUserPassword,
-  uploadProductImages,
-  getProductById,
-  getSellOrders,
-  getBuyOrders,
-  updateOrderStatus,
-  getPartnerSuggestionsForOrder,
-  assignPartnerToOrder,
-  getBrands,
-  createBrand,
-  updateBrand,
-  deleteBrand,
-  getModels,
-  createModel,
-  updateModel,
-  deleteModel,
-  updateModelByName,
-  deleteModelByName,
-  getQuestionnairesByCategory,
-  getConditionQuestionnaires,
-  getConditionQuestionnaireById,
-  createConditionQuestionnaire,
-  updateConditionQuestionnaire,
-  deleteConditionQuestionnaire,
-  getAgents,
-  approveAgent,
-  rejectAgent,
-  toggleAgentStatus,
-  toggleUserStatus,
 };

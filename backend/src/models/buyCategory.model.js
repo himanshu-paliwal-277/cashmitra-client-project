@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const buyCategorySchema = new mongoose.Schema(
   {
@@ -49,12 +49,10 @@ const buyCategorySchema = new mongoose.Schema(
   }
 );
 
-// Virtual for display name
 buyCategorySchema.virtual('displayName').get(function () {
   return this.name;
 });
 
-// Pre-save middleware to generate slug
 buyCategorySchema.pre('save', function (next) {
   if (this.isModified('name') && !this.slug) {
     this.slug = this.name
@@ -70,6 +68,6 @@ buyCategorySchema.index({ name: 1 });
 buyCategorySchema.index({ slug: 1 });
 buyCategorySchema.index({ isActive: 1, sortOrder: 1 });
 
-const BuyCategory = mongoose.model('BuyCategory', buyCategorySchema);
+export const BuyCategory = mongoose.model('BuyCategory', buyCategorySchema);
 
-module.exports = BuyCategory;
+

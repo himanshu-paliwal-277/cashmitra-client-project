@@ -1,9 +1,11 @@
-/**
- * Security configuration for the application
- */
+import {
+  isProduction,
+  JWT_EXPIRES_IN,
+  JWT_SECRET,
+  SESSION_SECRET,
+} from './serverConfig.js';
 
 const securityConfig = {
-  // CORS configuration
   cors: {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -12,7 +14,6 @@ const securityConfig = {
     credentials: false,
   },
 
-  // Helmet configuration for HTTP security headers
   helmet: {
     contentSecurityPolicy: {
       directives: {
@@ -32,10 +33,9 @@ const securityConfig = {
     referrerPolicy: { policy: 'same-origin' },
   },
 
-  // Rate limiting configuration
   rateLimit: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -44,10 +44,9 @@ const securityConfig = {
     },
   },
 
-  // Authentication rate limiting (for login/register)
   authRateLimit: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 50, // limit each IP to 5 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 50,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -56,23 +55,21 @@ const securityConfig = {
     },
   },
 
-  // Session configuration
   session: {
-    secret: process.env.SESSION_SECRET || 'cashify-secret-key',
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction(),
       httpOnly: true,
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: 24 * 60 * 60 * 1000,
     },
   },
 
-  // JWT configuration
   jwt: {
-    secret: process.env.JWT_SECRET || 'cashify-jwt-secret',
-    expiresIn: '1d',
+    secret: JWT_SECRET,
+    expiresIn: JWT_EXPIRES_IN,
   },
 };
 

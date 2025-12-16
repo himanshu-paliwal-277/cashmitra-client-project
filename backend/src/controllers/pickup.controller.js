@@ -1,17 +1,13 @@
-const Pickup = require('../models/pickup.model');
-const { Order } = require('../models/order.model');
-const SellOrder = require('../models/sellOrder.model');
-const User = require('../models/user.model');
-const { asyncHandler } = require('../middlewares/errorHandler.middleware');
-const ApiError = require('../utils/apiError');
-const { validationResult } = require('express-validator');
+import { validationResult } from 'express-validator';
 
-/**
- * @desc    Create a new pickup assignment
- * @route   POST /api/pickups
- * @access  Private (Admin only)
- */
-exports.createPickup = asyncHandler(async (req, res) => {
+import { asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import { Order } from '../models/order.model.js';
+import { Pickup } from '../models/pickup.model.js';
+import { SellOrder } from '../models/sellOrder.model.js';
+import { User } from '../models/user.model.js';
+import ApiError from '../utils/apiError.js';
+
+export var createPickup = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError('Validation failed', 400, errors.array());
@@ -31,7 +27,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
     specialInstructions,
   } = req.body;
 
-  // Verify the order exists and extract address information
   let order;
   let orderAddress = {};
 
@@ -47,7 +42,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
       .populate('userId', 'name phone email');
 
     if (order) {
-      // Extract address from SellOrder pickup details
       orderAddress = {
         street: order.pickup?.address?.street || '',
         city: order.pickup?.address?.city || '',
@@ -59,7 +53,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
     order = await Order.findById(orderId).populate('user', 'name phone email');
 
     if (order) {
-      // Extract address from Order shippingDetails
       orderAddress = {
         street: order.shippingDetails?.address?.street || '',
         city: order.shippingDetails?.address?.city || '',
@@ -73,11 +66,9 @@ exports.createPickup = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  // Use order address if address not provided in request
   const finalAddress =
     address && Object.keys(address).length > 0 ? address : orderAddress;
 
-  // Verify the assigned agent exists and has appropriate role
   const agent = await User.findById(assignedTo);
   if (!agent) {
     throw new ApiError(404, 'Assigned agent not found');
@@ -87,7 +78,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Invalid agent role for pickup assignment');
   }
 
-  // Check if pickup already exists for this order
   const existingPickup = await Pickup.findOne({ orderId, orderType });
   if (existingPickup) {
     throw new ApiError(400, 'Pickup already exists for this order');
@@ -102,7 +92,7 @@ exports.createPickup = asyncHandler(async (req, res) => {
     scheduledDate,
     scheduledTimeSlot,
     customer,
-    address: finalAddress, // Use the automatically fetched address from order
+    address: finalAddress,
     items,
     priority: priority || 'medium',
     specialInstructions,
@@ -117,7 +107,6 @@ exports.createPickup = asyncHandler(async (req, res) => {
 
   await pickup.save();
 
-  // Populate the response
   await pickup.populate([
     { path: 'assignedTo', select: 'name email phone' },
     { path: 'assignedBy', select: 'name email' },
@@ -130,12 +119,7 @@ exports.createPickup = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get all pickups with filtering and pagination
- * @route   GET /api/pickups
- * @access  Private
- */
-exports.getPickups = asyncHandler(async (req, res) => {
+export var getPickups = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 10,
@@ -150,20 +134,17 @@ exports.getPickups = asyncHandler(async (req, res) => {
 
   const query = {};
 
-  // Apply filters
   if (status) query.status = status;
   if (assignedTo) query.assignedTo = assignedTo;
   if (priority) query.priority = priority;
   if (pincode) query['address.pincode'] = pincode;
 
-  // Date range filter
   if (startDate || endDate) {
     query.scheduledDate = {};
     if (startDate) query.scheduledDate.$gte = new Date(startDate);
     if (endDate) query.scheduledDate.$lte = new Date(endDate);
   }
 
-  // Search filter
   if (search) {
     query.$or = [
       { orderNumber: { $regex: search, $options: 'i' } },
@@ -174,7 +155,6 @@ exports.getPickups = asyncHandler(async (req, res) => {
     ];
   }
 
-  // Role-based filtering for pickup agents and drivers
   if (['pickup_agent', 'driver'].includes(req.user.role)) {
     query.assignedTo = req.user.id;
   }
@@ -183,11 +163,9 @@ exports.getPickups = asyncHandler(async (req, res) => {
   const limitNum = parseInt(limit);
   const skip = (pageNum - 1) * limitNum;
 
-  // Get total count for pagination info
   const totalDocs = await Pickup.countDocuments(query);
   const totalPages = Math.ceil(totalDocs / limitNum);
 
-  // Get paginated results
   const docs = await Pickup.find(query)
     .sort({ scheduledDate: 1, priority: -1, createdAt: -1 })
     .skip(skip)
@@ -196,7 +174,6 @@ exports.getPickups = asyncHandler(async (req, res) => {
     .populate('assignedBy', 'name email')
     .exec();
 
-  // Format response to match expected paginate structure
   const pickups = {
     docs,
     totalDocs,
@@ -216,12 +193,7 @@ exports.getPickups = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get pickup by ID
- * @route   GET /api/pickups/:id
- * @access  Private
- */
-exports.getPickupById = asyncHandler(async (req, res) => {
+export var getPickupById = asyncHandler(async (req, res) => {
   const pickup = await Pickup.findById(req.params.id)
     .populate('assignedTo', 'name email phone')
     .populate('assignedBy', 'name email')
@@ -235,7 +207,6 @@ exports.getPickupById = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  // Role-based access control
   if (
     ['pickup_agent', 'driver'].includes(req.user.role) &&
     pickup.assignedTo._id.toString() !== req.user.id
@@ -249,12 +220,7 @@ exports.getPickupById = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Update pickup status
- * @route   PATCH /api/pickups/:id/status
- * @access  Private
- */
-exports.updatePickupStatus = asyncHandler(async (req, res) => {
+export var updatePickupStatus = asyncHandler(async (req, res) => {
   const { status, notes, location } = req.body;
 
   const pickup = await Pickup.findById(req.params.id);
@@ -262,7 +228,6 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  // Role-based access control
   if (
     ['pickup_agent', 'driver'].includes(req.user.role) &&
     pickup.assignedTo.toString() !== req.user.id
@@ -270,7 +235,6 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Access denied');
   }
 
-  // Validate status transition
   const validTransitions = {
     assigned: ['confirmed', 'cancelled'],
     confirmed: ['in_transit', 'rescheduled', 'cancelled'],
@@ -290,10 +254,8 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
     );
   }
 
-  // Update pickup with status
   await pickup.addStatusUpdate(status, req.user.id, notes, location);
 
-  // Handle specific status updates
   if (status === 'picked_up') {
     pickup.actualPickupDate = new Date();
     pickup.actualPickupTime = new Date().toLocaleTimeString('en-IN');
@@ -320,12 +282,7 @@ exports.updatePickupStatus = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Reschedule pickup
- * @route   PATCH /api/pickups/:id/reschedule
- * @access  Private
- */
-exports.reschedulePickup = asyncHandler(async (req, res) => {
+export var reschedulePickup = asyncHandler(async (req, res) => {
   const { newDate, newTimeSlot, reason } = req.body;
 
   const pickup = await Pickup.findById(req.params.id);
@@ -333,7 +290,6 @@ exports.reschedulePickup = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  // Role-based access control
   if (
     ['pickup_agent', 'driver'].includes(req.user.role) &&
     pickup.assignedTo.toString() !== req.user.id
@@ -359,12 +315,7 @@ exports.reschedulePickup = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Cancel pickup
- * @route   PATCH /api/pickups/:id/cancel
- * @access  Private
- */
-exports.cancelPickup = asyncHandler(async (req, res) => {
+export var cancelPickup = asyncHandler(async (req, res) => {
   const { reason } = req.body;
 
   const pickup = await Pickup.findById(req.params.id);
@@ -372,7 +323,6 @@ exports.cancelPickup = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  // Only admin or assigned agent can cancel
   if (
     req.user.role !== 'admin' &&
     pickup.assignedTo.toString() !== req.user.id
@@ -398,12 +348,7 @@ exports.cancelPickup = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Reassign pickup to different agent
- * @route   PATCH /api/pickups/:id/reassign
- * @access  Private (Admin only)
- */
-exports.reassignPickup = asyncHandler(async (req, res) => {
+export var reassignPickup = asyncHandler(async (req, res) => {
   const { newAgentId, reason } = req.body;
 
   const pickup = await Pickup.findById(req.params.id);
@@ -411,7 +356,6 @@ exports.reassignPickup = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  // Verify the new agent exists and has appropriate role
   const newAgent = await User.findById(newAgentId);
   if (!newAgent) {
     throw new ApiError(404, 'New agent not found');
@@ -448,12 +392,7 @@ exports.reassignPickup = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get pickup analytics and statistics
- * @route   GET /api/pickups/analytics
- * @access  Private (Admin only)
- */
-exports.getPickupAnalytics = asyncHandler(async (req, res) => {
+export var getPickupAnalytics = asyncHandler(async (req, res) => {
   const { startDate, endDate, agentId } = req.query;
 
   const dateFilter = {};
@@ -466,7 +405,6 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
   const agentFilter = agentId ? { assignedTo: agentId } : {};
   const combinedFilter = { ...dateFilter, ...agentFilter };
 
-  // Overall statistics
   const totalPickups = await Pickup.countDocuments(combinedFilter);
   const completedPickups = await Pickup.countDocuments({
     ...combinedFilter,
@@ -485,21 +423,18 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
     status: 'cancelled',
   });
 
-  // Status distribution
   const statusDistribution = await Pickup.aggregate([
     { $match: combinedFilter },
     { $group: { _id: '$status', count: { $sum: 1 } } },
     { $sort: { count: -1 } },
   ]);
 
-  // Priority distribution
   const priorityDistribution = await Pickup.aggregate([
     { $match: combinedFilter },
     { $group: { _id: '$priority', count: { $sum: 1 } } },
     { $sort: { count: -1 } },
   ]);
 
-  // Agent performance
   const agentPerformance = await Pickup.aggregate([
     { $match: combinedFilter },
     {
@@ -544,7 +479,6 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
     { $sort: { successRate: -1 } },
   ]);
 
-  // Daily pickup trends
   const dailyTrends = await Pickup.aggregate([
     { $match: combinedFilter },
     {
@@ -586,16 +520,10 @@ exports.getPickupAnalytics = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get pickups for a specific agent
- * @route   GET /api/pickups/agent/:agentId
- * @access  Private
- */
-exports.getAgentPickups = asyncHandler(async (req, res) => {
+export var getAgentPickups = asyncHandler(async (req, res) => {
   const { agentId } = req.params;
   const { status, date } = req.query;
 
-  // Role-based access control
   if (
     ['pickup_agent', 'driver'].includes(req.user.role) &&
     req.user.id !== agentId
@@ -605,7 +533,6 @@ exports.getAgentPickups = asyncHandler(async (req, res) => {
 
   const pickups = await Pickup.getPickupsByAgent(agentId, status);
 
-  // Filter by date if provided
   let filteredPickups = pickups;
   if (date) {
     const targetDate = new Date(date);
@@ -624,12 +551,7 @@ exports.getAgentPickups = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Add communication log to pickup
- * @route   POST /api/pickups/:id/communication
- * @access  Private
- */
-exports.addCommunication = asyncHandler(async (req, res) => {
+export var addCommunication = asyncHandler(async (req, res) => {
   const { type, message, status } = req.body;
 
   const pickup = await Pickup.findById(req.params.id);
@@ -653,18 +575,12 @@ exports.addCommunication = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Upload pickup images
- * @route   POST /api/pickups/:id/images
- * @access  Private
- */
-exports.uploadPickupImages = asyncHandler(async (req, res) => {
+export var uploadPickupImages = asyncHandler(async (req, res) => {
   const pickup = await Pickup.findById(req.params.id);
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found');
   }
 
-  // Role-based access control
   if (
     ['pickup_agent', 'driver'].includes(req.user.role) &&
     pickup.assignedTo.toString() !== req.user.id
@@ -672,7 +588,6 @@ exports.uploadPickupImages = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Access denied');
   }
 
-  // Handle file uploads (assuming multer middleware is used)
   if (!req.files || req.files.length === 0) {
     throw new ApiError(400, 'No images uploaded');
   }
@@ -689,15 +604,9 @@ exports.uploadPickupImages = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Get available pickup time slots
- * @route   GET /api/pickups/slots
- * @access  Private
- */
-exports.getPickupSlots = asyncHandler(async (req, res) => {
+export var getPickupSlots = asyncHandler(async (req, res) => {
   const { date } = req.query;
 
-  // Define available time slots
   const timeSlots = [
     { id: 1, slot: '09:00-12:00', label: 'Morning (9 AM - 12 PM)' },
     { id: 2, slot: '12:00-15:00', label: 'Afternoon (12 PM - 3 PM)' },
@@ -705,26 +614,22 @@ exports.getPickupSlots = asyncHandler(async (req, res) => {
     { id: 4, slot: '18:00-21:00', label: 'Night (6 PM - 9 PM)' },
   ];
 
-  // If date is provided, check availability for that date
   if (date) {
     const selectedDate = new Date(date);
     const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
     const endOfDay = new Date(selectedDate.setHours(23, 59, 59, 999));
 
-    // Get existing pickups for the date
     const existingPickups = await Pickup.find({
       scheduledDate: { $gte: startOfDay, $lte: endOfDay },
       status: { $nin: ['cancelled', 'completed'] },
     });
 
-    // Count pickups per time slot (assuming max 10 pickups per slot)
     const slotCounts = {};
     existingPickups.forEach((pickup) => {
       const slot = pickup.scheduledTimeSlot;
       slotCounts[slot] = (slotCounts[slot] || 0) + 1;
     });
 
-    // Mark slots as available/unavailable
     const availableSlots = timeSlots.map((slot) => ({
       ...slot,
       available: (slotCounts[slot.slot] || 0) < 10,
@@ -743,12 +648,7 @@ exports.getPickupSlots = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Update pickup details
- * @route   PUT /api/pickups/:id
- * @access  Private (Admin only)
- */
-exports.updatePickup = asyncHandler(async (req, res) => {
+export var updatePickup = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError('Validation failed', 400, errors.array());
@@ -770,7 +670,6 @@ exports.updatePickup = asyncHandler(async (req, res) => {
     specialInstructions,
   } = req.body;
 
-  // Update fields if provided
   if (assignedTo) {
     const agent = await User.findById(assignedTo);
     if (!agent) {

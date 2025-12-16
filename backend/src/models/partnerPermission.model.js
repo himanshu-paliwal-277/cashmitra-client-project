@@ -1,8 +1,6 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-// Define all available partner menu items and their hierarchical structure
-const PARTNER_MENU_ITEMS = {
-  // Main Dashboard
+export const PARTNER_MENU_ITEMS = {
   dashboard: {
     name: 'Dashboard',
     path: '/partner/dashboard',
@@ -10,7 +8,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Main',
   },
 
-  // Inventory & Products Section
   inventory: {
     name: 'My Inventory',
     path: '/partner/inventory',
@@ -30,7 +27,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Inventory & Products',
   },
 
-  // Sales & Orders Section
   orders: {
     name: 'Orders',
     path: '/partner/orders',
@@ -50,7 +46,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Sales & Orders',
   },
 
-  // Finance & Payouts Section
   wallet: {
     name: 'Wallet',
     path: '/partner/wallet',
@@ -76,7 +71,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Finance & Payouts',
   },
 
-  // KYC & Verification Section
   kyc: {
     name: 'KYC Verification',
     path: '/partner/kyc',
@@ -90,7 +84,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'KYC & Verification',
   },
 
-  // Analytics & Reports Section
   analytics: {
     name: 'Analytics',
     path: '/partner/analytics',
@@ -104,7 +97,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Analytics & Reports',
   },
 
-  // Support & Communication Section
   support: {
     name: 'Support',
     path: '/partner/support',
@@ -118,7 +110,6 @@ const PARTNER_MENU_ITEMS = {
     section: 'Support & Communication',
   },
 
-  // Settings Section
   profile: {
     name: 'Profile Settings',
     path: '/partner/profile',
@@ -165,8 +156,8 @@ const partnerPermissionSchema = new mongoose.Schema(
             default: false,
           },
           timeRestriction: {
-            startTime: String, // HH:MM format
-            endTime: String, // HH:MM format
+            startTime: String,
+            endTime: String,
           },
           dateRestriction: {
             startDate: Date,
@@ -174,11 +165,11 @@ const partnerPermissionSchema = new mongoose.Schema(
           },
           maxTransactionAmount: {
             type: Number,
-            default: null, // null means no limit
+            default: null,
           },
           maxDailyTransactions: {
             type: Number,
-            default: null, // null means no limit
+            default: null,
           },
         },
         metadata: {
@@ -188,7 +179,7 @@ const partnerPermissionSchema = new mongoose.Schema(
       },
       default: () => {
         const defaultPermissions = new Map();
-        // Initialize all menu items with default denied access
+
         Object.keys(PARTNER_MENU_ITEMS).forEach((key) => {
           defaultPermissions.set(key, {
             granted: false,
@@ -197,7 +188,7 @@ const partnerPermissionSchema = new mongoose.Schema(
             },
           });
         });
-        // Grant basic access by default (dashboard, profile, kyc)
+
         ['dashboard', 'profile', 'kyc'].forEach((key) => {
           defaultPermissions.set(key, {
             granted: true,
@@ -227,19 +218,19 @@ const partnerPermissionSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    // Partner-specific settings
+
     businessLimits: {
       maxInventoryItems: {
         type: Number,
-        default: 100, // Basic partners can list up to 100 items
+        default: 100,
       },
       maxMonthlyTransactions: {
         type: Number,
-        default: 50, // Basic partners can have up to 50 transactions per month
+        default: 50,
       },
       maxPayoutAmount: {
         type: Number,
-        default: 50000, // Maximum payout amount per transaction
+        default: 50000,
       },
     },
     features: {
@@ -268,13 +259,11 @@ const partnerPermissionSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for efficient querying
 partnerPermissionSchema.index({ partner: 1 });
 partnerPermissionSchema.index({ isActive: 1 });
 partnerPermissionSchema.index({ roleTemplate: 1 });
 partnerPermissionSchema.index({ lastUpdatedBy: 1 });
 
-// Virtual to get granted permissions only
 partnerPermissionSchema.virtual('grantedPermissions').get(function () {
   const granted = {};
   for (const [key, value] of this.permissions) {
@@ -290,13 +279,11 @@ partnerPermissionSchema.virtual('grantedPermissions').get(function () {
   return granted;
 });
 
-// Method to check if partner has specific permission
 partnerPermissionSchema.methods.hasPermission = function (menuItem) {
   const permission = this.permissions.get(menuItem);
   return permission && permission.granted && this.isActive;
 };
 
-// Method to grant permission
 partnerPermissionSchema.methods.grantPermission = function (
   menuItem,
   grantedBy,
@@ -316,7 +303,6 @@ partnerPermissionSchema.methods.grantPermission = function (
   this.lastUpdatedBy = grantedBy;
 };
 
-// Method to revoke permission
 partnerPermissionSchema.methods.revokePermission = function (
   menuItem,
   revokedBy
@@ -334,7 +320,6 @@ partnerPermissionSchema.methods.revokePermission = function (
   this.lastUpdatedBy = revokedBy;
 };
 
-// Method to apply role template
 partnerPermissionSchema.methods.applyRoleTemplate = function (
   template,
   appliedBy
@@ -404,11 +389,11 @@ partnerPermissionSchema.methods.applyRoleTemplate = function (
       },
     },
     enterprise: {
-      permissions: Object.keys(PARTNER_MENU_ITEMS), // All permissions
+      permissions: Object.keys(PARTNER_MENU_ITEMS),
       limits: {
-        maxInventoryItems: null, // Unlimited
-        maxMonthlyTransactions: null, // Unlimited
-        maxPayoutAmount: null, // Unlimited
+        maxInventoryItems: null,
+        maxMonthlyTransactions: null,
+        maxPayoutAmount: null,
       },
       features: {
         bulkUpload: true,
@@ -418,7 +403,7 @@ partnerPermissionSchema.methods.applyRoleTemplate = function (
       },
     },
     custom: {
-      permissions: [], // No default permissions for custom role
+      permissions: [],
       limits: {
         maxInventoryItems: 100,
         maxMonthlyTransactions: 50,
@@ -435,39 +420,32 @@ partnerPermissionSchema.methods.applyRoleTemplate = function (
 
   const templateConfig = templates[template] || templates.basic;
 
-  // Reset all permissions
   Object.keys(PARTNER_MENU_ITEMS).forEach((key) => {
     this.revokePermission(key, appliedBy);
   });
 
-  // Grant template permissions
   templateConfig.permissions.forEach((key) => {
     this.grantPermission(key, appliedBy);
   });
 
-  // Apply business limits
   this.businessLimits = { ...this.businessLimits, ...templateConfig.limits };
 
-  // Apply features
   this.features = { ...this.features, ...templateConfig.features };
 
   this.roleTemplate = template;
   this.lastUpdatedBy = appliedBy;
 };
 
-// Static method to get menu items structure
 partnerPermissionSchema.statics.getMenuItems = function () {
   return PARTNER_MENU_ITEMS;
 };
 
-// Static method to get permissions by partner
 partnerPermissionSchema.statics.getPartnerPermissions = function (partnerId) {
   return this.findOne({ partner: partnerId, isActive: true })
     .populate('partner', 'shopName shopEmail isVerified')
     .populate('lastUpdatedBy', 'name email');
 };
 
-// Static method to create default permissions for new partner
 partnerPermissionSchema.statics.createDefaultPermissions = function (
   partnerId,
   createdBy
@@ -480,9 +458,8 @@ partnerPermissionSchema.statics.createDefaultPermissions = function (
   });
 };
 
-const PartnerPermission = mongoose.model(
+export const PartnerPermission = mongoose.model(
   'PartnerPermission',
   partnerPermissionSchema
 );
 
-module.exports = { PartnerPermission, PARTNER_MENU_ITEMS };

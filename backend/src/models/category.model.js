@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const categorySchema = new mongoose.Schema(
   {
@@ -77,12 +77,10 @@ const categorySchema = new mongoose.Schema(
   }
 );
 
-// Virtual for display purposes
 categorySchema.virtual('displayName').get(function () {
   return this.name;
 });
 
-// Pre-save middleware to generate slug
 categorySchema.pre('save', function (next) {
   if (this.isModified('name') || !this.slug) {
     this.slug = this.name
@@ -98,6 +96,6 @@ categorySchema.index({ name: 1 });
 categorySchema.index({ slug: 1 });
 categorySchema.index({ isActive: 1, sortOrder: 1 });
 
-const Category = mongoose.model('Category', categorySchema);
+export const Category = mongoose.model('Category', categorySchema);
 
-module.exports = Category;
+

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const addressSchema = new mongoose.Schema(
   {
@@ -71,14 +71,11 @@ const addressSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Index for faster queries
 addressSchema.index({ user: 1 });
 addressSchema.index({ user: 1, isDefault: 1 });
 
-// Ensure only one default address per user
 addressSchema.pre('save', async function (next) {
   if (this.isDefault) {
-    // Remove default flag from other addresses of the same user
     await this.constructor.updateMany(
       { user: this.user, _id: { $ne: this._id } },
       { isDefault: false }
@@ -87,6 +84,4 @@ addressSchema.pre('save', async function (next) {
   next();
 });
 
-const Address = mongoose.model('Address', addressSchema);
-
-module.exports = Address;
+export const Address = mongoose.model('Address', addressSchema);

@@ -1,26 +1,11 @@
-/**
- * @fileoverview Sell Product Management Controller
- * @description Handles all sell product-related operations including CRUD operations,
- * variant management, and product configuration.
- * @author Cashify Development Team
- * @version 1.0.0
- */
+import { validationResult } from 'express-validator';
 
-const { validationResult } = require('express-validator');
-const SellProduct = require('../models/sellProduct.model');
-const SellConfig = require('../models/sellConfig.model');
-const Category = require('../models/category.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import { Category } from '../models/category.model.js';
+import { SellConfig } from '../models/sellConfig.model.js';
+import { SellProduct } from '../models/sellProduct.model.js';
 
-/**
- * Create new sell product
- * @route POST /api/sell/products
- * @access Private (Admin only)
- */
-exports.createProduct = asyncHandler(async (req, res) => {
+export var createProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -28,13 +13,11 @@ exports.createProduct = asyncHandler(async (req, res) => {
 
   const { categoryId, name, images, variants, tags } = req.body;
 
-  // Check if product with same name already exists
   const existingProduct = await SellProduct.findOne({ name: name.trim() });
   if (existingProduct) {
     throw new ApiError(400, 'Product with this name already exists');
   }
 
-  // Auto-attach partnerId if user is a partner
   let partnerId = null;
   if (req.user.role === 'partner' && req.partnerId) {
     partnerId = req.partnerId;
@@ -46,13 +29,12 @@ exports.createProduct = asyncHandler(async (req, res) => {
     images: images || [],
     variants: variants || [],
     tags: tags || [],
-    partnerId: partnerId, // Add partner ID
+    partnerId: partnerId,
     createdBy: req.user.id,
   });
 
   await product.save();
 
-  // Create default configuration for the product
   try {
     await SellConfig.createDefaultForProduct(product._id, req.user.id);
   } catch (error) {
@@ -66,21 +48,14 @@ exports.createProduct = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get all sell products
- * @route GET /api/sell/products
- * @access Private (Admin only)
- */
-exports.getProducts = asyncHandler(async (req, res) => {
+export var getProducts = asyncHandler(async (req, res) => {
   const { status, categoryId, search } = req.query;
 
   const query = {};
 
-  // Filter by partnerId if user is a partner
   if (req.user.role === 'partner' && req.partnerId) {
     query.partnerId = req.partnerId;
   }
-  // Admins see all products (no partnerId filter)
 
   if (status) query.status = status;
   if (categoryId) query.categoryId = categoryId;
@@ -102,12 +77,7 @@ exports.getProducts = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get single sell product
- * @route GET /api/sell/products/:id
- * @access Private (Admin only)
- */
-exports.getProduct = asyncHandler(async (req, res) => {
+export var getProduct = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id)
     .populate('categoryId', 'name')
     .populate('createdBy', 'name email');
@@ -122,12 +92,7 @@ exports.getProduct = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update sell product
- * @route PUT /api/sell/products/:id
- * @access Private (Admin only)
- */
-exports.updateProduct = asyncHandler(async (req, res) => {
+export var updateProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -140,7 +105,6 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Product not found');
   }
 
-  // Check if name is being changed and if it conflicts
   if (name && name.trim() !== product.name) {
     const existingProduct = await SellProduct.findOne({
       name: name.trim(),
@@ -151,7 +115,6 @@ exports.updateProduct = asyncHandler(async (req, res) => {
     }
   }
 
-  // Update fields
   if (name) product.name = name.trim();
   if (categoryId) product.categoryId = categoryId;
   if (images !== undefined) product.images = images;
@@ -168,12 +131,7 @@ exports.updateProduct = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Delete sell product
- * @route DELETE /api/sell/products/:id
- * @access Private (Admin only)
- */
-exports.deleteProduct = asyncHandler(async (req, res) => {
+export var deleteProduct = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id);
   if (!product) {
     throw new ApiError(404, 'Product not found');
@@ -187,12 +145,7 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get variants for a product
- * @route GET /api/sell/products/:id/variants
- * @access Private (Admin only)
- */
-exports.getVariants = asyncHandler(async (req, res) => {
+export var getVariants = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id);
   if (!product) {
     throw new ApiError(404, 'Product not found');
@@ -205,12 +158,7 @@ exports.getVariants = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Add variant to product
- * @route POST /api/sell/products/:id/variants
- * @access Private (Admin only)
- */
-exports.addVariant = asyncHandler(async (req, res) => {
+export var addVariant = asyncHandler(async (req, res) => {
   const { label, basePrice } = req.body;
 
   if (!label || !basePrice) {
@@ -237,12 +185,7 @@ exports.addVariant = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update variant
- * @route PUT /api/sell/products/:id/variants/:variantId
- * @access Private (Admin only)
- */
-exports.updateVariant = asyncHandler(async (req, res) => {
+export var updateVariant = asyncHandler(async (req, res) => {
   const { label, basePrice, isActive } = req.body;
 
   const product = await SellProduct.findById(req.params.id);
@@ -268,12 +211,7 @@ exports.updateVariant = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Delete variant
- * @route DELETE /api/sell/products/:id/variants/:variantId
- * @access Private (Admin only)
- */
-exports.deleteVariant = asyncHandler(async (req, res) => {
+export var deleteVariant = asyncHandler(async (req, res) => {
   const product = await SellProduct.findById(req.params.id);
   if (!product) {
     throw new ApiError(404, 'Product not found');
@@ -294,12 +232,7 @@ exports.deleteVariant = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get product stats
- * @route GET /api/sell/products/stats
- * @access Private (Admin only)
- */
-exports.getProductStats = asyncHandler(async (req, res) => {
+export var getProductStats = asyncHandler(async (req, res) => {
   const stats = await SellProduct.aggregate([
     {
       $group: {
@@ -325,12 +258,7 @@ exports.getProductStats = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get products for customers (public endpoint)
- * @route GET /api/sell/products/customer
- * @access Public
- */
-exports.getCustomerProducts = asyncHandler(async (req, res) => {
+export var getCustomerProducts = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -345,7 +273,6 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
     sortOrder = 'asc',
   } = req.query;
 
-  // Build query for active products only
   const query = { status: 'active' };
 
   if (search) {
@@ -359,7 +286,6 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
     query.categoryId = category;
   }
 
-  // Build sort object
   const sort = {};
   sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
@@ -375,7 +301,6 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
     SellProduct.countDocuments(query),
   ]);
 
-  // Filter only active variants for customer view
   const customerProducts = products.map((product) => ({
     ...product.toObject(),
     variants: product.variants.filter((variant) => variant.isActive),
@@ -395,12 +320,7 @@ exports.getCustomerProducts = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get products by category name (public endpoint)
- * @route GET /api/sell/products/category/:category
- * @access Public
- */
-exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
+export var getSellProductsByCategory = asyncHandler(async (req, res) => {
   const { category } = req.params;
   const {
     page = 1,
@@ -409,7 +329,6 @@ exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
     sortOrder = 'asc',
   } = req.query;
 
-  // Find category by name (case-insensitive)
   const categoryDoc = await Category.findOne({
     name: { $regex: new RegExp(`^${category}$`, 'i') },
     isActive: true,
@@ -419,13 +338,11 @@ exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Category not found');
   }
 
-  // Build query for active products in this category
   const query = {
     status: 'active',
     categoryId: categoryDoc._id,
   };
 
-  // Build sort object
   const sort = {};
   sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
@@ -441,7 +358,6 @@ exports.getSellProductsByCategory = asyncHandler(async (req, res) => {
     SellProduct.countDocuments(query),
   ]);
 
-  // Filter only active variants for customer view
   const customerProducts = products.map((product) => ({
     ...product.toObject(),
     variants: product.variants.filter((variant) => variant.isActive),

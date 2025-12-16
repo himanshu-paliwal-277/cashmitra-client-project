@@ -1,15 +1,11 @@
-const User = require('../models/user.model');
-const VendorPermission = require('../models/vendorPermission.model');
-const { generateToken } = require('../utils/jwt.utils');
-const { validationResult } = require('express-validator');
-const mongoose = require('mongoose');
+import { validationResult } from 'express-validator';
 
-// @desc    Vendor login
-// @route   POST /api/vendor/login
-// @access  Public
-const loginVendor = async (req, res) => {
+import { User } from '../models/user.model.js';
+import { VendorPermission } from '../models/vendorPermission.model.js';
+import { generateToken } from '../utils/jwt.utils.js';
+
+export const loginVendor = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -17,14 +13,11 @@ const loginVendor = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find user by email with vendor role
     const user = await User.findOne({ email, role: 'vendor' }).select(
       '+password'
     );
 
-    // Check if user exists and password matches
     if (user && (await user.matchPassword(password))) {
-      // Check if vendor has active permissions
       const permissions = await VendorPermission.findOne({
         vendor: user._id,
         isActive: true,
@@ -53,15 +46,11 @@ const loginVendor = async (req, res) => {
   }
 };
 
-// @desc    Get vendor profile
-// @route   GET /api/vendor/profile
-// @access  Private/Vendor
-const getVendorProfile = async (req, res) => {
+export const getVendorProfile = async (req, res) => {
   try {
     const vendor = await User.findById(req.user._id);
 
     if (vendor && vendor.role === 'vendor') {
-      // Get vendor permissions
       const permissions = await VendorPermission.findOne({
         vendor: vendor._id,
         isActive: true,
@@ -84,10 +73,7 @@ const getVendorProfile = async (req, res) => {
   }
 };
 
-// @desc    Get vendor permissions
-// @route   GET /api/vendor/permissions
-// @access  Private/Vendor
-const getVendorPermissions = async (req, res) => {
+export const getVendorPermissions = async (req, res) => {
   try {
     const permissions = await VendorPermission.findOne({
       vendor: req.user._id,
@@ -100,7 +86,6 @@ const getVendorPermissions = async (req, res) => {
       });
     }
 
-    // Get available menu items with permission status
     const menuItems = VendorPermission.getMenuItems();
     const vendorMenuItems = menuItems.map((item) => ({
       ...item,
@@ -119,15 +104,11 @@ const getVendorPermissions = async (req, res) => {
   }
 };
 
-// @desc    Get all vendors (Admin only)
-// @route   GET /api/vendor/admin/vendors
-// @access  Private/Admin
-const getAllVendors = async (req, res) => {
+export const getAllVendors = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = '', status = 'all' } = req.query;
     const skip = (page - 1) * limit;
 
-    // Build search query
     let query = { role: 'vendor' };
 
     if (search) {
@@ -137,14 +118,12 @@ const getAllVendors = async (req, res) => {
       ];
     }
 
-    // Get vendors
     const vendors = await User.find(query)
       .select('-password')
       .skip(skip)
       .limit(parseInt(limit))
       .sort({ createdAt: -1 });
 
-    // Get permissions for each vendor
     const vendorsWithPermissions = await Promise.all(
       vendors.map(async (vendor) => {
         const permissions = await VendorPermission.findOne({
@@ -161,7 +140,6 @@ const getAllVendors = async (req, res) => {
       })
     );
 
-    // Filter by status if specified
     let filteredVendors = vendorsWithPermissions;
     if (status === 'active') {
       filteredVendors = vendorsWithPermissions.filter((v) => v.isActive);
@@ -187,12 +165,8 @@ const getAllVendors = async (req, res) => {
   }
 };
 
-// @desc    Create vendor user (Admin only)
-// @route   POST /api/vendor/admin/create
-// @access  Private/Admin
-const createVendor = async (req, res) => {
+export const createVendor = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -200,13 +174,11 @@ const createVendor = async (req, res) => {
 
     const { name, email, password, phone, roleTemplate = 'basic' } = req.body;
 
-    // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create new vendor user
     const vendor = await User.create({
       name,
       email,
@@ -216,7 +188,6 @@ const createVendor = async (req, res) => {
     });
 
     if (vendor) {
-      // Create initial permissions based on role template
       const permissions = new VendorPermission({
         vendor: vendor._id,
         roleTemplate,
@@ -224,7 +195,6 @@ const createVendor = async (req, res) => {
         notes: `Initial vendor creation with ${roleTemplate} template`,
       });
 
-      // Apply role template
       await permissions.applyRoleTemplate(roleTemplate);
       await permissions.save();
 
@@ -246,21 +216,16 @@ const createVendor = async (req, res) => {
   }
 };
 
-// @desc    Update vendor permissions (Admin only)
-// @route   PUT /api/vendor/admin/:vendorId/permissions
-// @access  Private/Admin
-const updateVendorPermissions = async (req, res) => {
+export const updateVendorPermissions = async (req, res) => {
   try {
     const { vendorId } = req.params;
     const { permissions, roleTemplate, notes } = req.body;
 
-    // Validate vendor exists
     const vendor = await User.findById(vendorId);
     if (!vendor || vendor.role !== 'vendor') {
       return res.status(404).json({ message: 'Vendor not found' });
     }
 
-    // Find or create vendor permissions
     let vendorPermissions = await VendorPermission.findOne({
       vendor: vendorId,
     });
@@ -272,7 +237,6 @@ const updateVendorPermissions = async (req, res) => {
       });
     }
 
-    // Update permissions
     if (permissions) {
       for (const [menuItem, permissionData] of Object.entries(permissions)) {
         if (permissionData.granted) {
@@ -287,13 +251,11 @@ const updateVendorPermissions = async (req, res) => {
       }
     }
 
-    // Apply role template if provided
     if (roleTemplate) {
       await vendorPermissions.applyRoleTemplate(roleTemplate);
       vendorPermissions.roleTemplate = roleTemplate;
     }
 
-    // Update metadata
     vendorPermissions.lastUpdatedBy = req.user._id;
     if (notes) {
       vendorPermissions.notes = notes;
@@ -312,23 +274,17 @@ const updateVendorPermissions = async (req, res) => {
   }
 };
 
-// @desc    Get vendor permissions (Admin only)
-// @route   GET /api/vendor/admin/:vendorId/permissions
-// @access  Private/Admin
-const getVendorPermissionsAdmin = async (req, res) => {
+export const getVendorPermissionsAdmin = async (req, res) => {
   try {
     const { vendorId } = req.params;
 
-    // Validate vendor exists
     const vendor = await User.findById(vendorId).select('-password');
     if (!vendor || vendor.role !== 'vendor') {
       return res.status(404).json({ message: 'Vendor not found' });
     }
 
-    // Get vendor permissions
     const permissions = await VendorPermission.findOne({ vendor: vendorId });
 
-    // Get available menu items with permission status
     const menuItems = VendorPermission.getMenuItems();
     const vendorMenuItems = menuItems.map((item) => ({
       ...item,
@@ -357,21 +313,16 @@ const getVendorPermissionsAdmin = async (req, res) => {
   }
 };
 
-// @desc    Toggle vendor status (Admin only)
-// @route   PUT /api/vendor/admin/:vendorId/status
-// @access  Private/Admin
-const toggleVendorStatus = async (req, res) => {
+export const toggleVendorStatus = async (req, res) => {
   try {
     const { vendorId } = req.params;
     const { isActive, notes } = req.body;
 
-    // Validate vendor exists
     const vendor = await User.findById(vendorId);
     if (!vendor || vendor.role !== 'vendor') {
       return res.status(404).json({ message: 'Vendor not found' });
     }
 
-    // Find or create vendor permissions
     let vendorPermissions = await VendorPermission.findOne({
       vendor: vendorId,
     });
@@ -383,7 +334,6 @@ const toggleVendorStatus = async (req, res) => {
       });
     }
 
-    // Update status
     vendorPermissions.isActive = isActive;
     vendorPermissions.lastUpdatedBy = req.user._id;
     if (notes) {
@@ -402,23 +352,17 @@ const toggleVendorStatus = async (req, res) => {
   }
 };
 
-// @desc    Delete vendor (Admin only)
-// @route   DELETE /api/vendor/admin/:vendorId
-// @access  Private/Admin
-const deleteVendor = async (req, res) => {
+export const deleteVendor = async (req, res) => {
   try {
     const { vendorId } = req.params;
 
-    // Validate vendor exists
     const vendor = await User.findById(vendorId);
     if (!vendor || vendor.role !== 'vendor') {
       return res.status(404).json({ message: 'Vendor not found' });
     }
 
-    // Delete vendor permissions
     await VendorPermission.deleteOne({ vendor: vendorId });
 
-    // Delete vendor user
     await User.findByIdAndDelete(vendorId);
 
     res.json({ message: 'Vendor deleted successfully' });
@@ -428,10 +372,7 @@ const deleteVendor = async (req, res) => {
   }
 };
 
-// @desc    Get available menu items (Admin only)
-// @route   GET /api/vendor/admin/menu-items
-// @access  Private/Admin
-const getMenuItems = async (req, res) => {
+export const getMenuItems = async (req, res) => {
   try {
     const menuItems = VendorPermission.getMenuItems();
     res.json({ menuItems });
@@ -441,15 +382,3 @@ const getMenuItems = async (req, res) => {
   }
 };
 
-module.exports = {
-  loginVendor,
-  getVendorProfile,
-  getVendorPermissions,
-  getAllVendors,
-  createVendor,
-  updateVendorPermissions,
-  getVendorPermissionsAdmin,
-  toggleVendorStatus,
-  deleteVendor,
-  getMenuItems,
-};

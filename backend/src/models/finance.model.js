@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const financeSchema = new mongoose.Schema(
   {
@@ -100,7 +100,6 @@ const financeSchema = new mongoose.Schema(
   }
 );
 
-// Indexes
 financeSchema.index({ transactionType: 1 });
 financeSchema.index({ order: 1 });
 financeSchema.index({ user: 1 });
@@ -110,7 +109,6 @@ financeSchema.index({ category: 1 });
 financeSchema.index({ createdAt: -1 });
 financeSchema.index({ processedAt: -1 });
 
-// Virtual for net amount after commission
 financeSchema.virtual('netAmount').get(function () {
   if (this.commission && this.commission.amount) {
     return this.amount - this.commission.amount;
@@ -118,7 +116,6 @@ financeSchema.virtual('netAmount').get(function () {
   return this.amount;
 });
 
-// Pre-save middleware to calculate commission
 financeSchema.pre('save', function (next) {
   if (this.isModified('amount') || this.isModified('commission.rate')) {
     if (this.commission && this.commission.rate) {
@@ -134,7 +131,6 @@ financeSchema.pre('save', function (next) {
   next();
 });
 
-// Method to process transaction
 financeSchema.methods.processTransaction = function (processedBy) {
   this.status = 'processed';
   this.processedBy = processedBy;
@@ -142,7 +138,6 @@ financeSchema.methods.processTransaction = function (processedBy) {
   return this.save();
 };
 
-// Static method to get commission summary
 financeSchema.statics.getCommissionSummary = function (startDate, endDate) {
   const matchStage = {
     transactionType: 'commission',
@@ -173,7 +168,6 @@ financeSchema.statics.getCommissionSummary = function (startDate, endDate) {
   ]);
 };
 
-// Static method to get partner earnings
 financeSchema.statics.getPartnerEarnings = function (
   partnerId,
   startDate,
@@ -205,4 +199,4 @@ financeSchema.statics.getPartnerEarnings = function (
   ]);
 };
 
-module.exports = mongoose.model('Finance', financeSchema);
+export const Finance = mongoose.model('Finance', financeSchema);

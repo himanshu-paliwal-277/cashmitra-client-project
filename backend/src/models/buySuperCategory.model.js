@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const buySuperCategorySchema = new mongoose.Schema(
   {
@@ -49,19 +49,16 @@ const buySuperCategorySchema = new mongoose.Schema(
   }
 );
 
-// Virtual for display name
 buySuperCategorySchema.virtual('displayName').get(function () {
   return this.name;
 });
 
-// Virtual to populate categories
 buySuperCategorySchema.virtual('categories', {
   ref: 'BuyCategory',
   localField: '_id',
   foreignField: 'superCategory',
 });
 
-// Pre-save middleware to generate slug
 buySuperCategorySchema.pre('save', function (next) {
   if (this.isModified('name') && !this.slug) {
     this.slug = this.name
@@ -77,9 +74,9 @@ buySuperCategorySchema.index({ name: 1 });
 buySuperCategorySchema.index({ slug: 1 });
 buySuperCategorySchema.index({ isActive: 1, sortOrder: 1 });
 
-const BuySuperCategory = mongoose.model(
+export const BuySuperCategory = mongoose.model(
   'BuySuperCategory',
   buySuperCategorySchema
 );
 
-module.exports = BuySuperCategory;
+

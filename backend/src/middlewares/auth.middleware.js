@@ -1,23 +1,21 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/user.model');
+import jwt from 'jsonwebtoken';
 
-// Protect routes - Authentication middleware
-const protect = async (req, res, next) => {
+import { JWT_SECRET } from '../config/serverConfig.js';
+import { User } from '../models/user.model.js';
+
+
+export const protect = async (req, res, next) => {
   let token;
 
-  // Check if token exists in headers
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
     try {
-      // Get token from header
       token = req.headers.authorization.split(' ')[1];
 
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, JWT_SECRET);
 
-      // Get user from the token (exclude password)
       req.user = await User.findById(decoded.id).select('-password');
 
       next();
@@ -32,8 +30,7 @@ const protect = async (req, res, next) => {
   }
 };
 
-// Role-based authorization middleware
-const authorize = (...roles) => {
+export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Not authenticated' });
@@ -47,5 +44,3 @@ const authorize = (...roles) => {
     next();
   };
 };
-
-module.exports = { protect, authorize };

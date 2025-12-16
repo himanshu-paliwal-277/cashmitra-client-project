@@ -1,7 +1,6 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-// Question Option Schema
 const questionOptionSchema = new Schema(
   {
     id: {
@@ -18,7 +17,7 @@ const questionOptionSchema = new Schema(
       trim: true,
     },
     icon: {
-      type: String, // Icon name or component identifier
+      type: String,
       trim: true,
     },
     type: {
@@ -28,7 +27,7 @@ const questionOptionSchema = new Schema(
     },
     priceImpact: {
       type: Number,
-      default: 0, // Percentage impact on price (positive or negative)
+      default: 0,
       min: -100,
       max: 100,
     },
@@ -40,16 +39,14 @@ const questionOptionSchema = new Schema(
   { _id: false }
 );
 
-// Question Schema
 const questionSchema = new Schema(
   {
     id: {
       type: String,
-      // required: true
     },
     title: {
       type: String,
-      // required: true,
+
       trim: true,
     },
     description: {
@@ -82,7 +79,6 @@ const questionSchema = new Schema(
   { _id: false }
 );
 
-// Main Condition Questionnaire Schema
 const conditionQuestionnaireSchema = new Schema(
   {
     title: {
@@ -122,11 +118,11 @@ const conditionQuestionnaireSchema = new Schema(
     },
     brand: {
       type: String,
-      trim: true, // Optional: can be brand-specific or general
+      trim: true,
     },
     model: {
       type: String,
-      trim: true, // Optional: can be model-specific or general
+      trim: true,
     },
     questions: {
       type: [questionSchema],
@@ -148,11 +144,11 @@ const conditionQuestionnaireSchema = new Schema(
     },
     isDefault: {
       type: Boolean,
-      default: false, // Whether this is the default questionnaire for the category
+      default: false,
     },
     metadata: {
       estimatedTime: {
-        type: Number, // Estimated completion time in minutes
+        type: Number,
         default: 5,
         min: 1,
         max: 60,
@@ -180,7 +176,7 @@ const conditionQuestionnaireSchema = new Schema(
         default: 0,
       },
       averageCompletionTime: {
-        type: Number, // in minutes
+        type: Number,
         default: 0,
       },
       lastUsed: {
@@ -204,26 +200,21 @@ const conditionQuestionnaireSchema = new Schema(
   }
 );
 
-// Indexes for better performance
 conditionQuestionnaireSchema.index({ category: 1, isActive: 1 });
 conditionQuestionnaireSchema.index({ brand: 1, model: 1 });
 conditionQuestionnaireSchema.index({ isDefault: 1, category: 1 });
 conditionQuestionnaireSchema.index({ createdAt: -1 });
 conditionQuestionnaireSchema.index({ 'metadata.tags': 1 });
 
-// Virtual for question count
 conditionQuestionnaireSchema.virtual('questionCount').get(function () {
   return this.questions ? this.questions.length : 0;
 });
 
-// Virtual for active question count
 conditionQuestionnaireSchema.virtual('activeQuestionCount').get(function () {
   return this.questions ? this.questions.filter((q) => q.isActive).length : 0;
 });
 
-// Pre-save middleware
 conditionQuestionnaireSchema.pre('save', function (next) {
-  // Ensure only one default questionnaire per category
   if (this.isDefault && this.isModified('isDefault')) {
     this.constructor
       .updateMany(
@@ -237,11 +228,9 @@ conditionQuestionnaireSchema.pre('save', function (next) {
       .exec();
   }
 
-  // Sort questions by sortOrder
   if (this.questions && this.questions.length > 0) {
     this.questions.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-    // Sort options within each question
     this.questions.forEach((question) => {
       if (question.options && question.options.length > 0) {
         question.options.sort(
@@ -254,7 +243,6 @@ conditionQuestionnaireSchema.pre('save', function (next) {
   next();
 });
 
-// Static methods
 conditionQuestionnaireSchema.statics.findByCategory = function (
   category,
   includeInactive = false
@@ -293,7 +281,6 @@ conditionQuestionnaireSchema.statics.findByBrandModel = function (
   }).sort({ brand: -1, model: -1, isDefault: -1, createdAt: -1 });
 };
 
-// Instance methods
 conditionQuestionnaireSchema.methods.incrementUsage = function () {
   this.analytics.totalResponses += 1;
   this.analytics.lastUsed = new Date();
@@ -333,8 +320,8 @@ conditionQuestionnaireSchema.methods.duplicate = function (
     model: this.model,
     questions: this.questions.map((q) => ({ ...q.toObject() })),
     version: '1.0.0',
-    isActive: false, // Start as inactive
-    isDefault: false, // Never default
+    isActive: false,
+    isDefault: false,
     metadata: { ...this.metadata.toObject() },
     createdBy: createdBy,
   });
@@ -342,7 +329,8 @@ conditionQuestionnaireSchema.methods.duplicate = function (
   return duplicated;
 };
 
-module.exports = mongoose.model(
+export const ConditionQuestionnaire = mongoose.model(
   'ConditionQuestionnaire',
   conditionQuestionnaireSchema
 );
+

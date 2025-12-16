@@ -1,25 +1,10 @@
-/**
- * @fileoverview Sell Configuration Management Controller
- * @description Handles all sell configuration-related operations including
- * step management and pricing rules configuration.
- * @author Cashify Development Team
- * @version 1.0.0
- */
+import { validationResult } from 'express-validator';
 
-const { validationResult } = require('express-validator');
-const SellConfig = require('../models/sellConfig.model');
-const SellProduct = require('../models/sellProduct.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import { SellConfig } from '../models/sellConfig.model.js';
+import { SellProduct } from '../models/sellProduct.model.js';
 
-/**
- * Create or update sell configuration
- * @route POST /api/sell/config
- * @access Private (Admin only)
- */
-exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
+export var createOrUpdateConfig = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -27,17 +12,14 @@ exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
 
   const { productId, steps, rules } = req.body;
 
-  // Verify product exists
   const product = await SellProduct.findById(productId);
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
-  // Check if config already exists
   let config = await SellConfig.findOne({ productId });
 
   if (config) {
-    // Update existing config
     if (steps) config.steps = steps;
     if (rules) config.rules = { ...config.rules, ...rules };
     await config.save();
@@ -48,7 +30,6 @@ exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
       data: config,
     });
   } else {
-    // Create new config
     config = new SellConfig({
       productId,
       steps: steps || [
@@ -77,12 +58,7 @@ exports.createOrUpdateConfig = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * Get configuration for a product
- * @route GET /api/sell/config/:productId
- * @access Private (Admin only)
- */
-exports.getConfig = asyncHandler(async (req, res) => {
+export var getConfig = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   let config = await SellConfig.findOne({ productId })
@@ -90,7 +66,6 @@ exports.getConfig = asyncHandler(async (req, res) => {
     .populate('createdBy', 'name email');
 
   if (!config) {
-    // Return default configuration
     config = SellConfig.getDefaultConfig();
     config.productId = productId;
   }
@@ -101,12 +76,7 @@ exports.getConfig = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get configuration for customer flow
- * @route GET /api/sell/config/customer/:productId
- * @access Public
- */
-exports.getConfigForCustomer = asyncHandler(async (req, res) => {
+export var getConfigForCustomer = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   let config = await SellConfig.findOne({ productId }).select('steps rules');
@@ -124,12 +94,7 @@ exports.getConfigForCustomer = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get configuration for customers (public endpoint)
- * @route GET /api/sell/config/customer/:productId
- * @access Public
- */
-exports.getCustomerConfig = asyncHandler(async (req, res) => {
+export var getCustomerConfig = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -137,7 +102,6 @@ exports.getCustomerConfig = asyncHandler(async (req, res) => {
 
   const { productId } = req.params;
 
-  // Verify product exists
   const product = await SellProduct.findById(productId);
   if (!product) {
     throw new ApiError(404, 'Product not found');
@@ -158,12 +122,7 @@ exports.getCustomerConfig = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update configuration steps
- * @route PUT /api/sell/config/:productId/steps
- * @access Private (Admin only)
- */
-exports.updateSteps = asyncHandler(async (req, res) => {
+export var updateSteps = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { steps } = req.body;
 
@@ -174,7 +133,6 @@ exports.updateSteps = asyncHandler(async (req, res) => {
   let config = await SellConfig.findOne({ productId });
 
   if (!config) {
-    // Create config if it doesn't exist
     config = await SellConfig.createDefaultForProduct(productId, req.user.id);
   }
 
@@ -188,12 +146,7 @@ exports.updateSteps = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update pricing rules
- * @route PUT /api/sell/config/:productId/rules
- * @access Private (Admin only)
- */
-exports.updateRules = asyncHandler(async (req, res) => {
+export var updateRules = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { rules } = req.body;
 
@@ -204,7 +157,6 @@ exports.updateRules = asyncHandler(async (req, res) => {
   let config = await SellConfig.findOne({ productId });
 
   if (!config) {
-    // Create config if it doesn't exist
     config = await SellConfig.createDefaultForProduct(productId, req.user.id);
   }
 
@@ -218,12 +170,7 @@ exports.updateRules = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Delete configuration
- * @route DELETE /api/sell/config/:productId
- * @access Private (Admin only)
- */
-exports.deleteConfig = asyncHandler(async (req, res) => {
+export var deleteConfig = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   const config = await SellConfig.findOne({ productId });
@@ -239,24 +186,16 @@ exports.deleteConfig = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Reset configuration to default
- * @route POST /api/sell/config/:productId/reset
- * @access Private (Admin only)
- */
-exports.resetToDefault = asyncHandler(async (req, res) => {
+export var resetToDefault = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
-  // Verify product exists
   const product = await SellProduct.findById(productId);
   if (!product) {
     throw new ApiError(404, 'Product not found');
   }
 
-  // Delete existing config
   await SellConfig.deleteOne({ productId });
 
-  // Create new default config
   const config = await SellConfig.createDefaultForProduct(
     productId,
     req.user.id
@@ -269,12 +208,7 @@ exports.resetToDefault = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Test pricing calculation
- * @route POST /api/sell/config/:productId/test-pricing
- * @access Private (Admin only)
- */
-exports.testPricing = asyncHandler(async (req, res) => {
+export var testPricing = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { basePrice, adjustments } = req.body;
 
@@ -288,7 +222,6 @@ exports.testPricing = asyncHandler(async (req, res) => {
     config = SellConfig.getDefaultConfig();
   }
 
-  // Calculate total adjustment
   let totalAdjustment = 0;
   const breakdown = [];
 
@@ -310,7 +243,6 @@ exports.testPricing = asyncHandler(async (req, res) => {
     });
   }
 
-  // Apply pricing rules
   const rawPrice = basePrice + totalAdjustment;
   const finalPrice = config.applyPricingRules(basePrice, rawPrice);
 
@@ -327,12 +259,7 @@ exports.testPricing = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get all configurations
- * @route GET /api/sell/config
- * @access Private (Admin only)
- */
-exports.getAllConfigs = asyncHandler(async (req, res) => {
+export var getAllConfigs = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
   const options = {

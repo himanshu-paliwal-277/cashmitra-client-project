@@ -1,25 +1,10 @@
-/**
- * @fileoverview Sell Accessory Management Controller
- * @description Handles all sell accessory-related operations including CRUD operations
- * and accessory ordering.
- * @author Cashify Development Team
- * @version 1.0.0
- */
+import { validationResult } from 'express-validator';
 
-const { validationResult } = require('express-validator');
-const SellAccessory = require('../models/sellAccessory.model');
-const SellProduct = require('../models/sellProduct.model');
-const {
-  ApiError,
-  asyncHandler,
-} = require('../middlewares/errorHandler.middleware');
+import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import { SellAccessory } from '../models/sellAccessory.model.js';
+import { SellProduct } from '../models/sellProduct.model.js';
 
-/**
- * Create new sell accessory
- * @route POST /api/sell/accessories
- * @access Private (Admin only)
- */
-exports.createAccessory = asyncHandler(async (req, res) => {
+export var createAccessory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -27,14 +12,12 @@ exports.createAccessory = asyncHandler(async (req, res) => {
 
   const { categoryId, key, title, delta } = req.body;
 
-  // Verify category exists
   const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  // Check if accessory with same key already exists for this category
   const existingAccessory = await SellAccessory.findOne({ categoryId, key });
   if (existingAccessory) {
     throw new ApiError(
@@ -43,7 +26,6 @@ exports.createAccessory = asyncHandler(async (req, res) => {
     );
   }
 
-  // Get next order number
   const lastAccessory = await SellAccessory.findOne({ categoryId }).sort({
     order: -1,
   });
@@ -67,12 +49,7 @@ exports.createAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get all accessories for a product
- * @route GET /api/sell/accessories
- * @access Private (Admin only)
- */
-exports.getAccessories = asyncHandler(async (req, res) => {
+export var getAccessories = asyncHandler(async (req, res) => {
   const { categoryId, isActive } = req.query;
 
   const query = {};
@@ -91,12 +68,7 @@ exports.getAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get accessories for customer flow
- * @route GET /api/sell/accessories/customer/:categoryId
- * @access Public
- */
-exports.getAccessoriesForCustomer = asyncHandler(async (req, res) => {
+export var getAccessoriesForCustomer = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
 
   const accessories = await SellAccessory.getActiveForCategory(categoryId);
@@ -107,12 +79,7 @@ exports.getAccessoriesForCustomer = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get accessories for customers (public endpoint)
- * @route GET /api/sell/accessories/customer
- * @access Public
- */
-exports.getCustomerAccessories = asyncHandler(async (req, res) => {
+export var getCustomerAccessories = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -120,14 +87,12 @@ exports.getCustomerAccessories = asyncHandler(async (req, res) => {
 
   const { categoryId } = req.query;
 
-  // Verify category exists
   const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  // Get all active accessories for the category
   const accessories = await SellAccessory.find({
     categoryId,
     isActive: true,
@@ -139,12 +104,7 @@ exports.getCustomerAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get single accessory
- * @route GET /api/sell/accessories/:id
- * @access Private (Admin only)
- */
-exports.getAccessory = asyncHandler(async (req, res) => {
+export var getAccessory = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id)
     .populate('categoryId', 'name')
     .populate('createdBy', 'name email');
@@ -159,12 +119,7 @@ exports.getAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update accessory
- * @route PUT /api/sell/accessories/:id
- * @access Private (Admin only)
- */
-exports.updateAccessory = asyncHandler(async (req, res) => {
+export var updateAccessory = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new ApiError(400, 'Validation Error', errors.array());
@@ -177,7 +132,6 @@ exports.updateAccessory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Accessory not found');
   }
 
-  // Check if key is being changed and if it conflicts
   if (key && key !== accessory.key) {
     const existingAccessory = await SellAccessory.findOne({
       categoryId: accessory.categoryId,
@@ -207,17 +161,10 @@ exports.updateAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Reindex accessory orders
- * @route POST /api/sell/accessories/reindex-orders
- * @access Private (Admin only)
- */
-exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
+export var reindexAccessoryOrders = asyncHandler(async (req, res) => {
   try {
-    // Get all accessories
     const accessories = await SellAccessory.find({});
 
-    // Group by categoryId
     const byCategory = {};
     accessories.forEach((acc) => {
       const catId = acc.categoryId ? acc.categoryId.toString() : 'null';
@@ -229,22 +176,19 @@ exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
 
     let updatedCount = 0;
 
-    // Update each category's accessories with sequential orders
     for (const categoryId in byCategory) {
       const categoryAccessories = byCategory[categoryId];
 
-      // Sort by createdAt
       categoryAccessories.sort(
         (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
 
-      // Update each accessory
       for (let i = 0; i < categoryAccessories.length; i++) {
         await SellAccessory.findByIdAndUpdate(
           categoryAccessories[i]._id,
           { order: i + 1 },
-          { runValidators: false } // Skip validation to allow partial update
+          { runValidators: false }
         );
         updatedCount++;
       }
@@ -263,33 +207,23 @@ exports.reindexAccessoryOrders = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * Migrate productId to categoryId and reindex orders
- * @route POST /api/sell/accessories/migrate-and-reindex
- * @access Private (Admin only)
- */
-exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
+export var migrateAndReindexAccessories = asyncHandler(async (req, res) => {
   try {
     const SellProduct = require('../models/sellProduct.model');
     const mongoose = require('mongoose');
 
-    // Get all accessories with productId field
     const accessories = await SellAccessory.find({}).lean();
 
     let migratedCount = 0;
 
-    // Migrate productId to categoryId
     for (const acc of accessories) {
-      // Check if it has productId field (even if null)
       if ('productId' in acc) {
         if (acc.productId && !acc.categoryId) {
-          // Get the product to find its categoryId
           const product = await SellProduct.findById(acc.productId).select(
             'categoryId'
           );
 
           if (product && product.categoryId) {
-            // Update with categoryId and remove productId
             await mongoose.connection.collection('sellaccessories').updateOne(
               { _id: acc._id },
               {
@@ -300,7 +234,6 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
             migratedCount++;
           }
         } else if (!acc.productId && !acc.categoryId) {
-          // Remove empty productId field
           await mongoose.connection
             .collection('sellaccessories')
             .updateOne({ _id: acc._id }, { $unset: { productId: 1 } });
@@ -308,7 +241,6 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
       }
     }
 
-    // Now reindex orders
     const updatedAccessories = await SellAccessory.find({});
     const byCategory = {};
 
@@ -346,12 +278,7 @@ exports.migrateAndReindexAccessories = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * Delete accessory
- * @route DELETE /api/sell/accessories/:id
- * @access Private (Admin only)
- */
-exports.deleteAccessory = asyncHandler(async (req, res) => {
+export var deleteAccessory = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
     throw new ApiError(404, 'Accessory not found');
@@ -365,22 +292,15 @@ exports.deleteAccessory = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Bulk create accessories
- * @route POST /api/sell/accessories/bulk
- * @access Private (Admin)
- */
-exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
+export var bulkCreateAccessories = asyncHandler(async (req, res) => {
   const { categoryId, accessories } = req.body;
 
-  // Verify category exists
   const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  // Validate accessories array
   if (!Array.isArray(accessories) || accessories.length === 0) {
     throw new ApiError(
       400,
@@ -388,7 +308,6 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
     );
   }
 
-  // Check for duplicate keys within the request
   const keys = accessories.map((acc) => acc.key);
   const duplicateKeys = keys.filter(
     (key, index) => keys.indexOf(key) !== index
@@ -400,7 +319,6 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
     );
   }
 
-  // Check for existing accessories with same keys for this category
   const existingAccessories = await SellAccessory.find({
     categoryId,
     key: { $in: keys },
@@ -416,13 +334,11 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
     );
   }
 
-  // Get next order number
   const lastAccessory = await SellAccessory.findOne({ categoryId }).sort({
     order: -1,
   });
   let nextOrder = lastAccessory ? lastAccessory.order + 1 : 1;
 
-  // Prepare accessories for bulk insert
   const accessoriesToCreate = accessories.map((accessory) => ({
     categoryId,
     key: accessory.key,
@@ -433,7 +349,6 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
     createdBy: req.user._id,
   }));
 
-  // Bulk insert
   const createdAccessories =
     await SellAccessory.insertMany(accessoriesToCreate);
 
@@ -444,22 +359,15 @@ exports.bulkCreateAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Reorder accessories
- * @route PUT /api/sell/accessories/reorder
- * @access Private (Admin)
- */
-exports.reorderAccessories = asyncHandler(async (req, res) => {
+export var reorderAccessories = asyncHandler(async (req, res) => {
   const { categoryId, accessoryIds } = req.body;
 
-  // Verify category exists
   const Category = require('../models/category.model');
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
   }
 
-  // Validate accessoryIds array
   if (!Array.isArray(accessoryIds) || accessoryIds.length === 0) {
     throw new ApiError(
       400,
@@ -467,7 +375,6 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
     );
   }
 
-  // Verify all accessories belong to the specified category
   const accessories = await SellAccessory.find({
     _id: { $in: accessoryIds },
     categoryId,
@@ -480,7 +387,6 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
     );
   }
 
-  // Update order for each accessory
   const updatePromises = accessoryIds.map((accessoryId, index) =>
     SellAccessory.findByIdAndUpdate(
       accessoryId,
@@ -498,12 +404,7 @@ exports.reorderAccessories = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Toggle accessory status
- * @route PATCH /api/sell/accessories/:id/toggle-status
- * @access Private (Admin only)
- */
-exports.toggleAccessoryStatus = asyncHandler(async (req, res) => {
+export var toggleAccessoryStatus = asyncHandler(async (req, res) => {
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
     throw new ApiError(404, 'Accessory not found');

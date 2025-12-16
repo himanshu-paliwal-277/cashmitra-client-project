@@ -1,0 +1,122 @@
+import express from 'express';
+import { check } from 'express-validator';
+
+import * as userController from '../../controllers/user.controller.js';
+import { protect } from '../../middlewares/auth.middleware.js';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
+import { validateRequest } from '../../middlewares/validation.middleware.js';
+
+const router = express.Router();
+
+router.use(protect);
+
+router.get('/profile', asyncHandler(userController.getUserProfile));
+
+router.put(
+  '/profile',
+  [
+    check('name').optional().notEmpty().withMessage('Name cannot be empty'),
+    check('email')
+      .optional()
+      .isEmail()
+      .withMessage('Please include a valid email'),
+    check('phone')
+      .optional()
+      .isMobilePhone()
+      .withMessage('Please include a valid phone number'),
+    check('dateOfBirth')
+      .optional()
+      .isISO8601()
+      .withMessage('Please provide a valid date'),
+    check('address.street')
+      .optional()
+      .notEmpty()
+      .withMessage('Street cannot be empty'),
+    check('address.city')
+      .optional()
+      .notEmpty()
+      .withMessage('City cannot be empty'),
+    check('address.state')
+      .optional()
+      .notEmpty()
+      .withMessage('State cannot be empty'),
+    check('address.pincode')
+      .optional()
+      .isLength({ min: 6, max: 6 })
+      .withMessage('Pincode must be 6 digits'),
+  ],
+  validateRequest,
+  asyncHandler(userController.updateUserProfile)
+);
+
+router.get('/orders', asyncHandler(userController.getUserOrders));
+
+router.get('/orders/:id', asyncHandler(userController.getOrderById));
+
+router.get('/addresses', asyncHandler(userController.getUserAddresses));
+
+router.post(
+  '/addresses',
+  [
+    check('title').notEmpty().withMessage('Address title is required'),
+    check('fullName').notEmpty().withMessage('Full name is required'),
+    check('phone')
+      .isMobilePhone()
+      .withMessage('Please include a valid phone number'),
+    check('street').notEmpty().withMessage('Street address is required'),
+    check('city').notEmpty().withMessage('City is required'),
+    check('state').notEmpty().withMessage('State is required'),
+    check('pincode')
+      .isLength({ min: 6, max: 6 })
+      .withMessage('Pincode must be 6 digits'),
+    check('addressType')
+      .optional()
+      .isIn(['home', 'work', 'other'])
+      .withMessage('Invalid address type'),
+  ],
+  validateRequest,
+  asyncHandler(userController.addAddress)
+);
+
+router.put(
+  '/addresses/:id',
+  [
+    check('title')
+      .optional()
+      .notEmpty()
+      .withMessage('Address title cannot be empty'),
+    check('fullName')
+      .optional()
+      .notEmpty()
+      .withMessage('Full name cannot be empty'),
+    check('phone')
+      .optional()
+      .isMobilePhone()
+      .withMessage('Please include a valid phone number'),
+    check('street')
+      .optional()
+      .notEmpty()
+      .withMessage('Street address cannot be empty'),
+    check('city').optional().notEmpty().withMessage('City cannot be empty'),
+    check('state').optional().notEmpty().withMessage('State cannot be empty'),
+    check('pincode')
+      .optional()
+      .isLength({ min: 6, max: 6 })
+      .withMessage('Pincode must be 6 digits'),
+    check('addressType')
+      .optional()
+      .isIn(['home', 'work', 'other'])
+      .withMessage('Invalid address type'),
+  ],
+  validateRequest,
+  asyncHandler(userController.updateAddress)
+);
+
+router.delete('/addresses/:id', asyncHandler(userController.deleteAddress));
+
+router.put(
+  '/addresses/:id/default',
+  asyncHandler(userController.setDefaultAddress)
+);
+
+export default router;

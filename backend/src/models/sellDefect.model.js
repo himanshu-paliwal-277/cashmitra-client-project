@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const sellDefectSchema = new mongoose.Schema(
   {
@@ -74,16 +74,12 @@ const sellDefectSchema = new mongoose.Schema(
   }
 );
 
-// Compound index for unique key per category
 sellDefectSchema.index({ categoryId: 1, key: 1 }, { unique: true });
 
-// Index for querying by category and section
 sellDefectSchema.index({ categoryId: 1, section: 1, order: 1 });
 
-// Index for active defects
 sellDefectSchema.index({ categoryId: 1, isActive: 1 });
 
-// Method to get defects for specific category
 sellDefectSchema.statics.getForCategory = function (categoryId) {
   const query = {
     categoryId,
@@ -93,7 +89,6 @@ sellDefectSchema.statics.getForCategory = function (categoryId) {
   return this.find(query).sort({ section: 1, order: 1 });
 };
 
-// Method to get defects grouped by section
 sellDefectSchema.statics.getGroupedBySection = function (categoryId) {
   return this.aggregate([
     {
@@ -117,41 +112,34 @@ sellDefectSchema.statics.getGroupedBySection = function (categoryId) {
   ]);
 };
 
-// Method to get defects for specific product variants
-// Since defects are linked to categories, we need to get the product's category first
 sellDefectSchema.statics.getForVariants = async function (
   productId,
   variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
 
-  // Get the product to find its categoryId
   const product = await SellProduct.findById(productId).select('categoryId');
   if (!product) {
     return [];
   }
 
-  // Get defects for the product's category
   return this.getForCategory(product.categoryId);
 };
 
-// Method to get defects grouped by category for specific product variants
 sellDefectSchema.statics.getGroupedByCategory = async function (
   productId,
   variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
 
-  // Get the product to find its categoryId
   const product = await SellProduct.findById(productId).select('categoryId');
   if (!product) {
     return [];
   }
 
-  // Get defects grouped by section for the product's category
   return this.getGroupedBySection(product.categoryId);
 };
 
-const SellDefect = mongoose.model('SellDefect', sellDefectSchema);
+export const SellDefect = mongoose.model('SellDefect', sellDefectSchema);
 
-module.exports = SellDefect;
+

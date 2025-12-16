@@ -1,7 +1,4 @@
-/**
- * Custom error class for API errors
- */
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(statusCode, message, errors = []) {
     super(message);
     this.statusCode = statusCode;
@@ -11,21 +8,11 @@ class ApiError extends Error {
   }
 }
 
-/**
- * Error handler middleware
- * @param {Error} err - Error object
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @param {Function} next - Express next middleware function
- * @returns {Object} - Returns standardized error response
- */
-const errorHandler = (err, req, res, next) => {
-  // Default error values
+export const errorHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Something went wrong';
   let errors = err.errors || [];
 
-  // Handle Mongoose validation errors
   if (err.name === 'ValidationError') {
     statusCode = 400;
     message = 'Validation Error';
@@ -35,7 +22,6 @@ const errorHandler = (err, req, res, next) => {
     }));
   }
 
-  // Handle Mongoose CastError (invalid ObjectId)
   if (err.name === 'CastError') {
     statusCode = 400;
     message = `Invalid ${err.path}`;
@@ -47,7 +33,6 @@ const errorHandler = (err, req, res, next) => {
     ];
   }
 
-  // Handle JWT errors
   if (err.name === 'JsonWebTokenError') {
     statusCode = 401;
     message = 'Invalid token';
@@ -58,7 +43,6 @@ const errorHandler = (err, req, res, next) => {
     message = 'Token expired';
   }
 
-  // Handle duplicate key errors
   if (err.code === 11000) {
     statusCode = 400;
     message = 'Duplicate field value';
@@ -71,12 +55,10 @@ const errorHandler = (err, req, res, next) => {
     ];
   }
 
-  // Log error in development
   if (process.env.NODE_ENV === 'development') {
     console.error(err);
   }
 
-  // Send standardized error response
   res.status(statusCode).json({
     success: false,
     message,
@@ -85,19 +67,9 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-/**
- * Async handler to catch errors in async route handlers
- * @param {Function} fn - Async route handler function
- * @returns {Function} - Returns middleware function that catches errors
- */
-const asyncHandler = (fn) => {
+export const asyncHandler = (fn) => {
   return (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };
 
-module.exports = {
-  ApiError,
-  errorHandler,
-  asyncHandler,
-};

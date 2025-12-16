@@ -1,14 +1,11 @@
-const User = require('../models/user.model');
-const Partner = require('../models/partner.model');
-const { generateToken } = require('../utils/jwt.utils');
-const { validationResult } = require('express-validator');
+import { validationResult } from 'express-validator';
 
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public
-const registerUser = async (req, res) => {
+import { Partner } from '../models/partner.model.js';
+import { User } from '../models/user.model.js';
+import { generateToken } from '../utils/jwt.utils.js';
+
+export const registerUser = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -16,13 +13,11 @@ const registerUser = async (req, res) => {
 
     const { name, email, password, phone } = req.body;
 
-    // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create new user
     const user = await User.create({
       name,
       email,
@@ -48,12 +43,8 @@ const registerUser = async (req, res) => {
   }
 };
 
-// @desc    Login partner
-// @route   POST /api/auth/partner/login
-// @access  Public
-const loginPartner = async (req, res) => {
+export const loginPartner = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -61,7 +52,6 @@ const loginPartner = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find user by email and role partner
     const user = await User.findOne({ email, role: 'partner' }).select(
       '+password'
     );
@@ -70,9 +60,7 @@ const loginPartner = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Check if password matches
     if (await user.matchPassword(password)) {
-      // Find partner details
       const partner = await Partner.findOne({ user: user._id }).populate(
         'user'
       );
@@ -102,12 +90,8 @@ const loginPartner = async (req, res) => {
   }
 };
 
-// @desc    Register a new partner
-// @route   POST /api/auth/register-partner
-// @access  Public
-const registerPartner = async (req, res) => {
+export const registerPartner = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -115,13 +99,11 @@ const registerPartner = async (req, res) => {
 
     const { name, email, password, phone } = req.body;
 
-    // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create new user with partner role
     const user = await User.create({
       name,
       email,
@@ -148,12 +130,8 @@ const registerPartner = async (req, res) => {
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
-const loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   try {
-    // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -161,10 +139,8 @@ const loginUser = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find user by email
     const user = await User.findOne({ email }).select('+password');
 
-    // Check if user exists and password matches
     if (user && (await user.matchPassword(password))) {
       res.json({
         _id: user._id,
@@ -183,10 +159,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-// @desc    Get user profile
-// @route   GET /api/auth/profile
-// @access  Private
-const getUserProfile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
@@ -211,10 +184,7 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-// @desc    Update user profile
-// @route   PUT /api/auth/profile
-// @access  Private
-const updateUserProfile = async (req, res) => {
+export const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
@@ -258,13 +228,4 @@ const updateUserProfile = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
-};
-
-module.exports = {
-  registerUser,
-  registerPartner,
-  loginUser,
-  loginPartner,
-  getUserProfile,
-  updateUserProfile,
 };

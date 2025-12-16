@@ -1,6 +1,3 @@
-/**
- * Custom error class for API errors
- */
 class ApiError extends Error {
   constructor(message, statusCode, errors = []) {
     super(message);
@@ -11,4 +8,4 @@ class ApiError extends Error {
   }
 }
 
-module.exports = ApiError;
+export default ApiError;
