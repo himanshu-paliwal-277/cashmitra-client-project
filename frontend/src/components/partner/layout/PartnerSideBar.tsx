@@ -27,7 +27,7 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
 
   const permissionMap: Record<string, string> = {
     '/partner/dashboard': 'dashboard',
-    '/partner/inventory': 'inventory',
+    '/partner/products': 'products',
     '/partner/orders': 'orders',
     '/partner/payouts': 'payouts',
     '/partner/kyc': 'kyc',
@@ -71,9 +71,9 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
       items: [{ to: '/partner/dashboard', icon: LayoutDashboard, label: 'Dashboard' }],
     },
     {
-      title: 'Inventory & Orders',
+      title: 'Products & Orders',
       items: [
-        { to: '/partner/inventory', icon: Package, label: 'Inventory' },
+        { to: '/partner/products', icon: Package, label: 'My Products' },
         { to: '/partner/orders', icon: ShoppingCart, label: 'Orders' },
         // { to: '/partner/buy/categories', icon: FolderTree, label: 'Buy Categories' },
         // { to: '/partner/buy/products', icon: Package, label: 'Buy Products' },

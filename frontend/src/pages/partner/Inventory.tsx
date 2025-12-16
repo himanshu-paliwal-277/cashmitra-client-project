@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   Plus,
@@ -85,6 +86,8 @@ interface AddInventoryForm {
 }
 
 function Inventory() {
+  const navigate = useNavigate();
+
   // Helper function to get image URL from different formats
   const getImageUrl = (images: any): string | null => {
     if (!images) return null;
@@ -393,11 +396,18 @@ function Inventory() {
         <h1 className="text-3xl font-bold text-slate-900">Inventory Management</h1>
         <div className="flex gap-4">
           <button
+            onClick={() => navigate('/partner/inventory/create-product')}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all duration-200 flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Create New Product
+          </button>
+          <button
             onClick={() => setShowProductModal(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-all duration-200 flex items-center gap-2"
           >
             <Plus size={20} />
-            Add Product
+            Add to Inventory
           </button>
         </div>
       </div>

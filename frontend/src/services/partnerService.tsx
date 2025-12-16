@@ -33,50 +33,39 @@ class PartnerService {
     }
   }
 
-  // Inventory
-  async getInventory(params: any = {}) {
+  async getProducts(params: any = {}) {
     try {
       const queryParams = new URLSearchParams();
       if (params.page) queryParams.append('page', params.page);
       if (params.limit) queryParams.append('limit', params.limit);
       if (params.search) queryParams.append('search', params.search);
       if (params.category) queryParams.append('category', params.category);
-      if (params.condition) queryParams.append('condition', params.condition);
+      if (params.status) queryParams.append('status', params.status);
 
-      const response = await api.get(`/partner/inventory?${queryParams}`);
+      const response = await api.get(`/partner/products?${queryParams}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching inventory:', error);
+      console.error('Error fetching products:', error);
       throw error.response?.data || error;
     }
   }
 
-  async addInventory(inventoryData: any) {
+  async updateProduct(productId: string, productData: any) {
     try {
-      const response = await api.post('/partner/inventory', inventoryData);
+      const response = await api.put(`/partner/products/${productId}`, productData);
       return response.data;
     } catch (error) {
-      console.error('Error adding inventory:', error);
+      console.error('Error updating product:', error);
       throw error.response?.data || error;
     }
   }
 
-  async updateInventory(inventoryId: string, inventoryData: any) {
+  async deleteProduct(productId: string) {
     try {
-      const response = await api.put(`/partner/inventory/${inventoryId}`, inventoryData);
+      const response = await api.delete(`/partner/products/${productId}`);
       return response.data;
     } catch (error) {
-      console.error('Error updating inventory:', error);
-      throw error.response?.data || error;
-    }
-  }
-
-  async removeInventory(inventoryId: string) {
-    try {
-      const response = await api.delete(`/partner/inventory/${inventoryId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error removing inventory:', error);
+      console.error('Error deleting product:', error);
       throw error.response?.data || error;
     }
   }
@@ -149,24 +138,7 @@ class PartnerService {
     }
   }
 
-  // Products (for inventory selection)
-  async getProducts(params: any = {}) {
-    try {
-      const queryParams = new URLSearchParams();
-      if (params.page) queryParams.append('page', params.page);
-      if (params.limit) queryParams.append('limit', params.limit || '50'); // Higher default limit
-      if (params.search) queryParams.append('search', params.search);
-      if (params.category) queryParams.append('category', params.category);
-      if (params.brand) queryParams.append('brand', params.brand);
-
-      // Use dedicated partner products endpoint for full catalog access
-      const response = await api.get(`/partner/products?${queryParams}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      throw error.response?.data || error;
-    }
-  }
+  // Duplicate function removed - using the one above
 
   // Sell/Buy Products CRM
   async getDashboardSellBuy() {
@@ -205,6 +177,47 @@ class PartnerService {
       return response.data;
     } catch (error) {
       console.error('Error fetching buy products:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async createProduct(productData: any) {
+    try {
+      const response = await api.post('/partner/products', productData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating product:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  // Categories (for product creation)
+  async getBuySuperCategories() {
+    try {
+      const response = await api.get('/buy-super-categories/public');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching buy super categories:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getBuyCategories() {
+    try {
+      const response = await api.get('/buy-categories');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching buy categories:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getBuyCategoriesBySuperCategory(superCategoryId: string) {
+    try {
+      const response = await api.get(`/buy-super-categories/public/${superCategoryId}/categories`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching buy categories by super category:', error);
       throw error.response?.data || error;
     }
   }

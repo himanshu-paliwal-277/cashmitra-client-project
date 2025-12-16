@@ -1,9 +1,10 @@
 import { Agent } from '../models/agent.model.js';
 import { BuyProduct } from '../models/buyProduct.model.js';
-import { Inventory } from '../models/inventory.model.js';
 import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
 import { Product } from '../models/product.model.js';
+import { SellOrder } from '../models/sellOrder.model.js';
+import { SellProduct } from '../models/sellProduct.model.js';
 import { User } from '../models/user.model.js';
 import ApiError from '../utils/apiError.js';
 import { sanitizeData } from '../utils/security.utils.js';
@@ -210,7 +211,14 @@ export async function getProductsCatalog(req, res) {
     sortObj[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
     const products = await BuyProduct.find(filter)
-      .populate('categoryId', 'name')
+      .populate({
+        path: 'categoryId',
+        select: 'name displayName superCategory',
+        populate: {
+          path: 'superCategory',
+          select: 'name displayName',
+        },
+      })
       .sort(sortObj)
       .limit(limitNum)
       .skip((pageNum - 1) * limitNum)
@@ -269,63 +277,9 @@ export async function getProductsCatalog(req, res) {
   }
 }
 
-export async function addInventory(req, res) {
-  const partnerId = await Partner.findOne({ user: req.user.id });
-  if (!partnerId) {
-    throw new ApiError('Partner profile not found', 404);
-  }
+// Inventory functions removed - partners now manage products directly
 
-  if (!partnerId.isVerified) {
-    throw new ApiError('Your partner account is not verified yet', 403);
-  }
-
-  let product = await Product.findById(req.body.productId);
-  let productModel = 'Product';
-
-  if (!product) {
-    product = await BuyProduct.findById(req.body.productId);
-    productModel = 'BuyProduct';
-  }
-
-  if (!product) {
-    throw new ApiError('Product not found', 404);
-  }
-
-  const existingInventory = await Inventory.findOne({
-    partner: partnerId._id,
-    product: req.body.productId,
-    condition: req.body.condition,
-  });
-
-  if (existingInventory) {
-    throw new ApiError(
-      'You already have this product in your inventory with the same condition',
-      400
-    );
-  }
-
-  const inventory = await Inventory.create({
-    partner: partnerId._id,
-    productModel: productModel,
-    product: req.body.productId,
-    condition: req.body.condition,
-    price: req.body.price,
-    originalPrice: req.body.originalPrice,
-    quantity: req.body.quantity,
-    isAvailable: true,
-    warranty: req.body.warranty || 0,
-    additionalSpecs: req.body.additionalSpecs || {},
-    images: req.body.images || [],
-  });
-
-  res.status(201).json({
-    success: true,
-    data: inventory,
-    message: 'Inventory item added successfully',
-  });
-}
-
-export async function getInventory(req, res) {
+export async function getPartnerProducts(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
@@ -335,24 +289,37 @@ export async function getInventory(req, res) {
     page = 1,
     limit = 10,
     sort = '-createdAt',
-    condition,
-    isAvailable,
+    search,
+    category,
+    status,
   } = req.query;
 
-  const queryObj = { partner: partner._id };
-  if (condition) queryObj.condition = condition;
-  if (isAvailable !== undefined) queryObj.isAvailable = isAvailable === 'true';
+  const queryObj = { partnerId: partner._id };
+
+  if (search) {
+    queryObj.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { brand: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  if (category) queryObj.categoryId = category;
+  if (status !== undefined) queryObj.isActive = status === 'true';
 
   const pageNum = parseInt(page, 10);
   const limitNum = parseInt(limit, 10);
   const skip = (pageNum - 1) * limitNum;
 
-  const total = await Inventory.countDocuments(queryObj);
+  const total = await BuyProduct.countDocuments(queryObj);
 
-  const inventory = await Inventory.find(queryObj)
+  const products = await BuyProduct.find(queryObj)
     .populate({
-      path: 'product',
-      select: 'name brand model series category images',
+      path: 'categoryId',
+      select: 'name displayName superCategory',
+      populate: {
+        path: 'superCategory',
+        select: 'name displayName',
+      },
     })
     .sort(sort)
     .skip(skip)
@@ -361,7 +328,7 @@ export async function getInventory(req, res) {
   res.status(200).json({
     success: true,
     data: {
-      docs: inventory,
+      docs: products,
       totalDocs: total,
       limit: limitNum,
       page: pageNum,
@@ -372,75 +339,272 @@ export async function getInventory(req, res) {
   });
 }
 
-export async function updateInventory(req, res) {
-  const partner = await Partner.findOne({ user: req.user.id });
-  if (!partner) {
-    throw new ApiError('Partner profile not found', 404);
+export async function updatePartnerProduct(req, res) {
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      throw new ApiError('Partner profile not found', 404);
+    }
+
+    const product = await BuyProduct.findOne({
+      _id: req.params.id,
+      partnerId: partner._id,
+    });
+
+    if (!product) {
+      throw new ApiError('Product not found or not owned by you', 404);
+    }
+
+    // Validate category if being updated
+    if (req.body.categoryId) {
+      const { BuyCategory } = await import('../models/buyCategory.model.js');
+      const category = await BuyCategory.findById(req.body.categoryId).populate(
+        'superCategory'
+      );
+      if (!category || !category.isActive) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid or inactive category ID.',
+        });
+      }
+
+      // Validate super category is active
+      if (!category.superCategory || !category.superCategory.isActive) {
+        return res.status(400).json({
+          success: false,
+          message:
+            'The selected category belongs to an inactive super category. Please contact admin.',
+        });
+      }
+    }
+
+    // Transform and prepare update data with same logic as create
+    const updateData = {
+      ...req.body,
+      updatedBy: req.user.id,
+    };
+
+    // Remove fields that shouldn't be updated
+    delete updateData._id;
+    delete updateData.partnerId; // Prevent changing partner ownership
+    delete updateData.partner;
+
+    // Transform topSpecs from array to object format expected by schema
+    if (req.body.topSpecs && Array.isArray(req.body.topSpecs)) {
+      updateData.topSpecs = {
+        screenSize: req.body.productDetails?.display?.size || '',
+        chipset: req.body.productDetails?.general?.chipset || '',
+        pixelDensity: req.body.productDetails?.display?.resolution || '',
+        networkSupport: req.body.productDetails?.network?.network || '',
+        simSlots: req.body.productDetails?.network?.sim || '',
+      };
+    }
+
+    // Transform productDetails to match schema structure
+    if (req.body.productDetails) {
+      const details = req.body.productDetails;
+
+      // Initialize productDetails if not exists
+      if (!updateData.productDetails) {
+        updateData.productDetails = {};
+      }
+
+      // Transform camera data to match schema
+      if (details.camera) {
+        updateData.productDetails = {
+          ...updateData.productDetails,
+          frontCamera: {
+            resolution: details.camera?.front?.primary || '',
+            setup: 'Single',
+            features: [],
+          },
+          rearCamera: {
+            setup: details.camera?.rear?.secondary ? 'Dual' : 'Single',
+            camera1: {
+              resolution: details.camera?.rear?.primary || '',
+              type: 'Primary',
+            },
+            camera2: details.camera?.rear?.secondary
+              ? {
+                  resolution: details.camera?.rear?.secondary || '',
+                  type: 'Secondary',
+                }
+              : undefined,
+            features: [],
+          },
+        };
+      }
+
+      // Transform network connectivity
+      if (details.network) {
+        updateData.productDetails = {
+          ...updateData.productDetails,
+          networkConnectivity: {
+            wifi: details.network?.wifi || '',
+            bluetooth: details.network?.bluetooth || '',
+            nfc: details.network?.nfc ? 'Yes' : 'No',
+            gps: details.network?.gps ? 'Yes' : 'No',
+            simSlots: details.network?.sim || '',
+            networkSupport: details.network?.network || '',
+            volte: details.network?.volte ? 'Yes' : 'No',
+            esim: details.network?.esim ? 'Yes' : 'No',
+            has3p5mmJack: details.network?.audioJack || false,
+            wifiFeatures: [],
+            audioFeatures: [],
+          },
+        };
+      }
+
+      // Transform memory storage
+      if (details.memory) {
+        updateData.productDetails = {
+          ...updateData.productDetails,
+          memoryStorage: {
+            phoneVariants: [
+              `${details.memory?.ram || ''} + ${details.memory?.storage || ''}`,
+            ],
+            expandableStorage: details.memory?.expandable || false,
+            ramType: details.memory?.ramType || 'LPDDR',
+            storageType: details.memory?.storageType || 'UFS',
+          },
+        };
+      }
+
+      // Transform performance
+      if (details.general) {
+        updateData.productDetails = {
+          ...updateData.productDetails,
+          performance: {
+            chipset: details.general?.chipset || '',
+            cpu: details.general?.processor || '',
+            gpu: details.general?.gpu || '',
+            os: details.general?.os || '',
+            architecture: details.performance?.architecture || '64-bit',
+            processTechnology: details.performance?.processTechnology || '6nm',
+            clockSpeed: details.performance?.clockSpeed || '',
+          },
+        };
+      }
+
+      // Transform sensors data
+      if (details.sensors) {
+        updateData.productDetails = {
+          ...updateData.productDetails,
+          sensorsMisc: {
+            fingerprintScanner: details.sensors?.fingerprintScanner || false,
+            faceUnlock: details.sensors?.faceUnlock || false,
+            sensors: Object.entries(details.sensors)
+              .filter(
+                ([key, value]) =>
+                  value === true &&
+                  key !== 'fingerprintScanner' &&
+                  key !== 'faceUnlock'
+              )
+              .map(([key]) => key),
+          },
+        };
+      }
+
+      // Keep display, battery, and design as-is since they use Mixed type
+      if (details.display) {
+        updateData.productDetails = {
+          ...updateData.productDetails,
+          display: details.display,
+        };
+      }
+
+      if (details.battery) {
+        updateData.productDetails = {
+          ...updateData.productDetails,
+          battery: details.battery,
+        };
+      }
+
+      if (details.design) {
+        updateData.productDetails = {
+          ...updateData.productDetails,
+          design: details.design,
+        };
+      }
+
+      // Keep general info
+      if (details.general) {
+        updateData.productDetails = {
+          ...updateData.productDetails,
+          general: {
+            ...details.general,
+          },
+        };
+      }
+    }
+
+    // Ensure required fields have default values if not provided
+    if (!updateData.paymentOptions && req.body.paymentOptions) {
+      updateData.paymentOptions = {
+        emiAvailable: req.body.paymentOptions.emiAvailable || false,
+        emiPlans: req.body.paymentOptions.emiPlans || [],
+        methods: req.body.paymentOptions.methods || ['Cash', 'UPI', 'Card'],
+      };
+    }
+
+    const updatedProduct = await BuyProduct.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).populate({
+      path: 'categoryId',
+      select: 'name displayName superCategory',
+      populate: {
+        path: 'superCategory',
+        select: 'name displayName',
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: updatedProduct,
+      message: 'Product updated successfully',
+    });
+  } catch (error) {
+    console.error('Error updating partner product:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating product',
+      error: error.message,
+    });
   }
-
-  const inventory = await Inventory.findOne({
-    _id: req.params.id,
-    partner: partner._id,
-  });
-
-  if (!inventory) {
-    throw new ApiError('Inventory item not found or not owned by you', 404);
-  }
-
-  const updateData = {};
-  if (req.body.price !== undefined) updateData.price = req.body.price;
-  if (req.body.originalPrice !== undefined)
-    updateData.originalPrice = req.body.originalPrice;
-  if (req.body.quantity !== undefined) updateData.quantity = req.body.quantity;
-  if (req.body.isAvailable !== undefined)
-    updateData.isAvailable = req.body.isAvailable;
-  if (req.body.warranty !== undefined) updateData.warranty = req.body.warranty;
-  if (req.body.additionalSpecs)
-    updateData.additionalSpecs = req.body.additionalSpecs;
-  if (req.body.images) updateData.images = req.body.images;
-
-  const updatedInventory = await Inventory.findByIdAndUpdate(
-    req.params.id,
-    { $set: updateData },
-    { new: true, runValidators: true }
-  ).populate('product', 'name brand category images');
-
-  res.status(200).json({
-    success: true,
-    data: updatedInventory,
-    message: 'Inventory item updated successfully',
-  });
 }
 
-export async function deleteInventory(req, res) {
+export async function deletePartnerProduct(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
   if (!partner) {
     throw new ApiError('Partner profile not found', 404);
   }
 
-  const inventory = await Inventory.findOne({
+  const product = await BuyProduct.findOne({
     _id: req.params.id,
-    partner: partner._id,
+    partnerId: partner._id,
   });
 
-  if (!inventory) {
-    throw new ApiError('Inventory item not found or not owned by you', 404);
+  if (!product) {
+    throw new ApiError('Product not found or not owned by you', 404);
   }
 
+  // Check for active orders
   const activeOrders = await Order.countDocuments({
-    'items.inventory': req.params.id,
+    'items.product': req.params.id,
     status: { $nin: ['delivered', 'cancelled'] },
   });
 
   if (activeOrders > 0) {
-    throw new ApiError('Cannot delete inventory with active orders', 400);
+    throw new ApiError('Cannot delete product with active orders', 400);
   }
 
-  await Inventory.findByIdAndDelete(req.params.id);
+  await BuyProduct.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
     success: true,
-    message: 'Inventory item deleted successfully',
+    message: 'Product deleted successfully',
   });
 }
 
@@ -491,7 +655,6 @@ export async function getOrders(req, res) {
         searchConditions.push({ _id: search });
       }
 
-      const User = require('../models/user.model');
       const matchingUsers = await User.find({
         $or: [
           { name: { $regex: search, $options: 'i' } },
@@ -544,8 +707,6 @@ export async function getOrders(req, res) {
   }
 
   if (!orderType || orderType === 'sell') {
-    const SellOrder = require('../models/sellOrder.model');
-
     const sellQueryObj = { assignedTo: partner._id };
 
     if (status) sellQueryObj.status = status;
@@ -571,7 +732,6 @@ export async function getOrders(req, res) {
         'pickup.address.phone': { $regex: search, $options: 'i' },
       });
 
-      const User = require('../models/user.model');
       const matchingUsers = await User.find({
         $or: [
           { name: { $regex: search, $options: 'i' } },
@@ -711,14 +871,14 @@ export async function respondToOrderAssignment(req, res) {
     const missingItems = [];
 
     for (const item of order.items) {
-      const inventory = await Inventory.findOne({
-        partner: partner._id,
-        product: item.product._id,
-        isAvailable: true,
-        quantity: { $gte: item.quantity },
+      // Check if partner owns this product and has sufficient stock
+      const product = await BuyProduct.findOne({
+        _id: item.product._id,
+        partnerId: partner._id,
+        isActive: true,
       });
 
-      if (!inventory) {
+      if (!product) {
         missingItems.push({
           productId: item.product._id,
           productName:
@@ -728,7 +888,7 @@ export async function respondToOrderAssignment(req, res) {
           requiredQuantity: item.quantity,
           hasInventory: false,
         });
-      } else if (inventory.quantity < item.quantity) {
+      } else if ((product.stock?.quantity || 0) < item.quantity) {
         missingItems.push({
           productId: item.product._id,
           productName:
@@ -736,7 +896,7 @@ export async function respondToOrderAssignment(req, res) {
             item.product.model ||
             `${item.product.brand} Product`,
           requiredQuantity: item.quantity,
-          availableQuantity: inventory.quantity,
+          availableQuantity: product.stock?.quantity || 0,
           hasInventory: true,
           insufficient: true,
         });
@@ -753,7 +913,7 @@ export async function respondToOrderAssignment(req, res) {
         .join(', ');
 
       throw new ApiError(
-        `Cannot accept order. Missing or insufficient inventory for: ${missingProductNames}. Please add these products to your inventory with proper pricing first.`,
+        `Cannot accept order. Missing or insufficient stock for: ${missingProductNames}. Please ensure you have these products with adequate stock quantities.`,
         400
       );
     }
@@ -813,25 +973,25 @@ export async function checkMissingInventory(req, res) {
   const availableItems = [];
 
   for (const item of order.items) {
-    const inventory = await Inventory.findOne({
-      partner: partner._id,
-      product: item.product._id,
-      isAvailable: true,
-      quantity: { $gte: item.quantity },
-    }).populate('product', 'name brand categoryId images');
+    // Check if partner owns this product and has sufficient stock
+    const product = await BuyProduct.findOne({
+      _id: item.product._id,
+      partnerId: partner._id,
+      isActive: true,
+    });
 
     const itemStatus = {
       productId: item.product._id,
       productName: item.product.name || item.product.model,
       productBrand: item.product.brand,
-      productCategory: item.product.category,
+      productCategory: item.product.categoryId?.name,
       productImages: item.product.images,
       requiredQuantity: item.quantity,
-      hasInventory: !!inventory,
-      availableQuantity: inventory ? inventory.quantity : 0,
-      partnerPrice: inventory ? inventory.price : null,
-      condition: inventory ? inventory.condition : null,
-      canFulfill: inventory && inventory.quantity >= item.quantity,
+      hasInventory: !!product,
+      availableQuantity: product?.stock?.quantity || 0,
+      partnerPrice: product?.pricing?.mrp || null,
+      condition: product?.stock?.condition || null,
+      canFulfill: product && (product.stock?.quantity || 0) >= item.quantity,
     };
 
     if (itemStatus.canFulfill) {
@@ -851,8 +1011,8 @@ export async function checkMissingInventory(req, res) {
       totalMissingProducts: missingItems.length,
       message:
         missingItems.length > 0
-          ? 'You need to add missing products to your inventory before accepting this order'
-          : 'You have all required products in inventory',
+          ? 'You need to add missing products or increase stock quantities before accepting this order'
+          : 'You have all required products with sufficient stock',
     },
   });
 }
@@ -919,13 +1079,14 @@ export async function getDashboardStats(req, res) {
       });
     }
 
-    const inventoryCount = await Inventory.countDocuments({
-      partner: partner._id,
+    // Replace inventory stats with product stats
+    const productCount = await BuyProduct.countDocuments({
+      partnerId: partner._id,
     });
-    const activeInventory = await Inventory.countDocuments({
-      partner: partner._id,
-      isAvailable: true,
-      quantity: { $gt: 0 },
+    const activeProducts = await BuyProduct.countDocuments({
+      partnerId: partner._id,
+      isActive: true,
+      'stock.quantity': { $gt: 0 },
     });
 
     const buyOrders = await Order.countDocuments({
@@ -940,7 +1101,6 @@ export async function getDashboardStats(req, res) {
       status: 'delivered',
     });
 
-    const SellOrder = require('../models/sellOrder.model');
     const sellOrders = await SellOrder.countDocuments({
       assignedTo: partner._id,
     });
@@ -1053,9 +1213,9 @@ export async function getDashboardStats(req, res) {
       success: true,
       data: {
         wallet: partner.wallet,
-        inventory: {
-          total: inventoryCount,
-          active: activeInventory,
+        products: {
+          total: productCount,
+          active: activeProducts,
         },
         orders: {
           total: totalOrders,
@@ -1081,9 +1241,6 @@ export async function getDashboardStats(req, res) {
     });
   }
 }
-
-import { SellOrder } from '../models/sellOrder.model.js';
-import { SellProduct } from '../models/sellProduct.model.js';
 
 export async function getDashboardSellBuy(req, res) {
   const partner = await Partner.findOne({ user: req.user.id });
@@ -1177,7 +1334,14 @@ export async function getPartnerSellProducts(req, res) {
   const skip = (page - 1) * limit;
 
   const products = await SellProduct.find(filter)
-    .populate('categoryId', 'name image')
+    .populate({
+      path: 'categoryId',
+      select: 'name displayName image superCategory',
+      populate: {
+        path: 'superCategory',
+        select: 'name displayName',
+      },
+    })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(parseInt(limit));
@@ -1221,7 +1385,14 @@ export async function getPartnerBuyProducts(req, res) {
   const skip = (page - 1) * limit;
 
   const products = await BuyProduct.find(filter)
-    .populate('categoryId', 'name image')
+    .populate({
+      path: 'categoryId',
+      select: 'name displayName image superCategory',
+      populate: {
+        path: 'superCategory',
+        select: 'name displayName',
+      },
+    })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(parseInt(limit));
@@ -1528,4 +1699,206 @@ export async function deleteAgent(req, res) {
     success: true,
     message: 'Agent deactivated successfully',
   });
+}
+export async function createPartnerProduct(req, res) {
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      throw new ApiError('Partner profile not found', 404);
+    }
+
+    // Validate category exists and is active
+    const { BuyCategory } = await import('../models/buyCategory.model.js');
+    const category = await BuyCategory.findById(req.body.categoryId).populate(
+      'superCategory'
+    );
+    if (!category || !category.isActive) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'Invalid or inactive category ID. Please select a valid active category created by admin.',
+      });
+    }
+
+    // Validate super category is active
+    if (!category.superCategory || !category.superCategory.isActive) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'The selected category belongs to an inactive super category. Please contact admin.',
+      });
+    }
+
+    // Transform and create product data with partner ID automatically assigned
+    const productData = {
+      ...req.body,
+      partnerId: partner._id, // Automatically assign partner ID from JWT token
+      createdBy: req.user.id,
+    };
+
+    // Remove any manually passed partnerId from frontend for security
+    delete productData.partner;
+
+    // Transform topSpecs from array to object format expected by schema
+    if (req.body.topSpecs && Array.isArray(req.body.topSpecs)) {
+      productData.topSpecs = {
+        screenSize: req.body.productDetails?.display?.size || '',
+        chipset: req.body.productDetails?.general?.chipset || '',
+        pixelDensity: req.body.productDetails?.display?.resolution || '',
+        networkSupport: req.body.productDetails?.network?.network || '',
+        simSlots: req.body.productDetails?.network?.sim || '',
+      };
+    }
+
+    // Transform productDetails to match schema structure
+    if (req.body.productDetails) {
+      const details = req.body.productDetails;
+
+      // Transform camera data to match schema
+      if (details.camera) {
+        productData.productDetails = {
+          ...productData.productDetails,
+          frontCamera: {
+            resolution: details.camera?.front?.primary || '',
+            setup: 'Single',
+            features: [],
+          },
+          rearCamera: {
+            setup: details.camera?.rear?.secondary ? 'Dual' : 'Single',
+            camera1: {
+              resolution: details.camera?.rear?.primary || '',
+              type: 'Primary',
+            },
+            camera2: details.camera?.rear?.secondary
+              ? {
+                  resolution: details.camera?.rear?.secondary || '',
+                  type: 'Secondary',
+                }
+              : undefined,
+            features: [],
+          },
+        };
+      }
+
+      // Transform network connectivity
+      if (details.network) {
+        productData.productDetails = {
+          ...productData.productDetails,
+          networkConnectivity: {
+            wifi: details.network?.wifi || '',
+            bluetooth: details.network?.bluetooth || '',
+            nfc: details.network?.nfc ? 'Yes' : 'No',
+            gps: details.network?.gps ? 'Yes' : 'No',
+            simSlots: details.network?.sim || '',
+            networkSupport: details.network?.network || '',
+            wifiFeatures: [],
+            audioFeatures: [],
+          },
+        };
+      }
+
+      // Transform memory storage
+      if (details.memory) {
+        productData.productDetails = {
+          ...productData.productDetails,
+          memoryStorage: {
+            phoneVariants: [
+              `${details.memory?.ram || ''} + ${details.memory?.storage || ''}`,
+            ],
+            expandableStorage: details.memory?.expandable || false,
+            ramType: 'LPDDR',
+            storageType: 'UFS',
+          },
+        };
+      }
+
+      // Transform performance
+      if (details.general) {
+        productData.productDetails = {
+          ...productData.productDetails,
+          performance: {
+            chipset: details.general?.chipset || '',
+            cpu: details.general?.processor || '',
+            gpu: details.general?.gpu || '',
+            os: details.general?.os || '',
+            architecture: '64-bit',
+            processTechnology: '6nm',
+          },
+        };
+      }
+
+      // Keep display and battery as-is since they use Mixed type
+      if (details.display) {
+        productData.productDetails = {
+          ...productData.productDetails,
+          display: details.display,
+        };
+      }
+
+      if (details.battery) {
+        productData.productDetails = {
+          ...productData.productDetails,
+          battery: details.battery,
+        };
+      }
+
+      if (details.design) {
+        productData.productDetails = {
+          ...productData.productDetails,
+          design: details.design,
+        };
+      }
+    }
+
+    // Add default values for required fields
+    if (!productData.paymentOptions) {
+      productData.paymentOptions = {
+        emiAvailable: false,
+        emiPlans: [],
+        methods: ['Cash', 'UPI', 'Card'],
+      };
+    }
+
+    if (!productData.rating) {
+      productData.rating = {
+        average: 0,
+        totalReviews: 0,
+        breakdown: {
+          '5star': 0,
+          '4star': 0,
+          '3star': 0,
+          '2star': 0,
+          '1star': 0,
+        },
+      };
+    }
+
+    const product = new BuyProduct(productData);
+    await product.save();
+
+    const populatedProduct = await BuyProduct.findById(product._id)
+      .populate({
+        path: 'categoryId',
+        select: 'name displayName superCategory',
+        populate: {
+          path: 'superCategory',
+          select: 'name displayName',
+        },
+      })
+      .populate('partnerId', 'shopName')
+      .populate('createdBy', 'name email');
+
+    res.status(201).json({
+      success: true,
+      message: 'Product created successfully',
+      data: populatedProduct,
+    });
+  } catch (error) {
+    console.error('Error creating partner product:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error creating product',
+      error: error.message,
+    });
+  }
 }

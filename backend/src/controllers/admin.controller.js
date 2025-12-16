@@ -13,21 +13,6 @@ import { Wallet } from '../models/wallet.model.js';
 import ApiError from '../utils/apiError.js';
 import { generateToken } from '../utils/jwt.utils.js';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const loginAdmin = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -1185,164 +1170,18 @@ export const getCatalog = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array(),
-      });
-    }
-
-    const {
-      category,
-      brand,
-      series,
-      model,
-      basePrice,
-      depreciationRate,
-      specifications,
-      images,
-      status = 'active',
-      description,
-      features,
-    } = req.body;
-
-    if (!category || !brand || !model || !basePrice) {
-      return res.status(400).json({
-        success: false,
-        message:
-          'Missing required fields: category, brand, model, and basePrice are required',
-      });
-    }
-
-    if (isNaN(basePrice) || parseFloat(basePrice) <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Base price must be a positive number',
-      });
-    }
-
-    if (
-      depreciationRate &&
-      (isNaN(depreciationRate) ||
-        parseFloat(depreciationRate) < 0 ||
-        parseFloat(depreciationRate) > 100)
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: 'Depreciation rate must be between 0 and 100',
-      });
-    }
-
-    const existingProduct = await Product.findOne({
-      category: category.toLowerCase(),
-      brand: brand.toLowerCase(),
-      model: model.toLowerCase(),
-    });
-
-    if (existingProduct) {
-      return res.status(409).json({
-        success: false,
-        message: 'Product with this category, brand, and model already exists',
-      });
-    }
-
-    let processedImages = [];
-    if (images) {
-      if (typeof images === 'string') {
-        try {
-          processedImages = JSON.parse(images);
-        } catch (e) {
-          processedImages = [images];
-        }
-      } else if (Array.isArray(images)) {
-        processedImages = images;
-      }
-
-      processedImages = processedImages
-        .map((img) => {
-          if (typeof img === 'string') return img.trim();
-          return img.url || img.secure_url || '';
-        })
-        .filter((url) => url && url.length > 0)
-        .slice(0, 10); // Limit to 10 images
-    }
-
-    // Process specifications
-    let processedSpecs = {};
-    if (specifications) {
-      if (typeof specifications === 'string') {
-        try {
-          processedSpecs = JSON.parse(specifications);
-        } catch (e) {
-          processedSpecs = {};
-        }
-      } else if (typeof specifications === 'object') {
-        processedSpecs = specifications;
-      }
-    }
-
-    const productData = {
-      category: category.toLowerCase(),
-      brand: brand.trim(),
-      series: series ? series.trim() : '',
-      model: model.trim(),
-      basePrice: parseFloat(basePrice),
-      depreciationRate: depreciationRate ? parseFloat(depreciationRate) : 15,
-      specifications: processedSpecs,
-      images: processedImages,
-      status: ['active', 'inactive', 'pending'].includes(status)
-        ? status
-        : 'active',
-      description: description ? description.trim() : '',
-      features: Array.isArray(features) ? features : [],
-      createdBy: req.user._id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    // Create the product
-    const product = await Product.create(productData);
-
-    // Populate the created product for response
-    const populatedProduct = await Product.findById(product._id)
-      .populate('createdBy', 'name email')
-      .lean();
-
-    res.status(201).json({
-      success: true,
-      message: 'Product added successfully to catalog',
-      product: populatedProduct,
+    // Disable admin product creation as per new requirements
+    return res.status(403).json({
+      success: false,
+      message:
+        'Product creation is now handled by partners only. Admins can only manage categories and view products.',
     });
   } catch (error) {
-    console.error('Error adding product to catalog:', error);
-
-    if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        message: 'Product with this combination already exists',
-      });
-    }
-
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(
-        (err) => err.message
-      );
-      return res.status(400).json({
-        success: false,
-        message: 'Product validation failed',
-        errors: validationErrors,
-      });
-    }
-
+    console.error('Error in addProduct:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to add product to catalog',
-      error:
-        process.env.NODE_ENV === 'development'
-          ? error.message
-          : 'Internal server error',
+      message: 'Server error',
+      error: error.message,
     });
   }
 };
@@ -1485,7 +1324,7 @@ export const updateProduct = async (req, res) => {
       if (typeof images === 'string') {
         try {
           processedImages = JSON.parse(images);
-        } catch (e) {
+        } catch (_) {
           processedImages = [images];
         }
       } else if (Array.isArray(images)) {
@@ -1507,7 +1346,7 @@ export const updateProduct = async (req, res) => {
       if (typeof specifications === 'string') {
         try {
           processedSpecs = JSON.parse(specifications);
-        } catch (e) {
+        } catch (_) {
           processedSpecs = {};
         }
       } else if (typeof specifications === 'object') {
