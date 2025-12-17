@@ -45,7 +45,7 @@ const securityConfig = {
   },
 
   authRateLimit: {
-    windowMs: 15 * 60 * 1000,
+    windowMs: 15 * 60 * 1000, // 15 minutes
     max: 50,
     standardHeaders: true,
     legacyHeaders: false,
