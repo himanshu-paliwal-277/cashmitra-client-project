@@ -65,6 +65,7 @@ const PartnerLayout = lazy(() => import('./components/partner/layout/PartnerLayo
 const PartnerDashboard = lazy(() => import('./pages/partner/Dashboard'));
 const PartnerProducts = lazy(() => import('./pages/partner/Products'));
 const PartnerOrders = lazy(() => import('./pages/partner/Orders'));
+const PartnerBuyOrders = lazy(() => import('./pages/partner/BuyOrders'));
 const PartnerPayouts = lazy(() => import('./pages/partner/Payouts'));
 
 // Admin Pages (Lazy)
@@ -190,6 +191,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="dashboard" element={<PartnerDashboard />} />
           <Route path="products" element={<PartnerProducts />} />
           <Route path="orders" element={<PartnerOrders />} />
+          <Route path="buy-orders" element={<PartnerBuyOrders />} />
           <Route path="payouts" element={<PartnerPayouts />} />
           <Route path="kyc" element={<PartnerKYC />} />
           <Route path="agents" element={<PartnerAgentManagement />} />

@@ -155,6 +155,16 @@ router.put(
   asyncHandler(partnerController.updateOrderStatus)
 );
 
+router.put(
+  '/orders/:id/assign-agent',
+  protect,
+  authorize('partner'),
+  validateObjectId('id'),
+  [check('agentId').isMongoId().withMessage('Valid agent ID is required')],
+  validateRequest,
+  asyncHandler(partnerController.assignAgentToOrder)
+);
+
 router.get(
   '/dashboard',
   protect,

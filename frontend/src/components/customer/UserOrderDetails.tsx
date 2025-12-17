@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -17,7 +17,6 @@ import {
   Smartphone,
   Star,
   Shield,
-  Eye,
 } from 'lucide-react';
 import useUserOrders from '../../hooks/useUserOrders';
 import './UserOrderDetails.css';
@@ -334,24 +333,50 @@ const UserOrderDetails = () => {
 
                             <div className="price-section">
                               <div className="price">
-                                {formatCurrency(order?.totalAmount / item.quantity)}
-                              </div>
-                              {product?.basePrice &&
-                                product.basePrice > order?.totalAmount / item.quantity && (
-                                  <>
-                                    <div className="original-price">
-                                      {formatCurrency(product.basePrice)}
-                                    </div>
-                                    <div className="discount">
-                                      {Math.round(
-                                        ((product.basePrice - order?.totalAmount / item.quantity) /
-                                          product.basePrice) *
-                                          100
-                                      )}
-                                      % OFF
-                                    </div>
-                                  </>
+                                {formatCurrency(
+                                  item.price ||
+                                    item.unitPrice ||
+                                    item.totalPrice ||
+                                    // Customer pays the discounted price
+                                    product?.pricing?.discountedPrice ||
+                                    product?.pricing?.mrp ||
+                                    // Fallback: calculate from total amount
+                                    (order?.totalAmount && order.items
+                                      ? order.totalAmount / order.items.length
+                                      : 0)
                                 )}
+                              </div>
+                              {(() => {
+                                const actualPrice =
+                                  item.price ||
+                                  item.unitPrice ||
+                                  item.totalPrice ||
+                                  // Customer pays the discounted price
+                                  product?.pricing?.discountedPrice ||
+                                  product?.pricing?.mrp ||
+                                  (order?.totalAmount && order.items
+                                    ? order.totalAmount / order.items.length
+                                    : 0);
+
+                                const originalPrice = product?.pricing?.mrp || product?.basePrice;
+
+                                return (
+                                  originalPrice &&
+                                  originalPrice > actualPrice && (
+                                    <>
+                                      <div className="original-price">
+                                        {formatCurrency(originalPrice)}
+                                      </div>
+                                      <div className="discount">
+                                        {Math.round(
+                                          ((originalPrice - actualPrice) / originalPrice) * 100
+                                        )}
+                                        % OFF
+                                      </div>
+                                    </>
+                                  )
+                                );
+                              })()}
                             </div>
                           </div>
                         </div>
@@ -547,18 +572,63 @@ const UserOrderDetails = () => {
                   </>
                 ) : (
                   <>
-                    <div className="payment-row">
-                      <span>Subtotal</span>
-                      <span>{formatCurrency(order?.totalAmount * 0.9 || 0)}</span>
-                    </div>
-                    <div className="payment-row">
-                      <span>Taxes & Fees</span>
-                      <span>{formatCurrency(order?.totalAmount * 0.1 || 0)}</span>
-                    </div>
-                    <div className="payment-row total">
-                      <span>Total Amount</span>
-                      <span>{formatCurrency(order?.totalAmount || 0)}</span>
-                    </div>
+                    {(() => {
+                      // Calculate subtotal from items
+                      const itemsSubtotal =
+                        order?.items?.reduce((total: number, item: any) => {
+                          const product = item.product;
+                          const itemPrice =
+                            item.price ||
+                            item.unitPrice ||
+                            item.totalPrice ||
+                            // Customer pays the discounted price
+                            product?.pricing?.discountedPrice ||
+                            product?.pricing?.mrp ||
+                            0;
+                          return total + itemPrice * (item.quantity || 1);
+                        }, 0) || 0;
+
+                      // Use calculated itemsSubtotal as the correct total (not the backend totalAmount which is wrong)
+                      const correctTotalAmount = itemsSubtotal;
+
+                      // Calculate commission based on correct total amount, not backend's wrong amount
+                      const commissionRate = order?.commission?.rate || 0;
+                      const correctCommissionAmount = correctTotalAmount * commissionRate;
+
+                      // Customer actually pays: correctTotalAmount - correct commission
+                      const customerPayAmount = correctTotalAmount - correctCommissionAmount;
+
+                      // Use itemsSubtotal as subtotal, calculate taxes as difference
+                      const subtotal = itemsSubtotal;
+                      const taxesAndFees = Math.max(0, customerPayAmount - subtotal);
+
+                      return (
+                        <>
+                          <div className="payment-row">
+                            <span>Subtotal</span>
+                            <span>{formatCurrency(subtotal)}</span>
+                          </div>
+                          {taxesAndFees > 0 && (
+                            <div className="payment-row">
+                              <span>Taxes & Fees</span>
+                              <span>{formatCurrency(taxesAndFees)}</span>
+                            </div>
+                          )}
+                          {correctCommissionAmount > 0 && (
+                            <div className="payment-row">
+                              <span>Cashback</span>
+                              <span className="text-green-600">
+                                -{formatCurrency(correctCommissionAmount)}
+                              </span>
+                            </div>
+                          )}
+                          <div className="payment-row total">
+                            <span>You Pay</span>
+                            <span>{formatCurrency(customerPayAmount)}</span>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </>
                 )}
               </div>

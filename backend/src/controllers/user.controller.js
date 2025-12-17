@@ -100,7 +100,10 @@ export const getUserOrders = async (req, res) => {
 
     const orders = await Order.find(query)
       .populate('partner', 'name email phone')
-      .populate('items.product', 'name brand model images')
+      .populate(
+        'items.product',
+        'name brand model images pricing categoryId variants conditionOptions isActive'
+      )
       .populate('items.inventory', 'condition price')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
@@ -128,7 +131,10 @@ export const getOrderById = async (req, res) => {
       user: req.user._id,
     })
       .populate('partner', 'name email phone address')
-      .populate('items.product', 'name brand model images specifications')
+      .populate(
+        'items.product',
+        'name brand model images specifications pricing categoryId variants conditionOptions isActive'
+      )
       .populate('items.inventory', 'condition price');
 
     if (!order) {
@@ -251,4 +257,3 @@ export const setDefaultAddress = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
-

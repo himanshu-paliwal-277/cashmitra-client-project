@@ -147,7 +147,7 @@ router.post(
   asyncHandler(buyController.createOrder)
 );
 
-router.get('/orders', protect, asyncHandler(buyController.getUserOrders));
+router.get('/orders', protect, asyncHandler(buyController.getUserBuyOrders));
 
 router.get(
   '/orders/:orderId',

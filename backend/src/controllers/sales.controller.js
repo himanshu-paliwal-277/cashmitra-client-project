@@ -1,6 +1,9 @@
 import { validationResult } from 'express-validator';
 
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { BuyProduct } from '../models/buyProduct.model.js';
 import { Inventory } from '../models/inventory.model.js';
 import { Order } from '../models/order.model.js';
@@ -32,6 +35,7 @@ export var createOrder = asyncHandler(async (req, res) => {
 
   const processedItems = [];
   let totalAmount = 0;
+  let orderPartnerId = null;
 
   for (const item of items) {
     const { inventoryId, quantity } = item;
@@ -41,6 +45,23 @@ export var createOrder = asyncHandler(async (req, res) => {
 
     if (!product) {
       throw new ApiError(404, `Product ${inventoryId} not found`);
+    }
+
+    // Extract partner ID from the product
+    if (product.partnerId) {
+      if (!orderPartnerId) {
+        orderPartnerId = product.partnerId.toString();
+      } else if (orderPartnerId !== product.partnerId.toString()) {
+        throw new ApiError(
+          400,
+          'All items in an order must belong to the same partner'
+        );
+      }
+    } else {
+      throw new ApiError(
+        400,
+        `Product ${product.name} is not associated with any partner`
+      );
     }
 
     const itemTotal = product.pricing.mrp * quantity;
@@ -62,8 +83,6 @@ export var createOrder = asyncHandler(async (req, res) => {
   const partnerAmount = totalAmount - totalCommission;
 
   let discountAmount = 0;
-  
-  
 
   if (isNaN(totalAmount) || totalAmount <= 0) {
     throw new ApiError(400, 'Invalid total amount calculated');
@@ -72,7 +91,7 @@ export var createOrder = asyncHandler(async (req, res) => {
   const order = new Order({
     orderType: 'buy',
     user: userId,
-    partner: userId,
+    partner: orderPartnerId,
     items: processedItems,
     totalAmount,
     discountAmount,
@@ -196,7 +215,8 @@ export var getOrder = asyncHandler(async (req, res) => {
     { path: 'user', select: 'name email phone' },
     {
       path: 'items.product',
-      select: 'brand model variant images specifications',
+      select:
+        'name brand model variant images specifications pricing categoryId variants conditionOptions isActive',
     },
     { path: 'items.partner', select: 'shopName address phone' },
   ]);
@@ -242,7 +262,11 @@ export var getUserOrders = asyncHandler(async (req, res) => {
 
   const orders = await Order.find(filter)
     .populate([
-      { path: 'items.product', select: 'brand model variant images' },
+      {
+        path: 'items.product',
+        select:
+          'name brand model variant images pricing categoryId variants conditionOptions isActive',
+      },
       { path: 'items.partner', select: 'shopName' },
     ])
     .sort(sort)

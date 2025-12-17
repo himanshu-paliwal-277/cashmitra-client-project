@@ -374,6 +374,16 @@ class PartnerService {
       throw error.response?.data || error;
     }
   }
+
+  async assignAgentToOrder(orderId: string, agentId: string) {
+    try {
+      const response = await api.put(`/partner/orders/${orderId}/assign-agent`, { agentId });
+      return response.data;
+    } catch (error) {
+      console.error('Error assigning agent to order:', error);
+      throw error.response?.data || error;
+    }
+  }
 }
 
 export const partnerService = new PartnerService();

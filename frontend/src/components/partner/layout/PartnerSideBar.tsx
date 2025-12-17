@@ -29,6 +29,7 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
     '/partner/dashboard': 'dashboard',
     '/partner/products': 'products',
     '/partner/orders': 'orders',
+    '/partner/buy-orders': 'buyOrders',
     '/partner/payouts': 'payouts',
     '/partner/kyc': 'kyc',
     '/partner/agents': 'agents',
@@ -75,6 +76,7 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
       items: [
         { to: '/partner/products', icon: Package, label: 'My Products' },
         { to: '/partner/orders', icon: ShoppingCart, label: 'Orders' },
+        { to: '/partner/buy-orders', icon: ShoppingCart, label: 'Buy Orders' },
         // { to: '/partner/buy/categories', icon: FolderTree, label: 'Buy Categories' },
         // { to: '/partner/buy/products', icon: Package, label: 'Buy Products' },
         // { to: '/partner/sell/categories', icon: FolderTree, label: 'Sell Categories' },

@@ -360,7 +360,8 @@ export const checkout = async (req, res) => {
 
     for (const item of cart.items) {
       const product = await BuyProduct.findById(item.productId).populate(
-        'partnerId'
+        'partnerId',
+        '_id shopName'
       );
 
       if (!product) {
@@ -375,10 +376,19 @@ export const checkout = async (req, res) => {
         });
       }
 
-      // Extract partnerId from the product - this is the critical fix
-      const partnerId = product.partnerId
-        ? product.partnerId._id.toString()
-        : null;
+      // Extract partnerId from the product - handle both populated and non-populated cases
+      let partnerId = null;
+
+      if (product.partnerId) {
+        // If partnerId is populated (object with _id)
+        if (typeof product.partnerId === 'object' && product.partnerId._id) {
+          partnerId = product.partnerId._id.toString();
+        }
+        // If partnerId is just an ObjectId string
+        else {
+          partnerId = product.partnerId.toString();
+        }
+      }
 
       if (!partnerId) {
         return res.status(400).json({
@@ -471,11 +481,15 @@ export const getBuyOrderDetails = async (req, res) => {
       orderType: 'buy',
     })
       .populate('partner', 'shopName address phone')
+      .populate(
+        'items.product',
+        'name brand model images pricing categoryId variants conditionOptions isActive'
+      )
       .populate({
         path: 'items.inventory',
         populate: {
           path: 'product',
-          select: 'category brand model variant images',
+          select: 'name category brand model variant images pricing',
         },
       });
 
@@ -501,6 +515,11 @@ export const getUserBuyOrders = async (req, res) => {
       orderType: 'buy',
     })
       .populate('partner', 'shopName')
+      .populate(
+        'items.product',
+        'name brand model images pricing categoryId variants conditionOptions isActive'
+      )
+      .populate('items.inventory', 'condition price')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);

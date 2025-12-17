@@ -690,6 +690,14 @@ export async function getOrders(req, res) {
           path: 'items.inventory',
           populate: { path: 'product', select: 'name brand categoryId images' },
         })
+        .populate({
+          path: 'assignedAgent',
+          select: 'user agentCode employeeId',
+          populate: {
+            path: 'user',
+            select: 'name email phone',
+          },
+        })
         .sort(sortObj)
         .lean();
 
@@ -934,11 +942,26 @@ export async function respondToOrderAssignment(req, res) {
       note: `Order accepted by partner: ${reason || 'No reason provided'}`,
     });
   } else if (response === 'rejected') {
-    order.status = 'pending';
+    // When partner rejects, clear partner assignment and set status to awaiting reassignment
+    order.partner = null;
+    order.status = 'pending'; // Keep as pending but clear partner so it can be reassigned
+    order.partnerAssignment = {
+      response: {
+        status: 'pending',
+      },
+      reassignmentHistory: [
+        ...order.partnerAssignment.reassignmentHistory,
+        {
+          previousPartner: partner._id,
+          reason: reason || 'Partner rejected the order',
+          reassignedAt: new Date(),
+        },
+      ],
+    };
     order.statusHistory.push({
       status: 'partner_rejected',
       timestamp: new Date(),
-      note: `Order rejected by partner: ${reason || 'No reason provided'}`,
+      note: `Order rejected by partner: ${reason || 'No reason provided'}. Available for reassignment.`,
     });
   }
 
@@ -1700,6 +1723,75 @@ export async function deleteAgent(req, res) {
     message: 'Agent deactivated successfully',
   });
 }
+export async function assignAgentToOrder(req, res) {
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      throw new ApiError('Partner profile not found', 404);
+    }
+
+    const { agentId } = req.body;
+    const orderId = req.params.id;
+
+    // Verify the order belongs to this partner
+    const order = await Order.findById(orderId);
+    if (!order) {
+      throw new ApiError('Order not found', 404);
+    }
+
+    if (!order.partner || order.partner.toString() !== partner._id.toString()) {
+      throw new ApiError('Order is not assigned to your shop', 403);
+    }
+
+    // Verify the agent belongs to this partner
+    const agent = await Agent.findOne({
+      _id: agentId,
+      assignedPartner: partner._id,
+      isActive: true,
+    }).populate('user', 'name email phone');
+
+    if (!agent) {
+      throw new ApiError('Agent not found or not assigned to your shop', 404);
+    }
+
+    // Update the order with agent assignment
+    order.assignedAgent = agentId;
+    order.statusHistory.push({
+      status: order.status,
+      timestamp: new Date(),
+      note: `Agent ${agent.user.name} assigned to order`,
+    });
+
+    await order.save();
+
+    // Populate the order with agent details for response
+    await order.populate('assignedAgent', 'user agentCode employeeId');
+    await order.populate({
+      path: 'assignedAgent',
+      populate: {
+        path: 'user',
+        select: 'name email phone',
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Agent assigned to order successfully',
+      data: {
+        orderId: order._id,
+        assignedAgent: order.assignedAgent,
+      },
+    });
+  } catch (error) {
+    console.error('Error assigning agent to order:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error assigning agent to order',
+      error: error.message,
+    });
+  }
+}
+
 export async function createPartnerProduct(req, res) {
   try {
     const partner = await Partner.findOne({ user: req.user.id });
