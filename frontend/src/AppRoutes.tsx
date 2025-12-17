@@ -1,5 +1,7 @@
 import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './components/customer/auth/ProtectedRoute';
+import RoleBasedRedirect from './components/common/RoleBasedRedirect';
 
 // Layouts
 const MainLayout = lazy(() => import('./components/customer/layout/MainLayout'));
@@ -128,8 +130,8 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
   return (
     <Routes>
       {/* Auth Routes (No Layout - Full Screen) */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/login" element={<RoleBasedRedirect><LoginPage /></RoleBasedRedirect>} />
+      <Route path="/signup" element={<RoleBasedRedirect><SignupPage /></RoleBasedRedirect>} />
 
       {/* Admin Routes (No Main Layout - Has AdminLayout) */}
       <Route path="/admin/login" element={<AdminLogin />} />
@@ -213,7 +215,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
         <Route path="/terms" element={<Terms />} />
         <Route path="/returns-refund" element={<ReturnsRefund />} />
 
-        {/* Sell Flow Pages */}
+        {/* Sell Flow Pages - Public (browsing) and Protected (booking) */}
         <Route path="/sell" element={<CategorySelection />} />
         <Route path="/sell/category/:category" element={<SellCategoryHome />} />
         <Route path="/sell/:category/products" element={<CategoryProducts />} />
@@ -226,28 +228,30 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
         <Route path="/sell/:category/:brand/:model/condition" element={<ProductCondition />} />
         <Route path="/sell/:category/questionnaire" element={<ConditionQuestionnaire />} />
         <Route path="/sell/:category/quote" element={<PriceQuote />} />
-        <Route path="/sell/:category/pickup" element={<PickupBooking />} />
-        <Route path="/sell/:category/confirmation" element={<BookingConfirmation />} />
+        {/* Protected: Pickup booking requires authentication */}
+        <Route path="/sell/:category/pickup" element={<ProtectedRoute><PickupBooking /></ProtectedRoute>} />
+        <Route path="/sell/:category/confirmation" element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
         <Route path="/sell/tablet" element={<SellTablet />} />
         <Route path="/sell/laptop" element={<SellLaptop />} />
         <Route path="/sell-mobile" element={<SellMobileForm />} />
 
-        {/* Buy Flow Pages */}
+        {/* Buy Flow Pages - Public (browsing) and Protected (cart/checkout) */}
         <Route path="/buy" element={<BuySuperCategorySelection />} />
         <Route path="/buy/category/:category" element={<BuyCategoryHome />} />
         <Route path="/buy/:superCategory/:category/products" element={<BuyProductsPage />} />
         <Route path="/buy/product/:productId" element={<ProductDetails />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+        {/* Protected: Cart and checkout require authentication */}
+        <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+        <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+        <Route path="/order-confirmation/:orderId" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
 
-        {/* Account Pages */}
-        <Route path="/account/profile" element={<MyProfile />} />
-        <Route path="/account/orders" element={<MyOrders />} />
-        <Route path="/account/orders/:orderId" element={<UserOrderDetails />} />
-        <Route path="/account/wallet" element={<Wallet />} />
-        <Route path="/account/kyc" element={<KYC />} />
-        <Route path="/account/addresses" element={<SavedAddresses />} />
+        {/* Account Pages - All Protected */}
+        <Route path="/account/profile" element={<ProtectedRoute><MyProfile /></ProtectedRoute>} />
+        <Route path="/account/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+        <Route path="/account/orders/:orderId" element={<ProtectedRoute><UserOrderDetails /></ProtectedRoute>} />
+        <Route path="/account/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
+        <Route path="/account/kyc" element={<ProtectedRoute><KYC /></ProtectedRoute>} />
+        <Route path="/account/addresses" element={<ProtectedRoute><SavedAddresses /></ProtectedRoute>} />
       </Route>
 
       {/* 404 Not Found (No Layout - Full Screen) */}

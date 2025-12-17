@@ -94,7 +94,7 @@ const useSellOrders = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
@@ -130,7 +130,7 @@ const useSellOrders = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await api.put(`/sell-orders/admin/${orderId}/status`, statusData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -164,7 +164,7 @@ const useSellOrders = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const response = await api.put(`/sell-orders/admin/${orderId}/assign-staff`, staffData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -191,7 +191,7 @@ const useSellOrders = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const response = await api.put(`/sell-orders/admin/${orderId}/pickup`, pickupData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -218,7 +218,7 @@ const useSellOrders = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const response = await api.get(`/sell-orders/admin/status/${status}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -239,7 +239,7 @@ const useSellOrders = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const response = await api.get('/sell-orders/admin/statistics', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -262,7 +262,7 @@ const useSellOrders = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         await api.delete(`/sell-orders/admin/${orderId}`, {
           headers: {
             Authorization: `Bearer ${token}`,

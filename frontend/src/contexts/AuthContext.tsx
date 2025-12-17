@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { API_BASE_URL } from '../utils/api';
+import { decodeToken, getRoleFromToken, isTokenExpired } from '../utils/jwt.utils';
 
 // Define types
 interface User {
@@ -19,6 +20,7 @@ interface AuthResponse {
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   loading: boolean;
   error: string | null;
   currentOrder: any;
@@ -45,21 +47,42 @@ export const useAuth = (): AuthContextType => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentOrder, setCurrentOrder] = useState<any>(null);
 
   // Check for existing token on app load
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
+    const storedToken = localStorage.getItem('token');
     const userData = localStorage.getItem('userData');
 
-    if (token && userData) {
+    if (storedToken && userData) {
       try {
+        // Check if token is expired
+        if (isTokenExpired(storedToken)) {
+          console.log('Token expired - clearing auth data');
+          localStorage.removeItem('token');
+          localStorage.removeItem('userData');
+          setLoading(false);
+          return;
+        }
+
+        // Decode token to get role
+        const decodedToken = decodeToken(storedToken);
         const parsedUser = JSON.parse(userData);
+
+        // Add role from token to user object
+        if (decodedToken?.role) {
+          parsedUser.role = decodedToken.role;
+        }
+
         setUser(parsedUser);
+        setToken(storedToken);
       } catch (err) {
         console.error('Error parsing user data:', err);
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
       }
     }
     setLoading(false);
@@ -84,11 +107,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error(data.message || 'Login failed');
       }
 
-      // Store token and user data
-      localStorage.setItem('authToken', data.token);
+      // Store token and user data with consistent naming
+      localStorage.setItem('token', data.token);
       localStorage.setItem('userData', JSON.stringify(data));
 
       setUser(data);
+      setToken(data.token);
       return { success: true, user: data };
     } catch (err: any) {
       setError(err.message);
@@ -117,11 +141,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error(data.message || 'Signup failed');
       }
 
-      // Auto-login after successful signup
-      localStorage.setItem('authToken', data.token);
+      // Auto-login after successful signup with consistent naming
+      localStorage.setItem('token', data.token);
       localStorage.setItem('userData', JSON.stringify(data));
 
       setUser(data);
+      setToken(data.token);
       return { success: true, user: data };
     } catch (err: any) {
       setError(err.message);
@@ -132,10 +157,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = (): void => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
     localStorage.removeItem('userData');
     setUser(null);
+    setToken(null);
     setError(null);
+    setCurrentOrder(null);
   };
 
   const updateUser = (updatedUserData: any): void => {
@@ -145,11 +172,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const getAuthToken = (): string | null => {
-    return localStorage.getItem('authToken');
+    return token;
   };
 
   const isAuthenticated = (): boolean => {
-    return !!user && !!localStorage.getItem('authToken');
+    return !!user && !!token;
   };
 
   const clearError = (): void => {
@@ -166,6 +193,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const value: AuthContextType = {
     user,
+    token,
     loading,
     error,
     currentOrder,

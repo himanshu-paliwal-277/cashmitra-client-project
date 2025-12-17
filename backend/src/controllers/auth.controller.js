@@ -75,6 +75,22 @@ export const loginUser = async (req, res) => {
       });
     }
 
+    // Check if user is trying to login with admin credentials
+    if (user.role === 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'You are an admin. Please login through the admin panel.',
+      });
+    }
+
+    // Check if user is trying to login with partner credentials
+    if (user.role === 'partner') {
+      return res.status(403).json({
+        success: false,
+        message: 'You are a partner. Please login through the partner portal.',
+      });
+    }
+
     // Verify password
     const isPasswordValid = await user.matchPassword(password);
     if (!isPasswordValid) {
@@ -290,16 +306,38 @@ export const loginPartner = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user by email and partner role (include password for verification)
-    const user = await User.findOne({ email, role: 'partner' }).select(
-      '+password'
-    );
+    // Find user by email (include password for verification)
+    const user = await User.findOne({ email }).select('+password');
 
-    // Check if partner user exists
+    // Check if user exists
     if (!user) {
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password',
+      });
+    }
+
+    // Check if user is trying to login with admin credentials
+    if (user.role === 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'You are an admin. Please login through the admin panel.',
+      });
+    }
+
+    // Check if user is trying to login with customer credentials
+    if (user.role === 'user' || user.role === 'customer') {
+      return res.status(403).json({
+        success: false,
+        message: 'You are a customer. Please login through the customer login page.',
+      });
+    }
+
+    // Check if user is a partner
+    if (user.role !== 'partner') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Partner account required.',
       });
     }
 

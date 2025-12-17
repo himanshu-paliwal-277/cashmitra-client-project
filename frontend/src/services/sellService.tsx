@@ -177,16 +177,12 @@ class SellService {
   }
 
   // Update sell order status (for admin use)
-  async updateSellOrderStatus(orderId: any, status: any, adminToken: any) {
+  async updateSellOrderStatus(orderId: any, status: any) {
     try {
+      // Token is automatically added by axios interceptor
       const response = await api.put(
         `/sell/update-status/${orderId}`,
-        { status },
-        {
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        }
+        { status }
       );
       return response.data;
     } catch (error) {

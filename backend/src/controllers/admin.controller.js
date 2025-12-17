@@ -22,11 +22,37 @@ export const loginAdmin = async (req, res) => {
 
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email, role: 'admin' }).select(
-      '+password'
-    );
+    // Find user by email (include password for verification)
+    const user = await User.findOne({ email }).select('+password');
 
-    if (user && (await user.matchPassword(password))) {
+    // Check if user exists
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid admin credentials' });
+    }
+
+    // Check if user is trying to login with customer credentials
+    if (user.role === 'user' || user.role === 'customer') {
+      return res.status(403).json({
+        message: 'You are a customer. Please login through the customer login page.',
+      });
+    }
+
+    // Check if user is trying to login with partner credentials
+    if (user.role === 'partner') {
+      return res.status(403).json({
+        message: 'You are a partner. Please login through the partner portal.',
+      });
+    }
+
+    // Check if user is an admin
+    if (user.role !== 'admin') {
+      return res.status(403).json({
+        message: 'Access denied. Admin account required.',
+      });
+    }
+
+    // Verify password
+    if (await user.matchPassword(password)) {
       res.json({
         _id: user._id,
         name: user.name,

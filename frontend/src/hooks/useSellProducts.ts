@@ -25,7 +25,7 @@ const useSellProducts = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       // Remove page and limit from query params since pagination is removed
       const queryParams = new URLSearchParams({
         ...filters,
@@ -58,7 +58,7 @@ const useSellProducts = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const response = await api.get(`/sell-products/${productId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -79,7 +79,7 @@ const useSellProducts = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await api.post('/sell-products', productData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -106,7 +106,7 @@ const useSellProducts = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await api.put(`/sell-products/${productId}`, productData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -133,7 +133,7 @@ const useSellProducts = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         await api.delete(`/sell-products/${productId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -157,7 +157,7 @@ const useSellProducts = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const response = await api.get(`/sell-products/${productId}/variants`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -179,7 +179,7 @@ const useSellProducts = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await api.post(`/sell-products/${productId}/variants`, variantData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -206,7 +206,7 @@ const useSellProducts = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await api.put(
           `/sell-products/${productId}/variants/${variantId}`,
           variantData,
@@ -237,7 +237,7 @@ const useSellProducts = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         await api.delete(`/sell-products/${productId}/variants/${variantId}`, {
           headers: {
             Authorization: `Bearer ${token}`,

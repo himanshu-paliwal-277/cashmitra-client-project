@@ -360,9 +360,9 @@ const Cart = ({ onBack }: any) => {
 
                     <div className="item">
                       <div className="item__img">
-                        <img src={item.image} alt={item.name || item.title} />
+                        <img src={item.image} alt={item.name || item.title} className="" />
                         <div className="assured">
-                          <span className="assured__dot">ⓒ</span> cashmitra <b>ASSURED</b>
+                          <span className="assured__dot ">ⓒ</span> cashmitra <b>ASSURED</b>
                         </div>
                       </div>
 

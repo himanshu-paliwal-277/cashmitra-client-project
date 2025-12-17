@@ -63,8 +63,8 @@ class CloudinaryService {
   getAuthToken(): string | null {
     // Check for tokens in order of priority
     return (
-      localStorage.getItem('partnerToken') ||
-      localStorage.getItem('adminToken') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('token') ||
       localStorage.getItem('authToken') ||
       localStorage.getItem('vendorToken')
     );

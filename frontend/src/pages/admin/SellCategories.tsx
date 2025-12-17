@@ -135,7 +135,7 @@ const SellCategories = () => {
       if (imageFile) {
         const fd = new FormData();
         fd.append('image', imageFile);
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const res = await fetch(`${API_BASE_URL}/upload/image`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
