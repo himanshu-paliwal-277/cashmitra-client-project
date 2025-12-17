@@ -153,12 +153,12 @@ const BuyCategoryHome = () => {
       </div>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-12 px-4">
+      <section className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-16 px-4">
         <div className="main-container text-center">
           <h1 className="text-3xl text-white sm:text-4xl lg:text-5xl font-bold mb-4">
             {superCategory?.displayName || superCategoryName} Categories
           </h1>
-          <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto mb-8">
             Choose from our wide range of{' '}
             {(superCategory?.displayName || superCategoryName)?.toLowerCase()} categories
           </p>

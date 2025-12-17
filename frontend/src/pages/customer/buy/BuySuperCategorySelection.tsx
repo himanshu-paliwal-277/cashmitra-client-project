@@ -109,7 +109,7 @@ const BuySuperCategorySelection = () => {
 
       <div className="main-container">
         {/* Features Bar */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 bg-white rounded-2xl shadow-2xl p-6 sm:p-8 -mt-8 relative z-20 border border-slate-200">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 bg-white rounded-2xl shadow-2xl p-6 sm:p-8 -mt-8 relative border border-slate-200">
           <div className="flex items-center gap-3 p-2">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
               <Package className="w-6 h-6 text-white" />
