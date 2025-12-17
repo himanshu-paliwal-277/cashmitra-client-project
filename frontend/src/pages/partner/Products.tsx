@@ -146,7 +146,7 @@ function Products() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className=" bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-slate-900">My Products</h1>
@@ -259,7 +259,7 @@ function Products() {
               <img
                 src={getImageUrl(product.images) || '/placeholder-product.jpg'}
                 alt={product.name}
-                className="w-full h-48 object-cover"
+                className="w-full h-48 object-contain bg-gray-100 p-1"
               />
               <div className="absolute top-2 right-2">
                 <div className="relative">

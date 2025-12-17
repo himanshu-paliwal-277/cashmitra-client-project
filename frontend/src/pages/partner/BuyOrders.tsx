@@ -250,7 +250,7 @@ const BuyOrders = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className=" bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -459,10 +459,10 @@ const BuyOrders = () => {
                           <img
                             src={getImageUrl(item.product.images)}
                             alt={item.product.name}
-                            className="w-10 h-10 rounded-lg object-cover"
+                            className="w-10 h-10 rounded-lg object-contain bg-gray-100 "
                           />
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-gray-900 truncate max-w-32">
                               {item.product.name}
                             </div>
                             <div className="text-sm text-gray-500">Qty: {item.quantity}</div>
