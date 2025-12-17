@@ -1,16 +1,54 @@
 // Image upload service using backend proxy
-// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
+// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL =
+  (import.meta as any).env?.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
+
+interface TransformationOptions {
+  width?: number;
+  height?: number;
+  crop?: string;
+  quality?: string;
+  format?: string;
+  gravity?: string;
+  radius?: string;
+  effect?: string;
+}
+
+interface ValidationOptions {
+  maxSize?: number;
+  allowedTypes?: string[];
+  minWidth?: number;
+  minHeight?: number;
+  maxWidth?: number;
+  maxHeight?: number;
+}
+
+interface UploadOptions {
+  multiple?: boolean;
+  maxFiles?: number;
+  maxFileSize?: number;
+  maxImageWidth?: number;
+  maxImageHeight?: number;
+  cropping?: boolean;
+  croppingAspectRatio?: number | null;
+  folder?: string;
+  tags?: string[];
+}
 
 class CloudinaryService {
-  constructor() {    this.baseUrl = `${API_BASE_URL}/upload`;
+  private baseUrl: string;
+  private cloudName?: string;
+  private apiKey?: string;
+  private uploadPreset?: string;
+
+  constructor() {
+    this.baseUrl = `${API_BASE_URL}/upload`;
   }
 
   /**
    * Convert file to base64 string
-   * @param {File} file - The file to convert
-   * @returns {Promise<string>} Base64 string
    */
-  fileToBase64(file: any) {
+  fileToBase64(file: File): Promise<string | ArrayBuffer | null> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -20,18 +58,29 @@ class CloudinaryService {
   }
 
   /**
-   * Upload a single image to Cloudinary
-   * @param {File} file - The image file to upload
-   * @param {Object} options - Upload options
-   * @returns {Promise<Object>} Upload result
+   * Get the appropriate auth token based on current user context
    */
-  async uploadImage(file: any, options = {}) {
+  getAuthToken(): string | null {
+    // Check for tokens in order of priority
+    return (
+      localStorage.getItem('partnerToken') ||
+      localStorage.getItem('adminToken') ||
+      localStorage.getItem('authToken') ||
+      localStorage.getItem('vendorToken')
+    );
+  }
+
+  /**
+   * Upload a single image to Cloudinary
+   */
+  async uploadImage(file: File, options: Record<string, any> = {}) {
     try {
       const formData = new FormData();
       formData.append('image', file);
 
       // Get auth token from localStorage
-      const token = localStorage.getItem('adminToken');      const response = await fetch(`${this.baseUrl}/image`, {
+      const token = this.getAuthToken();
+      const response = await fetch(`${this.baseUrl}/image`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -64,28 +113,28 @@ class CloudinaryService {
           folder: result.data.folder,
         },
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Cloudinary upload error:', error);
       return {
-        success: false,        error: error.message || 'Failed to upload image',
+        success: false,
+        error: error.message || 'Failed to upload image',
       };
     }
   }
 
   /**
    * Upload multiple images to Cloudinary
-   * @param {FileList|Array} files - Array of image files
-   * @param {Object} options - Upload options
-   * @returns {Promise<Array>} Array of upload results
    */
-  async uploadMultipleImages(files: any, options = {}) {
+  async uploadMultipleImages(files: FileList | File[], options: Record<string, any> = {}) {
     try {
       const formData = new FormData();
-      Array.from(files).forEach(file => {        formData.append('images', file);
+      Array.from(files).forEach((file: File) => {
+        formData.append('images', file);
       });
 
       // Get auth token from localStorage
-      const token = localStorage.getItem('adminToken');      const response = await fetch(`${this.baseUrl}/images`, {
+      const token = this.getAuthToken();
+      const response = await fetch(`${this.baseUrl}/images`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -114,12 +163,14 @@ class CloudinaryService {
         totalUploaded: imageData.length,
         totalFailed: 0,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Multiple upload error:', error);
       return {
-        success: false,        error: error.message || 'Failed to upload images',
+        success: false,
+        error: error.message || 'Failed to upload images',
         results: [],
-        successful: [],        failed: [error.message],
+        successful: [],
+        failed: [error.message],
         totalUploaded: 0,
         totalFailed: Array.from(files).length,
       };
@@ -128,10 +179,8 @@ class CloudinaryService {
 
   /**
    * Delete an image from Cloudinary
-   * @param {string} publicId - The public ID of the image to delete
-   * @returns {Promise<Object>} Deletion result
    */
-  async deleteImage(publicId: any) {
+  async deleteImage(publicId: string) {
     try {
       const timestamp = Math.round(new Date().getTime() / 1000);
       const signature = await this.generateSignature({
@@ -140,8 +189,11 @@ class CloudinaryService {
       });
 
       const formData = new FormData();
-      formData.append('public_id', publicId);      formData.append('timestamp', timestamp);      formData.append('api_key', this.apiKey);
-      formData.append('signature', signature);      const response = await fetch(`${this.baseUrl}/image/destroy`, {
+      formData.append('public_id', publicId);
+      formData.append('timestamp', timestamp.toString());
+      formData.append('api_key', this.apiKey || '');
+      formData.append('signature', signature);
+      const response = await fetch(`${this.baseUrl}/image/destroy`, {
         method: 'POST',
         body: formData,
       });
@@ -152,23 +204,30 @@ class CloudinaryService {
         success: result.result === 'ok',
         result: result.result,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Cloudinary delete error:', error);
       return {
-        success: false,        error: error.message || 'Failed to delete image',
+        success: false,
+        error: error.message || 'Failed to delete image',
       };
     }
   }
 
   /**
    * Generate transformation URL for an image
-   * @param {string} publicId - The public ID of the image
-   * @param {Object} transformations - Transformation parameters
-   * @returns {string} Transformed image URL
    */
-  getTransformedUrl(publicId: any, transformations = {}) {    const baseUrl = `https://res.cloudinary.com/${this.cloudName}/image/upload`;
+  getTransformedUrl(publicId: string, transformations: TransformationOptions = {}): string {
+    const baseUrl = `https://res.cloudinary.com/${this.cloudName || 'demo'}/image/upload`;
 
-    const transformParams = [];    if (transformations.width) transformParams.push(`w_${transformations.width}`);    if (transformations.height) transformParams.push(`h_${transformations.height}`);    if (transformations.crop) transformParams.push(`c_${transformations.crop}`);    if (transformations.quality) transformParams.push(`q_${transformations.quality}`);    if (transformations.format) transformParams.push(`f_${transformations.format}`);    if (transformations.gravity) transformParams.push(`g_${transformations.gravity}`);    if (transformations.radius) transformParams.push(`r_${transformations.radius}`);    if (transformations.effect) transformParams.push(`e_${transformations.effect}`);
+    const transformParams = [];
+    if (transformations.width) transformParams.push(`w_${transformations.width}`);
+    if (transformations.height) transformParams.push(`h_${transformations.height}`);
+    if (transformations.crop) transformParams.push(`c_${transformations.crop}`);
+    if (transformations.quality) transformParams.push(`q_${transformations.quality}`);
+    if (transformations.format) transformParams.push(`f_${transformations.format}`);
+    if (transformations.gravity) transformParams.push(`g_${transformations.gravity}`);
+    if (transformations.radius) transformParams.push(`r_${transformations.radius}`);
+    if (transformations.effect) transformParams.push(`e_${transformations.effect}`);
 
     const transformString = transformParams.length > 0 ? `${transformParams.join(',')}/` : '';
 
@@ -177,11 +236,8 @@ class CloudinaryService {
 
   /**
    * Get optimized image URL with automatic format and quality
-   * @param {string} publicId - The public ID of the image
-   * @param {Object} options - Optimization options
-   * @returns {string} Optimized image URL
    */
-  getOptimizedUrl(publicId: any, options = {}) {
+  getOptimizedUrl(publicId: string, options: TransformationOptions = {}): string {
     const defaultTransformations = {
       quality: 'auto',
       format: 'auto',
@@ -193,11 +249,8 @@ class CloudinaryService {
 
   /**
    * Generate thumbnail URL
-   * @param {string} publicId - The public ID of the image
-   * @param {number} size - Thumbnail size (default: 150)
-   * @returns {string} Thumbnail URL
    */
-  getThumbnailUrl(publicId: any, size = 150) {
+  getThumbnailUrl(publicId: string, size = 150): string {
     return this.getTransformedUrl(publicId, {
       width: size,
       height: size,
@@ -210,12 +263,11 @@ class CloudinaryService {
 
   /**
    * Validate image file
-   * @param {File} file - The file to validate
-   * @param {Object} options - Validation options
-   * @returns {Object} Validation result
    */
-  validateImage(file: any, options = {}) {
-    const {      maxSize = 10 * 1024 * 1024, // 10MB default      allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],      minWidth = 100,      minHeight = 100,      maxWidth = 5000,      maxHeight = 5000,
+  validateImage(file: File, options: ValidationOptions = {}) {
+    const {
+      maxSize = 10 * 1024 * 1024, // 10MB default
+      allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
     } = options;
 
     const errors = [];
@@ -242,10 +294,8 @@ class CloudinaryService {
 
   /**
    * Generate signature for authenticated requests (requires server-side implementation)
-   * @param {Object} params - Parameters to sign
-   * @returns {Promise<string>} Generated signature
    */
-  async generateSignature(params: any) {
+  async generateSignature(_params: Record<string, any>): Promise<string> {
     // This should be implemented on the server side for security
     // For demo purposes, we'll return a placeholder
     console.warn('Signature generation should be implemented on the server side');
@@ -254,17 +304,27 @@ class CloudinaryService {
 
   /**
    * Get upload widget configuration
-   * @param {Object} options - Widget options
-   * @returns {Object} Widget configuration
    */
-  getUploadWidgetConfig(options = {}) {
-    return {      cloudName: this.cloudName,      uploadPreset: this.uploadPreset,
-      sources: ['local', 'url', 'camera'],      multiple: options.multiple || false,      maxFiles: options.maxFiles || 10,      maxFileSize: options.maxFileSize || 10000000, // 10MB      maxImageWidth: options.maxImageWidth || 2000,      maxImageHeight: options.maxImageHeight || 2000,      cropping: options.cropping || false,      croppingAspectRatio: options.croppingAspectRatio || null,      folder: options.folder || 'products',      tags: options.tags || ['product'],
+  getUploadWidgetConfig(options: UploadOptions = {}) {
+    return {
+      cloudName: this.cloudName || 'demo',
+      uploadPreset: this.uploadPreset || 'demo',
+      sources: ['local', 'url', 'camera'],
+      multiple: options.multiple || false,
+      maxFiles: options.maxFiles || 10,
+      maxFileSize: options.maxFileSize || 10000000, // 10MB
+      maxImageWidth: options.maxImageWidth || 2000,
+      maxImageHeight: options.maxImageHeight || 2000,
+      cropping: options.cropping || false,
+      croppingAspectRatio: options.croppingAspectRatio || null,
+      folder: options.folder || 'products',
+      tags: options.tags || ['product'],
       resourceType: 'image',
       clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
       theme: 'minimal',
       showAdvancedOptions: false,
-      showInsecurePreview: false,      showUploadMoreButton: options.multiple || false,
+      showInsecurePreview: false,
+      showUploadMoreButton: options.multiple || false,
       styles: {
         palette: {
           window: '#FFFFFF',

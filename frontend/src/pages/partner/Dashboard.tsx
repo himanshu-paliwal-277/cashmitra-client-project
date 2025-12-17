@@ -42,7 +42,7 @@ function Dashboard() {
         // Set fallback data so dashboard isn't completely blank
         setDashboardData({
           wallet: { balance: 0 },
-          inventory: { total: 0, active: 0 },
+          products: { total: 0, active: 0 },
           orders: { total: 0, pending: 0, completed: 0 },
           revenue: { total: 0, commission: 0, net: 0 },
           recentOrders: [],
@@ -59,7 +59,7 @@ function Dashboard() {
       setLoading(false);
       setDashboardData({
         wallet: { balance: 0 },
-        inventory: { total: 0, active: 0 },
+        products: { total: 0, active: 0 },
         orders: { total: 0, pending: 0, completed: 0 },
         revenue: { total: 0, commission: 0, net: 0 },
         recentOrders: [],
@@ -82,7 +82,7 @@ function Dashboard() {
     },
     {
       label: 'Active Products',
-      value: dashboardData ? `${dashboardData.inventory?.active || 0}` : '0',
+      value: dashboardData ? `${dashboardData.products?.active || 0}` : '0',
       color: 'bg-blue-500',
       icon: <Package size={24} />,
     },
@@ -104,18 +104,18 @@ function Dashboard() {
     dashboardData?.recentOrders?.map((order, index) => ({
       id: order._id || `#ORD-${index + 1}`,
       customer: order.user?.name || 'Unknown Customer',
-      product: order.items?.[0]?.inventory?.product?.name || 'Product',
+      product: order.items?.[0]?.product?.name || 'Product',
       amount: `₹${order.totalAmount?.toLocaleString() || '0'}`,
       status: order.status || 'pending',
     })) || [];
 
   const quickActions = [
     {
-      title: 'Manage Inventory',
+      title: 'Manage Products',
       description: 'View and manage your products',
       icon: <Package size={20} />,
       color: 'bg-green-500',
-      action: () => navigate('/partner/inventory'),
+      action: () => navigate('/partner/products'),
     },
     {
       title: 'View Orders',
@@ -265,13 +265,13 @@ function Dashboard() {
                 <ShoppingCart size={48} className="mx-auto text-gray-400 mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No Recent Orders</h3>
                 <p className="text-gray-600 mb-4">
-                  You haven't received any orders yet. Start by adding products to your inventory.
+                  You haven't received any orders yet. Start by adding products to your catalog.
                 </p>
                 <button
-                  onClick={() => navigate('/partner/inventory')}
+                  onClick={() => navigate('/partner/products')}
                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
-                  Manage Inventory
+                  Manage Products
                 </button>
               </div>
             )}

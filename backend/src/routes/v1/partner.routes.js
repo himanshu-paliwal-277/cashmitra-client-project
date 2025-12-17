@@ -95,75 +95,13 @@ router.put(
   asyncHandler(partnerController.uploadDocuments)
 );
 
-router.post(
-  '/inventory',
-  protect,
-  authorize('partner'),
-  [
-    check('productId')
-      .notEmpty()
-      .withMessage('Product ID is required')
-      .isMongoId()
-      .withMessage('Invalid productId format'),
-    check('condition')
-      .isIn(['New', 'Like New', 'Good', 'Fair', 'Refurbished'])
-      .withMessage('Valid condition is required'),
-    check('price').isNumeric().withMessage('Price must be a number'),
-    check('originalPrice')
-      .isNumeric()
-      .withMessage('Original price must be a number'),
-    check('quantity')
-      .isInt({ min: 1 })
-      .withMessage('Quantity must be at least 1'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.addInventory)
-);
+// Inventory routes removed - partners now manage products directly
 
 router.get(
   '/products',
   protect,
   authorize('partner'),
-  asyncHandler(partnerController.getProductsCatalog)
-);
-
-router.get(
-  '/inventory',
-  protect,
-  authorize('partner'),
-  asyncHandler(partnerController.getInventory)
-);
-
-router.put(
-  '/inventory/:id',
-  protect,
-  authorize('partner'),
-  validateObjectId('id'),
-  [
-    check('price').optional().isNumeric().withMessage('Price must be a number'),
-    check('originalPrice')
-      .optional()
-      .isNumeric()
-      .withMessage('Original price must be a number'),
-    check('quantity')
-      .optional()
-      .isInt({ min: 0 })
-      .withMessage('Quantity cannot be negative'),
-    check('isAvailable')
-      .optional()
-      .isBoolean()
-      .withMessage('isAvailable must be a boolean'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.updateInventory)
-);
-
-router.delete(
-  '/inventory/:id',
-  protect,
-  authorize('partner'),
-  validateObjectId('id'),
-  asyncHandler(partnerController.removeInventory)
+  asyncHandler(partnerController.getPartnerProducts)
 );
 
 router.get(
@@ -215,6 +153,16 @@ router.put(
   ],
   validateRequest,
   asyncHandler(partnerController.updateOrderStatus)
+);
+
+router.put(
+  '/orders/:id/assign-agent',
+  protect,
+  authorize('partner'),
+  validateObjectId('id'),
+  [check('agentId').isMongoId().withMessage('Valid agent ID is required')],
+  validateRequest,
+  asyncHandler(partnerController.assignAgentToOrder)
 );
 
 router.get(
@@ -271,6 +219,62 @@ router.get(
 router.get(
   '/buy-products',
   asyncHandler(partnerController.getPartnerBuyProducts)
+);
+
+// Partner product management endpoints
+router.post(
+  '/products',
+  protect,
+  authorize('partner'),
+  attachPartner,
+  requirePartner,
+  [
+    check('categoryId')
+      .notEmpty()
+      .withMessage('Category ID is required')
+      .isMongoId()
+      .withMessage('Invalid category ID format'),
+    check('name').notEmpty().withMessage('Product name is required'),
+    check('brand').notEmpty().withMessage('Brand is required'),
+    check('pricing.mrp').isNumeric().withMessage('MRP must be a number'),
+    check('stock.quantity')
+      .optional()
+      .isInt({ min: 0 })
+      .withMessage('Stock quantity must be non-negative'),
+  ],
+  validateRequest,
+  asyncHandler(partnerController.createPartnerProduct)
+);
+
+router.put(
+  '/products/:id',
+  protect,
+  authorize('partner'),
+  attachPartner,
+  requirePartner,
+  validateObjectId('id'),
+  [
+    check('pricing.mrp')
+      .optional()
+      .isNumeric()
+      .withMessage('MRP must be a number'),
+    check('stock.quantity')
+      .optional()
+      .isInt({ min: 0 })
+      .withMessage('Stock quantity must be non-negative'),
+  ],
+  validateRequest,
+  asyncHandler(partnerController.updatePartnerProduct)
+);
+
+router.delete(
+  '/products/:id',
+  protect,
+  authorize('partner'),
+  attachPartner,
+  requirePartner,
+  validateObjectId('id'),
+  asyncHandler(partnerController.deletePartnerProduct)
 );
 
 router.get(

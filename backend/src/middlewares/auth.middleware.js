@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/serverConfig.js';
 import { User } from '../models/user.model.js';
 
-
 export const protect = async (req, res, next) => {
   let token;
 
@@ -21,12 +20,10 @@ export const protect = async (req, res, next) => {
       next();
     } catch (error) {
       console.error(error);
-      res.status(401).json({ message: 'Not authorized, token failed' });
+      return res.status(401).json({ message: 'Not authorized, token failed' });
     }
-  }
-
-  if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+  } else {
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };
 

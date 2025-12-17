@@ -128,9 +128,7 @@ const BuyProducts = () => {
     setProductToDelete(null);
   };
 
-  const handleAddProduct = () => {
-    navigate('/admin/buy-products/add');
-  };
+ 
 
   const handleEditProduct = (product: any) => {
     navigate(`/admin/buy-products/edit/${product._id}`);
@@ -366,13 +364,6 @@ const BuyProducts = () => {
             Buy Products
           </h1>
         </div>
-        <button
-          onClick={handleAddProduct}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg"
-        >
-          <Plus size={20} />
-          <span>Add Product</span>
-        </button>
       </div>
 
       {/* Stats Grid */}
