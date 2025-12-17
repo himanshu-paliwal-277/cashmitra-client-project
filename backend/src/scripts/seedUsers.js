@@ -39,7 +39,7 @@ const sampleUsers = [
   },
   {
     name: 'Admin User',
-    email: 'admin@cashify.com',
+    email: 'admin@cashmitra.com',
     password: 'admin123',
     phone: '9876543214',
     role: 'admin',
@@ -50,7 +50,7 @@ const sampleUsers = [
 async function seedUsers() {
   try {
     await mongoose.connect(
-      process.env.MONGO_URI || 'mongodb://localhost:27017/cashify'
+      process.env.MONGO_URI || 'mongodb://localhost:27017/cashmitra'
     );
     console.log('Connected to MongoDB');
 

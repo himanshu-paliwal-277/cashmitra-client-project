@@ -1,7 +1,7 @@
 {
-  "name": "cashify-backend",
+  "name": "cashmitra-backend",
   "version": "1.0.0",
-  "description": "Backend API for Cashify - Device Trading Platform",
+  "description": "Backend API for Cashmitra - Device Trading Platform",
   "type": "module",
   "main": "src/server.js",
   "scripts": {
@@ -52,6 +52,6 @@
     "trading",
     "devices"
   ],
-  "author": "Cashify Team",
+  "author": "Cashmitra Team",
   "license": "MIT"
 }

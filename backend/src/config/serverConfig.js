@@ -6,18 +6,19 @@ export var PORT = process.env.PORT || 5000;
 export var SERVER_HOST = process.env.SERVER_HOST || 'localhost';
 export var NODE_ENV = process.env.NODE_ENV || 'development';
 export var MONGODB_URI =
-  process.env.MONGODB_URI || 'mongodb://localhost:27017/cashify';
+  process.env.MONGODB_URI || 'mongodb://localhost:27017/cashmitra';
 
 export var MONGO_URI =
   process.env.MONGO_URI ||
   process.env.MONGODB_URI ||
-  'mongodb://localhost:27017/cashify';
+  'mongodb://localhost:27017/cashmitra';
 
-export var JWT_SECRET = process.env.JWT_SECRET || 'cashify-jwt-secret';
+export var JWT_SECRET = process.env.JWT_SECRET || 'cashmitra-jwt-secret';
 export var JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 export var JWT_EXPIRY =
   process.env.JWT_EXPIRY || process.env.JWT_EXPIRES_IN || '7d';
-export var SESSION_SECRET = process.env.SESSION_SECRET || 'cashify-secret-key';
+export var SESSION_SECRET =
+  process.env.SESSION_SECRET || 'cashmitra-secret-key';
 export var EMAIL_HOST = process.env.EMAIL_HOST || 'smtp.gmail.com';
 export var EMAIL_PORT = process.env.EMAIL_PORT || 587;
 export var EMAIL_USER = process.env.EMAIL_USER;

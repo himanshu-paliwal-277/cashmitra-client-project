@@ -31,13 +31,13 @@ app.use((req, res, next) => {
 app.use('/api', apiRouter);
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Cashify API' });
+  res.json({ message: 'Welcome to Cashmitra API' });
 });
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is up and running at: http://localhost:${PORT}`);
   console.log(`Environment: ${NODE_ENV}`);
-  connectDB();  
+  connectDB();
 });
 
 app.use(errorHandler);

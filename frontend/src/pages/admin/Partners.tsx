@@ -1,7 +1,7 @@
 /**
  * @fileoverview Partners Management Component
  * @description Admin interface for managing partners and their details
- * @author Cashify Development Team
+ * @author Cashmitra Development Team
  * @version 2.0.0
  */
 

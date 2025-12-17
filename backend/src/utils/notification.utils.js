@@ -18,7 +18,7 @@ export async function sendOTPEmail(
 ) {
   try {
     const mailOptions = {
-      from: `"Cashify" <${process.env.EMAIL_USER}>`,
+      from: `"Cashmitra" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: subject,
       html: `
@@ -38,7 +38,7 @@ export async function sendOTPEmail(
         <body>
           <div class="container">
             <div class="header">
-              <h1>🚗 Cashify Agent Verification</h1>
+              <h1>🚗 Cashmitra Agent Verification</h1>
             </div>
             <div class="content">
               <h2>Hello ${customerName},</h2>
@@ -53,11 +53,11 @@ export async function sendOTPEmail(
               
               <p>If you did not request this, please contact our support immediately.</p>
               
-              <p>Thank you for choosing Cashify!</p>
+              <p>Thank you for choosing Cashmitra!</p>
             </div>
             <div class="footer">
               <p>This is an automated email. Please do not reply.</p>
-              <p>&copy; ${new Date().getFullYear()} Cashify. All rights reserved.</p>
+              <p>&copy; ${new Date().getFullYear()} Cashmitra. All rights reserved.</p>
             </div>
           </div>
         </body>
@@ -89,7 +89,7 @@ export async function sendOTPSMS(phone, otp) {
 export async function sendEmail(to, subject, html) {
   try {
     const mailOptions = {
-      from: `"Cashify" <${process.env.EMAIL_USER}>`,
+      from: `"Cashmitra" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,

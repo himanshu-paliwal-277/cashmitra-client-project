@@ -50,7 +50,7 @@ const additionalUsers = [
 async function addMoreUsers() {
   try {
     await mongoose.connect(
-      process.env.MONGO_URI || 'mongodb://localhost:27017/cashify'
+      process.env.MONGO_URI || 'mongodb://localhost:27017/cashmitra'
     );
     console.log('Connected to MongoDB');
 

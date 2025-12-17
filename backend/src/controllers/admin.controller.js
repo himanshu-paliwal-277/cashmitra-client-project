@@ -1198,7 +1198,7 @@ export const uploadProductImages = async (req, res) => {
     for (const file of req.files) {
       try {
         const result = await cloudinary.uploader.upload(file.path, {
-          folder: 'cashify/products',
+          folder: 'cashmitra/products',
           transformation: [
             { width: 800, height: 800, crop: 'fill', quality: 'auto' },
             { format: 'webp' },
@@ -1565,7 +1565,7 @@ export const deleteProduct = async (req, res) => {
             .slice(-2)
             .join('/')
             .split('.')[0];
-          await cloudinary.uploader.destroy(`cashify/products/${publicId}`);
+          await cloudinary.uploader.destroy(`cashmitra/products/${publicId}`);
         } catch (deleteError) {
           console.error('Error deleting image from Cloudinary:', deleteError);
         }

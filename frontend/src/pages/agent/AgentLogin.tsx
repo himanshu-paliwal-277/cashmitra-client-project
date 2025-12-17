@@ -197,7 +197,7 @@ const AgentLogin = () => {
                 type="email"
                 id="email"
                 name="email"
-                placeholder="agent@cashify.com"
+                placeholder="agent@cashmitra.com"
                 value={formData.email}
                 onChange={handleChange}
                 disabled={loading}
