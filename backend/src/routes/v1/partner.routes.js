@@ -2,7 +2,10 @@ import express from 'express';
 import { check } from 'express-validator';
 
 import * as partnerController from '../../controllers/partner.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import { authLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import {
@@ -14,7 +17,7 @@ const router = express.Router();
 
 router.post(
   '/register',
-  protect,
+  isAuthenticated,
   [
     check('shopName').notEmpty().withMessage('Shop name is required'),
     check('shopAddress').isObject().withMessage('Shop address is required'),
@@ -34,14 +37,14 @@ router.post(
 
 router.get(
   '/profile',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   asyncHandler(partnerController.getPartnerProfile)
 );
 
 router.put(
   '/profile',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   [
     check('shopName')
@@ -71,7 +74,7 @@ router.put(
 
 router.put(
   '/documents',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   [
     check('gstCertificate')
@@ -99,21 +102,21 @@ router.put(
 
 router.get(
   '/products',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   asyncHandler(partnerController.getPartnerProducts)
 );
 
 router.get(
   '/orders',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   asyncHandler(partnerController.getOrders)
 );
 
 router.get(
   '/orders/:id/missing-inventory',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   validateObjectId('id'),
   asyncHandler(partnerController.checkMissingInventory)
@@ -121,7 +124,7 @@ router.get(
 
 router.put(
   '/orders/:id/respond',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   validateObjectId('id'),
   [
@@ -139,7 +142,7 @@ router.put(
 
 router.put(
   '/orders/:id',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   validateObjectId('id'),
   [
@@ -157,7 +160,7 @@ router.put(
 
 router.put(
   '/orders/:id/assign-agent',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   validateObjectId('id'),
   [check('agentId').isMongoId().withMessage('Valid agent ID is required')],
@@ -167,7 +170,7 @@ router.put(
 
 router.get(
   '/dashboard',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   asyncHandler(partnerController.getDashboardStats)
 );
@@ -179,28 +182,28 @@ import {
 
 router.use(
   '/dashboard-sellbuy',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   attachPartner,
   requirePartner
 );
 router.use(
   '/sell-products',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   attachPartner,
   requirePartner
 );
 router.use(
   '/buy-products',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   attachPartner,
   requirePartner
 );
 router.use(
   '/sell-orders',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   attachPartner,
   requirePartner
@@ -224,7 +227,7 @@ router.get(
 // Partner product management endpoints
 router.post(
   '/products',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   attachPartner,
   requirePartner,
@@ -248,7 +251,7 @@ router.post(
 
 router.put(
   '/products/:id',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   attachPartner,
   requirePartner,
@@ -269,7 +272,7 @@ router.put(
 
 router.delete(
   '/products/:id',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   attachPartner,
   requirePartner,
@@ -301,14 +304,14 @@ router.put(
 
 router.get(
   '/agents',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   asyncHandler(partnerController.getPartnerAgents)
 );
 
 router.post(
   '/agents',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   [
     check('name').notEmpty().withMessage('Agent name is required'),
@@ -330,7 +333,7 @@ router.post(
 
 router.put(
   '/agents/:agentId',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   validateObjectId('agentId'),
   [
@@ -353,7 +356,7 @@ router.put(
 
 router.delete(
   '/agents/:agentId',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   validateObjectId('agentId'),
   asyncHandler(partnerController.deleteAgent)

@@ -4,7 +4,10 @@ import multer from 'multer';
 
 import * as adminController from '../../controllers/admin.controller.js';
 import * as categoryController from '../../controllers/category.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import { authLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import { validateRequest } from '../../middlewares/validation.middleware.js';
@@ -43,7 +46,7 @@ router.post(
 
 router.get(
   '/profile',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getAdminProfile)
 );
@@ -60,7 +63,7 @@ router.post(
       .isLength({ min: 8 })
       .withMessage('Password must be at least 8 characters long'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.createAdmin)
@@ -68,14 +71,14 @@ router.post(
 
 router.get(
   '/partners',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getAllPartners)
 );
 
 router.get(
   '/partners/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getPartnerById)
 );
@@ -157,7 +160,7 @@ router.post(
         'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)'
       ),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.createPartner)
@@ -208,7 +211,7 @@ router.put(
       .isBoolean()
       .withMessage('isVerified must be boolean'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.updatePartner)
@@ -216,7 +219,7 @@ router.put(
 
 router.delete(
   '/partners/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.deletePartner)
 );
@@ -229,7 +232,7 @@ router.put(
       .withMessage('Status must be approved or rejected'),
     check('notes').optional().isString().withMessage('Notes must be a string'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.verifyPartner)
@@ -244,7 +247,7 @@ router.post(
       .isIn(['credit', 'debit'])
       .withMessage('Type must be credit or debit'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.updatePartnerWallet)
@@ -252,42 +255,42 @@ router.post(
 
 router.get(
   '/orders',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getAllOrders)
 );
 
 router.get(
   '/orders/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getOrderById)
 );
 
 router.get(
   '/analytics',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getDashboardAnalytics)
 );
 
 router.get(
   '/catalog',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getCatalog)
 );
 
 router.get(
   '/catalog/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getProductById)
 );
 
 router.post(
   '/catalog/upload-images',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   upload.array('images', 10),
   asyncHandler(adminController.uploadProductImages)
@@ -301,7 +304,7 @@ router.post(
 
     check('model').notEmpty().withMessage('Model is required'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.addProduct)
@@ -309,7 +312,7 @@ router.post(
 
 router.put(
   '/catalog/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.updateProduct)
 );
@@ -321,7 +324,7 @@ router.patch(
       .isIn(['active', 'inactive', 'draft', 'archived'])
       .withMessage('Invalid status value'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.updateProductStatus)
@@ -329,35 +332,35 @@ router.patch(
 
 router.delete(
   '/catalog/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.deleteProduct)
 );
 
 router.get(
   '/commission',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getCommissionSettings)
 );
 
 router.put(
   '/commission',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.updateCommissionSettings)
 );
 
 router.get(
   '/users',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getAllUsers)
 );
 
 router.get(
   '/users/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getUserById)
 );
@@ -378,7 +381,7 @@ router.post(
       .isIn(['user', 'partner', 'admin', 'driver'])
       .withMessage('Invalid role'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.createUser)
@@ -401,7 +404,7 @@ router.put(
       .isIn(['user', 'partner', 'admin', 'driver'])
       .withMessage('Invalid role'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.updateUser)
@@ -414,7 +417,7 @@ router.put(
       .isLength({ min: 6 })
       .withMessage('Password must be at least 6 characters long'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.updateUserPassword)
@@ -422,7 +425,7 @@ router.put(
 
 router.delete(
   '/users/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.deleteUser)
 );
@@ -430,7 +433,7 @@ router.delete(
 router.put(
   '/users/:id/status',
   [check('isActive').isBoolean().withMessage('isActive must be a boolean')],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.toggleUserStatus)
@@ -456,7 +459,7 @@ router.post(
       .isBoolean()
       .withMessage('isActive must be a boolean'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(categoryController.createCategory)
@@ -464,7 +467,7 @@ router.post(
 
 router.get(
   '/categories/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(categoryController.getCategory)
 );
@@ -488,7 +491,7 @@ router.put(
       .isBoolean()
       .withMessage('isActive must be a boolean'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(categoryController.updateCategory)
@@ -496,28 +499,28 @@ router.put(
 
 router.delete(
   '/categories/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(categoryController.deleteCategory)
 );
 
 router.get(
   '/categories/admin/stats',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(categoryController.getCategoryStats)
 );
 
 router.get(
   '/sell-orders',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getSellOrders)
 );
 
 router.get(
   '/buy-orders',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getBuyOrders)
 );
@@ -541,7 +544,7 @@ router.put(
       .isLength({ max: 500 })
       .withMessage('Notes must not exceed 500 characters'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.updateOrderStatus)
@@ -549,7 +552,7 @@ router.put(
 
 router.get(
   '/orders/:id/partner-suggestions',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getPartnerSuggestionsForOrder)
 );
@@ -561,7 +564,7 @@ router.put(
       .isMongoId()
       .withMessage('Partner ID must be a valid MongoDB ObjectId'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.assignPartnerToOrder)
@@ -569,7 +572,7 @@ router.put(
 
 router.get(
   '/brands',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getBrands)
 );
@@ -585,7 +588,7 @@ router.post(
       .isIn(['mobile', 'laptop', 'tablet'])
       .withMessage('Category must be one of: mobile, laptop, tablet'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.createBrand)
@@ -599,7 +602,7 @@ router.put(
       .isLength({ min: 2, max: 50 })
       .withMessage('New brand name must be between 2 and 50 characters'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.updateBrand)
@@ -607,14 +610,14 @@ router.put(
 
 router.delete(
   '/brands/:brandName',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.deleteBrand)
 );
 
 router.get(
   '/models',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getModels)
 );
@@ -646,7 +649,7 @@ router.post(
         'Category must be one of: smartphone, laptop, tablet, smartwatch, headphones, camera, gaming, general'
       ),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.createModel)
@@ -693,7 +696,7 @@ router.put(
       .isBoolean()
       .withMessage('isActive must be a boolean'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.updateModelByName)
@@ -701,28 +704,28 @@ router.put(
 
 router.delete(
   '/models/:modelName',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.deleteModelByName)
 );
 
 router.get(
   '/questionnaires',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getConditionQuestionnaires)
 );
 
 router.get(
   '/questionnaires/:id',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getConditionQuestionnaireById)
 );
 
 router.get(
   '/questionnaires/category/:category',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getQuestionnairesByCategory)
 );
@@ -801,7 +804,7 @@ router.post(
       .isString()
       .withMessage('Instructions must be a string'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.createConditionQuestionnaire)
@@ -898,7 +901,7 @@ router.put(
       .isString()
       .withMessage('Instructions must be a string'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.updateConditionQuestionnaire)
@@ -912,7 +915,7 @@ router.delete(
       .isString()
       .withMessage('Deletion reason must be a string'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.deleteConditionQuestionnaire)
@@ -920,14 +923,14 @@ router.delete(
 
 router.get(
   '/agents',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.getAgents)
 );
 
 router.put(
   '/agents/:id/approve',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(adminController.approveAgent)
 );
@@ -935,7 +938,7 @@ router.put(
 router.put(
   '/agents/:id/reject',
   [check('reason').notEmpty().withMessage('Rejection reason is required')],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.rejectAgent)
@@ -944,7 +947,7 @@ router.put(
 router.put(
   '/agents/:id/status',
   [check('isActive').isBoolean().withMessage('isActive must be a boolean')],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(adminController.toggleAgentStatus)

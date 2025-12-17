@@ -2,13 +2,13 @@ import express from 'express';
 import { check } from 'express-validator';
 
 import * as userController from '../../controllers/user.controller.js';
-import { protect } from '../../middlewares/auth.middleware.js';
+import { isAuthenticated } from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import { validateRequest } from '../../middlewares/validation.middleware.js';
 
 const router = express.Router();
 
-router.use(protect);
+router.use(isAuthenticated);
 
 router.get('/profile', asyncHandler(userController.getUserProfile));
 

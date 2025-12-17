@@ -2,7 +2,10 @@ import express from 'express';
 import { body, param, query } from 'express-validator';
 
 import * as pickupController from '../../controllers/pickup.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -103,7 +106,7 @@ const getPickupsValidation = [
     .withMessage('Date must be a valid date'),
 ];
 
-router.use(protect);
+router.use(isAuthenticated);
 
 router.post(
   '/schedule',

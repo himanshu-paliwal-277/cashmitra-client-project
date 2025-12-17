@@ -2,7 +2,7 @@ import express from 'express';
 import { check } from 'express-validator';
 
 import * as sellController from '../../controllers/sell.controller.js';
-import { protect } from '../../middlewares/auth.middleware.js';
+import { isAuthenticated } from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import {
   validateAssessmentId,
@@ -37,7 +37,7 @@ router.get(
 
 router.post(
   '/calculate-price',
-  protect,
+  isAuthenticated,
   [
     check('productId').notEmpty().withMessage('Product ID is required'),
     check('purchaseDate')
@@ -63,7 +63,7 @@ router.post(
 
 router.post(
   '/orders',
-  protect,
+  isAuthenticated,
   [
     check('productId').notEmpty().withMessage('Product ID is required'),
     check('condition')
@@ -81,7 +81,7 @@ router.post(
 
 router.get(
   '/orders/:orderId',
-  protect,
+  isAuthenticated,
   validateObjectId('orderId'),
   asyncHandler(sellController.getSellOrderStatus)
 );
@@ -156,7 +156,7 @@ router.post(
 
 router.put(
   '/orders/:id/status',
-  protect,
+  isAuthenticated,
   [
     check('status')
       .isIn([

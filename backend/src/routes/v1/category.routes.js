@@ -11,7 +11,10 @@ import {
   searchCategories,
   updateCategory,
 } from '../../controllers/category.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -84,7 +87,7 @@ router.get('/search', searchValidation, searchCategories);
 router.get('/', getCategories);
 router.get('/:identifier', getCategory);
 
-router.use(protect);
+router.use(isAuthenticated);
 router.use(authorize('admin'));
 
 router.post('/', categoryValidation, createCategory);

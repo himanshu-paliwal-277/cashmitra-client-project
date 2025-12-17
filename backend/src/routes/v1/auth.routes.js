@@ -1,16 +1,16 @@
 import express from 'express';
 
 import * as authController from '../../controllers/auth.controller.js';
-import { protect } from '../../middlewares/auth.middleware.js';
+// import { isAuthenticated } from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import { authLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import {
   loginPartnerSchema,
   loginUserSchema,
-  registerPartnerSchema,
+  // registerPartnerSchema,
   registerUserSchema,
-  updatePartnerProfileSchema,
-  updateUserProfileSchema,
+  // updatePartnerProfileSchema,
+  // updateUserProfileSchema,
 } from '../../validators/auth.validation.js';
 import { validate } from '../../validators/validator.js';
 
@@ -37,47 +37,35 @@ router.post(
 );
 
 // Get current logged-in customer profile
-router.get('/me', protect, asyncHandler(authController.getCurrentUser));
+// NOTE: Not currently used in frontend
+// router.get('/me', isAuthenticated, asyncHandler(authController.getCurrentUser));
 
 // Update current customer profile
-router.put(
-  '/me',
-  protect,
-  validate(updateUserProfileSchema),
-  asyncHandler(authController.updateUserProfile)
-);
+// NOTE: Not currently used in frontend
+// router.put(
+//   '/me',
+//   isAuthenticated,
+//   validate(updateUserProfileSchema),
+//   asyncHandler(authController.updateUserProfile)
+// );
 
 // ==========================================
 // PARTNER AUTHENTICATION ROUTES
 // ==========================================
 
 // Register new partner account
-router.post(
-  '/partner/register',
-  validate(registerPartnerSchema),
-  asyncHandler(authController.registerPartner)
-);
+// NOTE: Not currently used in frontend (link exists but no registration page implemented)
+// router.post(
+//   '/partner/register',
+//   validate(registerPartnerSchema),
+//   asyncHandler(authController.registerPartner)
+// );
 
 // Login partner account
 router.post(
   '/partner/login',
   validate(loginPartnerSchema),
   asyncHandler(authController.loginPartner)
-);
-
-// Get current logged-in partner profile
-router.get(
-  '/partner/me',
-  protect,
-  asyncHandler(authController.getCurrentPartner)
-);
-
-// Update current partner profile
-router.put(
-  '/partner/me',
-  protect,
-  validate(updatePartnerProfileSchema),
-  asyncHandler(authController.updatePartnerProfile)
 );
 
 export default router;

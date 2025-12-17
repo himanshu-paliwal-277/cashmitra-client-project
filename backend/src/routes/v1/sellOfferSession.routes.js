@@ -15,7 +15,10 @@ import {
   updateDefects,
   updateSessionStatus,
 } from '../../controllers/sellOfferSession.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -62,7 +65,7 @@ router.post('/create', createSessionValidation, createSession);
 router.get('/:sessionId', getSession);
 router.get('/:sessionId/price', getCurrentPrice);
 
-router.use(protect);
+router.use(isAuthenticated);
 
 router.post('/', createSessionValidation, createSession);
 router.get('/my-sessions', getUserSessions);

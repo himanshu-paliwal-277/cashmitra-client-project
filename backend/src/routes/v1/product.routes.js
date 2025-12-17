@@ -12,7 +12,7 @@ import {
   getProductSuggestions,
   updateProduct,
 } from '../../controllers/product.controller.js';
-import { protect } from '../../middlewares/auth.middleware.js';
+import { isAuthenticated } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -203,8 +203,8 @@ router.get('/filters', filterValidation, getProductFilters);
 router.get('/:id', productDetailValidation, getProduct);
 router.get('/:id/suggestions', suggestionValidation, getProductSuggestions);
 
-router.post('/', protect, createProductValidation, createProduct);
-router.put('/:id', protect, updateProductValidation, updateProduct);
-router.delete('/:id', protect, deleteProductValidation, deleteProduct);
+router.post('/', isAuthenticated, createProductValidation, createProduct);
+router.put('/:id', isAuthenticated, updateProductValidation, updateProduct);
+router.delete('/:id', isAuthenticated, deleteProductValidation, deleteProduct);
 
 export default router;

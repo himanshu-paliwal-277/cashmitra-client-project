@@ -12,7 +12,10 @@ import {
   reorderDefects,
   updateDefect,
 } from '../../controllers/sellDefect.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -79,7 +82,7 @@ router.get(
 );
 router.get('/categories', getDefectCategories);
 
-router.use(protect);
+router.use(isAuthenticated);
 router.use(authorize('admin'));
 
 router.post('/', defectValidation, createDefect);

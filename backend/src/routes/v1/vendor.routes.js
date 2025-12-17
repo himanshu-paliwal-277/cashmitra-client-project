@@ -2,7 +2,10 @@ import express from 'express';
 import { check } from 'express-validator';
 
 import * as vendorController from '../../controllers/vendor.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import { authLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import {
@@ -25,21 +28,21 @@ router.post(
 
 router.get(
   '/profile',
-  protect,
+  isAuthenticated,
   authorize('vendor'),
   asyncHandler(vendorController.getVendorProfile)
 );
 
 router.get(
   '/permissions',
-  protect,
+  isAuthenticated,
   authorize('vendor'),
   asyncHandler(vendorController.getVendorPermissions)
 );
 
 router.get(
   '/admin/vendors',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   [
     check('page')
@@ -65,7 +68,7 @@ router.get(
 
 router.post(
   '/admin/create',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   [
     check('name').notEmpty().withMessage('Name is required'),
@@ -88,7 +91,7 @@ router.post(
 
 router.get(
   '/admin/:vendorId/permissions',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateObjectId('vendorId'),
   asyncHandler(vendorController.getVendorPermissionsAdmin)
@@ -96,7 +99,7 @@ router.get(
 
 router.put(
   '/admin/:vendorId/permissions',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateObjectId('vendorId'),
   [
@@ -116,7 +119,7 @@ router.put(
 
 router.put(
   '/admin/:vendorId/status',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateObjectId('vendorId'),
   [
@@ -129,7 +132,7 @@ router.put(
 
 router.delete(
   '/admin/:vendorId',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateObjectId('vendorId'),
   asyncHandler(vendorController.deleteVendor)
@@ -137,7 +140,7 @@ router.delete(
 
 router.get(
   '/admin/menu-items',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(vendorController.getMenuItems)
 );

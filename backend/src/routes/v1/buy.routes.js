@@ -2,7 +2,7 @@ import express from 'express';
 import { check } from 'express-validator';
 
 import * as buyController from '../../controllers/buy.controller.js';
-import { protect } from '../../middlewares/auth.middleware.js';
+import { isAuthenticated } from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import {
   validateObjectId,
@@ -16,7 +16,7 @@ router.get('/products/:id', asyncHandler(buyController.getProductDetails));
 
 router.post(
   '/cart',
-  protect,
+  isAuthenticated,
   [
     check('productId').isMongoId().withMessage('Valid product ID is required'),
     check('quantity')
@@ -27,11 +27,11 @@ router.post(
   asyncHandler(buyController.addToCart)
 );
 
-router.get('/cart', protect, asyncHandler(buyController.getCart));
+router.get('/cart', isAuthenticated, asyncHandler(buyController.getCart));
 
 router.put(
   '/cart/:itemId',
-  protect,
+  isAuthenticated,
   [
     check('quantity')
       .isInt({ min: 1 })
@@ -43,13 +43,13 @@ router.put(
 
 router.delete(
   '/cart/:itemId',
-  protect,
+  isAuthenticated,
   asyncHandler(buyController.removeCartItem)
 );
 
 router.post(
   '/checkout',
-  protect,
+  isAuthenticated,
   [
     check('shippingAddress')
       .notEmpty()
@@ -60,8 +60,16 @@ router.post(
   asyncHandler(buyController.checkout)
 );
 
-router.get('/orders', protect, asyncHandler(buyController.getOrderHistory));
-router.get('/orders/:id', protect, asyncHandler(buyController.getOrderDetails));
+router.get(
+  '/orders',
+  isAuthenticated,
+  asyncHandler(buyController.getOrderHistory)
+);
+router.get(
+  '/orders/:id',
+  isAuthenticated,
+  asyncHandler(buyController.getOrderDetails)
+);
 
 router.get('/categories', asyncHandler(buyController.getCategories));
 
@@ -134,7 +142,7 @@ router.get(
 
 router.post(
   '/orders',
-  protect,
+  isAuthenticated,
   [
     check('shippingAddress')
       .notEmpty()
@@ -147,11 +155,15 @@ router.post(
   asyncHandler(buyController.createOrder)
 );
 
-router.get('/orders', protect, asyncHandler(buyController.getUserBuyOrders));
+router.get(
+  '/orders',
+  isAuthenticated,
+  asyncHandler(buyController.getUserBuyOrders)
+);
 
 router.get(
   '/orders/:orderId',
-  protect,
+  isAuthenticated,
   validateObjectId('orderId'),
   asyncHandler(buyController.getOrderById)
 );

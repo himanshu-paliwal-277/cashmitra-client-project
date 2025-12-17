@@ -12,7 +12,10 @@ import {
   toggleProductStatus,
   updateBuyProduct,
 } from '../../controllers/buyProduct.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 import {
   handleValidationErrors,
   validateCreateBuyProduct,
@@ -49,7 +52,7 @@ router.post(
   createBuyProduct
 );
 
-router.use(protect);
+router.use(isAuthenticated);
 
 import { attachPartner } from '../../middlewares/partner.middleware.js';
 router.use(attachPartner);

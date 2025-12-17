@@ -2,7 +2,10 @@ import express from 'express';
 import { check, param, query } from 'express-validator';
 
 import * as partnerPermissionController from '../../controllers/partnerPermission.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import { validateRequest } from '../../middlewares/validation.middleware.js';
 
@@ -10,7 +13,7 @@ const router = express.Router();
 
 router.get(
   '/',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   asyncHandler(partnerPermissionController.getPartnerPermissions)
 );
@@ -24,7 +27,7 @@ router.get(
       .isAlphanumeric()
       .withMessage('Menu item must be alphanumeric'),
   ],
-  protect,
+  isAuthenticated,
   authorize('partner'),
   validateRequest,
   asyncHandler(partnerPermissionController.checkPermission)
@@ -32,7 +35,7 @@ router.get(
 
 router.get(
   '/menu-items',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   asyncHandler(partnerPermissionController.getAvailableMenuItems)
 );
@@ -63,7 +66,7 @@ router.get(
       .isBoolean()
       .withMessage('isActive must be a boolean'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(partnerPermissionController.getAllPartnerPermissions)
@@ -71,7 +74,7 @@ router.get(
 
 router.get(
   '/admin/role-templates',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(partnerPermissionController.getRoleTemplates)
 );
@@ -116,7 +119,7 @@ router.post(
       .isObject()
       .withMessage('Limits must be an object'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(partnerPermissionController.createRoleTemplate)
@@ -153,7 +156,7 @@ router.put(
       .isObject()
       .withMessage('Limits must be an object'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(partnerPermissionController.updateRoleTemplate)
@@ -162,7 +165,7 @@ router.put(
 router.delete(
   '/admin/role-templates/:templateId',
   [param('templateId').notEmpty().withMessage('Template ID is required')],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(partnerPermissionController.deleteRoleTemplate)
@@ -170,7 +173,7 @@ router.delete(
 
 router.get(
   '/admin/menu-items',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   asyncHandler(partnerPermissionController.getMenuItemsStructure)
 );
@@ -224,7 +227,7 @@ router.post(
       .isLength({ max: 50 })
       .withMessage('Icon name cannot exceed 50 characters'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(partnerPermissionController.createPermission)
@@ -233,7 +236,7 @@ router.post(
 router.get(
   '/admin/:partnerId',
   [param('partnerId').isMongoId().withMessage('Invalid partner ID')],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(partnerPermissionController.getPartnerPermissionsById)
@@ -298,7 +301,7 @@ router.put(
       .isBoolean()
       .withMessage('Priority support must be a boolean'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(partnerPermissionController.updatePartnerPermissions)
@@ -338,7 +341,7 @@ router.post(
       .isInt({ min: 0 })
       .withMessage('Max daily transactions must be a positive integer'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(partnerPermissionController.grantPermission)
@@ -354,7 +357,7 @@ router.post(
       .isAlphanumeric()
       .withMessage('Menu item must be alphanumeric'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(partnerPermissionController.revokePermission)
@@ -370,7 +373,7 @@ router.post(
       .isIn(['basic', 'seller', 'premium', 'enterprise', 'custom'])
       .withMessage('Invalid role template'),
   ],
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateRequest,
   asyncHandler(partnerPermissionController.applyRoleTemplate)

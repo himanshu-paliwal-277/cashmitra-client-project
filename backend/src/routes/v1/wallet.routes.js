@@ -2,7 +2,10 @@ import express from 'express';
 import { check } from 'express-validator';
 
 import * as walletController from '../../controllers/wallet.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import {
   validateObjectId,
@@ -13,14 +16,14 @@ const router = express.Router();
 
 router.get(
   '/',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   asyncHandler(walletController.getWallet)
 );
 
 router.get(
   '/transactions',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   [
     check('page')
@@ -53,7 +56,7 @@ router.get(
 
 router.post(
   '/payout',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   [
     check('amount')
@@ -95,7 +98,7 @@ router.post(
 
 router.put(
   '/settings',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   [
     check('minimumPayoutAmount')
@@ -122,7 +125,7 @@ router.put(
 
 router.get(
   '/payouts',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   [
     check('page')
@@ -144,7 +147,7 @@ router.get(
 
 router.get(
   '/analytics',
-  protect,
+  isAuthenticated,
   authorize('partner'),
   [
     check('period')
@@ -158,7 +161,7 @@ router.get(
 
 router.get(
   '/admin/payouts/pending',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   [
     check('page')
@@ -176,7 +179,7 @@ router.get(
 
 router.get(
   '/admin/payouts/all',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   [
     check('page')
@@ -198,7 +201,7 @@ router.get(
 
 router.put(
   '/admin/payouts/:transactionId',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateObjectId('transactionId'),
   [

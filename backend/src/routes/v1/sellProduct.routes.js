@@ -15,7 +15,10 @@ import {
   updateProduct,
   updateVariant,
 } from '../../controllers/sellProduct.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -149,7 +152,7 @@ router.get(
   getProduct
 );
 
-router.use(protect);
+router.use(isAuthenticated);
 
 import { attachPartner } from '../../middlewares/partner.middleware.js';
 

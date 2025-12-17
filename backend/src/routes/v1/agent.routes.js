@@ -4,7 +4,10 @@ import multer from 'multer';
 import path from 'path';
 
 import * as agentController from '../../controllers/agent.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import { validateRequest } from '../../middlewares/validation.middleware.js';
 
@@ -40,7 +43,7 @@ router.post(
   asyncHandler(agentController.loginAgent)
 );
 
-router.use(protect);
+router.use(isAuthenticated);
 router.use(authorize('driver', 'admin'));
 
 router.get('/dashboard', asyncHandler(agentController.getAgentDashboard));

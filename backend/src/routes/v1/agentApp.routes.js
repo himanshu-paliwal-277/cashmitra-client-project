@@ -2,7 +2,10 @@ import express from 'express';
 import { check } from 'express-validator';
 
 import * as agentAppController from '../../controllers/agentApp.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import {
   validateObjectId,
@@ -24,7 +27,7 @@ router.post(
   asyncHandler(agentAppController.login)
 );
 
-router.use(protect);
+router.use(isAuthenticated);
 router.use(authorize('agent'));
 
 router.get('/profile', asyncHandler(agentAppController.getProfile));
