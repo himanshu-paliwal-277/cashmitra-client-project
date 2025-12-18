@@ -25,6 +25,7 @@ export const isValidUrl = (url) => {
     new URL(url);
     return true;
   } catch (error) {
+    console.log(error);
     return false;
   }
 };
@@ -84,4 +85,3 @@ export const validatePassword = (password) => {
 
   return { isValid: true, message: 'Password is valid' };
 };
-

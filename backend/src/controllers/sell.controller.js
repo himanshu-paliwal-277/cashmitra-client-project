@@ -1,5 +1,3 @@
-import { validationResult } from 'express-validator';
-
 import { Category } from '../models/category.model.js';
 import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
@@ -107,13 +105,7 @@ export const getVariantsByModel = async (req, res) => {
   }
 };
 
-export const calculatePrice = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
+export const calculatePrice = async (req, res) => {  try {
     const {
       productId,
       purchaseDate,
@@ -332,13 +324,7 @@ const generatePriceRecommendations = (product, condition) => {
   return recommendations;
 };
 
-export const createSellOrder = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
+export const createSellOrder = async (req, res) => {  try {
     const { productId, condition, price, paymentMethod, pickupAddress } =
       req.body;
 

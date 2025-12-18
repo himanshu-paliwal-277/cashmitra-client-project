@@ -1,14 +1,8 @@
-import { validationResult } from 'express-validator';
-
 import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
 import { SellOfferSession } from '../models/sellOfferSession.model.js';
 import { SellOrder } from '../models/sellOrder.model.js';
 
 export var createOrder = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { sessionId, pickup, payment, orderNumber } = req.body;
   const userId = req.user.id;

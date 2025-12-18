@@ -1,13 +1,7 @@
-import { validationResult } from 'express-validator';
-
 import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
 import { BuyCategory } from '../models/buyCategory.model.js';
 
 export var createBuyCategory = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { name, image, superCategory } = req.body;
 
@@ -85,10 +79,6 @@ export var getBuyCategory = asyncHandler(async (req, res) => {
 });
 
 export var updateBuyCategory = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { id } = req.params;
   const { name, image, isActive, sortOrder, superCategory } = req.body;

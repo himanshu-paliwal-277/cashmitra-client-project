@@ -1,14 +1,8 @@
-import { validationResult } from 'express-validator';
-
 import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
 import { SellAccessory } from '../models/sellAccessory.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 
 export var createAccessory = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { categoryId, key, title, delta } = req.body;
 
@@ -80,10 +74,6 @@ export var getAccessoriesForCustomer = asyncHandler(async (req, res) => {
 });
 
 export var getCustomerAccessories = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { categoryId } = req.query;
 
@@ -120,10 +110,6 @@ export var getAccessory = asyncHandler(async (req, res) => {
 });
 
 export var updateAccessory = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { key, title, delta, isActive, order } = req.body;
 

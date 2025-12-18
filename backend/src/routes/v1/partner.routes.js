@@ -1,101 +1,60 @@
 import express from 'express';
-import { check } from 'express-validator';
 
 import * as partnerController from '../../controllers/partner.controller.js';
 import {
   authorize,
   isAuthenticated,
 } from '../../middlewares/auth.middleware.js';
-import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
-import { authLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import {
-  validateObjectId,
-  validateRequest,
-} from '../../middlewares/validation.middleware.js';
+  attachPartner,
+  requirePartner,
+} from '../../middlewares/partner.middleware.js';
+import { validateObjectId } from '../../middlewares/validation.middleware.js';
+import {
+  assignAgentToOrderSchema,
+  createAgentSchema,
+  createPartnerProductSchema,
+  registerPartnerShopSchema,
+  respondToOrderAssignmentSchema,
+  updateAgentSchema,
+  updateOrderStatusSchema,
+  updatePartnerProductSchema,
+  updatePartnerProfileSchema,
+  updatePartnerSellOrderStatusSchema,
+  uploadDocumentsSchema,
+} from '../../validators/partner.validation.js';
+import { validate } from '../../validators/validator.js';
 
 const router = express.Router();
 
 router.post(
   '/register',
   isAuthenticated,
-  [
-    check('shopName').notEmpty().withMessage('Shop name is required'),
-    check('shopAddress').isObject().withMessage('Shop address is required'),
-    check('shopAddress.street')
-      .notEmpty()
-      .withMessage('Street address is required'),
-    check('shopAddress.city').notEmpty().withMessage('City is required'),
-    check('shopAddress.state').notEmpty().withMessage('State is required'),
-    check('shopAddress.pincode').notEmpty().withMessage('Pincode is required'),
-    check('gstNumber').notEmpty().withMessage('GST number is required'),
-    check('shopPhone').notEmpty().withMessage('Shop phone number is required'),
-    check('shopEmail').isEmail().withMessage('Valid shop email is required'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.registerPartnerShop)
+  validate(registerPartnerShopSchema),
+  partnerController.registerPartnerShop
 );
 
 router.get(
   '/profile',
   isAuthenticated,
   authorize('partner'),
-  asyncHandler(partnerController.getPartnerProfile)
+  partnerController.getPartnerProfile
 );
 
 router.put(
   '/profile',
   isAuthenticated,
   authorize('partner'),
-  [
-    check('shopName')
-      .optional()
-      .notEmpty()
-      .withMessage('Shop name cannot be empty'),
-    check('shopAddress')
-      .optional()
-      .isObject()
-      .withMessage('Shop address must be an object'),
-    check('shopPhone')
-      .optional()
-      .notEmpty()
-      .withMessage('Shop phone cannot be empty'),
-    check('shopEmail')
-      .optional()
-      .isEmail()
-      .withMessage('Valid shop email is required'),
-    check('bankDetails')
-      .optional()
-      .isObject()
-      .withMessage('Bank details must be an object'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.updatePartnerProfile)
+  validate(updatePartnerProfileSchema),
+  partnerController.updatePartnerProfile
 );
 
 router.put(
   '/documents',
   isAuthenticated,
   authorize('partner'),
-  [
-    check('gstCertificate')
-      .optional()
-      .isURL()
-      .withMessage('Valid GST certificate URL is required'),
-    check('shopLicense')
-      .optional()
-      .isURL()
-      .withMessage('Valid shop license URL is required'),
-    check('ownerIdProof')
-      .optional()
-      .isURL()
-      .withMessage('Valid ID proof URL is required'),
-    check('additionalDocuments')
-      .optional()
-      .isArray()
-      .withMessage('Additional documents must be an array'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.uploadDocuments)
+  validate(uploadDocumentsSchema),
+  partnerController.uploadDocuments
 );
 
 // Inventory routes removed - partners now manage products directly
@@ -104,14 +63,14 @@ router.get(
   '/products',
   isAuthenticated,
   authorize('partner'),
-  asyncHandler(partnerController.getPartnerProducts)
+  partnerController.getPartnerProducts
 );
 
 router.get(
   '/orders',
   isAuthenticated,
   authorize('partner'),
-  asyncHandler(partnerController.getOrders)
+  partnerController.getOrders
 );
 
 router.get(
@@ -119,7 +78,7 @@ router.get(
   isAuthenticated,
   authorize('partner'),
   validateObjectId('id'),
-  asyncHandler(partnerController.checkMissingInventory)
+  partnerController.checkMissingInventory
 );
 
 router.put(
@@ -127,17 +86,8 @@ router.put(
   isAuthenticated,
   authorize('partner'),
   validateObjectId('id'),
-  [
-    check('response')
-      .isIn(['accepted', 'rejected'])
-      .withMessage("Response must be either 'accepted' or 'rejected'"),
-    check('reason')
-      .optional()
-      .isString()
-      .withMessage('Reason must be a string'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.respondToOrderAssignment)
+  validate(respondToOrderAssignmentSchema),
+  partnerController.respondToOrderAssignment
 );
 
 router.put(
@@ -145,17 +95,8 @@ router.put(
   isAuthenticated,
   authorize('partner'),
   validateObjectId('id'),
-  [
-    check('status')
-      .isIn(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])
-      .withMessage('Valid status is required'),
-    check('trackingInfo')
-      .optional()
-      .isObject()
-      .withMessage('Tracking info must be an object'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.updateOrderStatus)
+  validate(updateOrderStatusSchema),
+  partnerController.updateOrderStatus
 );
 
 router.put(
@@ -163,22 +104,16 @@ router.put(
   isAuthenticated,
   authorize('partner'),
   validateObjectId('id'),
-  [check('agentId').isMongoId().withMessage('Valid agent ID is required')],
-  validateRequest,
-  asyncHandler(partnerController.assignAgentToOrder)
+  validate(assignAgentToOrderSchema),
+  partnerController.assignAgentToOrder
 );
 
 router.get(
   '/dashboard',
   isAuthenticated,
   authorize('partner'),
-  asyncHandler(partnerController.getDashboardStats)
+  partnerController.getDashboardStats
 );
-
-import {
-  attachPartner,
-  requirePartner,
-} from '../../middlewares/partner.middleware.js';
 
 router.use(
   '/dashboard-sellbuy',
@@ -211,17 +146,17 @@ router.use(
 
 router.get(
   '/dashboard-sellbuy',
-  asyncHandler(partnerController.getDashboardSellBuy)
+  partnerController.getDashboardSellBuy
 );
 
 router.get(
   '/sell-products',
-  asyncHandler(partnerController.getPartnerSellProducts)
+  partnerController.getPartnerSellProducts
 );
 
 router.get(
   '/buy-products',
-  asyncHandler(partnerController.getPartnerBuyProducts)
+  partnerController.getPartnerBuyProducts
 );
 
 // Partner product management endpoints
@@ -231,22 +166,8 @@ router.post(
   authorize('partner'),
   attachPartner,
   requirePartner,
-  [
-    check('categoryId')
-      .notEmpty()
-      .withMessage('Category ID is required')
-      .isMongoId()
-      .withMessage('Invalid category ID format'),
-    check('name').notEmpty().withMessage('Product name is required'),
-    check('brand').notEmpty().withMessage('Brand is required'),
-    check('pricing.mrp').isNumeric().withMessage('MRP must be a number'),
-    check('stock.quantity')
-      .optional()
-      .isInt({ min: 0 })
-      .withMessage('Stock quantity must be non-negative'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.createPartnerProduct)
+  validate(createPartnerProductSchema),
+  partnerController.createPartnerProduct
 );
 
 router.put(
@@ -256,18 +177,8 @@ router.put(
   attachPartner,
   requirePartner,
   validateObjectId('id'),
-  [
-    check('pricing.mrp')
-      .optional()
-      .isNumeric()
-      .withMessage('MRP must be a number'),
-    check('stock.quantity')
-      .optional()
-      .isInt({ min: 0 })
-      .withMessage('Stock quantity must be non-negative'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.updatePartnerProduct)
+  validate(updatePartnerProductSchema),
+  partnerController.updatePartnerProduct
 );
 
 router.delete(
@@ -277,58 +188,40 @@ router.delete(
   attachPartner,
   requirePartner,
   validateObjectId('id'),
-  asyncHandler(partnerController.deletePartnerProduct)
+  partnerController.deletePartnerProduct
 );
 
 router.get(
   '/sell-orders',
-  asyncHandler(partnerController.getPartnerSellOrders)
+  partnerController.getPartnerSellOrders
 );
+
 router.get(
   '/sell-orders/:id',
   validateObjectId('id'),
-  asyncHandler(partnerController.getPartnerSellOrderDetails)
+  partnerController.getPartnerSellOrderDetails
 );
+
 router.put(
   '/sell-orders/:id/status',
   validateObjectId('id'),
-  [
-    check('status')
-      .isIn(['draft', 'confirmed', 'cancelled', 'picked', 'paid'])
-      .withMessage('Valid status is required'),
-    check('notes').optional().isString().withMessage('Notes must be a string'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.updatePartnerSellOrderStatus)
+  validate(updatePartnerSellOrderStatusSchema),
+  partnerController.updatePartnerSellOrderStatus
 );
 
 router.get(
   '/agents',
   isAuthenticated,
   authorize('partner'),
-  asyncHandler(partnerController.getPartnerAgents)
+  partnerController.getPartnerAgents
 );
 
 router.post(
   '/agents',
   isAuthenticated,
   authorize('partner'),
-  [
-    check('name').notEmpty().withMessage('Agent name is required'),
-    check('email').isEmail().withMessage('Valid email is required'),
-    check('phone').notEmpty().withMessage('Phone number is required'),
-    check('password')
-      .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters long'),
-    check('coverageAreas')
-      .isArray()
-      .withMessage('Coverage areas must be an array'),
-    check('aadharCard').optional().isString(),
-    check('panCard').optional().isString(),
-    check('drivingLicense').optional().isString(),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.createAgent)
+  validate(createAgentSchema),
+  partnerController.createAgent
 );
 
 router.put(
@@ -336,22 +229,8 @@ router.put(
   isAuthenticated,
   authorize('partner'),
   validateObjectId('agentId'),
-  [
-    check('name')
-      .optional()
-      .notEmpty()
-      .withMessage('Agent name cannot be empty'),
-    check('phone')
-      .optional()
-      .notEmpty()
-      .withMessage('Phone number cannot be empty'),
-    check('coverageAreas')
-      .optional()
-      .isArray()
-      .withMessage('Coverage areas must be an array'),
-  ],
-  validateRequest,
-  asyncHandler(partnerController.updateAgent)
+  validate(updateAgentSchema),
+  partnerController.updateAgent
 );
 
 router.delete(
@@ -359,7 +238,7 @@ router.delete(
   isAuthenticated,
   authorize('partner'),
   validateObjectId('agentId'),
-  asyncHandler(partnerController.deleteAgent)
+  partnerController.deleteAgent
 );
 
 export default router;

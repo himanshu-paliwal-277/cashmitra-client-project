@@ -1,5 +1,3 @@
-import { validationResult } from 'express-validator';
-
 import {
   ApiError,
   asyncHandler,
@@ -21,10 +19,6 @@ export var createOrder = asyncHandler(async (req, res) => {
     console.log('Converted items object to array:', req.body.items);
   }
 
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { items, shippingAddress, paymentMethod, couponCode } = req.body;
   const userId = req.user.id;
@@ -134,10 +128,6 @@ export var createOrder = asyncHandler(async (req, res) => {
 });
 
 export var processPayment = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { orderId } = req.params;
   const { paymentDetails } = req.body;

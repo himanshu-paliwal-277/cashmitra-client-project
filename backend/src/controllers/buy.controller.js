@@ -1,5 +1,3 @@
-import { validationResult } from 'express-validator';
-
 import { BuyProduct } from '../models/buyProduct.model.js';
 import { Cart } from '../models/cart.model.js';
 import { Order } from '../models/order.model.js';
@@ -114,13 +112,7 @@ export const getProductDetails = async (req, res) => {
   }
 };
 
-export const addToCart = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
+export const addToCart = async (req, res) => {  try {
     const { productId, quantity } = req.body;
     const userId = req.user.id;
 
@@ -255,13 +247,7 @@ export const getCart = async (req, res) => {
   }
 };
 
-export const updateCartItem = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
+export const updateCartItem = async (req, res) => {  try {
     const { itemId } = req.params;
     const productId = itemId;
     const { quantity } = req.body;
@@ -341,13 +327,7 @@ export const removeCartItem = async (req, res) => {
   }
 };
 
-export const checkout = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
+export const checkout = async (req, res) => {  try {
     const { shippingAddress, paymentMethod } = req.body;
     const userId = req.user.id;
 

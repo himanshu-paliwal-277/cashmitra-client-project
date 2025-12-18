@@ -1,5 +1,3 @@
-import { validationResult } from 'express-validator';
-
 import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
@@ -7,10 +5,6 @@ import { SellQuestion } from '../models/sellQuestion.model.js';
 import { SellSuperCategory } from '../models/sellSuperCategory.model.js';
 
 export var createQuestion = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const {
     categoryId,
@@ -67,10 +61,6 @@ export var createQuestion = asyncHandler(async (req, res) => {
 });
 
 export var getQuestions = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { categoryId, section } = req.query;
 
@@ -137,10 +127,6 @@ export var getQuestionsForCustomer = asyncHandler(async (req, res) => {
 });
 
 export var getCustomerQuestions = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { productId, variantId } = req.query;
 
@@ -192,10 +178,6 @@ export var getQuestion = asyncHandler(async (req, res) => {
 });
 
 export var updateQuestion = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const {
     categoryId,

@@ -1,4 +1,3 @@
-import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
 import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
@@ -8,10 +7,6 @@ import { SellOfferSession } from '../models/sellOfferSession.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 
 export var createSession = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { userId, productId, variantId, answers, defects, accessories } =
     req.body;

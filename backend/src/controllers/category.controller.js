@@ -1,5 +1,3 @@
-import { validationResult } from 'express-validator';
-
 import {
   ApiError,
   asyncHandler,
@@ -8,10 +6,6 @@ import { Category } from '../models/category.model.js';
 
 
 export var createCategory = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const {
     name,
@@ -91,10 +85,6 @@ export var getCategory = asyncHandler(async (req, res) => {
 });
 
 export var updateCategory = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const category = await Category.findById(req.params.id);
   if (!category) {
@@ -181,10 +171,6 @@ export var getCategoryStats = asyncHandler(async (req, res) => {
 });
 
 export var bulkUpdateStatus = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { categoryIds, isActive } = req.body;
 

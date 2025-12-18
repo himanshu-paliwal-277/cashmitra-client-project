@@ -1,5 +1,3 @@
-import { validationResult } from 'express-validator';
-
 import { BuyCategory } from '../models/buyCategory.model.js';
 import { BuyProduct } from '../models/buyProduct.model.js';
 import { processArrayFields } from '../utils/dataProcessing.utils.js';
@@ -256,17 +254,7 @@ function normalizeBuyProductInput(input = {}) {
 
 // ✅ Updated createBuyProduct
 export const createBuyProduct = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array(),
-      });
-    }
-
-    const category = await BuyCategory.findById(req.body.categoryId);
+  try {    const category = await BuyCategory.findById(req.body.categoryId);
     if (!category) {
       return res.status(400).json({
         success: false,
@@ -308,17 +296,7 @@ export const createBuyProduct = async (req, res) => {
 };
 
 export const updateBuyProduct = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array(),
-      });
-    }
-
-    if (req.body.categoryId) {
+  try {    if (req.body.categoryId) {
       const category = await BuyCategory.findById(req.body.categoryId);
       if (!category) {
         return res.status(400).json({

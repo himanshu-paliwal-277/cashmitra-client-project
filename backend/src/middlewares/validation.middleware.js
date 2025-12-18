@@ -1,20 +1,4 @@
-import { validationResult } from 'express-validator';
-
-import { isValidObjectId, validatePassword } from '../utils/validation.utils.js';
-
-export const validateRequest = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      success: false,
-      errors: errors.array().map((error) => ({
-        field: error.param,
-        message: error.msg,
-      })),
-    });
-  }
-  next();
-};
+import { isValidObjectId } from '../utils/validation.utils.js';
 
 export const validateObjectId = (paramName) => {
   return (req, res, next) => {
@@ -48,18 +32,3 @@ export const validateAssessmentId = (paramName) => {
     });
   };
 };
-
-export const validatePasswordStrength = (req, res, next) => {
-  const { password } = req.body;
-  const validation = validatePassword(password);
-
-  if (!validation.isValid) {
-    return res.status(400).json({
-      success: false,
-      message: validation.message,
-    });
-  }
-
-  next();
-};
-

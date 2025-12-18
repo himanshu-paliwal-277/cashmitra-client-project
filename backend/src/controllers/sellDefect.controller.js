@@ -1,14 +1,8 @@
-import { validationResult } from 'express-validator';
-
 import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 import { SellDefect } from '../models/sellDefect.model.js';
 
 export var createDefect = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { categoryId, section, key, title, icon, delta } = req.body;
 
@@ -119,10 +113,6 @@ export var getDefect = asyncHandler(async (req, res) => {
 });
 
 export var updateDefect = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
 
   const { id } = req.params;
   const { categoryId, section, key, title, icon, delta, order, isActive } =
