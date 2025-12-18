@@ -1204,7 +1204,7 @@ export const addProduct = async (req, res) => {
 
 export const uploadProductImages = async (req, res) => {
   try {
-    const cloudinary = require('../config/cloudinary.config');
+    const cloudinary = require('../config/cloudinaryConfig.js');
     const uploadedImages = [];
 
     if (!req.files || req.files.length === 0) {
@@ -1574,7 +1574,7 @@ export const deleteProduct = async (req, res) => {
     };
 
     if (product.images && product.images.length > 0) {
-      const cloudinary = require('../config/cloudinary.config');
+      const cloudinary = require('../config/cloudinaryConfig.js');
 
       for (const imageUrl of product.images) {
         try {

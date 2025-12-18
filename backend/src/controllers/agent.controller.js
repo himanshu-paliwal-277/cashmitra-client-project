@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import cloudinary from '../config/cloudinary.config.js';
+import cloudinary from '../config/cloudinaryConfig.js';
 import { Pickup } from '../models/pickup.model.js';
 import { User } from '../models/user.model.js';
 import { generateToken } from '../utils/jwt.utils.js';

@@ -1,25 +1,10 @@
 import express from 'express';
-import multer from 'multer';
 
-import cloudinary from '../../config/cloudinary.config.js';
+import cloudinary from '../../config/cloudinaryConfig.js';
+import { upload } from '../../config/multerConfig.js';
 import { isAuthenticated } from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
-
-const storage = multer.memoryStorage();
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'), false);
-    }
-  },
-});
 
 router.post(
   '/image',

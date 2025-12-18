@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import connectDB from './config/dbConfig.js';
-import securityConfig from './config/security.config.js';
+import securityConfig from './config/securityConfig.js';
 import { NODE_ENV, PORT } from './config/serverConfig.js';
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
 import apiRouter from './routes/apiRouter.routes.js';

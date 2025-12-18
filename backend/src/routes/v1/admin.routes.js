@@ -1,6 +1,6 @@
 import express from 'express';
-import multer from 'multer';
 
+import { upload } from '../../config/multerConfig.js';
 import * as adminController from '../../controllers/admin.controller.js';
 import * as categoryController from '../../controllers/category.controller.js';
 import {
@@ -35,22 +35,6 @@ import {
   verifyPartnerSchema,
 } from '../../validators/admin.validation.js';
 import { validate } from '../../validators/validator.js';
-
-const storage = multer.memoryStorage();
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024,
-  },
-  fileFilter: function (req, file, cb) {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'), false);
-    }
-  },
-});
 
 const router = express.Router();
 
