@@ -6,6 +6,7 @@ import {
 } from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 import { SellAccessory } from '../models/sellAccessory.model.js';
+import { SellProduct } from '../models/sellProduct.model.js';
 
 export var createAccessory = asyncHandler(async (req, res) => {
   const { categoryId, key, title, delta } = req.body;

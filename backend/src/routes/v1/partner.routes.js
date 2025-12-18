@@ -12,9 +12,7 @@ import {
   requirePartner,
 } from '../../middlewares/partner.middleware.js';
 import { validateObjectId } from '../../middlewares/validation.middleware.js';
-import {
-  validateRequest,
-} from '../../middlewares/validation.middleware.js';
+import { validateRequest } from '../../middlewares/validation.middleware.js';
 import {
   assignAgentToOrderSchema,
   createAgentSchema,
