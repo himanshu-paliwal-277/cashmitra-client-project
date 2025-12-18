@@ -113,7 +113,7 @@ export async function sendSMS(phone, message) {
   }
 }
 
-export async function sendPushNotification(userId, title, body, data = {}) {
+export async function sendPushNotification(userId, title, body) {
   try {
     console.log(`Push notification to user ${userId}: ${title} - ${body}`);
     return true;

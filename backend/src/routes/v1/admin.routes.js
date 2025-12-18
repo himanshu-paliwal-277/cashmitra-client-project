@@ -7,7 +7,6 @@ import {
   authorize,
   isAuthenticated,
 } from '../../middlewares/auth.middleware.js';
-import { authLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import {
   addProductSchema,
   assignPartnerToOrderSchema,

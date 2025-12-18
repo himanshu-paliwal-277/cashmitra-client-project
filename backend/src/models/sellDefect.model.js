@@ -114,7 +114,7 @@ sellDefectSchema.statics.getGroupedBySection = function (categoryId) {
 
 sellDefectSchema.statics.getForVariants = async function (
   productId,
-  variantIds = []
+  // variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
 
@@ -128,7 +128,7 @@ sellDefectSchema.statics.getForVariants = async function (
 
 sellDefectSchema.statics.getGroupedByCategory = async function (
   productId,
-  variantIds = []
+  // variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
 

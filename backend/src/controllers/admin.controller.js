@@ -1337,7 +1337,8 @@ export const updateProduct = async (req, res) => {
       if (typeof images === 'string') {
         try {
           processedImages = JSON.parse(images);
-        } catch (_) {
+        } catch (error) {
+          console.error('Error parsing images:', error);
           processedImages = [images];
         }
       } else if (Array.isArray(images)) {
@@ -1359,7 +1360,8 @@ export const updateProduct = async (req, res) => {
       if (typeof specifications === 'string') {
         try {
           processedSpecs = JSON.parse(specifications);
-        } catch (_) {
+        } catch (error) {
+          console.error('Error parsing specifications:', error);
           processedSpecs = {};
         }
       } else if (typeof specifications === 'object') {
@@ -2582,7 +2584,7 @@ export const deleteBrand = async (req, res) => {
       });
     }
 
-    const productIds = products.map((p) => p._id);
+    // const productIds = products.map((p) => p._id);
 
     const result = await Product.deleteMany({ brand: brandNameLower });
 
@@ -3086,7 +3088,7 @@ export const deleteModel = async (req, res) => {
       });
     }
 
-    const productIds = products.map((p) => p._id);
+    // const productIds = products.map((p) => p._id);
 
     const result = await Product.deleteMany({
       brand: brandLower,

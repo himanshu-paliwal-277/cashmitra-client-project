@@ -128,7 +128,7 @@ export var getQuestionsForCustomer = asyncHandler(async (req, res) => {
 
 export var getCustomerQuestions = asyncHandler(async (req, res) => {
 
-  const { productId, variantId } = req.query;
+  const { productId } = req.query;
 
   const product = await SellProduct.findById(productId);
   if (!product) {
@@ -213,7 +213,7 @@ export var updateQuestion = asyncHandler(async (req, res) => {
     }
   }
 
-  const transformedOptions = options?.map(({ tempId, ...opt }) => ({
+  const transformedOptions = options?.map(({ ...opt }) => ({
     ...opt,
     showIf: opt.showIf === null ? undefined : opt.showIf,
   }));

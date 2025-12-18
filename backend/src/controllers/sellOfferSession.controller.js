@@ -353,7 +353,7 @@ export var getAllSessions = asyncHandler(async (req, res) => {
     limit = 10,
     search = '',
     status = 'all',
-    deviceType = 'all',
+    // deviceType = 'all',
     sortBy = 'createdAt',
     sortOrder = 'desc',
   } = req.query;

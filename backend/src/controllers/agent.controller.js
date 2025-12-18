@@ -973,8 +973,8 @@ export async function getDailyReport(req, res) {
 }
 
 export async function submitDailyReport(req, res) {
-  const agentId = req.user._id;
-  const { notes, issues } = req.body;
+  // const agentId = req.user._id;
+  // const { notes, issues } = req.body;
 
   res.json({
     success: true,

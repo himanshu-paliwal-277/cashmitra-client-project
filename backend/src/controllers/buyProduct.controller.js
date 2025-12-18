@@ -1,6 +1,5 @@
 import { BuyCategory } from '../models/buyCategory.model.js';
 import { BuyProduct } from '../models/buyProduct.model.js';
-import { processArrayFields } from '../utils/dataProcessing.utils.js';
 
 export const getBuyProducts = async (req, res) => {
   try {
@@ -327,20 +326,20 @@ export const updateBuyProduct = async (req, res) => {
       }
     }
 
-    const processedData = processArrayFields(req.body);
+    // const processedData = processArrayFields(req.body);
 
-    const updateData = {
-      ...processedData,
-      updatedBy: req.user.id,
-    };
+    // const updateData = {
+    //   ...processedData,
+    //   updatedBy: req.user.id,
+    // };
 
-    const product = await BuyProduct.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true, runValidators: true }
-    )
-      .populate('categoryId', 'name')
-      .populate('updatedBy', 'name email');
+    // const product = await BuyProduct.findByIdAndUpdate(
+    //   req.params.id,
+    //   updateData,
+    //   { new: true, runValidators: true }
+    // )
+    //   .populate('categoryId', 'name')
+    //   .populate('updatedBy', 'name email');
 
     res.json({
       success: true,

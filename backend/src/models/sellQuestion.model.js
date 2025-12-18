@@ -179,7 +179,7 @@ sellQuestionSchema.statics.getForCategory = function (categoryId) {
 
 sellQuestionSchema.statics.getForVariants = async function (
   productId,
-  variantIds = []
+  // variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
 

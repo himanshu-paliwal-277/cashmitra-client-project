@@ -491,7 +491,7 @@ export var getOrderPickupDetails = asyncHandler(async (req, res) => {
 });
 
 export var getOrdersForPickup = asyncHandler(async (req, res) => {
-  const { status = 'confirmed' } = req.query;
+  // const { status = 'confirmed' } = req.query;
 
   const orders = await SellOrder.find({
     status: { $in: ['confirmed', 'processing'] },

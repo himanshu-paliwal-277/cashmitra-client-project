@@ -2,10 +2,8 @@ import {
   ApiError,
   asyncHandler,
 } from '../middlewares/errorHandler.middleware.js';
-import { BuyProduct } from '../models/buyProduct.model.js';
-import { Inventory } from '../models/inventory.model.js';
-import { Order } from '../models/order.model.js';
-import { Partner } from '../models/partner.model.js';
+import { BuyProduct } from '../models/buyProduct.model.js'; 
+import { Order } from '../models/order.model.js'; 
 import { Transaction } from '../models/transaction.model.js';
 import { Wallet } from '../models/wallet.model.js';
 
@@ -74,7 +72,7 @@ export var createOrder = asyncHandler(async (req, res) => {
 
   const commissionRate = 0.1;
   const totalCommission = totalAmount * commissionRate;
-  const partnerAmount = totalAmount - totalCommission;
+  // const partnerAmount = totalAmount - totalCommission;
 
   let discountAmount = 0;
 

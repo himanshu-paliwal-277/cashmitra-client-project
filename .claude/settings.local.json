@@ -34,7 +34,9 @@
       "Bash(do sed -i '/^export { \\w\\+ };/d' \"$f\")",
       "Bash(curl:*)",
       "Bash(npm uninstall:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

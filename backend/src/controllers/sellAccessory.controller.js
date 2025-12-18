@@ -1,6 +1,5 @@
 import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
-import { SellAccessory } from '../models/sellAccessory.model.js';
-import { SellProduct } from '../models/sellProduct.model.js';
+import { SellAccessory } from '../models/sellAccessory.model.js'; 
 
 export var createAccessory = asyncHandler(async (req, res) => {
 
@@ -111,7 +110,8 @@ export var getAccessory = asyncHandler(async (req, res) => {
 
 export var updateAccessory = asyncHandler(async (req, res) => {
 
-  const { key, title, delta, isActive, order } = req.body;
+  // const { key, title, delta, isActive, order } = req.body;
+  const { key } = req.body;
 
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
