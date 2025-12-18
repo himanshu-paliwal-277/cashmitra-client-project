@@ -476,6 +476,51 @@ const UserOrderDetails = () => {
                           </div>
                         </div>
                       )}
+                      {/* Assigned Agent Information */}
+                      {order?.assignedTo && (
+                        <div className="info-item">
+                          <div className="info-icon">
+                            <Shield size={20} />
+                          </div>
+                          <div className="info-content">
+                            <div className="info-label">Assigned Agent</div>
+                            <div className="info-value">
+                              {order.assignedTo.user?.name || order.assignedTo.name || 'Agent'}
+                              {order.assignedTo.agentCode && (
+                                <div className="text-sm text-blue-600 font-medium">
+                                  ID: {order.assignedTo.agentCode}
+                                </div>
+                              )}
+                              {order.assignedTo.user?.phone && (
+                                <div className="text-sm text-gray-600 flex items-center gap-1">
+                                  <Phone size={12} />
+                                  {order.assignedTo.user.phone}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {/* Partner Information */}
+                      {order?.assigned_partner_id && (
+                        <div className="info-item">
+                          <div className="info-icon">
+                            <Star size={20} />
+                          </div>
+                          <div className="info-content">
+                            <div className="info-label">Partner Shop</div>
+                            <div className="info-value">
+                              {order.assigned_partner_id.shopName || 'Partner Shop'}
+                              {order.assigned_partner_id.shopPhone && (
+                                <div className="text-sm text-gray-600 flex items-center gap-1">
+                                  <Phone size={12} />
+                                  {order.assigned_partner_id.shopPhone}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <>

@@ -50,6 +50,16 @@ const createOrderValidation = [
   body('pickup.address.pincode')
     .isPostalCode('IN')
     .withMessage('Valid Indian pincode is required'),
+  body('pickup.location.coordinates')
+    .optional()
+    .isArray({ min: 2, max: 2 })
+    .withMessage(
+      'Location coordinates must be an array of [longitude, latitude]'
+    ),
+  body('pickup.location.coordinates.*')
+    .optional()
+    .isFloat({ min: -180, max: 180 })
+    .withMessage('Coordinates must be valid numbers between -180 and 180'),
   body('pickup.slot.date')
     .isISO8601()
     .toDate()

@@ -715,7 +715,9 @@ export async function getOrders(req, res) {
   }
 
   if (!orderType || orderType === 'sell') {
-    const sellQueryObj = { assignedTo: partner._id };
+    const sellQueryObj = {
+      $or: [{ assignedTo: partner._id }, { assigned_partner_id: partner._id }],
+    };
 
     if (status) sellQueryObj.status = status;
     if (Object.keys(dateFilter).length > 0) sellQueryObj.createdAt = dateFilter;
@@ -1124,15 +1126,17 @@ export async function getDashboardStats(req, res) {
       status: 'delivered',
     });
 
-    const sellOrders = await SellOrder.countDocuments({
-      assignedTo: partner._id,
-    });
+    const sellPartnerFilter = {
+      $or: [{ assignedTo: partner._id }, { assigned_partner_id: partner._id }],
+    };
+
+    const sellOrders = await SellOrder.countDocuments(sellPartnerFilter);
     const pendingSellOrders = await SellOrder.countDocuments({
-      assignedTo: partner._id,
-      status: { $in: ['draft', 'confirmed'] },
+      ...sellPartnerFilter,
+      status: { $in: ['draft', 'confirmed', 'pending_acceptance'] },
     });
     const completedSellOrders = await SellOrder.countDocuments({
-      assignedTo: partner._id,
+      ...sellPartnerFilter,
       status: 'paid',
     });
 
@@ -1163,7 +1167,7 @@ export async function getDashboardStats(req, res) {
     });
 
     const completedSellOrdersData = await SellOrder.find({
-      assignedTo: partner._id,
+      ...sellPartnerFilter,
       status: 'paid',
     });
 
@@ -1182,7 +1186,7 @@ export async function getDashboardStats(req, res) {
       .populate('items.product', 'name brand categoryId images pricing')
       .lean();
 
-    const recentSellOrders = await SellOrder.find({ assignedTo: partner._id })
+    const recentSellOrders = await SellOrder.find(sellPartnerFilter)
       .sort('-createdAt')
       .limit(3)
       .populate('userId', 'name')
@@ -1276,20 +1280,24 @@ export async function getDashboardSellBuy(req, res) {
   const sellProductCount = await SellProduct.countDocuments({ partnerId });
   const buyProductCount = await BuyProduct.countDocuments({ partnerId });
 
-  const totalOrders = await SellOrder.countDocuments({ assignedTo: partnerId });
+  const partnerFilter = {
+    $or: [{ assignedTo: partnerId }, { assigned_partner_id: partnerId }],
+  };
+
+  const totalOrders = await SellOrder.countDocuments(partnerFilter);
   const pendingOrders = await SellOrder.countDocuments({
-    assignedTo: partnerId,
-    status: { $in: ['draft', 'confirmed'] },
+    ...partnerFilter,
+    status: { $in: ['draft', 'confirmed', 'pending_acceptance'] },
   });
   const completedOrders = await SellOrder.countDocuments({
-    assignedTo: partnerId,
+    ...partnerFilter,
     status: 'paid',
   });
 
   const revenueData = await SellOrder.aggregate([
     {
       $match: {
-        assignedTo: partnerId,
+        $or: [{ assignedTo: partnerId }, { assigned_partner_id: partnerId }],
         status: 'paid',
       },
     },
@@ -1303,7 +1311,7 @@ export async function getDashboardSellBuy(req, res) {
 
   const totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
 
-  const recentOrders = await SellOrder.find({ assignedTo: partnerId })
+  const recentOrders = await SellOrder.find(partnerFilter)
     .sort({ createdAt: -1 })
     .limit(10)
     .populate({
@@ -1443,7 +1451,10 @@ export async function getPartnerSellOrders(req, res) {
   const { status, page = 1, limit = 10 } = req.query;
   const partnerId = partner._id;
 
-  const filter = { assignedTo: partnerId };
+  // Check both old (assignedTo) and new (assigned_partner_id) assignment fields
+  const filter = {
+    $or: [{ assignedTo: partnerId }, { assigned_partner_id: partnerId }],
+  };
 
   if (status) {
     filter.status = status;
@@ -1457,10 +1468,19 @@ export async function getPartnerSellOrders(req, res) {
       populate: {
         path: 'productId',
         model: 'SellProduct',
-        select: 'name brand images categoryId variants isActive',
+        select:
+          'name brand images categoryId variants isActive description specifications',
       },
     })
     .populate('userId', 'name email phone')
+    .populate({
+      path: 'assignedAgent',
+      populate: {
+        path: 'user',
+        select: 'name email phone',
+      },
+      select: 'user agentCode employeeId',
+    })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(parseInt(limit));
@@ -1488,16 +1508,28 @@ export async function getPartnerSellOrderDetails(req, res) {
   const partnerId = partner._id;
   const orderId = req.params.id;
 
-  const order = await SellOrder.findOne({ _id: orderId, assignedTo: partnerId })
+  const order = await SellOrder.findOne({
+    _id: orderId,
+    $or: [{ assignedTo: partnerId }, { assigned_partner_id: partnerId }],
+  })
     .populate({
       path: 'sessionId',
       populate: {
         path: 'productId',
         model: 'SellProduct',
-        select: 'name brand images categoryId variants isActive',
+        select:
+          'name brand images categoryId variants isActive description specifications',
       },
     })
-    .populate('userId', 'name email phone address');
+    .populate('userId', 'name email phone address')
+    .populate({
+      path: 'assignedAgent',
+      populate: {
+        path: 'user',
+        select: 'name email phone',
+      },
+      select: 'user agentCode employeeId',
+    });
 
   if (!order) {
     throw new ApiError('Order not found or access denied', 404);
@@ -1521,7 +1553,7 @@ export async function updatePartnerSellOrderStatus(req, res) {
 
   const order = await SellOrder.findOne({
     _id: orderId,
-    assignedTo: partnerId,
+    $or: [{ assignedTo: partnerId }, { assigned_partner_id: partnerId }],
   });
 
   if (!order) {
@@ -1993,4 +2025,428 @@ export async function createPartnerProduct(req, res) {
       error: error.message,
     });
   }
+}
+
+export async function getAvailableSellOrders(req, res) {
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      throw new ApiError('Partner profile not found', 404);
+    }
+
+    if (
+      !partner.location ||
+      !partner.location.coordinates ||
+      (partner.location.coordinates[0] === 0 &&
+        partner.location.coordinates[1] === 0)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'Partner location not configured. Please update your shop coordinates.',
+        requiresLocationSetup: true,
+      });
+    }
+
+    const { page = 1, limit = 20 } = req.query;
+    const skip = (page - 1) * limit;
+
+    let availableOrders;
+    let usingFallback = false;
+
+    try {
+      const allAvailableOrders = await SellOrder.findAvailableNearPartner(
+        partner.location,
+        partner.service_radius,
+        parseInt(limit) + skip // Get more to handle pagination
+      );
+
+      availableOrders = allAvailableOrders.slice(skip, skip + parseInt(limit));
+    } catch (geoError) {
+      console.error('Geospatial query error:', geoError);
+
+      console.log('Falling back to non-geospatial query...');
+      try {
+        availableOrders = await SellOrder.find({
+          assigned_partner_id: null,
+          status: 'open',
+        })
+          .populate('userId', 'name email phone')
+          .populate({
+            path: 'sessionId',
+            populate: {
+              path: 'productId',
+              model: 'SellProduct',
+              select:
+                'name brand images categoryId variants isActive description specifications',
+            },
+          })
+          .sort({ createdAt: -1 })
+          .limit(parseInt(limit))
+          .skip(skip);
+      } catch (fallbackError) {
+        console.error('Fallback query error:', fallbackError);
+        return res.status(500).json({
+          success: false,
+          message: 'Error finding available orders.',
+          error: fallbackError.message,
+        });
+      }
+
+      usingFallback = true;
+    }
+
+    const radiusInRadians = partner.service_radius / 6378100;
+
+    let totalCount;
+    try {
+      totalCount = await SellOrder.countDocuments({
+        assigned_partner_id: null,
+        status: 'open',
+        'pickup.location': {
+          $geoWithin: {
+            $centerSphere: [partner.location.coordinates, radiusInRadians],
+          },
+        },
+      });
+    } catch (countError) {
+      console.error('Count query error:', countError);
+
+      try {
+        totalCount = await SellOrder.countDocuments({
+          assigned_partner_id: null,
+          status: 'open',
+        });
+      } catch (fallbackCountError) {
+        console.error('Fallback count error:', fallbackCountError);
+        totalCount = 0; // Final fallback
+      }
+    }
+
+    const ordersWithDistance = availableOrders.map((order) => {
+      let distance = 0;
+      let distanceFormatted = 'Unknown';
+
+      if (
+        isValidLocation(partner.location) &&
+        isValidLocation(order.pickup?.location)
+      ) {
+        distance = calculateDistance(
+          partner.location.coordinates[1], // latitude
+          partner.location.coordinates[0], // longitude
+          order.pickup.location.coordinates[1],
+          order.pickup.location.coordinates[0]
+        );
+
+        distanceFormatted =
+          distance > 1000
+            ? `${(distance / 1000).toFixed(1)} km`
+            : `${Math.round(distance)} m`;
+      }
+
+      return {
+        ...(order.toObject ? order.toObject() : order), // Handle both Mongoose docs and plain objects
+        distanceFromPartner: Math.round(distance), // in meters
+        distanceFormatted,
+      };
+    });
+
+    res.json({
+      success: true,
+      data: {
+        orders: ordersWithDistance,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(totalCount / limit),
+          totalOrders: totalCount,
+          hasNext: page * limit < totalCount,
+          hasPrev: page > 1,
+        },
+        partnerInfo: {
+          serviceRadius: partner.service_radius,
+          serviceRadiusFormatted: `${(partner.service_radius / 1000).toFixed(1)} km`,
+          location: partner.location,
+          isLocationFiltered: !usingFallback, // Indicates if geospatial filtering was used
+          fallbackMode: usingFallback || false, // Indicates if showing all orders due to location issues
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching available sell orders:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching available orders',
+      error: error.message,
+    });
+  }
+}
+
+export async function claimSellOrder(req, res) {
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      throw new ApiError('Partner profile not found', 404);
+    }
+
+    const { orderId } = req.params;
+    const { notes } = req.body;
+
+    const claimedOrder = await SellOrder.claimOrder(orderId, partner._id);
+
+    if (!claimedOrder) {
+      return res.status(409).json({
+        success: false,
+        message:
+          'Order already taken by another partner or no longer available',
+        code: 'ORDER_ALREADY_CLAIMED',
+      });
+    }
+
+    if (notes) {
+      claimedOrder.notes = notes;
+      await claimedOrder.save();
+    }
+
+    const populatedOrder = await SellOrder.findById(claimedOrder._id)
+      .populate('userId', 'name email phone')
+      .populate('sessionId')
+      .populate('assigned_partner_id', 'shopName shopPhone shopEmail');
+
+    res.json({
+      success: true,
+      message: 'Order claimed successfully',
+      data: populatedOrder,
+    });
+  } catch (error) {
+    console.error('Error claiming sell order:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error claiming order',
+      error: error.message,
+    });
+  }
+}
+
+export async function updatePartnerLocation(req, res) {
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      throw new ApiError('Partner profile not found', 404);
+    }
+
+    const { latitude, longitude, serviceRadius } = req.body;
+
+    if (
+      !latitude ||
+      !longitude ||
+      latitude < -90 ||
+      latitude > 90 ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid coordinates provided',
+      });
+    }
+
+    if (serviceRadius && serviceRadius < 1000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Service radius must be at least 1km',
+      });
+    }
+
+    await partner.updateLocationFromCoordinates(latitude, longitude);
+
+    if (serviceRadius) {
+      partner.service_radius = serviceRadius;
+      await partner.save();
+    }
+
+    res.json({
+      success: true,
+      message: 'Location updated successfully',
+      data: {
+        location: partner.location,
+        serviceRadius: partner.service_radius,
+        serviceRadiusFormatted: `${(partner.service_radius / 1000).toFixed(1)} km`,
+      },
+    });
+  } catch (error) {
+    console.error('Error updating partner location:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating location',
+      error: error.message,
+    });
+  }
+}
+
+export async function getClaimedSellOrders(req, res) {
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      throw new ApiError('Partner profile not found', 404);
+    }
+
+    const { page = 1, limit = 20, status } = req.query;
+    const skip = (page - 1) * limit;
+
+    const query = { assigned_partner_id: partner._id };
+    if (status) {
+      query.status = status;
+    }
+
+    const claimedOrders = await SellOrder.find(query)
+      .populate('userId', 'name email phone')
+      .populate('sessionId')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip(skip);
+
+    const totalCount = await SellOrder.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: {
+        orders: claimedOrders,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(totalCount / limit),
+          totalOrders: totalCount,
+          hasNext: page * limit < totalCount,
+          hasPrev: page > 1,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching claimed sell orders:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching claimed orders',
+      error: error.message,
+    });
+  }
+}
+
+export async function assignAgentToSellOrder(req, res) {
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
+    if (!partner) {
+      throw new ApiError('Partner profile not found', 404);
+    }
+
+    console.log('Partner found:', partner._id, 'for user:', req.user.id);
+
+    const orderId = req.params.id;
+    const { agentId } = req.body;
+
+    console.log('Looking for order:', orderId, 'for partner:', partner._id);
+
+    const orderExists = await SellOrder.findById(orderId);
+    console.log('Order exists:', orderExists ? 'Yes' : 'No');
+    if (orderExists) {
+      console.log('Order assignedTo:', orderExists.assignedTo);
+      console.log(
+        'Order assigned_partner_id:',
+        orderExists.assigned_partner_id
+      );
+    }
+
+    const order = await SellOrder.findOne({
+      _id: orderId,
+      $or: [{ assignedTo: partner._id }, { assigned_partner_id: partner._id }],
+    });
+
+    if (!order) {
+      if (orderExists) {
+        console.log('Order exists but not assigned to partner:', {
+          orderId,
+          partnerId: partner._id,
+          orderAssignedTo: orderExists.assignedTo,
+          orderAssignedPartnerId: orderExists.assigned_partner_id,
+          orderStatus: orderExists.status,
+        });
+        return res.status(403).json({
+          success: false,
+          message: 'Order is not assigned to your shop',
+        });
+      }
+
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
+
+    const Agent = (await import('../models/agent.model.js')).Agent;
+    const agent = await Agent.findOne({
+      _id: agentId,
+      assignedPartner: partner._id,
+    });
+
+    if (!agent) {
+      return res.status(404).json({
+        success: false,
+        message: 'Agent not found or not assigned to your shop',
+      });
+    }
+
+    order.assignedAgent = agentId;
+    await order.save();
+
+    const updatedOrder = await SellOrder.findById(orderId)
+      .populate('userId', 'name email phone')
+      .populate('sessionId')
+      .populate('assignedAgent', 'user agentCode')
+      .populate({
+        path: 'assignedAgent',
+        populate: {
+          path: 'user',
+          select: 'name email phone',
+        },
+      });
+
+    res.json({
+      success: true,
+      message: 'Agent assigned successfully',
+      data: updatedOrder,
+    });
+  } catch (error) {
+    console.error('Error assigning agent to sell order:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error assigning agent',
+      error: error.message,
+    });
+  }
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const φ1 = (lat1 * Math.PI) / 180;
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in meters
+}
+
+function isValidLocation(location) {
+  return (
+    location &&
+    location.coordinates &&
+    Array.isArray(location.coordinates) &&
+    location.coordinates.length === 2 &&
+    typeof location.coordinates[0] === 'number' &&
+    typeof location.coordinates[1] === 'number' &&
+    location.coordinates[0] !== 0 &&
+    location.coordinates[1] !== 0
+  );
 }

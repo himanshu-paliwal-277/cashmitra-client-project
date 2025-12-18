@@ -23,6 +23,7 @@ import {
   Download,
   Sparkles,
   AlertCircle,
+  UserCheck,
 } from 'lucide-react';
 import api from '../../utils/api';
 import adminService from '../../services/adminService';
@@ -549,17 +550,26 @@ const SellOrders = () => {
                       <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                         Assigned Partner
                       </div>
-                      {order.assignedTo ? (
+                      {order.assignedTo || order.assigned_partner_id ? (
                         <div className="font-semibold text-emerald-600 text-sm sm:text-base">
                           <div className="truncate">
-                            {order.assignedTo.businessName ||
-                              order.assignedTo.shopName ||
-                              order.assignedTo.user?.name ||
+                            {order.assignedTo?.businessName ||
+                              order.assigned_partner_id?.businessName ||
+                              order.assignedTo?.shopName ||
+                              order.assigned_partner_id?.shopName ||
+                              order.assignedTo?.user?.name ||
+                              order.assigned_partner_id?.user?.name ||
                               'Unknown Partner'}
                           </div>
-                          {(order.assignedTo.phone || order.assignedTo.user?.phone) && (
+                          {(order.assignedTo?.phone ||
+                            order.assigned_partner_id?.phone ||
+                            order.assignedTo?.user?.phone ||
+                            order.assigned_partner_id?.user?.phone) && (
                             <div className="text-xs text-gray-500 mt-1 truncate">
-                              {order.assignedTo.phone || order.assignedTo.user?.phone}
+                              {order.assignedTo?.phone ||
+                                order.assigned_partner_id?.phone ||
+                                order.assignedTo?.user?.phone ||
+                                order.assigned_partner_id?.user?.phone}
                             </div>
                           )}
                         </div>
@@ -581,6 +591,31 @@ const SellOrders = () => {
                         </select>
                       )}
                     </div>
+
+                    {/* Assigned Agent Information */}
+                    {order.assignedAgent && (
+                      <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                          Assigned Agent
+                        </div>
+                        <div className="font-semibold text-indigo-600 text-sm sm:text-base">
+                          <div className="truncate">
+                            {order.assignedAgent.user?.name || 'Agent'} (
+                            {order.assignedAgent.agentCode || 'N/A'})
+                          </div>
+                          {order.assignedAgent.user?.phone && (
+                            <div className="text-xs text-gray-500 mt-1 truncate">
+                              {order.assignedAgent.user.phone}
+                            </div>
+                          )}
+                          {order.assignedAgent.employeeId && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              ID: {order.assignedAgent.employeeId}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -605,8 +640,10 @@ const SellOrders = () => {
                     >
                       <option value="">Update Status</option>
                       <option value="draft">Draft</option>
+                      <option value="open">Open</option>
+                      <option value="pending_acceptance">Pending Acceptance</option>
                       <option value="confirmed">Confirmed</option>
-                      <option value="picked_up">Picked Up</option>
+                      <option value="picked">Picked Up</option>
                       <option value="paid">Paid</option>
                       <option value="cancelled">Cancelled</option>
                     </select>
@@ -803,14 +840,25 @@ const SellOrders = () => {
                       <User size={14} className="sm:w-4 sm:h-4" />
                       <span className="text-xs uppercase tracking-wide">Assigned Partner</span>
                     </div>
-                    {selectedOrder.assignedTo ? (
+                    {selectedOrder.assignedTo || selectedOrder.assigned_partner_id ? (
                       <div className="font-semibold text-emerald-600 text-sm sm:text-base break-words">
-                        {selectedOrder.assignedTo.businessName ||
-                          selectedOrder.assignedTo.shopName ||
-                          selectedOrder.assignedTo.user?.name ||
+                        {selectedOrder.assignedTo?.businessName ||
+                          selectedOrder.assigned_partner_id?.businessName ||
+                          selectedOrder.assignedTo?.shopName ||
+                          selectedOrder.assigned_partner_id?.shopName ||
+                          selectedOrder.assignedTo?.user?.name ||
+                          selectedOrder.assigned_partner_id?.user?.name ||
                           'Unknown Partner'}
-                        {(selectedOrder.assignedTo.phone || selectedOrder.assignedTo.user?.phone) &&
-                          ` (${selectedOrder.assignedTo.phone || selectedOrder.assignedTo.user?.phone})`}
+                        {(selectedOrder.assignedTo?.phone ||
+                          selectedOrder.assigned_partner_id?.phone ||
+                          selectedOrder.assignedTo?.user?.phone ||
+                          selectedOrder.assigned_partner_id?.user?.phone) &&
+                          ` (${
+                            selectedOrder.assignedTo?.phone ||
+                            selectedOrder.assigned_partner_id?.phone ||
+                            selectedOrder.assignedTo?.user?.phone ||
+                            selectedOrder.assigned_partner_id?.user?.phone
+                          })`}
                       </div>
                     ) : (
                       <select
@@ -830,6 +878,39 @@ const SellOrders = () => {
                       </select>
                     )}
                   </div>
+
+                  {/* Assigned Agent Information */}
+                  {selectedOrder.assignedAgent && (
+                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg sm:rounded-xl p-3 sm:p-4 md:col-span-2">
+                      <div className="flex items-center gap-2 text-gray-600 mb-2">
+                        <UserCheck size={14} className="sm:w-4 sm:h-4" />
+                        <span className="text-xs uppercase tracking-wide">Assigned Agent</span>
+                      </div>
+                      <div className="font-semibold text-indigo-600 text-sm sm:text-base break-words">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span>{selectedOrder.assignedAgent.user?.name || 'Agent'}</span>
+                          <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">
+                            {selectedOrder.assignedAgent.agentCode || 'N/A'}
+                          </span>
+                        </div>
+                        {selectedOrder.assignedAgent.user?.phone && (
+                          <div className="text-xs text-gray-600 mb-1">
+                            📞 {selectedOrder.assignedAgent.user.phone}
+                          </div>
+                        )}
+                        {selectedOrder.assignedAgent.user?.email && (
+                          <div className="text-xs text-gray-600 mb-1">
+                            ✉️ {selectedOrder.assignedAgent.user.email}
+                          </div>
+                        )}
+                        {selectedOrder.assignedAgent.employeeId && (
+                          <div className="text-xs text-gray-500">
+                            ID: {selectedOrder.assignedAgent.employeeId}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </section>
 

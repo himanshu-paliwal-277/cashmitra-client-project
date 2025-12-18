@@ -181,7 +181,7 @@ sellQuestionSchema.statics.getForVariants = async function (
   productId,
   variantIds = []
 ) {
-  const SellProduct = require('./sellProduct.model');
+  const { SellProduct } = await import('./sellProduct.model.js');
 
   const product = await SellProduct.findById(productId).select('categoryId');
   if (!product) {
@@ -192,5 +192,3 @@ sellQuestionSchema.statics.getForVariants = async function (
 };
 
 export const SellQuestion = mongoose.model('SellQuestion', sellQuestionSchema);
-
-

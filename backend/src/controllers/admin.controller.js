@@ -3,10 +3,12 @@ import mongoose from 'mongoose';
 
 import { Agent } from '../models/agent.model.js';
 import { ConditionQuestionnaire } from '../models/conditionQuestionnaire.model.js';
+import { Finance } from '../models/finance.model.js';
 import { Inventory } from '../models/inventory.model.js';
 import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
 import { Product } from '../models/product.model.js';
+import { SellOrder } from '../models/sellOrder.model.js';
 import { Transaction } from '../models/transaction.model.js';
 import { User } from '../models/user.model.js';
 import { Wallet } from '../models/wallet.model.js';
@@ -33,7 +35,8 @@ export const loginAdmin = async (req, res) => {
     // Check if user is trying to login with customer credentials
     if (user.role === 'user' || user.role === 'customer') {
       return res.status(403).json({
-        message: 'You are a customer. Please login through the customer login page.',
+        message:
+          'You are a customer. Please login through the customer login page.',
       });
     }
 
@@ -504,7 +507,7 @@ export const updatePartnerWallet = async (req, res) => {
       },
     });
 
-    const Finance = require('../models/finance.model');
+    // Finance is already imported at the top
     await Finance.create({
       transactionType: amount > 0 ? 'deposit' : 'withdrawal',
       amount: Math.abs(amount),
@@ -1214,7 +1217,7 @@ export const addProduct = async (req, res) => {
 
 export const uploadProductImages = async (req, res) => {
   try {
-    const cloudinary = require('../config/cloudinary.config');
+    const { cloudinary } = await import('../config/cloudinary.config.js');
     const uploadedImages = [];
 
     if (!req.files || req.files.length === 0) {
@@ -1582,7 +1585,7 @@ export const deleteProduct = async (req, res) => {
     };
 
     if (product.images && product.images.length > 0) {
-      const cloudinary = require('../config/cloudinary.config');
+      const { cloudinary } = await import('../config/cloudinary.config.js');
 
       for (const imageUrl of product.images) {
         try {
@@ -1979,7 +1982,7 @@ export const getSellOrders = async (req, res) => {
       sortOrder = 'desc',
     } = req.query;
 
-    const SellOrder = require('../models/sellOrder.model');
+    // SellOrder is already imported at the top
     const query = {};
 
     if (status) query.status = status;
@@ -2000,6 +2003,7 @@ export const getSellOrders = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const sortOptions = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
+    // First get the orders without population using lean() for plain objects
     const [orders, total] = await Promise.all([
       SellOrder.find(query)
         .populate({
@@ -2010,24 +2014,131 @@ export const getSellOrders = async (req, res) => {
           },
         })
         .populate('userId', 'name email phone')
-        .populate({
-          path: 'assignedTo',
-          populate: {
-            path: 'user',
-            select: 'name email phone',
-          },
-          select: 'businessName shopName email phone user',
-        })
+        .lean() // Get plain JavaScript objects
         .sort(sortOptions)
         .skip(skip)
         .limit(parseInt(limit)),
       SellOrder.countDocuments(query),
     ]);
 
+    // Manually populate partner and agent information
+    const populatedOrders = [];
+
+    console.log('Starting manual population for', orders.length, 'orders');
+
+    for (let order of orders) {
+      // Orders are already plain objects due to .lean()
+      console.log(
+        'Processing order:',
+        order._id,
+        'assigned_partner_id:',
+        order.assigned_partner_id
+      );
+
+      // Populate assignedTo (old system)
+      if (order.assignedTo) {
+        try {
+          const partner = await Partner.findById(order.assignedTo)
+            .populate('user', 'name email phone')
+            .lean();
+          if (partner) {
+            order.assignedTo = partner;
+          }
+        } catch (err) {
+          console.error('Error populating assignedTo:', err);
+        }
+      }
+
+      // Populate assigned_partner_id (new system)
+      if (order.assigned_partner_id) {
+        try {
+          console.log(
+            'Trying to populate partner ID:',
+            order.assigned_partner_id
+          );
+          const partner = await Partner.findById(order.assigned_partner_id)
+            .populate('user', 'name email phone')
+            .lean();
+          if (partner) {
+            console.log(
+              'Found partner:',
+              partner.businessName || partner.shopName
+            );
+            order.assigned_partner_id = partner;
+          } else {
+            console.log('Partner not found for ID:', order.assigned_partner_id);
+          }
+        } catch (err) {
+          console.error('Error populating assigned_partner_id:', err);
+        }
+      }
+
+      // Populate assignedAgent
+      if (order.assignedAgent) {
+        try {
+          console.log('Trying to populate agent ID:', order.assignedAgent);
+          const agent = await Agent.findById(order.assignedAgent)
+            .populate('user', 'name email phone')
+            .lean();
+          if (agent) {
+            console.log('Found agent:', agent.user?.name);
+            order.assignedAgent = agent;
+          } else {
+            console.log('Agent not found for ID:', order.assignedAgent);
+          }
+        } catch (err) {
+          console.error('Error populating assignedAgent:', err);
+        }
+      }
+
+      populatedOrders.push(order);
+    }
+
+    console.log('=== ADMIN SELL ORDERS DEBUG ===');
+    console.log('Total orders found:', populatedOrders.length);
+    console.log(
+      'Orders processed through manual population:',
+      populatedOrders.length
+    );
+
+    if (populatedOrders.length > 0) {
+      const firstOrder = populatedOrders[0];
+      console.log('First order ID:', firstOrder._id);
+      console.log(
+        'First order assigned_partner_id:',
+        firstOrder.assigned_partner_id
+      );
+      console.log(
+        'First order assigned_partner_id type:',
+        typeof firstOrder.assigned_partner_id
+      );
+      console.log('First order assignedAgent:', firstOrder.assignedAgent);
+      console.log(
+        'First order assignedAgent type:',
+        typeof firstOrder.assignedAgent
+      );
+
+      if (
+        firstOrder.assigned_partner_id &&
+        typeof firstOrder.assigned_partner_id === 'object'
+      ) {
+        console.log(
+          '✅ Partner populated successfully:',
+          firstOrder.assigned_partner_id.shopName
+        );
+      } else if (firstOrder.assigned_partner_id) {
+        console.log(
+          '❌ Partner NOT populated, still ID:',
+          firstOrder.assigned_partner_id
+        );
+      }
+    }
+    console.log('==============================');
+
     res.json({
       success: true,
       data: {
-        orders,
+        orders: populatedOrders,
         pagination: {
           currentPage: parseInt(page),
           totalPages: Math.ceil(total / parseInt(limit)),
