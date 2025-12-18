@@ -13,6 +13,8 @@ import {
   Building2,
   Wallet,
   Smartphone,
+  Navigation,
+  AlertCircle,
 } from 'lucide-react';
 
 const PickupBooking = () => {
@@ -43,9 +45,13 @@ const PickupBooking = () => {
     selectedDate: '',
     selectedTime: '',
     paymentType: 'bank_transfer',
+    latitude: '',
+    longitude: '',
   });
 
   const [selectedDateInfo, setSelectedDateInfo] = useState(null);
+  const [gettingLocation, setGettingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   // Generate next 5 days starting from tomorrow based on current date
   const getPickupDates = () => {
@@ -115,6 +121,32 @@ const PickupBooking = () => {
     }));
   };
 
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setGettingLocation(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        setFormData(prev => ({
+          ...prev,
+          latitude: position.coords.latitude.toFixed(6),
+          longitude: position.coords.longitude.toFixed(6),
+        }));
+        setGettingLocation(false);
+      },
+      error => {
+        setLocationError('Unable to get your location. Please enter coordinates manually.');
+        setGettingLocation(false);
+        console.error('Geolocation error:', error);
+      }
+    );
+  };
+
   // Helper function to get user data from localStorage
   const getUserFromLocalStorage = () => {
     try {
@@ -135,9 +167,15 @@ const PickupBooking = () => {
 
   const handleContinue = async () => {
     if (currentStep === 1) {
-      // Validate address
+      // Validate address and location
       if (!formData.pincode || !formData.flatNo || !formData.locality) {
         setSubmitError('Please fill all required address fields');
+        return;
+      }
+      if (!formData.latitude || !formData.longitude) {
+        setSubmitError(
+          'Location coordinates are required. Please use "Get Current Location" or enter manually.'
+        );
         return;
       }
       setCurrentStep(2);
@@ -231,6 +269,10 @@ const PickupBooking = () => {
               city: formData.city,
               state: formData.state || 'Delhi',
               pincode: formData.pincode,
+            },
+            location: {
+              type: 'Point',
+              coordinates: [parseFloat(formData.longitude), parseFloat(formData.latitude)], // [longitude, latitude]
             },
             slot: {
               date: new Date(formData.selectedDate),
@@ -422,10 +464,182 @@ const PickupBooking = () => {
                   />
                 </div>
 
-                {/* <button className="booking-location-button">
-                  <MapPin size={18} />
-                  Use my current location
-                </button> */}
+                {/* Location Section */}
+                <div
+                  className="booking-location-section"
+                  style={{
+                    marginTop: '20px',
+                    padding: '16px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <div
+                    className="booking-input-label"
+                    style={{
+                      marginBottom: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <MapPin size={18} style={{ color: '#dc3545' }} />
+                    Location Coordinates <span className="text-red-500 relative top-[-2px]">*</span>
+                  </div>
+
+                  <div
+                    style={{
+                      backgroundColor: '#e3f2fd',
+                      padding: '12px',
+                      borderRadius: '6px',
+                      marginBottom: '16px',
+                      border: '1px solid #bbdefb',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
+                      <AlertCircle
+                        size={16}
+                        style={{ color: '#1976d2', marginTop: '2px', flexShrink: 0 }}
+                      />
+                      <div style={{ fontSize: '13px', color: '#1565c0' }}>
+                        <p style={{ fontWeight: '500', margin: '0 0 4px 0' }}>Location Required</p>
+                        <p style={{ margin: 0, lineHeight: '1.4' }}>
+                          We need your exact location to assign the nearest partner for pickup.
+                          Click "Get Current Location" for automatic detection.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleGetCurrentLocation}
+                    disabled={gettingLocation}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '12px 16px',
+                      backgroundColor: gettingLocation
+                        ? '#6c757d'
+                        : formData.latitude && formData.longitude
+                          ? '#28a745'
+                          : '#007bff',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: gettingLocation ? 'not-allowed' : 'pointer',
+                      marginBottom: '16px',
+                      transition: 'background-color 0.2s',
+                    }}
+                  >
+                    <Navigation size={16} />
+                    {gettingLocation
+                      ? 'Getting location...'
+                      : formData.latitude && formData.longitude
+                        ? '✓ Location Captured'
+                        : 'Get Current Location'}
+                  </button>
+
+                  {/* Show coordinates when captured */}
+                  {formData.latitude && formData.longitude && (
+                    <div
+                      style={{
+                        backgroundColor: '#d4edda',
+                        border: '1px solid #c3e6cb',
+                        borderRadius: '6px',
+                        padding: '12px',
+                        marginBottom: '12px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          marginBottom: '8px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            backgroundColor: '#28a745',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Check size={12} style={{ color: 'white' }} />
+                        </div>
+                        <span style={{ fontSize: '14px', fontWeight: '500', color: '#155724' }}>
+                          Location Captured Successfully
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#155724', fontFamily: 'monospace' }}>
+                        Lat: {formData.latitude}, Lng: {formData.longitude}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleGetCurrentLocation}
+                        disabled={gettingLocation}
+                        style={{
+                          marginTop: '8px',
+                          padding: '4px 8px',
+                          fontSize: '12px',
+                          backgroundColor: 'transparent',
+                          color: '#155724',
+                          border: '1px solid #155724',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Update Location
+                      </button>
+                    </div>
+                  )}
+
+                  {locationError && (
+                    <div
+                      style={{
+                        backgroundColor: '#f8d7da',
+                        border: '1px solid #f5c6cb',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        marginTop: '12px',
+                      }}
+                    >
+                      <p style={{ fontSize: '13px', color: '#721c24', margin: 0 }}>
+                        {locationError}
+                      </p>
+                    </div>
+                  )}
+
+                  {!formData.latitude && !formData.longitude && (
+                    <div
+                      style={{
+                        marginTop: '12px',
+                        padding: '8px',
+                        backgroundColor: '#fff3cd',
+                        border: '1px solid #ffeaa7',
+                        borderRadius: '6px',
+                      }}
+                    >
+                      <p
+                        style={{ fontSize: '11px', color: '#856404', margin: 0, lineHeight: '1.4' }}
+                      >
+                        <strong>Note:</strong> Location access is required for pickup service.
+                        Please allow location permissions when prompted by your browser.
+                      </p>
+                    </div>
+                  )}
+                </div>
 
                 <div className="booking-save-as-group">
                   <div className="booking-save-as-label">Save As</div>

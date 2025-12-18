@@ -247,16 +247,6 @@ class PartnerService {
     }
   }
 
-  async updateSellOrderStatus(orderId: string, statusData: any) {
-    try {
-      const response = await api.put(`/partner/sell-orders/${orderId}/status`, statusData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating sell order status:', error);
-      throw error.response?.data || error;
-    }
-  }
-
   // Wallet & Payouts
   async getWallet() {
     try {
@@ -381,6 +371,81 @@ class PartnerService {
       return response.data;
     } catch (error) {
       console.error('Error assigning agent to order:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getAvailableSellOrders(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+
+      const response = await api.get(`/partner/sell/available?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching available sell orders:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async claimSellOrder(orderId: string, notes?: string) {
+    try {
+      const response = await api.put(`/partner/sell/${orderId}/claim`, { notes });
+      return response.data;
+    } catch (error) {
+      console.error('Error claiming sell order:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async updateLocation(locationData: {
+    latitude: number;
+    longitude: number;
+    serviceRadius?: number;
+  }) {
+    try {
+      const response = await api.put('/partner/location', locationData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating partner location:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getClaimedSellOrders(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.status) queryParams.append('status', params.status);
+      queryParams.append('orderType', 'sell');
+      queryParams.append('assignedOnly', 'true');
+
+      const response = await api.get(`/partner/sell-orders?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching claimed sell orders:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async updateSellOrderStatus(orderId: string, statusData: { status: string }) {
+    try {
+      const response = await api.put(`/partner/sell-orders/${orderId}/status`, statusData);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating sell order status:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async assignAgentToSellOrder(orderId: string, agentId: string) {
+    try {
+      const response = await api.put(`/partner/sell-orders/${orderId}/assign-agent`, { agentId });
+      return response.data;
+    } catch (error) {
+      console.error('Error assigning agent to sell order:', error);
       throw error.response?.data || error;
     }
   }

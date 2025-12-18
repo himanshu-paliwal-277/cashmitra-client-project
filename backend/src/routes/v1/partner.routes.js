@@ -1,15 +1,18 @@
 import express from 'express';
+import { check } from 'express-validator';
 
 import * as partnerController from '../../controllers/partner.controller.js';
 import {
   authorize,
   isAuthenticated,
 } from '../../middlewares/auth.middleware.js';
+import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
 import {
   attachPartner,
   requirePartner,
 } from '../../middlewares/partner.middleware.js';
 import { validateObjectId } from '../../middlewares/validation.middleware.js';
+import { validateRequest } from '../../middlewares/validation.middleware.js';
 import {
   assignAgentToOrderSchema,
   createAgentSchema,
@@ -197,6 +200,14 @@ router.put(
   partnerController.updatePartnerSellOrderStatus
 );
 
+router.put(
+  '/sell-orders/:id/assign-agent',
+  validateObjectId('id'),
+  [check('agentId').isMongoId().withMessage('Valid agent ID is required')],
+  validateRequest,
+  asyncHandler(partnerController.assignAgentToSellOrder)
+);
+
 router.get(
   '/agents',
   isAuthenticated,
@@ -227,6 +238,60 @@ router.delete(
   authorize('partner'),
   validateObjectId('agentId'),
   partnerController.deleteAgent
+);
+
+router.get(
+  '/sell/available',
+  isAuthenticated,
+  authorize('partner'),
+  asyncHandler(partnerController.getAvailableSellOrders)
+);
+
+router.put(
+  '/sell/:orderId/claim',
+  isAuthenticated,
+  authorize('partner'),
+  validateObjectId('orderId'),
+  [check('notes').optional().isString().withMessage('Notes must be a string')],
+  validateRequest,
+  asyncHandler(partnerController.claimSellOrder)
+);
+
+router.put(
+  '/location',
+  isAuthenticated,
+  authorize('partner'),
+  [
+    check('latitude')
+      .isFloat({ min: -90, max: 90 })
+      .withMessage('Latitude must be between -90 and 90'),
+    check('longitude')
+      .isFloat({ min: -180, max: 180 })
+      .withMessage('Longitude must be between -180 and 180'),
+    check('serviceRadius')
+      .optional()
+      .isInt({ min: 1000 })
+      .withMessage('Service radius must be at least 1000m (1km)'),
+  ],
+  validateRequest,
+  asyncHandler(partnerController.updatePartnerLocation)
+);
+
+router.get(
+  '/sell/claimed',
+  isAuthenticated,
+  authorize('partner'),
+  asyncHandler(partnerController.getClaimedSellOrders)
+);
+
+router.put(
+  '/sell/:orderId/assign-agent',
+  isAuthenticated,
+  authorize('partner'),
+  validateObjectId('orderId'),
+  [check('agentId').isMongoId().withMessage('Valid agent ID is required')],
+  validateRequest,
+  asyncHandler(partnerController.assignAgentToSellOrder)
 );
 
 export default router;

@@ -2,8 +2,10 @@ import {
   ApiError,
   asyncHandler,
 } from '../middlewares/errorHandler.middleware.js';
+import { Partner } from '../models/partner.model.js';
 import { SellOfferSession } from '../models/sellOfferSession.model.js';
 import { SellOrder } from '../models/sellOrder.model.js';
+import geocodingService from '../utils/geocoding.utils.js';
 
 export var createOrder = asyncHandler(async (req, res) => {
   const { sessionId, pickup, payment, orderNumber } = req.body;
@@ -31,13 +33,53 @@ export var createOrder = asyncHandler(async (req, res) => {
     orderNumber ||
     `ORD${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
+  let pickupLocation = { type: 'Point', coordinates: [0, 0] };
+
+  if (
+    pickup?.location?.coordinates &&
+    Array.isArray(pickup.location.coordinates) &&
+    pickup.location.coordinates.length === 2 &&
+    pickup.location.coordinates[0] !== 0 &&
+    pickup.location.coordinates[1] !== 0
+  ) {
+    pickupLocation = {
+      type: 'Point',
+      coordinates: pickup.location.coordinates, // [longitude, latitude]
+    };
+    console.log(
+      `Using provided coordinates for order ${finalOrderNumber}:`,
+      pickup.location.coordinates
+    );
+  } else if (pickup?.address) {
+    try {
+      const coordinates = await geocodingService.geocodeAddress(pickup.address);
+      pickupLocation = {
+        type: 'Point',
+        coordinates: [coordinates.longitude, coordinates.latitude],
+      };
+      console.log(
+        `Geocoded address for order ${finalOrderNumber}:`,
+        coordinates
+      );
+    } catch (error) {
+      console.warn(
+        `Geocoding failed for order ${finalOrderNumber}:`,
+        error.message
+      );
+    }
+  }
+
   const order = new SellOrder({
     userId,
     sessionId,
-    pickup,
+    pickup: {
+      ...pickup,
+      location: pickupLocation,
+    },
     payment,
     quoteAmount: session.finalPrice,
     orderNumber: finalOrderNumber,
+    status: 'open', // Set status to 'open' for partner broadcast system
   });
 
   await order.save();
@@ -162,6 +204,22 @@ export var getAllOrders = asyncHandler(async (req, res) => {
       },
       select: 'businessName shopName email phone user',
     })
+    .populate({
+      path: 'assigned_partner_id',
+      populate: {
+        path: 'user',
+        select: 'name email phone',
+      },
+      select: 'businessName shopName email phone user',
+    })
+    .populate({
+      path: 'assignedAgent',
+      populate: {
+        path: 'user',
+        select: 'name email phone',
+      },
+      select: 'user agentCode employeeId',
+    })
     .sort(sortOptions)
     .limit(limit * 1)
     .skip((page - 1) * limit);
@@ -241,7 +299,7 @@ export var assignOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Order not found');
   }
 
-  const Partner = require('../models/partner.model');
+  // Partner is already imported at the top
   const partner = await Partner.findById(staffId).populate(
     'user',
     'name email phone'
@@ -256,20 +314,35 @@ export var assignOrder = asyncHandler(async (req, res) => {
   console.log('Partner Name:', partner.businessName || partner.shopName);
   console.log('Partner User:', partner.user?.name);
 
-  order.assignedTo = staffId;
+  // Use the new assignment field for consistency with the pincode-based system
+  order.assigned_partner_id = staffId;
+  order.status = 'pending_acceptance'; // Update status to match the new system
   await order.save();
 
-  const updatedOrder = await SellOrder.findById(orderId).populate({
-    path: 'assignedTo',
-    populate: {
-      path: 'user',
-      select: 'name email phone',
-    },
-    select: 'businessName shopName email phone user',
-  });
+  const updatedOrder = await SellOrder.findById(orderId)
+    .populate({
+      path: 'assignedTo',
+      populate: {
+        path: 'user',
+        select: 'name email phone',
+      },
+      select: 'businessName shopName email phone user',
+    })
+    .populate({
+      path: 'assigned_partner_id',
+      populate: {
+        path: 'user',
+        select: 'name email phone',
+      },
+      select: 'businessName shopName email phone user',
+    });
 
   console.log('✅ Order assigned to partner successfully');
   console.log('Updated Order assignedTo:', updatedOrder.assignedTo);
+  console.log(
+    'Updated Order assigned_partner_id:',
+    updatedOrder.assigned_partner_id
+  );
   console.log('================================');
 
   res.json({
