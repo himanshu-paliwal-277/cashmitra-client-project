@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import mongoose from 'mongoose';
 
 const sellOfferSessionSchema = new mongoose.Schema(
@@ -111,7 +112,6 @@ sellOfferSessionSchema.virtual('totalAdjustments').get(function () {
 });
 
 sellOfferSessionSchema.methods.generateSessionToken = function () {
-  const crypto = require('crypto');
   this.sessionToken = crypto.randomBytes(32).toString('hex');
   return this.sessionToken;
 };

@@ -68,6 +68,7 @@ const PartnerDashboard = lazy(() => import('./pages/partner/Dashboard'));
 const PartnerProducts = lazy(() => import('./pages/partner/Products'));
 const PartnerOrders = lazy(() => import('./pages/partner/Orders'));
 const PartnerBuyOrders = lazy(() => import('./pages/partner/BuyOrders'));
+const PartnerSellOrders = lazy(() => import('./pages/partner/SellOrders'));
 const PartnerPayouts = lazy(() => import('./pages/partner/Payouts'));
 
 // Admin Pages (Lazy)
@@ -130,8 +131,22 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
   return (
     <Routes>
       {/* Auth Routes (No Layout - Full Screen) */}
-      <Route path="/login" element={<RoleBasedRedirect><LoginPage /></RoleBasedRedirect>} />
-      <Route path="/signup" element={<RoleBasedRedirect><SignupPage /></RoleBasedRedirect>} />
+      <Route
+        path="/login"
+        element={
+          <RoleBasedRedirect>
+            <LoginPage />
+          </RoleBasedRedirect>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <RoleBasedRedirect>
+            <SignupPage />
+          </RoleBasedRedirect>
+        }
+      />
 
       {/* Admin Routes (No Main Layout - Has AdminLayout) */}
       <Route path="/admin/login" element={<AdminLogin />} />
@@ -194,6 +209,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="products" element={<PartnerProducts />} />
           <Route path="orders" element={<PartnerOrders />} />
           <Route path="buy-orders" element={<PartnerBuyOrders />} />
+          <Route path="sell-orders" element={<PartnerSellOrders />} />
           <Route path="payouts" element={<PartnerPayouts />} />
           <Route path="kyc" element={<PartnerKYC />} />
           <Route path="agents" element={<PartnerAgentManagement />} />
@@ -229,8 +245,22 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
         <Route path="/sell/:category/questionnaire" element={<ConditionQuestionnaire />} />
         <Route path="/sell/:category/quote" element={<PriceQuote />} />
         {/* Protected: Pickup booking requires authentication */}
-        <Route path="/sell/:category/pickup" element={<ProtectedRoute><PickupBooking /></ProtectedRoute>} />
-        <Route path="/sell/:category/confirmation" element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
+        <Route
+          path="/sell/:category/pickup"
+          element={
+            <ProtectedRoute>
+              <PickupBooking />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sell/:category/confirmation"
+          element={
+            <ProtectedRoute>
+              <BookingConfirmation />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/sell/tablet" element={<SellTablet />} />
         <Route path="/sell/laptop" element={<SellLaptop />} />
         <Route path="/sell-mobile" element={<SellMobileForm />} />
@@ -241,17 +271,80 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
         <Route path="/buy/:superCategory/:category/products" element={<BuyProductsPage />} />
         <Route path="/buy/product/:productId" element={<ProductDetails />} />
         {/* Protected: Cart and checkout require authentication */}
-        <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-        <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-        <Route path="/order-confirmation/:orderId" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/order-confirmation/:orderId"
+          element={
+            <ProtectedRoute>
+              <OrderConfirmation />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Account Pages - All Protected */}
-        <Route path="/account/profile" element={<ProtectedRoute><MyProfile /></ProtectedRoute>} />
-        <Route path="/account/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
-        <Route path="/account/orders/:orderId" element={<ProtectedRoute><UserOrderDetails /></ProtectedRoute>} />
-        <Route path="/account/wallet" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
-        <Route path="/account/kyc" element={<ProtectedRoute><KYC /></ProtectedRoute>} />
-        <Route path="/account/addresses" element={<ProtectedRoute><SavedAddresses /></ProtectedRoute>} />
+        <Route
+          path="/account/profile"
+          element={
+            <ProtectedRoute>
+              <MyProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account/orders"
+          element={
+            <ProtectedRoute>
+              <MyOrders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account/orders/:orderId"
+          element={
+            <ProtectedRoute>
+              <UserOrderDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account/wallet"
+          element={
+            <ProtectedRoute>
+              <Wallet />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account/kyc"
+          element={
+            <ProtectedRoute>
+              <KYC />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account/addresses"
+          element={
+            <ProtectedRoute>
+              <SavedAddresses />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       {/* 404 Not Found (No Layout - Full Screen) */}

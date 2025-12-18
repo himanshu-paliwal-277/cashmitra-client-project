@@ -1,4 +1,12 @@
-import { LayoutDashboard, Package, ShoppingCart, UserCheck, CreditCard, Users } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  UserCheck,
+  CreditCard,
+  Users,
+  Smartphone,
+} from 'lucide-react';
 // Unused imports kept for future use when pages are created:
 // Users, BarChart3, Settings, FolderTree, ShoppingBag, RotateCcw,
 // Smartphone, HelpCircle, ClipboardList, CheckSquare, DollarSign,
@@ -30,6 +38,7 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
     '/partner/products': 'products',
     '/partner/orders': 'orders',
     '/partner/buy-orders': 'buyOrders',
+    '/partner/sell-orders': 'sellOrders',
     '/partner/payouts': 'payouts',
     '/partner/kyc': 'kyc',
     '/partner/agents': 'agents',
@@ -77,6 +86,7 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
         { to: '/partner/products', icon: Package, label: 'My Products' },
         { to: '/partner/orders', icon: ShoppingCart, label: 'Orders' },
         { to: '/partner/buy-orders', icon: ShoppingCart, label: 'Buy Orders' },
+        { to: '/partner/sell-orders', icon: Smartphone, label: 'Sell Orders' },
         // { to: '/partner/buy/categories', icon: FolderTree, label: 'Buy Categories' },
         // { to: '/partner/buy/products', icon: Package, label: 'Buy Products' },
         // { to: '/partner/sell/categories', icon: FolderTree, label: 'Sell Categories' },
