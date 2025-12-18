@@ -1,8 +1,10 @@
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
-import { SellAccessory } from '../models/sellAccessory.model.js'; 
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
+import { SellAccessory } from '../models/sellAccessory.model.js';
 
 export var createAccessory = asyncHandler(async (req, res) => {
-
   const { categoryId, key, title, delta } = req.body;
 
   const Category = require('../models/category.model');
@@ -73,7 +75,6 @@ export var getAccessoriesForCustomer = asyncHandler(async (req, res) => {
 });
 
 export var getCustomerAccessories = asyncHandler(async (req, res) => {
-
   const { categoryId } = req.query;
 
   const Category = require('../models/category.model');
@@ -109,7 +110,6 @@ export var getAccessory = asyncHandler(async (req, res) => {
 });
 
 export var updateAccessory = asyncHandler(async (req, res) => {
-
   // const { key, title, delta, isActive, order } = req.body;
   const { key } = req.body;
 

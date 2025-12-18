@@ -6,7 +6,9 @@ import { z } from 'zod';
 
 export const addToCartSchema = {
   body: z.object({
-    productId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Valid product ID is required'),
+    productId: z
+      .string()
+      .regex(/^[0-9a-fA-F]{24}$/, 'Valid product ID is required'),
     quantity: z.number().int().min(1, 'Quantity must be at least 1'),
   }),
 };
@@ -48,10 +50,21 @@ export const searchProductsSchema = {
     brand: z.string().optional(),
     minPrice: z.coerce.number().optional(),
     maxPrice: z.coerce.number().optional(),
-    condition: z.enum(['new', 'like-new', 'good', 'fair'], {
-      errorMap: () => ({ message: 'Invalid condition' }),
-    }).optional(),
-    page: z.coerce.number().int().min(1, 'Page must be a positive integer').optional(),
-    limit: z.coerce.number().int().min(1).max(50, 'Limit must be between 1 and 50').optional(),
+    condition: z
+      .enum(['new', 'like-new', 'good', 'fair'], {
+        errorMap: () => ({ message: 'Invalid condition' }),
+      })
+      .optional(),
+    page: z.coerce
+      .number()
+      .int()
+      .min(1, 'Page must be a positive integer')
+      .optional(),
+    limit: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(50, 'Limit must be between 1 and 50')
+      .optional(),
   }),
 };

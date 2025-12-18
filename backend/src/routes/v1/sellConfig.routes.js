@@ -17,41 +17,20 @@ import {
 
 const router = express.Router();
 
-router.get(
-  '/customer/:productId',
-  getCustomerConfig
-);
+router.get('/customer/:productId', getCustomerConfig);
 
 router.use(isAuthenticated);
 router.use(authorize('admin'));
 
 router.post('/', createOrUpdateConfig);
-router.get(
-  '/:productId',
-  getConfig
-);
-router.delete(
-  '/:productId',
-  deleteConfig
-);
+router.get('/:productId', getConfig);
+router.delete('/:productId', deleteConfig);
 
-router.put(
-  '/:productId/steps',
-  updateSteps
-);
-router.put(
-  '/:productId/rules',
-  updateRules
-);
+router.put('/:productId/steps', updateSteps);
+router.put('/:productId/rules', updateRules);
 
-router.post(
-  '/:productId/reset',
-  resetToDefault
-);
+router.post('/:productId/reset', resetToDefault);
 
-router.post(
-  '/:productId/test-pricing',
-  testPricing
-);
+router.post('/:productId/test-pricing', testPricing);
 
 export default router;

@@ -17,14 +17,8 @@ import { validate } from '../../validators/validator.js';
 const router = express.Router();
 
 router.get('/categories', sellController.getProductCategories);
-router.get(
-  '/brands/:category',
-  sellController.getBrandsByCategory
-);
-router.get(
-  '/series/:category/:brand',
-  sellController.getSeriesByBrand
-);
+router.get('/brands/:category', sellController.getBrandsByCategory);
+router.get('/series/:category/:brand', sellController.getSeriesByBrand);
 router.get(
   '/models/:category/:brand/:series',
   sellController.getModelsBySeries
@@ -34,10 +28,7 @@ router.get(
   sellController.getVariantsByModel
 );
 
-router.get(
-  '/products/search',
-  sellController.findProductsByModel
-);
+router.get('/products/search', sellController.findProductsByModel);
 
 router.post(
   '/calculate-price',

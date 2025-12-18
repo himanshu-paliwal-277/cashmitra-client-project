@@ -105,7 +105,8 @@ export const getVariantsByModel = async (req, res) => {
   }
 };
 
-export const calculatePrice = async (req, res) => {  try {
+export const calculatePrice = async (req, res) => {
+  try {
     const {
       productId,
       purchaseDate,
@@ -324,7 +325,8 @@ const generatePriceRecommendations = (product, condition) => {
   return recommendations;
 };
 
-export const createSellOrder = async (req, res) => {  try {
+export const createSellOrder = async (req, res) => {
+  try {
     const { productId, condition, price, paymentMethod, pickupAddress } =
       req.body;
 
@@ -859,4 +861,3 @@ export const findProductsByModel = async (req, res) => {
     });
   }
 };
-

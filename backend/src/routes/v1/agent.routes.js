@@ -40,11 +40,7 @@ const upload = multer({
   },
 });
 
-router.post(
-  '/login',
-  validate(loginAgentSchema),
-  agentController.loginAgent
-);
+router.post('/login', validate(loginAgentSchema), agentController.loginAgent);
 
 router.use(isAuthenticated);
 router.use(authorize('driver', 'admin'));
@@ -53,20 +49,11 @@ router.get('/dashboard', agentController.getAgentDashboard);
 router.get('/stats', agentController.getAgentStats);
 
 router.get('/pickups', agentController.getAssignedPickups);
-router.get(
-  '/pickups/:pickupId',
-  agentController.getPickupDetails
-);
+router.get('/pickups/:pickupId', agentController.getPickupDetails);
 
-router.put(
-  '/pickups/:pickupId/start',
-  agentController.startPickup
-);
+router.put('/pickups/:pickupId/start', agentController.startPickup);
 
-router.put(
-  '/pickups/:pickupId/reached',
-  agentController.reachedDoorstep
-);
+router.put('/pickups/:pickupId/reached', agentController.reachedDoorstep);
 
 router.post(
   '/pickups/:pickupId/selfie',
@@ -74,10 +61,7 @@ router.post(
   agentController.uploadAgentSelfie
 );
 
-router.post(
-  '/pickups/:pickupId/send-otp',
-  agentController.sendCustomerOTP
-);
+router.post('/pickups/:pickupId/send-otp', agentController.sendCustomerOTP);
 
 router.post(
   '/pickups/:pickupId/verify-otp',
@@ -133,10 +117,7 @@ router.post(
   agentController.recordPayment
 );
 
-router.post(
-  '/pickups/:pickupId/send-final-otp',
-  agentController.sendFinalOTP
-);
+router.post('/pickups/:pickupId/send-final-otp', agentController.sendFinalOTP);
 
 router.post(
   '/pickups/:pickupId/verify-final-otp',
@@ -144,10 +125,7 @@ router.post(
   agentController.verifyFinalOTP
 );
 
-router.post(
-  '/pickups/:pickupId/complete',
-  agentController.completePickup
-);
+router.post('/pickups/:pickupId/complete', agentController.completePickup);
 
 router.post(
   '/pickups/:pickupId/signature',
@@ -159,9 +137,6 @@ router.get('/history', agentController.getPickupHistory);
 router.get('/completed-today', agentController.getCompletedToday);
 
 router.get('/daily-report', agentController.getDailyReport);
-router.post(
-  '/submit-daily-report',
-  agentController.submitDailyReport
-);
+router.post('/submit-daily-report', agentController.submitDailyReport);
 
 export default router;

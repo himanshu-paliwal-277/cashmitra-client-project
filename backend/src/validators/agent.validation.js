@@ -38,11 +38,15 @@ export const verifyIMEISchema = {
 
 export const submitDeviceInspectionSchema = {
   body: z.object({
-    inspectionData: z.object({
-      screenCondition: z.string().min(1, 'Screen condition is required'),
-      sim1Working: z.boolean({ invalid_type_error: 'SIM 1 status is required' }),
-      sim2Working: z.boolean().optional(),
-    }).passthrough(),
+    inspectionData: z
+      .object({
+        screenCondition: z.string().min(1, 'Screen condition is required'),
+        sim1Working: z.boolean({
+          invalid_type_error: 'SIM 1 status is required',
+        }),
+        sim2Working: z.boolean().optional(),
+      })
+      .passthrough(),
   }),
 };
 
@@ -52,7 +56,9 @@ export const submitDeviceInspectionSchema = {
 
 export const updatePriceSchema = {
   body: z.object({
-    adjustedPrice: z.number({ invalid_type_error: 'Adjusted price must be a number' }),
+    adjustedPrice: z.number({
+      invalid_type_error: 'Adjusted price must be a number',
+    }),
     reason: z.string().min(1, 'Reason for price adjustment is required'),
   }),
 };

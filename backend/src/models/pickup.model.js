@@ -286,5 +286,3 @@ pickupSchema.methods.addNote = function (content, addedBy) {
 };
 
 export const Pickup = mongoose.model('Pickup', pickupSchema);
-
-

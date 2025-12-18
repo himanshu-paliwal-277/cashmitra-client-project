@@ -18,7 +18,9 @@ export const calculatePriceSchema = {
       errorMap: () => ({ message: 'Valid battery health is required' }),
     }),
     functionalIssues: z.enum(['none', 'minor', 'major'], {
-      errorMap: () => ({ message: 'Valid functional issues status is required' }),
+      errorMap: () => ({
+        message: 'Valid functional issues status is required',
+      }),
     }),
   }),
 };
@@ -43,9 +45,19 @@ export const createSellOrderSchema = {
 
 export const updateSellOrderStatusSchema = {
   body: z.object({
-    status: z.enum(['pending', 'confirmed', 'picked_up', 'inspected', 'completed', 'cancelled'], {
-      errorMap: () => ({ message: 'Valid status is required' }),
-    }),
+    status: z.enum(
+      [
+        'pending',
+        'confirmed',
+        'picked_up',
+        'inspected',
+        'completed',
+        'cancelled',
+      ],
+      {
+        errorMap: () => ({ message: 'Valid status is required' }),
+      }
+    ),
     note: z.string().optional(),
   }),
 };
@@ -55,62 +67,63 @@ export const updateSellOrderStatusSchema = {
 // ==========================================
 
 export const submitAssessmentSchema = {
-  body: z.object({
-    category: z.union([
-      z.string().min(1, 'Category is required'),
-      z.object({
-        category: z.string().min(1, 'Category is required'),
-      }).passthrough(),
-    ]),
-    brand: z.union([
-      z.string().min(1, 'Brand is required'),
-      z.any(),
-    ]),
-    model: z.union([
-      z.string().min(1, 'Model is required'),
-      z.any(),
-    ]),
-    answers: z.record(z.any(), { invalid_type_error: 'Answers must be an object' }),
-    productDetails: z.any().optional(),
-  }).refine(
-    (data) => {
-      // Validate brand exists either as string or in category object
-      if (typeof data.brand === 'string' && data.brand.trim()) {
-        return true;
+  body: z
+    .object({
+      category: z.union([
+        z.string().min(1, 'Category is required'),
+        z
+          .object({
+            category: z.string().min(1, 'Category is required'),
+          })
+          .passthrough(),
+      ]),
+      brand: z.union([z.string().min(1, 'Brand is required'), z.any()]),
+      model: z.union([z.string().min(1, 'Model is required'), z.any()]),
+      answers: z.record(z.any(), {
+        invalid_type_error: 'Answers must be an object',
+      }),
+      productDetails: z.any().optional(),
+    })
+    .refine(
+      (data) => {
+        // Validate brand exists either as string or in category object
+        if (typeof data.brand === 'string' && data.brand.trim()) {
+          return true;
+        }
+        if (
+          typeof data.category === 'object' &&
+          data.category.brand &&
+          typeof data.category.brand === 'string' &&
+          data.category.brand.trim()
+        ) {
+          return true;
+        }
+        return false;
+      },
+      {
+        message: 'Brand is required',
+        path: ['brand'],
       }
-      if (
-        typeof data.category === 'object' &&
-        data.category.brand &&
-        typeof data.category.brand === 'string' &&
-        data.category.brand.trim()
-      ) {
-        return true;
+    )
+    .refine(
+      (data) => {
+        // Validate model exists either as string or in category object
+        if (typeof data.model === 'string' && data.model.trim()) {
+          return true;
+        }
+        if (
+          typeof data.category === 'object' &&
+          data.category.model &&
+          typeof data.category.model === 'string' &&
+          data.category.model.trim()
+        ) {
+          return true;
+        }
+        return false;
+      },
+      {
+        message: 'Model is required',
+        path: ['model'],
       }
-      return false;
-    },
-    {
-      message: 'Brand is required',
-      path: ['brand'],
-    }
-  ).refine(
-    (data) => {
-      // Validate model exists either as string or in category object
-      if (typeof data.model === 'string' && data.model.trim()) {
-        return true;
-      }
-      if (
-        typeof data.category === 'object' &&
-        data.category.model &&
-        typeof data.category.model === 'string' &&
-        data.category.model.trim()
-      ) {
-        return true;
-      }
-      return false;
-    },
-    {
-      message: 'Model is required',
-      path: ['model'],
-    }
-  ),
+    ),
 };

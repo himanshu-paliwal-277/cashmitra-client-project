@@ -14,10 +14,6 @@ import { SellProduct } from '../models/sellProduct.model.js';
 import { SellQuestion } from '../models/sellQuestion.model.js';
 import { User } from '../models/user.model.js';
 
-
-
-
-
 export var login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 

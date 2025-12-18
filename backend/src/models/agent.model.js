@@ -216,5 +216,3 @@ agentSchema.statics.findByCoverageArea = function (area) {
 };
 
 export const Agent = mongoose.model('Agent', agentSchema);
-
-

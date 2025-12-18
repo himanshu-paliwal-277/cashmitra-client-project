@@ -4,9 +4,7 @@ import {
 } from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 
-
 export var createCategory = asyncHandler(async (req, res) => {
-
   const {
     name,
     description,
@@ -85,7 +83,6 @@ export var getCategory = asyncHandler(async (req, res) => {
 });
 
 export var updateCategory = asyncHandler(async (req, res) => {
-
   const category = await Category.findById(req.params.id);
   if (!category) {
     throw new ApiError(404, 'Category not found');
@@ -171,7 +168,6 @@ export var getCategoryStats = asyncHandler(async (req, res) => {
 });
 
 export var bulkUpdateStatus = asyncHandler(async (req, res) => {
-
   const { categoryIds, isActive } = req.body;
 
   if (!Array.isArray(categoryIds) || categoryIds.length === 0) {

@@ -156,7 +156,8 @@ export async function processCommission(
 }
 
 export async function requestPayout(req, res) {
-  try {    const partner = await Partner.findOne({ user: req.user.id });
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
     if (!partner) {
       return res.status(404).json({
         success: false,
@@ -251,7 +252,8 @@ export async function requestPayout(req, res) {
 }
 
 export async function updatePayoutSettings(req, res) {
-  try {    const partner = await Partner.findOne({ user: req.user.id });
+  try {
+    const partner = await Partner.findOne({ user: req.user.id });
     if (!partner) {
       return res.status(404).json({
         success: false,

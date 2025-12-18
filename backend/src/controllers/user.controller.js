@@ -30,7 +30,8 @@ export const getUserProfile = async (req, res) => {
 };
 
 export const updateUserProfile = async (req, res) => {
-  try {    const user = await User.findById(req.user._id);
+  try {
+    const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -155,7 +156,8 @@ export const getUserAddresses = async (req, res) => {
 };
 
 export const addAddress = async (req, res) => {
-  try {    const addressData = {
+  try {
+    const addressData = {
       ...req.body,
       user: req.user._id,
     };
@@ -171,7 +173,8 @@ export const addAddress = async (req, res) => {
 };
 
 export const updateAddress = async (req, res) => {
-  try {    const address = await Address.findOne({
+  try {
+    const address = await Address.findOne({
       _id: req.params.id,
       user: req.user._id,
     });

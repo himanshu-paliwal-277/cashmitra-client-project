@@ -21,11 +21,7 @@ import { validate } from '../../validators/validator.js';
 
 const router = express.Router();
 
-router.post(
-  '/login',
-  validate(loginSchema),
-  agentAppController.login
-);
+router.post('/login', validate(loginSchema), agentAppController.login);
 
 router.use(isAuthenticated);
 router.use(authorize('agent'));
@@ -34,10 +30,7 @@ router.get('/profile', agentAppController.getProfile);
 
 router.get('/orders/today', agentAppController.getTodayOrders);
 
-router.get(
-  '/orders/tomorrow',
-  agentAppController.getTomorrowOrders
-);
+router.get('/orders/tomorrow', agentAppController.getTomorrowOrders);
 
 router.get(
   '/orders/past',

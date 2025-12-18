@@ -15,12 +15,32 @@ const router = express.Router();
 router.get('/products', buyController.searchProducts);
 router.get('/products/:id', buyController.getProductDetails);
 
-router.post('/cart', isAuthenticated, validate(addToCartSchema), buyController.addToCart);
+router.post(
+  '/cart',
+  isAuthenticated,
+  validate(addToCartSchema),
+  buyController.addToCart
+);
 router.get('/cart', isAuthenticated, buyController.getCart);
-router.put('/cart/:itemId', isAuthenticated, validate(updateCartItemSchema), buyController.updateCartItem);
+router.put(
+  '/cart/:itemId',
+  isAuthenticated,
+  validate(updateCartItemSchema),
+  buyController.updateCartItem
+);
 router.delete('/cart/:itemId', isAuthenticated, buyController.removeCartItem);
-router.post('/checkout', isAuthenticated, validate(checkoutSchema), buyController.checkout);
+router.post(
+  '/checkout',
+  isAuthenticated,
+  validate(checkoutSchema),
+  buyController.checkout
+);
 router.get('/orders', isAuthenticated, buyController.getUserBuyOrders);
-router.get('/orders/:orderId', isAuthenticated, validateObjectId('orderId'), buyController.getBuyOrderDetails);
+router.get(
+  '/orders/:orderId',
+  isAuthenticated,
+  validateObjectId('orderId'),
+  buyController.getBuyOrderDetails
+);
 
 export default router;

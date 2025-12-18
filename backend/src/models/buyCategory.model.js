@@ -69,5 +69,3 @@ buyCategorySchema.index({ slug: 1 });
 buyCategorySchema.index({ isActive: 1, sortOrder: 1 });
 
 export const BuyCategory = mongoose.model('BuyCategory', buyCategorySchema);
-
-

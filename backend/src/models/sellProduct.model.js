@@ -99,5 +99,3 @@ sellProductSchema.pre('save', function (next) {
 });
 
 export const SellProduct = mongoose.model('SellProduct', sellProductSchema);
-
-

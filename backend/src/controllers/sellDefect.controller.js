@@ -1,9 +1,11 @@
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 import { SellDefect } from '../models/sellDefect.model.js';
 
 export var createDefect = asyncHandler(async (req, res) => {
-
   const { categoryId, section, key, title, icon, delta } = req.body;
 
   const category = await Category.findById(categoryId);
@@ -113,7 +115,6 @@ export var getDefect = asyncHandler(async (req, res) => {
 });
 
 export var updateDefect = asyncHandler(async (req, res) => {
-
   const { id } = req.params;
   const { categoryId, section, key, title, icon, delta, order, isActive } =
     req.body;

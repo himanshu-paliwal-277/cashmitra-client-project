@@ -462,4 +462,3 @@ export const PartnerPermission = mongoose.model(
   'PartnerPermission',
   partnerPermissionSchema
 );
-

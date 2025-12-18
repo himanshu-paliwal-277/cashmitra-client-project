@@ -333,4 +333,3 @@ export const ConditionQuestionnaire = mongoose.model(
   'ConditionQuestionnaire',
   conditionQuestionnaireSchema
 );
-

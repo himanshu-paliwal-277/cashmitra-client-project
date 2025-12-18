@@ -1,11 +1,13 @@
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 import { SellQuestion } from '../models/sellQuestion.model.js';
 import { SellSuperCategory } from '../models/sellSuperCategory.model.js';
 
 export var createQuestion = asyncHandler(async (req, res) => {
-
   const {
     categoryId,
     section,
@@ -61,7 +63,6 @@ export var createQuestion = asyncHandler(async (req, res) => {
 });
 
 export var getQuestions = asyncHandler(async (req, res) => {
-
   const { categoryId, section } = req.query;
 
   const query = { isActive: true };
@@ -127,7 +128,6 @@ export var getQuestionsForCustomer = asyncHandler(async (req, res) => {
 });
 
 export var getCustomerQuestions = asyncHandler(async (req, res) => {
-
   const { productId } = req.query;
 
   const product = await SellProduct.findById(productId);
@@ -178,7 +178,6 @@ export var getQuestion = asyncHandler(async (req, res) => {
 });
 
 export var updateQuestion = asyncHandler(async (req, res) => {
-
   const {
     categoryId,
     section,

@@ -329,7 +329,8 @@ export const loginPartner = async (req, res) => {
     if (user.role === 'user' || user.role === 'customer') {
       return res.status(403).json({
         success: false,
-        message: 'You are a customer. Please login through the customer login page.',
+        message:
+          'You are a customer. Please login through the customer login page.',
       });
     }
 

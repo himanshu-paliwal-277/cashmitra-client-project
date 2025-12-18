@@ -1,7 +1,7 @@
 import { Agent } from '../models/agent.model.js';
 import { BuyProduct } from '../models/buyProduct.model.js';
 import { Order } from '../models/order.model.js';
-import { Partner } from '../models/partner.model.js'; 
+import { Partner } from '../models/partner.model.js';
 import { SellOrder } from '../models/sellOrder.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 import { User } from '../models/user.model.js';

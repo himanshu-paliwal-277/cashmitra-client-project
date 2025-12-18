@@ -78,5 +78,3 @@ export const SellSuperCategory = mongoose.model(
   'SellSuperCategory',
   sellSuperCategorySchema
 );
-
-

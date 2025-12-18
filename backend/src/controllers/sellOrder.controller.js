@@ -1,9 +1,11 @@
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { SellOfferSession } from '../models/sellOfferSession.model.js';
 import { SellOrder } from '../models/sellOrder.model.js';
 
 export var createOrder = asyncHandler(async (req, res) => {
-
   const { sessionId, pickup, payment, orderNumber } = req.body;
   const userId = req.user.id;
 

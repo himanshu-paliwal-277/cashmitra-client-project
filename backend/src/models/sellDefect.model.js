@@ -113,7 +113,7 @@ sellDefectSchema.statics.getGroupedBySection = function (categoryId) {
 };
 
 sellDefectSchema.statics.getForVariants = async function (
-  productId,
+  productId
   // variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
@@ -127,7 +127,7 @@ sellDefectSchema.statics.getForVariants = async function (
 };
 
 sellDefectSchema.statics.getGroupedByCategory = async function (
-  productId,
+  productId
   // variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
@@ -141,5 +141,3 @@ sellDefectSchema.statics.getGroupedByCategory = async function (
 };
 
 export const SellDefect = mongoose.model('SellDefect', sellDefectSchema);
-
-

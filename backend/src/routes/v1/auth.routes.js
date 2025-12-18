@@ -22,7 +22,11 @@ router.use(authLimiter);
 // ==========================================
 
 // Register new customer account
-router.post('/register', validate(registerUserSchema), authController.registerUser);
+router.post(
+  '/register',
+  validate(registerUserSchema),
+  authController.registerUser
+);
 
 // Login customer account
 router.post('/login', validate(loginUserSchema), authController.loginUser);
@@ -44,6 +48,10 @@ router.post('/login', validate(loginUserSchema), authController.loginUser);
 // router.post('/partner/register', validate(registerPartnerSchema), authController.registerPartner);
 
 // Login partner account
-router.post('/partner/login', validate(loginPartnerSchema), authController.loginPartner);
+router.post(
+  '/partner/login',
+  validate(loginPartnerSchema),
+  authController.loginPartner
+);
 
 export default router;

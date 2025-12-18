@@ -253,7 +253,8 @@ function normalizeBuyProductInput(input = {}) {
 
 // ✅ Updated createBuyProduct
 export const createBuyProduct = async (req, res) => {
-  try {    const category = await BuyCategory.findById(req.body.categoryId);
+  try {
+    const category = await BuyCategory.findById(req.body.categoryId);
     if (!category) {
       return res.status(400).json({
         success: false,
@@ -295,7 +296,8 @@ export const createBuyProduct = async (req, res) => {
 };
 
 export const updateBuyProduct = async (req, res) => {
-  try {    if (req.body.categoryId) {
+  try {
+    if (req.body.categoryId) {
       const category = await BuyCategory.findById(req.body.categoryId);
       if (!category) {
         return res.status(400).json({
@@ -585,4 +587,3 @@ export const getBuyProductsByCategory = async (req, res) => {
     });
   }
 };
-

@@ -15,7 +15,10 @@ export const isAuthenticated = async (req, res, next) => {
 
       // Verify token
       const decoded = jwt.verify(token, JWT_SECRET);
-      console.log('Token decoded successfully:', { id: decoded.id, role: decoded.role });
+      console.log('Token decoded successfully:', {
+        id: decoded.id,
+        role: decoded.role,
+      });
 
       // Find user by ID
       req.user = await User.findById(decoded.id).select('-password');
@@ -26,7 +29,11 @@ export const isAuthenticated = async (req, res, next) => {
         return res.status(401).json({ message: 'User not found' });
       }
 
-      console.log('User authenticated:', { id: req.user._id, email: req.user.email, role: req.user.role });
+      console.log('User authenticated:', {
+        id: req.user._id,
+        email: req.user.email,
+        role: req.user.role,
+      });
       next();
     } catch (error) {
       console.error('Auth middleware error:', error.name, error.message);
@@ -37,7 +44,9 @@ export const isAuthenticated = async (req, res, next) => {
       } else if (error.name === 'JsonWebTokenError') {
         return res.status(401).json({ message: 'Invalid token' });
       } else {
-        return res.status(401).json({ message: 'Not authorized, token failed' });
+        return res
+          .status(401)
+          .json({ message: 'Not authorized, token failed' });
       }
     }
   } else {

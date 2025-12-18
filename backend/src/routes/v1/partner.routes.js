@@ -144,20 +144,11 @@ router.use(
   requirePartner
 );
 
-router.get(
-  '/dashboard-sellbuy',
-  partnerController.getDashboardSellBuy
-);
+router.get('/dashboard-sellbuy', partnerController.getDashboardSellBuy);
 
-router.get(
-  '/sell-products',
-  partnerController.getPartnerSellProducts
-);
+router.get('/sell-products', partnerController.getPartnerSellProducts);
 
-router.get(
-  '/buy-products',
-  partnerController.getPartnerBuyProducts
-);
+router.get('/buy-products', partnerController.getPartnerBuyProducts);
 
 // Partner product management endpoints
 router.post(
@@ -191,10 +182,7 @@ router.delete(
   partnerController.deletePartnerProduct
 );
 
-router.get(
-  '/sell-orders',
-  partnerController.getPartnerSellOrders
-);
+router.get('/sell-orders', partnerController.getPartnerSellOrders);
 
 router.get(
   '/sell-orders/:id',

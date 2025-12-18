@@ -213,5 +213,3 @@ sellOrderSchema.statics.getByStatus = function (status, limit = 50, skip = 0) {
 };
 
 export const SellOrder = mongoose.model('SellOrder', sellOrderSchema);
-
-

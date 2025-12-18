@@ -3,7 +3,8 @@ import { VendorPermission } from '../models/vendorPermission.model.js';
 import { generateToken } from '../utils/jwt.utils.js';
 
 export const loginVendor = async (req, res) => {
-  try {    const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
     const user = await User.findOne({ email, role: 'vendor' }).select(
       '+password'
@@ -158,7 +159,8 @@ export const getAllVendors = async (req, res) => {
 };
 
 export const createVendor = async (req, res) => {
-  try {    const { name, email, password, phone, roleTemplate = 'basic' } = req.body;
+  try {
+    const { name, email, password, phone, roleTemplate = 'basic' } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -367,4 +369,3 @@ export const getMenuItems = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
-

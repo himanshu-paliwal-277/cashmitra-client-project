@@ -1,4 +1,7 @@
-import { generateCSRFToken, validateCSRFToken } from '../utils/security.utils.js';
+import {
+  generateCSRFToken,
+  validateCSRFToken,
+} from '../utils/security.utils.js';
 
 export const generateToken = (req, res, next) => {
   const csrfToken = generateCSRFToken();
@@ -32,4 +35,3 @@ export const validateToken = (req, res, next) => {
 
   next();
 };
-

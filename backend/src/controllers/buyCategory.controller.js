@@ -1,8 +1,10 @@
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { BuyCategory } from '../models/buyCategory.model.js';
 
 export var createBuyCategory = asyncHandler(async (req, res) => {
-
   const { name, image, superCategory } = req.body;
 
   if (!superCategory) {
@@ -79,7 +81,6 @@ export var getBuyCategory = asyncHandler(async (req, res) => {
 });
 
 export var updateBuyCategory = asyncHandler(async (req, res) => {
-
   const { id } = req.params;
   const { name, image, isActive, sortOrder, superCategory } = req.body;
 

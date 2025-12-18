@@ -41,9 +41,6 @@ router.put(
 
 router.delete('/addresses/:id', userController.deleteAddress);
 
-router.put(
-  '/addresses/:id/default',
-  userController.setDefaultAddress
-);
+router.put('/addresses/:id/default', userController.setDefaultAddress);
 
 export default router;

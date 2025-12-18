@@ -13,7 +13,8 @@ import ApiError from '../utils/apiError.js';
 import { generateToken } from '../utils/jwt.utils.js';
 
 export const loginAdmin = async (req, res) => {
-  try {    const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
     // Find user by email (include password for verification)
     const user = await User.findOne({ email }).select('+password');
@@ -26,7 +27,8 @@ export const loginAdmin = async (req, res) => {
     // Check if user is trying to login with customer credentials
     if (user.role === 'user' || user.role === 'customer') {
       return res.status(403).json({
-        message: 'You are a customer. Please login through the customer login page.',
+        message:
+          'You are a customer. Please login through the customer login page.',
       });
     }
 
@@ -83,7 +85,8 @@ export const getAdminProfile = async (req, res) => {
 };
 
 export const createAdmin = async (req, res) => {
-  try {    const { name, email, password, phone } = req.body;
+  try {
+    const { name, email, password, phone } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -1736,7 +1739,8 @@ export const getUserById = async (req, res) => {
 };
 
 export const createUser = async (req, res) => {
-  try {    const {
+  try {
+    const {
       name,
       email,
       password,
@@ -1816,7 +1820,8 @@ export const createUser = async (req, res) => {
 };
 
 export const updateUser = async (req, res) => {
-  try {    const { name, email, phone, role, address, isVerified, roleTemplate } =
+  try {
+    const { name, email, phone, role, address, isVerified, roleTemplate } =
       req.body;
 
     const user = await User.findById(req.params.id);
@@ -3270,7 +3275,8 @@ export const getConditionQuestionnaireById = async (req, res) => {
 };
 
 export const createConditionQuestionnaire = async (req, res) => {
-  try {    const {
+  try {
+    const {
       title,
       description,
       category,
@@ -3402,7 +3408,8 @@ export const createConditionQuestionnaire = async (req, res) => {
 
 export const updateConditionQuestionnaire = async (req, res) => {
   try {
-    const { id } = req.params;    if (!mongoose.Types.ObjectId.isValid(id)) {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
         message: 'Invalid questionnaire ID format',

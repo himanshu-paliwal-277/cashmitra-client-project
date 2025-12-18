@@ -26,10 +26,7 @@ router.use(authorize('admin'));
 
 router.post('/', createCategory);
 router.put('/:id', updateCategory);
-router.delete(
-  '/:id',
-  deleteCategory
-);
+router.delete('/:id', deleteCategory);
 router.get('/admin/stats', getCategoryStats);
 router.patch('/bulk-status', bulkUpdateStatus);
 

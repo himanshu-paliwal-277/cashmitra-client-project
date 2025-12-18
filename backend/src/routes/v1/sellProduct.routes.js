@@ -23,10 +23,7 @@ const router = express.Router();
 
 router.get('/customer', getCustomerProducts);
 router.get('/category/:category', getSellProductsByCategory);
-router.get(
-  '/customer/:id',
-  getProduct
-);
+router.get('/customer/:id', getProduct);
 
 router.use(isAuthenticated);
 
@@ -39,20 +36,11 @@ router.use(authorize('admin', 'partner'));
 router.post('/', createProduct);
 router.get('/', getProducts);
 router.get('/stats', getProductStats);
-router.get(
-  '/:id',
-  getProduct
-);
+router.get('/:id', getProduct);
 router.put('/:id', updateProduct);
-router.delete(
-  '/:id',
-  deleteProduct
-);
+router.delete('/:id', deleteProduct);
 
-router.get(
-  '/:id/variants',
-  getVariants
-);
+router.get('/:id/variants', getVariants);
 router.post('/:id/variants', addVariant);
 router.put('/:id/variants/:variantId', updateVariant);
 router.delete('/:id/variants/:variantId', deleteVariant);

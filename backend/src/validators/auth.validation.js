@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
 // Password validation regex for strength checking
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]/;
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]/;
 
 // Custom password refinement for strength validation
 const passwordSchema = z
@@ -47,7 +48,11 @@ export const loginUserSchema = {
 export const updateUserProfileSchema = {
   body: z.object({
     name: z.string().min(1, 'Name cannot be empty').trim().optional(),
-    email: z.string().email('Please include a valid email').toLowerCase().optional(),
+    email: z
+      .string()
+      .email('Please include a valid email')
+      .toLowerCase()
+      .optional(),
     phone: z
       .string()
       .regex(/^[0-9]{10}$/, 'Please include a valid 10-digit phone number')
@@ -91,7 +96,11 @@ export const loginPartnerSchema = {
 export const updatePartnerProfileSchema = {
   body: z.object({
     name: z.string().min(1, 'Shop name cannot be empty').trim().optional(),
-    email: z.string().email('Please include a valid email').toLowerCase().optional(),
+    email: z
+      .string()
+      .email('Please include a valid email')
+      .toLowerCase()
+      .optional(),
     phone: z
       .string()
       .regex(/^[0-9]{10}$/, 'Please include a valid 10-digit phone number')

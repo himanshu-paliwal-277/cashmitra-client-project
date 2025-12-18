@@ -69,6 +69,7 @@ sellAccessorySchema.statics.getActiveForCategory = function (categoryId) {
   }).sort({ order: 1 });
 };
 
-export const SellAccessory = mongoose.model('SellAccessory', sellAccessorySchema);
-
-
+export const SellAccessory = mongoose.model(
+  'SellAccessory',
+  sellAccessorySchema
+);

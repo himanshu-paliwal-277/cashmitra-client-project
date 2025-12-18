@@ -109,5 +109,3 @@ const partnerSchema = new mongoose.Schema(
 );
 
 export const Partner = mongoose.model('Partner', partnerSchema);
-
-

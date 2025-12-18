@@ -1,4 +1,7 @@
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { BuyCategory } from '../models/buyCategory.model.js';
 import { BuySuperCategory } from '../models/buySuperCategory.model.js';
 

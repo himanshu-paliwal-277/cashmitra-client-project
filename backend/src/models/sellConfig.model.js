@@ -138,5 +138,3 @@ sellConfigSchema.methods.applyPricingRules = function (
 };
 
 export const SellConfig = mongoose.model('SellConfig', sellConfigSchema);
-
-

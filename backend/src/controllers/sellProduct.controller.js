@@ -1,10 +1,12 @@
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 import { SellConfig } from '../models/sellConfig.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 
 export var createProduct = asyncHandler(async (req, res) => {
-
   const { categoryId, name, images, variants, tags } = req.body;
 
   const existingProduct = await SellProduct.findOne({ name: name.trim() });
@@ -87,7 +89,6 @@ export var getProduct = asyncHandler(async (req, res) => {
 });
 
 export var updateProduct = asyncHandler(async (req, res) => {
-
   const { name, categoryId, images, variants, tags, status } = req.body;
 
   const product = await SellProduct.findById(req.params.id);
@@ -249,7 +250,6 @@ export var getProductStats = asyncHandler(async (req, res) => {
 });
 
 export var getCustomerProducts = asyncHandler(async (req, res) => {
-
   const {
     page = 1,
     limit = 20,

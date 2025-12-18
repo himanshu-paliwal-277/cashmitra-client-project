@@ -178,7 +178,7 @@ sellQuestionSchema.statics.getForCategory = function (categoryId) {
 };
 
 sellQuestionSchema.statics.getForVariants = async function (
-  productId,
+  productId
   // variantIds = []
 ) {
   const SellProduct = require('./sellProduct.model');
@@ -192,5 +192,3 @@ sellQuestionSchema.statics.getForVariants = async function (
 };
 
 export const SellQuestion = mongoose.model('SellQuestion', sellQuestionSchema);
-
-

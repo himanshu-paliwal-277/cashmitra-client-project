@@ -27,10 +27,7 @@ router.post(
 );
 router.get('/my-pickups', pickupController.getPickups);
 router.get('/slots', pickupController.getPickupSlots);
-router.get(
-  '/:pickupId',
-  pickupController.getPickupById
-);
+router.get('/:pickupId', pickupController.getPickupById);
 
 router.use(authorize('admin'));
 router.get('/', validate(getPickupsSchema), pickupController.getPickups);
@@ -66,18 +63,12 @@ router.patch(
   pickupController.reschedulePickup
 );
 router.get('/analytics', pickupController.getPickupAnalytics);
-router.get(
-  '/agent/:agentId',
-  pickupController.getAgentPickups
-);
+router.get('/agent/:agentId', pickupController.getAgentPickups);
 router.post(
   '/:pickupId/communication',
   validate(addCommunicationSchema),
   pickupController.addCommunication
 );
-router.post(
-  '/:pickupId/images',
-  pickupController.uploadPickupImages
-);
+router.post('/:pickupId/images', pickupController.uploadPickupImages);
 
 export default router;

@@ -6,7 +6,6 @@ import { User } from '../models/user.model.js';
 import ApiError from '../utils/apiError.js';
 
 export var createPickup = asyncHandler(async (req, res) => {
-
   const {
     orderId,
     orderType,
@@ -643,7 +642,6 @@ export var getPickupSlots = asyncHandler(async (req, res) => {
 });
 
 export var updatePickup = asyncHandler(async (req, res) => {
-
   const pickup = await Pickup.findById(req.params.pickupId);
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found');

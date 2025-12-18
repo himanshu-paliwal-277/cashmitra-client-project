@@ -18,37 +18,19 @@ import {
 
 const router = express.Router();
 
-router.get(
-  '/customer',
-  getCustomerAccessories
-);
+router.get('/customer', getCustomerAccessories);
 
 router.use(isAuthenticated);
 router.use(authorize('admin'));
 
 router.post('/', createAccessory);
 router.get('/', getAccessories);
-router.get(
-  '/:id',
-  getAccessory
-);
-router.put(
-  '/:id',
-  updateAccessory
-);
-router.delete(
-  '/:id',
-  deleteAccessory
-);
+router.get('/:id', getAccessory);
+router.put('/:id', updateAccessory);
+router.delete('/:id', deleteAccessory);
 
-router.post(
-  '/bulk',
-  bulkCreateAccessories
-);
-router.put(
-  '/reorder',
-  reorderAccessories
-);
+router.post('/bulk', bulkCreateAccessories);
+router.put('/reorder', reorderAccessories);
 
 import {
   migrateAndReindexAccessories,
@@ -57,9 +39,6 @@ import {
 router.post('/reindex-orders', reindexAccessoryOrders);
 router.post('/migrate-and-reindex', migrateAndReindexAccessories);
 
-router.patch(
-  '/:id/toggle-status',
-  toggleAccessoryStatus
-);
+router.patch('/:id/toggle-status', toggleAccessoryStatus);
 
 export default router;

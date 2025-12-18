@@ -162,5 +162,3 @@ export const SellOfferSession = mongoose.model(
   'SellOfferSession',
   sellOfferSessionSchema
 );
-
-

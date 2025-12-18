@@ -112,7 +112,8 @@ export const getProductDetails = async (req, res) => {
   }
 };
 
-export const addToCart = async (req, res) => {  try {
+export const addToCart = async (req, res) => {
+  try {
     const { productId, quantity } = req.body;
     const userId = req.user.id;
 
@@ -247,7 +248,8 @@ export const getCart = async (req, res) => {
   }
 };
 
-export const updateCartItem = async (req, res) => {  try {
+export const updateCartItem = async (req, res) => {
+  try {
     const { itemId } = req.params;
     const productId = itemId;
     const { quantity } = req.body;
@@ -327,7 +329,8 @@ export const removeCartItem = async (req, res) => {
   }
 };
 
-export const checkout = async (req, res) => {  try {
+export const checkout = async (req, res) => {
+  try {
     const { shippingAddress, paymentMethod } = req.body;
     const userId = req.user.id;
 

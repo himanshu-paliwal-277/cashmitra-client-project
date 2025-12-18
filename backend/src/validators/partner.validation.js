@@ -31,8 +31,14 @@ export const updatePartnerProfileSchema = {
 
 export const uploadDocumentsSchema = {
   body: z.object({
-    gstCertificate: z.string().url('Valid GST certificate URL is required').optional(),
-    shopLicense: z.string().url('Valid shop license URL is required').optional(),
+    gstCertificate: z
+      .string()
+      .url('Valid GST certificate URL is required')
+      .optional(),
+    shopLicense: z
+      .string()
+      .url('Valid shop license URL is required')
+      .optional(),
     ownerIdProof: z.string().url('Valid ID proof URL is required').optional(),
     additionalDocuments: z.array(z.any()).optional(),
   }),
@@ -45,7 +51,9 @@ export const uploadDocumentsSchema = {
 export const respondToOrderAssignmentSchema = {
   body: z.object({
     response: z.enum(['accepted', 'rejected'], {
-      errorMap: () => ({ message: "Response must be either 'accepted' or 'rejected'" }),
+      errorMap: () => ({
+        message: "Response must be either 'accepted' or 'rejected'",
+      }),
     }),
     reason: z.string().optional(),
   }),
@@ -53,16 +61,21 @@ export const respondToOrderAssignmentSchema = {
 
 export const updateOrderStatusSchema = {
   body: z.object({
-    status: z.enum(['pending', 'processing', 'shipped', 'delivered', 'cancelled'], {
-      errorMap: () => ({ message: 'Valid status is required' }),
-    }),
+    status: z.enum(
+      ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+      {
+        errorMap: () => ({ message: 'Valid status is required' }),
+      }
+    ),
     trackingInfo: z.object({}).passthrough().optional(),
   }),
 };
 
 export const assignAgentToOrderSchema = {
   body: z.object({
-    agentId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Valid agent ID is required'),
+    agentId: z
+      .string()
+      .regex(/^[0-9a-fA-F]{24}$/, 'Valid agent ID is required'),
   }),
 };
 
@@ -72,26 +85,50 @@ export const assignAgentToOrderSchema = {
 
 export const createPartnerProductSchema = {
   body: z.object({
-    categoryId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid category ID format').min(1, 'Category ID is required'),
+    categoryId: z
+      .string()
+      .regex(/^[0-9a-fA-F]{24}$/, 'Invalid category ID format')
+      .min(1, 'Category ID is required'),
     name: z.string().min(1, 'Product name is required'),
     brand: z.string().min(1, 'Brand is required'),
-    pricing: z.object({
-      mrp: z.number({ invalid_type_error: 'MRP must be a number' }),
-    }).passthrough(),
-    stock: z.object({
-      quantity: z.number().int().min(0, 'Stock quantity must be non-negative').optional(),
-    }).passthrough().optional(),
+    pricing: z
+      .object({
+        mrp: z.number({ invalid_type_error: 'MRP must be a number' }),
+      })
+      .passthrough(),
+    stock: z
+      .object({
+        quantity: z
+          .number()
+          .int()
+          .min(0, 'Stock quantity must be non-negative')
+          .optional(),
+      })
+      .passthrough()
+      .optional(),
   }),
 };
 
 export const updatePartnerProductSchema = {
   body: z.object({
-    pricing: z.object({
-      mrp: z.number({ invalid_type_error: 'MRP must be a number' }).optional(),
-    }).passthrough().optional(),
-    stock: z.object({
-      quantity: z.number().int().min(0, 'Stock quantity must be non-negative').optional(),
-    }).passthrough().optional(),
+    pricing: z
+      .object({
+        mrp: z
+          .number({ invalid_type_error: 'MRP must be a number' })
+          .optional(),
+      })
+      .passthrough()
+      .optional(),
+    stock: z
+      .object({
+        quantity: z
+          .number()
+          .int()
+          .min(0, 'Stock quantity must be non-negative')
+          .optional(),
+      })
+      .passthrough()
+      .optional(),
   }),
 };
 
@@ -118,7 +155,9 @@ export const createAgentSchema = {
     email: z.string().email('Valid email is required'),
     phone: z.string().min(1, 'Phone number is required'),
     password: z.string().min(6, 'Password must be at least 6 characters long'),
-    coverageAreas: z.array(z.any(), { invalid_type_error: 'Coverage areas must be an array' }),
+    coverageAreas: z.array(z.any(), {
+      invalid_type_error: 'Coverage areas must be an array',
+    }),
     aadharCard: z.string().optional(),
     panCard: z.string().optional(),
     drivingLicense: z.string().optional(),
@@ -129,6 +168,8 @@ export const updateAgentSchema = {
   body: z.object({
     name: z.string().min(1, 'Agent name cannot be empty').optional(),
     phone: z.string().min(1, 'Phone number cannot be empty').optional(),
-    coverageAreas: z.array(z.any(), { invalid_type_error: 'Coverage areas must be an array' }).optional(),
+    coverageAreas: z
+      .array(z.any(), { invalid_type_error: 'Coverage areas must be an array' })
+      .optional(),
   }),
 };

@@ -1,4 +1,7 @@
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 import { Inventory } from '../models/inventory.model.js';
 import { Partner } from '../models/partner.model.js';
@@ -525,7 +528,6 @@ export var getProductFilters = asyncHandler(async (req, res) => {
 });
 
 export var createProduct = asyncHandler(async (req, res) => {
-
   const {
     category,
     brand,
@@ -568,7 +570,6 @@ export var createProduct = asyncHandler(async (req, res) => {
 });
 
 export var updateProduct = asyncHandler(async (req, res) => {
-
   const { id } = req.params;
   const updateData = req.body;
 

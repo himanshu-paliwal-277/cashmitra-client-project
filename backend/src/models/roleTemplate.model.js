@@ -217,5 +217,3 @@ roleTemplateSchema.statics.getActiveTemplates = async function () {
 };
 
 export const RoleTemplate = mongoose.model('RoleTemplate', roleTemplateSchema);
-
-

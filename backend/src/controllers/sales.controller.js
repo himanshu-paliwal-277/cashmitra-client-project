@@ -2,8 +2,8 @@ import {
   ApiError,
   asyncHandler,
 } from '../middlewares/errorHandler.middleware.js';
-import { BuyProduct } from '../models/buyProduct.model.js'; 
-import { Order } from '../models/order.model.js'; 
+import { BuyProduct } from '../models/buyProduct.model.js';
+import { Order } from '../models/order.model.js';
 import { Transaction } from '../models/transaction.model.js';
 import { Wallet } from '../models/wallet.model.js';
 
@@ -16,7 +16,6 @@ export var createOrder = asyncHandler(async (req, res) => {
     req.body.items = Object.values(req.body.items);
     console.log('Converted items object to array:', req.body.items);
   }
-
 
   const { items, shippingAddress, paymentMethod, couponCode } = req.body;
   const userId = req.user.id;
@@ -126,7 +125,6 @@ export var createOrder = asyncHandler(async (req, res) => {
 });
 
 export var processPayment = asyncHandler(async (req, res) => {
-
   const { orderId } = req.params;
   const { paymentDetails } = req.body;
   const userId = req.user.id;

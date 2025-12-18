@@ -73,5 +73,3 @@ transactionSchema.index({ status: 1 });
 transactionSchema.index({ createdAt: -1 });
 
 export const Transaction = mongoose.model('Transaction', transactionSchema);
-
-

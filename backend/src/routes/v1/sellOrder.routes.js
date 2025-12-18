@@ -27,42 +27,21 @@ router.use(isAuthenticated);
 
 router.post('/', createOrder);
 router.get('/my-orders', getUserOrders);
-router.get(
-  '/:orderId',
-  getOrder
-);
+router.get('/:orderId', getOrder);
 router.put('/:orderId/cancel', cancelOrder);
 router.put('/:orderId/reschedule', rescheduleOrder);
 
 router.use(authorize('admin'));
 
 router.get('/pickup/orders-list', getOrdersForPickup);
-router.get(
-  '/:orderId/pickup-details',
-  getOrderPickupDetails
-);
+router.get('/:orderId/pickup-details', getOrderPickupDetails);
 
 router.get('/', getAllOrders);
-router.put(
-  '/:orderId/status',
-  updateOrderStatus
-);
-router.put(
-  '/:orderId/assign-staff',
-  assignOrder
-);
-router.put(
-  '/:orderId/pickup-details',
-  updatePickupDetails
-);
-router.get(
-  '/status/:status',
-  getOrdersByStatus
-);
+router.put('/:orderId/status', updateOrderStatus);
+router.put('/:orderId/assign-staff', assignOrder);
+router.put('/:orderId/pickup-details', updatePickupDetails);
+router.get('/status/:status', getOrdersByStatus);
 router.get('/admin/statistics', getOrderStats);
-router.delete(
-  '/:orderId',
-  deleteOrder
-);
+router.delete('/:orderId', deleteOrder);
 
 export default router;
