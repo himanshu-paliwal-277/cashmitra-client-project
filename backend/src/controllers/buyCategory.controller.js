@@ -4,7 +4,7 @@ import {
 } from '../middlewares/errorHandler.middleware.js';
 import { BuyCategory } from '../models/buyCategory.model.js';
 
-export var createBuyCategory = asyncHandler(async (req, res) => {
+export const createBuyCategory = asyncHandler(async (req, res) => {
   const { name, image, superCategory } = req.body;
 
   if (!superCategory) {
@@ -15,19 +15,25 @@ export var createBuyCategory = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Category image is required');
   }
 
-  const existingCategory = await BuyCategory.findOne({ name: name.trim() });
+  // ✅ uniqueness check ONLY within same superCategory
+  const existingCategory = await BuyCategory.findOne({
+    name: name.trim(),
+    superCategory,
+  });
+
   if (existingCategory) {
-    throw new ApiError(400, 'Buy category with this name already exists');
+    throw new ApiError(
+      400,
+      'Buy category with this name already exists in this super category'
+    );
   }
 
-  const category = new BuyCategory({
+  const category = await BuyCategory.create({
     name: name.trim(),
     image,
     superCategory,
     createdBy: req.user.id,
   });
-
-  await category.save();
 
   await category.populate([
     { path: 'createdBy', select: 'name email' },
@@ -40,7 +46,6 @@ export var createBuyCategory = asyncHandler(async (req, res) => {
     data: category,
   });
 });
-
 export var getBuyCategories = asyncHandler(async (req, res) => {
   const { includeInactive, superCategory } = req.query;
 
@@ -80,7 +85,7 @@ export var getBuyCategory = asyncHandler(async (req, res) => {
   });
 });
 
-export var updateBuyCategory = asyncHandler(async (req, res) => {
+export const updateBuyCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name, image, isActive, sortOrder, superCategory } = req.body;
 
@@ -89,32 +94,34 @@ export var updateBuyCategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Buy category not found');
   }
 
-  if (name && name.trim() !== category.name) {
-    const existingCategory = await BuyCategory.findOne({
-      name: name.trim(),
+  const newName = name?.trim();
+  const newSuperCategory = superCategory || category.superCategory;
+
+  // ✅ uniqueness check on name OR superCategory change
+  if (
+    (newName && newName !== category.name) ||
+    (superCategory &&
+      superCategory.toString() !== category.superCategory.toString())
+  ) {
+    const duplicateCategory = await BuyCategory.findOne({
+      name: newName || category.name,
+      superCategory: newSuperCategory,
       _id: { $ne: id },
     });
-    if (existingCategory) {
-      throw new ApiError(400, 'Buy category with this name already exists');
+
+    if (duplicateCategory) {
+      throw new ApiError(
+        400,
+        'Buy category with this name already exists in this super category'
+      );
     }
-    category.name = name.trim();
   }
 
-  if (image) {
-    category.image = image;
-  }
-
-  if (typeof isActive === 'boolean') {
-    category.isActive = isActive;
-  }
-
-  if (typeof sortOrder === 'number') {
-    category.sortOrder = sortOrder;
-  }
-
-  if (superCategory) {
-    category.superCategory = superCategory;
-  }
+  if (newName) category.name = newName;
+  if (image) category.image = image;
+  if (typeof isActive === 'boolean') category.isActive = isActive;
+  if (typeof sortOrder === 'number') category.sortOrder = sortOrder;
+  if (superCategory) category.superCategory = superCategory;
 
   category.updatedBy = req.user.id;
   await category.save();

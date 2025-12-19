@@ -534,7 +534,7 @@ const EditBuyProduct = () => {
                   <option value="">Select Category</option>
                   {categories.map((cat: any) => (
                     <option key={cat._id || cat.id} value={cat._id || cat.id}>
-                      {cat.name}
+                      {cat.name} {` (${cat?.superCategory?.name})`}
                     </option>
                   ))}
                 </Select>
