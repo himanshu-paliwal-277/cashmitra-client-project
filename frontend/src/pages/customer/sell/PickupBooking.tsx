@@ -75,6 +75,7 @@ const PickupBooking = () => {
   const timeSlots = [
     { id: 'morning', label: '10:00 AM - 03:00 PM' },
     { id: 'afternoon', label: '03:00 PM - 06:00 PM' },
+    { id: 'evening', label: '06:00 PM - 08:00 PM' },
   ];
 
   const paymentOptions = [
@@ -161,17 +162,44 @@ const PickupBooking = () => {
   };
 
   const getTotalAmount = () => {
-    const amount = priceData?.totalAmount || 1151;
-    return amount;
+    // If priceData.totalAmount is already calculated with processing fee deducted, use it
+    // Otherwise calculate: device value - processing fee
+    if (priceData?.totalAmount !== undefined) {
+      return priceData.totalAmount;
+    }
+    const deviceValue = priceData?.quotedPrice || priceData?.basePrice || 1200;
+    return Math.max(deviceValue - 49, 0);
   };
 
   const handleContinue = async () => {
     if (currentStep === 1) {
-      // Validate address and location
-      if (!formData.pincode || !formData.flatNo || !formData.locality) {
-        setSubmitError('Please fill all required address fields');
+      // Validate address and location - all required fields
+      const missingFields = [];
+      if (!formData.pincode) missingFields.push('Pincode');
+      if (!formData.flatNo) missingFields.push('Flat No/Office');
+      if (!formData.locality) missingFields.push('Locality/Area/Street');
+      if (!formData.city) missingFields.push('City');
+      if (!formData.state) missingFields.push('State');
+      if (!formData.fullName) missingFields.push('Full Name');
+
+      if (missingFields.length > 0) {
+        setSubmitError(`Please fill the following required fields: ${missingFields.join(', ')}`);
         return;
       }
+
+      // Validate pincode format (Indian pincode: 6 digits, first digit cannot be 0)
+      const pincodeRegex = /^[1-9][0-9]{5}$/;
+      if (!pincodeRegex.test(formData.pincode)) {
+        setSubmitError('Please enter a valid 6-digit Indian pincode');
+        return;
+      }
+
+      // Validate full name (at least 2 characters)
+      if (formData.fullName.trim().length < 2) {
+        setSubmitError('Full name must be at least 2 characters long');
+        return;
+      }
+
       if (!formData.latitude || !formData.longitude) {
         setSubmitError(
           'Location coordinates are required. Please use "Get Current Location" or enter manually.'
@@ -262,12 +290,12 @@ const PickupBooking = () => {
           orderNumber: `ORD${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
           pickup: {
             address: {
-              fullName: userData?.name || formData.fullName || 'User',
-              phone: formData.alternateNumber || userData?.phone || '1234567890',
+              fullName: formData.fullName || userData?.name || 'User',
+              phone: userData?.phone || formData.alternateNumber || '1234567890',
               street:
                 `${formData.flatNo}, ${formData.locality}${formData.landmark ? `, Near ${formData.landmark}` : ''}`.trim(),
               city: formData.city,
-              state: formData.state || 'Delhi',
+              state: formData.state,
               pincode: formData.pincode,
             },
             location: {
@@ -367,7 +395,7 @@ const PickupBooking = () => {
     'Variant';
   const displayName = `${deviceName} (${variantLabel})`;
   const basePrice = priceData?.quotedPrice || priceData?.basePrice || 0;
-  const totalPrice = priceData?.totalAmount || getTotalAmount();
+  const totalPrice = getTotalAmount();
 
   return (
     <div className="booking-pickup-booking-page">
@@ -397,6 +425,27 @@ const PickupBooking = () => {
           <div className="booking-step-content">
             {currentStep === 1 && (
               <div className="booking-address-fields">
+                <div
+                  style={{
+                    backgroundColor: '#e3f2fd',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    marginBottom: '20px',
+                    border: '1px solid #bbdefb',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: '14px',
+                      color: '#1565c0',
+                      margin: 0,
+                      fontWeight: '500',
+                    }}
+                  >
+                    📝 Please fill all required fields marked with{' '}
+                    <span style={{ color: '#dc3545' }}>*</span> to proceed
+                  </p>
+                </div>
                 <div className="booking-input-group">
                   <label className="booking-input-label">
                     Enter Pincode
@@ -404,9 +453,10 @@ const PickupBooking = () => {
                   </label>
                   <input
                     className="booking-styled-input"
-                    placeholder="Pincode"
+                    placeholder="Enter 6-digit pincode (e.g., 110001)"
                     value={formData.pincode}
                     onChange={e => handleInputChange('pincode', e.target.value)}
+                    maxLength={6}
                   />
                 </div>
 
@@ -445,12 +495,40 @@ const PickupBooking = () => {
                 </div>
 
                 <div className="booking-input-group">
-                  <label className="booking-input-label">City (optional)</label>
+                  <label className="booking-input-label">
+                    City <span className="text-red-500 relative top-[-2px]">*</span>
+                  </label>
                   <input
                     className="booking-styled-input"
                     placeholder="City"
                     value={formData.city}
                     onChange={e => handleInputChange('city', e.target.value)}
+                  />
+                </div>
+
+                <div className="booking-input-group">
+                  <label className="booking-input-label">
+                    State <span className="text-red-500 relative top-[-2px]">*</span>
+                  </label>
+                  <input
+                    className="booking-styled-input"
+                    placeholder="State"
+                    value={formData.state}
+                    onChange={e => handleInputChange('state', e.target.value)}
+                  />
+                </div>
+
+                <div className="booking-input-group">
+                  <label className="booking-input-label">
+                    Full Name <span className="text-red-500 relative top-[-2px]">*</span>
+                  </label>
+                  <input
+                    className="booking-styled-input"
+                    placeholder="Enter your full name"
+                    value={formData.fullName}
+                    onChange={e => handleInputChange('fullName', e.target.value)}
+                    minLength={2}
+                    maxLength={100}
                   />
                 </div>
 
@@ -829,15 +907,35 @@ const PickupBooking = () => {
 
             <div className="booking-price-row">
               <span className="booking-label">Processing Fee</span>
-              <span className="booking-value">+ ₹49</span>
+              <span className="booking-value" style={{ color: '#dc3545' }}>
+                - ₹49
+              </span>
             </div>
 
             <div className="booking-total-row">
-              <span className="booking-label">Total Amount</span>
+              <span className="booking-label">You'll Receive</span>
               <span className="booking-value">
-                {formatPrice((priceData?.quotedPrice || priceData?.basePrice || 1200) + 49)}
+                {formatPrice(
+                  Math.max((priceData?.quotedPrice || priceData?.basePrice || 1200) - 49, 0)
+                )}
               </span>
             </div>
+
+            {Math.max((priceData?.quotedPrice || priceData?.basePrice || 1200) - 49, 0) === 0 && (
+              <div
+                style={{
+                  fontSize: '12px',
+                  color: '#dc3545',
+                  marginTop: '8px',
+                  padding: '8px',
+                  backgroundColor: '#f8d7da',
+                  borderRadius: '4px',
+                  border: '1px solid #f5c6cb',
+                }}
+              >
+                ⚠️ Processing fee exceeds device value
+              </div>
+            )}
 
             <button
               className={`booking-continue-btn ${!formData.paymentType && currentStep === 3 ? 'disabled' : ''} ${isSubmitting ? 'loading' : ''}`}

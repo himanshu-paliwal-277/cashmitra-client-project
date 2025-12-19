@@ -1,12 +1,4 @@
-import {
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
-  UserCheck,
-  CreditCard,
-  Users,
-  Smartphone,
-} from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, UserCheck, Users, Smartphone } from 'lucide-react';
 // Unused imports kept for future use when pages are created:
 // Users, BarChart3, Settings, FolderTree, ShoppingBag, RotateCcw,
 // Smartphone, HelpCircle, ClipboardList, CheckSquare, DollarSign,
@@ -39,7 +31,7 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
     '/partner/orders': 'orders',
     '/partner/buy-orders': 'buyOrders',
     '/partner/sell-orders': 'sellOrders',
-    '/partner/payouts': 'payouts',
+    // '/partner/payouts': 'payouts',
     '/partner/kyc': 'kyc',
     '/partner/agents': 'agents',
     // Commented out - for future use when pages are created
@@ -96,7 +88,7 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
     {
       title: 'Finance',
       items: [
-        { to: '/partner/payouts', icon: CreditCard, label: 'Payouts' },
+        // { to: '/partner/payouts', icon: CreditCard, label: 'Payouts' },
         // { to: '/partner/pricing', icon: DollarSign, label: 'Pricing' },
         // { to: '/partner/finance', icon: Calculator, label: 'Finance' },
       ],

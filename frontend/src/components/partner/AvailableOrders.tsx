@@ -420,7 +420,7 @@ const AvailableOrders: React.FC = () => {
                         <h5 className="font-medium text-blue-800 mb-2">Condition Assessment:</h5>
                         <div className="space-y-1 text-sm">
                           {Object.entries(order.sessionId.answers).map(
-                            ([key, value]: [string, any]) => (
+                            ([key, answer]: [string, any]) => (
                               <div key={key} className="flex justify-between">
                                 <span className="text-blue-700 capitalize">
                                   {key
@@ -430,14 +430,18 @@ const AvailableOrders: React.FC = () => {
                                 </span>
                                 <span
                                   className={`font-medium ${
-                                    Array.isArray(value) && value.includes('yes')
+                                    answer.answerText?.toLowerCase().includes('no') ||
+                                    answer.answerText?.toLowerCase().includes('good') ||
+                                    answer.answerText?.toLowerCase().includes('excellent')
                                       ? 'text-green-600'
-                                      : Array.isArray(value) && value.includes('no')
+                                      : answer.answerText?.toLowerCase().includes('damaged') ||
+                                          answer.answerText?.toLowerCase().includes('poor') ||
+                                          answer.answerText?.toLowerCase().includes('issues')
                                         ? 'text-red-600'
                                         : 'text-blue-800'
                                   }`}
                                 >
-                                  {Array.isArray(value) ? value.join(', ') : value}
+                                  {answer.answerText || answer.value || 'N/A'}
                                 </span>
                               </div>
                             )

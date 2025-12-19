@@ -26,6 +26,47 @@ const SellScreenDefects = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Generate a unique key for localStorage based on product and variant
+  const getStorageKey = () => {
+    const productId = product?.id || product?._id || product?.data?.id || product?.data?._id;
+    const variantId = selectedVariant?.id || selectedVariant?._id || 'default';
+    return `sell_defects_${productId}_${variantId}`;
+  };
+
+  // Save defects to localStorage
+  const saveDefectsToStorage = (defectsToSave: any[], detailsToSave: any[]) => {
+    try {
+      const storageKey = getStorageKey();
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          selectedDefects: defectsToSave,
+          selectedDefectsDetails: detailsToSave,
+        })
+      );
+    } catch (error) {
+      console.error('Error saving defects to localStorage:', error);
+    }
+  };
+
+  // Load defects from localStorage
+  const loadDefectsFromStorage = () => {
+    try {
+      const storageKey = getStorageKey();
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          selectedDefects: parsed.selectedDefects || [],
+          selectedDefectsDetails: parsed.selectedDefectsDetails || [],
+        };
+      }
+    } catch (error) {
+      console.error('Error loading defects from localStorage:', error);
+    }
+    return { selectedDefects: [], selectedDefectsDetails: [] };
+  };
+
   // Helper function to get category-specific icons
   const getCategoryIcon = (category: any) => {
     const categoryIcons = {
@@ -128,6 +169,13 @@ const SellScreenDefects = () => {
         ];
         setDefectOptions(defectOptionsWithNoDefects);
         setGroupedDefects(finalGroupedDefects);
+
+        // Load saved defects from localStorage after setting up options
+        const savedData = loadDefectsFromStorage();
+        if (savedData.selectedDefects.length > 0) {
+          setSelectedDefects(savedData.selectedDefects);
+          setSelectedDefectsDetails(savedData.selectedDefectsDetails);
+        }
       } catch (err) {
         console.error('Error fetching defects:', err);
         setError('Failed to load defects');
@@ -153,8 +201,8 @@ const SellScreenDefects = () => {
 
   const handleDefectToggle = (defectId: any) => {
     if (defectId === 'no-defects') {
-      setSelectedDefects(['no-defects']);
-      setSelectedDefectsDetails([
+      const newDefects = ['no-defects'];
+      const newDetails = [
         {
           id: 'no-defects',
           label: 'No Defects',
@@ -166,42 +214,55 @@ const SellScreenDefects = () => {
           questionType: 'defect_selection',
           section: 'screen_defects',
         },
-      ]);
+      ];
+      setSelectedDefects(newDefects);
+      setSelectedDefectsDetails(newDetails);
+      saveDefectsToStorage(newDefects, newDetails);
     } else {
       setSelectedDefects(prev => {
         const filtered = prev.filter(id => id !== 'no-defects');
+        let newSelected;
+        let newDetails;
+
         if (filtered.includes(defectId)) {
-          const newSelected = filtered.filter(id => id !== defectId);
-          setSelectedDefectsDetails(prevDetails =>
-            prevDetails.filter(defect => defect.id !== defectId)
-          );
+          newSelected = filtered.filter(id => id !== defectId);
+          setSelectedDefectsDetails(prevDetails => {
+            newDetails = prevDetails.filter(defect => defect.id !== defectId);
+            saveDefectsToStorage(newSelected, newDetails);
+            return newDetails;
+          });
           return newSelected;
         } else {
           const defectToAdd =
             defectOptions.find(d => d.id === defectId) ||
             Object.values(groupedDefects)
               .flat()
-              .find(d => d.id === defectId);
+              .find((d: any) => d.id === defectId);
 
           if (defectToAdd) {
-            setSelectedDefectsDetails(prevDetails => [
-              ...prevDetails.filter(d => d.id !== 'no-defects'),
-              {
-                id: defectToAdd.id,
-                label: defectToAdd.label,
-                icon: defectToAdd.icon,
-                category: defectToAdd.category,
-                delta: defectToAdd.delta || 0,
-                questionText: 'Screen/Body Condition',
-                answerText: defectToAdd.label,
-                questionType: 'defect_selection',
-                section: 'screen_defects',
-              },
-            ]);
+            newSelected = [...filtered, defectId];
+            setSelectedDefectsDetails(prevDetails => {
+              newDetails = [
+                ...prevDetails.filter(d => d.id !== 'no-defects'),
+                {
+                  id: defectToAdd.id,
+                  label: defectToAdd.label,
+                  icon: defectToAdd.icon,
+                  category: defectToAdd.category,
+                  delta: defectToAdd.delta || 0,
+                  questionText: 'Screen/Body Condition',
+                  answerText: defectToAdd.label,
+                  questionType: 'defect_selection',
+                  section: 'screen_defects',
+                },
+              ];
+              saveDefectsToStorage(newSelected, newDetails);
+              return newDetails;
+            });
+            return newSelected;
           }
-
-          return [...filtered, defectId];
         }
+        return prev;
       });
     }
   };
@@ -246,11 +307,61 @@ const SellScreenDefects = () => {
 
   const brandName = product.category || product.data?.brand || 'Brand';
   const productName = product.name || product.data?.name || 'Product';
-  const basePrice = selectedVariant?.label
-    ? typeof selectedVariant === 'object' && selectedVariant.basePrice
-      ? selectedVariant.basePrice
-      : '2,160'
-    : '2,160';
+  const originalBasePrice = selectedVariant?.basePrice || 2160;
+
+  // Calculate price including evaluation answers and selected defects
+  const calculateCurrentPrice = () => {
+    let percentDelta = 0;
+    let absDelta = 0;
+
+    // Process evaluation answers
+    Object.values(evaluationData || {}).forEach((answer: any) => {
+      if (answer && answer.delta) {
+        const adjust = answer.delta.sign === '-' ? -1 : 1;
+        if (answer.delta.type === 'percent') {
+          percentDelta += adjust * (answer.delta.value || 0);
+        } else {
+          absDelta += adjust * (answer.delta.value || 0);
+        }
+      }
+    });
+
+    // Process selected defects
+    selectedDefectsDetails.forEach((defect: any) => {
+      if (defect.delta) {
+        const adjust = defect.delta.sign === '-' ? -1 : 1;
+        if (defect.delta.type === 'percent') {
+          percentDelta += adjust * (defect.delta.value || 0);
+        } else {
+          absDelta += adjust * (defect.delta.value || 0);
+        }
+      }
+    });
+
+    const adjustedPrice = Math.round(originalBasePrice * (1 + percentDelta / 100) + absDelta);
+    return Math.max(adjustedPrice, 0);
+  };
+
+  const currentPrice = calculateCurrentPrice();
+  const evaluationOnlyPrice = (() => {
+    let percentDelta = 0;
+    let absDelta = 0;
+    Object.values(evaluationData || {}).forEach((answer: any) => {
+      if (answer && answer.delta) {
+        const adjust = answer.delta.sign === '-' ? -1 : 1;
+        if (answer.delta.type === 'percent') {
+          percentDelta += adjust * (answer.delta.value || 0);
+        } else {
+          absDelta += adjust * (answer.delta.value || 0);
+        }
+      }
+    });
+    return Math.max(Math.round(originalBasePrice * (1 + percentDelta / 100) + absDelta), 0);
+  })();
+
+  const evaluationImpact = evaluationOnlyPrice - originalBasePrice;
+  const defectsImpact = currentPrice - evaluationOnlyPrice;
+  const totalImpact = currentPrice - originalBasePrice;
 
   // Handle image - check if it's an array or object
   let productImage = null;
@@ -302,10 +413,27 @@ const SellScreenDefects = () => {
             <h1 className="text-3xl sm:text-4xl font-bold mb-3">
               Sell {brandName} {productName} ({selectedVariant?.label || 'Variant'})
             </h1>
-            <p className="text-lg text-blue-100">
-              <span className="text-green-400 font-bold">₹{basePrice}+</span> already sold on our
-              platform
-            </p>
+            <div className="flex items-center gap-4 text-lg text-blue-100">
+              <div>
+                <span className="text-green-400 font-bold">₹{currentPrice.toLocaleString()}</span>
+                {totalImpact !== 0 && (
+                  <span
+                    className={`ml-2 text-sm ${totalImpact > 0 ? 'text-green-300' : 'text-red-300'}`}
+                  >
+                    (
+                    {evaluationImpact !== 0
+                      ? `evaluation: ${evaluationImpact > 0 ? '+' : ''}₹${Math.abs(evaluationImpact).toLocaleString()}`
+                      : ''}
+                    {evaluationImpact !== 0 && defectsImpact !== 0 ? ', ' : ''}
+                    {defectsImpact !== 0
+                      ? `defects: ${defectsImpact > 0 ? '+' : ''}₹${Math.abs(defectsImpact).toLocaleString()}`
+                      : ''}
+                    )
+                  </span>
+                )}
+              </div>
+              <span>current estimate</span>
+            </div>
           </div>
         </div>
       </div>
@@ -391,69 +519,116 @@ const SellScreenDefects = () => {
                 </div>
 
                 {/* Grouped Defects by Category */}
-                {Object.entries(groupedDefects).map(([category, categoryDefects]) => (
-                  <div key={category}>
-                    <h3 className="text-lg font-bold text-slate-900 mb-4 capitalize border-b-2 border-slate-200 pb-2">
-                      {category}
-                    </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                      {categoryDefects.map((defect: any) => {
-                        const isSelected = selectedDefects.includes(defect.id);
-                        return (
-                          <div
-                            key={defect.id}
-                            onClick={() => handleDefectToggle(defect.id)}
-                            className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
-                              isSelected
-                                ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-500 shadow-lg scale-105'
-                                : 'bg-white border-slate-200 hover:border-blue-400 hover:bg-blue-50'
-                            }`}
-                          >
+                {Object.entries(groupedDefects).map(
+                  ([category, categoryDefects]: [string, any]) => (
+                    <div key={category}>
+                      <h3 className="text-lg font-bold text-slate-900 mb-4 capitalize border-b-2 border-slate-200 pb-2">
+                        {category}
+                      </h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        {(categoryDefects as any[]).map((defect: any) => {
+                          const isSelected = selectedDefects.includes(defect.id);
+                          return (
                             <div
-                              className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl mx-auto mb-3 ${
-                                isSelected ? 'bg-green-100' : 'bg-slate-100'
+                              key={defect.id}
+                              onClick={() => handleDefectToggle(defect.id)}
+                              className={`p-4 rounded-xl border-2 cursor-pointer transition-all text-center ${
+                                isSelected
+                                  ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-500 shadow-lg scale-105'
+                                  : 'bg-white border-slate-200 hover:border-blue-400 hover:bg-blue-50'
                               }`}
                             >
-                              {defect.icon}
-                            </div>
-                            <p
-                              className={`text-sm font-semibold ${
-                                isSelected ? 'text-green-700' : 'text-slate-900'
-                              }`}
-                            >
-                              {defect.label}
-                            </p>
-                            {(() => {
-                              // Handle delta - it might be an object or a number
-                              let deltaValue = 0;
-                              if (defect.delta && typeof defect.delta === 'object') {
-                                deltaValue = defect.delta.value || 0;
-                              } else if (typeof defect.delta === 'number') {
-                                deltaValue = defect.delta;
-                              }
+                              <div
+                                className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl mx-auto mb-3 ${
+                                  isSelected ? 'bg-green-100' : 'bg-slate-100'
+                                }`}
+                              >
+                                {defect.icon}
+                              </div>
+                              <p
+                                className={`text-sm font-semibold ${
+                                  isSelected ? 'text-green-700' : 'text-slate-900'
+                                }`}
+                              >
+                                {defect.label}
+                              </p>
+                              {(() => {
+                                // Handle delta - it might be an object or a number
+                                let deltaValue = 0;
+                                let deltaType = 'abs';
+                                let deltaSign = '-';
 
-                              return deltaValue !== 0 ? (
-                                <p className="text-xs text-slate-600 mt-1">
-                                  {deltaValue > 0 ? '+' : ''}₹{Math.abs(deltaValue)}
-                                </p>
-                              ) : null;
-                            })()}
-                          </div>
-                        );
-                      })}
+                                if (defect.delta && typeof defect.delta === 'object') {
+                                  deltaValue = defect.delta.value || 0;
+                                  deltaType = defect.delta.type || 'abs';
+                                  deltaSign = defect.delta.sign || '-';
+                                } else if (typeof defect.delta === 'number') {
+                                  deltaValue = Math.abs(defect.delta);
+                                  deltaSign = defect.delta >= 0 ? '+' : '-';
+                                }
+
+                                if (deltaValue !== 0) {
+                                  const priceImpact =
+                                    deltaType === 'percent'
+                                      ? Math.round((originalBasePrice * deltaValue) / 100)
+                                      : deltaValue;
+
+                                  return (
+                                    <div className="text-xs mt-1">
+                                      <p
+                                        className={`font-medium ${deltaSign === '+' ? 'text-green-600' : 'text-red-600'}`}
+                                      >
+                                        {deltaSign}
+                                        {deltaValue}
+                                        {deltaType === 'percent' ? '%' : '₹'}
+                                      </p>
+                                      {deltaType === 'percent' && (
+                                        <p className="text-slate-500">
+                                          (₹{priceImpact.toLocaleString()})
+                                        </p>
+                                      )}
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })()}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
 
-              {/* Continue Button */}
-              <button
-                onClick={handleContinue}
-                className="w-full mt-8 py-4 rounded-xl font-bold text-lg bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center justify-center gap-2"
-              >
-                Continue to Accessories
-                <ArrowRight className="w-5 h-5" />
-              </button>
+              {/* Action Buttons */}
+              <div className="flex gap-4 mt-8">
+                {selectedDefects.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setSelectedDefects([]);
+                      setSelectedDefectsDetails([]);
+                      saveDefectsToStorage([], []);
+                    }}
+                    className="px-6 py-4 rounded-xl font-semibold text-slate-600 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all"
+                  >
+                    Clear All
+                  </button>
+                )}
+
+                <button
+                  onClick={handleContinue}
+                  disabled={currentPrice === 0}
+                  className={`flex-1 py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${
+                    currentPrice === 0
+                      ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:scale-105'
+                  }`}
+                >
+                  Continue to Accessories
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -482,9 +657,116 @@ const SellScreenDefects = () => {
               </h4>
 
               {/* Price */}
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-6 border-2 border-green-200">
-                <p className="text-sm text-slate-600 mb-1">Get Up To</p>
-                <p className="text-3xl font-bold text-green-600">₹{basePrice}</p>
+              <div
+                className={`rounded-xl p-4 mb-6 border-2 ${
+                  totalImpact > 0
+                    ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-300'
+                    : totalImpact < 0
+                      ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-300'
+                      : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-slate-600">Current Estimate</p>
+                  {totalImpact !== 0 && (
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        totalImpact > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                      }`}
+                    >
+                      {evaluationImpact !== 0 && defectsImpact !== 0
+                        ? 'Cumulative'
+                        : evaluationImpact !== 0
+                          ? 'From evaluation'
+                          : 'From defects'}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <p
+                    className={`text-3xl font-bold ${
+                      currentPrice === 0
+                        ? 'text-red-600'
+                        : totalImpact > 0
+                          ? 'text-green-600'
+                          : totalImpact < 0
+                            ? 'text-amber-600'
+                            : 'text-blue-600'
+                    }`}
+                  >
+                    ₹{currentPrice.toLocaleString()}
+                  </p>
+                  {evaluationImpact !== 0 && (
+                    <p className="text-sm text-slate-500 line-through">
+                      ₹{originalBasePrice.toLocaleString()}
+                    </p>
+                  )}
+                </div>
+                {evaluationImpact !== 0 && (
+                  <p
+                    className={`text-sm mt-1 ${
+                      evaluationImpact > 0 ? 'text-green-600' : 'text-red-600'
+                    }`}
+                  >
+                    {evaluationImpact > 0 ? '+' : ''}₹{Math.abs(evaluationImpact).toLocaleString()}{' '}
+                    from evaluation
+                  </p>
+                )}
+                {defectsImpact !== 0 && (
+                  <p
+                    className={`text-sm mt-1 ${
+                      defectsImpact > 0 ? 'text-green-600' : 'text-red-600'
+                    }`}
+                  >
+                    {defectsImpact > 0 ? '+' : ''}₹{Math.abs(defectsImpact).toLocaleString()} from
+                    defects
+                  </p>
+                )}
+
+                {/* Price Breakdown */}
+                {(evaluationImpact !== 0 || defectsImpact !== 0) && (
+                  <div className="mt-3 pt-3 border-t border-slate-200">
+                    <p className="text-xs text-slate-500 mb-2">Price Breakdown:</p>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <span>Base Price:</span>
+                        <span>₹{originalBasePrice.toLocaleString()}</span>
+                      </div>
+                      {evaluationImpact !== 0 && (
+                        <div className="flex justify-between">
+                          <span>Evaluation:</span>
+                          <span
+                            className={evaluationImpact > 0 ? 'text-green-600' : 'text-red-600'}
+                          >
+                            {evaluationImpact > 0 ? '+' : ''}₹
+                            {Math.abs(evaluationImpact).toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                      {defectsImpact !== 0 && (
+                        <div className="flex justify-between">
+                          <span>Defects:</span>
+                          <span className={defectsImpact > 0 ? 'text-green-600' : 'text-red-600'}>
+                            {defectsImpact > 0 ? '+' : ''}₹
+                            {Math.abs(defectsImpact).toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex justify-between font-semibold pt-1 border-t border-slate-200">
+                        <span>Final Price:</span>
+                        <span className={currentPrice === 0 ? 'text-red-600' : 'text-slate-900'}>
+                          ₹{currentPrice.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {currentPrice === 0 && (
+                  <p className="text-sm text-red-600 mt-2 font-medium bg-red-50 p-2 rounded">
+                    ⚠️ Minimum price reached - device may not be eligible for sale
+                  </p>
+                )}
               </div>
 
               {/* Evaluation Summary */}
@@ -517,12 +799,13 @@ const SellScreenDefects = () => {
                       } else if (
                         answer &&
                         typeof answer === 'object' &&
-                        answer.questionText &&
-                        answer.answerText
+                        'questionText' in answer &&
+                        'answerText' in answer
                       ) {
                         return (
                           <p key={questionId} className="text-xs text-slate-600">
-                            {String(answer.questionText)}: {String(answer.answerText)}
+                            {String((answer as any).questionText)}:{' '}
+                            {String((answer as any).answerText)}
                           </p>
                         );
                       }

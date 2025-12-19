@@ -128,11 +128,43 @@ const SellAccessories = () => {
 
   const brandName = product.category || product.data?.brand || 'Brand';
   const productName = product.name || product.data?.name || 'Product';
-  const basePrice = selectedVariant?.label
-    ? typeof selectedVariant === 'object' && selectedVariant.basePrice
-      ? selectedVariant.basePrice
-      : '2,160'
-    : '2,160';
+  const originalBasePrice = selectedVariant?.basePrice || 2160;
+
+  // Calculate cumulative price including evaluation answers and defects
+  const calculateCumulativePrice = () => {
+    let percentDelta = 0;
+    let absDelta = 0;
+
+    // Process evaluation answers
+    Object.values(finalAnswers || {}).forEach((answer: any) => {
+      if (answer && answer.delta) {
+        const adjust = answer.delta.sign === '-' ? -1 : 1;
+        if (answer.delta.type === 'percent') {
+          percentDelta += adjust * (answer.delta.value || 0);
+        } else {
+          absDelta += adjust * (answer.delta.value || 0);
+        }
+      }
+    });
+
+    // Process defects
+    finalSelectedDefects.forEach((defect: any) => {
+      if (defect.delta) {
+        const adjust = defect.delta.sign === '-' ? -1 : 1;
+        if (defect.delta.type === 'percent') {
+          percentDelta += adjust * (defect.delta.value || 0);
+        } else {
+          absDelta += adjust * (defect.delta.value || 0);
+        }
+      }
+    });
+
+    const adjustedPrice = Math.round(originalBasePrice * (1 + percentDelta / 100) + absDelta);
+    return Math.max(adjustedPrice, 0);
+  };
+
+  const currentBasePrice = calculateCumulativePrice();
+  const cumulativeImpact = currentBasePrice - originalBasePrice;
 
   // Handle image - check if it's an array or object
   let productImage = null;
@@ -190,10 +222,22 @@ const SellAccessories = () => {
             <h1 className="text-3xl sm:text-4xl font-bold mb-3">
               Sell {brandName} {productName} ({selectedVariant?.label || 'Variant'})
             </h1>
-            <p className="text-lg text-blue-100">
-              <span className="text-green-400 font-bold">₹{basePrice}+</span> already sold on our
-              platform
-            </p>
+            <div className="flex items-center gap-4 text-lg text-blue-100">
+              <div>
+                <span className="text-green-400 font-bold">
+                  ₹{currentBasePrice.toLocaleString()}
+                </span>
+                {cumulativeImpact !== 0 && (
+                  <span
+                    className={`ml-2 text-sm ${cumulativeImpact > 0 ? 'text-green-300' : 'text-red-300'}`}
+                  >
+                    (includes evaluation + defects: {cumulativeImpact > 0 ? '+' : ''}₹
+                    {Math.abs(cumulativeImpact).toLocaleString()})
+                  </span>
+                )}
+              </div>
+              <span>current estimate</span>
+            </div>
           </div>
         </div>
       </div>
@@ -308,16 +352,25 @@ const SellAccessories = () => {
               {/* Continue Button */}
               <button
                 onClick={handleContinue}
-                disabled={loading}
+                disabled={loading || currentBasePrice + totalAccessoryValue === 0}
                 className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${
-                  loading
+                  loading || currentBasePrice + totalAccessoryValue === 0
                     ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
                     : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:scale-105'
                 }`}
               >
-                Get Final Quote
+                {currentBasePrice + totalAccessoryValue === 0
+                  ? 'Device Not Eligible'
+                  : 'Get Final Quote'}
                 <ArrowRight className="w-5 h-5" />
               </button>
+
+              {currentBasePrice + totalAccessoryValue === 0 && (
+                <p className="text-sm text-red-600 text-center mt-2">
+                  The device condition results in zero value. Please contact support for alternative
+                  options.
+                </p>
+              )}
             </div>
           </div>
 
@@ -346,12 +399,67 @@ const SellAccessories = () => {
               </h4>
 
               {/* Price Section */}
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-6 border-2 border-green-200">
-                <p className="text-sm text-slate-600 mb-1">Estimated Value</p>
-                <p className="text-3xl font-bold text-green-600">₹{basePrice}</p>
+              <div
+                className={`rounded-xl p-4 mb-6 border-2 ${
+                  cumulativeImpact > 0
+                    ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-300'
+                    : cumulativeImpact < 0
+                      ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-300'
+                      : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-slate-600">Current Estimate</p>
+                  {cumulativeImpact !== 0 && (
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        cumulativeImpact > 0
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}
+                    >
+                      Cumulative
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <p
+                    className={`text-3xl font-bold ${
+                      currentBasePrice + totalAccessoryValue === 0
+                        ? 'text-red-600'
+                        : cumulativeImpact > 0
+                          ? 'text-green-600'
+                          : cumulativeImpact < 0
+                            ? 'text-amber-600'
+                            : 'text-blue-600'
+                    }`}
+                  >
+                    ₹{(currentBasePrice + totalAccessoryValue).toLocaleString()}
+                  </p>
+                  {cumulativeImpact !== 0 && (
+                    <p className="text-sm text-slate-500 line-through">
+                      ₹{(originalBasePrice + totalAccessoryValue).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+                {cumulativeImpact !== 0 && (
+                  <p
+                    className={`text-sm mt-1 ${
+                      cumulativeImpact > 0 ? 'text-green-600' : 'text-red-600'
+                    }`}
+                  >
+                    {cumulativeImpact > 0 ? '+' : ''}₹{Math.abs(cumulativeImpact).toLocaleString()}{' '}
+                    from evaluation + defects
+                  </p>
+                )}
                 {totalAccessoryValue > 0 && (
-                  <p className="text-sm text-green-700 mt-2">
+                  <p className="text-sm text-green-700 mt-1">
                     + ₹{totalAccessoryValue} (accessories)
+                  </p>
+                )}
+                {currentBasePrice + totalAccessoryValue === 0 && (
+                  <p className="text-sm text-red-600 mt-2 font-medium bg-red-50 p-2 rounded">
+                    ⚠️ Minimum price reached - device may not be eligible for sale
                   </p>
                 )}
               </div>

@@ -210,7 +210,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="orders" element={<PartnerOrders />} />
           <Route path="buy-orders" element={<PartnerBuyOrders />} />
           <Route path="sell-orders" element={<PartnerSellOrders />} />
-          <Route path="payouts" element={<PartnerPayouts />} />
+          {/* <Route path="payouts" element={<PartnerPayouts />} /> */}
           <Route path="kyc" element={<PartnerKYC />} />
           <Route path="agents" element={<PartnerAgentManagement />} />
         </Route>

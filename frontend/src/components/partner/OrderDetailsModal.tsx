@@ -166,11 +166,11 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ isOpen, onClose, 
                 <div className="mt-3">
                   <span className="text-gray-600 text-sm">Assessment Answers:</span>
                   <div className="mt-1 text-sm">
-                    {Object.entries(order.sessionId.answers).map(([key, value]: [string, any]) => (
+                    {Object.entries(order.sessionId.answers).map(([key, answer]: [string, any]) => (
                       <div key={key} className="flex justify-between">
                         <span className="capitalize">{key.replace(/([A-Z])/g, ' $1')}:</span>
                         <span className="font-medium">
-                          {Array.isArray(value) ? value.join(', ') : value}
+                          {answer.answerText || answer.value || 'N/A'}
                         </span>
                       </div>
                     ))}
