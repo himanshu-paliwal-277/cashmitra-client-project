@@ -1,5 +1,4 @@
 import express from 'express';
-import { body, param, query } from 'express-validator';
 
 import {
   createOrUpdateConfig,
@@ -11,160 +10,27 @@ import {
   updateRules,
   updateSteps,
 } from '../../controllers/sellConfig.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-const configValidation = [
-  body('productId')
-    .isMongoId()
-    .withMessage('Product ID must be a valid MongoDB ObjectId'),
-  body('steps').optional().isArray().withMessage('Steps must be an array'),
-  body('steps.*.key')
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 100 })
-    .withMessage('Step key must be between 1 and 100 characters'),
-  body('steps.*.title')
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 200 })
-    .withMessage('Step title must be between 1 and 200 characters'),
-  body('steps.*.order')
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage('Step order must be a non-negative integer'),
-  body('rules').optional().isObject().withMessage('Rules must be an object'),
-  body('rules.roundToNearest')
-    .optional()
-    .isNumeric({ min: 1 })
-    .withMessage('Round to nearest must be a positive number'),
-  body('rules.floorPrice')
-    .optional()
-    .isNumeric({ min: 0 })
-    .withMessage('Floor price must be a non-negative number'),
-  body('rules.capPrice')
-    .optional()
-    .isNumeric({ min: 0 })
-    .withMessage('Cap price must be a non-negative number'),
-  body('rules.minPercent')
-    .optional()
-    .isNumeric({ min: 0, max: 100 })
-    .withMessage('Min percent must be between 0 and 100'),
-  body('rules.maxPercent')
-    .optional()
-    .isNumeric({ min: 0, max: 100 })
-    .withMessage('Max percent must be between 0 and 100'),
-];
+router.get('/customer/:productId', getCustomerConfig);
 
-const stepsValidation = [
-  body('steps').isArray({ min: 1 }).withMessage('Steps array is required'),
-  body('steps.*.key')
-    .trim()
-    .isLength({ min: 1, max: 100 })
-    .withMessage('Step key must be between 1 and 100 characters'),
-  body('steps.*.title')
-    .trim()
-    .isLength({ min: 1, max: 200 })
-    .withMessage('Step title must be between 1 and 200 characters'),
-  body('steps.*.order')
-    .isInt({ min: 0 })
-    .withMessage('Step order must be a non-negative integer'),
-];
-
-const rulesValidation = [
-  body('rules').isObject().withMessage('Rules object is required'),
-  body('rules.roundToNearest')
-    .optional()
-    .isNumeric({ min: 1 })
-    .withMessage('Round to nearest must be a positive number'),
-  body('rules.floorPrice')
-    .optional()
-    .isNumeric({ min: 0 })
-    .withMessage('Floor price must be a non-negative number'),
-  body('rules.capPrice')
-    .optional()
-    .isNumeric({ min: 0 })
-    .withMessage('Cap price must be a non-negative number'),
-  body('rules.minPercent')
-    .optional()
-    .isNumeric({ min: 0, max: 100 })
-    .withMessage('Min percent must be between 0 and 100'),
-  body('rules.maxPercent')
-    .optional()
-    .isNumeric({ min: 0, max: 100 })
-    .withMessage('Max percent must be between 0 and 100'),
-];
-
-const testPricingValidation = [
-  body('basePrice')
-    .isNumeric({ min: 0 })
-    .withMessage('Base price must be a non-negative number'),
-  body('adjustments')
-    .optional()
-    .isNumeric()
-    .withMessage('Adjustments must be a number'),
-];
-
-router.get(
-  '/customer/:productId',
-  param('productId')
-    .isMongoId()
-    .withMessage('Product ID must be a valid MongoDB ObjectId'),
-  getCustomerConfig
-);
-
-router.use(protect);
+router.use(isAuthenticated);
 router.use(authorize('admin'));
 
-router.post('/', configValidation, createOrUpdateConfig);
-router.get(
-  '/:productId',
-  param('productId')
-    .isMongoId()
-    .withMessage('Product ID must be a valid MongoDB ObjectId'),
-  getConfig
-);
-router.delete(
-  '/:productId',
-  param('productId')
-    .isMongoId()
-    .withMessage('Product ID must be a valid MongoDB ObjectId'),
-  deleteConfig
-);
+router.post('/', createOrUpdateConfig);
+router.get('/:productId', getConfig);
+router.delete('/:productId', deleteConfig);
 
-router.put(
-  '/:productId/steps',
-  param('productId')
-    .isMongoId()
-    .withMessage('Product ID must be a valid MongoDB ObjectId'),
-  stepsValidation,
-  updateSteps
-);
-router.put(
-  '/:productId/rules',
-  param('productId')
-    .isMongoId()
-    .withMessage('Product ID must be a valid MongoDB ObjectId'),
-  rulesValidation,
-  updateRules
-);
+router.put('/:productId/steps', updateSteps);
+router.put('/:productId/rules', updateRules);
 
-router.post(
-  '/:productId/reset',
-  param('productId')
-    .isMongoId()
-    .withMessage('Product ID must be a valid MongoDB ObjectId'),
-  resetToDefault
-);
+router.post('/:productId/reset', resetToDefault);
 
-router.post(
-  '/:productId/test-pricing',
-  param('productId')
-    .isMongoId()
-    .withMessage('Product ID must be a valid MongoDB ObjectId'),
-  testPricingValidation,
-  testPricing
-);
+router.post('/:productId/test-pricing', testPricing);
 
 export default router;

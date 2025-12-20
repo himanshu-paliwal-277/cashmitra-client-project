@@ -71,7 +71,7 @@ const useAdminLeads = (): UseAdminLeadsReturn => {
   const [error, setError] = useState<string | null>(null);
 
   const getAuthHeaders = () => {
-    const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+    const token = localStorage.getItem('token') || localStorage.getItem('token');
     return {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',

@@ -60,5 +60,3 @@ const walletSchema = new mongoose.Schema(
 walletSchema.index({ partner: 1 }, { unique: true });
 
 export const Wallet = mongoose.model('Wallet', walletSchema);
-
-

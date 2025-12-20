@@ -104,15 +104,17 @@ const SellCategories = () => {
     setImageFile(null);
   };
 
-  const handleDeleteCategory = async (categoryId: any) => {
+  const handleDeleteCategory = async categoryId => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
         await adminService.deleteCategory(categoryId);
-        fetchCategories();
+        await fetchCategories();
         showToast('Category deleted successfully');
       } catch (error) {
         console.error('Error deleting category:', error);
-        showToast('Failed to delete category', 'error');
+        const errorMessage =
+          error.response?.data?.message || error.message || 'Failed to delete category';
+        showToast(errorMessage, 'error');
       }
     }
   };
@@ -132,41 +134,79 @@ const SellCategories = () => {
       setIsSubmitting(true);
 
       let imageUrl = imagePreview || '';
+
+      // Upload image if a new file is selected
       if (imageFile) {
         const fd = new FormData();
         fd.append('image', imageFile);
-        const token = localStorage.getItem('adminToken');
-        const res = await fetch(`${API_BASE_URL}/upload/image`, {
+        const token = localStorage.getItem('token');
+
+        const imageUploadResponse = await fetch(`${API_BASE_URL}/upload/image`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: fd,
         });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || 'Image upload failed');
-        imageUrl = data.data.url;
+
+        const imageData = await imageUploadResponse.json();
+
+        if (!imageUploadResponse.ok || !imageData.success) {
+          throw new Error(imageData.message || 'Image upload failed');
+        }
+
+        imageUrl = imageData.data.url;
       }
+
+      // Save or update category
+      const categoryData = {
+        name: formData.name.trim(),
+        image: imageUrl,
+        superCategory: formData.superCategory || null,
+      };
 
       if (editingCategory) {
-        await adminService.updateCategory(editingCategory.id, {
-          name: formData.name.trim(),
-          image: imageUrl,
-          superCategory: formData.superCategory || null,
-        });
-        showToast('Category updated successfully');
+        const response = await adminService.updateCategory(editingCategory.id, categoryData);
+
+        // Check if the response indicates an error
+        if (response.error || !response.success) {
+          showToast(response.message || 'Failed to update category', 'error');
+          throw new Error(response.message || 'Failed to update category');
+        }
+
+        showToast( response.message || 'Category updated successfully');
       } else {
-        await adminService.createCategory({
-          name: formData.name.trim(),
-          image: imageUrl,
-          superCategory: formData.superCategory || null,
-        });
-        showToast('Category created successfully');
+        const response = await adminService.createCategory(categoryData);
+
+        // Check if the response indicates an error
+        if (response.error || !response.success) {
+          showToast(response.message || 'Failed to create category', 'error');
+          console.log('response', response);
+          throw new Error(response.message || 'Failed to create category');
+        }
+
+        showToast(response.message || 'Category created successfully');
       }
 
+      // Only fetch categories and reset form if everything succeeded
       await fetchCategories();
       resetForm();
     } catch (error) {
       console.error('Error saving category:', error);
-      showToast(error.message || 'Failed to save category', 'error');
+
+      // Extract error message from various error formats
+      let errorMessage = 'Failed to save category';
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+
+      showToast(errorMessage, 'error');
+
+      // DO NOT reset form or refetch on error
+      // User can see what went wrong and fix it
     } finally {
       setIsSubmitting(false);
     }
@@ -187,12 +227,12 @@ const SellCategories = () => {
   );
   const mainCategories = filteredCategories.filter(category => !category.parentId);
 
-  const renderCategoryIcon = (iconName: any) => {
+  const renderCategoryIcon = iconName => {
     const IconComponent = categoryIcons[iconName] || Package;
     return <IconComponent className="w-4 h-4" />;
   };
 
-  const renderCategory = (category: any, level = 0) => {
+  const renderCategory = (category, level = 0) => {
     const hasChildren = categories.some(cat => cat.parentId === category.id);
     const isExpanded = expandedCategories.has(category.id);
     const children = categories.filter(cat => cat.parentId === category.id);
@@ -343,7 +383,8 @@ const SellCategories = () => {
             {/* Super Category */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Super Category (optional)
+                {/* Super Category (optional) */}
+                Super Category
               </label>
               <select
                 value={formData.superCategory}
@@ -430,7 +471,12 @@ const SellCategories = () => {
               )}
               <button
                 onClick={handleSaveCategory}
-                disabled={isSubmitting || !formData.name.trim()}
+                disabled={
+                  isSubmitting ||
+                  !formData.name.trim() ||
+                  (!imageFile && !imagePreview && !editingCategory) ||
+                  superCategories.length === 0
+                }
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (

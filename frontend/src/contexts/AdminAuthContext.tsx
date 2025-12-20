@@ -26,14 +26,18 @@ export const AdminAuthProvider = ({ children }: any) => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const token = localStorage.getItem('adminToken');
-        const storedUser = localStorage.getItem('adminUser');
+        const token = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('userData');
 
         if (token && storedUser) {
-          // Verify token validity by fetching profile
-          const profileData = await getAdminProfile();
-          setAdminUser(profileData.admin);
-          setIsAuthenticated(true);
+          const userData = JSON.parse(storedUser);
+          // Check if user is admin
+          if (userData.role === 'admin') {
+            // Verify token validity by fetching profile
+            const profileData = await getAdminProfile();
+            setAdminUser(profileData.admin);
+            setIsAuthenticated(true);
+          }
         }
       } catch (error) {
         console.error('Authentication check failed:', error);
@@ -62,9 +66,9 @@ export const AdminAuthProvider = ({ children }: any) => {
         role: data.role,
       };
 
-      // Store auth data
-      localStorage.setItem('adminToken', data.token);
-      localStorage.setItem('adminUser', JSON.stringify(adminDetails));
+      // Store auth data with consistent naming
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userData', JSON.stringify(adminDetails));
 
       // Update state
       setAdminUser(adminDetails);
@@ -83,8 +87,8 @@ export const AdminAuthProvider = ({ children }: any) => {
   // Logout function
   const logout = () => {
     // Clear auth data from localStorage
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userData');
 
     // Reset state
     setAdminUser(null);
@@ -96,7 +100,7 @@ export const AdminAuthProvider = ({ children }: any) => {
 
   // Get auth header for API requests
   const getAuthHeader = () => {
-    const token = localStorage.getItem('adminToken');
+    const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 

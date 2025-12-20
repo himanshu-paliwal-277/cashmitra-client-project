@@ -119,8 +119,25 @@ const BuyProductSchema = new mongoose.Schema(
 
     availability: {
       inStock: { type: Boolean, default: true },
+      quantity: { type: Number, default: 0, min: 0 },
       deliveryPincode: String,
       estimatedDelivery: String,
+    },
+
+    // Partner-specific stock management
+    stock: {
+      condition: {
+        type: String,
+        enum: ['New', 'Like New', 'Good', 'Fair', 'Refurbished'],
+        default: 'New',
+      },
+      quantity: { type: Number, default: 0, min: 0 },
+      originalPrice: { type: Number },
+      warranty: {
+        available: { type: Boolean, default: false },
+        durationMonths: { type: Number, default: 0 },
+        description: String,
+      },
     },
 
     topSpecs: {
@@ -237,5 +254,5 @@ BuyProductSchema.index({ isActive: 1 });
 BuyProductSchema.index({ 'rating.average': -1 });
 BuyProductSchema.index({ 'pricing.discountedPrice': 1 });
 
-export const BuyProduct = mongoose.models.BuyProduct ||
-  mongoose.model('BuyProduct', BuyProductSchema);
+export const BuyProduct =
+  mongoose.models.BuyProduct || mongoose.model('BuyProduct', BuyProductSchema);

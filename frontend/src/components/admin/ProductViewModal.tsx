@@ -176,10 +176,21 @@ const ProductViewModal = ({ isOpen, onClose, product }: ProductViewModalProps) =
                         <span className="text-sm font-medium text-gray-900">{product.sku}</span>
                       </div>
                     )}
-                    {product.stock !== undefined && (
+                    {(product.stock?.quantity !== undefined ||
+                      product.availability?.quantity !== undefined) && (
                       <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">Stock</span>
-                        <span className="text-sm font-medium text-gray-900">{product.stock}</span>
+                        <span className="text-sm text-gray-600">Stock Quantity</span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {product.stock?.quantity || product.availability?.quantity || 0}
+                        </span>
+                      </div>
+                    )}
+                    {product.stock?.condition && (
+                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                        <span className="text-sm text-gray-600">Condition</span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {product.stock.condition}
+                        </span>
                       </div>
                     )}
                     {product.createdAt && (

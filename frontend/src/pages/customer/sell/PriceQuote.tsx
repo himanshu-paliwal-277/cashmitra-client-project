@@ -6,11 +6,12 @@ import {
   Truck,
   Shield,
   Package,
-  CheckCircle,
   Loader,
   RefreshCw,
   ArrowRight,
-  Tag,
+  TrendingDown,
+  TrendingUp,
+  Minus,
 } from 'lucide-react';
 
 const PriceQuote = () => {
@@ -21,9 +22,8 @@ const PriceQuote = () => {
   const { assessmentData, product } = location.state || {};
   const [priceData, setPriceData] = useState(null);
   const [productDetails, setProductDetails] = useState(null);
-  const [selectedOffer, setSelectedOffer] = useState(null);
-  const [offerSessionData, setOfferSessionData] = useState(null);
-  const [isLoadingOffers, setIsLoadingOffers] = useState(false);
+  const [sessionData, setSessionData] = useState(null);
+  const [isLoadingSession, setIsLoadingSession] = useState(false);
 
   const category = searchParams.get('category');
   const brand = searchParams.get('brand');
@@ -35,8 +35,8 @@ const PriceQuote = () => {
     let absDelta = 0;
 
     // Process answers
-    Object.values(data.answers || {}).forEach(ans => {
-      if (ans.delta) {
+    Object.values(data.answers || {}).forEach((ans: any) => {
+      if (ans && ans.delta) {
         const adjust = ans.delta.sign === '-' ? -1 : 1;
         if (ans.delta.type === 'percent') {
           percentDelta += adjust * (ans.delta.value || 0);
@@ -71,20 +71,16 @@ const PriceQuote = () => {
     });
 
     const adjustedPrice = Math.round(basePrice * (1 + percentDelta / 100) + absDelta);
-    return adjustedPrice;
+    return Math.max(adjustedPrice, 0); // Ensure price doesn't go negative
   };
-  const offers = offerSessionData?.offers || [
-    { id: 'amazon', brand: 'A', percent: 2, tcs: true },
-    { id: 'flipkart', brand: 'F', percent: 3.5, tcs: true },
-    { id: 'croma', brand: 'C', percent: 1, tcs: true },
-  ];
 
   useEffect(() => {
     if (assessmentData && product) {
+      // Set initial price data using local calculation as fallback
       const quotedPrice = calculatePrice(assessmentData);
       const processingFee = 49;
       const pickupCharge = 0;
-      const totalAmount = quotedPrice + processingFee;
+      const totalAmount = Math.max(quotedPrice - processingFee, 0); // Deduct processing fee
 
       setPriceData({
         quotedPrice,
@@ -98,16 +94,17 @@ const PriceQuote = () => {
         variant: assessmentData.selectedVariant.label,
       });
 
+      // Create session to get detailed pricing
       createOfferSession();
     }
   }, [assessmentData, product]);
 
   const createOfferSession = async () => {
     if (!assessmentData || !product) return;
-    setIsLoadingOffers(true);
+    setIsLoadingSession(true);
     try {
       const variantId = assessmentData.selectedVariant?.id || assessmentData.selectedVariant?._id;
-      const userData = JSON.parse(localStorage.getItem('userData'));
+      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
       const offerData = {
         userId: userData?.id || userData?._id,
@@ -125,7 +122,21 @@ const PriceQuote = () => {
       };
 
       const response = await createSellOfferSession(offerData);
-      setOfferSessionData(response.data);
+      setSessionData(response.data);
+
+      // Update price data with session data
+      if (response.data?.pricing) {
+        const processingFee = 49;
+        const pickupCharge = 0;
+        const totalAmount = Math.max(response.data.pricing.finalPrice - processingFee, 0); // Deduct processing fee
+
+        setPriceData({
+          quotedPrice: response.data.pricing.finalPrice,
+          processingFee,
+          pickupCharge,
+          totalAmount,
+        });
+      }
 
       // Store sessionId in localStorage as backup
       if (response.data?.sessionId) {
@@ -134,7 +145,7 @@ const PriceQuote = () => {
     } catch (error) {
       console.error('Error creating sell offer session:', error);
     } finally {
-      setIsLoadingOffers(false);
+      setIsLoadingSession(false);
     }
   };
 
@@ -157,13 +168,8 @@ const PriceQuote = () => {
         state: {
           assessmentData,
           product,
-          sessionId: offerSessionData?.sessionId,
-          priceData: {
-            quotedPrice: calculatePrice(assessmentData),
-            processingFee: 49,
-            pickupCharge: 0,
-            totalAmount: calculatePrice(assessmentData) + 49,
-          },
+          sessionData,
+          priceData,
         },
       });
     } catch (error) {
@@ -177,19 +183,11 @@ const PriceQuote = () => {
         state: {
           assessmentData,
           product,
-          priceData: {
-            quotedPrice: calculatePrice(assessmentData),
-            processingFee: 49,
-            pickupCharge: 0,
-            totalAmount: calculatePrice(assessmentData) + 49,
-          },
+          sessionData,
+          priceData,
         },
       });
     }
-  };
-
-  const handleOfferChange = (offerId: any) => {
-    setSelectedOffer(offerId);
   };
 
   if (!priceData || !productDetails) {
@@ -244,10 +242,33 @@ const PriceQuote = () => {
 
                     {/* Price Display */}
                     <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 mb-6 border-2 border-green-300">
-                      <p className="text-sm text-slate-600 mb-1">Your Device Value</p>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm text-slate-600">Your Device Value</p>
+                        {isLoadingSession && (
+                          <div className="flex items-center gap-2">
+                            <Loader className="w-4 h-4 text-blue-600 animate-spin" />
+                            <span className="text-xs text-blue-600">Calculating...</span>
+                          </div>
+                        )}
+                      </div>
                       <p className="text-4xl font-bold text-green-600">
                         {formatPrice(priceData.quotedPrice)}
                       </p>
+                      {sessionData?.pricing && (
+                        <div className="mt-2 text-sm text-slate-600">
+                          <p>Base: ₹{sessionData.pricing.basePrice.toLocaleString()}</p>
+                          <p
+                            className={
+                              sessionData.pricing.adjustment >= 0
+                                ? 'text-green-600'
+                                : 'text-red-600'
+                            }
+                          >
+                            Adjustment: {sessionData.pricing.adjustment >= 0 ? '+' : ''}₹
+                            {sessionData.pricing.adjustment.toLocaleString()}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <button
@@ -283,6 +304,145 @@ const PriceQuote = () => {
               </div>
             </div>
 
+            {/* Price Breakdown */}
+            {sessionData?.pricing?.breakdown && (
+              <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
+                <h3 className="text-xl font-bold text-slate-900 mb-6">Price Breakdown</h3>
+
+                <div className="space-y-4">
+                  {sessionData.pricing.breakdown.map((item: any, index: number) => {
+                    const isPositive = item.delta > 0;
+                    const isNegative = item.delta < 0;
+                    const isBase = item.type === 'base';
+
+                    return (
+                      <div
+                        key={item.id || index}
+                        className="flex items-center justify-between p-4 rounded-lg bg-slate-50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              isBase ? 'bg-blue-100' : isPositive ? 'bg-green-100' : 'bg-red-100'
+                            }`}
+                          >
+                            {isBase ? (
+                              <Minus className={`w-4 h-4 text-blue-600`} />
+                            ) : isPositive ? (
+                              <TrendingUp className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <TrendingDown className="w-4 h-4 text-red-600" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium text-slate-900">{item.label}</p>
+                            <p className="text-xs text-slate-500 capitalize">{item.type}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p
+                            className={`font-bold ${
+                              isBase
+                                ? 'text-blue-600'
+                                : isPositive
+                                  ? 'text-green-600'
+                                  : 'text-red-600'
+                            }`}
+                          >
+                            {isBase ? '' : isPositive ? '+' : ''}₹
+                            {Math.abs(item.delta).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Final Price Summary */}
+                  <div className="border-t-2 border-slate-200 pt-4 mt-6">
+                    <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200">
+                      <div>
+                        <p className="font-bold text-slate-900">Final Device Value</p>
+                        <p className="text-sm text-slate-600">
+                          {sessionData.pricing.adjustment > 0 ? '+' : ''}₹
+                          {sessionData.pricing.adjustment.toLocaleString()} adjustment
+                        </p>
+                        <p className="text-xs text-slate-500 mt-1">
+                          *Processing fee of ₹49 will be deducted
+                        </p>
+                      </div>
+                      <p className="text-2xl font-bold text-green-600">
+                        ₹{sessionData.pricing.finalPrice.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Assessment Summary */}
+            {sessionData?.assessment && (
+              <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
+                <h3 className="text-xl font-bold text-slate-900 mb-6">Your Assessment Summary</h3>
+
+                <div className="space-y-6">
+                  {/* Evaluation Answers */}
+                  {sessionData.assessment.answers &&
+                    Object.keys(sessionData.assessment.answers).length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-slate-900 mb-3">Device Evaluation</h4>
+                        <div className="space-y-3">
+                          {Object.entries(sessionData.assessment.answers).map(
+                            ([key, answer]: [string, any]) => (
+                              <div
+                                key={key}
+                                className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg"
+                              >
+                                <div
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                    answer.delta?.sign === '+'
+                                      ? 'bg-green-100'
+                                      : answer.delta?.sign === '-'
+                                        ? 'bg-red-100'
+                                        : 'bg-blue-100'
+                                  }`}
+                                >
+                                  {answer.delta?.sign === '+' ? (
+                                    <TrendingUp className="w-4 h-4 text-green-600" />
+                                  ) : answer.delta?.sign === '-' ? (
+                                    <TrendingDown className="w-4 h-4 text-red-600" />
+                                  ) : (
+                                    <Minus className="w-4 h-4 text-blue-600" />
+                                  )}
+                                </div>
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-slate-900">
+                                    {answer.questionText}
+                                  </p>
+                                  <p className="text-sm text-slate-600">{answer.answerText}</p>
+                                  {answer.delta && (
+                                    <p
+                                      className={`text-xs mt-1 ${
+                                        answer.delta.sign === '+'
+                                          ? 'text-green-600'
+                                          : 'text-red-600'
+                                      }`}
+                                    >
+                                      {answer.delta.sign}
+                                      {answer.delta.value}
+                                      {answer.delta.type === 'percent' ? '%' : '₹'}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+                </div>
+              </div>
+            )}
+
             {/* Features */}
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-white rounded-xl shadow-lg p-6 text-center border border-slate-200">
@@ -315,12 +475,42 @@ const PriceQuote = () => {
               <h3 className="text-xl font-bold text-slate-900 mb-6">Price Summary</h3>
 
               <div className="space-y-4 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-600">Base Price</span>
-                  <span className="font-semibold text-slate-900">
-                    {formatPrice(priceData.quotedPrice)}
-                  </span>
-                </div>
+                {sessionData?.pricing ? (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600">Base Price</span>
+                      <span className="font-semibold text-slate-900">
+                        ₹{sessionData.pricing.basePrice.toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600">Price Adjustments</span>
+                      <span
+                        className={`font-semibold ${
+                          sessionData.pricing.adjustment >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}
+                      >
+                        {sessionData.pricing.adjustment >= 0 ? '+' : ''}₹
+                        {sessionData.pricing.adjustment.toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600">Device Value</span>
+                      <span className="font-semibold text-slate-900">
+                        ₹{sessionData.pricing.finalPrice.toLocaleString()}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Device Value</span>
+                    <span className="font-semibold text-slate-900">
+                      {formatPrice(priceData.quotedPrice)}
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex justify-between items-center">
                   <span className="text-slate-600">Pickup charges</span>
@@ -329,18 +519,32 @@ const PriceQuote = () => {
 
                 <div className="flex justify-between items-center">
                   <span className="text-slate-600">Processing Fee</span>
-                  <span className="font-semibold text-slate-900">+₹49</span>
+                  <span className="font-semibold text-red-600">-₹49</span>
                 </div>
 
                 <div className="border-t-2 border-slate-200 pt-4 mt-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-slate-900">Total Amount</span>
+                    <span className="text-lg font-bold text-slate-900">You'll Receive</span>
                     <span className="text-2xl font-bold text-green-600">
                       {formatPrice(priceData.totalAmount)}
                     </span>
                   </div>
+                  {priceData.totalAmount === 0 && (
+                    <p className="text-sm text-red-600 mt-2 font-medium">
+                      ⚠️ Processing fee exceeds device value
+                    </p>
+                  )}
                 </div>
               </div>
+
+              {sessionData?.expiresAt && (
+                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-800">
+                    <span className="font-semibold">Quote expires:</span>{' '}
+                    {new Date(sessionData.expiresAt).toLocaleString()}
+                  </p>
+                </div>
+              )}
 
               <button
                 onClick={handleSellNow}
@@ -349,67 +553,6 @@ const PriceQuote = () => {
                 Sell Now
                 <ArrowRight className="w-5 h-5" />
               </button>
-            </div>
-
-            {/* Special Offers */}
-            <div className="bg-white rounded-2xl shadow-xl p-6 border border-slate-200">
-              <div className="flex items-center gap-2 mb-4">
-                <Tag className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-bold text-slate-900">Special Offers</h3>
-              </div>
-
-              {isLoadingOffers ? (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <Loader className="w-8 h-8 text-blue-600 animate-spin mb-2" />
-                  <p className="text-sm text-slate-600">Loading offers...</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {offers.map((offer: any) => {
-                    const isSelected = selectedOffer === offer.id;
-                    const bonusAmount = Math.round((priceData.quotedPrice * offer.percent) / 100);
-
-                    return (
-                      <label
-                        key={offer.id}
-                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                          isSelected
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="offer"
-                          value={offer.id}
-                          checked={isSelected}
-                          onChange={() => handleOfferChange(offer.id)}
-                          className="w-5 h-5 text-blue-600"
-                        />
-
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="w-10 h-10 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full flex items-center justify-center font-bold text-slate-700">
-                            {offer.brand}
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-semibold text-slate-900 capitalize">{offer.id}</p>
-                            {offer.tcs && <p className="text-xs text-slate-500">TCS applicable</p>}
-                          </div>
-                        </div>
-
-                        <div className="text-right">
-                          <p className="text-sm text-green-600 font-semibold">+{offer.percent}%</p>
-                          <p className="text-lg font-bold text-slate-900">₹{bonusAmount}</p>
-                        </div>
-
-                        {isSelected && (
-                          <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0" />
-                        )}
-                      </label>
-                    );
-                  })}
-                </div>
-              )}
             </div>
           </div>
         </div>

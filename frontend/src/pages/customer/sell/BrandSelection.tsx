@@ -20,7 +20,11 @@ const BrandSelection = () => {
   const urlParams = new URLSearchParams(location.search);
   const categoryId = urlParams.get('category') || category;
 
+  const [modelId, setModelId] = useState(null);
+
   const { categories } = useSellCategories();
+
+  console.log('filteredBrands = ', filteredBrands);
 
   // Fetch brands from public sell endpoint
   useEffect(() => {
@@ -36,6 +40,9 @@ const BrandSelection = () => {
         if (response.data && response.data.brands) {
           setBrands(response.data.brands);
         }
+
+        console.log('Fetched brands:', response.data);
+        setModelId(null);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch brands');
         console.error('Error fetching brands:', err);
@@ -57,12 +64,13 @@ const BrandSelection = () => {
 
   // Filter brands based on search query
   useEffect(() => {
-    if (brands) {
+    if (brands && brands.length > 0) {
       let filtered = brands;
 
       if (searchQuery) {
         filtered = brands.filter(
-          (brand: any) => brand && brand.toLowerCase().includes(searchQuery.toLowerCase())
+          (brand: any) =>
+            brand && brand.name && brand.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }
 
@@ -76,9 +84,8 @@ const BrandSelection = () => {
 
   const handleNext = () => {
     if (selectedBrand) {
-      // Handle both string and object formats
-      const brandName = typeof selectedBrand === 'string' ? selectedBrand : selectedBrand.brand;
-      navigate(`/sell/${categoryId}/${brandName}/model`);
+      const brandId = selectedBrand._id || selectedBrand.id;
+      navigate(`/sell/${categoryId}/${brandId}/model`);
     }
   };
 
@@ -95,7 +102,7 @@ const BrandSelection = () => {
       .toUpperCase();
   };
 
-  const getBrandColor = (brandName: any) => {
+  const getBrandColor = (brandName: string) => {
     const colors = [
       { bg: 'from-blue-500 to-blue-600', text: 'text-blue-600', light: 'bg-blue-100' },
       { bg: 'from-purple-500 to-purple-600', text: 'text-purple-600', light: 'bg-purple-100' },
@@ -105,7 +112,7 @@ const BrandSelection = () => {
       { bg: 'from-pink-500 to-pink-600', text: 'text-pink-600', light: 'bg-pink-100' },
       { bg: 'from-indigo-500 to-indigo-600', text: 'text-indigo-600', light: 'bg-indigo-100' },
     ];
-    const index = brandName.length % colors.length;
+    const index = (brandName?.length || 0) % colors.length;
     return colors[index];
   };
 
@@ -196,14 +203,11 @@ const BrandSelection = () => {
         {filteredBrands.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 mb-12">
             {filteredBrands.map((brand, index) => {
-              // Handle both string and object formats
-              const brandName = typeof brand === 'string' ? brand : brand.brand;
-              const brandId = typeof brand === 'string' ? brand : brand._id;
+              const brandName = brand.name || brand.displayName;
+              const brandId = brand._id || brand.id;
+              const brandImage = brand.image;
               const colorScheme = getBrandColor(brandName);
-              const isSelected =
-                typeof selectedBrand === 'string'
-                  ? selectedBrand === brand
-                  : selectedBrand?._id === brandId;
+              const isSelected = selectedBrand?._id === brandId || selectedBrand?.id === brandId;
 
               return (
                 <div
@@ -216,15 +220,24 @@ const BrandSelection = () => {
                   }`}
                 >
                   {/* Brand Logo/Initials */}
-                  <div
-                    className={`w-20 h-20 ${colorScheme.light} rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform ${
-                      isSelected ? 'scale-110' : 'group-hover:scale-110'
-                    }`}
-                  >
-                    <span className={`text-2xl font-bold ${colorScheme.text}`}>
-                      {getBrandInitials(brandName)}
-                    </span>
-                  </div>
+
+                  {brandImage ? (
+                    <img
+                      src={brandImage}
+                      alt={brandName}
+                      className="w-20 h-20 rounded-xl mx-auto mb-4 transition-transform group-hover:scale-110 object-contain"
+                    />
+                  ) : (
+                    <div
+                      className={`w-20 h-20 ${colorScheme.light} rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform ${
+                        isSelected ? 'scale-110' : 'group-hover:scale-110'
+                      }`}
+                    >
+                      <span className={`text-2xl font-bold ${colorScheme.text}`}>
+                        {getBrandInitials(brandName)}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Brand Name */}
                   <h3
@@ -236,7 +249,7 @@ const BrandSelection = () => {
                   </h3>
 
                   {/* Models Count */}
-                  <p className="text-xs sm:text-sm text-slate-600">Multiple models available</p>
+                  {/* <p className="text-xs sm:text-sm text-slate-600">Multiple models available</p> */}
 
                   {/* Selected Indicator */}
                   {isSelected && (

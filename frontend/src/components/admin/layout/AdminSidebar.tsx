@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   Clock,
   Truck,
+  Layers,
 } from 'lucide-react';
 import AdminSidebarItem from './AdminSidebarItem';
 import { useLocation } from 'react-router-dom';
@@ -73,9 +74,11 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
       items: [
         { to: '/admin/sell-super-categories', icon: FolderTree, label: 'Super Categories' },
         { to: '/admin/sell-categories', icon: FolderTree, label: 'Categories' },
+        { to: '/admin/series', icon: Layers, label: 'Series' },
         { to: '/admin/sell-products', icon: Package, label: 'Products' },
       ],
     },
+
     {
       title: 'Sell Management',
       items: [

@@ -188,23 +188,23 @@ const Header = () => {
             <ChevronDown size={14} />
           </button>
 
-          {/* Cart */}
-          <button
-            onClick={() => handleLinkClick('/cart')}
-            title="Shopping Cart"
-            className="relative flex items-center justify-center w-9 h-9 lg:w-10 lg:h-10 border-none bg-transparent text-gray-800 cursor-pointer rounded-lg transition-all hover:bg-gray-100 hover:text-green-600"
-          >
-            <ShoppingCart size={18} className="lg:w-5 lg:h-5" />
-            {/* Cart badge - uncomment and add count if needed
+          {/* Profile/Login */}
+          {isAuthenticated ? (
+            <div ref={profileDropdownRef} className="relative hidden lg:flex gap-2">
+              {/* Cart */}
+              <button
+                onClick={() => handleLinkClick('/cart')}
+                title="Shopping Cart"
+                className="relative flex items-center justify-center w-9 h-9 lg:w-10 lg:h-10 border-none bg-transparent text-gray-800 cursor-pointer rounded-lg transition-all hover:bg-gray-100 hover:text-green-600"
+              >
+                <ShoppingCart size={18} className="lg:w-5 lg:h-5" />
+                {/* Cart badge - uncomment and add count if needed
             <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
               0
             </span>
             */}
-          </button>
+              </button>
 
-          {/* Profile/Login */}
-          {isAuthenticated ? (
-            <div ref={profileDropdownRef} className="relative hidden lg:block">
               <button
                 onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                 title="My Account"

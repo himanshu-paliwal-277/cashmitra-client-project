@@ -1,5 +1,3 @@
-import { validationResult } from 'express-validator';
-
 import { Category } from '../models/category.model.js';
 import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
@@ -47,12 +45,21 @@ export const getBrandsByCategory = async (req, res) => {
       superCategory: superCategory._id,
       isActive: true,
     })
-      .select('name')
+      .select('_id name displayName image slug')
       .sort({ name: 1 });
 
-    const brands = categories.map((cat) => cat.name);
-
-    res.json({ brands });
+    res.json({
+      success: true,
+      count: categories.length,
+      brands: categories.map((cat) => ({
+        _id: cat._id,
+        name: cat.name,
+        displayName: cat.displayName,
+        image: cat.image,
+        slug: cat.slug,
+        id: cat._id,
+      })),
+    });
   } catch (error) {
     console.error('Error fetching brands:', error);
     res.status(500).json({ message: 'Server error' });
@@ -108,11 +115,6 @@ export const getVariantsByModel = async (req, res) => {
 };
 
 export const calculatePrice = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const {
       productId,
@@ -333,11 +335,6 @@ const generatePriceRecommendations = (product, condition) => {
 };
 
 export const createSellOrder = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { productId, condition, price, paymentMethod, pickupAddress } =
       req.body;
@@ -820,6 +817,7 @@ export const submitAssessment = async (req, res) => {
 export const findProductsByModel = async (req, res) => {
   try {
     const { category, brand, model } = req.query;
+    console.log('Search params:', { category, brand, model });
 
     const query = { status: 'active' };
 
@@ -841,13 +839,17 @@ export const findProductsByModel = async (req, res) => {
     }
 
     if (brand) {
-      const brandCategory = await Category.findOne({
-        name: { $regex: new RegExp(`^${brand}$`, 'i') },
-        isActive: true,
-      });
+      if (brand.match(/^[0-9a-fA-F]{24}$/)) {
+        query.categoryId = brand;
+      } else {
+        const brandCategory = await Category.findOne({
+          name: { $regex: new RegExp(`^${brand}$`, 'i') },
+          isActive: true,
+        });
 
-      if (brandCategory) {
-        query.categoryId = brandCategory._id;
+        if (brandCategory) {
+          query.categoryId = brandCategory._id;
+        }
       }
     }
 
@@ -857,7 +859,8 @@ export const findProductsByModel = async (req, res) => {
 
     const products = await SellProduct.find(query)
       .populate('categoryId', 'name')
-      .select('_id name images variants categoryId')
+      .populate('series', 'name _id')
+      .select('_id name images variants categoryId series')
       .sort({ name: 1 });
 
     res.json({
@@ -873,4 +876,3 @@ export const findProductsByModel = async (req, res) => {
     });
   }
 };
-

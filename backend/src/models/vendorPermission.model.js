@@ -366,4 +366,3 @@ export const VendorPermission = mongoose.model(
   'VendorPermission',
   vendorPermissionSchema
 );
-

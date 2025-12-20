@@ -8,6 +8,7 @@ export class ApiError extends Error {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 export const errorHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Something went wrong';
@@ -72,4 +73,3 @@ export const asyncHandler = (fn) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };
-

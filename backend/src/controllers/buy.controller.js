@@ -1,5 +1,3 @@
-import { validationResult } from 'express-validator';
-
 import { BuyProduct } from '../models/buyProduct.model.js';
 import { Cart } from '../models/cart.model.js';
 import { Order } from '../models/order.model.js';
@@ -43,7 +41,7 @@ export const searchProducts = async (req, res) => {
         });
       }
 
-      filter.partner = { $in: partnerIds };
+      filter.partnerId = { $in: partnerIds };
     }
 
     let inventoryItems;
@@ -67,7 +65,7 @@ export const searchProducts = async (req, res) => {
     const skip = (page - 1) * limit;
 
     inventoryItems = await BuyProduct.find(filter)
-      .populate('partner', 'shopName address rating')
+      .populate('partnerId', 'shopName address rating')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -89,7 +87,7 @@ export const searchProducts = async (req, res) => {
 export const getProductDetails = async (req, res) => {
   try {
     const product = await BuyProduct.findById(req.params.id).populate(
-      'partner',
+      'partnerId',
       'shopName address phone rating'
     );
 
@@ -98,8 +96,8 @@ export const getProductDetails = async (req, res) => {
     }
 
     const similarProducts = await BuyProduct.find({
-      partner: product.partner._id,
-      category: product.category,
+      partnerId: product.partnerId,
+      categoryId: product.categoryId,
       _id: { $ne: product._id },
       'availability.inStock': true,
     }).limit(4);
@@ -115,11 +113,6 @@ export const getProductDetails = async (req, res) => {
 };
 
 export const addToCart = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { productId, quantity } = req.body;
     const userId = req.user.id;
@@ -256,11 +249,6 @@ export const getCart = async (req, res) => {
 };
 
 export const updateCartItem = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { itemId } = req.params;
     const productId = itemId;
@@ -342,11 +330,6 @@ export const removeCartItem = async (req, res) => {
 };
 
 export const checkout = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
     const { shippingAddress, paymentMethod } = req.body;
     const userId = req.user.id;
@@ -360,7 +343,8 @@ export const checkout = async (req, res) => {
 
     for (const item of cart.items) {
       const product = await BuyProduct.findById(item.productId).populate(
-        'partner'
+        'partnerId',
+        '_id shopName'
       );
 
       if (!product) {
@@ -371,15 +355,33 @@ export const checkout = async (req, res) => {
 
       if (!product.availability.inStock) {
         return res.status(400).json({
-          message: `Product ${product.brand} ${product.model} is no longer available`,
+          message: `Product ${product.brand} ${product.name} is no longer available`,
         });
       }
 
-      const partnerId = product.partner._id.toString();
+      // Extract partnerId from the product - handle both populated and non-populated cases
+      let partnerId = null;
+
+      if (product.partnerId) {
+        // If partnerId is populated (object with _id)
+        if (typeof product.partnerId === 'object' && product.partnerId._id) {
+          partnerId = product.partnerId._id.toString();
+        }
+        // If partnerId is just an ObjectId string
+        else {
+          partnerId = product.partnerId.toString();
+        }
+      }
+
+      if (!partnerId) {
+        return res.status(400).json({
+          message: `Product ${product.brand} ${product.name} is not associated with any partner`,
+        });
+      }
 
       if (!partnerItems[partnerId]) {
         partnerItems[partnerId] = {
-          partner: product.partner,
+          partner: product.partnerId,
           items: [],
         };
       }
@@ -462,11 +464,15 @@ export const getBuyOrderDetails = async (req, res) => {
       orderType: 'buy',
     })
       .populate('partner', 'shopName address phone')
+      .populate(
+        'items.product',
+        'name brand model images pricing categoryId variants conditionOptions isActive'
+      )
       .populate({
         path: 'items.inventory',
         populate: {
           path: 'product',
-          select: 'category brand model variant images',
+          select: 'name category brand model variant images pricing',
         },
       });
 
@@ -492,6 +498,11 @@ export const getUserBuyOrders = async (req, res) => {
       orderType: 'buy',
     })
       .populate('partner', 'shopName')
+      .populate(
+        'items.product',
+        'name brand model images pricing categoryId variants conditionOptions isActive'
+      )
+      .populate('items.inventory', 'condition price')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);

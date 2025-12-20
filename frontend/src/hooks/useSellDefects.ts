@@ -24,7 +24,7 @@ const useSellDefects = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
@@ -56,7 +56,7 @@ const useSellDefects = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const response = await api.get(`/sell-defects/${defectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -77,7 +77,7 @@ const useSellDefects = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await api.post('/sell-defects', defectData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ const useSellDefects = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await api.put(`/sell-defects/${defectId}`, defectData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -131,7 +131,7 @@ const useSellDefects = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         await api.delete(`/sell-defects/${defectId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -156,7 +156,7 @@ const useSellDefects = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await api.post('/sell-defects/bulk', defectsData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -183,7 +183,7 @@ const useSellDefects = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await api.put('/sell-defects/reorder', reorderData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -210,7 +210,7 @@ const useSellDefects = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await api.patch(
           `/sell-defects/${defectId}/toggle`,
           {},

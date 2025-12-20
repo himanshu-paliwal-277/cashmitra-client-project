@@ -16,6 +16,11 @@ const sellOrderSchema = new mongoose.Schema(
       ref: 'Partner',
       required: false,
     },
+    assigned_partner_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Partner',
+      default: null,
+    },
     orderNumber: {
       type: String,
       unique: true,
@@ -23,7 +28,15 @@ const sellOrderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['draft', 'confirmed', 'cancelled', 'picked', 'paid'],
+      enum: [
+        'draft',
+        'open',
+        'pending_acceptance',
+        'confirmed',
+        'cancelled',
+        'picked',
+        'paid',
+      ],
       default: 'draft',
     },
     pickup: {
@@ -57,6 +70,17 @@ const sellOrderSchema = new mongoose.Schema(
           type: String,
           required: [true, 'Pincode is required'],
           trim: true,
+        },
+      },
+      location: {
+        type: {
+          type: String,
+          enum: ['Point'],
+          default: 'Point',
+        },
+        coordinates: {
+          type: [Number], // [longitude, latitude]
+          default: [0, 0],
         },
       },
       slot: {
@@ -107,6 +131,11 @@ const sellOrderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Partner',
     },
+    assignedAgent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Agent',
+      default: null,
+    },
     pickedAt: {
       type: Date,
     },
@@ -130,6 +159,9 @@ sellOrderSchema.index({ orderNumber: 1 }, { unique: true });
 sellOrderSchema.index({ status: 1, createdAt: -1 });
 sellOrderSchema.index({ 'pickup.slot.date': 1, status: 1 });
 sellOrderSchema.index({ assignedTo: 1, status: 1 });
+sellOrderSchema.index({ assigned_partner_id: 1, status: 1 });
+sellOrderSchema.index({ assignedAgent: 1, status: 1 });
+sellOrderSchema.index({ 'pickup.location': '2dsphere' });
 
 sellOrderSchema.virtual('formattedAddress').get(function () {
   const addr = this.pickup.address;
@@ -195,6 +227,26 @@ sellOrderSchema.methods.markPaid = function (transactionId) {
   return this.save();
 };
 
+sellOrderSchema.methods.setPickupLocation = function (latitude, longitude) {
+  this.pickup.location = {
+    type: 'Point',
+    coordinates: [longitude, latitude],
+  };
+  return this;
+};
+
+sellOrderSchema.methods.makeAvailable = function () {
+  this.status = 'open';
+  this.assigned_partner_id = null;
+  return this.save();
+};
+
+sellOrderSchema.methods.assignToPartner = function (partnerId) {
+  this.assigned_partner_id = partnerId;
+  this.status = 'pending_acceptance';
+  return this.save();
+};
+
 sellOrderSchema.statics.getByStatus = function (status, limit = 50, skip = 0) {
   return this.find({ status })
     .populate('userId', 'name email phone')
@@ -212,6 +264,107 @@ sellOrderSchema.statics.getByStatus = function (status, limit = 50, skip = 0) {
     .skip(skip);
 };
 
+sellOrderSchema.statics.findAvailableNearPartner = function (
+  partnerLocation,
+  serviceRadius,
+  limit = 20
+) {
+  const radiusInRadians = serviceRadius / 6378100;
+
+  return this.aggregate([
+    {
+      $match: {
+        assigned_partner_id: null,
+        status: 'open',
+        'pickup.location': {
+          $geoWithin: {
+            $centerSphere: [partnerLocation.coordinates, radiusInRadians],
+          },
+        },
+      },
+    },
+    {
+      $sort: { createdAt: -1 },
+    },
+    {
+      $limit: limit,
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'userId',
+        pipeline: [{ $project: { name: 1, email: 1, phone: 1 } }],
+      },
+    },
+    {
+      $lookup: {
+        from: 'selloffersessions',
+        localField: 'sessionId',
+        foreignField: '_id',
+        as: 'sessionId',
+      },
+    },
+    {
+      $unwind: {
+        path: '$userId',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: '$sessionId',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'sellproducts',
+        localField: 'sessionId.productId',
+        foreignField: '_id',
+        as: 'sessionId.productId',
+        pipeline: [
+          {
+            $project: {
+              name: 1,
+              brand: 1,
+              images: 1,
+              categoryId: 1,
+              variants: 1,
+              isActive: 1,
+              description: 1,
+              specifications: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $unwind: {
+        path: '$sessionId.productId',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+  ]);
+};
+
+sellOrderSchema.statics.claimOrder = function (orderId, partnerId) {
+  return this.findOneAndUpdate(
+    {
+      _id: orderId,
+      assigned_partner_id: null,
+      status: 'open',
+    },
+    {
+      assigned_partner_id: partnerId,
+      status: 'pending_acceptance',
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+};
+
 export const SellOrder = mongoose.model('SellOrder', sellOrderSchema);
-
-

@@ -1,17 +1,13 @@
-import { validationResult } from 'express-validator';
-
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 import { SellQuestion } from '../models/sellQuestion.model.js';
 import { SellSuperCategory } from '../models/sellSuperCategory.model.js';
 
 export var createQuestion = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
   const {
     categoryId,
     section,
@@ -67,11 +63,6 @@ export var createQuestion = asyncHandler(async (req, res) => {
 });
 
 export var getQuestions = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
   const { categoryId, section } = req.query;
 
   const query = { isActive: true };
@@ -137,12 +128,7 @@ export var getQuestionsForCustomer = asyncHandler(async (req, res) => {
 });
 
 export var getCustomerQuestions = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
-  const { productId, variantId } = req.query;
+  const { productId } = req.query;
 
   const product = await SellProduct.findById(productId);
   if (!product) {
@@ -192,11 +178,6 @@ export var getQuestion = asyncHandler(async (req, res) => {
 });
 
 export var updateQuestion = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
   const {
     categoryId,
     section,
@@ -231,7 +212,7 @@ export var updateQuestion = asyncHandler(async (req, res) => {
     }
   }
 
-  const transformedOptions = options?.map(({ tempId, ...opt }) => ({
+  const transformedOptions = options?.map(({ ...opt }) => ({
     ...opt,
     showIf: opt.showIf === null ? undefined : opt.showIf,
   }));

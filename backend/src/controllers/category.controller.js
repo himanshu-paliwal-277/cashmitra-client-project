@@ -1,18 +1,10 @@
-import { validationResult } from 'express-validator';
-
 import {
   ApiError,
   asyncHandler,
 } from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 
-
-export var createCategory = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
+export const createCategory = asyncHandler(async (req, res) => {
   const {
     name,
     description,
@@ -23,12 +15,26 @@ export var createCategory = asyncHandler(async (req, res) => {
     metadata,
   } = req.body;
 
-  const existingCategory = await Category.findOne({ name: name.trim() });
-  if (existingCategory) {
-    throw new ApiError(400, 'Category with this name already exists');
+  if (!name || !name.trim()) {
+    throw new ApiError(400, 'Category name is required');
   }
 
-  const category = new Category({
+  console.log('Creating category with data:', req.body);
+
+  // ✅ uniqueness only inside same superCategory
+  const existingCategory = await Category.findOne({
+    name: name.trim(),
+    superCategory: superCategory || null,
+  });
+
+  if (existingCategory) {
+    throw new ApiError(
+      400,
+      'Category with this name already exists in this super category'
+    );
+  }
+
+  const category = await Category.create({
     name: name.trim(),
     description,
     image,
@@ -39,8 +45,6 @@ export var createCategory = asyncHandler(async (req, res) => {
     metadata,
     createdBy: req.user.id,
   });
-
-  await category.save();
 
   await category.populate('createdBy', 'name email');
 
@@ -90,12 +94,7 @@ export var getCategory = asyncHandler(async (req, res) => {
   });
 });
 
-export var updateCategory = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
+export const updateCategory = asyncHandler(async (req, res) => {
   const category = await Category.findById(req.params.id);
   if (!category) {
     throw new ApiError(404, 'Category not found');
@@ -113,42 +112,49 @@ export var updateCategory = asyncHandler(async (req, res) => {
     sortOrder,
   } = req.body;
 
-  if (name && name.trim() !== category.name) {
-    const existingCategory = await Category.findOne({
-      name: name.trim(),
+  const newName = name?.trim();
+  const newSuperCategory =
+    superCategory !== undefined ? superCategory : category.superCategory;
+
+  // ✅ uniqueness check
+  if (
+    (newName && newName !== category.name) ||
+    (superCategory !== undefined &&
+      String(newSuperCategory) !== String(category.superCategory))
+  ) {
+    const duplicate = await Category.findOne({
+      name: newName || category.name,
+      superCategory: newSuperCategory,
       _id: { $ne: category._id },
     });
-    if (existingCategory) {
-      throw new ApiError(400, 'Category with this name already exists');
+
+    if (duplicate) {
+      throw new ApiError(
+        400,
+        'Category with this name already exists in this super category'
+      );
     }
   }
 
-  const updateFields = {
-    updatedBy: req.user.id,
-  };
+  if (newName) category.name = newName;
+  if (description !== undefined) category.description = description;
+  if (image !== undefined) category.image = image;
+  if (icon !== undefined) category.icon = icon;
+  if (superCategory !== undefined) category.superCategory = superCategory;
+  if (specifications) category.specifications = specifications;
+  if (metadata) category.metadata = metadata;
+  if (isActive !== undefined) category.isActive = isActive;
+  if (sortOrder !== undefined) category.sortOrder = sortOrder;
 
-  if (name) updateFields.name = name.trim();
-  if (description !== undefined) updateFields.description = description;
-  if (image !== undefined) updateFields.image = image;
-  if (icon !== undefined) updateFields.icon = icon;
-  if (superCategory !== undefined) updateFields.superCategory = superCategory;
-  if (specifications) updateFields.specifications = specifications;
-  if (metadata) updateFields.metadata = metadata;
-  if (isActive !== undefined) updateFields.isActive = isActive;
-  if (sortOrder !== undefined) updateFields.sortOrder = sortOrder;
+  category.updatedBy = req.user.id;
+  await category.save();
 
-  const updatedCategory = await Category.findByIdAndUpdate(
-    req.params.id,
-    updateFields,
-    { new: true, runValidators: true }
-  );
-
-  await updatedCategory.populate('updatedBy', 'name');
+  await category.populate('updatedBy', 'name');
 
   res.json({
     success: true,
     message: 'Category updated successfully',
-    data: updatedCategory,
+    data: category,
   });
 });
 
@@ -181,11 +187,6 @@ export var getCategoryStats = asyncHandler(async (req, res) => {
 });
 
 export var bulkUpdateStatus = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
   const { categoryIds, isActive } = req.body;
 
   if (!Array.isArray(categoryIds) || categoryIds.length === 0) {

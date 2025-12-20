@@ -31,7 +31,12 @@
       "Bash(done)",
       "Bash(node:*)",
       "Bash(for f in *.model.js)",
-      "Bash(do sed -i '/^export { \\w\\+ };/d' \"$f\")"
+      "Bash(do sed -i '/^export { \\w\\+ };/d' \"$f\")",
+      "Bash(curl:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm run:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

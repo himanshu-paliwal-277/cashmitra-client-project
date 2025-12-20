@@ -1,5 +1,3 @@
-import { validationResult } from 'express-validator';
-
 import { asyncHandler } from '../middlewares/errorHandler.middleware.js';
 import { Order } from '../models/order.model.js';
 import { Pickup } from '../models/pickup.model.js';
@@ -8,11 +6,6 @@ import { User } from '../models/user.model.js';
 import ApiError from '../utils/apiError.js';
 
 export var createPickup = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError('Validation failed', 400, errors.array());
-  }
-
   const {
     orderId,
     orderType,
@@ -649,11 +642,6 @@ export var getPickupSlots = asyncHandler(async (req, res) => {
 });
 
 export var updatePickup = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError('Validation failed', 400, errors.array());
-  }
-
   const pickup = await Pickup.findById(req.params.pickupId);
   if (!pickup) {
     throw new ApiError(404, 'Pickup not found');

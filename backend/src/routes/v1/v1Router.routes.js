@@ -1,5 +1,4 @@
 import express from 'express';
-const router = express.Router();
 
 import adminRoutes from './admin.routes.js';
 import agentRoutes from './agent.routes.js';
@@ -25,15 +24,19 @@ import sellOrderRoutes from './sellOrder.routes.js';
 import sellProductRoutes from './sellProduct.routes.js';
 import sellQuestionRoutes from './sellQuestion.routes.js';
 import sellSuperCategoryRoutes from './sellSuperCategory.routes.js';
+import seriesRoutes from './series.routes.js';
 import uploadRoutes from './upload.routes.js';
 import userRoutes from './user.routes.js';
 import vendorRoutes from './vendor.routes.js';
 import walletRoutes from './wallet.routes.js';
 
+const router = express.Router();
+
 router.use('/auth', authRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/buy-super-categories', buySuperCategoryRoutes);
 router.use('/sell-super-categories', sellSuperCategoryRoutes);
+router.use('/series', seriesRoutes);
 router.use('/buy-categories', buyCategoryRoutes);
 router.use('/buy-products', buyProductRoutes);
 router.use('/user', userRoutes);

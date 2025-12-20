@@ -17,7 +17,7 @@ const SellSuperCategoryManagement = () => {
     try {
       setLoading(true);
       setError('');
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
 
       let url = `${API_BASE_URL}/sell-super-categories?`;
       if (filterActive !== 'all') {
@@ -71,7 +71,7 @@ const SellSuperCategoryManagement = () => {
     }
 
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/sell-super-categories/${id}`, {
         method: 'DELETE',
         headers: {

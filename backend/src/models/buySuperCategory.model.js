@@ -78,5 +78,3 @@ export const BuySuperCategory = mongoose.model(
   'BuySuperCategory',
   buySuperCategorySchema
 );
-
-

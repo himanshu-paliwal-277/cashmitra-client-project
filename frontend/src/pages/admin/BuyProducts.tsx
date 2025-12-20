@@ -128,10 +128,6 @@ const BuyProducts = () => {
     setProductToDelete(null);
   };
 
-  const handleAddProduct = () => {
-    navigate('/admin/buy-products/add');
-  };
-
   const handleEditProduct = (product: any) => {
     navigate(`/admin/buy-products/edit/${product._id}`);
   };
@@ -182,14 +178,14 @@ const BuyProducts = () => {
     return (
       <div
         key={product._id}
-        className="border border-gray-200 rounded-xl overflow-hidden transition-all duration-200 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 bg-white"
+        className="border border-gray-200 rounded-xl overflow-hidden transition-all duration-200 hover:shadow-xl hover:border-emerald-500 bg-white"
       >
-        <div className="h-48 bg-gray-100 flex items-center justify-center text-gray-400 relative overflow-hidden">
+        <div className="h-48 flex items-center justify-center text-gray-400 relative overflow-hidden">
           {productImage ? (
             <img
               src={productImage.replace(/`/g, '').trim()}
               alt={product.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain p-3"
               onError={(e: any) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
@@ -278,12 +274,15 @@ const BuyProducts = () => {
               <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                 <td className="p-4 border-b border-gray-200 text-gray-700">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0"
+                      style={{ boxShadow: '0px 0px 1px black' }}
+                    >
                       {productImage ? (
                         <img
                           src={productImage.replace(/`/g, '').trim()}
                           alt={product.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain p-0.5"
                           onError={(e: any) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
@@ -366,13 +365,6 @@ const BuyProducts = () => {
             Buy Products
           </h1>
         </div>
-        <button
-          onClick={handleAddProduct}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg"
-        >
-          <Plus size={20} />
-          <span>Add Product</span>
-        </button>
       </div>
 
       {/* Stats Grid */}

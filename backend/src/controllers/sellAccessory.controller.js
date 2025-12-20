@@ -1,18 +1,17 @@
-import { validationResult } from 'express-validator';
+import mongoose from 'mongoose';
 
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
+import { Category } from '../models/category.model.js';
 import { SellAccessory } from '../models/sellAccessory.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 
 export var createAccessory = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
   const { categoryId, key, title, delta } = req.body;
 
-  const Category = require('../models/category.model');
+  // Category is already imported at the top
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
@@ -80,14 +79,9 @@ export var getAccessoriesForCustomer = asyncHandler(async (req, res) => {
 });
 
 export var getCustomerAccessories = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
   const { categoryId } = req.query;
 
-  const Category = require('../models/category.model');
+  // Category is already imported at the top
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
@@ -120,12 +114,8 @@ export var getAccessory = asyncHandler(async (req, res) => {
 });
 
 export var updateAccessory = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
-  const { key, title, delta, isActive, order } = req.body;
+  // const { key, title, delta, isActive, order } = req.body;
+  const { key } = req.body;
 
   const accessory = await SellAccessory.findById(req.params.id);
   if (!accessory) {
@@ -209,9 +199,7 @@ export var reindexAccessoryOrders = asyncHandler(async (req, res) => {
 
 export var migrateAndReindexAccessories = asyncHandler(async (req, res) => {
   try {
-    const SellProduct = require('../models/sellProduct.model');
-    const mongoose = require('mongoose');
-
+    // SellProduct and mongoose are already imported at the top
     const accessories = await SellAccessory.find({}).lean();
 
     let migratedCount = 0;
@@ -295,7 +283,7 @@ export var deleteAccessory = asyncHandler(async (req, res) => {
 export var bulkCreateAccessories = asyncHandler(async (req, res) => {
   const { categoryId, accessories } = req.body;
 
-  const Category = require('../models/category.model');
+  // Category is already imported at the top
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');
@@ -362,7 +350,7 @@ export var bulkCreateAccessories = asyncHandler(async (req, res) => {
 export var reorderAccessories = asyncHandler(async (req, res) => {
   const { categoryId, accessoryIds } = req.body;
 
-  const Category = require('../models/category.model');
+  // Category is already imported at the top
   const category = await Category.findById(categoryId);
   if (!category) {
     throw new ApiError(404, 'Category not found');

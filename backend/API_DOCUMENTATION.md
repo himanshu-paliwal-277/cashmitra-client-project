@@ -1,8 +1,8 @@
-# Cashify Backend API Documentation
+# Cashmitra Backend API Documentation
 
 ## Overview
 
-The Cashify Backend API provides comprehensive endpoints for managing a marketplace platform for buying and selling electronic devices. The API follows RESTful conventions and includes proper authentication, validation, and error handling.
+The Cashmitra Backend API provides comprehensive endpoints for managing a marketplace platform for buying and selling electronic devices. The API follows RESTful conventions and includes proper authentication, validation, and error handling.
 
 ## Base URL
 
@@ -853,7 +853,7 @@ Use the following test credentials for API testing:
 
 **Admin User:**
 
-- Email: `admin@cashify.com`
+- Email: `admin@cashmitra.com`
 - Password: `admin123`
 
 **Partner User:**
@@ -870,7 +870,7 @@ Use the following test credentials for API testing:
 
 ```
 Base URL: http://localhost:5000/api
-Database: cashify_test
+Database: cashmitra_test
 ```
 
 ---
@@ -879,6 +879,6 @@ Database: cashify_test
 
 For API support and questions:
 
-- Email: api-support@cashify.com
-- Documentation: https://docs.cashify.com
-- Status Page: https://status.cashify.com
+- Email: api-support@cashmitra.com
+- Documentation: https://docs.cashmitra.com
+- Status Page: https://status.cashmitra.com

@@ -1,17 +1,15 @@
-import { validationResult } from 'express-validator';
-
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { Category } from '../models/category.model.js';
 import { SellConfig } from '../models/sellConfig.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 
 export var createProduct = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
+  const { categoryId, name, images, variants, tags, seriesId } = req.body;
 
-  const { categoryId, name, images, variants, tags } = req.body;
+  console.log('create product req.body:', req.body);
 
   const existingProduct = await SellProduct.findOne({ name: name.trim() });
   if (existingProduct) {
@@ -30,6 +28,7 @@ export var createProduct = asyncHandler(async (req, res) => {
     variants: variants || [],
     tags: tags || [],
     partnerId: partnerId,
+    series: seriesId || null,
     createdBy: req.user.id,
   });
 
@@ -49,7 +48,7 @@ export var createProduct = asyncHandler(async (req, res) => {
 });
 
 export var getProducts = asyncHandler(async (req, res) => {
-  const { status, categoryId, search } = req.query;
+  const { status, categoryId, seriesId, search } = req.query;
 
   const query = {};
 
@@ -59,6 +58,12 @@ export var getProducts = asyncHandler(async (req, res) => {
 
   if (status) query.status = status;
   if (categoryId) query.categoryId = categoryId;
+
+  // ✅ Series filter
+  if (seriesId) {
+    query.series = seriesId;
+  }
+
   if (search) {
     query.$or = [
       { name: { $regex: search, $options: 'i' } },
@@ -68,6 +73,7 @@ export var getProducts = asyncHandler(async (req, res) => {
 
   const products = await SellProduct.find(query)
     .populate('categoryId', 'name')
+    .populate('series', 'name')
     .populate('createdBy', 'name email')
     .sort({ createdAt: -1 });
 
@@ -93,12 +99,7 @@ export var getProduct = asyncHandler(async (req, res) => {
 });
 
 export var updateProduct = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
-  const { name, categoryId, images, variants, tags, status } = req.body;
+  const { name, categoryId, images, variants, tags, status, seriesId } = req.body;
 
   const product = await SellProduct.findById(req.params.id);
   if (!product) {
@@ -121,6 +122,7 @@ export var updateProduct = asyncHandler(async (req, res) => {
   if (variants !== undefined) product.variants = variants;
   if (tags !== undefined) product.tags = tags;
   if (status) product.status = status;
+  if (seriesId) product.series = seriesId;
 
   await product.save();
 
@@ -259,11 +261,6 @@ export var getProductStats = asyncHandler(async (req, res) => {
 });
 
 export var getCustomerProducts = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
   const {
     page = 1,
     limit = 20,

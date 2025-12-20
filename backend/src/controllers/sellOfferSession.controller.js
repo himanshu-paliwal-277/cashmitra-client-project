@@ -1,18 +1,15 @@
-import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { SellAccessory } from '../models/sellAccessory.model.js';
 import { SellDefect } from '../models/sellDefect.model.js';
 import { SellOfferSession } from '../models/sellOfferSession.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 
 export var createSession = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
   const { userId, productId, variantId, answers, defects, accessories } =
     req.body;
 
@@ -358,7 +355,7 @@ export var getAllSessions = asyncHandler(async (req, res) => {
     limit = 10,
     search = '',
     status = 'all',
-    deviceType = 'all',
+    // deviceType = 'all',
     sortBy = 'createdAt',
     sortOrder = 'desc',
   } = req.query;

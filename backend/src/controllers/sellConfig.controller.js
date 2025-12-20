@@ -1,15 +1,11 @@
-import { validationResult } from 'express-validator';
-
-import { ApiError, asyncHandler } from '../middlewares/errorHandler.middleware.js';
+import {
+  ApiError,
+  asyncHandler,
+} from '../middlewares/errorHandler.middleware.js';
 import { SellConfig } from '../models/sellConfig.model.js';
 import { SellProduct } from '../models/sellProduct.model.js';
 
 export var createOrUpdateConfig = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
   const { productId, steps, rules } = req.body;
 
   const product = await SellProduct.findById(productId);
@@ -95,11 +91,6 @@ export var getConfigForCustomer = asyncHandler(async (req, res) => {
 });
 
 export var getCustomerConfig = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    throw new ApiError(400, 'Validation Error', errors.array());
-  }
-
   const { productId } = req.params;
 
   const product = await SellProduct.findById(productId);

@@ -1,7 +1,10 @@
 import express from 'express';
 const router = express.Router();
 import * as buySuperCategoryController from '../../controllers/buySuperCategory.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
+import {
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
 
 router.get('/public', buySuperCategoryController.getPublicSuperCategories);
 
@@ -10,7 +13,7 @@ router.get(
   buySuperCategoryController.getPublicCategoriesBySuperCategory
 );
 
-router.use(protect);
+router.use(isAuthenticated);
 
 router.use(authorize('admin'));
 

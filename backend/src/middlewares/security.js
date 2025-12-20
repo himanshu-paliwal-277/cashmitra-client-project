@@ -304,4 +304,3 @@ export const applySecurity = (app) => {
     validateContentType(['application/json', 'multipart/form-data'])
   );
 };
-

@@ -11,19 +11,14 @@ const api = axios.create({
   },
 });
 
-// Attach auth token if present (admin/vendor/user)
+// Attach auth token if present
+// Using consistent 'token' key for all user types (customer, admin, vendor, partner)
 api.interceptors.request.use(
   config => {
-    const adminToken = localStorage.getItem('adminToken');
-    const vendorToken = localStorage.getItem('vendorToken');
-    const userToken = localStorage.getItem('authToken');
+    const token = localStorage.getItem('token');
 
-    if (adminToken) {
-      config.headers.Authorization = `Bearer ${adminToken}`;
-    } else if (vendorToken) {
-      config.headers.Authorization = `Bearer ${vendorToken}`;
-    } else if (userToken) {
-      config.headers.Authorization = `Bearer ${userToken}`;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },

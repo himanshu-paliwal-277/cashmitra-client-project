@@ -32,21 +32,24 @@ export const PartnerAuthProvider = ({ children }: any) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const token = localStorage.getItem('partnerToken');
-        const storedPartner = localStorage.getItem('partnerData');
+        const token = localStorage.getItem('token');
+        const storedPartner = localStorage.getItem('userData');
 
         if (token && storedPartner) {
           const partnerData = JSON.parse(storedPartner);
-          setPartner(partnerData);
+          // Check if user is partner
+          if (partnerData.role === 'partner') {
+            setPartner(partnerData);
 
-          // Fetch fresh permissions and role data
-          await fetchPartnerPermissions(partnerData._id);
+            // Fetch fresh permissions and role data
+            await fetchPartnerPermissions(partnerData._id);
+          }
         }
       } catch (error) {
         console.error('Error initializing partner auth:', error);
         // Clear invalid data
-        localStorage.removeItem('partnerToken');
-        localStorage.removeItem('partnerData');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
       } finally {
         setLoading(false);
       }
@@ -58,7 +61,7 @@ export const PartnerAuthProvider = ({ children }: any) => {
   // Fetch partner permissions
   const fetchPartnerPermissions = async (partnerId: any) => {
     try {
-      const token = localStorage.getItem('partnerToken');
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/partner-permissions`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -101,9 +104,9 @@ export const PartnerAuthProvider = ({ children }: any) => {
       const data = await response.json();
 
       if (response.ok) {
-        // Store auth data
-        localStorage.setItem('partnerToken', data.token);
-        localStorage.setItem('partnerData', JSON.stringify(data));
+        // Store auth data with consistent naming
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userData', JSON.stringify(data));
 
         setPartner(data);
 
@@ -127,8 +130,8 @@ export const PartnerAuthProvider = ({ children }: any) => {
 
   // Partner logout
   const logout = () => {
-    localStorage.removeItem('partnerToken');
-    localStorage.removeItem('partnerData');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userData');
     setPartner(null);
     setPermissions(null);
     setRoleTemplate(null);
@@ -180,7 +183,7 @@ export const PartnerAuthProvider = ({ children }: any) => {
   // Update partner profile
   const updateProfile = async (profileData: any) => {
     try {
-      const token = localStorage.getItem('partnerToken');
+      const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/partners/profile`, {
         method: 'PUT',
         headers: {
@@ -195,7 +198,7 @@ export const PartnerAuthProvider = ({ children }: any) => {
       if (response.ok) {
         const updatedPartner = { ...partner, ...data.partner };
         setPartner(updatedPartner);
-        localStorage.setItem('partnerData', JSON.stringify(updatedPartner));
+        localStorage.setItem('userData', JSON.stringify(updatedPartner));
         toast.success('Profile updated successfully');
         return { success: true, partner: updatedPartner };
       } else {
@@ -218,7 +221,7 @@ export const PartnerAuthProvider = ({ children }: any) => {
 
   // Check if partner is authenticated
   const isAuthenticated = () => {
-    return !!partner && !!localStorage.getItem('partnerToken');
+    return !!partner && !!localStorage.getItem('token');
   };
 
   // Get partner's verification status

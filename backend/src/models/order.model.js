@@ -22,6 +22,11 @@ const orderSchema = new mongoose.Schema(
       ref: 'Partner',
       required: false,
     },
+    assignedAgent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Agent',
+      required: false,
+    },
     items: [
       {
         inventory: {

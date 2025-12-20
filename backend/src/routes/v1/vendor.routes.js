@@ -1,145 +1,90 @@
 import express from 'express';
-import { check } from 'express-validator';
 
 import * as vendorController from '../../controllers/vendor.controller.js';
-import { authorize, protect } from '../../middlewares/auth.middleware.js';
-import { asyncHandler } from '../../middlewares/errorHandler.middleware.js';
-import { authLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import {
-  validateObjectId,
-  validateRequest,
-} from '../../middlewares/validation.middleware.js';
+  authorize,
+  isAuthenticated,
+} from '../../middlewares/auth.middleware.js';
+import { authLimiter } from '../../middlewares/rateLimiter.middleware.js';
+import { validateObjectId } from '../../middlewares/validation.middleware.js';
+import { validate } from '../../validators/validator.js';
+import {
+  createVendorSchema,
+  getAllVendorsSchema,
+  loginVendorSchema,
+  toggleVendorStatusSchema,
+  updateVendorPermissionsSchema,
+} from '../../validators/vendor.validation.js';
 
 const router = express.Router();
 
 router.post(
   '/login',
   authLimiter,
-  [
-    check('email').isEmail().withMessage('Please include a valid email'),
-    check('password').notEmpty().withMessage('Password is required'),
-  ],
-  validateRequest,
-  asyncHandler(vendorController.loginVendor)
+  validate(loginVendorSchema),
+  vendorController.loginVendor
 );
-
 router.get(
   '/profile',
-  protect,
+  isAuthenticated,
   authorize('vendor'),
-  asyncHandler(vendorController.getVendorProfile)
+  vendorController.getVendorProfile
 );
-
 router.get(
   '/permissions',
-  protect,
+  isAuthenticated,
   authorize('vendor'),
-  asyncHandler(vendorController.getVendorPermissions)
+  vendorController.getVendorPermissions
 );
-
 router.get(
   '/admin/vendors',
-  protect,
+  isAuthenticated,
   authorize('admin'),
-  [
-    check('page')
-      .optional()
-      .isInt({ min: 1 })
-      .withMessage('Page must be a positive integer'),
-    check('limit')
-      .optional()
-      .isInt({ min: 1, max: 50 })
-      .withMessage('Limit must be between 1 and 50'),
-    check('search')
-      .optional()
-      .isString()
-      .withMessage('Search must be a string'),
-    check('status')
-      .optional()
-      .isIn(['all', 'active', 'inactive'])
-      .withMessage('Invalid status filter'),
-  ],
-  validateRequest,
-  asyncHandler(vendorController.getAllVendors)
+  validate(getAllVendorsSchema),
+  vendorController.getAllVendors
 );
-
 router.post(
   '/admin/create',
-  protect,
+  isAuthenticated,
   authorize('admin'),
-  [
-    check('name').notEmpty().withMessage('Name is required'),
-    check('email').isEmail().withMessage('Please include a valid email'),
-    check('password')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters long'),
-    check('phone')
-      .optional()
-      .isMobilePhone()
-      .withMessage('Please include a valid phone number'),
-    check('roleTemplate')
-      .optional()
-      .isIn(['basic', 'advanced', 'full'])
-      .withMessage('Invalid role template'),
-  ],
-  validateRequest,
-  asyncHandler(vendorController.createVendor)
+  validate(createVendorSchema),
+  vendorController.createVendor
 );
-
 router.get(
   '/admin/:vendorId/permissions',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateObjectId('vendorId'),
-  asyncHandler(vendorController.getVendorPermissionsAdmin)
+  vendorController.getVendorPermissionsAdmin
 );
-
 router.put(
   '/admin/:vendorId/permissions',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateObjectId('vendorId'),
-  [
-    check('permissions')
-      .optional()
-      .isObject()
-      .withMessage('Permissions must be an object'),
-    check('roleTemplate')
-      .optional()
-      .isIn(['basic', 'advanced', 'full'])
-      .withMessage('Invalid role template'),
-    check('notes').optional().isString().withMessage('Notes must be a string'),
-  ],
-  validateRequest,
-  asyncHandler(vendorController.updateVendorPermissions)
+  validate(updateVendorPermissionsSchema),
+  vendorController.updateVendorPermissions
 );
-
 router.put(
   '/admin/:vendorId/status',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateObjectId('vendorId'),
-  [
-    check('isActive').isBoolean().withMessage('isActive must be a boolean'),
-    check('notes').optional().isString().withMessage('Notes must be a string'),
-  ],
-  validateRequest,
-  asyncHandler(vendorController.toggleVendorStatus)
+  validate(toggleVendorStatusSchema),
+  vendorController.toggleVendorStatus
 );
-
 router.delete(
   '/admin/:vendorId',
-  protect,
+  isAuthenticated,
   authorize('admin'),
   validateObjectId('vendorId'),
-  asyncHandler(vendorController.deleteVendor)
+  vendorController.deleteVendor
 );
-
 router.get(
   '/admin/menu-items',
-  protect,
+  isAuthenticated,
   authorize('admin'),
-  asyncHandler(vendorController.getMenuItems)
+  vendorController.getMenuItems
 );
 
 export default router;

@@ -1,8 +1,5 @@
-import { validationResult } from 'express-validator';
-
 import { BuyCategory } from '../models/buyCategory.model.js';
 import { BuyProduct } from '../models/buyProduct.model.js';
-import { processArrayFields } from '../utils/dataProcessing.utils.js';
 
 export const getBuyProducts = async (req, res) => {
   try {
@@ -257,15 +254,6 @@ function normalizeBuyProductInput(input = {}) {
 // ✅ Updated createBuyProduct
 export const createBuyProduct = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array(),
-      });
-    }
-
     const category = await BuyCategory.findById(req.body.categoryId);
     if (!category) {
       return res.status(400).json({
@@ -309,15 +297,6 @@ export const createBuyProduct = async (req, res) => {
 
 export const updateBuyProduct = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array(),
-      });
-    }
-
     if (req.body.categoryId) {
       const category = await BuyCategory.findById(req.body.categoryId);
       if (!category) {
@@ -349,20 +328,20 @@ export const updateBuyProduct = async (req, res) => {
       }
     }
 
-    const processedData = processArrayFields(req.body);
+    // const processedData = processArrayFields(req.body);
 
-    const updateData = {
-      ...processedData,
-      updatedBy: req.user.id,
-    };
+    // const updateData = {
+    //   ...processedData,
+    //   updatedBy: req.user.id,
+    // };
 
-    const product = await BuyProduct.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true, runValidators: true }
-    )
-      .populate('categoryId', 'name')
-      .populate('updatedBy', 'name email');
+    // const product = await BuyProduct.findByIdAndUpdate(
+    //   req.params.id,
+    //   updateData,
+    //   { new: true, runValidators: true }
+    // )
+    //   .populate('categoryId', 'name')
+    //   .populate('updatedBy', 'name email');
 
     res.json({
       success: true,
@@ -608,4 +587,3 @@ export const getBuyProductsByCategory = async (req, res) => {
     });
   }
 };
-

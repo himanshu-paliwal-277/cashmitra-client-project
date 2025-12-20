@@ -1,16 +1,9 @@
-import { validationResult } from 'express-validator';
-
 import { User } from '../models/user.model.js';
 import { VendorPermission } from '../models/vendorPermission.model.js';
 import { generateToken } from '../utils/jwt.utils.js';
 
 export const loginVendor = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { email, password } = req.body;
 
     const user = await User.findOne({ email, role: 'vendor' }).select(
@@ -167,11 +160,6 @@ export const getAllVendors = async (req, res) => {
 
 export const createVendor = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { name, email, password, phone, roleTemplate = 'basic' } = req.body;
 
     const userExists = await User.findOne({ email });
@@ -381,4 +369,3 @@ export const getMenuItems = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
-

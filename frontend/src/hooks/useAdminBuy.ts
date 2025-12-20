@@ -16,7 +16,7 @@ const useAdminBuy = () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem('token');
       const response = await fetch('/api/admin/buy-orders', {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -60,7 +60,7 @@ const useAdminBuy = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/admin/orders/${orderId}/status`, {
           method: 'PUT',
           headers: {
@@ -92,7 +92,7 @@ const useAdminBuy = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await fetch('/api/admin/buy-orders', {
           method: 'POST',
           headers: {
@@ -124,7 +124,7 @@ const useAdminBuy = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('token');
         const response = await fetch(`/api/admin/buy-orders/${orderId}`, {
           method: 'DELETE',
           headers: {

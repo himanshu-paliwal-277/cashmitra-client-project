@@ -1,5 +1,3 @@
-import { validationResult } from 'express-validator';
-
 import { Address } from '../models/address.model.js';
 import { Order } from '../models/order.model.js';
 import { User } from '../models/user.model.js';
@@ -33,11 +31,6 @@ export const getUserProfile = async (req, res) => {
 
 export const updateUserProfile = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -100,7 +93,10 @@ export const getUserOrders = async (req, res) => {
 
     const orders = await Order.find(query)
       .populate('partner', 'name email phone')
-      .populate('items.product', 'name brand model images')
+      .populate(
+        'items.product',
+        'name brand model images pricing categoryId variants conditionOptions isActive'
+      )
       .populate('items.inventory', 'condition price')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
@@ -128,7 +124,10 @@ export const getOrderById = async (req, res) => {
       user: req.user._id,
     })
       .populate('partner', 'name email phone address')
-      .populate('items.product', 'name brand model images specifications')
+      .populate(
+        'items.product',
+        'name brand model images specifications pricing categoryId variants conditionOptions isActive'
+      )
       .populate('items.inventory', 'condition price');
 
     if (!order) {
@@ -158,11 +157,6 @@ export const getUserAddresses = async (req, res) => {
 
 export const addAddress = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const addressData = {
       ...req.body,
       user: req.user._id,
@@ -180,11 +174,6 @@ export const addAddress = async (req, res) => {
 
 export const updateAddress = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const address = await Address.findOne({
       _id: req.params.id,
       user: req.user._id,
@@ -251,4 +240,3 @@ export const setDefaultAddress = async (req, res) => {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
-

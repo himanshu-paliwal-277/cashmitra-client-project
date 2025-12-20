@@ -13,6 +13,8 @@ import {
   Building2,
   Wallet,
   Smartphone,
+  Navigation,
+  AlertCircle,
 } from 'lucide-react';
 
 const PickupBooking = () => {
@@ -43,9 +45,13 @@ const PickupBooking = () => {
     selectedDate: '',
     selectedTime: '',
     paymentType: 'bank_transfer',
+    latitude: '',
+    longitude: '',
   });
 
   const [selectedDateInfo, setSelectedDateInfo] = useState(null);
+  const [gettingLocation, setGettingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   // Generate next 5 days starting from tomorrow based on current date
   const getPickupDates = () => {
@@ -69,6 +75,7 @@ const PickupBooking = () => {
   const timeSlots = [
     { id: 'morning', label: '10:00 AM - 03:00 PM' },
     { id: 'afternoon', label: '03:00 PM - 06:00 PM' },
+    { id: 'evening', label: '06:00 PM - 08:00 PM' },
   ];
 
   const paymentOptions = [
@@ -115,6 +122,32 @@ const PickupBooking = () => {
     }));
   };
 
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setGettingLocation(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        setFormData(prev => ({
+          ...prev,
+          latitude: position.coords.latitude.toFixed(6),
+          longitude: position.coords.longitude.toFixed(6),
+        }));
+        setGettingLocation(false);
+      },
+      error => {
+        setLocationError('Unable to get your location. Please enter coordinates manually.');
+        setGettingLocation(false);
+        console.error('Geolocation error:', error);
+      }
+    );
+  };
+
   // Helper function to get user data from localStorage
   const getUserFromLocalStorage = () => {
     try {
@@ -129,15 +162,48 @@ const PickupBooking = () => {
   };
 
   const getTotalAmount = () => {
-    const amount = priceData?.totalAmount || 1151;
-    return amount;
+    // If priceData.totalAmount is already calculated with processing fee deducted, use it
+    // Otherwise calculate: device value - processing fee
+    if (priceData?.totalAmount !== undefined) {
+      return priceData.totalAmount;
+    }
+    const deviceValue = priceData?.quotedPrice || priceData?.basePrice || 1200;
+    return Math.max(deviceValue - 49, 0);
   };
 
   const handleContinue = async () => {
     if (currentStep === 1) {
-      // Validate address
-      if (!formData.pincode || !formData.flatNo || !formData.locality) {
-        setSubmitError('Please fill all required address fields');
+      // Validate address and location - all required fields
+      const missingFields = [];
+      if (!formData.pincode) missingFields.push('Pincode');
+      if (!formData.flatNo) missingFields.push('Flat No/Office');
+      if (!formData.locality) missingFields.push('Locality/Area/Street');
+      if (!formData.city) missingFields.push('City');
+      if (!formData.state) missingFields.push('State');
+      if (!formData.fullName) missingFields.push('Full Name');
+
+      if (missingFields.length > 0) {
+        setSubmitError(`Please fill the following required fields: ${missingFields.join(', ')}`);
+        return;
+      }
+
+      // Validate pincode format (Indian pincode: 6 digits, first digit cannot be 0)
+      const pincodeRegex = /^[1-9][0-9]{5}$/;
+      if (!pincodeRegex.test(formData.pincode)) {
+        setSubmitError('Please enter a valid 6-digit Indian pincode');
+        return;
+      }
+
+      // Validate full name (at least 2 characters)
+      if (formData.fullName.trim().length < 2) {
+        setSubmitError('Full name must be at least 2 characters long');
+        return;
+      }
+
+      if (!formData.latitude || !formData.longitude) {
+        setSubmitError(
+          'Location coordinates are required. Please use "Get Current Location" or enter manually.'
+        );
         return;
       }
       setCurrentStep(2);
@@ -224,13 +290,17 @@ const PickupBooking = () => {
           orderNumber: `ORD${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
           pickup: {
             address: {
-              fullName: userData?.name || formData.fullName || 'User',
-              phone: formData.alternateNumber || userData?.phone || '1234567890',
+              fullName: formData.fullName || userData?.name || 'User',
+              phone: userData?.phone || formData.alternateNumber || '1234567890',
               street:
                 `${formData.flatNo}, ${formData.locality}${formData.landmark ? `, Near ${formData.landmark}` : ''}`.trim(),
               city: formData.city,
-              state: formData.state || 'Delhi',
+              state: formData.state,
               pincode: formData.pincode,
+            },
+            location: {
+              type: 'Point',
+              coordinates: [parseFloat(formData.longitude), parseFloat(formData.latitude)], // [longitude, latitude]
             },
             slot: {
               date: new Date(formData.selectedDate),
@@ -325,7 +395,7 @@ const PickupBooking = () => {
     'Variant';
   const displayName = `${deviceName} (${variantLabel})`;
   const basePrice = priceData?.quotedPrice || priceData?.basePrice || 0;
-  const totalPrice = priceData?.totalAmount || getTotalAmount();
+  const totalPrice = getTotalAmount();
 
   return (
     <div className="booking-pickup-booking-page">
@@ -355,6 +425,27 @@ const PickupBooking = () => {
           <div className="booking-step-content">
             {currentStep === 1 && (
               <div className="booking-address-fields">
+                <div
+                  style={{
+                    backgroundColor: '#e3f2fd',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    marginBottom: '20px',
+                    border: '1px solid #bbdefb',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: '14px',
+                      color: '#1565c0',
+                      margin: 0,
+                      fontWeight: '500',
+                    }}
+                  >
+                    📝 Please fill all required fields marked with{' '}
+                    <span style={{ color: '#dc3545' }}>*</span> to proceed
+                  </p>
+                </div>
                 <div className="booking-input-group">
                   <label className="booking-input-label">
                     Enter Pincode
@@ -362,9 +453,10 @@ const PickupBooking = () => {
                   </label>
                   <input
                     className="booking-styled-input"
-                    placeholder="Pincode"
+                    placeholder="Enter 6-digit pincode (e.g., 110001)"
                     value={formData.pincode}
                     onChange={e => handleInputChange('pincode', e.target.value)}
+                    maxLength={6}
                   />
                 </div>
 
@@ -403,12 +495,40 @@ const PickupBooking = () => {
                 </div>
 
                 <div className="booking-input-group">
-                  <label className="booking-input-label">City (optional)</label>
+                  <label className="booking-input-label">
+                    City <span className="text-red-500 relative top-[-2px]">*</span>
+                  </label>
                   <input
                     className="booking-styled-input"
                     placeholder="City"
                     value={formData.city}
                     onChange={e => handleInputChange('city', e.target.value)}
+                  />
+                </div>
+
+                <div className="booking-input-group">
+                  <label className="booking-input-label">
+                    State <span className="text-red-500 relative top-[-2px]">*</span>
+                  </label>
+                  <input
+                    className="booking-styled-input"
+                    placeholder="State"
+                    value={formData.state}
+                    onChange={e => handleInputChange('state', e.target.value)}
+                  />
+                </div>
+
+                <div className="booking-input-group">
+                  <label className="booking-input-label">
+                    Full Name <span className="text-red-500 relative top-[-2px]">*</span>
+                  </label>
+                  <input
+                    className="booking-styled-input"
+                    placeholder="Enter your full name"
+                    value={formData.fullName}
+                    onChange={e => handleInputChange('fullName', e.target.value)}
+                    minLength={2}
+                    maxLength={100}
                   />
                 </div>
 
@@ -422,10 +542,182 @@ const PickupBooking = () => {
                   />
                 </div>
 
-                {/* <button className="booking-location-button">
-                  <MapPin size={18} />
-                  Use my current location
-                </button> */}
+                {/* Location Section */}
+                <div
+                  className="booking-location-section"
+                  style={{
+                    marginTop: '20px',
+                    padding: '16px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    border: '1px solid #e9ecef',
+                  }}
+                >
+                  <div
+                    className="booking-input-label"
+                    style={{
+                      marginBottom: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <MapPin size={18} style={{ color: '#dc3545' }} />
+                    Location Coordinates <span className="text-red-500 relative top-[-2px]">*</span>
+                  </div>
+
+                  <div
+                    style={{
+                      backgroundColor: '#e3f2fd',
+                      padding: '12px',
+                      borderRadius: '6px',
+                      marginBottom: '16px',
+                      border: '1px solid #bbdefb',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
+                      <AlertCircle
+                        size={16}
+                        style={{ color: '#1976d2', marginTop: '2px', flexShrink: 0 }}
+                      />
+                      <div style={{ fontSize: '13px', color: '#1565c0' }}>
+                        <p style={{ fontWeight: '500', margin: '0 0 4px 0' }}>Location Required</p>
+                        <p style={{ margin: 0, lineHeight: '1.4' }}>
+                          We need your exact location to assign the nearest partner for pickup.
+                          Click "Get Current Location" for automatic detection.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleGetCurrentLocation}
+                    disabled={gettingLocation}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '12px 16px',
+                      backgroundColor: gettingLocation
+                        ? '#6c757d'
+                        : formData.latitude && formData.longitude
+                          ? '#28a745'
+                          : '#007bff',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: gettingLocation ? 'not-allowed' : 'pointer',
+                      marginBottom: '16px',
+                      transition: 'background-color 0.2s',
+                    }}
+                  >
+                    <Navigation size={16} />
+                    {gettingLocation
+                      ? 'Getting location...'
+                      : formData.latitude && formData.longitude
+                        ? '✓ Location Captured'
+                        : 'Get Current Location'}
+                  </button>
+
+                  {/* Show coordinates when captured */}
+                  {formData.latitude && formData.longitude && (
+                    <div
+                      style={{
+                        backgroundColor: '#d4edda',
+                        border: '1px solid #c3e6cb',
+                        borderRadius: '6px',
+                        padding: '12px',
+                        marginBottom: '12px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          marginBottom: '8px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            backgroundColor: '#28a745',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Check size={12} style={{ color: 'white' }} />
+                        </div>
+                        <span style={{ fontSize: '14px', fontWeight: '500', color: '#155724' }}>
+                          Location Captured Successfully
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#155724', fontFamily: 'monospace' }}>
+                        Lat: {formData.latitude}, Lng: {formData.longitude}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleGetCurrentLocation}
+                        disabled={gettingLocation}
+                        style={{
+                          marginTop: '8px',
+                          padding: '4px 8px',
+                          fontSize: '12px',
+                          backgroundColor: 'transparent',
+                          color: '#155724',
+                          border: '1px solid #155724',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Update Location
+                      </button>
+                    </div>
+                  )}
+
+                  {locationError && (
+                    <div
+                      style={{
+                        backgroundColor: '#f8d7da',
+                        border: '1px solid #f5c6cb',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        marginTop: '12px',
+                      }}
+                    >
+                      <p style={{ fontSize: '13px', color: '#721c24', margin: 0 }}>
+                        {locationError}
+                      </p>
+                    </div>
+                  )}
+
+                  {!formData.latitude && !formData.longitude && (
+                    <div
+                      style={{
+                        marginTop: '12px',
+                        padding: '8px',
+                        backgroundColor: '#fff3cd',
+                        border: '1px solid #ffeaa7',
+                        borderRadius: '6px',
+                      }}
+                    >
+                      <p
+                        style={{ fontSize: '11px', color: '#856404', margin: 0, lineHeight: '1.4' }}
+                      >
+                        <strong>Note:</strong> Location access is required for pickup service.
+                        Please allow location permissions when prompted by your browser.
+                      </p>
+                    </div>
+                  )}
+                </div>
 
                 <div className="booking-save-as-group">
                   <div className="booking-save-as-label">Save As</div>
@@ -615,15 +907,35 @@ const PickupBooking = () => {
 
             <div className="booking-price-row">
               <span className="booking-label">Processing Fee</span>
-              <span className="booking-value">+ ₹49</span>
+              <span className="booking-value" style={{ color: '#dc3545' }}>
+                - ₹49
+              </span>
             </div>
 
             <div className="booking-total-row">
-              <span className="booking-label">Total Amount</span>
+              <span className="booking-label">You'll Receive</span>
               <span className="booking-value">
-                {formatPrice((priceData?.quotedPrice || priceData?.basePrice || 1200) + 49)}
+                {formatPrice(
+                  Math.max((priceData?.quotedPrice || priceData?.basePrice || 1200) - 49, 0)
+                )}
               </span>
             </div>
+
+            {Math.max((priceData?.quotedPrice || priceData?.basePrice || 1200) - 49, 0) === 0 && (
+              <div
+                style={{
+                  fontSize: '12px',
+                  color: '#dc3545',
+                  marginTop: '8px',
+                  padding: '8px',
+                  backgroundColor: '#f8d7da',
+                  borderRadius: '4px',
+                  border: '1px solid #f5c6cb',
+                }}
+              >
+                ⚠️ Processing fee exceeds device value
+              </div>
+            )}
 
             <button
               className={`booking-continue-btn ${!formData.paymentType && currentStep === 3 ? 'disabled' : ''} ${isSubmitting ? 'loading' : ''}`}

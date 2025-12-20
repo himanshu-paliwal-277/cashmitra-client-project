@@ -26,6 +26,22 @@ const partnerSchema = new mongoose.Schema(
         longitude: Number,
       },
     },
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        default: [0, 0],
+      },
+    },
+    service_radius: {
+      type: Number,
+      default: 5000, // 5km default radius
+      min: [1000, 'Service radius must be at least 1km'],
+    },
     gstNumber: {
       type: String,
       required: [true, 'GST number is required'],
@@ -108,6 +124,34 @@ const partnerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+partnerSchema.index({ location: '2dsphere' });
+
+partnerSchema.pre('save', function (next) {
+  if (
+    this.shopAddress?.coordinates?.latitude &&
+    this.shopAddress?.coordinates?.longitude
+  ) {
+    this.location = {
+      type: 'Point',
+      coordinates: [
+        this.shopAddress.coordinates.longitude,
+        this.shopAddress.coordinates.latitude,
+      ],
+    };
+  }
+  next();
+});
+
+partnerSchema.methods.updateLocationFromCoordinates = function (
+  latitude,
+  longitude
+) {
+  this.shopAddress.coordinates = { latitude, longitude };
+  this.location = {
+    type: 'Point',
+    coordinates: [longitude, latitude],
+  };
+  return this.save();
+};
+
 export const Partner = mongoose.model('Partner', partnerSchema);
-
-

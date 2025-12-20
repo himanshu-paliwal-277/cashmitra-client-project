@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import cloudinary from '../config/cloudinary.config.js';
+import cloudinary from '../config/cloudinaryConfig.js';
 import { Pickup } from '../models/pickup.model.js';
 import { User } from '../models/user.model.js';
 import { generateToken } from '../utils/jwt.utils.js';
@@ -267,7 +267,7 @@ export async function uploadAgentSelfie(req, res) {
   }
 
   const result = await cloudinary.uploader.upload(req.file.path, {
-    folder: 'cashify/agent-selfies',
+    folder: 'cashmitra/agent-selfies',
     transformation: [{ width: 500, height: 500, crop: 'fill' }],
   });
 
@@ -405,7 +405,7 @@ export async function uploadDevicePhotos(req, res) {
   for (const [fieldName, files] of Object.entries(req.files)) {
     const file = files[0];
     const result = await cloudinary.uploader.upload(file.path, {
-      folder: `cashify/device-photos/${pickupId}`,
+      folder: `cashmitra/device-photos/${pickupId}`,
       transformation: [{ width: 1200, height: 1600, crop: 'limit' }],
     });
 
@@ -856,7 +856,7 @@ export async function saveCustomerSignature(req, res) {
   }
 
   const result = await cloudinary.uploader.upload(req.file.path, {
-    folder: `cashify/signatures/${pickupId}`,
+    folder: `cashmitra/signatures/${pickupId}`,
   });
 
   pickup.customerSignature = {
@@ -973,8 +973,8 @@ export async function getDailyReport(req, res) {
 }
 
 export async function submitDailyReport(req, res) {
-  const agentId = req.user._id;
-  const { notes, issues } = req.body;
+  // const agentId = req.user._id;
+  // const { notes, issues } = req.body;
 
   res.json({
     success: true,

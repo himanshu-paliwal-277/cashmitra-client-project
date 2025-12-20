@@ -1215,7 +1215,7 @@ export const helpContent = {
   ],
   contactInfo: {
     phone: '+91 1800-123-4567',
-    email: 'support@cashify.com',
+    email: 'support@cashmitra.com',
     hours: 'MoCashmitra9 AM - 8 PM, Sun: 10 AM - 6 PM',
     address: 'Cashmitra Technologies Pvt Ltd, Sector 44, Gurugram, Haryana 122003',
   },

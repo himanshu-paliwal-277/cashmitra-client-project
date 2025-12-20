@@ -219,4 +219,3 @@ export const processArrayFields = (data) => {
 
   return processedData;
 };
-

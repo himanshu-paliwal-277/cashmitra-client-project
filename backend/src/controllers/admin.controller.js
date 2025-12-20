@@ -1,47 +1,55 @@
-import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 
 import { Agent } from '../models/agent.model.js';
 import { ConditionQuestionnaire } from '../models/conditionQuestionnaire.model.js';
+import { Finance } from '../models/finance.model.js';
 import { Inventory } from '../models/inventory.model.js';
 import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
 import { Product } from '../models/product.model.js';
+import { SellOrder } from '../models/sellOrder.model.js';
 import { Transaction } from '../models/transaction.model.js';
 import { User } from '../models/user.model.js';
 import { Wallet } from '../models/wallet.model.js';
 import ApiError from '../utils/apiError.js';
 import { generateToken } from '../utils/jwt.utils.js';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const loginAdmin = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email, role: 'admin' }).select(
-      '+password'
-    );
+    // Find user by email (include password for verification)
+    const user = await User.findOne({ email }).select('+password');
 
-    if (user && (await user.matchPassword(password))) {
+    // Check if user exists
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid admin credentials' });
+    }
+
+    // Check if user is trying to login with customer credentials
+    if (user.role === 'user' || user.role === 'customer') {
+      return res.status(403).json({
+        message:
+          'You are a customer. Please login through the customer login page.',
+      });
+    }
+
+    // Check if user is trying to login with partner credentials
+    if (user.role === 'partner') {
+      return res.status(403).json({
+        message: 'You are a partner. Please login through the partner portal.',
+      });
+    }
+
+    // Check if user is an admin
+    if (user.role !== 'admin') {
+      return res.status(403).json({
+        message: 'Access denied. Admin account required.',
+      });
+    }
+
+    // Verify password
+    if (await user.matchPassword(password)) {
       res.json({
         _id: user._id,
         name: user.name,
@@ -80,11 +88,6 @@ export const getAdminProfile = async (req, res) => {
 
 export const createAdmin = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { name, email, password, phone } = req.body;
 
     const userExists = await User.findOne({ email });
@@ -493,7 +496,7 @@ export const updatePartnerWallet = async (req, res) => {
       },
     });
 
-    const Finance = require('../models/finance.model');
+    // Finance is already imported at the top
     await Finance.create({
       transactionType: amount > 0 ? 'deposit' : 'withdrawal',
       amount: Math.abs(amount),
@@ -1185,171 +1188,25 @@ export const getCatalog = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array(),
-      });
-    }
-
-    const {
-      category,
-      brand,
-      series,
-      model,
-      basePrice,
-      depreciationRate,
-      specifications,
-      images,
-      status = 'active',
-      description,
-      features,
-    } = req.body;
-
-    if (!category || !brand || !model || !basePrice) {
-      return res.status(400).json({
-        success: false,
-        message:
-          'Missing required fields: category, brand, model, and basePrice are required',
-      });
-    }
-
-    if (isNaN(basePrice) || parseFloat(basePrice) <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Base price must be a positive number',
-      });
-    }
-
-    if (
-      depreciationRate &&
-      (isNaN(depreciationRate) ||
-        parseFloat(depreciationRate) < 0 ||
-        parseFloat(depreciationRate) > 100)
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: 'Depreciation rate must be between 0 and 100',
-      });
-    }
-
-    const existingProduct = await Product.findOne({
-      category: category.toLowerCase(),
-      brand: brand.toLowerCase(),
-      model: model.toLowerCase(),
-    });
-
-    if (existingProduct) {
-      return res.status(409).json({
-        success: false,
-        message: 'Product with this category, brand, and model already exists',
-      });
-    }
-
-    let processedImages = [];
-    if (images) {
-      if (typeof images === 'string') {
-        try {
-          processedImages = JSON.parse(images);
-        } catch (e) {
-          processedImages = [images];
-        }
-      } else if (Array.isArray(images)) {
-        processedImages = images;
-      }
-
-      processedImages = processedImages
-        .map((img) => {
-          if (typeof img === 'string') return img.trim();
-          return img.url || img.secure_url || '';
-        })
-        .filter((url) => url && url.length > 0)
-        .slice(0, 10); // Limit to 10 images
-    }
-
-    // Process specifications
-    let processedSpecs = {};
-    if (specifications) {
-      if (typeof specifications === 'string') {
-        try {
-          processedSpecs = JSON.parse(specifications);
-        } catch (e) {
-          processedSpecs = {};
-        }
-      } else if (typeof specifications === 'object') {
-        processedSpecs = specifications;
-      }
-    }
-
-    const productData = {
-      category: category.toLowerCase(),
-      brand: brand.trim(),
-      series: series ? series.trim() : '',
-      model: model.trim(),
-      basePrice: parseFloat(basePrice),
-      depreciationRate: depreciationRate ? parseFloat(depreciationRate) : 15,
-      specifications: processedSpecs,
-      images: processedImages,
-      status: ['active', 'inactive', 'pending'].includes(status)
-        ? status
-        : 'active',
-      description: description ? description.trim() : '',
-      features: Array.isArray(features) ? features : [],
-      createdBy: req.user._id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    // Create the product
-    const product = await Product.create(productData);
-
-    // Populate the created product for response
-    const populatedProduct = await Product.findById(product._id)
-      .populate('createdBy', 'name email')
-      .lean();
-
-    res.status(201).json({
-      success: true,
-      message: 'Product added successfully to catalog',
-      product: populatedProduct,
+    // Disable admin product creation as per new requirements
+    return res.status(403).json({
+      success: false,
+      message:
+        'Product creation is now handled by partners only. Admins can only manage categories and view products.',
     });
   } catch (error) {
-    console.error('Error adding product to catalog:', error);
-
-    if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        message: 'Product with this combination already exists',
-      });
-    }
-
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(
-        (err) => err.message
-      );
-      return res.status(400).json({
-        success: false,
-        message: 'Product validation failed',
-        errors: validationErrors,
-      });
-    }
-
+    console.error('Error in addProduct:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to add product to catalog',
-      error:
-        process.env.NODE_ENV === 'development'
-          ? error.message
-          : 'Internal server error',
+      message: 'Server error',
+      error: error.message,
     });
   }
 };
 
 export const uploadProductImages = async (req, res) => {
   try {
-    const cloudinary = require('../config/cloudinary.config');
+    const { cloudinary } = await import('../config/cloudinary.config.js');
     const uploadedImages = [];
 
     if (!req.files || req.files.length === 0) {
@@ -1359,7 +1216,7 @@ export const uploadProductImages = async (req, res) => {
     for (const file of req.files) {
       try {
         const result = await cloudinary.uploader.upload(file.path, {
-          folder: 'cashify/products',
+          folder: 'cashmitra/products',
           transformation: [
             { width: 800, height: 800, crop: 'fill', quality: 'auto' },
             { format: 'webp' },
@@ -1485,7 +1342,8 @@ export const updateProduct = async (req, res) => {
       if (typeof images === 'string') {
         try {
           processedImages = JSON.parse(images);
-        } catch (e) {
+        } catch (error) {
+          console.error('Error parsing images:', error);
           processedImages = [images];
         }
       } else if (Array.isArray(images)) {
@@ -1507,7 +1365,8 @@ export const updateProduct = async (req, res) => {
       if (typeof specifications === 'string') {
         try {
           processedSpecs = JSON.parse(specifications);
-        } catch (e) {
+        } catch (error) {
+          console.error('Error parsing specifications:', error);
           processedSpecs = {};
         }
       } else if (typeof specifications === 'object') {
@@ -1717,7 +1576,7 @@ export const deleteProduct = async (req, res) => {
     };
 
     if (product.images && product.images.length > 0) {
-      const cloudinary = require('../config/cloudinary.config');
+      const { cloudinary } = await import('../config/cloudinary.config.js');
 
       for (const imageUrl of product.images) {
         try {
@@ -1726,7 +1585,7 @@ export const deleteProduct = async (req, res) => {
             .slice(-2)
             .join('/')
             .split('.')[0];
-          await cloudinary.uploader.destroy(`cashify/products/${publicId}`);
+          await cloudinary.uploader.destroy(`cashmitra/products/${publicId}`);
         } catch (deleteError) {
           console.error('Error deleting image from Cloudinary:', deleteError);
         }
@@ -1883,11 +1742,6 @@ export const getUserById = async (req, res) => {
 
 export const createUser = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const {
       name,
       email,
@@ -1969,11 +1823,6 @@ export const createUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { name, email, phone, role, address, isVerified, roleTemplate } =
       req.body;
 
@@ -2114,7 +1963,7 @@ export const getSellOrders = async (req, res) => {
       sortOrder = 'desc',
     } = req.query;
 
-    const SellOrder = require('../models/sellOrder.model');
+    // SellOrder is already imported at the top
     const query = {};
 
     if (status) query.status = status;
@@ -2135,6 +1984,7 @@ export const getSellOrders = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const sortOptions = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
+    // First get the orders without population using lean() for plain objects
     const [orders, total] = await Promise.all([
       SellOrder.find(query)
         .populate({
@@ -2145,24 +1995,131 @@ export const getSellOrders = async (req, res) => {
           },
         })
         .populate('userId', 'name email phone')
-        .populate({
-          path: 'assignedTo',
-          populate: {
-            path: 'user',
-            select: 'name email phone',
-          },
-          select: 'businessName shopName email phone user',
-        })
+        .lean() // Get plain JavaScript objects
         .sort(sortOptions)
         .skip(skip)
         .limit(parseInt(limit)),
       SellOrder.countDocuments(query),
     ]);
 
+    // Manually populate partner and agent information
+    const populatedOrders = [];
+
+    console.log('Starting manual population for', orders.length, 'orders');
+
+    for (let order of orders) {
+      // Orders are already plain objects due to .lean()
+      console.log(
+        'Processing order:',
+        order._id,
+        'assigned_partner_id:',
+        order.assigned_partner_id
+      );
+
+      // Populate assignedTo (old system)
+      if (order.assignedTo) {
+        try {
+          const partner = await Partner.findById(order.assignedTo)
+            .populate('user', 'name email phone')
+            .lean();
+          if (partner) {
+            order.assignedTo = partner;
+          }
+        } catch (err) {
+          console.error('Error populating assignedTo:', err);
+        }
+      }
+
+      // Populate assigned_partner_id (new system)
+      if (order.assigned_partner_id) {
+        try {
+          console.log(
+            'Trying to populate partner ID:',
+            order.assigned_partner_id
+          );
+          const partner = await Partner.findById(order.assigned_partner_id)
+            .populate('user', 'name email phone')
+            .lean();
+          if (partner) {
+            console.log(
+              'Found partner:',
+              partner.businessName || partner.shopName
+            );
+            order.assigned_partner_id = partner;
+          } else {
+            console.log('Partner not found for ID:', order.assigned_partner_id);
+          }
+        } catch (err) {
+          console.error('Error populating assigned_partner_id:', err);
+        }
+      }
+
+      // Populate assignedAgent
+      if (order.assignedAgent) {
+        try {
+          console.log('Trying to populate agent ID:', order.assignedAgent);
+          const agent = await Agent.findById(order.assignedAgent)
+            .populate('user', 'name email phone')
+            .lean();
+          if (agent) {
+            console.log('Found agent:', agent.user?.name);
+            order.assignedAgent = agent;
+          } else {
+            console.log('Agent not found for ID:', order.assignedAgent);
+          }
+        } catch (err) {
+          console.error('Error populating assignedAgent:', err);
+        }
+      }
+
+      populatedOrders.push(order);
+    }
+
+    console.log('=== ADMIN SELL ORDERS DEBUG ===');
+    console.log('Total orders found:', populatedOrders.length);
+    console.log(
+      'Orders processed through manual population:',
+      populatedOrders.length
+    );
+
+    if (populatedOrders.length > 0) {
+      const firstOrder = populatedOrders[0];
+      console.log('First order ID:', firstOrder._id);
+      console.log(
+        'First order assigned_partner_id:',
+        firstOrder.assigned_partner_id
+      );
+      console.log(
+        'First order assigned_partner_id type:',
+        typeof firstOrder.assigned_partner_id
+      );
+      console.log('First order assignedAgent:', firstOrder.assignedAgent);
+      console.log(
+        'First order assignedAgent type:',
+        typeof firstOrder.assignedAgent
+      );
+
+      if (
+        firstOrder.assigned_partner_id &&
+        typeof firstOrder.assigned_partner_id === 'object'
+      ) {
+        console.log(
+          '✅ Partner populated successfully:',
+          firstOrder.assigned_partner_id.shopName
+        );
+      } else if (firstOrder.assigned_partner_id) {
+        console.log(
+          '❌ Partner NOT populated, still ID:',
+          firstOrder.assigned_partner_id
+        );
+      }
+    }
+    console.log('==============================');
+
     res.json({
       success: true,
       data: {
-        orders,
+        orders: populatedOrders,
         pagination: {
           currentPage: parseInt(page),
           totalPages: Math.ceil(total / parseInt(limit)),
@@ -2742,7 +2699,7 @@ export const deleteBrand = async (req, res) => {
       });
     }
 
-    const productIds = products.map((p) => p._id);
+    // const productIds = products.map((p) => p._id);
 
     const result = await Product.deleteMany({ brand: brandNameLower });
 
@@ -3246,7 +3203,7 @@ export const deleteModel = async (req, res) => {
       });
     }
 
-    const productIds = products.map((p) => p._id);
+    // const productIds = products.map((p) => p._id);
 
     const result = await Product.deleteMany({
       brand: brandLower,
@@ -3429,15 +3386,6 @@ export const getConditionQuestionnaireById = async (req, res) => {
 
 export const createConditionQuestionnaire = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array(),
-      });
-    }
-
     const {
       title,
       description,
@@ -3571,16 +3519,6 @@ export const createConditionQuestionnaire = async (req, res) => {
 export const updateConditionQuestionnaire = async (req, res) => {
   try {
     const { id } = req.params;
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array(),
-      });
-    }
-
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,

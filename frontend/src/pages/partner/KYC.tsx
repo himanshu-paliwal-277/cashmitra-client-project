@@ -88,7 +88,7 @@ function PartnerKYC() {
       const uploadResponse = await fetch('/api/upload/image', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('partnerToken')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: formData,
       });

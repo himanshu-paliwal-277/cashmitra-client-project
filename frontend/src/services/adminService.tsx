@@ -6,7 +6,7 @@ class AdminService {
     try {
       const response = await api.post('/admin/login', credentials);
       if (response.data.token) {
-        localStorage.setItem('adminToken', response.data.token);
+        localStorage.setItem('token', response.data.token);
         api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       }
       return response.data;
@@ -727,14 +727,10 @@ class AdminService {
       return response.data;
     } catch (error) {
       console.error('Error creating category:', error);
-      // Mock success response
       return {
-        success: true,
-        data: {
-          id: Date.now().toString(),
-          ...categoryData,
-          createdAt: new Date().toISOString(),
-        },
+        success: false,
+        error: 'Failed to create category',
+        message: error.response.data.message,
       };
     }
   }
@@ -745,14 +741,10 @@ class AdminService {
       return response.data;
     } catch (error) {
       console.error('Error updating category:', error);
-      // Mock success response
       return {
-        success: true,
-        data: {
-          id: categoryId,
-          ...categoryData,
-          updatedAt: new Date().toISOString(),
-        },
+        success: false,
+        error: 'Failed to update category',
+        message: error.response.data.message,
       };
     }
   }
@@ -1744,7 +1736,7 @@ class AdminService {
 
   // Logout
   logout() {
-    localStorage.removeItem('adminToken');
+    localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
   }
 }

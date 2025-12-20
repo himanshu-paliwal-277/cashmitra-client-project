@@ -73,5 +73,3 @@ inventorySchema.index({ condition: 1, price: 1 });
 inventorySchema.index({ isAvailable: 1 });
 
 export const Inventory = mongoose.model('Inventory', inventorySchema);
-
-
