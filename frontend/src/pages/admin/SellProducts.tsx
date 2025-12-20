@@ -251,14 +251,14 @@ const SellProducts = () => {
   const renderProductCard = (product: any) => (
     <div
       key={product._id || product.id}
-      className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-2xl hover:border-amber-300 transition-all duration-300 hover:-translate-y-1"
+      className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-amber-300 transition-all duration-300"
     >
       <div className="relative h-56 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden">
         {product.images && product.images.length > 0 ? (
           <img
             src={product.images[0]}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-contain p-3 group-hover:scale-110 transition-transform duration-500"
           />
         ) : (
           <Package
@@ -351,7 +351,7 @@ const SellProducts = () => {
                       <img
                         src={product.images[0]}
                         alt={product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain p-1"
                       />
                     ) : (
                       <Package size={20} className="text-gray-400" />

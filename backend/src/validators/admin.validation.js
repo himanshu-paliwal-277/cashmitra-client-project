@@ -221,6 +221,12 @@ export const createCategorySchema = {
       .string()
       .max(500, 'Description cannot exceed 500 characters')
       .optional(),
+    superCategory: z
+      .string()
+      .regex(
+        /^[0-9a-fA-F]{24}$/,
+        'Super Category ID must be a valid MongoDB ObjectId'
+      ),
     image: z.string().url('Image must be a valid URL').optional(),
     icon: z.string().optional(),
     isActive: z
@@ -242,6 +248,12 @@ export const updateCategorySchema = {
       .max(500, 'Description cannot exceed 500 characters')
       .optional(),
     image: z.string().url('Image must be a valid URL').optional(),
+    superCategory: z
+      .string()
+      .regex(
+        /^[0-9a-fA-F]{24}$/,
+        'Super Category ID must be a valid MongoDB ObjectId'
+      ),
     icon: z.string().optional(),
     isActive: z
       .boolean({ invalid_type_error: 'isActive must be a boolean' })
