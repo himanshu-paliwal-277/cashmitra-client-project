@@ -82,6 +82,7 @@ const CreateUser = lazy(() => import('./components/admin/CreateUser'));
 const EditUser = lazy(() => import('./components/admin/EditUser'));
 const CreateProduct = lazy(() => import('./components/admin/CreateProduct'));
 const EditProduct = lazy(() => import('./components/admin/EditProduct'));
+const SeriesManagement = lazy(() => import('./pages/admin/SeriesManagement'));
 
 const SuperCategoryManagement = lazy(() => import('./pages/admin/SuperCategoryManagement'));
 const SellSuperCategoryManagement = lazy(() => import('./pages/admin/SellSuperCategoryManagement'));
@@ -155,6 +156,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="sell-super-categories" element={<SellSuperCategoryManagement />} />
           <Route path="sell-categories" element={<SellCategories />} />
+          <Route path="series" element={<SeriesManagement />} />
           <Route path="sell-products" element={<SellProducts />} />
           <Route path="sell-questions" element={<SellQuestionsManagement />} />
           <Route path="sell-defects" element={<SellDefectsManagement />} />

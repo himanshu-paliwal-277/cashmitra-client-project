@@ -20,7 +20,11 @@ const BrandSelection = () => {
   const urlParams = new URLSearchParams(location.search);
   const categoryId = urlParams.get('category') || category;
 
+  const [modelId, setModelId] = useState(null);
+
   const { categories } = useSellCategories();
+
+  console.log('filteredBrands = ', filteredBrands);
 
   // Fetch brands from public sell endpoint
   useEffect(() => {
@@ -36,6 +40,9 @@ const BrandSelection = () => {
         if (response.data && response.data.brands) {
           setBrands(response.data.brands);
         }
+
+        console.log('Fetched brands:', response.data);
+        setModelId(null);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch brands');
         console.error('Error fetching brands:', err);
@@ -216,15 +223,24 @@ const BrandSelection = () => {
                   }`}
                 >
                   {/* Brand Logo/Initials */}
-                  <div
-                    className={`w-20 h-20 ${colorScheme.light} rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform ${
-                      isSelected ? 'scale-110' : 'group-hover:scale-110'
-                    }`}
-                  >
-                    <span className={`text-2xl font-bold ${colorScheme.text}`}>
-                      {getBrandInitials(brandName)}
-                    </span>
-                  </div>
+
+                  {brand.image ? (
+                    <img
+                      src={brand.image}
+                      alt={brandName}
+                      className="w-20 h-20 rounded-xl mx-auto mb-4 transition-transform group-hover:scale-110"
+                    />
+                  ) : (
+                    <div
+                      className={`w-20 h-20 ${colorScheme.light} rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform ${
+                        isSelected ? 'scale-110' : 'group-hover:scale-110'
+                      }`}
+                    >
+                      <span className={`text-2xl font-bold ${colorScheme.text}`}>
+                        {getBrandInitials(brandName)}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Brand Name */}
                   <h3
@@ -236,7 +252,7 @@ const BrandSelection = () => {
                   </h3>
 
                   {/* Models Count */}
-                  <p className="text-xs sm:text-sm text-slate-600">Multiple models available</p>
+                  {/* <p className="text-xs sm:text-sm text-slate-600">Multiple models available</p> */}
 
                   {/* Selected Indicator */}
                   {isSelected && (

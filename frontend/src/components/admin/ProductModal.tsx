@@ -1,15 +1,9 @@
-/**
- * @fileoverview Product Modal Component
- * @description Modal for adding and editing sell products
- * @author Cashmitra Development Team
- * @version 1.0.0
- */
-
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { adminService } from '../../services/adminService';
 import cloudinaryService from '../../services/cloudinaryService';
 import { X, Save, Upload, Image as ImageIcon, Plus, Trash2, AlertCircle, Tag } from 'lucide-react';
+import { seriesService } from '../../services/seriesService';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -112,22 +106,6 @@ const Select = styled.select`
   border-radius: 0.5rem;
   font-size: 0.875rem;
   background: white;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-`;
-
-const TextArea = styled.textarea`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  min-height: 100px;
-  resize: vertical;
   transition: all 0.2s;
 
   &:focus {
@@ -380,6 +358,7 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
   const [formData, setFormData] = useState({
     name: '',
     categoryId: '',
+    seriesId: '',
     slug: '',
     images: [],
     status: 'active',
@@ -391,6 +370,20 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   const [tagInput, setTagInput] = useState('');
+  const [series, setSeries] = useState([]); // 🔹 SERIES ADDITION
+  const [seriesLoading, setSeriesLoading] = useState(false);
+
+  const fetchSeries = async (categoryId: string) => {
+    try {
+      setSeriesLoading(true);
+      const response = await seriesService.getAllSeries({ categoryId });
+      setSeries(response.data || []);
+    } catch (error) {
+      console.error('Error fetching series:', error);
+    } finally {
+      setSeriesLoading(false);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -412,17 +405,23 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
     if (product) {
       setFormData({
         name: product.name || '',
-        categoryId: product.categoryId || '',
+        categoryId: product?.categoryId?._id || '',
+        seriesId: product?.series?._id || '', // 🔹
         slug: product.slug || '',
         images: product.images || [],
         status: product.status || 'active',
         variants: product.variants || [],
         tags: product.tags || [],
       });
+
+      if (product.categoryId) {
+        fetchSeries(product.categoryId); // 🔹
+      }
     } else {
       setFormData({
         name: '',
         categoryId: '',
+        seriesId: '', // 🔹
         slug: '',
         images: [],
         status: 'active',
@@ -432,6 +431,12 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
     }
     setError('');
   }, [product, isOpen]);
+
+  const handleCategoryChange = (value: string) => {
+    handleInputChange('categoryId', value);
+    handleInputChange('seriesId', ''); // reset series
+    fetchSeries(value); // 🔹 load series
+  };
 
   const handleInputChange = (field: any, value: any) => {
     setFormData(prev => ({
@@ -597,20 +602,22 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
       // Clean up the data before sending to backend
       const cleanedData = {
         ...formData,
-        slug, // Ensure slug is always present
+        seriesId: formData.seriesId, // 🔹
+        slug,
         variants: formData.variants.map(variant => {
           const cleanedVariant = {
             label: variant.label,
             basePrice: parseFloat(variant.basePrice),
             isActive: variant.isActive,
           };
-          // Only include _id if it exists and is a valid ObjectId (for updates)
           if (variant._id && variant._id.length === 24) {
             cleanedVariant._id = variant._id;
           }
           return cleanedVariant;
         }),
       };
+
+      console.log('Submitting product data:', cleanedData);
 
       await onSave(cleanedData);
       onClose();
@@ -667,7 +674,7 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
                 <Label>Category *</Label>
                 <Select
                   value={formData.categoryId}
-                  onChange={(e: any) => handleInputChange('categoryId', e.target.value)}
+                  onChange={(e: any) => handleCategoryChange(e.target.value)}
                   required
                   disabled={categoriesLoading}
                 >
@@ -677,6 +684,24 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
                   {categories.map(category => (
                     <option key={category._id} value={category._id}>
                       {category.name}
+                    </option>
+                  ))}
+                </Select>
+              </FormGroup>
+
+              {/* 🔹 SERIES SELECT INPUT */}
+              <FormGroup>
+                <Label>Series *</Label>
+                <Select
+                  value={formData.seriesId}
+                  onChange={(e: any) => handleInputChange('seriesId', e.target.value)}
+                  required
+                  disabled={!formData.categoryId || seriesLoading}
+                >
+                  <option value="">{seriesLoading ? 'Loading series...' : 'Select series'}</option>
+                  {series.map(item => (
+                    <option key={item._id} value={item._id}>
+                      {item.name}
                     </option>
                   ))}
                 </Select>

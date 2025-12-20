@@ -7,6 +7,11 @@ const sellProductSchema = new mongoose.Schema(
       ref: 'Category',
       required: [true, 'Category is required'],
     },
+    series: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Series',
+      required: false,
+    },
     name: {
       type: String,
       required: [true, 'Product name is required'],
