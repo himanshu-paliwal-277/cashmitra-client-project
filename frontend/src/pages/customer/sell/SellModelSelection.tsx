@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../services/api';
-import { seriesService } from '../../../services/seriesService';
-import { Home, ChevronRight, Package, Monitor, CheckCircle, ArrowRight, X } from 'lucide-react';
+import { Package, ArrowRight, X } from 'lucide-react';
 
 const SellModelSelection = () => {
   const navigate = useNavigate();
@@ -12,18 +11,19 @@ const SellModelSelection = () => {
   const [allProducts, setAllProducts] = useState([]); // 🔹 keep original list
   const [series, setSeries] = useState([]);
   const [selectedSeries, setSelectedSeries] = useState(null);
+  const [brandInfo, setBrandInfo] = useState(null);
 
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   /* ---------------- Fetch Series ---------------- */
-  const fetchSeries = async (categoryId: string) => {
+  const fetchSeries = async (brandCategoryId: string) => {
     try {
-      const res = await seriesService.getAllSeries({ categoryId });
-      setSeries(res.data || []);
-    } catch {
-      console.error('Failed to fetch series');
+      const res = await api.get(`/series?categoryId=${brandCategoryId}`);
+      setSeries(res.data?.data || []);
+    } catch (err) {
+      console.error('Failed to fetch series:', err);
     }
   };
 
@@ -39,6 +39,15 @@ const SellModelSelection = () => {
         setLoading(true);
         setError(null);
 
+        try {
+          const brandResponse = await api.get(`/sell/brands/${category.toLowerCase()}`);
+          const brands = brandResponse.data?.brands || [];
+          const currentBrand = brands.find((b: any) => b._id === brand || b.id === brand);
+          setBrandInfo(currentBrand);
+        } catch (err) {
+          console.error('Failed to fetch brand info:', err);
+        }
+
         const response = await api.get(`/sell/products/search`, {
           params: { category, brand },
         });
@@ -48,8 +57,7 @@ const SellModelSelection = () => {
           setAllProducts(response.data.data);
         }
 
-        // 🔹 fetch series once category is available
-        fetchSeries(category);
+        fetchSeries(brand);
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to fetch products');
       } finally {
@@ -65,7 +73,10 @@ const SellModelSelection = () => {
     setSelectedSeries(seriesItem);
     setSelectedProduct(null);
 
-    const filtered = allProducts.filter((p: any) => p.seriesId === seriesItem._id);
+    const filtered = allProducts.filter((p: any) => {
+      return p.series === seriesItem._id || p.series?._id === seriesItem._id;
+    });
+
     setProducts(filtered);
   };
 
@@ -108,7 +119,9 @@ const SellModelSelection = () => {
       {/* Header */}
       <div className="bg-indigo-600 text-white py-8">
         <div className="main-container">
-          <h1 className="text-3xl font-bold text-center">Sell Old {brand} Mobile Phone</h1>
+          <h1 className="text-3xl font-bold text-center">
+            Sell Old {brandInfo?.name || brand} {category} Phone
+          </h1>
         </div>
       </div>
 
@@ -147,40 +160,81 @@ const SellModelSelection = () => {
           </div>
         )}
 
-        {/* PRODUCTS GRID (UNCHANGED) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product: any) => {
-            const productImage = product.images?.[0];
-            const basePrice = product.variants?.[0]?.basePrice || 0;
-            const isSelected = selectedProduct?._id === product._id;
+        {/* PRODUCTS GRID */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">
+              {selectedSeries ? `${selectedSeries.name} Models` : 'All Models'}
+            </h2>
+            <span className="text-sm text-gray-600">
+              {products.length} model{products.length !== 1 ? 's' : ''} found
+            </span>
+          </div>
 
-            return (
-              <div
-                key={product._id}
-                onClick={() => handleProductClick(product)}
-                className={`bg-white rounded-xl shadow cursor-pointer border-2 ${
-                  isSelected ? 'border-indigo-600' : 'border-transparent'
-                }`}
-              >
-                <div className="h-48 flex items-center justify-center">
-                  {productImage ? (
-                    <img src={productImage} className="h-full object-contain" />
-                  ) : (
-                    <Package className="w-12 h-12 text-gray-400" />
-                  )}
-                </div>
+          {products.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {products.map((product: any) => {
+                const productImage = product.images?.[0];
+                const basePrice = product.variants?.[0]?.basePrice || 0;
+                const isSelected = selectedProduct?._id === product._id;
 
-                <div className="p-4">
-                  <h3 className="font-bold">{product.name}</h3>
-                  <p className="text-green-600 font-bold mt-2">₹{basePrice}+</p>
+                return (
+                  <div
+                    key={product._id}
+                    onClick={() => handleProductClick(product)}
+                    className={`bg-white rounded-xl shadow cursor-pointer border-2 transition-all hover:shadow-lg ${
+                      isSelected
+                        ? 'border-indigo-600'
+                        : 'border-transparent hover:border-indigo-300'
+                    }`}
+                  >
+                    <div className="h-48 flex items-center justify-center p-4">
+                      {productImage ? (
+                        <img
+                          src={productImage}
+                          alt={product.name}
+                          className="h-full object-contain"
+                        />
+                      ) : (
+                        <Package className="w-12 h-12 text-gray-400" />
+                      )}
+                    </div>
 
-                  <button className="w-full mt-4 py-2 bg-indigo-600 text-white rounded-lg">
-                    Select Model
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                    <div className="p-4">
+                      <h3 className="font-bold text-lg mb-2">{product.name}</h3>
+                      <p className="text-green-600 font-bold text-xl mb-3">
+                        ₹{basePrice.toLocaleString()}+
+                      </p>
+
+                      <button className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                        Select Model
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl shadow p-8 text-center">
+              <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-gray-700 mb-2">
+                {selectedSeries ? `No models found in ${selectedSeries.name}` : 'No models found'}
+              </h3>
+              <p className="text-gray-500 mb-4">
+                {selectedSeries
+                  ? 'Try selecting a different series or clear the filter to see all models.'
+                  : 'No models are available for this brand at the moment.'}
+              </p>
+              {selectedSeries && (
+                <button
+                  onClick={clearSeriesFilter}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Show All Models
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {selectedProduct && (

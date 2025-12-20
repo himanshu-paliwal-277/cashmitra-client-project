@@ -14,7 +14,7 @@ import {
 
 const router = express.Router();
 
-router.get('/', isAuthenticated, getSeries);
+router.get('/', getSeries);
 router.get('/:id', isAuthenticated, getSeriesById);
 router.post('/', isAuthenticated, authorize('admin'), createSeries);
 router.put('/:id', isAuthenticated, authorize('admin'), updateSeries);
