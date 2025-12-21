@@ -163,18 +163,39 @@ const Partners = () => {
         setEditingPartner(null);
         resetForm();
       } else {
-        // Show error message
-        setSubmitError(result?.message || 'Failed to save partner. Please check all fields.');
+        // Handle validation errors or other errors
+        let errorMessage = result?.message || 'Failed to save partner. Please check all fields.';
+
+        // If there are validation errors, format them nicely
+        if (result?.errors && Array.isArray(result.errors)) {
+          errorMessage = result.errors.map((e: any) => `${e.field}: ${e.message}`).join('\n');
+        }
+
+        setSubmitError(errorMessage);
       }
     } catch (error: any) {
       console.error('Error saving partner:', error);
 
       // Extract error message from response
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.errors?.map((e: any) => e.message).join(', ') ||
-        error?.message ||
-        'Failed to save partner. Please try again.';
+      let errorMessage = 'Failed to save partner. Please try again.';
+
+      if (error?.response?.data) {
+        const responseData = error.response.data;
+
+        // Handle validation errors (array of field errors)
+        if (responseData.errors && Array.isArray(responseData.errors)) {
+          errorMessage = responseData.errors.map((e: any) => `${e.field}: ${e.message}`).join('\n');
+        }
+        // Handle single error message
+        else if (responseData.message) {
+          errorMessage = responseData.message;
+        }
+      }
+      // Handle network/other errors
+      else if (error?.message) {
+        errorMessage = error.message;
+      }
+
       setSubmitError(errorMessage);
     } finally {
       setSubmitting(false);
@@ -335,6 +356,47 @@ const Partners = () => {
       upiId: '',
     });
     setShowPassword(false);
+  };
+
+  // Validation function to check if all required fields are filled
+  const isFormValid = () => {
+    if (editingPartner) {
+      // For editing, only partner fields are required
+      return (
+        formData.shopName.trim() &&
+        formData.shopAddress.street.trim() &&
+        formData.shopAddress.city.trim() &&
+        formData.shopAddress.state.trim() &&
+        formData.shopAddress.pincode.trim() &&
+        formData.shopPhone.trim() &&
+        formData.shopEmail.trim() &&
+        formData.gstNumber.trim()
+      );
+    } else {
+      // For new partner, all user and partner fields are required
+      return (
+        formData.name.trim() &&
+        formData.email.trim() &&
+        formData.phone.trim() &&
+        formData.password.trim() &&
+        formData.shopName.trim() &&
+        formData.shopAddress.street.trim() &&
+        formData.shopAddress.city.trim() &&
+        formData.shopAddress.state.trim() &&
+        formData.shopAddress.pincode.trim() &&
+        formData.shopPhone.trim() &&
+        formData.shopEmail.trim() &&
+        formData.gstNumber.trim()
+      );
+    }
+  };
+
+  // Helper function to get field validation class
+  const getFieldClass = (isValid: boolean, baseClass: string) => {
+    if (!isValid) {
+      return `${baseClass} border-red-300 focus:border-red-500 focus:ring-red-500`;
+    }
+    return baseClass;
   };
 
   const getStatusIcon = (status: any) => {
@@ -666,19 +728,106 @@ const Partners = () => {
             className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">
-                {editingPartner ? 'Edit Partner' : 'Add New Partner'}
-              </h2>
-              <button
-                onClick={() => {
-                  setShowModal(false);
-                  setEditingPartner(null);
-                }}
-                className="p-2 hover:bg-white rounded-lg transition-colors duration-150 text-gray-600 hover:text-gray-900"
-              >
-                <X size={24} />
-              </button>
+            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {editingPartner ? 'Edit Partner' : 'Add New Partner'}
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingPartner(null);
+                  }}
+                  className="p-2 hover:bg-white rounded-lg transition-colors duration-150 text-gray-600 hover:text-gray-900"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              {/* Progress indicator */}
+              {!editingPartner ? (
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-gray-600">Required fields:</span>
+                  <div className="flex items-center gap-1">
+                    {[
+                      formData.name.trim(),
+                      formData.email.trim(),
+                      formData.phone.trim(),
+                      formData.password.trim(),
+                      formData.shopName.trim(),
+                      formData.shopAddress.street.trim(),
+                      formData.shopAddress.city.trim(),
+                      formData.shopAddress.state.trim(),
+                      formData.shopAddress.pincode.trim(),
+                      formData.shopPhone.trim(),
+                      formData.shopEmail.trim(),
+                      formData.gstNumber.trim(),
+                    ].map((field, index) => (
+                      <div
+                        key={index}
+                        className={`w-2 h-2 rounded-full ${field ? 'bg-green-500' : 'bg-gray-300'}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-gray-500">
+                    (
+                    {
+                      [
+                        formData.name.trim(),
+                        formData.email.trim(),
+                        formData.phone.trim(),
+                        formData.password.trim(),
+                        formData.shopName.trim(),
+                        formData.shopAddress.street.trim(),
+                        formData.shopAddress.city.trim(),
+                        formData.shopAddress.state.trim(),
+                        formData.shopAddress.pincode.trim(),
+                        formData.shopPhone.trim(),
+                        formData.shopEmail.trim(),
+                        formData.gstNumber.trim(),
+                      ].filter(Boolean).length
+                    }
+                    /12)
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-gray-600">Required fields:</span>
+                  <div className="flex items-center gap-1">
+                    {[
+                      formData.shopName.trim(),
+                      formData.shopAddress.street.trim(),
+                      formData.shopAddress.city.trim(),
+                      formData.shopAddress.state.trim(),
+                      formData.shopAddress.pincode.trim(),
+                      formData.shopPhone.trim(),
+                      formData.shopEmail.trim(),
+                      formData.gstNumber.trim(),
+                    ].map((field, index) => (
+                      <div
+                        key={index}
+                        className={`w-2 h-2 rounded-full ${field ? 'bg-green-500' : 'bg-gray-300'}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-gray-500">
+                    (
+                    {
+                      [
+                        formData.shopName.trim(),
+                        formData.shopAddress.street.trim(),
+                        formData.shopAddress.city.trim(),
+                        formData.shopAddress.state.trim(),
+                        formData.shopAddress.pincode.trim(),
+                        formData.shopPhone.trim(),
+                        formData.shopEmail.trim(),
+                        formData.gstNumber.trim(),
+                      ].filter(Boolean).length
+                    }
+                    /8)
+                  </span>
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -688,7 +837,17 @@ const Partners = () => {
                   <XCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-red-800">Error</p>
-                    <p className="text-sm text-red-700 mt-1">{submitError}</p>
+                    <div className="text-sm text-red-700 mt-1">
+                      {submitError.includes('\n') ? (
+                        <ul className="list-disc list-inside space-y-1">
+                          {submitError.split('\n').map((line, index) => (
+                            <li key={index}>{line}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>{submitError}</p>
+                      )}
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -715,7 +874,10 @@ const Partners = () => {
                           onChange={e => setFormData({ ...formData, name: e.target.value })}
                           required
                           placeholder="Enter full name"
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                          className={getFieldClass(
+                            formData.name.trim().length > 0,
+                            'w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200'
+                          )}
                         />
                       </div>
                       <div>
@@ -825,7 +987,10 @@ const Partners = () => {
                   onChange={e => setFormData({ ...formData, shopName: e.target.value })}
                   required
                   placeholder="Enter shop name"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                  className={getFieldClass(
+                    formData.shopName.trim().length > 0,
+                    'w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200'
+                  )}
                 />
               </div>
 
@@ -1062,6 +1227,12 @@ const Partners = () => {
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                {!isFormValid() && (
+                  <div className="flex items-center gap-2 text-sm text-amber-600 mr-auto">
+                    <XCircle size={16} />
+                    <span>Please fill all required fields</span>
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={() => {
@@ -1076,7 +1247,8 @@ const Partners = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || !isFormValid()}
+                  title={!isFormValid() ? 'Please fill all required fields to continue' : ''}
                   className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? (

@@ -145,13 +145,24 @@ export async function uploadDocuments(req, res) {
     );
   }
 
-  if (Object.keys(updateData).length > 0) {
+  // Only set verification status to 'submitted' if explicitly requested
+  if (req.body.verificationStatus === 'submitted') {
     updateData.verificationStatus = 'submitted';
   }
 
   const partner = await Partner.findOneAndUpdate(
     { user: userId },
-    { $set: updateData },
+    {
+      $set: {
+        'documents.gstCertificate': updateData.gstCertificate,
+        'documents.shopLicense': updateData.shopLicense,
+        'documents.ownerIdProof': updateData.ownerIdProof,
+        'documents.additionalDocuments': updateData.additionalDocuments,
+        ...(updateData.verificationStatus && {
+          verificationStatus: updateData.verificationStatus,
+        }),
+      },
+    },
     { new: true }
   );
 
@@ -162,7 +173,10 @@ export async function uploadDocuments(req, res) {
   res.status(200).json({
     success: true,
     data: partner,
-    message: 'Documents uploaded successfully',
+    message:
+      updateData.verificationStatus === 'submitted'
+        ? 'Documents submitted for verification successfully'
+        : 'Documents uploaded successfully',
   });
 }
 

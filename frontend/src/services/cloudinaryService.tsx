@@ -42,7 +42,7 @@ class CloudinaryService {
   private uploadPreset?: string;
 
   constructor() {
-    this.baseUrl = `${API_BASE_URL}/upload`;
+    this.baseUrl = `${API_BASE_URL}/v1/upload`;
   }
 
   /**

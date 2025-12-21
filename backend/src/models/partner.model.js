@@ -76,7 +76,7 @@ const partnerSchema = new mongoose.Schema(
     },
     verificationStatus: {
       type: String,
-      enum: ['pending', 'approved', 'rejected'],
+      enum: ['pending', 'submitted', 'approved', 'rejected'],
       default: 'pending',
     },
     verificationNotes: String,

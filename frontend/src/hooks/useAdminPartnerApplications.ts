@@ -39,15 +39,35 @@ const useAdminPartnerApplications = () => {
           email: partner.shopEmail || partner.user?.email || 'N/A',
           phone: partner.shopPhone || partner.user?.phone || 'N/A',
           businessName: partner.shopName || 'N/A',
-          businessType: 'Retail Shop', // Default value
+          businessType: 'Electronics Retail', // Default value
           gstNumber: partner.gstNumber || 'N/A',
           address: partner.shopAddress?.street || 'N/A',
           city: partner.shopAddress?.city || 'N/A',
           state: partner.shopAddress?.state || 'N/A',
           status: partner.verificationStatus || 'pending',
+          verificationStatus: partner.verificationStatus || 'pending',
           priority: 'medium', // Default priority
           createdAt: partner.createdAt,
-          documents: partner.documents
+          updatedAt: partner.updatedAt,
+          isVerified: partner.isVerified || false,
+          rating: partner.rating || 0,
+
+          // Include all partner data for the modal
+          user: partner.user,
+          shopName: partner.shopName,
+          shopEmail: partner.shopEmail,
+          shopPhone: partner.shopPhone,
+          shopAddress: partner.shopAddress,
+          service_radius: partner.service_radius,
+          upiId: partner.upiId,
+          bankDetails: partner.bankDetails,
+          wallet: partner.wallet,
+          documents: partner.documents,
+          verificationNotes: partner.verificationNotes,
+          reviews: partner.reviews || [],
+
+          // Legacy format for compatibility
+          documents_legacy: partner.documents
             ? [
                 partner.documents.gstCertificate && {
                   name: 'GST Certificate',
@@ -88,7 +108,7 @@ const useAdminPartnerApplications = () => {
           pending: statusCounts.pending || 0,
           approved: statusCounts.approved || 0,
           rejected: statusCounts.rejected || 0,
-          under_review: statusCounts.under_review || 0,
+          under_review: statusCounts.submitted || 0, // Map 'submitted' to 'under_review' for display
         });
       }
     } catch (err: any) {
@@ -112,11 +132,19 @@ const useAdminPartnerApplications = () => {
         });
 
         if (response.success) {
-          // Update local state
+          // Update local state with all relevant fields
           setApplications((prev: any) =>
             prev.map((app: any) =>
               app._id === applicationId
-                ? { ...app, status, experience: notes, updatedAt: new Date().toISOString() }
+                ? {
+                    ...app,
+                    status,
+                    verificationStatus: status,
+                    isVerified: status === 'approved',
+                    experience: notes,
+                    verificationNotes: notes,
+                    updatedAt: new Date().toISOString(),
+                  }
                 : app
             )
           );
@@ -125,11 +153,22 @@ const useAdminPartnerApplications = () => {
           setStats((prev: any) => {
             const oldApp: any = applications.find((app: any) => app._id === applicationId);
             if (oldApp && oldApp.status !== status) {
-              return {
+              const newStats = {
                 ...prev,
                 [oldApp.status]: Math.max(0, prev[oldApp.status] - 1),
                 [status]: (prev[status] || 0) + 1,
               };
+
+              // Handle 'submitted' status mapping to 'under_review' for display
+              if (status === 'submitted') {
+                newStats.under_review = (newStats.under_review || 0) + 1;
+                delete newStats.submitted;
+              }
+              if (oldApp.status === 'submitted') {
+                newStats.under_review = Math.max(0, (newStats.under_review || 0) - 1);
+              }
+
+              return newStats;
             }
             return prev;
           });

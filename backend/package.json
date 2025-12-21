@@ -12,7 +12,8 @@
     "lint:fix": "eslint . --fix",
     "seed:admin": "node src/scripts/seedSuperAdmin.js",
     "seed:user": "node src/scripts/seedUsers.js",
-    "seed:partner": "node src/scripts/seedPartners.js"
+    "seed:partner": "node src/scripts/seedPartners.js",
+    "fix:partner-status": "node src/scripts/fixPartnerVerificationStatus.js"
   },
   "dependencies": {
     "axios": "^1.13.2",

@@ -1,7 +1,8 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { User } from '../models/user.model.js';
+import mongoose from 'mongoose';
+
 import connectDB from '../config/dbConfig.js';
+import { User } from '../models/user.model.js';
 
 dotenv.config();
 

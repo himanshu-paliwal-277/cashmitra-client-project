@@ -1,9 +1,10 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { User } from '../models/user.model.js';
-import { Partner } from '../models/partner.model.js';
-import { Wallet } from '../models/wallet.model.js';
+import mongoose from 'mongoose';
+
 import connectDB from '../config/dbConfig.js';
+import { Partner } from '../models/partner.model.js';
+import { User } from '../models/user.model.js';
+import { Wallet } from '../models/wallet.model.js';
 
 dotenv.config();
 

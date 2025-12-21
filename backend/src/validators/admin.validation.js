@@ -57,12 +57,22 @@ export const createPartnerSchema = {
         pincode: z.string().length(6, 'Pincode must be 6 digits'),
       }),
       shopEmail: z.string().email('Valid shop email is required'),
-      shopPhone: z.string().length(10, 'Phone number length should be of atleast 10 digits.'),
+      shopLogo: z.string().optional(),
+      shopImages: z.array(z.string()).optional(),
+      shopPhone: z.string().min(10, 'Phone number must be at least 10 digits'),
       gstNumber: z.string().length(15, 'GST number should be of 15 digits'),
+      bankDetails: z
+        .object({
+          accountNumber: z.string().optional(),
+          ifscCode: z.string().optional(),
+          bankName: z.string().optional(),
+          accountHolderName: z.string().optional(),
+        })
+        .optional(),
       upiId: z
         .string()
         .regex(
-          /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/,
+          /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/,
           'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)'
         )
         .optional(),
@@ -104,7 +114,7 @@ export const updatePartnerSchema = {
     upiId: z
       .string()
       .regex(
-        /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/,
+        /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/,
         'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)'
       )
       .optional(),
