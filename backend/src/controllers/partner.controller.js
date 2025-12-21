@@ -560,6 +560,8 @@ export async function updatePartnerProduct(req, res) {
       };
     }
 
+    console.log('Update Buy Product - Prepared Data:', updateData);
+
     const updatedProduct = await BuyProduct.findByIdAndUpdate(
       req.params.id,
       { $set: updateData },

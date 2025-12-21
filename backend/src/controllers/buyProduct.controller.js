@@ -280,6 +280,8 @@ export const createBuyProduct = async (req, res) => {
       .populate('categoryId', 'name')
       .populate('createdBy', 'name email');
 
+    console.log('Created Buy Product:', populatedProduct);
+
     res.status(201).json({
       success: true,
       message: 'Buy product created successfully',
@@ -306,6 +308,8 @@ export const updateBuyProduct = async (req, res) => {
         });
       }
     }
+
+    console.log('Update Buy Product - Incoming Data:', req.body);
 
     const existingProduct = await BuyProduct.findById(req.params.id);
 

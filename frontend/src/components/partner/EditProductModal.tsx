@@ -711,7 +711,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="w-full overflow-y-auto overflow-x-hidden">
           {/* Success/Error Messages */}
           {success && (
             <div className="m-6 mb-0 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">

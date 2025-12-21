@@ -1,16 +1,14 @@
 import { z } from 'zod';
 
 // Password validation regex for strength checking
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]/;
+const passwordRegex = /^(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
 // Custom password refinement for strength validation
-const passwordSchema = z
+export const passwordSchema = z
   .string()
-  .min(8, 'Password must be at least 8 characters long')
-  .refine(
-    (password) => passwordRegex.test(password),
-    'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+  .regex(
+    passwordRegex,
+    'Password must be at least 8 characters and include lowercase, number, and special character'
   );
 
 // ==========================================

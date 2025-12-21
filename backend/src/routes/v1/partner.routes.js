@@ -16,12 +16,10 @@ import { validateRequest } from '../../middlewares/validation.middleware.js';
 import {
   assignAgentToOrderSchema,
   createAgentSchema,
-  createPartnerProductSchema,
   registerPartnerShopSchema,
   respondToOrderAssignmentSchema,
   updateAgentSchema,
   updateOrderStatusSchema,
-  updatePartnerProductSchema,
   updatePartnerProfileSchema,
   updatePartnerSellOrderStatusSchema,
   uploadDocumentsSchema,
@@ -160,7 +158,7 @@ router.post(
   authorize('partner'),
   attachPartner,
   requirePartner,
-  validate(createPartnerProductSchema),
+  // validate(createPartnerProductSchema),
   partnerController.createPartnerProduct
 );
 
@@ -171,7 +169,7 @@ router.put(
   attachPartner,
   requirePartner,
   validateObjectId('id'),
-  validate(updatePartnerProductSchema),
+  // validate(updatePartnerProductSchema),
   partnerController.updatePartnerProduct
 );
 
