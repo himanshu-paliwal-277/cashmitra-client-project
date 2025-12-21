@@ -57,6 +57,8 @@ export const createPartnerSchema = {
         pincode: z.string().length(6, 'Pincode must be 6 digits'),
       }),
       shopEmail: z.string().email('Valid shop email is required'),
+      shopPhone: z.string().length(10, 'Phone number length should be of atleast 10 digits.'),
+      gstNumber: z.string().length(15, 'GST number should be of 15 digits'),
       upiId: z
         .string()
         .regex(
