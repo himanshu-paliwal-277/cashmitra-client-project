@@ -1,306 +1,27 @@
 /**
- * @fileoverview Question Modal Component
- * @description Modal for adding and editing sell questions
+ * @fileoverview Enhanced Question Modal Component
+ * @description User-friendly modal for adding and editing sell questions
  * @author Cashmitra Development Team
- * @version 1.0.0
+ * @version 2.0.0
  */
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { X, Save, Plus, Trash2, AlertCircle, HelpCircle, CheckCircle, Circle } from 'lucide-react';
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  width: 100%;
-  max-width: 700px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-`;
-
-const ModalHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-`;
-
-const ModalBody = styled.div`
-  padding: 1.5rem;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-`;
-
-const Label = styled.label`
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-
-  &:disabled {
-    background: #f9fafb;
-    color: #6b7280;
-  }
-`;
-
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-`;
-
-const TextArea = styled.textarea`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  min-height: 100px;
-  resize: vertical;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-`;
-
-const OptionsSection = styled.div`
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 1rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const OptionCard = styled.div`
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  background: #f9fafb;
-`;
-
-const OptionHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-
-const OptionGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 1rem;
-  align-items: center;
-`;
-
-const AddOptionButton = styled.button`
-  background: #f59e0b;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #d97706;
-  }
-`;
-
-const RemoveOptionButton = styled.button`
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #dc2626;
-  }
-`;
-
-const CorrectToggle = styled.button`
-  background: ${(props: any) => (props.isCorrect ? '#10b981' : '#e5e7eb')};
-  color: ${(props: any) => (props.isCorrect ? 'white' : '#6b7280')};
-  border: none;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: ${(props: any) => (props.isCorrect ? '#059669' : '#d1d5db')};
-  }
-`;
-
-const ErrorMessage = styled.div`
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const ModalFooter = styled.div`
-  padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-`;
-
-const Button = styled.button`
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  ${(props: any) =>
-    props.variant === 'primary'
-      ? `
-background: #f59e0b;
-color: white;
-border: none;
-
-&:hover {
-  background: #d97706;
-}
-
-&:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
-`
-      : `
-background: white;
-color: #374151;
-border: 1px solid #d1d5db;
-
-&:hover {
-  background: #f9fafb;
-}
-`}
-`;
-
-// Updated QuestionModal component
-// Changes:
-// - RpplacedaproductId with ced produc
-//t- Ripltceh egoryIds propewithed products
-// - Replaced telech aPies
-//IdewithlcelectedProductId w(assuming you uidate the patent chm onent accordingly)
-// - Removed variantIds from formDataselectedCategoryId (assuming you update the parent compon
-// - No other major changes needed
-// QuestionModal.jsx
-
-// QuestionModal.jsxent accordingly)
-// - Removed variantIds from formData
-// - Updated labels and selects from Product to Category
-// - No other major changes needed
-// QuestionModal.jsx
-
-// QuestionModal.jsx
+import { useState, useEffect } from 'react';
+import {
+  X,
+  Save,
+  Plus,
+  Trash2,
+  AlertCircle,
+  HelpCircle,
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  Info,
+  Tag,
+  Type,
+  Settings,
+  DollarSign,
+} from 'lucide-react';
 
 const QuestionModal = ({
   isOpen,
@@ -335,6 +56,12 @@ const QuestionModal = ({
   });
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [error, setError] = useState('');
+  const [expandedSections, setExpandedSections] = useState({
+    basic: true,
+    targeting: false,
+    configuration: false,
+    options: true,
+  });
 
   // Filter products by selected category
   const filteredProducts = formData.categoryId
@@ -397,6 +124,40 @@ const QuestionModal = ({
     setError('');
   }, [question, isOpen, selectedCategoryId, products]);
 
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  const getSectionIcon = (section: string) => {
+    switch (section) {
+      case 'basic':
+        return <Type size={18} className="text-blue-600" />;
+      case 'targeting':
+        return <Tag size={18} className="text-green-600" />;
+      case 'configuration':
+        return <Settings size={18} className="text-purple-600" />;
+      case 'options':
+        return <CheckCircle size={18} className="text-orange-600" />;
+      default:
+        return <Info size={18} className="text-gray-600" />;
+    }
+  };
+
+  const getUITypeDescription = (type: string) => {
+    const descriptions = {
+      radio: 'Single choice - users can select only one option',
+      checkbox: 'Multiple choice - users can select multiple options',
+      select: 'Dropdown menu - single selection from a list',
+      multiselect: 'Dropdown menu - multiple selections allowed',
+      slider: 'Range slider - for numeric values',
+      toggle: 'Simple yes/no switch',
+    };
+    return descriptions[type] || '';
+  };
+
   const handleInputChange = (field: any, value: any) => {
     setFormData(prev => ({
       ...prev,
@@ -406,24 +167,46 @@ const QuestionModal = ({
   };
 
   const addOption = () => {
-    setFormData(prev => ({
-      ...prev,
-      options: [
-        ...prev.options,
-        {
-          tempId: Date.now(), // Use tempId instead of id
-          key: '',
-          label: '',
-          value: '',
-          delta: {
-            type: 'percent',
-            sign: '+',
-            value: 0,
+    const newOption = {
+      tempId: Date.now(),
+      key: '',
+      label: '',
+      value: '',
+      delta: {
+        type: 'percent',
+        sign: '+',
+        value: 0,
+      },
+      showIf: { questionKey: '', value: '' },
+    };
+
+    // For toggle questions, auto-populate with Yes/No if no options exist
+    if (formData.uiType === 'toggle' && formData.options.length === 0) {
+      setFormData(prev => ({
+        ...prev,
+        options: [
+          {
+            ...newOption,
+            tempId: Date.now(),
+            key: 'yes',
+            label: 'Yes',
+            value: 'yes',
           },
-          showIf: { questionKey: '', value: '' },
-        },
-      ],
-    }));
+          {
+            ...newOption,
+            tempId: Date.now() + 1,
+            key: 'no',
+            label: 'No',
+            value: 'no',
+          },
+        ],
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        options: [...prev.options, newOption],
+      }));
+    }
   };
 
   const removeOption = (tempId: any) => {
@@ -478,7 +261,8 @@ const QuestionModal = ({
     if (
       formData.uiType === 'radio' ||
       formData.uiType === 'checkbox' ||
-      formData.uiType === 'select'
+      formData.uiType === 'select' ||
+      formData.uiType === 'multiselect'
     ) {
       if (formData.options.length < 2) {
         setError('At least 2 options are required for choice questions');
@@ -499,6 +283,28 @@ const QuestionModal = ({
       ) {
         setError('Option showIf must have both questionKey and value or be empty');
         return;
+      }
+    }
+
+    // Special validation for toggle questions
+    if (formData.uiType === 'toggle') {
+      if (formData.options.length > 0 && formData.options.length !== 2) {
+        setError(
+          'Toggle questions must have exactly 2 options (Yes/No) or none for default behavior'
+        );
+        return;
+      }
+      if (formData.options.length === 2) {
+        const hasYes = formData.options.some(
+          o => o.key.toLowerCase() === 'yes' || o.key.toLowerCase() === 'true'
+        );
+        const hasNo = formData.options.some(
+          o => o.key.toLowerCase() === 'no' || o.key.toLowerCase() === 'false'
+        );
+        if (!hasYes || !hasNo) {
+          setError('Toggle questions should have Yes/No or True/False options');
+          return;
+        }
       }
     }
 
@@ -532,444 +338,770 @@ const QuestionModal = ({
   if (!isOpen) return null;
 
   return (
-    <ModalOverlay onClick={(e: any) => e.target === e.currentTarget && onClose()}>
-      <ModalContent>
-        <ModalHeader>
-          <ModalTitle>
-            <HelpCircle size={20} />
-            {isViewMode ? 'View Question' : question ? 'Edit Question' : 'Add New Question'}
-          </ModalTitle>
-          <CloseButton onClick={onClose}>
-            <X size={20} />
-          </CloseButton>
-        </ModalHeader>
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      onClick={(e: any) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <HelpCircle size={20} className="text-blue-600" />
+            <h2 className="text-xl font-semibold text-gray-900">
+              {isViewMode ? 'View Question' : question ? 'Edit Question' : 'Add New Question'}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X size={20} className="text-gray-500" />
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <ModalBody>
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <div className="flex-1 p-6 overflow-y-auto space-y-6">
             {error && (
-              <ErrorMessage>
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
                 <AlertCircle size={16} />
                 {error}
-              </ErrorMessage>
+              </div>
             )}
 
-            <FormGroup>
-              <Label>Category *</Label>
-              <Select
-                value={formData.categoryId}
-                onChange={(e: any) => {
-                  const newCategoryId = e.target.value;
-                  handleInputChange('categoryId', newCategoryId);
-                  // Clear product and variants when category changes
-                  handleInputChange('productId', '');
-                  handleInputChange('variantIds', []);
-                  setSelectedProduct(null);
-                }}
-                required
-                disabled={isViewMode}
+            {/* Basic Information Section */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('basic')}
+                className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-150 transition-colors"
               >
-                <option value="">Select category</option>
-                {categories.map(category => (
-                  <option key={category._id} value={category._id}>
-                    {category.displayName || category.name}
-                  </option>
-                ))}
-              </Select>
-            </FormGroup>
+                <div className="flex items-center gap-3">
+                  {getSectionIcon('basic')}
+                  <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
+                  <span className="text-sm text-gray-500">Question details and content</span>
+                </div>
+                {expandedSections.basic ? (
+                  <ChevronUp size={20} className="text-gray-600" />
+                ) : (
+                  <ChevronDown size={20} className="text-gray-600" />
+                )}
+              </button>
 
-            <FormGroup>
-              <Label>Product (Optional)</Label>
-              <Select
-                value={formData.productId}
-                onChange={(e: any) => {
-                  const productId = e.target.value;
-                  handleInputChange('productId', productId);
-                  const prod = filteredProducts.find((p: any) => p._id === productId);
-                  setSelectedProduct(prod || null);
-                  handleInputChange('variantIds', []);
-                }}
-                disabled={isViewMode || !formData.categoryId}
-              >
-                <option value="">All Products (General Question)</option>
-                {filteredProducts.map((product: any) => (
-                  <option key={product._id} value={product._id}>
-                    {product.name}
-                  </option>
-                ))}
-              </Select>
-              <small style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '0.25rem' }}>
-                {!formData.categoryId
-                  ? 'Select a category first to see products'
-                  : 'Leave empty to apply this question to all products in the category'}
-              </small>
-            </FormGroup>
-
-            {selectedProduct && selectedProduct.variants && selectedProduct.variants.length > 0 && (
-              <FormGroup>
-                <Label>Variants (Optional)</Label>
-                <div
-                  style={{
-                    maxHeight: '150px',
-                    overflowY: 'auto',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '0.5rem',
-                    padding: '0.5rem',
-                  }}
-                >
-                  {selectedProduct.variants.map((variant: any) => (
-                    <label
-                      key={variant._id}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '0.5rem',
-                        cursor: 'pointer',
-                      }}
-                    >
+              {expandedSections.basic && (
+                <div className="p-6 space-y-6 bg-white">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Question Key *
+                        <span className="ml-1 text-xs text-gray-500">(Unique identifier)</span>
+                      </label>
                       <input
-                        type="checkbox"
-                        checked={formData.variantIds.includes(variant._id)}
-                        onChange={(e: any) => {
-                          if (e.target.checked) {
-                            handleInputChange('variantIds', [...formData.variantIds, variant._id]);
-                          } else {
-                            handleInputChange(
-                              'variantIds',
-                              formData.variantIds.filter((id: any) => id !== variant._id)
-                            );
-                          }
-                        }}
-                        style={{ marginRight: '0.5rem' }}
+                        type="text"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                        value={formData.key}
+                        onChange={(e: any) => handleInputChange('key', e.target.value)}
+                        placeholder="e.g., screen_condition"
+                        required
                         disabled={isViewMode}
                       />
-                      <span style={{ fontSize: '0.875rem' }}>
-                        {variant.label ||
-                          `${variant.ram ? variant.ram + ' RAM' : ''}${variant.storage ? ' / ' + variant.storage + ' Storage' : ''}${variant.color ? ' / ' + variant.color : ''}`.trim() ||
-                          'Unnamed Variant'}
+                      <p className="text-xs text-gray-500 mt-1">
+                        Use lowercase with underscores (e.g., screen_condition)
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Display Order
+                        <span className="ml-1 text-xs text-gray-500">(Question sequence)</span>
+                      </label>
+                      <input
+                        type="number"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                        value={formData.order}
+                        onChange={(e: any) =>
+                          handleInputChange('order', parseInt(e.target.value) || 1)
+                        }
+                        min="1"
+                        disabled={isViewMode}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Question Title *
+                      <span className="ml-1 text-xs text-gray-500">(What users will see)</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                      value={formData.title}
+                      onChange={(e: any) => handleInputChange('title', e.target.value)}
+                      placeholder="What is the condition of your screen?"
+                      required
+                      disabled={isViewMode}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Description
+                      <span className="ml-1 text-xs text-gray-500">(Optional help text)</span>
+                    </label>
+                    <textarea
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 resize-none"
+                      rows={3}
+                      value={formData.description}
+                      onChange={(e: any) => handleInputChange('description', e.target.value)}
+                      placeholder="Please select the current condition of your device screen"
+                      disabled={isViewMode}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        UI Type *
+                        <span className="ml-1 text-xs text-gray-500">(How users interact)</span>
+                      </label>
+                      <select
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                        value={formData.uiType}
+                        onChange={(e: any) => handleInputChange('uiType', e.target.value)}
+                        required
+                        disabled={isViewMode}
+                      >
+                        <option value="radio">📻 Radio Button</option>
+                        <option value="checkbox">☑️ Checkbox</option>
+                        <option value="select">📋 Select Dropdown</option>
+                        <option value="multiselect">📋 Multi-Select</option>
+                        <option value="slider">🎚️ Slider</option>
+                        <option value="toggle">🔘 Toggle (Yes/No)</option>
+                      </select>
+                      {formData.uiType && (
+                        <p className="text-xs text-blue-600 mt-1">
+                          {getUITypeDescription(formData.uiType)}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Section *
+                        <span className="ml-1 text-xs text-gray-500">(Question category)</span>
+                      </label>
+                      <select
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                        value={formData.section}
+                        onChange={(e: any) => handleInputChange('section', e.target.value)}
+                        required
+                        disabled={isViewMode}
+                      >
+                        <option value="">Select section</option>
+                        <option value="Physical Condition">🔍 Physical Condition</option>
+                        <option value="Performance">⚡ Performance</option>
+                        <option value="Damage History">🔧 Damage History</option>
+                        <option value="screen">📱 Screen</option>
+                        <option value="body">📦 Body</option>
+                        <option value="functionality">⚙️ Functionality</option>
+                        <option value="accessories">🎧 Accessories</option>
+                        <option value="warranty">🛡️ Warranty</option>
+                        <option value="general">📝 General</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Required Question
+                      </label>
+                      <select
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                        value={formData.required ? 'true' : 'false'}
+                        onChange={(e: any) =>
+                          handleInputChange('required', e.target.value === 'true')
+                        }
+                        disabled={isViewMode}
+                      >
+                        <option value="true">✅ Yes - Must be answered</option>
+                        <option value="false">⭕ No - Optional</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Multi Select
+                      </label>
+                      <select
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                        value={formData.multiSelect ? 'true' : 'false'}
+                        onChange={(e: any) =>
+                          handleInputChange('multiSelect', e.target.value === 'true')
+                        }
+                        disabled={isViewMode}
+                      >
+                        <option value="false">🔘 Single selection</option>
+                        <option value="true">☑️ Multiple selections allowed</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Question Status
+                      <span className="ml-1 text-xs text-gray-500">
+                        (Active questions appear to users)
                       </span>
                     </label>
-                  ))}
+                    <select
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                      value={formData.isActive ? 'true' : 'false'}
+                      onChange={(e: any) =>
+                        handleInputChange('isActive', e.target.value === 'true')
+                      }
+                      disabled={isViewMode}
+                    >
+                      <option value="true">🟢 Active - Visible to users</option>
+                      <option value="false">🔴 Inactive - Hidden from users</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Inactive questions are saved but won't appear in the customer flow
+                    </p>
+                  </div>
                 </div>
-                <small style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '0.25rem' }}>
-                  Leave empty to apply to all variants of this product
-                </small>
-              </FormGroup>
-            )}
-
-            <FormGroup>
-              <Label>Question Key *</Label>
-              <Input
-                type="text"
-                value={formData.key}
-                onChange={(e: any) => handleInputChange('key', e.target.value)}
-                placeholder="e.g., screen_condition"
-                required
-                disabled={isViewMode}
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Question Title *</Label>
-              <Input
-                type="text"
-                value={formData.title}
-                onChange={(e: any) => handleInputChange('title', e.target.value)}
-                placeholder="What is the condition of your screen?"
-                required
-                disabled={isViewMode}
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Description</Label>
-              <TextArea
-                value={formData.description}
-                onChange={(e: any) => handleInputChange('description', e.target.value)}
-                placeholder="Please select the current condition of your device screen"
-                disabled={isViewMode}
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <Label>UI Type *</Label>
-              <Select
-                value={formData.uiType}
-                onChange={(e: any) => handleInputChange('uiType', e.target.value)}
-                required
-                disabled={isViewMode}
-              >
-                <option value="radio">Radio Button</option>
-                <option value="checkbox">Checkbox</option>
-                <option value="select">Select Dropdown</option>
-                <option value="multiselect">Multi-Select</option>
-                <option value="slider">Slider</option>
-                <option value="toggle">Toggle (Yes/No)</option>
-              </Select>
-            </FormGroup>
-
-            <FormGroup>
-              <Label>Section *</Label>
-              <Select
-                value={formData.section}
-                onChange={(e: any) => handleInputChange('section', e.target.value)}
-                required
-                disabled={isViewMode}
-              >
-                <option value="">Select section</option>
-                <option value="Physical Condition">Physical Condition</option>
-                <option value="Performance">Performance</option>
-                <option value="Damage History">Damage History</option>
-                <option value="screen">Screen</option>
-                <option value="body">Body</option>
-                <option value="functionality">Functionality</option>
-                <option value="accessories">Accessories</option>
-                <option value="warranty">Warranty</option>
-                <option value="general">General</option>
-              </Select>
-            </FormGroup>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
-              <FormGroup>
-                <Label>Display Order</Label>
-                <Input
-                  type="number"
-                  value={formData.order}
-                  onChange={(e: any) => handleInputChange('order', parseInt(e.target.value) || 1)}
-                  min="1"
-                  disabled={isViewMode}
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <Label>Required Question</Label>
-                <Select
-                  value={formData.required ? 'true' : 'false'}
-                  onChange={(e: any) => handleInputChange('required', e.target.value === 'true')}
-                  disabled={isViewMode}
-                >
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </Select>
-              </FormGroup>
-
-              <FormGroup>
-                <Label>Multi Select</Label>
-                <Select
-                  value={formData.multiSelect ? 'true' : 'false'}
-                  onChange={(e: any) => handleInputChange('multiSelect', e.target.value === 'true')}
-                  disabled={isViewMode}
-                >
-                  <option value="false">No</option>
-                  <option value="true">Yes</option>
-                </Select>
-              </FormGroup>
+              )}
             </div>
 
-            <FormGroup>
-              <Label>Show If Condition</Label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <Input
-                  type="text"
-                  value={formData.showIf.questionKey}
-                  onChange={(e: any) =>
-                    handleInputChange('showIf', { ...formData.showIf, questionKey: e.target.value })
-                  }
-                  placeholder="Question key"
-                  disabled={isViewMode}
-                />
-                <Input
-                  type="text"
-                  value={formData.showIf.value}
-                  onChange={(e: any) =>
-                    handleInputChange('showIf', { ...formData.showIf, value: e.target.value })
-                  }
-                  placeholder="Expected value"
-                  disabled={isViewMode}
-                />
-              </div>
-            </FormGroup>
-
-            {(formData.uiType === 'radio' ||
-              formData.uiType === 'checkbox' ||
-              formData.uiType === 'select') && (
-              <OptionsSection>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '1rem',
-                  }}
-                >
-                  <SectionTitle>
-                    <CheckCircle size={18} />
-                    Answer Options
-                  </SectionTitle>
-                  {!isViewMode && (
-                    <AddOptionButton type="button" onClick={addOption}>
-                      <Plus size={16} />
-                      Add Option
-                    </AddOptionButton>
-                  )}
+            {/* Targeting Section */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('targeting')}
+                className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-150 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  {getSectionIcon('targeting')}
+                  <h3 className="text-lg font-semibold text-gray-900">Question Targeting</h3>
+                  <span className="text-sm text-gray-500">Where this question appears</span>
                 </div>
+                {expandedSections.targeting ? (
+                  <ChevronUp size={20} className="text-gray-600" />
+                ) : (
+                  <ChevronDown size={20} className="text-gray-600" />
+                )}
+              </button>
 
-                {formData.options.map((option, index) => (
-                  <OptionCard key={option.tempId}>
-                    <OptionHeader>
-                      <span style={{ fontWeight: '600', color: '#374151' }}>
-                        Option {index + 1}
+              {expandedSections.targeting && (
+                <div className="p-6 space-y-6 bg-white">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Category *
+                      <span className="ml-1 text-xs text-gray-500">
+                        (Required - which category)
                       </span>
-                      {!isViewMode && (
-                        <RemoveOptionButton
-                          type="button"
-                          onClick={() => removeOption(option.tempId)}
-                        >
-                          <Trash2 size={12} />
-                          Remove
-                        </RemoveOptionButton>
-                      )}
-                    </OptionHeader>
-
-                    <div
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: '1rem',
-                        marginBottom: '1rem',
+                    </label>
+                    <select
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                      value={formData.categoryId}
+                      onChange={(e: any) => {
+                        const newCategoryId = e.target.value;
+                        handleInputChange('categoryId', newCategoryId);
+                        // Clear product and variants when category changes
+                        handleInputChange('productId', '');
+                        handleInputChange('variantIds', []);
+                        setSelectedProduct(null);
                       }}
+                      required
+                      disabled={isViewMode}
                     >
-                      <FormGroup>
-                        <Label>Option Key</Label>
-                        <Input
-                          type="text"
-                          value={option.key}
-                          onChange={(e: any) => updateOption(option.tempId, 'key', e.target.value)}
-                          placeholder="excellent"
-                          disabled={isViewMode}
-                        />
-                      </FormGroup>
+                      <option value="">Select category</option>
+                      {categories.map((category: any) => (
+                        <option key={category._id} value={category._id}>
+                          {category.superCategory?.name
+                            ? `${category.superCategory.name} > ${category.displayName || category.name}`
+                            : category.displayName || category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                      <FormGroup>
-                        <Label>Option Value</Label>
-                        <Input
-                          type="text"
-                          value={option.value}
-                          onChange={(e: any) =>
-                            updateOption(option.tempId, 'value', e.target.value)
-                          }
-                          placeholder="excellent"
-                          disabled={isViewMode}
-                        />
-                      </FormGroup>
-                    </div>
-
-                    <FormGroup>
-                      <Label>Option Label</Label>
-                      <Input
-                        type="text"
-                        value={option.label}
-                        onChange={(e: any) => updateOption(option.tempId, 'label', e.target.value)}
-                        placeholder="Excellent - No scratches or damage"
-                        disabled={isViewMode}
-                      />
-                    </FormGroup>
-
-                    <div
-                      style={{
-                        marginTop: '1rem',
-                        padding: '1rem',
-                        background: '#f3f4f6',
-                        borderRadius: '0.5rem',
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Product (Optional)
+                      <span className="ml-1 text-xs text-gray-500">(Specific product or all)</span>
+                    </label>
+                    <select
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                      value={formData.productId}
+                      onChange={(e: any) => {
+                        const productId = e.target.value;
+                        handleInputChange('productId', productId);
+                        const prod = filteredProducts.find((p: any) => p._id === productId);
+                        setSelectedProduct(prod || null);
+                        handleInputChange('variantIds', []);
                       }}
+                      disabled={isViewMode || !formData.categoryId}
                     >
-                      <Label style={{ marginBottom: '0.5rem', display: 'block' }}>
-                        Price Delta
-                      </Label>
-                      <div
-                        style={{
-                          display: 'grid',
-                          gridTemplateColumns: '1fr 1fr 1fr',
-                          gap: '0.5rem',
-                        }}
-                      >
-                        <Select
-                          value={option.delta?.type || 'percent'}
-                          onChange={(e: any) =>
-                            updateOptionDelta(option.tempId, 'type', e.target.value)
-                          }
-                          disabled={isViewMode}
-                        >
-                          <option value="percent">Percentage</option>
-                          <option value="abs">Absolute</option>
-                        </Select>
+                      <option value="">🌐 All Products (General Question)</option>
+                      {filteredProducts.map((product: any) => (
+                        <option key={product._id} value={product._id}>
+                          📱 {product.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {!formData.categoryId
+                        ? 'Select a category first to see products'
+                        : 'Leave empty to apply this question to all products in the category'}
+                    </p>
+                  </div>
 
-                        <Select
-                          value={option.delta?.sign || '+'}
-                          onChange={(e: any) =>
-                            updateOptionDelta(option.tempId, 'sign', e.target.value)
-                          }
-                          disabled={isViewMode}
-                        >
-                          <option value="+">+ (Add)</option>
-                          <option value="-">- (Subtract)</option>
-                        </Select>
+                  {selectedProduct &&
+                    selectedProduct.variants &&
+                    selectedProduct.variants.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Variants (Optional)
+                          <span className="ml-1 text-xs text-gray-500">
+                            (Specific variants or all)
+                          </span>
+                        </label>
+                        <div className="max-h-36 overflow-y-auto border border-gray-300 rounded-lg p-2 bg-gray-50">
+                          {selectedProduct.variants.map((variant: any) => (
+                            <label
+                              key={variant._id}
+                              className="flex items-center p-2 cursor-pointer hover:bg-white rounded transition-colors"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={formData.variantIds.includes(variant._id)}
+                                onChange={(e: any) => {
+                                  if (e.target.checked) {
+                                    handleInputChange('variantIds', [
+                                      ...formData.variantIds,
+                                      variant._id,
+                                    ]);
+                                  } else {
+                                    handleInputChange(
+                                      'variantIds',
+                                      formData.variantIds.filter((id: any) => id !== variant._id)
+                                    );
+                                  }
+                                }}
+                                className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                disabled={isViewMode}
+                              />
+                              <span className="text-sm text-gray-700">
+                                {variant.label ||
+                                  `${variant.ram ? variant.ram + ' RAM' : ''}${variant.storage ? ' / ' + variant.storage + ' Storage' : ''}${variant.color ? ' / ' + variant.color : ''}`.trim() ||
+                                  'Unnamed Variant'}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Leave empty to apply to all variants of this product
+                        </p>
+                      </div>
+                    )}
+                </div>
+              )}
+            </div>
 
-                        <Input
-                          type="number"
-                          value={option.delta?.value || 0}
+            {/* Advanced Configuration Section */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('configuration')}
+                className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-150 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  {getSectionIcon('configuration')}
+                  <h3 className="text-lg font-semibold text-gray-900">Advanced Configuration</h3>
+                  <span className="text-sm text-gray-500">Conditional logic and settings</span>
+                </div>
+                {expandedSections.configuration ? (
+                  <ChevronUp size={20} className="text-gray-600" />
+                ) : (
+                  <ChevronDown size={20} className="text-gray-600" />
+                )}
+              </button>
+
+              {expandedSections.configuration && (
+                <div className="p-6 space-y-6 bg-white">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Show If Condition
+                      <span className="ml-1 text-xs text-gray-500">
+                        (Optional - conditional display)
+                      </span>
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <input
+                          type="text"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                          value={formData.showIf.questionKey}
                           onChange={(e: any) =>
-                            updateOptionDelta(
-                              option.tempId,
-                              'value',
-                              parseFloat(e.target.value) || 0
-                            )
+                            handleInputChange('showIf', {
+                              ...formData.showIf,
+                              questionKey: e.target.value,
+                            })
                           }
-                          placeholder="0"
-                          min="0"
+                          placeholder="Question key (e.g., has_damage)"
                           disabled={isViewMode}
                         />
+                        <p className="text-xs text-gray-500 mt-1">Previous question's key</p>
+                      </div>
+                      <div>
+                        <input
+                          type="text"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                          value={formData.showIf.value}
+                          onChange={(e: any) =>
+                            handleInputChange('showIf', {
+                              ...formData.showIf,
+                              value: e.target.value,
+                            })
+                          }
+                          placeholder="Expected value (e.g., yes)"
+                          disabled={isViewMode}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Value that triggers this question
+                        </p>
                       </div>
                     </div>
-                  </OptionCard>
-                ))}
+                    <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-blue-700">
+                        💡 <strong>Tip:</strong> This question will only appear if the specified
+                        question has the expected value. Leave empty to always show this question.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Answer Options Section */}
+            {(formData.uiType === 'radio' ||
+              formData.uiType === 'checkbox' ||
+              formData.uiType === 'select' ||
+              formData.uiType === 'toggle' ||
+              formData.uiType === 'multiselect' ||
+              formData.uiType === 'slider') && (
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => toggleSection('options')}
+                  className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-150 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    {getSectionIcon('options')}
+                    <h3 className="text-lg font-semibold text-gray-900">Answer Options</h3>
+                    <span className="text-sm text-gray-500">
+                      {formData.options.length} option{formData.options.length !== 1 ? 's' : ''}{' '}
+                      configured
+                    </span>
+                  </div>
+                  {expandedSections.options ? (
+                    <ChevronUp size={20} className="text-gray-600" />
+                  ) : (
+                    <ChevronDown size={20} className="text-gray-600" />
+                  )}
+                </button>
 
-                {formData.options.length === 0 && (
-                  <div
-                    style={{
-                      textAlign: 'center',
-                      padding: '2rem',
-                      color: '#6b7280',
-                      border: '2px dashed #d1d5db',
-                      borderRadius: '0.5rem',
-                    }}
-                  >
-                    No options added yet. Click "Add Option" to create answer choices.
+                {expandedSections.options && (
+                  <div className="p-6 bg-white">
+                    <div className="flex justify-between items-center mb-6">
+                      <div>
+                        <p className="text-sm text-gray-600">
+                          {formData.uiType === 'toggle'
+                            ? 'Configure Yes/No options and their price impact. Toggle questions can work without options (default Yes/No) or with custom options for price calculation.'
+                            : formData.uiType === 'slider'
+                              ? "Slider questions typically don't need predefined options, but you can add them for specific value ranges."
+                              : `Create answer choices for your ${formData.uiType} question. Each option can affect the final price.`}
+                        </p>
+                      </div>
+                      {!isViewMode && (
+                        <button
+                          type="button"
+                          onClick={addOption}
+                          className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                        >
+                          <Plus size={16} />
+                          {formData.uiType === 'toggle' && formData.options.length === 0
+                            ? 'Add Yes/No Options'
+                            : 'Add Option'}
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      {formData.options.map((option, index) => (
+                        <div
+                          key={option.tempId}
+                          className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200"
+                        >
+                          <div className="flex justify-between items-center mb-4">
+                            <div className="flex items-center gap-2">
+                              <span className="flex items-center justify-center w-6 h-6 bg-orange-600 text-white text-xs font-bold rounded-full">
+                                {index + 1}
+                              </span>
+                              <span className="font-semibold text-gray-700">
+                                Option {index + 1}
+                              </span>
+                            </div>
+                            {!isViewMode && (
+                              <button
+                                type="button"
+                                onClick={() => removeOption(option.tempId)}
+                                className="flex items-center gap-1 px-3 py-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                              >
+                                <Trash2 size={12} />
+                                Remove
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Option Key *
+                                <span className="ml-1 text-xs text-gray-500">
+                                  (Internal identifier)
+                                </span>
+                              </label>
+                              <input
+                                type="text"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                                value={option.key}
+                                onChange={(e: any) =>
+                                  updateOption(option.tempId, 'key', e.target.value)
+                                }
+                                placeholder="excellent"
+                                disabled={isViewMode}
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Option Value *
+                                <span className="ml-1 text-xs text-gray-500">(Stored value)</span>
+                              </label>
+                              <input
+                                type="text"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                                value={option.value}
+                                onChange={(e: any) =>
+                                  updateOption(option.tempId, 'value', e.target.value)
+                                }
+                                placeholder="excellent"
+                                disabled={isViewMode}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Option Label *
+                              <span className="ml-1 text-xs text-gray-500">(What users see)</span>
+                            </label>
+                            <input
+                              type="text"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                              value={option.label}
+                              onChange={(e: any) =>
+                                updateOption(option.tempId, 'label', e.target.value)
+                              }
+                              placeholder="Excellent - No scratches or damage"
+                              disabled={isViewMode}
+                            />
+                          </div>
+
+                          <div className="p-4 bg-white rounded-lg border border-gray-200">
+                            <div className="flex items-center gap-2 mb-3">
+                              <DollarSign size={16} className="text-green-600" />
+                              <label className="text-sm font-medium text-gray-700">
+                                Price Impact
+                                <span className="ml-1 text-xs text-gray-500">
+                                  (How this affects the quote)
+                                </span>
+                              </label>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              <div>
+                                <select
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                                  value={option.delta?.type || 'percent'}
+                                  onChange={(e: any) =>
+                                    updateOptionDelta(option.tempId, 'type', e.target.value)
+                                  }
+                                  disabled={isViewMode}
+                                >
+                                  <option value="percent">📊 Percentage</option>
+                                  <option value="abs">💰 Fixed Amount</option>
+                                </select>
+                              </div>
+
+                              <div>
+                                <select
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                                  value={option.delta?.sign || '+'}
+                                  onChange={(e: any) =>
+                                    updateOptionDelta(option.tempId, 'sign', e.target.value)
+                                  }
+                                  disabled={isViewMode}
+                                >
+                                  <option value="+">➕ Increase Price</option>
+                                  <option value="-">➖ Decrease Price</option>
+                                </select>
+                              </div>
+
+                              <div>
+                                <input
+                                  type="number"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                                  value={option.delta?.value || 0}
+                                  onChange={(e: any) =>
+                                    updateOptionDelta(
+                                      option.tempId,
+                                      'value',
+                                      parseFloat(e.target.value) || 0
+                                    )
+                                  }
+                                  placeholder="0"
+                                  min="0"
+                                  step="0.01"
+                                  disabled={isViewMode}
+                                />
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">
+                              {option.delta?.type === 'percent'
+                                ? `${option.delta?.sign === '+' ? 'Increases' : 'Decreases'} price by ${option.delta?.value || 0}%`
+                                : `${option.delta?.sign === '+' ? 'Adds' : 'Subtracts'} $${option.delta?.value || 0} to/from price`}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+
+                      {formData.options.length === 0 && (
+                        <div className="text-center py-12 text-gray-500 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+                          <CheckCircle size={48} className="mx-auto mb-4 text-gray-400" />
+                          <h4 className="text-lg font-medium mb-2">
+                            {formData.uiType === 'toggle'
+                              ? 'No custom options configured'
+                              : formData.uiType === 'slider'
+                                ? 'No value ranges defined'
+                                : 'No options added yet'}
+                          </h4>
+                          <p className="text-sm mb-4">
+                            {formData.uiType === 'toggle'
+                              ? 'Toggle questions work with default Yes/No behavior, but you can add custom options with specific price impacts.'
+                              : formData.uiType === 'slider'
+                                ? 'Slider questions can work without predefined options, or you can define specific ranges with price impacts.'
+                                : 'Click "Add Option" to create answer choices for your question.'}
+                          </p>
+                          {!isViewMode && (
+                            <button
+                              type="button"
+                              onClick={addOption}
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                            >
+                              <Plus size={16} />
+                              {formData.uiType === 'toggle'
+                                ? 'Add Yes/No Options'
+                                : formData.uiType === 'slider'
+                                  ? 'Add Value Range'
+                                  : 'Add Your First Option'}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
-              </OptionsSection>
+              </div>
             )}
-          </ModalBody>
+          </div>
 
-          <ModalFooter>
-            {isViewMode ? (
-              <Button type="button" onClick={onClose} variant="primary">
-                Close
-              </Button>
-            ) : (
-              <>
-                <Button type="button" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button type="submit" variant="primary" disabled={loading}>
-                  <Save size={16} />
-                  {loading ? 'Saving...' : question ? 'Update Question' : 'Create Question'}
-                </Button>
-              </>
+          {/* Enhanced Footer with Better Visibility */}
+          <div className="flex-shrink-0 border-t border-gray-200 bg-white">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6">
+              {/* Progress/Status Info */}
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Info size={16} className="text-blue-500" />
+                <span>
+                  {isViewMode
+                    ? 'Viewing question details'
+                    : question
+                      ? 'Editing existing question'
+                      : 'Creating new question'}
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 w-full sm:w-auto">
+                {isViewMode ? (
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="flex-1 sm:flex-none px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+                  >
+                    Close
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="flex-1 sm:flex-none px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-sm min-w-[160px]"
+                    >
+                      {loading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save size={16} />
+                          {question ? 'Update Question' : 'Create Question'}
+                        </>
+                      )}
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Additional Help Text for Non-View Mode */}
+            {!isViewMode && (
+              <div className="px-6 pb-4">
+                <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <AlertCircle size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-blue-700">
+                    <p className="font-medium mb-1">Before saving:</p>
+                    <ul className="text-xs space-y-1 text-blue-600">
+                      <li>• Ensure all required fields are filled</li>
+                      <li>• Add at least 2 options for choice-based questions</li>
+                      <li>• Configure price impact for each option</li>
+                      <li>• Test conditional logic if using "Show If" conditions</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             )}
-          </ModalFooter>
+          </div>
         </form>
-      </ModalContent>
-    </ModalOverlay>
+      </div>
+    </div>
   );
 };
 

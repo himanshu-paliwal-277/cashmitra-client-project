@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect } from 'react';
 import { Upload, X, Save, Image as ImageIcon } from 'lucide-react';
 import { API_BASE_URL } from '../../utils/api';
 
@@ -11,10 +10,10 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
     sortOrder: 0,
   });
 
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (category) {
@@ -63,7 +62,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result);
+        setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -87,7 +86,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
   };
 
   const validate = () => {
-    const newErrors = {};
+    const newErrors: { [key: string]: string } = {};
 
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
@@ -205,415 +204,182 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
   };
 
   return (
-    <FormContainer>
-      <Form onSubmit={handleSubmit}>
-        <FormSection>
-          <SectionTitle>Basic Information</SectionTitle>
+    <div className="bg-white rounded-2xl p-8 max-w-2xl w-full">
+      {/* Modal Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">
+          {category ? 'Edit' : 'Create'} Super Category
+        </h2>
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+        >
+          <X size={24} />
+        </button>
+      </div>
 
-          <FormGroup>
-            <Label>
-              Name <Required>*</Required>
-            </Label>
-            <Input
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Basic Information Section */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+
+          <div className="space-y-2">
+            <label className="flex items-center gap-1 text-base font-semibold text-gray-900">
+              Name <span className="text-red-500">*</span>
+            </label>
+            <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               placeholder="e.g., Mobile, Laptop, Watch"
               maxLength={50}
-              hasError={errors.name}
+              className={`w-full px-4 py-3 border-2 rounded-xl text-base transition-all focus:outline-none ${
+                errors.name
+                  ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100'
+                  : 'border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-100'
+              }`}
             />
-            {errors.name && <ErrorText>{errors.name}</ErrorText>}
-            <CharCount>{formData.name.length}/50</CharCount>
-          </FormGroup>
+            {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+            <p className="text-sm text-gray-500 text-right">{formData.name.length}/50</p>
+          </div>
 
-          <FormGroup>
-            <Label>Description</Label>
-            <Textarea
+          <div className="space-y-2">
+            <label className="text-base font-semibold text-gray-900">Description</label>
+            <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
               placeholder="Brief description of the super category"
               rows={4}
               maxLength={200}
-              hasError={errors.description}
+              className={`w-full px-4 py-3 border-2 rounded-xl text-base resize-y transition-all focus:outline-none ${
+                errors.description
+                  ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100'
+                  : 'border-gray-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-100'
+              }`}
             />
-            {errors.description && <ErrorText>{errors.description}</ErrorText>}
-            <CharCount>{formData.description.length}/200</CharCount>
-          </FormGroup>
+            {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
+            <p className="text-sm text-gray-500 text-right">{formData.description.length}/200</p>
+          </div>
 
-          <FormRow>
-            <FormGroup>
-              <Label>Sort Order</Label>
-              <Input
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-base font-semibold text-gray-900">Sort Order</label>
+              <input
                 type="number"
                 name="sortOrder"
                 value={formData.sortOrder}
                 onChange={handleChange}
                 min={0}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-base transition-all focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
               />
-              <HelpText>Lower numbers appear first</HelpText>
-            </FormGroup>
+              <p className="text-sm text-gray-500">Lower numbers appear first</p>
+            </div>
 
-            <FormGroup>
-              <CheckboxWrapper>
-                <Checkbox
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <input
                   type="checkbox"
                   name="isActive"
                   checked={formData.isActive}
                   onChange={handleChange}
                   id="isActive"
+                  className="w-5 h-5 text-amber-500 border-2 border-gray-300 rounded focus:ring-amber-500"
                 />
-                <Label htmlFor="isActive">Active</Label>
-              </CheckboxWrapper>
-              <HelpText>Only active categories are visible to users</HelpText>
-            </FormGroup>
-          </FormRow>
-        </FormSection>
+                <label htmlFor="isActive" className="text-base font-semibold text-gray-900">
+                  Active
+                </label>
+              </div>
+              <p className="text-sm text-gray-500">Only active categories are visible to users</p>
+            </div>
+          </div>
+        </div>
 
-        <FormSection>
-          <SectionTitle>
-            Image <Required>*</Required>
-          </SectionTitle>
+        {/* Image Section */}
+        <div className="space-y-4">
+          <h3 className="flex items-center gap-1 text-lg font-semibold text-gray-900">
+            Image <span className="text-red-500">*</span>
+          </h3>
 
           {imagePreview ? (
-            <ImagePreview>
-              <img src={imagePreview} alt="Preview" />
-              <RemoveImageButton onClick={removeImage} type="button">
+            <div className="relative rounded-2xl overflow-hidden max-w-md mx-auto">
+              <img src={imagePreview} alt="Preview" className="w-full h-auto" />
+              <button
+                onClick={removeImage}
+                type="button"
+                className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all hover:scale-110"
+              >
                 <X size={20} />
-              </RemoveImageButton>
-            </ImagePreview>
+              </button>
+            </div>
           ) : (
-            <DropZone onDrop={handleDrop} onDragOver={handleDragOver} hasError={errors.image}>
-              <ImageIcon size={48} />
-              <DropText>Drag and drop an image here</DropText>
-              <DropSubText>or</DropSubText>
-              <FileInputLabel htmlFor="imageInput">
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              className={`border-3 border-dashed rounded-2xl p-12 text-center transition-all bg-gray-50 hover:bg-gray-100 ${
+                errors.image ? 'border-red-500' : 'border-gray-300 hover:border-amber-500'
+              }`}
+            >
+              <ImageIcon size={48} className="text-gray-400 mx-auto mb-4" />
+              <p className="text-lg font-semibold text-gray-900 mb-2">
+                Drag and drop an image here
+              </p>
+              <p className="text-gray-600 mb-4">or</p>
+              <label
+                htmlFor="imageInput"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-semibold cursor-pointer hover:from-amber-600 hover:to-amber-700 transition-all transform hover:-translate-y-0.5 hover:shadow-lg"
+              >
                 <Upload size={20} />
                 Choose File
-              </FileInputLabel>
-              <FileInput
+              </label>
+              <input
                 id="imageInput"
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
+                className="hidden"
               />
-              <DropHint>PNG, JPG, GIF up to 5MB</DropHint>
-            </DropZone>
+              <p className="text-sm text-gray-500 mt-4">PNG, JPG, GIF up to 5MB</p>
+            </div>
           )}
-          {errors.image && <ErrorText>{errors.image}</ErrorText>}
-        </FormSection>
-        {errors.submit && <SubmitError>{errors.submit}</SubmitError>}
+          {errors.image && <p className="text-sm text-red-500">{errors.image}</p>}
+        </div>
 
-        <FormActions>
-          <CancelButton type="button" onClick={onClose} disabled={loading}>
+        {errors.submit && (
+          <div className="p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-center">
+            {errors.submit}
+          </div>
+        )}
+
+        {/* Form Actions */}
+        <div className="flex gap-4 justify-end pt-6 border-t-2 border-gray-100">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="px-8 py-3 bg-gray-100 text-gray-900 rounded-xl font-semibold hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             Cancel
-          </CancelButton>
-          <SubmitButton type="submit" disabled={loading}>
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all transform hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+          >
             {loading ? (
-              <>Saving...</>
+              'Saving...'
             ) : (
               <>
                 <Save size={20} />
                 {category ? 'Update' : 'Create'} Super Category
               </>
             )}
-          </SubmitButton>
-        </FormActions>
-      </Form>
-    </FormContainer>
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
-
-// Styled Components
-const FormContainer = styled.div`
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-`;
-
-const FormSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 0.5rem;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const FormRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Label = styled.label`
-  font-size: 1rem;
-  font-weight: 600;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-
-const Required = styled.span`
-  color: #ff4444;
-`;
-
-const Input = styled.input`
-  padding: 0.75rem 1rem;
-  border: 2px solid ${(props: any) => (props.hasError ? '#ff4444' : '#e0e0e0')};
-  border-radius: 12px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => (props.hasError ? '#ff4444' : '#00C853')};
-    box-shadow: 0 0 0 3px
-      ${(props: any) => (props.hasError ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 83, 0.1)')};
-  }
-
-  &::placeholder {
-    color: #999;
-  }
-`;
-
-const Textarea = styled.textarea`
-  padding: 0.75rem 1rem;
-  border: 2px solid ${(props: any) => (props.hasError ? '#ff4444' : '#e0e0e0')};
-  border-radius: 12px;
-  font-size: 1rem;
-  font-family: inherit;
-  resize: vertical;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => (props.hasError ? '#ff4444' : '#00C853')};
-    box-shadow: 0 0 0 3px
-      ${(props: any) => (props.hasError ? 'rgba(255, 68, 68, 0.1)' : 'rgba(0, 200, 83, 0.1)')};
-  }
-
-  &::placeholder {
-    color: #999;
-  }
-`;
-
-const CheckboxWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const Checkbox = styled.input`
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: #00c853;
-`;
-
-const CharCount = styled.span`
-  font-size: 0.85rem;
-  color: #999;
-  text-align: right;
-`;
-
-const HelpText = styled.span`
-  font-size: 0.85rem;
-  color: #666;
-`;
-
-const ErrorText = styled.span`
-  font-size: 0.85rem;
-  color: #ff4444;
-`;
-
-const DropZone = styled.div`
-  border: 3px dashed ${(props: any) => (props.hasError ? '#ff4444' : '#e0e0e0')};
-  border-radius: 16px;
-  padding: 3rem 2rem;
-  text-align: center;
-  transition: all 0.3s ease;
-  background: #fafafa;
-
-  &:hover {
-    border-color: ${(props: any) => (props.hasError ? '#ff4444' : '#00C853')};
-    background: #f5f5f5;
-  }
-
-  svg:first-child {
-    color: #999;
-    margin-bottom: 1rem;
-  }
-`;
-
-const DropText = styled.p`
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
-`;
-
-const DropSubText = styled.p`
-  font-size: 0.95rem;
-  color: #666;
-  margin-bottom: 1rem;
-`;
-
-const FileInput = styled.input`
-  display: none;
-`;
-
-const FileInputLabel = styled.label`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
-  color: white;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
-  }
-`;
-
-const DropHint = styled.p`
-  font-size: 0.85rem;
-  color: #999;
-  margin-top: 1rem;
-`;
-
-const ImagePreview = styled.div`
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  max-width: 400px;
-  margin: 0 auto;
-
-  img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-`;
-
-const RemoveImageButton = styled.button`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(255, 68, 68, 0.9);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: #ff4444;
-    transform: scale(1.1);
-  }
-`;
-
-const SubmitError = styled.div`
-  padding: 1rem;
-  background: #ffe6e6;
-  border: 2px solid #ff4444;
-  border-radius: 12px;
-  color: #cc0000;
-  text-align: center;
-`;
-
-const FormActions = styled.div`
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  padding-top: 1rem;
-  border-top: 2px solid #f5f5f5;
-
-  @media (max-width: 768px) {
-    flex-direction: column-reverse;
-  }
-`;
-
-const CancelButton = styled.button`
-  padding: 0.75rem 2rem;
-  background: #f5f5f5;
-  color: #333;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover:not(:disabled) {
-    background: #e0e0e0;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const SubmitButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 2rem;
-  background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 200, 83, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
 
 export default SuperCategoryForm;

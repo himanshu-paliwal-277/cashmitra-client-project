@@ -303,16 +303,47 @@ export const createPartner = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating partner:', error);
+
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map((err) => ({
+        field: err.path,
+        message: err.message,
+      }));
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: validationErrors,
+      });
+    }
+
+    // Handle duplicate key errors
     if (error.code === 11000) {
       if (error.keyPattern?.email) {
-        return res.status(400).json({ message: 'Email already exists' });
+        return res.status(400).json({
+          success: false,
+          message:
+            'Email already exists. Please use a different email address.',
+        });
       }
       if (error.keyPattern?.gstNumber) {
-        return res.status(400).json({ message: 'GST number already exists' });
+        return res.status(400).json({
+          success: false,
+          message:
+            'GST number already exists. Please use a different GST number.',
+        });
       }
-      return res.status(400).json({ message: 'Duplicate entry found' });
+      return res.status(400).json({
+        success: false,
+        message: 'Duplicate entry found. Please check your input data.',
+      });
     }
-    res.status(500).json({ message: 'Server error' });
+
+    // Handle other errors
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error occurred while creating partner',
+    });
   }
 };
 

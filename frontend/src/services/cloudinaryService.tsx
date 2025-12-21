@@ -1,7 +1,5 @@
 // Image upload service using backend proxy
-// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const API_BASE_URL =
-  (import.meta as any).env?.VITE_API_URL || 'https://cahsifiy-backend.onrender.com/api';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5000/api/v1';
 
 interface TransformationOptions {
   width?: number;

@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit2, Trash2, Image as ImageIcon, Search } from 'lucide-react';
 import { API_BASE_URL } from '../../utils/api';
 import SuperCategoryForm from './SuperCategoryForm';
@@ -120,318 +119,146 @@ const SellSuperCategoryManagement = () => {
   });
 
   return (
-    <Container>
-      <Header>
-        <Title>Sell Super Categories</Title>
-        <HeaderActions>
-          <SearchBox>
-            <Search size={18} />
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Sell Super Categories</h1>
+        <div className="flex gap-4 items-center flex-wrap">
+          <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg flex-1 min-w-[250px]">
+            <Search size={18} className="text-gray-400" />
             <input
               type="text"
               placeholder="Search super categories..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
+              className="border-none outline-none flex-1 text-sm"
             />
-          </SearchBox>
-          <FilterGroup>
-            <FilterButton active={filterActive === 'all'} onClick={() => setFilterActive('all')}>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setFilterActive('all')}
+              className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all ${
+                filterActive === 'all'
+                  ? 'border-amber-500 bg-amber-500 text-white'
+                  : 'border-gray-300 bg-white text-gray-700 hover:border-amber-500 hover:bg-amber-50'
+              }`}
+            >
               All
-            </FilterButton>
-            <FilterButton
-              active={filterActive === 'active'}
+            </button>
+            <button
               onClick={() => setFilterActive('active')}
+              className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all ${
+                filterActive === 'active'
+                  ? 'border-amber-500 bg-amber-500 text-white'
+                  : 'border-gray-300 bg-white text-gray-700 hover:border-amber-500 hover:bg-amber-50'
+              }`}
             >
               Active
-            </FilterButton>
-            <FilterButton
-              active={filterActive === 'inactive'}
+            </button>
+            <button
               onClick={() => setFilterActive('inactive')}
+              className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all ${
+                filterActive === 'inactive'
+                  ? 'border-amber-500 bg-amber-500 text-white'
+                  : 'border-gray-300 bg-white text-gray-700 hover:border-amber-500 hover:bg-amber-50'
+              }`}
             >
               Inactive
-            </FilterButton>
-          </FilterGroup>
-          <CreateButton onClick={handleCreate}>
+            </button>
+          </div>
+          <button
+            onClick={handleCreate}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-semibold hover:from-amber-600 hover:to-amber-700 transition-all transform hover:-translate-y-0.5 hover:shadow-lg"
+          >
             <Plus size={20} />
             Create Super Category
-          </CreateButton>
-        </HeaderActions>
-      </Header>
+          </button>
+        </div>
+      </div>
 
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {error && <div className="p-4 bg-red-50 text-red-700 rounded-lg mb-4">{error}</div>}
 
       {loading ? (
-        <LoadingMessage>Loading super categories...</LoadingMessage>
+        <div className="text-center py-12 text-gray-500">Loading super categories...</div>
       ) : filteredCategories.length === 0 ? (
-        <EmptyMessage>
+        <div className="text-center py-12 text-gray-500 text-lg">
           {searchTerm || filterActive !== 'all'
             ? 'No super categories found matching your criteria'
             : 'No super categories yet. Create your first one!'}
-        </EmptyMessage>
+        </div>
       ) : (
-        <Grid>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredCategories.map(category => (
-            <Card key={category._id}>
-              <CardImage>
+            <div
+              key={category._id}
+              className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1"
+            >
+              <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                 {category.image ? (
-                  <img src={category.image} alt={category.name} />
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  <ImageIcon size={48} color="#cbd5e0" />
+                  <ImageIcon size={48} className="text-gray-400" />
                 )}
-              </CardImage>
-              <CardContent>
-                <CardHeader>
-                  <CategoryName>{category.name}</CategoryName>
-                  <StatusBadge isActive={category.isActive}>
+              </div>
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="text-xl font-semibold text-gray-900">{category.name}</h3>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      category.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}
+                  >
                     {category.isActive ? 'Active' : 'Inactive'}
-                  </StatusBadge>
-                </CardHeader>
-                <CardDescription>{category.description || 'No description'}</CardDescription>
-                <CardFooter>
-                  <CardMeta>
-                    <MetaItem>Sort: {category.sortOrder || 0}</MetaItem>
-                    <MetaItem>{new Date(category.createdAt).toLocaleDateString()}</MetaItem>
-                  </CardMeta>
-                  <CardActions>
-                    <ActionButton onClick={() => handleEdit(category)}>
+                  </span>
+                </div>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  {category.description || 'No description'}
+                </p>
+                <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-gray-400">Sort: {category.sortOrder || 0}</span>
+                    <span className="text-xs text-gray-400">
+                      {new Date(category.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(category)}
+                      className="p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all hover:scale-110"
+                    >
                       <Edit2 size={16} />
-                    </ActionButton>
-                    <ActionButton danger onClick={() => handleDelete(category._id)}>
+                    </button>
+                    <button
+                      onClick={() => handleDelete(category._id)}
+                      className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all hover:scale-110"
+                    >
                       <Trash2 size={16} />
-                    </ActionButton>
-                  </CardActions>
-                </CardFooter>
-              </CardContent>
-            </Card>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           ))}
-        </Grid>
+        </div>
       )}
 
       {showForm && (
-        <SuperCategoryForm
-          category={editingCategory}
-          onClose={handleCloseForm}
-          onSuccess={handleFormSuccess}
-          apiType="sell"
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <SuperCategoryForm
+              category={editingCategory}
+              onClose={handleCloseForm}
+              onSuccess={handleFormSuccess}
+              apiType="sell"
+            />
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
-
-// Styled Components
-const Container = styled.div`
-  max-width: 1400px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin-bottom: 1.5rem;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-`;
-
-const SearchBox = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  flex: 1;
-  min-width: 250px;
-
-  input {
-    border: none;
-    outline: none;
-    flex: 1;
-    font-size: 0.875rem;
-  }
-`;
-
-const FilterGroup = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const FilterButton = styled.button`
-  padding: 0.5rem 1rem;
-  border: 1px solid ${(props: any) => (props.active ? '#f59e0b' : '#e2e8f0')};
-  background: ${(props: any) => (props.active ? '#f59e0b' : 'white')};
-  color: ${(props: any) => (props.active ? 'white' : '#4a5568')};
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    border-color: #f59e0b;
-    background: ${(props: any) => (props.active ? '#d97706' : '#fffbeb')};
-  }
-`;
-
-const CreateButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-  }
-`;
-
-const ErrorMessage = styled.div`
-  padding: 1rem;
-  background: #fee2e2;
-  color: #dc2626;
-  border-radius: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const LoadingMessage = styled.div`
-  text-align: center;
-  padding: 3rem;
-  color: #718096;
-`;
-
-const EmptyMessage = styled.div`
-  text-align: center;
-  padding: 3rem;
-  color: #718096;
-  font-size: 1.125rem;
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-`;
-
-const Card = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const CardImage = styled.div`
-  width: 100%;
-  height: 200px;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const CardContent = styled.div`
-  padding: 1.5rem;
-`;
-
-const CardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.75rem;
-`;
-
-const CategoryName = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1a202c;
-  margin: 0;
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: ${(props: any) => (props.isActive ? '#d1fae5' : '#fee2e2')};
-  color: ${(props: any) => (props.isActive ? '#065f46' : '#991b1b')};
-`;
-
-const CardDescription = styled.p`
-  color: #718096;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  line-height: 1.5;
-`;
-
-const CardFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
-`;
-
-const CardMeta = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const MetaItem = styled.span`
-  font-size: 0.75rem;
-  color: #a0aec0;
-`;
-
-const CardActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const ActionButton = styled.button`
-  padding: 0.5rem;
-  background: ${(props: any) => (props.danger ? '#fee2e2' : '#f3f4f6')};
-  color: ${(props: any) => (props.danger ? '#dc2626' : '#4a5568')};
-  border: none;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: ${(props: any) => (props.danger ? '#fecaca' : '#e2e8f0')};
-    transform: scale(1.1);
-  }
-`;
 
 export default SellSuperCategoryManagement;

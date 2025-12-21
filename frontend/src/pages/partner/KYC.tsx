@@ -34,11 +34,9 @@ interface PartnerProfile {
 }
 
 function PartnerKYC() {
-  const { partner } = usePartnerAuth() as any;
   const [profile, setProfile] = useState<PartnerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
 
   const [documents, setDocuments] = useState<DocumentData>({
@@ -55,10 +53,10 @@ function PartnerKYC() {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      setError(null);
       const response = await partnerService.getProfile();
 
       if (response.success) {
+        console.log('Profile fetched:', response.data);
         setProfile(response.data);
         setDocuments(
           response.data.documents || {
@@ -71,7 +69,7 @@ function PartnerKYC() {
       }
     } catch (err: any) {
       console.error('Error fetching profile:', err);
-      setError(err.message || 'Failed to load profile');
+      alert(err.message || 'Failed to load profile');
     } finally {
       setLoading(false);
     }
@@ -85,7 +83,7 @@ function PartnerKYC() {
       const formData = new FormData();
       formData.append('image', file);
 
-      const uploadResponse = await fetch('/api/upload/image', {
+      const uploadResponse = await fetch('/api/v1/upload/image', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -106,11 +104,35 @@ function PartnerKYC() {
         [documentType]: fileUrl,
       };
 
-      const response = await partnerService.uploadDocuments(updatedDocuments);
+      // Check if all required documents are now uploaded
+      const allDocumentsUploaded = !!(
+        updatedDocuments.gstCertificate &&
+        updatedDocuments.shopLicense &&
+        updatedDocuments.ownerIdProof
+      );
+
+      // If all documents are uploaded, automatically submit for verification
+      const dataToSend = allDocumentsUploaded
+        ? { ...updatedDocuments, verificationStatus: 'submitted' }
+        : updatedDocuments;
+
+      const response = await partnerService.uploadDocuments(dataToSend);
 
       if (response.success) {
-        setDocuments(updatedDocuments);
+        const newDocuments = response.data.documents || updatedDocuments;
+        setDocuments(newDocuments);
         setProfile(response.data);
+
+        // Show success message based on whether it was auto-submitted
+        if (allDocumentsUploaded) {
+          alert(
+            'All documents uploaded successfully! Your KYC has been automatically submitted for review.'
+          );
+          // Refresh profile to get updated status
+          setTimeout(() => {
+            fetchProfile();
+          }, 1000);
+        }
       }
     } catch (err: any) {
       console.error('Error uploading document:', err);
@@ -122,6 +144,7 @@ function PartnerKYC() {
 
   const getVerificationStatus = () => {
     if (!profile) return 'not_started';
+    console.log('Profile verification status:', profile.verificationStatus);
     return profile.verificationStatus;
   };
 
@@ -183,12 +206,40 @@ function PartnerKYC() {
     },
     {
       id: 3,
-      title: 'Verification',
-      description: 'Submit for verification',
+      title: 'Auto-Verification',
+      description: 'Automatic submission when complete',
       icon: <Shield size={20} />,
       completed: getVerificationStatus() === 'approved',
     },
   ];
+
+  // Auto-advance to step 3 when all documents are uploaded
+  useEffect(() => {
+    const allDocumentsUploaded = !!(
+      documents.gstCertificate &&
+      documents.shopLicense &&
+      documents.ownerIdProof
+    );
+    if (allDocumentsUploaded && currentStep < 3) {
+      setCurrentStep(3);
+    }
+  }, [documents, currentStep]);
+
+  // Initialize currentStep based on completion status
+  useEffect(() => {
+    if (profile && documents) {
+      const allDocumentsUploaded = !!(
+        documents.gstCertificate &&
+        documents.shopLicense &&
+        documents.ownerIdProof
+      );
+      if (allDocumentsUploaded) {
+        setCurrentStep(3);
+      } else if (profile.shopName) {
+        setCurrentStep(2);
+      }
+    }
+  }, [profile, documents]);
 
   const DocumentUploadCard = ({
     title,
@@ -289,7 +340,7 @@ function PartnerKYC() {
         <div className="mb-8">
           <div className="flex items-center justify-between relative">
             <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-200 -z-10"></div>
-            {steps.map((step, index) => (
+            {steps.map(step => (
               <div
                 key={step.id}
                 className={`flex flex-col items-center cursor-pointer ${
@@ -388,14 +439,31 @@ function PartnerKYC() {
           {currentStep === 3 && (
             <div className="p-6 text-center">
               <Shield size={64} className="mx-auto text-blue-500 mb-4" />
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">Ready for Verification</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                {getVerificationStatus() === 'pending'
+                  ? 'Upload Documents to Submit'
+                  : getVerificationStatus() === 'submitted'
+                    ? 'KYC Under Review'
+                    : getVerificationStatus() === 'approved'
+                      ? 'KYC Verified'
+                      : 'KYC Rejected'}
+              </h3>
               <p className="text-slate-600 mb-6">
-                Review your information and submit for verification. Our team will review your
-                documents within 2-3 business days.
+                {getVerificationStatus() === 'pending'
+                  ? 'Upload all required documents in Step 2. Your KYC will be automatically submitted for review once all documents are uploaded.'
+                  : getVerificationStatus() === 'submitted'
+                    ? 'Your documents have been automatically submitted and are under review. We will notify you once the verification is complete.'
+                    : getVerificationStatus() === 'approved'
+                      ? 'Your KYC verification has been approved. You now have full access to all partner features.'
+                      : 'Your KYC verification was rejected. Please review the feedback and resubmit your documents.'}
               </p>
 
               <div className="bg-slate-50 rounded-lg p-4 mb-6">
-                <h4 className="font-medium text-slate-900 mb-2">Documents Submitted:</h4>
+                <h4 className="font-medium text-slate-900 mb-2">
+                  {getVerificationStatus() === 'pending'
+                    ? 'Required Documents:'
+                    : 'Documents Status:'}
+                </h4>
                 <div className="space-y-2 text-sm text-slate-600">
                   <div className="flex items-center gap-2">
                     {documents.gstCertificate ? (
@@ -424,44 +492,45 @@ function PartnerKYC() {
                 </div>
               </div>
 
-              <button
-                onClick={async () => {
-                  try {
-                    setUploading(true);
-                    const response = await partnerService.uploadDocuments({
-                      ...documents,
-                      verificationStatus: 'submitted',
-                    });
-                    if (response.success) {
-                      setProfile(response.data);
-                      alert('Documents submitted successfully for verification!');
-                    }
-                  } catch (err: any) {
-                    alert(err.message || 'Failed to submit documents');
-                  } finally {
-                    setUploading(false);
-                  }
-                }}
-                disabled={
-                  uploading ||
-                  !documents.gstCertificate ||
-                  !documents.shopLicense ||
-                  !documents.ownerIdProof
-                }
-                className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 mx-auto"
-              >
-                {uploading ? (
-                  <>
-                    <Loader2 size={20} className="animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
+              {getVerificationStatus() === 'pending' && (
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 text-blue-600 rounded-lg border border-blue-200">
                     <Shield size={20} />
-                    Submit for Verification
-                  </>
-                )}
-              </button>
+                    <span>
+                      {documents.gstCertificate && documents.shopLicense && documents.ownerIdProof
+                        ? 'All documents uploaded! KYC automatically submitted for review.'
+                        : 'Upload all required documents to automatically submit for verification'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {getVerificationStatus() === 'submitted' && (
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-50 text-yellow-600 rounded-lg border border-yellow-200">
+                    <Clock size={20} />
+                    <span>KYC automatically submitted and under review</span>
+                  </div>
+                </div>
+              )}
+
+              {getVerificationStatus() === 'approved' && (
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 px-6 py-3 bg-green-50 text-green-600 rounded-lg border border-green-200">
+                    <CheckCircle size={20} />
+                    <span>KYC verification completed successfully</span>
+                  </div>
+                </div>
+              )}
+
+              {getVerificationStatus() === 'rejected' && (
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 px-6 py-3 bg-red-50 text-red-600 rounded-lg border border-red-200">
+                    <AlertCircle size={20} />
+                    <span>KYC verification rejected - please resubmit documents</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

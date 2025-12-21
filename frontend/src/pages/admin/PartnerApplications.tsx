@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import useAdminPartnerApplications from '../../hooks/useAdminPartnerApplications';
 import {
   UserCheck,
-  Search,
   Eye,
   CheckCircle,
   XCircle,
@@ -20,7 +19,6 @@ import {
   RefreshCw,
   MessageSquare,
   Star,
-  Briefcase,
 } from 'lucide-react';
 
 const PartnerApplications = () => {
@@ -31,15 +29,8 @@ const PartnerApplications = () => {
   const [selectedApplication, setSelectedApplication] = useState<any>(null);
   const [comment, setComment] = useState('');
 
-  const {
-    applications,
-    stats,
-    loading,
-    error,
-    updateApplicationStatus,
-    downloadDocument,
-    fetchApplications,
-  } = useAdminPartnerApplications();
+  const { applications, stats, loading, updateApplicationStatus, fetchApplications } =
+    useAdminPartnerApplications();
 
   const handleStatusUpdate = async (applicationId: any, newStatus: any, comments = '') => {
     try {
@@ -50,11 +41,23 @@ const PartnerApplications = () => {
 
         // Update selected application if modal is open
         if (selectedApplication && selectedApplication._id === applicationId) {
-          setSelectedApplication({ ...selectedApplication, status: newStatus });
+          setSelectedApplication({
+            ...selectedApplication,
+            status: newStatus,
+            verificationStatus: newStatus,
+            isVerified: newStatus === 'approved',
+            verificationNotes: comments,
+            experience: comments,
+            updatedAt: new Date().toISOString(),
+          });
         }
+
+        // Show success message
+        alert(result.message || 'Status updated successfully');
       }
     } catch (error) {
       console.error('Error updating application status:', error);
+      alert('Failed to update status. Please try again.');
     }
   };
 
@@ -64,11 +67,39 @@ const PartnerApplications = () => {
     setComment('');
   };
 
-  const handleDocumentDownload = async (documentId: any, filename: any) => {
+  const handleDocumentDownload = async (documentUrl: string, filename: string) => {
     try {
-      await downloadDocument(documentId, filename);
+      // Extract file extension from URL if not provided in filename
+      const urlParts = documentUrl.split('.');
+      const extension = urlParts.length > 1 ? urlParts[urlParts.length - 1].split('?')[0] : 'jpg';
+      const finalFilename = filename.includes('.') ? filename : `${filename}.${extension}`;
+
+      // Fetch the document from the URL
+      const response = await fetch(documentUrl);
+      if (!response.ok) {
+        throw new Error('Failed to fetch document');
+      }
+
+      // Get the blob data
+      const blob = await response.blob();
+
+      // Create a temporary URL for the blob
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Create a temporary anchor element and trigger download
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = finalFilename;
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error('Error downloading document:', error);
+      // Fallback to opening in new tab if download fails
+      window.open(documentUrl, '_blank');
     }
   };
 
@@ -76,6 +107,8 @@ const PartnerApplications = () => {
     switch (status) {
       case 'pending':
         return <Clock size={12} />;
+      case 'submitted':
+        return <AlertTriangle size={12} />;
       case 'approved':
         return <CheckCircle size={12} />;
       case 'rejected':
@@ -86,9 +119,10 @@ const PartnerApplications = () => {
   };
 
   const canUpdateStatus = (currentStatus: any, newStatus: any) => {
-    // Simplified status flow: pending -> approved/rejected
+    // Status flow: pending -> submitted -> approved/rejected
     const statusFlow: any = {
       pending: ['approved', 'rejected'],
+      submitted: ['approved', 'rejected'],
       approved: [],
       rejected: [],
     };
@@ -97,10 +131,16 @@ const PartnerApplications = () => {
 
   const filteredApplications = applications.filter((application: any) => {
     const matchesSearch =
-      application.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.shopName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       application.applicantName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.shopEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       application.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = !statusFilter || application.status === statusFilter;
+    const matchesStatus =
+      !statusFilter ||
+      application.status === statusFilter ||
+      application.verificationStatus === statusFilter;
     const matchesPriority = !priorityFilter || application.priority === priorityFilter;
 
     return matchesSearch && matchesStatus && matchesPriority;
@@ -135,7 +175,7 @@ const PartnerApplications = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
           <div className="bg-blue-500 text-white p-4 rounded-xl">
             <FileText size={24} />
@@ -147,12 +187,22 @@ const PartnerApplications = () => {
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
-          <div className="bg-amber-500 text-white p-4 rounded-xl">
+          <div className="bg-gray-500 text-white p-4 rounded-xl">
             <Clock size={24} />
           </div>
           <div>
             <div className="text-3xl font-bold text-gray-900">{stats.pending}</div>
-            <div className="text-sm text-gray-600">Pending Review</div>
+            <div className="text-sm text-gray-600">Pending</div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-amber-500 text-white p-4 rounded-xl">
+            <AlertTriangle size={24} />
+          </div>
+          <div>
+            <div className="text-3xl font-bold text-gray-900">{stats.under_review}</div>
+            <div className="text-sm text-gray-600">Under Review</div>
           </div>
         </div>
 
@@ -194,10 +244,9 @@ const PartnerApplications = () => {
         >
           <option value="">All Status</option>
           <option value="pending">Pending</option>
-          <option value="under_review">Under Review</option>
+          <option value="submitted">Submitted</option>
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
-          <option value="on_hold">On Hold</option>
         </select>
 
         <select
@@ -245,28 +294,31 @@ const PartnerApplications = () => {
                 {/* Applicant */}
                 <div className="flex flex-col gap-1">
                   <div className="font-semibold text-gray-900 text-sm">
-                    {application.applicantName || 'N/A'}
+                    {application.user?.name || application.applicantName || 'N/A'}
                   </div>
-                  <div className="text-xs text-gray-600">{application.email || 'N/A'}</div>
+                  <div className="text-xs text-gray-600">
+                    {application.user?.email || application.shopEmail || application.email || 'N/A'}
+                  </div>
                 </div>
 
                 {/* Business */}
                 <div className="flex flex-col gap-1">
                   <div className="font-semibold text-gray-900 text-sm">
-                    {application.businessName || 'N/A'}
+                    {application.shopName || application.businessName || 'N/A'}
                   </div>
-                  <div className="text-xs text-gray-600">{application.businessType || 'N/A'}</div>
+                  <div className="text-xs text-gray-600">GST: {application.gstNumber || 'N/A'}</div>
                 </div>
 
                 {/* Contact */}
                 <div className="flex flex-col gap-1">
                   <div className="text-sm text-gray-900 flex items-center gap-1">
                     <Phone size={12} />
-                    {application.phone || 'N/A'}
+                    {application.user?.phone || application.shopPhone || application.phone || 'N/A'}
                   </div>
                   <div className="text-xs text-gray-600 flex items-center gap-1">
                     <MapPin size={12} />
-                    {application.city || 'N/A'}, {application.state || 'N/A'}
+                    {application.shopAddress?.city || application.city || 'N/A'},{' '}
+                    {application.shopAddress?.state || application.state || 'N/A'}
                   </div>
                 </div>
 
@@ -296,12 +348,14 @@ const PartnerApplications = () => {
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${
                       application.status === 'pending'
-                        ? 'bg-amber-100 text-amber-800'
-                        : application.status === 'approved'
-                          ? 'bg-green-100 text-green-800'
-                          : application.status === 'rejected'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-gray-100 text-gray-700'
+                        ? 'bg-gray-100 text-gray-800'
+                        : application.status === 'submitted'
+                          ? 'bg-amber-100 text-amber-800'
+                          : application.status === 'approved'
+                            ? 'bg-green-100 text-green-800'
+                            : application.status === 'rejected'
+                              ? 'bg-red-100 text-red-700'
+                              : 'bg-gray-100 text-gray-700'
                     }`}
                   >
                     {getStatusIcon(application.status)}
@@ -370,21 +424,27 @@ const PartnerApplications = () => {
                   <User size={16} className="text-gray-400" />
                   <span className="text-gray-600 font-medium">Name:</span>
                   <span className="text-gray-900 font-semibold">
-                    {selectedApplication.applicantName || 'N/A'}
+                    {selectedApplication.user?.name || selectedApplication.applicantName || 'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
                   <Mail size={16} className="text-gray-400" />
                   <span className="text-gray-600 font-medium">Email:</span>
                   <span className="text-gray-900 font-semibold">
-                    {selectedApplication.email || 'N/A'}
+                    {selectedApplication.user?.email ||
+                      selectedApplication.shopEmail ||
+                      selectedApplication.email ||
+                      'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
                   <Phone size={16} className="text-gray-400" />
                   <span className="text-gray-600 font-medium">Phone:</span>
                   <span className="text-gray-900 font-semibold">
-                    {selectedApplication.phone || 'N/A'}
+                    {selectedApplication.user?.phone ||
+                      selectedApplication.shopPhone ||
+                      selectedApplication.phone ||
+                      'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
@@ -392,6 +452,22 @@ const PartnerApplications = () => {
                   <span className="text-gray-600 font-medium">Applied Date:</span>
                   <span className="text-gray-900 font-semibold">
                     {new Date(selectedApplication.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Star size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Rating:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.rating || 0}/5
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <CheckCircle size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Verified:</span>
+                  <span
+                    className={`font-semibold ${selectedApplication.isVerified ? 'text-green-600' : 'text-red-600'}`}
+                  >
+                    {selectedApplication.isVerified ? 'Yes' : 'No'}
                   </span>
                 </div>
               </div>
@@ -406,16 +482,9 @@ const PartnerApplications = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
                   <Building size={16} className="text-gray-400" />
-                  <span className="text-gray-600 font-medium">Business Name:</span>
+                  <span className="text-gray-600 font-medium">Shop Name:</span>
                   <span className="text-gray-900 font-semibold">
-                    {selectedApplication.businessName || 'N/A'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
-                  <Briefcase size={16} className="text-gray-400" />
-                  <span className="text-gray-600 font-medium">Business Type:</span>
-                  <span className="text-gray-900 font-semibold">
-                    {selectedApplication.businessType || 'N/A'}
+                    {selectedApplication.shopName || selectedApplication.businessName || 'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
@@ -426,103 +495,420 @@ const PartnerApplications = () => {
                   </span>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
-                  <MapPin size={16} className="text-gray-400" />
-                  <span className="text-gray-600 font-medium">Address:</span>
+                  <Phone size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Shop Phone:</span>
                   <span className="text-gray-900 font-semibold">
-                    {selectedApplication.address || 'N/A'}
+                    {selectedApplication.shopPhone || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Mail size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Shop Email:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.shopEmail || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <MapPin size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Service Radius:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.service_radius
+                      ? `${selectedApplication.service_radius / 1000} km`
+                      : 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <CreditCard size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">UPI ID:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.upiId || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Address Information */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <MapPin size={20} />
+                Address Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <MapPin size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Street:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.shopAddress?.street ||
+                      selectedApplication.address ||
+                      'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
                   <MapPin size={16} className="text-gray-400" />
                   <span className="text-gray-600 font-medium">City:</span>
                   <span className="text-gray-900 font-semibold">
-                    {selectedApplication.city || 'N/A'}
+                    {selectedApplication.shopAddress?.city || selectedApplication.city || 'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
                   <MapPin size={16} className="text-gray-400" />
                   <span className="text-gray-600 font-medium">State:</span>
                   <span className="text-gray-900 font-semibold">
-                    {selectedApplication.state || 'N/A'}
+                    {selectedApplication.shopAddress?.state || selectedApplication.state || 'N/A'}
                   </span>
                 </div>
-              </div>
-            </div>
-
-            {/* Documents */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                <FileText size={20} />
-                Documents
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {selectedApplication.documents?.map((doc: any, index: any) => (
-                  <div
-                    key={index}
-                    className="border border-gray-200 rounded-lg p-4 text-center hover:border-blue-500 hover:shadow-md transition-all"
-                  >
-                    <div className="bg-gray-100 text-gray-400 p-4 rounded-lg flex items-center justify-center mb-2">
-                      <FileText size={24} />
-                    </div>
-                    <div className="font-semibold text-gray-900 mb-1 text-sm">
-                      {doc.name || `Document ${index + 1}`}
-                    </div>
-                    <div className="text-xs text-gray-600 mb-2">
-                      {doc.verified ? 'Verified' : 'Pending Verification'}
-                    </div>
-                    <div className="flex gap-2 justify-center">
-                      <button
-                        onClick={() => handleDocumentDownload(doc._id, doc.filename)}
-                        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-all"
-                      >
-                        <Download size={12} />
-                      </button>
-                      {!doc.verified && (
-                        <button className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-all">
-                          <CheckCircle size={12} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )) || (
-                  <div className="col-span-3 text-center text-gray-600 py-8">
-                    No documents uploaded
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <MapPin size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Pincode:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.shopAddress?.pincode || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <MapPin size={16} className="text-gray-400" />
+                  <span className="text-gray-600 font-medium">Country:</span>
+                  <span className="text-gray-900 font-semibold">
+                    {selectedApplication.shopAddress?.country || 'India'}
+                  </span>
+                </div>
+                {selectedApplication.shopAddress?.coordinates && (
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                    <MapPin size={16} className="text-gray-400" />
+                    <span className="text-gray-600 font-medium">Coordinates:</span>
+                    <span className="text-gray-900 font-semibold">
+                      {selectedApplication.shopAddress.coordinates.latitude},{' '}
+                      {selectedApplication.shopAddress.coordinates.longitude}
+                    </span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Experience */}
-            {selectedApplication.experience && (
+            {/* Bank Details */}
+            {selectedApplication.bankDetails && (
               <div className="mb-8">
                 <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                  <Star size={20} />
-                  Experience & Background
+                  <CreditCard size={20} />
+                  Bank Details
                 </h3>
-                <div className="p-4 bg-gray-50 rounded-lg text-gray-700">
-                  {selectedApplication.experience}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                    <User size={16} className="text-gray-400" />
+                    <span className="text-gray-600 font-medium">Account Holder:</span>
+                    <span className="text-gray-900 font-semibold">
+                      {selectedApplication.bankDetails.accountHolderName || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                    <CreditCard size={16} className="text-gray-400" />
+                    <span className="text-gray-600 font-medium">Account Number:</span>
+                    <span className="text-gray-900 font-semibold">
+                      {selectedApplication.bankDetails.accountNumber
+                        ? `****${selectedApplication.bankDetails.accountNumber.slice(-4)}`
+                        : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                    <Building size={16} className="text-gray-400" />
+                    <span className="text-gray-600 font-medium">Bank Name:</span>
+                    <span className="text-gray-900 font-semibold">
+                      {selectedApplication.bankDetails.bankName || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                    <CreditCard size={16} className="text-gray-400" />
+                    <span className="text-gray-600 font-medium">IFSC Code:</span>
+                    <span className="text-gray-900 font-semibold">
+                      {selectedApplication.bankDetails.ifscCode || 'N/A'}
+                    </span>
+                  </div>
+                  {selectedApplication.bankDetails.branch && (
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                      <Building size={16} className="text-gray-400" />
+                      <span className="text-gray-600 font-medium">Branch:</span>
+                      <span className="text-gray-900 font-semibold">
+                        {selectedApplication.bankDetails.branch}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-            {/* Review Comments */}
-            {selectedApplication.comments && selectedApplication.comments.length > 0 && (
+            {/* Wallet Information */}
+            {selectedApplication.wallet && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                  <CreditCard size={20} />
+                  Wallet Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                    <CreditCard size={16} className="text-gray-400" />
+                    <span className="text-gray-600 font-medium">Balance:</span>
+                    <span className="text-gray-900 font-semibold">
+                      ₹{selectedApplication.wallet.balance || 0}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                    <FileText size={16} className="text-gray-400" />
+                    <span className="text-gray-600 font-medium">Transactions:</span>
+                    <span className="text-gray-900 font-semibold">
+                      {selectedApplication.wallet.transactions?.length || 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Documents */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <FileText size={20} />
+                KYC Documents
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* GST Certificate */}
+                <div className="border border-gray-200 rounded-lg p-4 text-center hover:border-blue-500 hover:shadow-md transition-all">
+                  <div className="bg-gray-100 text-gray-400 p-4 rounded-lg flex items-center justify-center mb-2">
+                    <FileText size={24} />
+                  </div>
+                  <div className="font-semibold text-gray-900 mb-1 text-sm">GST Certificate</div>
+                  <div
+                    className={`text-xs mb-2 ${selectedApplication.documents?.gstCertificate ? 'text-green-600' : 'text-red-600'}`}
+                  >
+                    {selectedApplication.documents?.gstCertificate ? 'Uploaded' : 'Not Uploaded'}
+                  </div>
+                  {selectedApplication.documents?.gstCertificate && (
+                    <div className="flex gap-2 justify-center">
+                      <button
+                        onClick={() =>
+                          window.open(selectedApplication.documents.gstCertificate, '_blank')
+                        }
+                        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-all"
+                        title="View Document"
+                      >
+                        <Eye size={12} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDocumentDownload(
+                            selectedApplication.documents.gstCertificate,
+                            'gst-certificate'
+                          )
+                        }
+                        className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-all"
+                        title="Download Document"
+                      >
+                        <Download size={12} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Shop License */}
+                <div className="border border-gray-200 rounded-lg p-4 text-center hover:border-blue-500 hover:shadow-md transition-all">
+                  <div className="bg-gray-100 text-gray-400 p-4 rounded-lg flex items-center justify-center mb-2">
+                    <FileText size={24} />
+                  </div>
+                  <div className="font-semibold text-gray-900 mb-1 text-sm">Shop License</div>
+                  <div
+                    className={`text-xs mb-2 ${selectedApplication.documents?.shopLicense ? 'text-green-600' : 'text-red-600'}`}
+                  >
+                    {selectedApplication.documents?.shopLicense ? 'Uploaded' : 'Not Uploaded'}
+                  </div>
+                  {selectedApplication.documents?.shopLicense && (
+                    <div className="flex gap-2 justify-center">
+                      <button
+                        onClick={() =>
+                          window.open(selectedApplication.documents.shopLicense, '_blank')
+                        }
+                        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-all"
+                        title="View Document"
+                      >
+                        <Eye size={12} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDocumentDownload(
+                            selectedApplication.documents.shopLicense,
+                            'shop-license'
+                          )
+                        }
+                        className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-all"
+                        title="Download Document"
+                      >
+                        <Download size={12} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Owner ID Proof */}
+                <div className="border border-gray-200 rounded-lg p-4 text-center hover:border-blue-500 hover:shadow-md transition-all">
+                  <div className="bg-gray-100 text-gray-400 p-4 rounded-lg flex items-center justify-center mb-2">
+                    <FileText size={24} />
+                  </div>
+                  <div className="font-semibold text-gray-900 mb-1 text-sm">Owner ID Proof</div>
+                  <div
+                    className={`text-xs mb-2 ${selectedApplication.documents?.ownerIdProof ? 'text-green-600' : 'text-red-600'}`}
+                  >
+                    {selectedApplication.documents?.ownerIdProof ? 'Uploaded' : 'Not Uploaded'}
+                  </div>
+                  {selectedApplication.documents?.ownerIdProof && (
+                    <div className="flex gap-2 justify-center">
+                      <button
+                        onClick={() =>
+                          window.open(selectedApplication.documents.ownerIdProof, '_blank')
+                        }
+                        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-all"
+                        title="View Document"
+                      >
+                        <Eye size={12} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleDocumentDownload(
+                            selectedApplication.documents.ownerIdProof,
+                            'owner-id-proof'
+                          )
+                        }
+                        className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-all"
+                        title="Download Document"
+                      >
+                        <Download size={12} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Additional Documents */}
+                {selectedApplication.documents?.additionalDocuments?.length > 0 &&
+                  selectedApplication.documents.additionalDocuments.map(
+                    (docUrl: string, index: number) => (
+                      <div
+                        key={index}
+                        className="border border-gray-200 rounded-lg p-4 text-center hover:border-blue-500 hover:shadow-md transition-all"
+                      >
+                        <div className="bg-gray-100 text-gray-400 p-4 rounded-lg flex items-center justify-center mb-2">
+                          <FileText size={24} />
+                        </div>
+                        <div className="font-semibold text-gray-900 mb-1 text-sm">
+                          Additional Document {index + 1}
+                        </div>
+                        <div className="text-xs text-green-600 mb-2">Uploaded</div>
+                        <div className="flex gap-2 justify-center">
+                          <button
+                            onClick={() => window.open(docUrl, '_blank')}
+                            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-all"
+                            title="View Document"
+                          >
+                            <Eye size={12} />
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleDocumentDownload(docUrl, `additional-document-${index + 1}`)
+                            }
+                            className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-all"
+                            title="Download Document"
+                          >
+                            <Download size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  )}
+              </div>
+
+              {/* Document Summary */}
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-semibold text-gray-700 mb-2">Document Status Summary</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    {selectedApplication.documents?.gstCertificate ? (
+                      <CheckCircle size={16} className="text-green-500" />
+                    ) : (
+                      <XCircle size={16} className="text-red-500" />
+                    )}
+                    <span>GST Certificate</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedApplication.documents?.shopLicense ? (
+                      <CheckCircle size={16} className="text-green-500" />
+                    ) : (
+                      <XCircle size={16} className="text-red-500" />
+                    )}
+                    <span>Shop License</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedApplication.documents?.ownerIdProof ? (
+                      <CheckCircle size={16} className="text-green-500" />
+                    ) : (
+                      <XCircle size={16} className="text-red-500" />
+                    )}
+                    <span>Owner ID Proof</span>
+                  </div>
+                </div>
+                <div className="mt-2 text-xs text-gray-600">
+                  Total Documents:{' '}
+                  {
+                    [
+                      selectedApplication.documents?.gstCertificate,
+                      selectedApplication.documents?.shopLicense,
+                      selectedApplication.documents?.ownerIdProof,
+                      ...(selectedApplication.documents?.additionalDocuments || []),
+                    ].filter(Boolean).length
+                  }
+                </div>
+              </div>
+            </div>
+
+            {/* Verification Notes */}
+            {selectedApplication.verificationNotes && (
               <div className="mb-8">
                 <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
                   <MessageSquare size={20} />
-                  Review Comments
+                  Verification Notes
                 </h3>
-                {selectedApplication.comments.map((comment: any, index: any) => (
-                  <div
-                    key={index}
-                    className="p-4 bg-gray-50 rounded-lg mb-2 border-l-4 border-blue-500"
-                  >
-                    <div className="font-semibold mb-1">
-                      {comment.author} - {new Date(comment.createdAt).toLocaleDateString()}
+                <div className="p-4 bg-gray-50 rounded-lg text-gray-700 border-l-4 border-blue-500">
+                  {selectedApplication.verificationNotes}
+                </div>
+              </div>
+            )}
+
+            {/* Reviews */}
+            {selectedApplication.reviews && selectedApplication.reviews.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                  <Star size={20} />
+                  Customer Reviews ({selectedApplication.reviews.length})
+                </h3>
+                <div className="space-y-4">
+                  {selectedApplication.reviews.map((review: any, index: number) => (
+                    <div
+                      key={index}
+                      className="p-4 bg-gray-50 rounded-lg border-l-4 border-yellow-500"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={16}
+                              className={
+                                i < review.rating ? 'text-yellow-500 fill-current' : 'text-gray-300'
+                              }
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-gray-700">{review.comment}</p>
                     </div>
-                    <div className="text-gray-700">{comment.text}</div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
 
@@ -542,7 +928,7 @@ const PartnerApplications = () => {
                   <button
                     onClick={() => {
                       handleStatusUpdate(selectedApplication._id, 'approved', comment);
-                      setShowDetailModal(false);
+                      // Don't close modal immediately - let user see the updated status
                     }}
                     className="px-6 py-3 bg-green-500 text-white rounded-lg font-semibold flex items-center gap-2 hover:bg-green-600 transition-all"
                   >
@@ -555,7 +941,7 @@ const PartnerApplications = () => {
                     onClick={() => {
                       if (comment.trim()) {
                         handleStatusUpdate(selectedApplication._id, 'rejected', comment);
-                        setShowDetailModal(false);
+                        // Don't close modal immediately - let user see the updated status
                       } else {
                         alert('Please provide a reason for rejection');
                       }
@@ -566,16 +952,42 @@ const PartnerApplications = () => {
                     Reject Application
                   </button>
                 )}
-                {selectedApplication.status === 'approved' && (
+                {(selectedApplication.status === 'approved' ||
+                  selectedApplication.verificationStatus === 'approved') && (
                   <div className="text-green-600 font-semibold flex items-center gap-2">
                     <CheckCircle size={20} />
                     Application Approved
+                    {selectedApplication.verificationNotes && (
+                      <span className="text-sm text-gray-600 ml-2">
+                        - {selectedApplication.verificationNotes}
+                      </span>
+                    )}
                   </div>
                 )}
-                {selectedApplication.status === 'rejected' && (
+                {(selectedApplication.status === 'rejected' ||
+                  selectedApplication.verificationStatus === 'rejected') && (
                   <div className="text-red-600 font-semibold flex items-center gap-2">
                     <XCircle size={20} />
                     Application Rejected
+                    {selectedApplication.verificationNotes && (
+                      <span className="text-sm text-gray-600 ml-2">
+                        - {selectedApplication.verificationNotes}
+                      </span>
+                    )}
+                  </div>
+                )}
+                {(selectedApplication.status === 'submitted' ||
+                  selectedApplication.verificationStatus === 'submitted') && (
+                  <div className="text-amber-600 font-semibold flex items-center gap-2">
+                    <AlertTriangle size={20} />
+                    Application Under Review
+                  </div>
+                )}
+                {(selectedApplication.status === 'pending' ||
+                  selectedApplication.verificationStatus === 'pending') && (
+                  <div className="text-gray-600 font-semibold flex items-center gap-2">
+                    <Clock size={20} />
+                    Application Pending Review
                   </div>
                 )}
               </div>

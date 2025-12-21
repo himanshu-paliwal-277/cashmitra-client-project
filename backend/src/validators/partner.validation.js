@@ -83,54 +83,54 @@ export const assignAgentToOrderSchema = {
 // PRODUCT MANAGEMENT SCHEMAS
 // ==========================================
 
-export const createPartnerProductSchema = {
-  body: z.object({
-    categoryId: z
-      .string()
-      .regex(/^[0-9a-fA-F]{24}$/, 'Invalid category ID format')
-      .min(1, 'Category ID is required'),
-    name: z.string().min(1, 'Product name is required'),
-    brand: z.string().min(1, 'Brand is required'),
-    pricing: z
-      .object({
-        mrp: z.number({ invalid_type_error: 'MRP must be a number' }),
-      })
-      .passthrough(),
-    stock: z
-      .object({
-        quantity: z
-          .number()
-          .int()
-          .min(0, 'Stock quantity must be non-negative')
-          .optional(),
-      })
-      .passthrough()
-      .optional(),
-  }),
-};
+// export const createPartnerProductSchema = {
+//   body: z.object({
+//     categoryId: z
+//       .string()
+//       .regex(/^[0-9a-fA-F]{24}$/, 'Invalid category ID format')
+//       .min(1, 'Category ID is required'),
+//     name: z.string().min(1, 'Product name is required'),
+//     brand: z.string().min(1, 'Brand is required'),
+//     pricing: z
+//       .object({
+//         mrp: z.number({ invalid_type_error: 'MRP must be a number' }),
+//       })
+//       .passthrough(),
+//     stock: z
+//       .object({
+//         quantity: z
+//           .number()
+//           .int()
+//           .min(0, 'Stock quantity must be non-negative')
+//           .optional(),
+//       })
+//       .passthrough()
+//       .optional(),
+//   }),
+// };
 
-export const updatePartnerProductSchema = {
-  body: z.object({
-    pricing: z
-      .object({
-        mrp: z
-          .number({ invalid_type_error: 'MRP must be a number' })
-          .optional(),
-      })
-      .passthrough()
-      .optional(),
-    stock: z
-      .object({
-        quantity: z
-          .number()
-          .int()
-          .min(0, 'Stock quantity must be non-negative')
-          .optional(),
-      })
-      .passthrough()
-      .optional(),
-  }),
-};
+// export const updatePartnerProductSchema = {
+//   body: z.object({
+//     pricing: z
+//       .object({
+//         mrp: z
+//           .number({ invalid_type_error: 'MRP must be a number' })
+//           .optional(),
+//       })
+//       .passthrough()
+//       .optional(),
+//     stock: z
+//       .object({
+//         quantity: z
+//           .number()
+//           .int()
+//           .min(0, 'Stock quantity must be non-negative')
+//           .optional(),
+//       })
+//       .passthrough()
+//       .optional(),
+//   }),
+// };
 
 // ==========================================
 // SELL ORDER SCHEMAS

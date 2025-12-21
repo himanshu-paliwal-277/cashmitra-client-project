@@ -30,6 +30,8 @@ const SellCategories = () => {
   const [superCategories, setSuperCategories] = useState([]);
   const [expandedCategories, setExpandedCategories] = useState(new Set());
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSuperCategory, setSelectedSuperCategory] = useState(''); // New filter state
+  const [showModal, setShowModal] = useState(false); // Modal state
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -102,6 +104,12 @@ const SellCategories = () => {
     });
     setImagePreview(category.image || '');
     setImageFile(null);
+    setShowModal(true); // Open modal
+  };
+
+  const handleAddCategory = () => {
+    resetForm();
+    setShowModal(true); // Open modal
   };
 
   const handleDeleteCategory = async categoryId => {
@@ -172,7 +180,7 @@ const SellCategories = () => {
           throw new Error(response.message || 'Failed to update category');
         }
 
-        showToast( response.message || 'Category updated successfully');
+        showToast(response.message || 'Category updated successfully');
       } else {
         const response = await adminService.createCategory(categoryData);
 
@@ -189,6 +197,7 @@ const SellCategories = () => {
       // Only fetch categories and reset form if everything succeeded
       await fetchCategories();
       resetForm();
+      setShowModal(false); // Close modal on success
     } catch (error) {
       console.error('Error saving category:', error);
 
@@ -222,9 +231,14 @@ const SellCategories = () => {
     setImagePreview('');
   };
 
-  const filteredCategories = categories.filter(category =>
-    category.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCategories = categories.filter(category => {
+    const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSuperCategory =
+      !selectedSuperCategory ||
+      category.superCategory?._id === selectedSuperCategory ||
+      category.superCategory === selectedSuperCategory;
+    return matchesSearch && matchesSuperCategory;
+  });
   const mainCategories = filteredCategories.filter(category => !category.parentId);
 
   const renderCategoryIcon = iconName => {
@@ -240,60 +254,62 @@ const SellCategories = () => {
     return (
       <div key={category.id}>
         <div
-          className="flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors group"
-          style={{ paddingLeft: `${level * 20 + 12}px` }}
+          className="flex items-center p-4 rounded-xl hover:bg-gray-50 transition-all group border border-transparent hover:border-gray-200 hover:shadow-sm"
+          style={{ paddingLeft: `${level * 20 + 16}px` }}
         >
           {hasChildren && (
             <button
               onClick={() => handleToggleExpand(category.id)}
-              className="p-1 mr-2 hover:bg-slate-200 rounded transition-colors"
+              className="p-1 mr-3 hover:bg-gray-200 rounded-lg transition-colors"
             >
               {isExpanded ? (
-                <ChevronDown className="w-4 h-4 text-slate-600" />
+                <ChevronDown className="w-4 h-4 text-gray-600" />
               ) : (
-                <ChevronRight className="w-4 h-4 text-slate-600" />
+                <ChevronRight className="w-4 h-4 text-gray-600" />
               )}
             </button>
           )}
 
           <div
-            className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 flex-shrink-0 overflow-hidden ${
-              hasChildren ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600'
+            className={`w-12 h-12 rounded-xl flex items-center justify-center mr-4 flex-shrink-0 overflow-hidden ${
+              hasChildren ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600'
             }`}
           >
             {category.image ? (
               <img
                 src={category.image}
                 alt={category.name}
-                className="w-full h-full object-cover rounded-lg"
+                className="w-full h-full object-cover rounded-xl"
               />
             ) : (
               renderCategoryIcon(category.icon)
             )}
           </div>
 
-          <div className="flex-1">
-            <div className="font-medium text-slate-900 mb-1">{category.name}</div>
-            <div className="text-xs text-slate-600">
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-gray-900 mb-1 truncate">{category.name}</div>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
               {category.superCategory && (
-                <span className="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-medium mr-2">
+                <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded-lg text-xs font-medium">
                   {category.superCategory.name}
                 </span>
               )}
-              {children.length} subcategories
+              <span className="text-xs text-gray-500">{children.length} subcategories</span>
             </div>
           </div>
 
           <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => handleEditCategory(category)}
-              className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-600"
+              className="p-2 hover:bg-amber-100 rounded-lg transition-colors text-amber-600 hover:text-amber-700"
+              title="Edit category"
             >
               <Edit className="w-4 h-4" />
             </button>
             <button
               onClick={() => handleDeleteCategory(category.id)}
-              className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
+              className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600 hover:text-red-700"
+              title="Delete category"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -301,7 +317,9 @@ const SellCategories = () => {
         </div>
 
         {hasChildren && isExpanded && (
-          <div>{children.map(child => renderCategory(child, level + 1))}</div>
+          <div className="ml-4 space-y-1">
+            {children.map(child => renderCategory(child, level + 1))}
+          </div>
         )}
       </div>
     );
@@ -311,190 +329,276 @@ const SellCategories = () => {
     <div className="min-h-screen">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 flex items-center gap-3">
-          <TrendingDown className="w-8 h-8 text-amber-600" />
-          Sell Categories
-        </h1>
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 flex items-center gap-3 mb-2">
+            <TrendingDown className="w-8 h-8 text-amber-600" />
+            Sell Categories
+          </h1>
+          <p className="text-gray-600">
+            Manage your product categories and organize them by super categories
+          </p>
+        </div>
         <button
-          onClick={resetForm}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg hover:shadow-xl"
+          onClick={handleAddCategory}
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-amber-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
         >
           <Plus className="w-5 h-5" />
           Add Category
         </button>
       </div>
 
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Categories List */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-xl font-semibold text-slate-900">Categories</h2>
-            <div className="relative w-full sm:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search categories..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              />
-            </div>
+      {/* Filters */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search categories..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+            />
           </div>
 
-          <div className="p-4">
-            {loading ? (
-              <div className="text-center py-12">
-                <Loader className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-2" />
-                <p className="text-slate-600">Loading categories...</p>
-              </div>
-            ) : mainCategories.length === 0 ? (
-              <div className="text-center py-12 text-slate-600">No categories found</div>
-            ) : (
-              mainCategories.map(category => renderCategory(category))
+          {/* Super Category Filter */}
+          <div className="sm:w-64">
+            <select
+              value={selectedSuperCategory}
+              onChange={e => setSelectedSuperCategory(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all bg-white"
+            >
+              <option value="">All Super Categories</option>
+              {superCategories.map(superCat => (
+                <option key={superCat._id} value={superCat._id}>
+                  {superCat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Clear Filters */}
+          {(searchTerm || selectedSuperCategory) && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedSuperCategory('');
+              }}
+              className="px-4 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Categories List */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Categories ({mainCategories.length})
+            </h2>
+            {selectedSuperCategory && (
+              <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
+                Filtered by: {superCategories.find(sc => sc._id === selectedSuperCategory)?.name}
+              </span>
             )}
           </div>
         </div>
 
-        {/* Form */}
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden h-fit sticky top-8">
-          <div className="px-6 py-4 border-b border-slate-200">
-            <h2 className="text-xl font-semibold text-slate-900">
-              {editingCategory ? 'Edit Category' : 'Add New Category'}
-            </h2>
-          </div>
-
-          <div className="p-6 space-y-6">
-            {/* Category Name */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Category Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Enter category name"
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent disabled:bg-slate-50"
-              />
+        <div className="p-4">
+          {loading ? (
+            <div className="text-center py-12">
+              <Loader className="w-8 h-8 animate-spin text-amber-600 mx-auto mb-2" />
+              <p className="text-gray-600">Loading categories...</p>
             </div>
-
-            {/* Super Category */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                {/* Super Category (optional) */}
-                Super Category
-              </label>
-              <select
-                value={formData.superCategory}
-                onChange={e => setFormData({ ...formData, superCategory: e.target.value })}
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent disabled:bg-slate-50"
-              >
-                <option value="">Select a super category</option>
-                {superCategories.map(superCat => (
-                  <option key={superCat._id} value={superCat._id}>
-                    {superCat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Image Upload */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Category Image{' '}
-                {editingCategory ? '(optional to change)' : <span className="text-red-500">*</span>}
-              </label>
-              {!imagePreview ? (
-                <div
-                  onClick={() => document.getElementById('sellCatImageInput').click()}
-                  className="p-8 border-2 border-dashed border-slate-300 rounded-xl text-center cursor-pointer bg-slate-50 hover:border-amber-500 hover:bg-amber-50 transition-all"
-                >
-                  <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <div className="text-slate-700 font-medium mb-1">
-                    Click to upload or drag & drop
-                  </div>
-                  <div className="text-sm text-slate-500">PNG, JPG, GIF up to 10MB</div>
-                  <input
-                    id="sellCatImageInput"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    disabled={isSubmitting}
-                    onChange={e => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        setImageFile(file);
-                        const reader = new FileReader();
-                        reader.onloadend = () => setImagePreview(reader.result);
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="relative rounded-xl overflow-hidden border-2 border-slate-200">
-                  <img src={imagePreview} alt="preview" className="w-full h-48 object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImageFile(null);
-                      setImagePreview('');
-                    }}
-                    disabled={isSubmitting}
-                    className="absolute top-2 right-2 flex items-center gap-1 px-3 py-2 bg-white border border-slate-200 rounded-lg hover:bg-red-50 hover:border-red-500 transition-all shadow-lg"
-                  >
-                    <X className="w-4 h-4" />
-                    <span className="text-sm font-medium">Remove</span>
-                  </button>
-                  <div className="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 bg-black/60 text-white rounded text-xs">
-                    <ImageIcon className="w-3 h-3" />
-                    {imageFile ? imageFile.name : 'Current image'}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-3 pt-4">
-              {editingCategory && (
+          ) : mainCategories.length === 0 ? (
+            <div className="text-center py-12">
+              <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No categories found</h3>
+              <p className="text-gray-600 mb-4">
+                {searchTerm || selectedSuperCategory
+                  ? 'Try adjusting your filters or search terms'
+                  : 'Get started by creating your first category'}
+              </p>
+              {!searchTerm && !selectedSuperCategory && (
                 <button
-                  onClick={resetForm}
-                  disabled={isSubmitting}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 border-2 border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-all disabled:opacity-50"
+                  onClick={handleAddCategory}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
                 >
-                  <X className="w-4 h-4" />
-                  Cancel
+                  <Plus className="w-4 h-4" />
+                  Add First Category
                 </button>
               )}
-              <button
-                onClick={handleSaveCategory}
-                disabled={
-                  isSubmitting ||
-                  !formData.name.trim() ||
-                  (!imageFile && !imagePreview && !editingCategory) ||
-                  superCategories.length === 0
-                }
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <Loader className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4" />
-                )}
-                {editingCategory ? 'Update Category' : 'Create Category'}
-              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {mainCategories.map(category => renderCategory(category))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Modal Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {editingCategory ? 'Edit Category' : 'Add New Category'}
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                    resetForm();
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Category Name */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    Category Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Enter category name"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent disabled:bg-gray-50 transition-all"
+                  />
+                </div>
+
+                {/* Super Category */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    Super Category
+                  </label>
+                  <select
+                    value={formData.superCategory}
+                    onChange={e => setFormData({ ...formData, superCategory: e.target.value })}
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent disabled:bg-gray-50 bg-white transition-all"
+                  >
+                    <option value="">Select a super category</option>
+                    {superCategories.map(superCat => (
+                      <option key={superCat._id} value={superCat._id}>
+                        {superCat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Image Upload */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    Category Image{' '}
+                    {editingCategory ? (
+                      '(optional to change)'
+                    ) : (
+                      <span className="text-red-500">*</span>
+                    )}
+                  </label>
+                  {!imagePreview ? (
+                    <div
+                      onClick={() => document.getElementById('sellCatImageInput')?.click()}
+                      className="p-8 border-3 border-dashed border-gray-300 rounded-xl text-center cursor-pointer bg-gray-50 hover:border-amber-500 hover:bg-amber-50 transition-all"
+                    >
+                      <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <div className="text-gray-700 font-medium mb-1">
+                        Click to upload or drag & drop
+                      </div>
+                      <div className="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</div>
+                      <input
+                        id="sellCatImageInput"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={isSubmitting}
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setImageFile(file);
+                            const reader = new FileReader();
+                            reader.onloadend = () => setImagePreview(reader.result as string);
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative rounded-xl overflow-hidden border-2 border-gray-200">
+                      <img src={imagePreview} alt="preview" className="w-full h-48 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageFile(null);
+                          setImagePreview('');
+                        }}
+                        disabled={isSubmitting}
+                        className="absolute top-2 right-2 flex items-center gap-1 px-3 py-2 bg-white border border-gray-200 rounded-lg hover:bg-red-50 hover:border-red-500 transition-all shadow-lg"
+                      >
+                        <X className="w-4 h-4" />
+                        <span className="text-sm font-medium">Remove</span>
+                      </button>
+                      <div className="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 bg-black/60 text-white rounded text-xs">
+                        <ImageIcon className="w-3 h-3" />
+                        {imageFile ? imageFile.name : 'Current image'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-6 border-t border-gray-200">
+                  <button
+                    onClick={() => {
+                      setShowModal(false);
+                      resetForm();
+                    }}
+                    disabled={isSubmitting}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all disabled:opacity-50"
+                  >
+                    <X className="w-4 h-4" />
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveCategory}
+                    disabled={
+                      isSubmitting ||
+                      !formData.name.trim() ||
+                      (!imageFile && !imagePreview && !editingCategory) ||
+                      superCategories.length === 0
+                    }
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <Loader className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
+                    {editingCategory ? 'Update Category' : 'Create Category'}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Toast */}
       {toast && (
         <div
-          className={`fixed top-4 right-4 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl z-50 animate-slide-in ${
+          className={`fixed top-4 right-4 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl z-50 transform transition-all duration-300 ease-out ${
             toast.type === 'success' ? 'bg-amber-500 text-white' : 'bg-red-500 text-white'
           }`}
         >

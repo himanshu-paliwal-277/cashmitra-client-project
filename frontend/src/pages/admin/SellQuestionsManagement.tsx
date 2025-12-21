@@ -72,11 +72,18 @@ const SellQuestionsManagement = () => {
       const response = await adminService.getSellSuperCategories();
       const superCategories = response.data || [];
 
-      // Flatten all categories from all super categories
+      // Flatten all categories from all super categories and include super category info
       const allCategories: any[] = [];
       superCategories.forEach((superCat: any) => {
         if (superCat.categories && Array.isArray(superCat.categories)) {
-          allCategories.push(...superCat.categories);
+          const categoriesWithSuperCat = superCat.categories.map((category: any) => ({
+            ...category,
+            superCategory: {
+              _id: superCat._id,
+              name: superCat.name,
+            },
+          }));
+          allCategories.push(...categoriesWithSuperCat);
         }
       });
 
@@ -296,7 +303,9 @@ const SellQuestionsManagement = () => {
               <span className="font-medium">Order: {question.order}</span>
               <span>•</span>
               <span className="truncate">
-                {question.categoryId?.displayName || question.categoryId?.name || 'No Category'}
+                {question.categoryId?.superCategory?.name
+                  ? `${question.categoryId.superCategory.name} > ${question.categoryId?.displayName || question.categoryId?.name || 'No Category'}`
+                  : question.categoryId?.displayName || question.categoryId?.name || 'No Category'}
               </span>
               <span>•</span>
               <span className="font-medium capitalize">{question.section || 'No Section'}</span>
@@ -502,7 +511,11 @@ const SellQuestionsManagement = () => {
               </td>
               <td className="px-4 py-3 border-b border-gray-200">
                 <div className="text-gray-700">
-                  {question.categoryId?.displayName || question.categoryId?.name || 'No Category'}
+                  {question.categoryId?.superCategory?.name
+                    ? `${question.categoryId.superCategory.name} > ${question.categoryId?.displayName || question.categoryId?.name || 'No Category'}`
+                    : question.categoryId?.displayName ||
+                      question.categoryId?.name ||
+                      'No Category'}
                 </div>
                 <div className="text-xs text-gray-500 capitalize mt-1">
                   {question.section || 'No Section'}
@@ -719,7 +732,9 @@ const SellQuestionsManagement = () => {
             <option value="">All Categories</option>
             {categories.map(category => (
               <option key={category._id} value={category._id}>
-                {category.displayName || category.name}
+                {category.superCategory?.name
+                  ? `${category.superCategory.name} > ${category.displayName || category.name}`
+                  : category.displayName || category.name}
               </option>
             ))}
           </select>
