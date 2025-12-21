@@ -235,7 +235,7 @@ const Signup = () => {
                 type="button"
                 onClick={togglePasswordVisibility}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none text-gray-600 cursor-pointer p-1 rounded-sm hover:text-gray-900 hover:bg-gray-100"
+                className="absolute right-3 top-1.5 bg-transparent border-none text-gray-600 cursor-pointer p-1 rounded-sm hover:text-gray-900 hover:bg-gray-100"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -258,7 +258,7 @@ const Signup = () => {
           </div>
 
           {/* Terms Checkbox */}
-          <div className="flex items-start gap-3 my-2">
+          <div className="flex items-center gap-3 my-2">
             <input
               type="checkbox"
               id="agreeToTerms"
@@ -267,7 +267,7 @@ const Signup = () => {
               onChange={handleChange}
               className="m-0 mt-0.5"
             />
-            <label htmlFor="agreeToTerms" className="text-sm text-gray-600 leading-6">
+            <label htmlFor="agreeToTerms" className="text-sm text-gray-600 leading-6 ">
               I agree to the{' '}
               <Link to="/terms" className="text-blue-500 no-underline hover:underline">
                 Terms of Service
