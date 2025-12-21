@@ -179,6 +179,7 @@ export var getCategoriesBySuperCategory = asyncHandler(async (req, res) => {
 
 export var getPublicCategoriesBySuperCategory = asyncHandler(
   async (req, res) => {
+    console.log('req.param.id = ', req.params.id);
     const superCategory = await BuySuperCategory.findById(req.params.id);
 
     if (!superCategory) {

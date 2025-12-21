@@ -18,7 +18,7 @@ const PhoneDropdown = ({ isVisible = true, onClose, onLinkClick = () => {} }: an
   const [error, setError] = useState<string | null>(null);
 
   // Mobile super category ID - you can make this dynamic if needed
-  const MOBILE_SUPER_CATEGORY_ID = '69028f06887ace411d8fe98e';
+  const MOBILE_SUPER_CATEGORY_ID = '6947b6b253cf5d8231277564';
 
   useEffect(() => {
     if (isVisible) {

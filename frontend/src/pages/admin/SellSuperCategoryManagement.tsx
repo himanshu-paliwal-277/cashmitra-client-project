@@ -190,14 +190,14 @@ const SellSuperCategoryManagement = () => {
           {filteredCategories.map(category => (
             <div
               key={category._id}
-              className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1"
+              className="bg-white rounded-xl shadow-md overflow-hidden shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1"
             >
-              <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <div className="w-full h-48 flex items-center justify-center">
                 {category.image ? (
                   <img
                     src={category.image}
                     alt={category.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain p-2"
                   />
                 ) : (
                   <ImageIcon size={48} className="text-gray-400" />
