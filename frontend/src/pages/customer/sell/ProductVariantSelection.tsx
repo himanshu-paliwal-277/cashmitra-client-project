@@ -13,6 +13,7 @@ import {
   Zap,
   Award,
 } from 'lucide-react';
+import { truncate } from '../../../utils/truncateString';
 
 const ProductVariantSelection = ({ onContinue, onBack }: any) => {
   const { category, brand, model } = useParams();
@@ -171,7 +172,7 @@ const ProductVariantSelection = ({ onContinue, onBack }: any) => {
           <ArrowRight className="w-4 h-4 text-slate-400" />
           <span className="text-slate-900 font-medium">{product?.category || 'Product'}</span>
           <ArrowRight className="w-4 h-4 text-slate-400" />
-          <span className="text-slate-900 font-medium">{product?.name}</span>
+          <span className="text-slate-900 font-medium">{truncate(product?.name, 20)}</span>
         </nav>
 
         {/* Back Button */}
@@ -185,7 +186,7 @@ const ProductVariantSelection = ({ onContinue, onBack }: any) => {
 
         {/* Product Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">{product?.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">{product?.name}</h1>
           <div className="flex items-center justify-center gap-2 text-blue-600">
             <TrendingUp className="w-5 h-5" />
             <p className="text-lg font-semibold">{product?.soldCount}+ already sold</p>

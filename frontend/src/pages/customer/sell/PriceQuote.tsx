@@ -220,12 +220,12 @@ const PriceQuote = () => {
             <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Product Image */}
-                <div className="w-full h-80 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center overflow-hidden">
+                <div className="w-full h-80 p-2 rounded-2xl flex items-center justify-center overflow-hidden">
                   {productDetails.images?.[0] ? (
                     <img
                       src={productDetails.images[0]}
                       alt={productDetails.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   ) : (
                     <Package className="w-24 h-24 text-slate-400" />

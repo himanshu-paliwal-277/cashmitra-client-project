@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../services/api';
 import { Package, ArrowRight, X } from 'lucide-react';
+import { truncate } from '../../../utils/truncateString';
 
 const SellModelSelection = () => {
   const navigate = useNavigate();
@@ -201,7 +202,7 @@ const SellModelSelection = () => {
                     </div>
 
                     <div className="p-4">
-                      <h3 className="font-bold text-lg mb-2">{product.name}</h3>
+                      <h3 className="font-bold text-lg mb-2">{truncate(product.name, 75)}</h3>
                       <p className="text-green-600 font-bold text-xl mb-3">
                         ₹{basePrice.toLocaleString()}+
                       </p>

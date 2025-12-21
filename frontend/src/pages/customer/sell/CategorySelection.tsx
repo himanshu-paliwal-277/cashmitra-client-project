@@ -152,12 +152,12 @@ const CategorySelection = () => {
                 }}
                 className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all cursor-pointer border-2 border-slate-100 hover:border-blue-400 group overflow-hidden"
               >
-                <div className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden">
+                <div className="relative h-52 p-2 overflow-hidden">
                   {superCat.image ? (
                     <img
                       src={superCat.image}
                       alt={superCat.displayName || superCat.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
