@@ -34,12 +34,13 @@ const SellProducts = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
-  const [viewMode, setViewMode] = useState('grid');
+  const [displayMode, setDisplayMode] = useState('grid');
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [selectedProductForQuestions, setSelectedProductForQuestions] = useState(null);
+  const [isViewMode, setIsViewMode] = useState(false);
 
   const sellProductsHook = useSellProducts();
   const {
@@ -126,6 +127,13 @@ const SellProducts = () => {
 
   const handleEditProduct = (product: any) => {
     setSelectedProduct(product);
+    setIsViewMode(false);
+    setIsProductModalOpen(true);
+  };
+
+  const handleViewProduct = (product: any) => {
+    setSelectedProduct(product);
+    setIsViewMode(true);
     setIsProductModalOpen(true);
   };
 
@@ -139,6 +147,7 @@ const SellProducts = () => {
       fetchProducts();
       setIsProductModalOpen(false);
       setSelectedProduct(null);
+      setIsViewMode(false);
     } catch (error) {
       console.error('Error saving product:', error);
       throw error;
@@ -148,11 +157,12 @@ const SellProducts = () => {
   const handleCloseModal = () => {
     setIsProductModalOpen(false);
     setSelectedProduct(null);
+    setIsViewMode(false);
   };
 
   const handleManageQuestions = (product: any) => {
     setSelectedProductForQuestions(product);
-    fetchQuestions({ productId: product._id || product.id });
+    fetchQuestions(1, 10, { productId: product._id || product.id });
   };
 
   const handleBackToProducts = () => {
@@ -181,7 +191,7 @@ const SellProducts = () => {
       } else {
         await createQuestion(dataWithProduct);
       }
-      fetchQuestions({
+      fetchQuestions(1, 10, {
         productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
       });
       setIsQuestionModalOpen(false);
@@ -196,7 +206,7 @@ const SellProducts = () => {
     if (window.confirm('Are you sure you want to delete this question?')) {
       try {
         await deleteQuestion(questionId);
-        fetchQuestions({
+        fetchQuestions(1, 10, {
           productId: selectedProductForQuestions?._id || selectedProductForQuestions?.id,
         });
       } catch (error) {
@@ -309,7 +319,10 @@ const SellProducts = () => {
             <HelpCircle size={14} />
             Questions
           </button>
-          <button className="flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm font-medium">
+          <button
+            onClick={() => handleViewProduct(product)}
+            className="flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm font-medium"
+          >
             <Eye size={14} />
             View
           </button>
@@ -390,6 +403,7 @@ const SellProducts = () => {
               <td className="px-6 py-4">
                 <div className="flex items-center gap-2">
                   <button
+                    onClick={() => handleViewProduct(product)}
                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-150 text-gray-600 hover:text-gray-900"
                     title="View"
                   >
@@ -656,9 +670,9 @@ const SellProducts = () => {
                 {/* View Toggle */}
                 <div className="flex border border-gray-200 rounded-xl overflow-hidden bg-gray-50">
                   <button
-                    onClick={() => setViewMode('grid')}
+                    onClick={() => setDisplayMode('grid')}
                     className={`p-3 transition-all duration-200 ${
-                      viewMode === 'grid'
+                      displayMode === 'grid'
                         ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md'
                         : 'text-gray-600 hover:bg-gray-100'
                     }`}
@@ -666,9 +680,9 @@ const SellProducts = () => {
                     <Grid size={20} />
                   </button>
                   <button
-                    onClick={() => setViewMode('list')}
+                    onClick={() => setDisplayMode('list')}
                     className={`p-3 transition-all duration-200 ${
-                      viewMode === 'list'
+                      displayMode === 'list'
                         ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md'
                         : 'text-gray-600 hover:bg-gray-100'
                     }`}
@@ -692,7 +706,7 @@ const SellProducts = () => {
                   </p>
                 </div>
                 <button
-                  onClick={fetchProducts}
+                  onClick={() => fetchProducts()}
                   className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium shadow-sm"
                 >
                   <RefreshCw size={16} />
@@ -726,7 +740,7 @@ const SellProducts = () => {
                     </button>
                   )}
                 </div>
-              ) : viewMode === 'grid' ? (
+              ) : displayMode === 'grid' ? (
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {sortedProducts.map(renderProductCard)}
                 </div>
@@ -745,6 +759,7 @@ const SellProducts = () => {
         product={selectedProduct}
         onSave={handleSaveProduct}
         loading={apiLoading}
+        viewOnly={isViewMode}
       />
 
       <QuestionModal

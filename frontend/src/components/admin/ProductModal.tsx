@@ -1,360 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import cloudinaryService from '../../services/cloudinaryService';
-import { X, Save, Upload, Image as ImageIcon, Plus, Trash2, AlertCircle, Tag } from 'lucide-react';
+import { X, Save, Upload, Plus, Trash2, AlertCircle, Tag } from 'lucide-react';
 import { seriesService } from '../../services/seriesService';
 
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-`;
-
-const ModalHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-`;
-
-const ModalBody = styled.div`
-  padding: 1.5rem;
-`;
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const Label = styled.label`
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-
-  &:disabled {
-    background: #f9fafb;
-    color: #6b7280;
-  }
-`;
-
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-  }
-`;
-
-const VariantsSection = styled.div`
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid #e5e7eb;
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 1rem 0;
-`;
-
-const VariantCard = styled.div`
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  background: #f9fafb;
-`;
-
-const VariantHeader = styled.div`
-  display: flex;
-  justify-content: between;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-
-const AddVariantButton = styled.button`
-  background: #f59e0b;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #d97706;
-  }
-`;
-
-const RemoveVariantButton = styled.button`
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #dc2626;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-`;
-
-const ModalFooter = styled.div`
-  padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-`;
-
-const Button = styled.button`
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  ${(props: any) =>
-    props.variant === 'primary'
-      ? `
-background: #f59e0b;
-color: white;
-border: none;
-
-&:hover {
-  background: #d97706;
-}
-
-&:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
-`
-      : `
-background: white;
-color: #374151;
-border: 1px solid #d1d5db;
-
-&:hover {
-  background: #f9fafb;
-}
-`}
-`;
-
-// Image Upload Components
-const ImageUploadContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const ImageUploadButton = styled.button`
-  background: #f59e0b;
-  color: white;
-  border: none;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #d97706;
-  }
-
-  &:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-  }
-`;
-
-const ImagePreviewContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-`;
-
-const ImagePreview = styled.div`
-  position: relative;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-
-  img {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-  }
-`;
-
-const RemoveImageButton = styled.button`
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  background: rgba(239, 68, 68, 0.9);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: rgba(220, 38, 38, 0.9);
-  }
-`;
-
-// Tags Components
-const TagInputContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const TagsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-`;
-
-const TagChip = styled.div`
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: 1rem;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  button {
-    background: none;
-    border: none;
-    color: #6b7280;
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    transition: all 0.2s;
-
-    &:hover {
-      background: #e5e7eb;
-      color: #374151;
-    }
-  }
-`;
-
-const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false }: any) => {
+const ProductModal = ({
+  isOpen,
+  onClose,
+  product = null,
+  onSave,
+  loading = false,
+  viewOnly = false,
+}: any) => {
   const [formData, setFormData] = useState({
     name: '',
     categoryId: '',
@@ -466,7 +123,7 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
 
   // Image upload handling
   const handleImageUpload = async (e: any) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files as FileList);
     if (files.length === 0) return;
 
     setImageUploading(true);
@@ -605,7 +262,7 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
         seriesId: formData.seriesId, // 🔹
         slug,
         variants: formData.variants.map(variant => {
-          const cleanedVariant = {
+          const cleanedVariant: any = {
             label: variant.label,
             basePrice: parseFloat(variant.basePrice),
             isActive: variant.isActive,
@@ -629,74 +286,89 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
   if (!isOpen) return null;
 
   return (
-    <ModalOverlay onClick={(e: any) => e.target === e.currentTarget && onClose()}>
-      <ModalContent>
-        <ModalHeader>
-          <ModalTitle>{product ? 'Edit Product' : 'Add New Product'}</ModalTitle>
-          <CloseButton onClick={onClose}>
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      onClick={(e: any) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {viewOnly ? 'View Product' : product ? 'Edit Product' : 'Add New Product'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+          >
             <X size={20} />
-          </CloseButton>
-        </ModalHeader>
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit}>
-          <ModalBody>
+          <div className="p-6">
             {error && (
-              <ErrorMessage>
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2 mb-6">
                 <AlertCircle size={16} />
                 {error}
-              </ErrorMessage>
+              </div>
             )}
 
-            <FormGrid>
-              <FormGroup>
-                <Label>Product Name *</Label>
-                <Input
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-700">Product Name *</label>
+                <input
                   type="text"
                   value={formData.name}
                   onChange={(e: any) => handleNameChange(e.target.value)}
                   placeholder="Enter product name"
                   required
+                  disabled={viewOnly}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm transition-all focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:bg-gray-50 disabled:text-gray-500"
                 />
-              </FormGroup>
+              </div>
 
-              <FormGroup>
-                <Label>Slug *</Label>
-                <Input
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-700">Slug *</label>
+                <input
                   type="text"
                   value={formData.slug}
                   onChange={(e: any) => handleInputChange('slug', e.target.value)}
                   placeholder="product-slug"
                   required
+                  disabled={viewOnly}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm transition-all focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:bg-gray-50 disabled:text-gray-500"
                 />
-              </FormGroup>
+              </div>
 
-              <FormGroup>
-                <Label>Category *</Label>
-                <Select
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-700">Category *</label>
+                <select
                   value={formData.categoryId}
                   onChange={(e: any) => handleCategoryChange(e.target.value)}
                   required
-                  disabled={categoriesLoading}
+                  disabled={categoriesLoading || viewOnly}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white transition-all focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:bg-gray-50"
                 >
                   <option value="">
                     {categoriesLoading ? 'Loading categories...' : 'Select category'}
                   </option>
                   {categories.map(category => (
                     <option key={category._id} value={category._id}>
-                      {category.name}
+                      {category.superCategory?.name
+                        ? `${category.superCategory.name} > ${category.name}`
+                        : category.name}
                     </option>
                   ))}
-                </Select>
-              </FormGroup>
+                </select>
+              </div>
 
-              {/* 🔹 SERIES SELECT INPUT */}
-              <FormGroup>
-                <Label>Series *</Label>
-                <Select
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-700">Series *</label>
+                <select
                   value={formData.seriesId}
                   onChange={(e: any) => handleInputChange('seriesId', e.target.value)}
                   required
-                  disabled={!formData.categoryId || seriesLoading}
+                  disabled={!formData.categoryId || seriesLoading || viewOnly}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white transition-all focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:bg-gray-50"
                 >
                   <option value="">{seriesLoading ? 'Loading series...' : 'Select series'}</option>
                   {series.map(item => (
@@ -704,121 +376,162 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
                       {item.name}
                     </option>
                   ))}
-                </Select>
-              </FormGroup>
+                </select>
+              </div>
 
-              <FormGroup>
-                <Label>Status</Label>
-                <Select
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-700">Status</label>
+                <select
                   value={formData.status}
                   onChange={(e: any) => handleInputChange('status', e.target.value)}
+                  disabled={viewOnly}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white transition-all focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:bg-gray-50"
                 >
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
-                </Select>
-              </FormGroup>
-            </FormGrid>
+                </select>
+              </div>
+            </div>
 
             {/* Images Section */}
-            <FormGroup style={{ marginTop: '1.5rem' }}>
-              <Label>Product Images</Label>
-              <ImageUploadContainer>
-                <ImageUploadButton
+            <div className="mt-6">
+              <label className="text-sm font-semibold text-gray-700 block mb-2">
+                Product Images
+              </label>
+              <div className="flex items-center gap-4">
+                <button
                   type="button"
-                  onClick={() => document.getElementById('image-upload').click()}
+                  onClick={() => document.getElementById('image-upload')?.click()}
+                  disabled={viewOnly || imageUploading}
+                  className="bg-amber-500 hover:bg-amber-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors disabled:cursor-not-allowed"
                 >
                   <Upload size={16} />
                   {imageUploading ? 'Uploading...' : 'Upload Images'}
-                </ImageUploadButton>
+                </button>
                 <input
                   id="image-upload"
                   type="file"
                   multiple
                   accept="image/*"
                   onChange={handleImageUpload}
-                  style={{ display: 'none' }}
-                  disabled={imageUploading}
+                  className="hidden"
+                  disabled={imageUploading || viewOnly}
                 />
-              </ImageUploadContainer>
+              </div>
 
               {formData.images.length > 0 && (
-                <ImagePreviewContainer>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-4">
                   {formData.images.map((image, index) => (
-                    <ImagePreview key={index}>
-                      <img src={image} alt={`Product ${index + 1}`} />
-                      <RemoveImageButton onClick={() => removeImage(index)}>
-                        <X size={12} />
-                      </RemoveImageButton>
-                    </ImagePreview>
+                    <div
+                      key={index}
+                      className="relative rounded-lg overflow-hidden border border-gray-200"
+                    >
+                      <img
+                        src={image}
+                        alt={`Product ${index + 1}`}
+                        className="w-full h-24 object-cover"
+                      />
+                      {!viewOnly && (
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center transition-colors"
+                        >
+                          <X size={12} />
+                        </button>
+                      )}
+                    </div>
                   ))}
-                </ImagePreviewContainer>
+                </div>
               )}
-            </FormGroup>
+            </div>
 
             {/* Tags Section */}
-            <FormGroup style={{ marginTop: '1.5rem' }}>
-              <Label>Tags</Label>
-              <TagInputContainer>
-                <Input
+            <div className="mt-6">
+              <label className="text-sm font-semibold text-gray-700 block mb-2">Tags</label>
+              <div className="flex items-center gap-2">
+                <input
                   type="text"
                   value={tagInput}
                   onChange={(e: any) => setTagInput(e.target.value)}
                   onKeyPress={handleTagInputKeyPress}
                   placeholder="Enter tag and press Enter"
+                  disabled={viewOnly}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm transition-all focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:bg-gray-50"
                 />
-                <Button type="button" onClick={addTag} style={{ marginLeft: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={addTag}
+                  disabled={viewOnly}
+                  className="bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors disabled:cursor-not-allowed"
+                >
                   <Tag size={16} />
                   Add
-                </Button>
-              </TagInputContainer>
+                </button>
+              </div>
 
               {formData.tags.length > 0 && (
-                <TagsContainer>
+                <div className="flex flex-wrap gap-2 mt-2">
                   {formData.tags.map((tag, index) => (
-                    <TagChip key={index}>
+                    <div
+                      key={index}
+                      className="bg-gray-100 border border-gray-300 rounded-full px-3 py-1 text-sm flex items-center gap-2"
+                    >
                       {tag}
-                      <button type="button" onClick={() => removeTag(tag)}>
-                        <X size={12} />
-                      </button>
-                    </TagChip>
+                      {!viewOnly && (
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="hover:bg-gray-200 text-gray-500 hover:text-gray-700 rounded-full w-4 h-4 flex items-center justify-center transition-colors"
+                        >
+                          <X size={12} />
+                        </button>
+                      )}
+                    </div>
                   ))}
-                </TagsContainer>
+                </div>
               )}
-            </FormGroup>
+            </div>
 
-            <VariantsSection>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '1rem',
-                }}
-              >
-                <SectionTitle>Product Variants</SectionTitle>
-                <AddVariantButton type="button" onClick={addVariant}>
-                  <Plus size={16} />
-                  Add Variant
-                </AddVariantButton>
+            {/* Variants Section */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Product Variants</h3>
+                {!viewOnly && (
+                  <button
+                    type="button"
+                    onClick={addVariant}
+                    className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
+                  >
+                    <Plus size={16} />
+                    Add Variant
+                  </button>
+                )}
               </div>
 
               {formData.variants.map((variant, index) => (
-                <VariantCard key={variant._id || variant.tempId}>
-                  <VariantHeader>
-                    <span style={{ fontWeight: '600', color: '#374151' }}>Variant {index + 1}</span>
-                    <RemoveVariantButton
-                      type="button"
-                      onClick={() => removeVariant(variant._id || variant.tempId)}
-                    >
-                      <Trash2 size={12} />
-                      Remove
-                    </RemoveVariantButton>
-                  </VariantHeader>
+                <div
+                  key={variant._id || variant.tempId}
+                  className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="font-semibold text-gray-700">Variant {index + 1}</span>
+                    {!viewOnly && (
+                      <button
+                        type="button"
+                        onClick={() => removeVariant(variant._id || variant.tempId)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1 transition-colors"
+                      >
+                        <Trash2 size={12} />
+                        Remove
+                      </button>
+                    )}
+                  </div>
 
-                  <FormGrid>
-                    <FormGroup>
-                      <Label>Label *</Label>
-                      <Input
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-semibold text-gray-700">Label *</label>
+                      <input
                         type="text"
                         value={variant.label}
                         onChange={(e: any) =>
@@ -826,12 +539,14 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
                         }
                         placeholder="e.g., 128GB Black, 256GB White"
                         required
+                        disabled={viewOnly}
+                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm transition-all focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:bg-gray-50"
                       />
-                    </FormGroup>
+                    </div>
 
-                    <FormGroup>
-                      <Label>Base Price *</Label>
-                      <Input
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-semibold text-gray-700">Base Price *</label>
+                      <input
                         type="number"
                         value={variant.basePrice}
                         onChange={(e: any) =>
@@ -841,13 +556,15 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
                         min="0"
                         step="0.01"
                         required
+                        disabled={viewOnly}
+                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm transition-all focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:bg-gray-50"
                       />
-                    </FormGroup>
+                    </div>
 
-                    <FormGroup>
-                      <Label>Active</Label>
-                      <Select
-                        value={variant.isActive}
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-semibold text-gray-700">Active</label>
+                      <select
+                        value={variant.isActive ? 'true' : 'false'}
                         onChange={(e: any) =>
                           updateVariant(
                             variant._id || variant.tempId,
@@ -855,29 +572,41 @@ const ProductModal = ({ isOpen, onClose, product = null, onSave, loading = false
                             e.target.value === 'true'
                           )
                         }
+                        disabled={viewOnly}
+                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white transition-all focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:bg-gray-50"
                       >
-                        <option value={true}>Active</option>
-                        <option value={false}>Inactive</option>
-                      </Select>
-                    </FormGroup>
-                  </FormGrid>
-                </VariantCard>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </VariantsSection>
-          </ModalBody>
+            </div>
+          </div>
 
-          <ModalFooter>
-            <Button type="button" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" variant="primary" disabled={loading || imageUploading}>
-              <Save size={16} />
-              {loading ? 'Saving...' : product ? 'Update Product' : 'Create Product'}
-            </Button>
-          </ModalFooter>
+          <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+            >
+              {viewOnly ? 'Close' : 'Cancel'}
+            </button>
+            {!viewOnly && (
+              <button
+                type="submit"
+                disabled={loading || imageUploading}
+                className="px-6 py-2 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-400 text-white rounded-lg font-semibold flex items-center gap-2 transition-colors disabled:cursor-not-allowed"
+              >
+                <Save size={16} />
+                {loading ? 'Saving...' : product ? 'Update Product' : 'Create Product'}
+              </button>
+            )}
+          </div>
         </form>
-      </ModalContent>
-    </ModalOverlay>
+      </div>
+    </div>
   );
 };
 

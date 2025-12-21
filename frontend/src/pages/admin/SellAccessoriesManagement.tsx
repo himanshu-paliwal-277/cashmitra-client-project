@@ -689,7 +689,9 @@ const SellAccessoriesManagement = () => {
               {categories &&
                 categories.map((category: any) => (
                   <option key={category._id} value={category._id}>
-                    {category.name}
+                    {category.superCategory?.name
+                      ? `${category.superCategory.name} > ${category.displayName || category.name}`
+                      : category.displayName || category.name}
                   </option>
                 ))}
             </select>
@@ -901,20 +903,28 @@ const SellAccessoriesManagement = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                  <select
-                    value={formData.categoryId}
-                    onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                    required
-                    className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-                  >
-                    <option value="">Select a category</option>
-                    {categories &&
-                      categories.map(category => (
-                        <option key={category._id} value={category._id}>
-                          {category.name}
-                        </option>
-                      ))}
-                  </select>
+                  {categoriesLoading ? (
+                    <div className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-500">
+                      Loading categories...
+                    </div>
+                  ) : (
+                    <select
+                      value={formData.categoryId}
+                      onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
+                      required
+                      className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                    >
+                      <option value="">Select a category</option>
+                      {categories &&
+                        categories.map((category: any) => (
+                          <option key={category._id} value={category._id}>
+                            {category.superCategory?.name
+                              ? `${category.superCategory.name} > ${category.displayName || category.name}`
+                              : category.displayName || category.name}
+                          </option>
+                        ))}
+                    </select>
+                  )}
                   {categoriesLoading && (
                     <small className="text-gray-500">Loading categories...</small>
                   )}

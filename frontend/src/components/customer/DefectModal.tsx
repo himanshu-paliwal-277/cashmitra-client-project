@@ -191,18 +191,30 @@ const DefectModal = ({
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-700">Category *</label>
-            <select
-              value={formData.categoryId}
-              onChange={e => handleInputChange('categoryId', e.target.value)}
-              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            >
-              <option value="">Select a category</option>
-              {categories.map((category: any) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+            {categoriesLoading ? (
+              <div className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-500">
+                Loading categories...
+              </div>
+            ) : categoriesError ? (
+              <div className="px-3 py-2.5 border border-red-300 rounded-lg text-sm text-red-600 bg-red-50">
+                {categoriesError}
+              </div>
+            ) : (
+              <select
+                value={formData.categoryId}
+                onChange={e => handleInputChange('categoryId', e.target.value)}
+                className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              >
+                <option value="">Select a category</option>
+                {categories.map((category: any) => (
+                  <option key={category._id} value={category._id}>
+                    {category.superCategory?.name
+                      ? `${category.superCategory.name} > ${category.displayName || category.name}`
+                      : category.displayName || category.name}
+                  </option>
+                ))}
+              </select>
+            )}
             {errors.categoryId && (
               <div className="flex items-center gap-2 text-red-600 text-sm mt-1">
                 <AlertCircle size={16} />
@@ -268,14 +280,73 @@ const DefectModal = ({
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700">Icon</label>
-            <input
-              type="text"
-              value={formData.icon}
-              onChange={e => handleInputChange('icon', e.target.value)}
-              placeholder="Enter icon emoji or name"
-              className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            />
+            <label className="text-sm font-medium text-gray-700">
+              Icon
+              <span className="ml-1 text-xs text-gray-500">(Visual representation)</span>
+            </label>
+            <div className="space-y-3">
+              {/* Icon Preview */}
+              {formData.icon && (
+                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg border">
+                  <span className="text-lg">{formData.icon}</span>
+                  <span className="text-sm text-gray-600">Preview</span>
+                </div>
+              )}
+
+              {/* Predefined Icons */}
+              <div>
+                <label className="text-xs text-gray-600 mb-2 block">Quick Select:</label>
+                <div className="grid grid-cols-8 gap-2">
+                  {[
+                    '📱',
+                    '💻',
+                    '🎧',
+                    '⌚',
+                    '📷',
+                    '🔋',
+                    '📺',
+                    '🖥️',
+                    '💔',
+                    '🔧',
+                    '⚡',
+                    '🔴',
+                    '❌',
+                    '⚠️',
+                    '🚫',
+                    '💥',
+                  ].map(emoji => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => handleInputChange('icon', emoji)}
+                      className={`p-2 text-lg border rounded-lg hover:bg-amber-50 hover:border-amber-300 transition-colors ${
+                        formData.icon === emoji
+                          ? 'bg-amber-100 border-amber-400'
+                          : 'bg-white border-gray-300'
+                      }`}
+                      title={`Select ${emoji}`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Icon Input */}
+              <div>
+                <label className="text-xs text-gray-600 mb-1 block">Or enter custom:</label>
+                <input
+                  type="text"
+                  value={formData.icon}
+                  onChange={e => handleInputChange('icon', e.target.value)}
+                  placeholder="Enter emoji or icon name (e.g., 📱, 💔, broken-screen)"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Use emojis for visual appeal or text for icon names
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
