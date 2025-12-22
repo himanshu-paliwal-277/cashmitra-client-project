@@ -6,6 +6,7 @@ import { Finance } from '../models/finance.model.js';
 import { Inventory } from '../models/inventory.model.js';
 import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
+import { PartnerPermission } from '../models/partnerPermission.model.js';
 import { Product } from '../models/product.model.js';
 import { SellOrder } from '../models/sellOrder.model.js';
 import { Transaction } from '../models/transaction.model.js';
@@ -143,12 +144,26 @@ export const getAllPartners = async (req, res) => {
     const partnersWithWallet = await Promise.all(
       partners.map(async (partner) => {
         const wallet = await Wallet.findOne({ partner: partner._id });
+        const permissions = await PartnerPermission.findOne({ partner: partner._id });
         const partnerObj = partner.toObject();
 
         if (wallet) {
           partnerObj.wallet = {
             balance: wallet.balance,
             transactions: wallet.transactions,
+          };
+        }
+
+        // Add buy/sell permissions to partner object
+        if (permissions) {
+          partnerObj.permissions = {
+            buy: permissions.hasPermission('buy'),
+            sell: permissions.hasPermission('sell'),
+          };
+        } else {
+          partnerObj.permissions = {
+            buy: false,
+            sell: false,
           };
         }
 
@@ -219,6 +234,7 @@ export const createPartner = async (req, res) => {
       shopImages,
       bankDetails,
       upiId,
+      permissions, // { buy: boolean, sell: boolean }
     } = req.body;
 
     let user;
@@ -291,6 +307,23 @@ export const createPartner = async (req, res) => {
       transactions: [],
     });
 
+    // Create default partner permissions
+    const partnerPermissions = await PartnerPermission.createDefaultPermissions(
+      partner._id,
+      req.user._id
+    );
+
+    // Grant buy/sell permissions based on admin selection
+    if (permissions) {
+      if (permissions.buy) {
+        partnerPermissions.grantPermission('buy', req.user._id);
+      }
+      if (permissions.sell) {
+        partnerPermissions.grantPermission('sell', req.user._id);
+      }
+      await partnerPermissions.save();
+    }
+
     const populatedPartner = await Partner.findById(partner._id).populate(
       'user',
       'name email phone'
@@ -352,10 +385,14 @@ export const updatePartner = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
 
+    // Extract permissions before deleting
+    const permissions = updateData.permissions;
+
     delete updateData.user;
     delete updateData._id;
     delete updateData.createdAt;
     delete updateData.updatedAt;
+    delete updateData.permissions; // Don't update partner document with permissions
 
     if (updateData.gstNumber) {
       const existingGST = await Partner.findOne({
@@ -374,6 +411,39 @@ export const updatePartner = async (req, res) => {
 
     if (!partner) {
       return res.status(404).json({ message: 'Partner not found' });
+    }
+
+    // Update partner permissions if provided
+    if (permissions !== undefined) {
+      let partnerPermissions = await PartnerPermission.findOne({ partner: id });
+
+      // Create permissions if they don't exist
+      if (!partnerPermissions) {
+        partnerPermissions = await PartnerPermission.createDefaultPermissions(
+          id,
+          req.user._id
+        );
+      }
+
+      // Update buy permission
+      if (permissions.buy !== undefined) {
+        if (permissions.buy) {
+          partnerPermissions.grantPermission('buy', req.user._id);
+        } else {
+          partnerPermissions.revokePermission('buy', req.user._id);
+        }
+      }
+
+      // Update sell permission
+      if (permissions.sell !== undefined) {
+        if (permissions.sell) {
+          partnerPermissions.grantPermission('sell', req.user._id);
+        } else {
+          partnerPermissions.revokePermission('sell', req.user._id);
+        }
+      }
+
+      await partnerPermissions.save();
     }
 
     res.json({

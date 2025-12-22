@@ -87,6 +87,11 @@ const Partners = () => {
       accountHolderName: '',
     },
     upiId: '',
+    // Permissions
+    permissions: {
+      buy: false,
+      sell: false,
+    },
   });
 
   const {
@@ -271,6 +276,11 @@ const Partners = () => {
         accountHolderName: partner.bankDetails?.accountHolderName || '',
       },
       upiId: partner.upiId || '',
+      // Permissions
+      permissions: {
+        buy: partner.permissions?.buy || false,
+        sell: partner.permissions?.sell || false,
+      },
     });
     setShowModal(true);
   };
@@ -354,6 +364,11 @@ const Partners = () => {
         accountHolderName: '',
       },
       upiId: '',
+      // Permissions
+      permissions: {
+        buy: false,
+        sell: false,
+      },
     });
     setShowPassword(false);
   };
@@ -572,10 +587,7 @@ const Partners = () => {
                     Wallet Balance
                   </th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                    Business Type
-                  </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                    Total Orders
+                    Permissions
                   </th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
                     Status
@@ -591,7 +603,7 @@ const Partners = () => {
               <tbody className="divide-y divide-gray-100">
                 {filteredPartners.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center">
+                    <td colSpan={6} className="px-6 py-12 text-center">
                       <Users size={48} className="mx-auto text-gray-400 mb-4" />
                       <p className="text-gray-600 text-lg">
                         {searchTerm || statusFilter
@@ -637,8 +649,25 @@ const Partners = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">Individual</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">0</td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1.5">
+                          {partner.permissions?.buy ? (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                              Buy
+                            </span>
+                          ) : null}
+                          {partner.permissions?.sell ? (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-200">
+                              Sell
+                            </span>
+                          ) : null}
+                          {!partner.permissions?.buy && !partner.permissions?.sell && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                              None
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(partner.verificationStatus)}`}
@@ -1224,6 +1253,68 @@ const Partners = () => {
                   Enter UPI ID in format: username@provider (e.g., user@paytm, phone@ybl,
                   partner@oksbi)
                 </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Module Permissions</h3>
+                <div className="space-y-3 bg-gray-50 p-4 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="buy-permission"
+                      checked={formData.permissions.buy}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          permissions: { ...formData.permissions, buy: e.target.checked },
+                        })
+                      }
+                      className="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="buy-permission"
+                      className="flex-1 cursor-pointer select-none"
+                    >
+                      <span className="font-semibold text-gray-900">Buy Module Access</span>
+                      <p className="text-sm text-gray-600">
+                        Allow partner to access and manage buy orders and related features
+                      </p>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="sell-permission"
+                      checked={formData.permissions.sell}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          permissions: { ...formData.permissions, sell: e.target.checked },
+                        })
+                      }
+                      className="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="sell-permission"
+                      className="flex-1 cursor-pointer select-none"
+                    >
+                      <span className="font-semibold text-gray-900">Sell Module Access</span>
+                      <p className="text-sm text-gray-600">
+                        Allow partner to access and manage sell orders and related features
+                      </p>
+                    </label>
+                  </div>
+
+                  {!formData.permissions.buy && !formData.permissions.sell && (
+                    <div className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <XCircle className="text-yellow-600 flex-shrink-0 mt-0.5" size={16} />
+                      <p className="text-sm text-yellow-800">
+                        Partner will have limited access without any module permissions enabled
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">

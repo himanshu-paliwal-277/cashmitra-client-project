@@ -29,8 +29,8 @@ const PartnerSideBar = ({ isOpen, onClose, roleTemplate }: PartnerSideBarProps) 
     '/partner/dashboard': 'dashboard',
     '/partner/products': 'products',
     '/partner/orders': 'orders',
-    '/partner/buy-orders': 'buyOrders',
-    '/partner/sell-orders': 'sellOrders',
+    '/partner/buy-orders': 'buy', // Requires buy permission
+    '/partner/sell-orders': 'sell', // Requires sell permission
     // '/partner/payouts': 'payouts',
     '/partner/kyc': 'kyc',
     '/partner/agents': 'agents',

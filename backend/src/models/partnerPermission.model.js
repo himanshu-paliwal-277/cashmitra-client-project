@@ -128,6 +128,20 @@ export const PARTNER_MENU_ITEMS = {
     icon: 'Building2',
     section: 'Settings',
   },
+
+  // Buy/Sell Permissions
+  buy: {
+    name: 'Buy Module',
+    path: '/partner/buy',
+    icon: 'ShoppingBag',
+    section: 'Modules',
+  },
+  sell: {
+    name: 'Sell Module',
+    path: '/partner/sell',
+    icon: 'Tag',
+    section: 'Modules',
+  },
 };
 
 const partnerPermissionSchema = new mongoose.Schema(
@@ -359,6 +373,7 @@ partnerPermissionSchema.methods.applyRoleTemplate = function (
         'payouts',
         'transactions',
         'support',
+        'sell', // Sellers can access sell module by default
       ],
       limits: {
         maxInventoryItems: 500,
