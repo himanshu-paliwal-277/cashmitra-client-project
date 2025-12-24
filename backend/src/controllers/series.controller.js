@@ -6,7 +6,7 @@ import ApiError from '../utils/apiError.js';
  * CREATE SERIES
  */
 export const createSeries = asyncHandler(async (req, res) => {
-  const { name, categoryId, superCategory, sortOrder } = req.body;
+  const { name, categoryId, sortOrder } = req.body;
 
   console.log('req.body:', req.body);
 

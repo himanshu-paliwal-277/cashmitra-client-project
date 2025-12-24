@@ -87,6 +87,11 @@ const Partners = () => {
       accountHolderName: '',
     },
     upiId: '',
+    // Permissions
+    permissions: {
+      buy: false,
+      sell: false,
+    },
   });
 
   const {
@@ -143,6 +148,8 @@ const Partners = () => {
         delete cleanedData.userId;
       }
 
+      console.log('📝 Form data permissions before submit:', formData.permissions);
+
       let result;
       if (editingPartner) {
         // For editing, only send partner data (user data is read-only)
@@ -151,9 +158,13 @@ const Partners = () => {
         delete partnerData.email;
         delete partnerData.phone;
         delete partnerData.password;
+        console.log('📝 Sending partner data to edit API:', partnerData);
+        console.log('📝 Partner permissions being sent:', partnerData.permissions);
         result = await editPartner(editingPartner._id, partnerData);
       } else {
         // For new partner creation, send all data including user details
+        console.log('📝 Sending data to create API:', cleanedData);
+        console.log('📝 Partner permissions being sent:', cleanedData.permissions);
         result = await addPartner(cleanedData);
       }
 
@@ -271,6 +282,11 @@ const Partners = () => {
         accountHolderName: partner.bankDetails?.accountHolderName || '',
       },
       upiId: partner.upiId || '',
+      // Permissions
+      permissions: {
+        buy: partner.permissions?.buy || false,
+        sell: partner.permissions?.sell || false,
+      },
     });
     setShowModal(true);
   };
@@ -354,6 +370,11 @@ const Partners = () => {
         accountHolderName: '',
       },
       upiId: '',
+      // Permissions
+      permissions: {
+        buy: false,
+        sell: false,
+      },
     });
     setShowPassword(false);
   };
@@ -572,10 +593,7 @@ const Partners = () => {
                     Wallet Balance
                   </th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                    Business Type
-                  </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
-                    Total Orders
+                    Permissions
                   </th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-gray-700">
                     Status
@@ -591,7 +609,7 @@ const Partners = () => {
               <tbody className="divide-y divide-gray-100">
                 {filteredPartners.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center">
+                    <td colSpan={6} className="px-6 py-12 text-center">
                       <Users size={48} className="mx-auto text-gray-400 mb-4" />
                       <p className="text-gray-600 text-lg">
                         {searchTerm || statusFilter
@@ -637,8 +655,25 @@ const Partners = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">Individual</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">0</td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1.5">
+                          {partner.permissions?.buy ? (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                              Buy
+                            </span>
+                          ) : null}
+                          {partner.permissions?.sell ? (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-200">
+                              Sell
+                            </span>
+                          ) : null}
+                          {!partner.permissions?.buy && !partner.permissions?.sell && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                              None
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusBadge(partner.verificationStatus)}`}
@@ -1226,6 +1261,68 @@ const Partners = () => {
                 </p>
               </div>
 
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Module Permissions</h3>
+                <div className="space-y-3 bg-gray-50 p-4 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="buy-permission"
+                      checked={formData.permissions.buy}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          permissions: { ...formData.permissions, buy: e.target.checked },
+                        })
+                      }
+                      className="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="buy-permission"
+                      className="flex-1 cursor-pointer select-none"
+                    >
+                      <span className="font-semibold text-gray-900">Buy Module Access</span>
+                      <p className="text-sm text-gray-600">
+                        Allow partner to access and manage buy orders and related features
+                      </p>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="sell-permission"
+                      checked={formData.permissions.sell}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          permissions: { ...formData.permissions, sell: e.target.checked },
+                        })
+                      }
+                      className="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="sell-permission"
+                      className="flex-1 cursor-pointer select-none"
+                    >
+                      <span className="font-semibold text-gray-900">Sell Module Access</span>
+                      <p className="text-sm text-gray-600">
+                        Allow partner to access and manage sell orders and related features
+                      </p>
+                    </label>
+                  </div>
+
+                  {!formData.permissions.buy && !formData.permissions.sell && (
+                    <div className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <XCircle className="text-yellow-600 flex-shrink-0 mt-0.5" size={16} />
+                      <p className="text-sm text-yellow-800">
+                        Partner will have limited access without any module permissions enabled
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
                 {!isFormValid() && (
                   <div className="flex items-center gap-2 text-sm text-amber-600 mr-auto">
@@ -1456,6 +1553,35 @@ const Partners = () => {
                       <p className="text-sm text-blue-600">Total Transactions</p>
                       <p className="font-semibold text-blue-700">
                         {selectedPartner.wallet?.transactions?.length || 0}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Module Permissions */}
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Module Permissions</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPartner.permissions?.buy ? 'bg-blue-500' : 'bg-gray-300'}`}>
+                      <span className="text-white font-bold text-sm">₿</span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Buy Module</p>
+                      <p className={`font-semibold ${selectedPartner.permissions?.buy ? 'text-blue-700' : 'text-gray-500'}`}>
+                        {selectedPartner.permissions?.buy ? 'Enabled' : 'Disabled'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPartner.permissions?.sell ? 'bg-purple-500' : 'bg-gray-300'}`}>
+                      <span className="text-white font-bold text-sm">$</span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Sell Module</p>
+                      <p className={`font-semibold ${selectedPartner.permissions?.sell ? 'text-purple-700' : 'text-gray-500'}`}>
+                        {selectedPartner.permissions?.sell ? 'Enabled' : 'Disabled'}
                       </p>
                     </div>
                   </div>

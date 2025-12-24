@@ -11,6 +11,7 @@ import {
   attachPartner,
   requirePartner,
 } from '../../middlewares/partner.middleware.js';
+import { checkPermission } from '../../middlewares/permission.middleware.js';
 import { validateObjectId } from '../../middlewares/validation.middleware.js';
 import { validateRequest } from '../../middlewares/validation.middleware.js';
 import {
@@ -147,9 +148,25 @@ router.use(
 
 router.get('/dashboard-sellbuy', partnerController.getDashboardSellBuy);
 
-router.get('/sell-products', partnerController.getPartnerSellProducts);
+router.get(
+  '/sell-products',
+  isAuthenticated,
+  authorize('partner'),
+  attachPartner,
+  requirePartner,
+  checkPermission('sell'),
+  partnerController.getPartnerSellProducts
+);
 
-router.get('/buy-products', partnerController.getPartnerBuyProducts);
+router.get(
+  '/buy-products',
+  isAuthenticated,
+  authorize('partner'),
+  attachPartner,
+  requirePartner,
+  checkPermission('buy'),
+  partnerController.getPartnerBuyProducts
+);
 
 // Partner product management endpoints
 router.post(
@@ -183,16 +200,34 @@ router.delete(
   partnerController.deletePartnerProduct
 );
 
-router.get('/sell-orders', partnerController.getPartnerSellOrders);
+router.get(
+  '/sell-orders',
+  isAuthenticated,
+  authorize('partner'),
+  attachPartner,
+  requirePartner,
+  checkPermission('sell'),
+  partnerController.getPartnerSellOrders
+);
 
 router.get(
   '/sell-orders/:id',
+  isAuthenticated,
+  authorize('partner'),
+  attachPartner,
+  requirePartner,
+  checkPermission('sell'),
   validateObjectId('id'),
   partnerController.getPartnerSellOrderDetails
 );
 
 router.put(
   '/sell-orders/:id/status',
+  isAuthenticated,
+  authorize('partner'),
+  attachPartner,
+  requirePartner,
+  checkPermission('sell'),
   validateObjectId('id'),
   validate(updatePartnerSellOrderStatusSchema),
   partnerController.updatePartnerSellOrderStatus

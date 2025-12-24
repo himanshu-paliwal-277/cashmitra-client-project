@@ -8,13 +8,8 @@ import PartnerSideBar from './PartnerSideBar';
 const PartnerLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const partnerAuth: any = usePartnerAuth();
-  const { partner, logout } = partnerAuth;
+  const { partner, logout } = usePartnerAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  // Debug: Log the entire context
-  console.log('PartnerLayout - partnerAuth:', partnerAuth);
-  console.log('PartnerLayout - hasMenuPermission:', partnerAuth.hasMenuPermission);
 
   // Check if non-partner user is accessing partner pages and redirect
   useEffect(() => {
@@ -57,15 +52,6 @@ const PartnerLayout = () => {
     setSidebarOpen(false);
   };
 
-  // Wrapper function to safely call hasMenuPermission
-  const safeHasMenuPermission = (menuId: string) => {
-    if (!partnerAuth.hasMenuPermission) {
-      console.log('hasMenuPermission function not available, returning true by default');
-      return true; // Default to showing all items if permission system not ready
-    }
-    return partnerAuth.hasMenuPermission(menuId);
-  };
-
   return (
     <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
       {/* Header */}
@@ -74,7 +60,7 @@ const PartnerLayout = () => {
       {/* Content Area with Sidebar */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <PartnerSideBar isOpen={sidebarOpen} onClose={closeSidebar} hasMenuPermission={safeHasMenuPermission} />
+        <PartnerSideBar isOpen={sidebarOpen} onClose={closeSidebar} />
 
         {/* Overlay for mobile */}
         {sidebarOpen && (

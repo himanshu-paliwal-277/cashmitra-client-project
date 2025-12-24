@@ -6,6 +6,7 @@ import { Finance } from '../models/finance.model.js';
 import { Inventory } from '../models/inventory.model.js';
 import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
+import { PartnerPermission } from '../models/partnerPermission.model.js';
 import { Product } from '../models/product.model.js';
 import { SellOrder } from '../models/sellOrder.model.js';
 import { Transaction } from '../models/transaction.model.js';
@@ -143,12 +144,26 @@ export const getAllPartners = async (req, res) => {
     const partnersWithWallet = await Promise.all(
       partners.map(async (partner) => {
         const wallet = await Wallet.findOne({ partner: partner._id });
+        const permissions = await PartnerPermission.findOne({ partner: partner._id });
         const partnerObj = partner.toObject();
 
         if (wallet) {
           partnerObj.wallet = {
             balance: wallet.balance,
             transactions: wallet.transactions,
+          };
+        }
+
+        // Add buy/sell permissions to partner object
+        if (permissions) {
+          partnerObj.permissions = {
+            buy: permissions.buy || false,
+            sell: permissions.sell || false,
+          };
+        } else {
+          partnerObj.permissions = {
+            buy: false,
+            sell: false,
           };
         }
 
@@ -219,7 +234,12 @@ export const createPartner = async (req, res) => {
       shopImages,
       bankDetails,
       upiId,
+      permissions, // { buy: boolean, sell: boolean }
     } = req.body;
+
+    console.log('📝 Creating partner with permissions:', permissions);
+    console.log('📝 Permission types - buy:', typeof permissions?.buy, 'sell:', typeof permissions?.sell);
+    console.log('📝 Full request body:', req.body);
 
     let user;
     let isNewUser = false;
@@ -291,6 +311,20 @@ export const createPartner = async (req, res) => {
       transactions: [],
     });
 
+    // Create partner permissions with selected buy/sell access
+    const permData = {
+      partner: partner._id,
+      buy: permissions?.buy === true,
+      sell: permissions?.sell === true,
+      grantedBy: req.user._id,
+      updatedBy: req.user._id,
+    };
+    console.log('📝 Creating permissions with data:', permData);
+
+    const createdPermissions = await PartnerPermission.create(permData);
+
+    console.log('✅ Permissions created in DB:', createdPermissions.toObject());
+
     const populatedPartner = await Partner.findById(partner._id).populate(
       'user',
       'name email phone'
@@ -352,10 +386,16 @@ export const updatePartner = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
 
+    // Extract permissions before deleting
+    const permissions = updateData.permissions;
+
+    console.log("permissions from frontend:", permissions);
+
     delete updateData.user;
     delete updateData._id;
     delete updateData.createdAt;
     delete updateData.updatedAt;
+    delete updateData.permissions; // Don't update partner document with permissions
 
     if (updateData.gstNumber) {
       const existingGST = await Partner.findOne({
@@ -374,6 +414,41 @@ export const updatePartner = async (req, res) => {
 
     if (!partner) {
       return res.status(404).json({ message: 'Partner not found' });
+    }
+
+    // Update partner permissions if provided
+    if (permissions !== undefined) {
+      console.log('📝 Updating partner permissions received from frontend:', permissions);
+      console.log('📝 Permission types - buy:', typeof permissions.buy, 'sell:', typeof permissions.sell);
+
+      let partnerPermissions = await PartnerPermission.findOne({ partner: id });
+
+      // Create permissions if they don't exist
+      if (!partnerPermissions) {
+        const permData = {
+          partner: id,
+          buy: permissions.buy === true,
+          sell: permissions.sell === true,
+          grantedBy: req.user._id,
+          updatedBy: req.user._id,
+        };
+        console.log('📝 Creating new permissions with data:', permData);
+        partnerPermissions = await PartnerPermission.create(permData);
+        console.log('✅ Permissions created in DB:', partnerPermissions.toObject());
+      } else {
+        // Update existing permissions
+        if (permissions.buy !== undefined) {
+          partnerPermissions.buy = permissions.buy === true;
+        }
+        if (permissions.sell !== undefined) {
+          partnerPermissions.sell = permissions.sell === true;
+        }
+        partnerPermissions.updatedBy = req.user._id;
+
+        console.log('📝 Before save - buy:', partnerPermissions.buy, 'sell:', partnerPermissions.sell);
+        await partnerPermissions.save();
+        console.log('✅ Permissions updated in DB:', partnerPermissions.toObject());
+      }
     }
 
     res.json({

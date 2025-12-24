@@ -1,15 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { API_BASE_URL } from '../utils/api';
-import {
-  hasMenuPermission,
-  isMenuItemAccessible,
-  getMenuPermissionDetails,
-  getAvailableMenuItems,
-  getBusinessLimits,
-  getAvailableFeatures,
-  canPerformAction,
-} from '../utils/partnerMenuPermissions';
+
 const PartnerAuthContext = createContext();
 
 export const usePartnerAuth = () => {
@@ -22,11 +14,8 @@ export const usePartnerAuth = () => {
 
 export const PartnerAuthProvider = ({ children }: any) => {
   const [partner, setPartner] = useState(null);
-  const [permissions, setPermissions] = useState(null);
-  const [roleTemplate, setRoleTemplate] = useState(null);
+  const [permissions, setPermissions] = useState({ buy: false, sell: false });
   const [loading, setLoading] = useState(true);
-  const [businessLimits, setBusinessLimits] = useState({});
-  const [availableFeatures, setAvailableFeatures] = useState({});
 
   // Initialize auth state from localStorage
   useEffect(() => {
@@ -71,21 +60,19 @@ export const PartnerAuthProvider = ({ children }: any) => {
 
       if (response.ok) {
         const data = await response.json();
-        setPermissions(data.permissions);
-        setRoleTemplate(data.roleTemplate);
-
-        // Set business limits and features based on role
-        const limits = getBusinessLimits(data.permissions, data.roleTemplate);
-        const features = getAvailableFeatures(data.permissions, data.roleTemplate);
-
-        setBusinessLimits(limits);
-        setAvailableFeatures(features);
+        // Simplified permissions - just buy and sell
+        setPermissions({
+          buy: data.buy || false,
+          sell: data.sell || false,
+        });
       } else {
         throw new Error('Failed to fetch permissions');
       }
     } catch (error) {
       console.error('Error fetching partner permissions:', error);
       toast.error('Failed to load permissions');
+      // Set default permissions on error
+      setPermissions({ buy: false, sell: false });
     }
   };
 
@@ -133,51 +120,15 @@ export const PartnerAuthProvider = ({ children }: any) => {
     localStorage.removeItem('token');
     localStorage.removeItem('userData');
     setPartner(null);
-    setPermissions(null);
-    setRoleTemplate(null);
-    setBusinessLimits({});
-    setAvailableFeatures({});
+    setPermissions({ buy: false, sell: false });
     toast.success('Logged out successfully');
   };
 
   // Check if partner has specific permission
   const hasPermission = (permissionName: any) => {
-    return hasMenuPermission(permissions, permissionName);
-  };
-
-  // Check if menu item is accessible (considering restrictions)
-  const canAccessMenuItem = (permissionName: any) => {
-    return isMenuItemAccessible(permissions, permissionName);
-  };
-
-  // Get permission details
-  const getPermissionDetails = (permissionName: any) => {
-    return getMenuPermissionDetails(permissions, permissionName);
-  };
-
-  // Get available menu items for current partner
-  const getMenuItems = () => {
-    return getAvailableMenuItems(permissions);
-  };
-
-  // Check if partner can perform specific business action
-  const canPerformBusinessAction = (action: any, currentCount = 0) => {
-    return canPerformAction(businessLimits, action, currentCount);
-  };
-
-  // Check if partner has specific feature enabled
-  const hasFeature = (featureName: any) => {
-    return availableFeatures[featureName] || false;
-  };
-
-  // Get partner's role information
-  const getRoleInfo = () => {
-    return {
-      template: roleTemplate,
-      permissions: permissions,
-      limits: businessLimits,
-      features: availableFeatures,
-    };
+    if (permissionName === 'buy') return permissions.buy;
+    if (permissionName === 'sell') return permissions.sell;
+    return false;
   };
 
   // Update partner profile
@@ -244,10 +195,7 @@ export const PartnerAuthProvider = ({ children }: any) => {
     // State
     partner,
     permissions,
-    roleTemplate,
     loading,
-    businessLimits,
-    availableFeatures,
 
     // Auth methods
     login,
@@ -257,21 +205,7 @@ export const PartnerAuthProvider = ({ children }: any) => {
 
     // Permission methods
     hasPermission,
-    canAccessMenuItem,
-    getPermissionDetails,
-    getMenuItems,
     refreshPermissions,
-
-    // Menu and feature methods (from utils)
-    getAvailableMenuItems: () => getAvailableMenuItems(permissions, roleTemplate),
-    getBusinessLimits: () => getBusinessLimits(permissions, roleTemplate),
-    getAvailableFeatures: () => getAvailableFeatures(permissions, roleTemplate),
-    hasMenuPermission: (menuId: any) => hasMenuPermission(permissions, roleTemplate, menuId),
-
-    // Business logic methods
-    canPerformBusinessAction,
-    hasFeature,
-    getRoleInfo,
 
     // Verification methods
     getVerificationStatus,
