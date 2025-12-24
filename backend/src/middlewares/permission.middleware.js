@@ -2,7 +2,7 @@ import { PartnerPermission } from '../models/partnerPermission.model.js';
 
 /**
  * Middleware to check if partner has specific permission
- * @param {string} permissionName - The permission to check (e.g., 'buy', 'sell')
+ * @param {string} permissionName - The permission to check ('buy' or 'sell')
  * @returns {Function} Express middleware function
  */
 export const checkPermission = (permissionName) => {
@@ -29,7 +29,6 @@ export const checkPermission = (permissionName) => {
       // Fetch partner permissions
       const partnerPermissions = await PartnerPermission.findOne({
         partner: partnerId,
-        isActive: true,
       });
 
       if (!partnerPermissions) {
@@ -40,7 +39,11 @@ export const checkPermission = (permissionName) => {
       }
 
       // Check if partner has the required permission
-      if (!partnerPermissions.hasPermission(permissionName)) {
+      const hasPermission =
+        (permissionName === 'buy' && partnerPermissions.buy === true) ||
+        (permissionName === 'sell' && partnerPermissions.sell === true);
+
+      if (!hasPermission) {
         return res.status(403).json({
           success: false,
           message: `Access denied. You need '${permissionName}' permission to access this resource.`,

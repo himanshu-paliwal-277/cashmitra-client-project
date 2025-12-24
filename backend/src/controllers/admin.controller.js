@@ -157,8 +157,8 @@ export const getAllPartners = async (req, res) => {
         // Add buy/sell permissions to partner object
         if (permissions) {
           partnerObj.permissions = {
-            buy: permissions.hasPermission('buy'),
-            sell: permissions.hasPermission('sell'),
+            buy: permissions.buy || false,
+            sell: permissions.sell || false,
           };
         } else {
           partnerObj.permissions = {
@@ -237,6 +237,10 @@ export const createPartner = async (req, res) => {
       permissions, // { buy: boolean, sell: boolean }
     } = req.body;
 
+    console.log('📝 Creating partner with permissions:', permissions);
+    console.log('📝 Permission types - buy:', typeof permissions?.buy, 'sell:', typeof permissions?.sell);
+    console.log('📝 Full request body:', req.body);
+
     let user;
     let isNewUser = false;
 
@@ -307,22 +311,19 @@ export const createPartner = async (req, res) => {
       transactions: [],
     });
 
-    // Create default partner permissions
-    const partnerPermissions = await PartnerPermission.createDefaultPermissions(
-      partner._id,
-      req.user._id
-    );
+    // Create partner permissions with selected buy/sell access
+    const permData = {
+      partner: partner._id,
+      buy: permissions?.buy === true,
+      sell: permissions?.sell === true,
+      grantedBy: req.user._id,
+      updatedBy: req.user._id,
+    };
+    console.log('📝 Creating permissions with data:', permData);
 
-    // Grant buy/sell permissions based on admin selection
-    if (permissions) {
-      if (permissions.buy) {
-        partnerPermissions.grantPermission('buy', req.user._id);
-      }
-      if (permissions.sell) {
-        partnerPermissions.grantPermission('sell', req.user._id);
-      }
-      await partnerPermissions.save();
-    }
+    const createdPermissions = await PartnerPermission.create(permData);
+
+    console.log('✅ Permissions created in DB:', createdPermissions.toObject());
 
     const populatedPartner = await Partner.findById(partner._id).populate(
       'user',
@@ -388,6 +389,8 @@ export const updatePartner = async (req, res) => {
     // Extract permissions before deleting
     const permissions = updateData.permissions;
 
+    console.log("permissions from frontend:", permissions);
+
     delete updateData.user;
     delete updateData._id;
     delete updateData.createdAt;
@@ -415,35 +418,37 @@ export const updatePartner = async (req, res) => {
 
     // Update partner permissions if provided
     if (permissions !== undefined) {
+      console.log('📝 Updating partner permissions received from frontend:', permissions);
+      console.log('📝 Permission types - buy:', typeof permissions.buy, 'sell:', typeof permissions.sell);
+
       let partnerPermissions = await PartnerPermission.findOne({ partner: id });
 
       // Create permissions if they don't exist
       if (!partnerPermissions) {
-        partnerPermissions = await PartnerPermission.createDefaultPermissions(
-          id,
-          req.user._id
-        );
-      }
-
-      // Update buy permission
-      if (permissions.buy !== undefined) {
-        if (permissions.buy) {
-          partnerPermissions.grantPermission('buy', req.user._id);
-        } else {
-          partnerPermissions.revokePermission('buy', req.user._id);
+        const permData = {
+          partner: id,
+          buy: permissions.buy === true,
+          sell: permissions.sell === true,
+          grantedBy: req.user._id,
+          updatedBy: req.user._id,
+        };
+        console.log('📝 Creating new permissions with data:', permData);
+        partnerPermissions = await PartnerPermission.create(permData);
+        console.log('✅ Permissions created in DB:', partnerPermissions.toObject());
+      } else {
+        // Update existing permissions
+        if (permissions.buy !== undefined) {
+          partnerPermissions.buy = permissions.buy === true;
         }
-      }
-
-      // Update sell permission
-      if (permissions.sell !== undefined) {
-        if (permissions.sell) {
-          partnerPermissions.grantPermission('sell', req.user._id);
-        } else {
-          partnerPermissions.revokePermission('sell', req.user._id);
+        if (permissions.sell !== undefined) {
+          partnerPermissions.sell = permissions.sell === true;
         }
-      }
+        partnerPermissions.updatedBy = req.user._id;
 
-      await partnerPermissions.save();
+        console.log('📝 Before save - buy:', partnerPermissions.buy, 'sell:', partnerPermissions.sell);
+        await partnerPermissions.save();
+        console.log('✅ Permissions updated in DB:', partnerPermissions.toObject());
+      }
     }
 
     res.json({

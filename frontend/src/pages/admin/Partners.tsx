@@ -148,6 +148,8 @@ const Partners = () => {
         delete cleanedData.userId;
       }
 
+      console.log('📝 Form data permissions before submit:', formData.permissions);
+
       let result;
       if (editingPartner) {
         // For editing, only send partner data (user data is read-only)
@@ -156,9 +158,13 @@ const Partners = () => {
         delete partnerData.email;
         delete partnerData.phone;
         delete partnerData.password;
+        console.log('📝 Sending partner data to edit API:', partnerData);
+        console.log('📝 Partner permissions being sent:', partnerData.permissions);
         result = await editPartner(editingPartner._id, partnerData);
       } else {
         // For new partner creation, send all data including user details
+        console.log('📝 Sending data to create API:', cleanedData);
+        console.log('📝 Partner permissions being sent:', cleanedData.permissions);
         result = await addPartner(cleanedData);
       }
 
@@ -1547,6 +1553,35 @@ const Partners = () => {
                       <p className="text-sm text-blue-600">Total Transactions</p>
                       <p className="font-semibold text-blue-700">
                         {selectedPartner.wallet?.transactions?.length || 0}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Module Permissions */}
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Module Permissions</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPartner.permissions?.buy ? 'bg-blue-500' : 'bg-gray-300'}`}>
+                      <span className="text-white font-bold text-sm">₿</span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Buy Module</p>
+                      <p className={`font-semibold ${selectedPartner.permissions?.buy ? 'text-blue-700' : 'text-gray-500'}`}>
+                        {selectedPartner.permissions?.buy ? 'Enabled' : 'Disabled'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPartner.permissions?.sell ? 'bg-purple-500' : 'bg-gray-300'}`}>
+                      <span className="text-white font-bold text-sm">$</span>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Sell Module</p>
+                      <p className={`font-semibold ${selectedPartner.permissions?.sell ? 'text-purple-700' : 'text-gray-500'}`}>
+                        {selectedPartner.permissions?.sell ? 'Enabled' : 'Disabled'}
                       </p>
                     </div>
                   </div>
