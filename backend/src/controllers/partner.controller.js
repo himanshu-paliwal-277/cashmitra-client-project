@@ -129,12 +129,21 @@ export async function uploadDocuments(req, res) {
   const userId = req.user.id;
 
   const updateData = {};
-  if (req.body.gstCertificate)
-    updateData.gstCertificate = sanitizeData(req.body.gstCertificate);
-  if (req.body.shopLicense)
-    updateData.shopLicense = sanitizeData(req.body.shopLicense);
-  if (req.body.ownerIdProof)
-    updateData.ownerIdProof = sanitizeData(req.body.ownerIdProof);
+  if (req.body.gstCertificate !== undefined) {
+    updateData.gstCertificate = req.body.gstCertificate
+      ? sanitizeData(req.body.gstCertificate)
+      : '';
+  }
+  if (req.body.shopLicense !== undefined) {
+    updateData.shopLicense = req.body.shopLicense
+      ? sanitizeData(req.body.shopLicense)
+      : '';
+  }
+  if (req.body.ownerIdProof !== undefined) {
+    updateData.ownerIdProof = req.body.ownerIdProof
+      ? sanitizeData(req.body.ownerIdProof)
+      : '';
+  }
 
   if (
     req.body.additionalDocuments &&
@@ -145,22 +154,59 @@ export async function uploadDocuments(req, res) {
     );
   }
 
-  // Only set verification status to 'submitted' if explicitly requested
+  // Get current partner to check status and documents
+  const currentPartner = await Partner.findOne({ user: userId });
+  if (!currentPartner) {
+    throw new ApiError('Partner profile not found', 404);
+  }
+
+  // Handle verification status logic
+  let newVerificationStatus = currentPartner.verificationStatus;
+
+  // If explicitly requesting 'submitted' status
   if (req.body.verificationStatus === 'submitted') {
-    updateData.verificationStatus = 'submitted';
+    newVerificationStatus = 'submitted';
+  }
+  // If explicitly requesting 'pending' status (for resubmission) - don't auto-submit
+  else if (req.body.verificationStatus === 'pending') {
+    newVerificationStatus = 'pending';
+  }
+  // Auto-submit logic: only if no explicit status is provided and status is 'pending' or 'rejected' and all documents are present
+  else if (
+    !req.body.verificationStatus && // Only auto-submit if no explicit status is provided
+    (currentPartner.verificationStatus === 'pending' ||
+      currentPartner.verificationStatus === 'rejected')
+  ) {
+    // Check if all required documents will be present after this update
+    const finalGstCert =
+      updateData.gstCertificate || currentPartner.documents?.gstCertificate;
+    const finalShopLicense =
+      updateData.shopLicense || currentPartner.documents?.shopLicense;
+    const finalOwnerIdProof =
+      updateData.ownerIdProof || currentPartner.documents?.ownerIdProof;
+
+    if (finalGstCert && finalShopLicense && finalOwnerIdProof) {
+      newVerificationStatus = 'submitted';
+    }
   }
 
   const partner = await Partner.findOneAndUpdate(
     { user: userId },
     {
       $set: {
-        'documents.gstCertificate': updateData.gstCertificate,
-        'documents.shopLicense': updateData.shopLicense,
-        'documents.ownerIdProof': updateData.ownerIdProof,
-        'documents.additionalDocuments': updateData.additionalDocuments,
-        ...(updateData.verificationStatus && {
-          verificationStatus: updateData.verificationStatus,
+        ...(updateData.gstCertificate !== undefined && {
+          'documents.gstCertificate': updateData.gstCertificate,
         }),
+        ...(updateData.shopLicense !== undefined && {
+          'documents.shopLicense': updateData.shopLicense,
+        }),
+        ...(updateData.ownerIdProof !== undefined && {
+          'documents.ownerIdProof': updateData.ownerIdProof,
+        }),
+        ...(updateData.additionalDocuments !== undefined && {
+          'documents.additionalDocuments': updateData.additionalDocuments,
+        }),
+        verificationStatus: newVerificationStatus,
       },
     },
     { new: true }
@@ -174,7 +220,7 @@ export async function uploadDocuments(req, res) {
     success: true,
     data: partner,
     message:
-      updateData.verificationStatus === 'submitted'
+      newVerificationStatus === 'submitted'
         ? 'Documents submitted for verification successfully'
         : 'Documents uploaded successfully',
   });

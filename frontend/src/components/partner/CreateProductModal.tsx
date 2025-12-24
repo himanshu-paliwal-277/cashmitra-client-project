@@ -18,6 +18,7 @@ import {
   Shield,
   Star,
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import partnerService from '../../services/partnerService';
 import cloudinaryService from '../../services/cloudinaryService';
 
@@ -32,7 +33,6 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
   const [superCategories, setSuperCategories] = useState([]);
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState<any>({});
-  const [success, setSuccess] = useState('');
 
   // Enhanced form data for partner product creation
   const [formData, setFormData] = useState<any>({
@@ -235,6 +235,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
       setSuperCategories(response.data || []);
     } catch (error) {
       console.error('Error fetching super categories:', error);
+      toast.error('Failed to load super categories');
       setErrors({ superCategories: 'Failed to load super categories' });
     }
   };
@@ -250,6 +251,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
       setCategories(response.data || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
+      toast.error('Failed to load categories for selected super category');
       setErrors({ categories: 'Failed to load categories for selected super category' });
     }
   };
@@ -337,10 +339,10 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
         images: [...prev.images, ...newImages],
       }));
 
-      setSuccess(`${newImages.length} image(s) uploaded successfully!`);
-      setTimeout(() => setSuccess(''), 3000);
+      toast.success(`${newImages.length} image(s) uploaded successfully!`);
     } catch (error) {
       console.error('Error uploading images:', error);
+      toast.error('Failed to upload images. Please try again.');
       setErrors({ images: 'Failed to upload images' });
     } finally {
       setLoading(false);
@@ -469,14 +471,17 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
       };
 
       await partnerService.createProduct(productData);
-      setSuccess('Product created successfully!');
+      toast.success('Product created successfully!');
       setTimeout(() => {
         onSuccess();
         handleClose();
       }, 1500);
     } catch (error: any) {
       console.error('Error creating product:', error);
-      setErrors({ submit: error.message || 'Failed to create product' });
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to create product';
+      toast.error(errorMessage);
+      setErrors({ submit: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -615,7 +620,6 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
     });
     setCategories([]);
     setErrors({});
-    setSuccess('');
     onClose();
   };
 
@@ -640,13 +644,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
-          {/* Success/Error Messages */}
-          {success && (
-            <div className="m-6 mb-0 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              <span className="text-green-800">{success}</span>
-            </div>
-          )}
+          {/* Error Messages */}
           {errors.submit && (
             <div className="m-6 mb-0 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-red-600" />

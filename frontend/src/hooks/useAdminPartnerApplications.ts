@@ -131,7 +131,8 @@ const useAdminPartnerApplications = () => {
           notes,
         });
 
-        if (response.success) {
+        // Check if response has partner data (indicates success)
+        if (response.partner || response.message) {
           // Update local state with all relevant fields
           setApplications((prev: any) =>
             prev.map((app: any) =>
@@ -174,8 +175,9 @@ const useAdminPartnerApplications = () => {
           });
 
           return { success: true, message: response.message || 'Status updated successfully' };
+        } else {
+          throw new Error(response.message || 'Failed to update application status');
         }
-        throw new Error('Failed to update application status');
       } catch (err: any) {
         setError(err.message || 'Failed to update application status');
         console.error('Error updating application status:', err);

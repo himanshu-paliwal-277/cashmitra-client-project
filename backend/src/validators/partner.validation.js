@@ -33,14 +33,27 @@ export const uploadDocumentsSchema = {
   body: z.object({
     gstCertificate: z
       .string()
-      .url('Valid GST certificate URL is required')
+      .refine(
+        (val) => val === '' || z.string().url().safeParse(val).success,
+        'Valid GST certificate URL is required'
+      )
       .optional(),
     shopLicense: z
       .string()
-      .url('Valid shop license URL is required')
+      .refine(
+        (val) => val === '' || z.string().url().safeParse(val).success,
+        'Valid shop license URL is required'
+      )
       .optional(),
-    ownerIdProof: z.string().url('Valid ID proof URL is required').optional(),
+    ownerIdProof: z
+      .string()
+      .refine(
+        (val) => val === '' || z.string().url().safeParse(val).success,
+        'Valid ID proof URL is required'
+      )
+      .optional(),
     additionalDocuments: z.array(z.any()).optional(),
+    verificationStatus: z.enum(['pending', 'submitted']).optional(),
   }),
 };
 
