@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { adminService } from '../../services/adminService';
 import {
-import { toast } from 'react-toastify';
   Users,
   Plus,
   Search,

@@ -1,17 +1,10 @@
-/**
- * @fileoverview Sell Accessories Management Component
- * @description Admin interface for managing device accessories with comprehensive functionality
- * @author Cashmitra Development Team
- * @version 2.0.0
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { cn } from '../../utils/utils';
 import useSellAccessories from '../../hooks/useSellAccessories';
 import useAdminCategories from '../../hooks/useAdminCategories';
 import Card from '../../components/ui/Card';
-import {
 import { toast } from 'react-toastify';
+import {
   Search,
   Download,
   RefreshCw,

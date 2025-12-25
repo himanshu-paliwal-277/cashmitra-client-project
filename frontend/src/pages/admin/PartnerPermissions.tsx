@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './PartnerPermissions.css';
 import partnerPermissionService from '../../services/partnerPermissionService';
-import {
 import { toast } from 'react-toastify';
+import {
   Plus,
   Edit,
   Trash2,
