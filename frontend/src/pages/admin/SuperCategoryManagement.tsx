@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, Image as ImageIcon, Search, ArrowLeft, Package } f
 import { API_BASE_URL } from '../../utils/api';
 import SuperCategoryForm from './SuperCategoryForm';
 import SkeletonLoader from '../../components/customer/common/SkeletonLoader';
+import { toast } from 'react-toastify';
 
 const SuperCategoryManagement = () => {
   const [superCategories, setSuperCategories] = useState([]);
@@ -94,12 +95,12 @@ const SuperCategoryManagement = () => {
 
       if (data.success) {
         fetchSuperCategories();
-        alert('Super category deleted successfully');
+        toast.success('Super category deleted successfully');
       } else {
-        alert(data.message || 'Failed to delete super category');
+        toast.error(data.message || 'Failed to delete super category');
       }
     } catch (err) {
-      alert('Error deleting super category: ' + err.message);
+      toast.error('Error deleting super category: ' + err.message);
     }
   };
 

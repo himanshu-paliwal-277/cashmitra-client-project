@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import {
+import { toast } from 'react-toastify';
   Users,
   Plus,
   Search,
@@ -225,7 +226,7 @@ const UserManagement = () => {
         fetchUsers();
       } catch (error) {
         console.error('Error deleting user:', error);
-        alert('Failed to delete user');
+        toast.error('Failed to delete user');
       }
     }
   };
@@ -236,7 +237,7 @@ const UserManagement = () => {
       fetchUsers(); // Refresh the list
     } catch (error) {
       console.error('Error toggling user active status:', error);
-      alert('Failed to update user active status. Please try again.');
+      toast.error('Failed to update user active status. Please try again.');
     }
   };
 

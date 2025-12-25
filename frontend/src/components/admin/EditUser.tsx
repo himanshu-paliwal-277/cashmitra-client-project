@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import partnerPermissionService from '../../services/partnerPermissionService';
 import './EditUser.css';
+import { toast } from 'react-toastify';
 
 const EditUser = () => {
   const navigate = useNavigate();
@@ -62,7 +63,7 @@ const EditUser = () => {
       });
     } catch (error) {
       console.error('Error fetching user:', error);
-      alert('Failed to fetch user details. Please try again.');
+      toast.error('Failed to fetch user details. Please try again.');
       navigate('/admin/users');
     } finally {
       setFetchingUser(false);
@@ -127,11 +128,11 @@ const EditUser = () => {
       }
 
       await adminService.updateUser(userId, userData);
-      alert('User updated successfully!');
+      toast.success('User updated successfully!');
       navigate('/admin/users');
     } catch (error) {
       console.error('Error updating user:', error);
-      alert(error.message || 'Failed to update user. Please try again.');
+      toast.error(error.message || 'Failed to update user. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -147,11 +148,11 @@ const EditUser = () => {
     setLoading(true);
     try {
       await adminService.deleteUser(userId);
-      alert('User deleted successfully!');
+      toast.success('User deleted successfully!');
       navigate('/admin/users');
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert(error.message || 'Failed to delete user. Please try again.');
+      toast.error(error.message || 'Failed to delete user. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -200,7 +201,7 @@ const EditUser = () => {
       await adminService.updateUserPassword(userId, {
         newPassword: passwordData.newPassword,
       });
-      alert('Password updated successfully!');
+      toast.success('Password updated successfully!');
       setPasswordData({
         newPassword: '',
         confirmPassword: '',
@@ -208,7 +209,7 @@ const EditUser = () => {
       setPasswordErrors({});
     } catch (error) {
       console.error('Error updating password:', error);
-      alert(error.message || 'Failed to update password. Please try again.');
+      toast.error(error.message || 'Failed to update password. Please try again.');
     } finally {
       setPasswordLoading(false);
     }

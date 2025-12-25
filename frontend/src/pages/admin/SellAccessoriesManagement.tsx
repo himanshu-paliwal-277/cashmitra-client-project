@@ -11,6 +11,7 @@ import useSellAccessories from '../../hooks/useSellAccessories';
 import useAdminCategories from '../../hooks/useAdminCategories';
 import Card from '../../components/ui/Card';
 import {
+import { toast } from 'react-toastify';
   Search,
   Download,
   RefreshCw,
@@ -230,11 +231,11 @@ const SellAccessoriesManagement = () => {
         }
       }
 
-      alert('Orders reindexed successfully!');
+      toast.success('Orders reindexed successfully!');
       handleRefresh();
     } catch (error) {
       console.error('Failed to reindex orders:', error);
-      alert('Failed to reindex orders');
+      toast.error('Failed to reindex orders');
     }
   };
 

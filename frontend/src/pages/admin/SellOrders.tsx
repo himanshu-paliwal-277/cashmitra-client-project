@@ -30,6 +30,7 @@ import adminService from '../../services/adminService';
 import pickupService from '../../services/pickupService';
 import AdminPageHeader from '../../components/admin/common/AdminPageHeader';
 import AdminStatsCard from '../../components/admin/common/AdminStatsCard';
+import { toast } from 'react-toastify';
 
 const SellOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -136,10 +137,10 @@ const SellOrders = () => {
         assignedTo: partnerId,
       });
       fetchOrders(pagination.currentPage, statusFilter, searchTerm);
-      alert('Partner assigned successfully!');
+      toast.success('Partner assigned successfully!');
     } catch (err) {
       console.error('Failed to assign partner to order', err);
-      alert('Failed to assign partner. Please try again.');
+      toast.error('Failed to assign partner. Please try again.');
     }
   };
 
@@ -152,10 +153,10 @@ const SellOrders = () => {
         notes: notes || `Status updated to ${newStatus}`,
       });
       fetchOrders(pagination.currentPage, statusFilter, searchTerm);
-      alert(`Order status updated to ${newStatus}!`);
+      toast.success(`Order status updated to ${newStatus}!`);
     } catch (err: any) {
       console.error('Failed to update order status', err);
-      alert(err.response?.data?.message || 'Failed to update status. Please try again.');
+      toast.error(err.response?.data?.message || 'Failed to update status. Please try again.');
     }
   };
 
@@ -167,10 +168,10 @@ const SellOrders = () => {
     try {
       await api.delete(`/sell-orders/${orderId}`);
       fetchOrders(pagination.currentPage, statusFilter, searchTerm);
-      alert('Order deleted successfully!');
+      toast.success('Order deleted successfully!');
     } catch (err: any) {
       console.error('Failed to delete order', err);
-      alert(err.response?.data?.message || 'Failed to delete order. Please try again.');
+      toast.error(err.response?.data?.message || 'Failed to delete order. Please try again.');
     }
   };
 

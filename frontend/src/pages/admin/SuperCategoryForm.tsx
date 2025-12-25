@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Upload, X, Save, Image as ImageIcon } from 'lucide-react';
 import { API_BASE_URL } from '../../utils/api';
+import { toast } from 'react-toastify';
 
 const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'buy' }: any) => {
   const [formData, setFormData] = useState({
@@ -188,7 +189,7 @@ const SuperCategoryForm = ({ category, onClose, onSave, onSuccess, apiType = 'bu
       const data = await response.json();
 
       if (data.success) {
-        alert(data.message || 'Super category saved successfully');
+        toast.success(data.message || 'Super category saved successfully');
         if (onSuccess) onSuccess(data.data);
         if (onSave) onSave(data.data);
         if (onClose) onClose();

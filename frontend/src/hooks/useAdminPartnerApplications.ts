@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import adminService from '../services/adminService';
+import { toast } from 'react-toastify';
 
 const useAdminPartnerApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -245,7 +246,7 @@ const useAdminPartnerApplications = () => {
     try {
       console.log('Downloading document:', documentId, filename);
       // TODO: Implement document download when backend endpoint is available
-      alert('Document download feature coming soon');
+      toast.success('Document download feature coming soon');
     } catch (err: any) {
       console.error('Error downloading document:', err);
       throw err;

@@ -17,6 +17,7 @@ import {
 import { partnerService } from '../../services/partnerService';
 import LocationSetupModal from './LocationSetupModal';
 import OrderDetailsModal from './OrderDetailsModal';
+import { toast } from 'react-toastify';
 
 interface AvailableOrder {
   _id: string;
@@ -142,7 +143,7 @@ const AvailableOrders: React.FC = () => {
         setOrders(prev => prev.filter(order => order._id !== orderId));
 
         // Show success message
-        alert('Order claimed successfully! You can now manage it in your "My Orders" section.');
+        toast.success('Order claimed successfully! You can now manage it in your "My Orders" section.');
       }
     } catch (err: any) {
       console.error('Error claiming order:', err);
@@ -150,9 +151,9 @@ const AvailableOrders: React.FC = () => {
       if (err.code === 'ORDER_ALREADY_CLAIMED') {
         // Remove order from list as it's no longer available
         setOrders(prev => prev.filter(order => order._id !== orderId));
-        alert('This order was already claimed by another partner.');
+        toast.error('This order was already claimed by another partner.');
       } else {
-        alert(err.message || 'Failed to claim order');
+        toast.error(err.message || 'Failed to claim order');
       }
     } finally {
       setClaimingOrderId(null);

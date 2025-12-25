@@ -11,6 +11,7 @@ import useSellProducts from '../../hooks/useSellProducts';
 import useSellDefects from '../../hooks/useSellDefects';
 import useSellAccessories from '../../hooks/useSellAccessories';
 import {
+import { toast } from 'react-toastify';
   Search,
   Download,
   RefreshCw,
@@ -229,12 +230,12 @@ const SellSessionsManagement = () => {
     e.preventDefault();
 
     if (!createFormData.productId) {
-      alert('Please select a product');
+      toast.success('Please select a product');
       return;
     }
 
     if (!createFormData.variantId) {
-      alert('Please select a variant');
+      toast.success('Please select a variant');
       return;
     }
 
@@ -250,13 +251,13 @@ const SellSessionsManagement = () => {
       const result = await createSession(sessionData);
 
       if (result) {
-        alert('Session created successfully!');
+        toast.success('Session created successfully!');
         handleCloseCreateModal();
         fetchSessions();
       }
     } catch (error) {
       console.error('Error creating session:', error);
-      alert('Error creating session. Please try again.');
+      toast.error('Error creating session. Please try again.');
     }
   };
 
@@ -296,11 +297,11 @@ const SellSessionsManagement = () => {
                 if (confirm('Clean up all expired sessions?')) {
                   try {
                     const result = await cleanExpiredSessions();
-                    alert(result.message);
+                    toast.success(result.message);
                     fetchSessions();
                   } catch (error) {
                     console.error('Error cleaning sessions:', error);
-                    alert('Failed to clean expired sessions');
+                    toast.error('Failed to clean expired sessions');
                   }
                 }
               }}

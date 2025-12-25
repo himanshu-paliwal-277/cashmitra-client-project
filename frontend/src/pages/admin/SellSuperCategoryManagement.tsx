@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit2, Trash2, Image as ImageIcon, Search } from 'lucide-react';
 import { API_BASE_URL } from '../../utils/api';
 import SuperCategoryForm from './SuperCategoryForm';
+import { toast } from 'react-toastify';
 
 const SellSuperCategoryManagement = () => {
   const [superCategories, setSuperCategories] = useState([]);
@@ -82,12 +83,12 @@ const SellSuperCategoryManagement = () => {
 
       if (data.success) {
         fetchSuperCategories();
-        alert('Super category deleted successfully');
+        toast.success('Super category deleted successfully');
       } else {
-        alert(data.message || 'Failed to delete super category');
+        toast.error(data.message || 'Failed to delete super category');
       }
     } catch (err) {
-      alert('Error deleting super category: ' + err.message);
+      toast.error('Error deleting super category: ' + err.message);
     }
   };
 

@@ -25,6 +25,7 @@ import {
 import pickupService from '../../services/pickupService';
 import productService from '../../services/productService';
 import adminService from '../../services/adminService';
+import { toast } from 'react-toastify';
 
 interface Pickup {
   _id: string;
@@ -874,7 +875,7 @@ const PickupModal: React.FC<PickupModalProps> = ({
   const handleSubmit = () => {
     // Validate required fields
     if (!formData.customer.name || !formData.customer.phone) {
-      alert('Customer name and phone are required');
+      toast.success('Customer name and phone are required');
       return;
     }
     if (
@@ -883,11 +884,11 @@ const PickupModal: React.FC<PickupModalProps> = ({
       !formData.address.state ||
       !formData.address.pincode
     ) {
-      alert('Complete address is required');
+      toast.error('Complete address is required');
       return;
     }
     if (!formData.scheduledDate) {
-      alert('Scheduled date is required');
+      toast.error('Scheduled date is required');
       return;
     }
 

@@ -17,6 +17,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import AdminPageHeader from '../../components/admin/common/AdminPageHeader';
+import { toast } from 'react-toastify';
 
 const BuyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -90,10 +91,10 @@ const BuyOrders = () => {
 
       // Refresh orders after update
       fetchOrders(pagination.currentPage, statusFilter, searchTerm);
-      alert(`Order status updated to ${newStatus}!`);
+      toast.success(`Order status updated to ${newStatus}!`);
     } catch (err: any) {
       console.error('Failed to update order status', err);
-      alert(err.response?.data?.message || 'Failed to update status. Please try again.');
+      toast.error(err.response?.data?.message || 'Failed to update status. Please try again.');
     }
   };
 
@@ -163,13 +164,11 @@ const BuyOrders = () => {
         // Refresh orders after update
         fetchOrders(pagination.currentPage, statusFilter, searchTerm);
         setShowPartnerModal(false);
-        alert(
-          'Partner assigned successfully! Partner will be notified to accept or reject the order.'
-        );
+        toast.success('Partner assigned successfully! Partner will be notified to accept or reject the order.');
       }
     } catch (err: any) {
       console.error('Failed to assign partner', err);
-      alert(err.response?.data?.message || 'Failed to assign partner. Please try again.');
+      toast.error(err.response?.data?.message || 'Failed to assign partner. Please try again.');
     }
   };
 

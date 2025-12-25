@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import './PartnerPermissions.css';
 import partnerPermissionService from '../../services/partnerPermissionService';
 import {
+import { toast } from 'react-toastify';
   Plus,
   Edit,
   Trash2,
@@ -436,7 +437,7 @@ const PartnerPermissions = () => {
     // Prevent deletion of default templates
     const defaultTemplates = ['basic', 'seller', 'premium', 'enterprise'];
     if (defaultTemplates.includes(template.name?.toLowerCase())) {
-      alert('Cannot delete default role templates');
+      toast.error('Cannot delete default role templates');
       return;
     }
 

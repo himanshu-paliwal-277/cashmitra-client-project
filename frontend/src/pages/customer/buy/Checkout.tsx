@@ -21,6 +21,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import useUserAddresses from '../../../hooks/useUserAddresses';
 import api from '../../../services/api';
 import './Checkout.css';
+import { toast } from 'react-toastify';
 
 const Checkout = ({ onBack, onOrderComplete }: any) => {
   const navigate = useNavigate();
@@ -157,7 +158,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
       closeAddressModal();
     } catch (e) {
       console.error('Error adding address:', e);
-      alert('Could not add address. Please try again.');
+      toast.success('Could not add address. Please try again.');
     }
   };
 
@@ -222,7 +223,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
       }
     } catch (err) {
       console.error('Error placing order:', err);
-      alert(err.message || 'Failed to place order. Please try again.');
+      toast.error(err.message || 'Failed to place order. Please try again.');
     } finally {
       setOrderLoading(false);
     }

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { partnerService } from '../../services/partnerService';
 import OrderDetailsModal from './OrderDetailsModal';
+import { toast } from 'react-toastify';
 
 interface ClaimedOrder {
   _id: string;
@@ -157,7 +158,7 @@ const ClaimedOrders: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error updating order status:', err);
-      alert(err.message || 'Failed to update order status');
+      toast.error(err.message || 'Failed to update order status');
     } finally {
       setUpdatingOrderId(null);
     }
@@ -177,11 +178,11 @@ const ClaimedOrders: React.FC = () => {
           )
         );
 
-        alert('Agent assigned successfully!');
+        toast.success('Agent assigned successfully!');
       }
     } catch (err: any) {
       console.error('Error assigning agent:', err);
-      alert(err.message || 'Failed to assign agent');
+      toast.error(err.message || 'Failed to assign agent');
     } finally {
       setUpdatingOrderId(null);
     }
