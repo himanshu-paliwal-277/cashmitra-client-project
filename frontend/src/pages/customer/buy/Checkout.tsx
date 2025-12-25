@@ -21,6 +21,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import useUserAddresses from '../../../hooks/useUserAddresses';
 import api from '../../../services/api';
 import './Checkout.css';
+import { toast } from 'react-toastify';
 
 const Checkout = ({ onBack, onOrderComplete }: any) => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
   const { addresses = [], loading: addressLoading, addAddress } = useUserAddresses();
 
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [selectedPayment, setSelectedPayment] = useState('card');
+  const [selectedPayment, setSelectedPayment] = useState('Cash');
   const [selectedDelivery, setSelectedDelivery] = useState('standard');
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [orderLoading, setOrderLoading] = useState(false);
@@ -98,10 +99,11 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
       title: 'Credit/Debit Card',
       icon: CreditCard,
       description: 'Visa, Mastercard, RuPay',
+      enabled: false,
     },
-    { id: 'UPI', title: 'UPI Payment', icon: Wallet, description: 'PhonePe, GPay, Paytm' },
-    { id: 'netbanking', title: 'Net Banking', icon: Building2, description: 'All major banks' },
-    { id: 'Cash', title: 'Cash on Delivery', icon: Truck, description: 'Pay when you receive' },
+    { id: 'UPI', title: 'UPI Payment', icon: Wallet, description: 'PhonePe, GPay, Paytm', enabled: false },
+    { id: 'netbanking', title: 'Net Banking', icon: Building2, description: 'All major banks', enabled: false },
+    { id: 'Cash', title: 'Cash on Delivery', icon: Truck, description: 'Pay when you receive', enabled: true },
   ];
 
   const deliveryOptions = [
@@ -156,7 +158,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
       closeAddressModal();
     } catch (e) {
       console.error('Error adding address:', e);
-      alert('Could not add address. Please try again.');
+      toast.success('Could not add address. Please try again.');
     }
   };
 
@@ -221,7 +223,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
       }
     } catch (err) {
       console.error('Error placing order:', err);
-      alert(err.message || 'Failed to place order. Please try again.');
+      toast.error(err.message || 'Failed to place order. Please try again.');
     } finally {
       setOrderLoading(false);
     }
@@ -318,11 +320,13 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
                 {paymentMethods.map(m => {
                   const Icon = m.icon;
                   const active = selectedPayment === m.id;
+                  const isDisabled = !m.enabled;
                   return (
                     <button
                       key={m.id}
-                      className={`pay-item ${active ? 'active' : ''}`}
-                      onClick={() => setSelectedPayment(m.id)}
+                      className={`pay-item ${active ? 'active' : ''} ${isDisabled ? 'disabled' : ''}`}
+                      onClick={() => !isDisabled && setSelectedPayment(m.id)}
+                      disabled={isDisabled}
                     >
                       {active && <CheckCircle size={18} className="pay-check" />}
                       <div className="pay-icon">
@@ -330,6 +334,7 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
                       </div>
                       <div className="pay-title">{m.title}</div>
                       <div className="pay-desc">{m.description}</div>
+                      {isDisabled && <div className="pay-coming-soon">Coming Soon</div>}
                     </button>
                   );
                 })}

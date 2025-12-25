@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import partnerService from '../../services/partnerService';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
+import { toast } from 'react-toastify';
 
 interface Transaction {
   _id: string;
@@ -171,12 +172,12 @@ function Payouts() {
     e.preventDefault();
 
     if (!analytics || payoutForm.amount > analytics.currentBalance) {
-      alert('Insufficient balance');
+      toast.error('Insufficient balance');
       return;
     }
 
     if (payoutForm.amount < (analytics.payoutSettings?.minimumPayoutAmount || 1000)) {
-      alert(`Minimum payout amount is ₹${analytics.payoutSettings?.minimumPayoutAmount || 1000}`);
+      toast.error(`Minimum payout amount is ₹${analytics.payoutSettings?.minimumPayoutAmount || 1000}`);
       return;
     }
 
@@ -191,7 +192,7 @@ function Payouts() {
       }
     } catch (err: any) {
       console.error('Error requesting payout:', err);
-      alert(err.message || 'Failed to request payout');
+      toast.error(err.message || 'Failed to request payout');
     }
   };
 
@@ -206,7 +207,7 @@ function Payouts() {
       }
     } catch (err: any) {
       console.error('Error updating settings:', err);
-      alert(err.message || 'Failed to update settings');
+      toast.error(err.message || 'Failed to update settings');
     }
   };
 

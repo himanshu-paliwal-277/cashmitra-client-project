@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import partnerService from '../../services/partnerService';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
+import { toast } from 'react-toastify';
 
 interface OrderItem {
   _id: string;
@@ -397,7 +398,7 @@ function Orders() {
       }
     } catch (err: any) {
       console.error('Error updating order status:', err);
-      alert(err.message || 'Failed to update order status');
+      toast.error(err.message || 'Failed to update order status');
     }
   };
 
@@ -406,11 +407,11 @@ function Orders() {
       const response = await partnerService.updateSellOrderStatus(orderId, { status: newStatus });
       if (response.success) {
         fetchOrders(currentPage, debouncedSearchTerm); // Refresh the list
-        alert(`Order status updated to ${newStatus}!`);
+        toast.success(`Order status updated to ${newStatus}!`);
       }
     } catch (err: any) {
       console.error('Error updating sell order status:', err);
-      alert(err.message || 'Failed to update order status');
+      toast.error(err.message || 'Failed to update order status');
     }
   };
 
@@ -429,7 +430,7 @@ function Orders() {
       }
     } catch (error: any) {
       console.error('Error checking missing inventory:', error);
-      alert(error.message || 'Failed to check inventory status');
+      toast.error(error.message || 'Failed to check inventory status');
     }
   };
 
@@ -447,7 +448,7 @@ function Orders() {
         setShowResponseModal(false);
         setResponseReason('');
         fetchOrders(currentPage, debouncedSearchTerm); // Refresh orders
-        alert(`Order ${responseType} successfully!`);
+        toast.success(`Order ${responseType} successfully!`);
       }
     } catch (error: any) {
       console.error('Error responding to order:', error);
@@ -455,13 +456,11 @@ function Orders() {
       // Handle inventory validation errors specifically
       if (error.message && error.message.includes('Missing or insufficient inventory')) {
         setShowResponseModal(false);
-        alert(
-          `${error.message}\n\nPlease check your inventory and add the missing products first.`
-        );
+        toast.error(`${error.message}\n\nPlease check your inventory and add the missing products first.`);
         // Show inventory check modal to guide user
         handleCheckMissingInventory(selectedOrder);
       } else {
-        alert(error.message || 'Failed to respond to order assignment');
+        toast.error(error.message || 'Failed to respond to order assignment');
       }
     }
   };

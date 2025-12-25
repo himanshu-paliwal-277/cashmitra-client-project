@@ -6,12 +6,11 @@ import {
   Save,
   X,
   Search,
-  AlertCircle,
-  CheckCircle,
   Loader,
   Sparkles,
   Layers,
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 import SkeletonLoader from '../../components/customer/common/SkeletonLoader';
 import { seriesService } from '../../services/seriesService';
@@ -36,7 +35,6 @@ const SeriesManagement = () => {
   console.log('formData =>', formData);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: string } | null>(null);
 
   /* -------------------- Debounce Search -------------------- */
   useEffect(() => {
@@ -55,7 +53,7 @@ const SeriesManagement = () => {
       const res = await adminService.getCategories();
       setCategories(res.data || []);
     } catch {
-      showToast('Failed to load categories', 'error');
+      toast.error('Failed to load categories');
     }
   };
 
@@ -65,25 +63,20 @@ const SeriesManagement = () => {
       const res = await seriesService.getAllSeries();
       setSeries(res.data || []);
     } catch {
-      showToast('Failed to fetch series', 'error');
+      toast.error('Failed to fetch series');
     } finally {
       setLoading(false);
     }
   };
 
-  const showToast = (message: string, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
   /* -------------------- Create / Update -------------------- */
   const handleSubmit = async () => {
     if (!formData.name.trim()) {
-      return showToast('Series name is required', 'error');
+      return toast.error('Series name is required');
     }
 
     if (!formData.categoryId) {
-      return showToast('Please select a category', 'error');
+      return toast.error('Please select a category');
     }
 
     try {
@@ -96,16 +89,16 @@ const SeriesManagement = () => {
 
       if (editingId) {
         await seriesService.updateSeries(editingId, payload);
-        showToast('Series updated successfully');
+        toast.success('Series updated successfully');
       } else {
         await seriesService.createSeries(payload);
-        showToast('Series created successfully');
+        toast.success('Series created successfully');
       }
 
       handleClose();
       fetchSeries();
     } catch (err: any) {
-      showToast(err.message || 'Operation failed', 'error');
+      toast.error(err.message || 'Operation failed');
     } finally {
       setIsSubmitting(false);
     }
@@ -126,9 +119,9 @@ const SeriesManagement = () => {
     try {
       await seriesService.deleteSeries(id);
       fetchSeries();
-      showToast('Series deleted successfully');
+      toast.success('Series deleted successfully');
     } catch {
-      showToast('Delete failed', 'error');
+      toast.error('Delete failed');
     }
   };
 
@@ -246,18 +239,6 @@ const SeriesManagement = () => {
               {editingId ? 'Update Series' : 'Create Series'}
             </button>
           </div>
-        </div>
-      )}
-
-      {/* Toast */}
-      {toast && (
-        <div
-          className={`fixed top-6 right-6 px-6 py-4 rounded-xl flex gap-2 text-white ${
-            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-          }`}
-        >
-          {toast.type === 'success' ? <CheckCircle /> : <AlertCircle />}
-          {toast.message}
         </div>
       )}
     </>

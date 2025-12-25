@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
 import partnerPermissionService from '../../services/partnerPermissionService';
 import './CreateUser.css';
+import { toast } from 'react-toastify';
 
 const CreateUser = () => {
   const navigate = useNavigate();
@@ -108,11 +109,11 @@ const CreateUser = () => {
       }
 
       await adminService.createUser(userData);
-      alert('User created successfully!');
+      toast.success('User created successfully!');
       navigate('/admin/users');
     } catch (error) {
       console.error('Error creating user:', error);
-      alert(error.message || 'Failed to create user. Please try again.');
+      toast.error(error.message || 'Failed to create user. Please try again.');
     } finally {
       setLoading(false);
     }

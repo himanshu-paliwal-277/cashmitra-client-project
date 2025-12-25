@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import partnerService from '../../services/partnerService';
 import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
+import { toast } from 'react-toastify';
 
 interface InventoryItem {
   _id: string;
@@ -249,7 +250,7 @@ function Inventory() {
     e.preventDefault();
 
     if (!selectedProduct) {
-      alert('Please select a product first');
+      toast.error('Please select a product first');
       return;
     }
 
@@ -271,7 +272,7 @@ function Inventory() {
       }
     } catch (err: any) {
       console.error('Error adding inventory:', err);
-      alert(err.message || 'Failed to add inventory item');
+      toast.error(err.message || 'Failed to add inventory item');
     }
   };
 
@@ -296,7 +297,7 @@ function Inventory() {
       }
     } catch (err: any) {
       console.error('Error updating inventory:', err);
-      alert(err.message || 'Failed to update inventory item');
+      toast.error(err.message || 'Failed to update inventory item');
     }
   };
 
@@ -310,7 +311,7 @@ function Inventory() {
       }
     } catch (err: any) {
       console.error('Error deleting inventory:', err);
-      alert(err.message || 'Failed to delete inventory item');
+      toast.error(err.message || 'Failed to delete inventory item');
     }
   };
 

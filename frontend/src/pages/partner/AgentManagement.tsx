@@ -22,6 +22,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import partnerService from '../../services/partnerService';
+import { toast } from 'react-toastify';
 
 interface Agent {
   _id: string;
@@ -141,7 +142,7 @@ function AgentManagement() {
       }
     } catch (err: any) {
       console.error('Error creating agent:', err);
-      alert(err.message || 'Failed to create agent');
+      toast.error(err.message || 'Failed to create agent');
     } finally {
       setSubmitting(false);
     }
@@ -163,11 +164,11 @@ function AgentManagement() {
         setSelectedAgent(null);
         resetForm();
         fetchAgents();
-        alert('Agent updated successfully!');
+        toast.success('Agent updated successfully!');
       }
     } catch (err: any) {
       console.error('Error updating agent:', err);
-      alert(err.message || 'Failed to update agent');
+      toast.error(err.message || 'Failed to update agent');
     } finally {
       setSubmitting(false);
     }
@@ -180,11 +181,11 @@ function AgentManagement() {
       const response = await partnerService.deleteAgent(agentId);
       if (response.success) {
         fetchAgents();
-        alert('Agent deactivated successfully!');
+        toast.success('Agent deactivated successfully!');
       }
     } catch (err: any) {
       console.error('Error deleting agent:', err);
-      alert(err.message || 'Failed to deactivate agent');
+      toast.error(err.message || 'Failed to deactivate agent');
     }
   };
 
@@ -981,7 +982,7 @@ function AgentManagement() {
                   onClick={() => {
                     const credentials = `Agent Login Credentials:\n\nAgent Code: ${createdAgentCredentials.agentCode}\nEmployee ID: ${createdAgentCredentials.employeeId}\nEmail: ${createdAgentCredentials.email}\nPassword: ${createdAgentCredentials.password}\n\nNote: Account pending admin approval`;
                     navigator.clipboard.writeText(credentials);
-                    alert('All credentials copied to clipboard!');
+                    toast.success('All credentials copied to clipboard!');
                   }}
                   className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >

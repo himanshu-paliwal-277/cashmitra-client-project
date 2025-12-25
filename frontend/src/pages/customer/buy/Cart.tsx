@@ -28,6 +28,7 @@ import useUserAddresses from '../../../hooks/useUserAddresses';
 import api from '../../../services/api';
 
 import './cart.css';
+import { toast } from 'react-toastify';
 
 const Cart = ({ onBack }: any) => {
   const navigate = useNavigate();
@@ -194,7 +195,7 @@ const Cart = ({ onBack }: any) => {
   const handleProceedToCheckout = () => {
     const selectedAddr = addresses.find(a => (a._id || a.id) === selectedAddress);
     if (!selectedAddr) {
-      alert('Please select a delivery address');
+      toast.success('Please select a delivery address');
       return;
     }
 

@@ -254,7 +254,7 @@ const Partners = () => {
     try {
       // Check if partner has a user associated
       if (!partner.user || !partner.user._id) {
-        alert('Cannot update status: Partner has no associated user account.');
+        toast.error('Cannot update status: Partner has no associated user account.');
         return;
       }
 
@@ -263,7 +263,7 @@ const Partners = () => {
       await fetchPartners(); // Refresh the list
     } catch (error) {
       console.error('Error toggling partner active status:', error);
-      alert('Failed to update partner active status. Please try again.');
+      toast.error('Failed to update partner active status. Please try again.');
     }
   };
 
@@ -347,11 +347,11 @@ const Partners = () => {
         );
 
         setShowWalletModal(false);
-        alert('Wallet balance updated successfully!');
+        toast.success('Wallet balance updated successfully!');
       }
     } catch (error: any) {
       console.error('Error updating wallet:', error);
-      alert(error.response?.data?.message || 'Failed to update wallet balance');
+      toast.error(error.response?.data?.message || 'Failed to update wallet balance');
     } finally {
       setWalletLoading(false);
     }

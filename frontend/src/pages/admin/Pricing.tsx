@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import {
+import { toast } from 'react-toastify';
   DollarSign,
   Plus,
   Search,
@@ -316,7 +317,7 @@ const Pricing = () => {
         fetchStats();
       } catch (error) {
         console.error('Error deleting pricing config:', error);
-        alert('Failed to delete pricing configuration');
+        toast.error('Failed to delete pricing configuration');
       }
     }
   };

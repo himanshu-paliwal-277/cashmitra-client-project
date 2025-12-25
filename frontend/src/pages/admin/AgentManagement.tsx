@@ -21,6 +21,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import adminService from '../../services/adminService';
+import { toast } from 'react-toastify';
 
 interface Agent {
   _id: string;
@@ -107,11 +108,11 @@ function AgentManagement() {
       const response = await adminService.approveAgent(agentId);
       if (response.success) {
         fetchAgents();
-        alert('Agent approved successfully!');
+        toast.success('Agent approved successfully!');
       }
     } catch (err: any) {
       console.error('Error approving agent:', err);
-      alert(err.message || 'Failed to approve agent');
+      toast.error(err.message || 'Failed to approve agent');
     } finally {
       setProcessing(null);
     }
@@ -126,11 +127,11 @@ function AgentManagement() {
       const response = await adminService.rejectAgent(agentId, { reason });
       if (response.success) {
         fetchAgents();
-        alert('Agent rejected successfully!');
+        toast.success('Agent rejected successfully!');
       }
     } catch (err: any) {
       console.error('Error rejecting agent:', err);
-      alert(err.message || 'Failed to reject agent');
+      toast.error(err.message || 'Failed to reject agent');
     } finally {
       setProcessing(null);
     }
@@ -145,11 +146,11 @@ function AgentManagement() {
       const response = await adminService.toggleAgentStatus(agentId, !currentStatus);
       if (response.success) {
         fetchAgents();
-        alert(`Agent ${action}d successfully!`);
+        toast.success(`Agent ${action}d successfully!`);
       }
     } catch (err: any) {
       console.error(`Error ${action}ing agent:`, err);
-      alert(err.message || `Failed to ${action} agent`);
+      toast.error(err.message || `Failed to ${action} agent`);
     } finally {
       setProcessing(null);
     }
@@ -164,7 +165,7 @@ function AgentManagement() {
       }
     } catch (err: any) {
       console.error('Error toggling user active status:', err);
-      alert(err.message || 'Failed to update user active status');
+      toast.error(err.message || 'Failed to update user active status');
     } finally {
       setProcessing(null);
     }

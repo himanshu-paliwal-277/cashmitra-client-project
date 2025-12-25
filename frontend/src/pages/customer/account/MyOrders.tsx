@@ -16,6 +16,7 @@ import {
 import { useAuth } from '../../../contexts/AuthContext';
 import useUserOrders from '../../../hooks/useUserOrders';
 import CancelOrderDialog from '../../../components/customer/CancelOrderDialog';
+import { toast } from 'react-toastify';
 
 const statusIcon = (status, order = null) => {
   const actualStatus = order ? getActualStatus(order) : status;
@@ -461,7 +462,7 @@ const MyOrders = () => {
                     {order.orderType === 'buy' && status === 'shipped' && (
                       <button
                         className="inline-flex items-center gap-2 border border-blue-600/35 bg-blue-50 text-blue-900 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-all duration-150 hover:bg-blue-100"
-                        onClick={() => alert('Order tracking feature coming soon!')}
+                        onClick={() => toast.success('Order tracking feature coming soon!')}
                         title="Coming soon"
                       >
                         <Truck size={14} />
@@ -507,9 +508,9 @@ const MyOrders = () => {
             setCancelDialogOpen(false);
             setSelectedOrderId(null);
             fetchOrders(); // Refresh the orders list
-            alert('Order cancelled successfully!');
+            toast.success('Order cancelled successfully!');
           } catch (err) {
-            alert(err?.response?.data?.message || 'Failed to cancel order');
+            toast.error(err?.response?.data?.message || 'Failed to cancel order');
           } finally {
             setCancelLoading(false);
           }

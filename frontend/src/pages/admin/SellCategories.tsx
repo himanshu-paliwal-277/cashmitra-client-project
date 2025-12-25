@@ -19,10 +19,9 @@ import {
   TrendingDown,
   Upload,
   Image as ImageIcon,
-  AlertCircle,
-  CheckCircle,
   Loader,
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { API_BASE_URL } from '../../utils/api';
 
 const SellCategories = () => {
@@ -39,7 +38,6 @@ const SellCategories = () => {
   });
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [toast, setToast] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
 
@@ -58,11 +56,6 @@ const SellCategories = () => {
     fetchSuperCategories();
   }, []);
 
-  const showToast = (message: any, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
   const fetchCategories = async () => {
     try {
       setLoading(true);
@@ -70,7 +63,7 @@ const SellCategories = () => {
       setCategories(response.data || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
-      showToast('Failed to fetch categories', 'error');
+      toast.error('Failed to fetch categories');
     } finally {
       setLoading(false);
     }
@@ -82,7 +75,7 @@ const SellCategories = () => {
       setSuperCategories(response.data || []);
     } catch (error) {
       console.error('Error fetching super categories:', error);
-      showToast('Failed to fetch super categories', 'error');
+      toast.error('Failed to fetch super categories');
     }
   };
 
@@ -117,24 +110,24 @@ const SellCategories = () => {
       try {
         await adminService.deleteCategory(categoryId);
         await fetchCategories();
-        showToast('Category deleted successfully');
+        toast.success('Category deleted successfully');
       } catch (error) {
         console.error('Error deleting category:', error);
         const errorMessage =
           error.response?.data?.message || error.message || 'Failed to delete category';
-        showToast(errorMessage, 'error');
+        toast.error(errorMessage);
       }
     }
   };
 
   const handleSaveCategory = async () => {
     if (!formData.name.trim()) {
-      showToast('Category name is required', 'error');
+      toast.error('Category name is required');
       return;
     }
 
     if (!imageFile && !imagePreview && !editingCategory) {
-      showToast('Please upload a category image', 'error');
+      toast.error('Please upload a category image');
       return;
     }
 
@@ -176,22 +169,22 @@ const SellCategories = () => {
 
         // Check if the response indicates an error
         if (response.error || !response.success) {
-          showToast(response.message || 'Failed to update category', 'error');
+          toast.error(response.message || 'Failed to update category');
           throw new Error(response.message || 'Failed to update category');
         }
 
-        showToast(response.message || 'Category updated successfully');
+        toast.success(response.message || 'Category updated successfully');
       } else {
         const response = await adminService.createCategory(categoryData);
 
         // Check if the response indicates an error
         if (response.error || !response.success) {
-          showToast(response.message || 'Failed to create category', 'error');
+          toast.error(response.message || 'Failed to create category');
           console.log('response', response);
           throw new Error(response.message || 'Failed to create category');
         }
 
-        showToast(response.message || 'Category created successfully');
+        toast.success(response.message || 'Category created successfully');
       }
 
       // Only fetch categories and reset form if everything succeeded
@@ -212,7 +205,7 @@ const SellCategories = () => {
         errorMessage = error;
       }
 
-      showToast(errorMessage, 'error');
+      toast.error(errorMessage);
 
       // DO NOT reset form or refetch on error
       // User can see what went wrong and fix it
@@ -592,22 +585,6 @@ const SellCategories = () => {
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Toast */}
-      {toast && (
-        <div
-          className={`fixed top-4 right-4 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl z-50 transform transition-all duration-300 ease-out ${
-            toast.type === 'success' ? 'bg-amber-500 text-white' : 'bg-red-500 text-white'
-          }`}
-        >
-          {toast.type === 'success' ? (
-            <CheckCircle className="w-5 h-5" />
-          ) : (
-            <AlertCircle className="w-5 h-5" />
-          )}
-          {toast.message}
         </div>
       )}
     </div>

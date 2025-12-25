@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
 import {
+import { toast } from 'react-toastify';
   DollarSign,
   Clock,
   CheckCircle,
@@ -120,7 +121,7 @@ function PayoutManagement() {
       }
     } catch (err: any) {
       console.error('Error processing payout:', err);
-      alert(err.message || 'Failed to process payout request');
+      toast.error(err.message || 'Failed to process payout request');
     } finally {
       setProcessing(false);
     }
