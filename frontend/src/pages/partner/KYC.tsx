@@ -80,11 +80,23 @@ function PartnerKYC() {
     try {
       setUploading(true);
 
+      // Validate file size (10MB max)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        throw new Error('File size must be less than 10MB');
+      }
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error('Only PDF, JPG, JPEG, and PNG files are allowed');
+      }
+
       // Upload file to server
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('document', file);
 
-      const uploadResponse = await fetch('/api/v1/upload/image', {
+      const uploadResponse = await fetch('/api/v1/upload/document', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -516,7 +528,7 @@ function PartnerKYC() {
                     {isRejected ? 'Resubmit document' : 'Replace document'}
                   </p>
                   <p className={`text-xs ${isRejected ? 'text-red-600' : 'text-gray-500'}`}>
-                    Click to upload a new version (PDF, JPG, PNG up to 5MB)
+                    Click to upload a new version (PDF, JPG, PNG up to 10MB)
                   </p>
                 </label>
               </div>
@@ -549,7 +561,7 @@ function PartnerKYC() {
             <label htmlFor={documentType} className="cursor-pointer">
               <Upload size={32} className="mx-auto text-slate-400 mb-2" />
               <p className="text-sm font-medium text-slate-700">Click to upload</p>
-              <p className="text-xs text-slate-500">PDF, JPG, PNG up to 5MB</p>
+              <p className="text-xs text-slate-500">PDF, JPG, PNG up to 10MB</p>
             </label>
           </div>
         )}

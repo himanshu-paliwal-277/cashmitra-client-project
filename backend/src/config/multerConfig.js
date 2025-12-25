@@ -46,5 +46,30 @@ export const agentUpload = multer({
   fileFilter: strictImageFileFilter,
 });
 
+// File filter for documents (PDF, images)
+const documentFileFilter = (req, file, cb) => {
+  const allowedTypes = /jpeg|jpg|png|pdf/;
+  const extname = allowedTypes.test(
+    path.extname(file.originalname).toLowerCase()
+  );
+  const mimetype =
+    file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf';
+
+  if (extname && mimetype) {
+    return cb(null, true);
+  } else {
+    cb(new Error('Only .png, .jpg, .jpeg, and .pdf formats are allowed!'));
+  }
+};
+
+// Upload configuration for documents (10MB limit, PDF and images)
+export const documentUpload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB
+  },
+  fileFilter: documentFileFilter,
+});
+
 // Export storage and filters for custom configurations if needed
-export { imageFileFilter, storage, strictImageFileFilter };
+export { documentFileFilter, imageFileFilter, storage, strictImageFileFilter };
