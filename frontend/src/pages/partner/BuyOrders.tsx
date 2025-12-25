@@ -698,9 +698,9 @@ const BuyOrderDetailsModal: React.FC<BuyOrderDetailsModalProps> = ({
     return '/placeholder-product.jpg';
   };
 
-  const canAcceptReject = order.partnerAssignment?.response?.status === 'pending';
+  const canAcceptReject = order.partnerAssignment?.response?.status === 'pending' && order.status !== 'cancelled';
   const canUpdateStatus =
-    order.partnerAssignment?.response?.status === 'accepted' || order.status === 'confirmed';
+    (order.partnerAssignment?.response?.status === 'accepted' || order.status === 'confirmed') && order.status !== 'cancelled';
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

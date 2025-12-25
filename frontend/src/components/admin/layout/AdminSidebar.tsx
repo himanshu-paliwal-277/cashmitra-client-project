@@ -57,7 +57,7 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
         { to: '/admin/leads', icon: FileText, label: 'Leads' },
         { to: '/admin/sell-orders', icon: ShoppingCart, label: 'Sell Orders' },
         { to: '/admin/buy-orders', icon: ShoppingBag, label: 'Buy Orders' },
-        { to: '/admin/pickup-management', icon: Truck, label: 'Pickup Management' },
+        // { to: '/admin/pickup-management', icon: Truck, label: 'Pickup Management' },
         // { to: '/admin/returns', icon: RotateCcw, label: 'Returns' }, // TODO: Implement returns backend API
       ],
     },

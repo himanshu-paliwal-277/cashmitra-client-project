@@ -31,7 +31,7 @@ const PartnerSideBar = ({ isOpen, onClose }: PartnerSideBarProps) => {
       title: 'Products & Orders',
       items: [
         { to: '/partner/products', icon: Package, label: 'My Products' },
-        { to: '/partner/orders', icon: ShoppingCart, label: 'Orders' },
+        // { to: '/partner/orders', icon: ShoppingCart, label: 'Orders' },
         { to: '/partner/buy-orders', icon: ShoppingCart, label: 'Buy Orders', permission: 'buy' },
         { to: '/partner/sell-orders', icon: Smartphone, label: 'Sell Orders', permission: 'sell' },
       ],

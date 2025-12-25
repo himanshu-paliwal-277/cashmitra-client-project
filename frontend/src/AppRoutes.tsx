@@ -172,7 +172,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="buy-products/add" element={<AddBuyProduct />} />
           <Route path="buy-products/edit/:id" element={<EditBuyProduct />} />
           <Route path="buy-orders" element={<BuyOrders />} />
-          <Route path="pickup-management" element={<PickupManagement />} />
+          {/* <Route path="pickup-management" element={<PickupManagement />} /> */}
           {/* <Route path="returns" element={<Returns />} /> */}{' '}
           {/* TODO: Implement returns backend API */}
           <Route path="catalog" element={<CatalogManagement />} />
@@ -209,7 +209,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
         <Route element={<PartnerLayout />}>
           <Route path="dashboard" element={<PartnerDashboard />} />
           <Route path="products" element={<PartnerProducts />} />
-          <Route path="orders" element={<PartnerOrders />} />
+          {/* <Route path="orders" element={<PartnerOrders />} /> */}
           <Route path="buy-orders" element={<PartnerBuyOrders />} />
           <Route path="sell-orders" element={<PartnerSellOrders />} />
           {/* <Route path="payouts" element={<PartnerPayouts />} /> */}

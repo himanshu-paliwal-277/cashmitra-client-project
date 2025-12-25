@@ -243,13 +243,23 @@
   position: relative;
   transition: 0.15s ease;
 }
-.pay-item:hover {
+.pay-item:hover:not(.disabled) {
   border-color: rgba(37, 99, 235, 0.35);
   box-shadow: var(--focus);
 }
 .pay-item.active {
   border-color: rgba(37, 99, 235, 0.55);
   background: linear-gradient(180deg, #ffffff, #f5f7fb);
+}
+.pay-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f8f9fa;
+}
+.pay-item.disabled .pay-icon,
+.pay-item.disabled .pay-title,
+.pay-item.disabled .pay-desc {
+  opacity: 0.6;
 }
 .pay-check {
   position: absolute;
@@ -270,6 +280,16 @@
 .pay-desc {
   font-size: 0.85rem;
   color: var(--text-2);
+}
+.pay-coming-soon {
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  display: inline-block;
 }
 
 /* Delivery */
@@ -340,7 +360,7 @@
 /* Summary */
 .co-summary {
   position: sticky;
-  top: 16px;
+  top: 86px;
   background: linear-gradient(180deg, var(--panel), var(--panel-2));
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
