@@ -1,0 +1,12 @@
+// 1. disable other payment options 
+// 2. hide pickup management 
+// 3. hide order page in partner 
+// 4. if order cancel then hide the approve and reject
+5. 
+6. check document update in production in kyc 
+// 7. add the toast to all the hooks api call in the frontend
+8. home page first load show this error --
+Oops! Something went wrong
+Failed to load products
+9. order confirmation screen - Order Items section the product price is not correct 
+10. price issue what is total price and actual price
