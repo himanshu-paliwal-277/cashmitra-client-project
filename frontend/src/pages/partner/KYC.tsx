@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import {
   Shield,
   CheckCircle,
@@ -15,7 +16,6 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import partnerService from '../../services/partnerService';
-import { usePartnerAuth } from '../../contexts/PartnerAuthContext';
 
 interface DocumentData {
   gstCertificate: string;
@@ -30,6 +30,7 @@ interface PartnerProfile {
   shopEmail: string;
   isVerified: boolean;
   verificationStatus: 'pending' | 'approved' | 'rejected' | 'submitted';
+  verificationNotes?: string;
   documents: DocumentData;
 }
 
@@ -69,7 +70,7 @@ function PartnerKYC() {
       }
     } catch (err: any) {
       console.error('Error fetching profile:', err);
-      alert(err.message || 'Failed to load profile');
+      toast.error(err.message || 'Failed to load profile');
     } finally {
       setLoading(false);
     }
@@ -111,32 +112,185 @@ function PartnerKYC() {
         updatedDocuments.ownerIdProof
       );
 
-      // If all documents are uploaded, automatically submit for verification
-      const dataToSend = allDocumentsUploaded
-        ? { ...updatedDocuments, verificationStatus: 'submitted' }
-        : updatedDocuments;
+      // If resubmitting (status was rejected), reset to pending first, then submit if all docs are uploaded
+      const isResubmission = getVerificationStatus() === 'rejected';
+      const newStatus = isResubmission
+        ? allDocumentsUploaded
+          ? 'submitted'
+          : 'pending'
+        : allDocumentsUploaded
+          ? 'submitted'
+          : 'pending';
+
+      // Only send documents that have URLs to avoid validation errors
+      const dataToSend: any = {};
+      if (updatedDocuments.gstCertificate) {
+        dataToSend.gstCertificate = updatedDocuments.gstCertificate;
+      }
+      if (updatedDocuments.shopLicense) {
+        dataToSend.shopLicense = updatedDocuments.shopLicense;
+      }
+      if (updatedDocuments.ownerIdProof) {
+        dataToSend.ownerIdProof = updatedDocuments.ownerIdProof;
+      }
+      if (updatedDocuments.additionalDocuments && updatedDocuments.additionalDocuments.length > 0) {
+        dataToSend.additionalDocuments = updatedDocuments.additionalDocuments;
+      }
+
+      // Only add verification status if all documents are uploaded
+      if (allDocumentsUploaded) {
+        dataToSend.verificationStatus = newStatus;
+      }
 
       const response = await partnerService.uploadDocuments(dataToSend);
 
       if (response.success) {
-        const newDocuments = response.data.documents || updatedDocuments;
-        setDocuments(newDocuments);
-        setProfile(response.data);
+        // Update documents from backend response
+        const backendDocuments = response.data.documents || {};
+        setDocuments(backendDocuments);
 
-        // Show success message based on whether it was auto-submitted
-        if (allDocumentsUploaded) {
-          alert(
-            'All documents uploaded successfully! Your KYC has been automatically submitted for review.'
-          );
-          // Refresh profile to get updated status
-          setTimeout(() => {
-            fetchProfile();
-          }, 1000);
+        // Check if all documents are present in backend response
+        const allBackendDocsPresent = !!(
+          backendDocuments.gstCertificate &&
+          backendDocuments.shopLicense &&
+          backendDocuments.ownerIdProof
+        );
+
+        // If we're in resubmission mode and all docs are present, but status is still rejected,
+        // we need to submit for review
+        if (
+          isResubmission &&
+          allBackendDocsPresent &&
+          response.data.verificationStatus === 'rejected'
+        ) {
+          console.log('All documents present during resubmission, submitting for review...');
+
+          // Submit for review with all documents
+          try {
+            const submitResponse = await partnerService.uploadDocuments({
+              ...backendDocuments,
+              verificationStatus: 'submitted',
+            });
+
+            if (submitResponse.success) {
+              setProfile(submitResponse.data);
+              toast.success(
+                'All documents resubmitted successfully! Your KYC has been submitted for review again.'
+              );
+              // Refresh profile to get updated status
+              setTimeout(() => {
+                fetchProfile();
+              }, 1000);
+            } else {
+              setProfile(response.data);
+              toast.success(
+                `${documentType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} uploaded successfully! Please upload remaining documents.`
+              );
+            }
+          } catch (submitErr) {
+            console.error('Error submitting for review:', submitErr);
+            setProfile(response.data);
+            toast.success(
+              `${documentType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} uploaded successfully! Please upload remaining documents.`
+            );
+          }
+        } else {
+          setProfile(response.data);
+
+          // Show success message based on whether it was auto-submitted
+          if (allBackendDocsPresent && response.data.verificationStatus === 'submitted') {
+            if (isResubmission) {
+              toast.success(
+                'All documents resubmitted successfully! Your KYC has been submitted for review again.'
+              );
+            } else {
+              toast.success(
+                'All documents uploaded successfully! Your KYC has been automatically submitted for review.'
+              );
+            }
+            // Refresh profile to get updated status
+            setTimeout(() => {
+              fetchProfile();
+            }, 1000);
+          } else {
+            toast.success(
+              `${documentType.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} uploaded successfully!`
+            );
+          }
         }
       }
     } catch (err: any) {
       console.error('Error uploading document:', err);
-      alert(err.message || 'Failed to upload document');
+      toast.error(err.message || 'Failed to upload document');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleResubmitDocuments = async () => {
+    try {
+      console.log('Starting resubmit process...');
+      console.log('Current documents:', documents);
+
+      // Show loading state briefly for user feedback
+      setUploading(true);
+
+      // Clear documents locally so user can upload fresh ones
+      const clearedDocuments = {
+        gstCertificate: '',
+        shopLicense: '',
+        ownerIdProof: '',
+        additionalDocuments: [],
+      };
+      setDocuments(clearedDocuments);
+
+      // Reset verification status to pending and clear documents in backend
+      const response = await partnerService.uploadDocuments({
+        gstCertificate: '',
+        shopLicense: '',
+        ownerIdProof: '',
+        additionalDocuments: [],
+        verificationStatus: 'pending',
+      });
+
+      if (response.success) {
+        setProfile(response.data);
+        console.log('Updated profile via API to pending with cleared documents:', response.data);
+      } else {
+        // Fallback: update locally
+        if (profile) {
+          const updatedProfile = {
+            ...profile,
+            verificationStatus: 'pending' as const,
+            documents: clearedDocuments,
+          };
+          setProfile(updatedProfile);
+        }
+      }
+
+      setCurrentStep(2);
+      toast.success('Ready to resubmit documents. Please upload your documents again.');
+    } catch (err: any) {
+      console.error('Error in resubmit process:', err);
+
+      // Fallback: update locally
+      if (profile) {
+        const clearedDocuments = {
+          gstCertificate: '',
+          shopLicense: '',
+          ownerIdProof: '',
+          additionalDocuments: [],
+        };
+        const updatedProfile = {
+          ...profile,
+          verificationStatus: 'pending' as const,
+          documents: clearedDocuments,
+        };
+        setProfile(updatedProfile);
+        setDocuments(clearedDocuments);
+      }
+      setCurrentStep(2);
+      toast.success('Ready to resubmit documents. Please upload your documents again.');
     } finally {
       setUploading(false);
     }
@@ -173,8 +327,9 @@ function PartnerKYC() {
         return {
           icon: <AlertCircle size={48} className="text-red-500" />,
           title: 'KYC Rejected',
-          description:
-            'Some documents need to be resubmitted. Please check the requirements and try again.',
+          description: profile?.verificationNotes
+            ? `Rejection reason: ${profile.verificationNotes}. Please review the feedback and resubmit your documents.`
+            : 'Some documents need to be resubmitted. Please check the requirements and try again.',
           bgColor: 'bg-red-50',
           borderColor: 'border-red-200',
         };
@@ -251,49 +406,156 @@ function PartnerKYC() {
     documentType: keyof DocumentData;
     currentUrl: string;
     description: string;
-  }) => (
-    <div className="border border-slate-200 rounded-lg p-6">
-      <h4 className="font-semibold text-slate-900 mb-2">{title}</h4>
-      <p className="text-sm text-slate-600 mb-4">{description}</p>
+  }) => {
+    const status = getVerificationStatus();
+    const isApproved = status === 'approved';
+    const isRejected = status === 'rejected';
+    const canReplace = !isApproved; // Can replace unless approved
 
-      {currentUrl ? (
-        <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center gap-3">
-            <CheckCircle size={20} className="text-green-500" />
-            <span className="text-sm font-medium text-green-700">Document uploaded</span>
+    return (
+      <div className="border border-slate-200 rounded-lg p-6">
+        <h4 className="font-semibold text-slate-900 mb-2">{title}</h4>
+        <p className="text-sm text-slate-600 mb-4">{description}</p>
+
+        {currentUrl ? (
+          <div className="space-y-3">
+            {/* Current Document Display */}
+            <div
+              className={`flex items-center justify-between p-3 rounded-lg ${
+                isApproved
+                  ? 'bg-green-50 border border-green-200'
+                  : isRejected
+                    ? 'bg-red-50 border border-red-200'
+                    : 'bg-blue-50 border border-blue-200'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                {isApproved ? (
+                  <CheckCircle size={20} className="text-green-500" />
+                ) : isRejected ? (
+                  <AlertCircle size={20} className="text-red-500" />
+                ) : (
+                  <Clock size={20} className="text-blue-500" />
+                )}
+                <span
+                  className={`text-sm font-medium ${
+                    isApproved ? 'text-green-700' : isRejected ? 'text-red-700' : 'text-blue-700'
+                  }`}
+                >
+                  {isApproved
+                    ? 'Document verified'
+                    : isRejected
+                      ? 'Document rejected - needs resubmission'
+                      : 'Document uploaded'}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => window.open(currentUrl, '_blank')}
+                  className={`p-1 hover:opacity-80 ${
+                    isApproved ? 'text-green-600' : isRejected ? 'text-red-600' : 'text-blue-600'
+                  }`}
+                  title="View Document"
+                >
+                  <Eye size={16} />
+                </button>
+                <button
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = currentUrl;
+                    link.download = `${title.replace(/\s+/g, '_')}.jpg`;
+                    link.click();
+                  }}
+                  className={`p-1 hover:opacity-80 ${
+                    isApproved ? 'text-green-600' : isRejected ? 'text-red-600' : 'text-blue-600'
+                  }`}
+                  title="Download Document"
+                >
+                  <Download size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Replace Document Option */}
+            {canReplace && (
+              <div
+                className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
+                  isRejected
+                    ? 'border-red-300 bg-red-50 hover:border-red-400'
+                    : 'border-gray-300 bg-gray-50 hover:border-blue-400'
+                }`}
+              >
+                <input
+                  type="file"
+                  id={`${documentType}_replace`}
+                  className="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const message = isRejected
+                        ? `Are you sure you want to resubmit the ${title}? This will update your KYC submission.`
+                        : `Are you sure you want to replace the ${title}? This will update your current document.`;
+
+                      if (confirm(message)) {
+                        handleDocumentUpload(documentType, file);
+                      }
+                    }
+                  }}
+                />
+                <label htmlFor={`${documentType}_replace`} className="cursor-pointer">
+                  <RefreshCw
+                    size={24}
+                    className={`mx-auto mb-2 ${isRejected ? 'text-red-500' : 'text-gray-500'}`}
+                  />
+                  <p
+                    className={`text-sm font-medium ${
+                      isRejected ? 'text-red-700' : 'text-gray-700'
+                    }`}
+                  >
+                    {isRejected ? 'Resubmit document' : 'Replace document'}
+                  </p>
+                  <p className={`text-xs ${isRejected ? 'text-red-600' : 'text-gray-500'}`}>
+                    Click to upload a new version (PDF, JPG, PNG up to 5MB)
+                  </p>
+                </label>
+              </div>
+            )}
+
+            {/* Show message for approved documents */}
+            {isApproved && (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-700 flex items-center gap-2">
+                  <CheckCircle size={16} />
+                  Document verified and approved. Changes not allowed.
+                </p>
+              </div>
+            )}
           </div>
-          <div className="flex gap-2">
-            <button className="p-1 text-green-600 hover:text-green-800">
-              <Eye size={16} />
-            </button>
-            <button className="p-1 text-green-600 hover:text-green-800">
-              <Download size={16} />
-            </button>
+        ) : (
+          <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+            <input
+              type="file"
+              id={documentType}
+              className="hidden"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleDocumentUpload(documentType, file);
+                }
+              }}
+            />
+            <label htmlFor={documentType} className="cursor-pointer">
+              <Upload size={32} className="mx-auto text-slate-400 mb-2" />
+              <p className="text-sm font-medium text-slate-700">Click to upload</p>
+              <p className="text-xs text-slate-500">PDF, JPG, PNG up to 5MB</p>
+            </label>
           </div>
-        </div>
-      ) : (
-        <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-          <input
-            type="file"
-            id={documentType}
-            className="hidden"
-            accept=".pdf,.jpg,.jpeg,.png"
-            onChange={e => {
-              const file = e.target.files?.[0];
-              if (file) {
-                handleDocumentUpload(documentType, file);
-              }
-            }}
-          />
-          <label htmlFor={documentType} className="cursor-pointer">
-            <Upload size={32} className="mx-auto text-slate-400 mb-2" />
-            <p className="text-sm font-medium text-slate-700">Click to upload</p>
-            <p className="text-xs text-slate-500">PDF, JPG, PNG up to 5MB</p>
-          </label>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -325,13 +587,24 @@ function PartnerKYC() {
         <p className="text-slate-600 mb-4">{statusInfo.description}</p>
 
         {getVerificationStatus() === 'rejected' && (
-          <button
-            onClick={() => setCurrentStep(2)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <RefreshCw size={20} />
-            Resubmit Documents
-          </button>
+          <>
+            {profile?.verificationNotes && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <h4 className="font-semibold text-red-800 mb-2 flex items-center gap-2">
+                  <AlertCircle size={16} />
+                  Rejection Reason
+                </h4>
+                <p className="text-red-700 text-sm">{profile.verificationNotes}</p>
+              </div>
+            )}
+            <button
+              onClick={handleResubmitDocuments}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              <RefreshCw size={20} />
+              Resubmit Documents
+            </button>
+          </>
         )}
       </div>
 
@@ -430,7 +703,7 @@ function PartnerKYC() {
                   title="Owner ID Proof"
                   documentType="ownerIdProof"
                   currentUrl={documents.ownerIdProof}
-                  description="Upload Aadhar Card, PAN Card, or Passport"
+                  description="Upload Aadhaar Card, PAN Card, or Passport"
                 />
               </div>
             </div>

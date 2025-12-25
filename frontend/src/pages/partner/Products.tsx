@@ -12,6 +12,7 @@ import {
   X,
   Loader2,
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import partnerService from '../../services/partnerService';
 import CreateProductModal from '../../components/partner/CreateProductModal';
 import EditProductModal from '../../components/partner/EditProductModal';
@@ -109,7 +110,9 @@ function Products() {
 
       setStats({ total, active, inactive, lowStock });
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch products');
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch products';
+      toast.error(errorMessage);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -121,6 +124,7 @@ function Products() {
   };
 
   const handleEditSuccess = () => {
+    toast.success('Product updated successfully!');
     fetchProducts(); // Refresh the products list
     setShowEditModal(false);
     setEditingProduct(null);
@@ -131,9 +135,12 @@ function Products() {
 
     try {
       await partnerService.deleteProduct(productId);
+      toast.success('Product deleted successfully!');
       fetchProducts();
     } catch (err: any) {
-      setError(err.message || 'Failed to delete product');
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete product';
+      toast.error(errorMessage);
+      setError(errorMessage);
     }
   };
 

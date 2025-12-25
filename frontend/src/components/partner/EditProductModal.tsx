@@ -18,6 +18,7 @@ import {
   Shield,
   Star,
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import partnerService from '../../services/partnerService';
 import cloudinaryService from '../../services/cloudinaryService';
 
@@ -672,14 +673,17 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
       };
 
       await partnerService.updateProduct(product._id, productData);
-      setSuccess('Product updated successfully!');
+      toast.success('Product updated successfully!');
       setTimeout(() => {
         onSuccess();
         handleClose();
       }, 1500);
     } catch (error: any) {
       console.error('Error updating product:', error);
-      setErrors({ submit: error.message || 'Failed to update product' });
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Failed to update product';
+      toast.error(errorMessage);
+      setErrors({ submit: errorMessage });
     } finally {
       setLoading(false);
     }

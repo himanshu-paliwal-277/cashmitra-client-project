@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import useAdminPartnerApplications from '../../hooks/useAdminPartnerApplications';
 import {
   UserCheck,
@@ -32,32 +33,76 @@ const PartnerApplications = () => {
   const { applications, stats, loading, updateApplicationStatus, fetchApplications } =
     useAdminPartnerApplications();
 
+  // Update selected application when applications data changes
+  useEffect(() => {
+    console.log(
+      'useEffect triggered - applications length:',
+      applications.length,
+      'selectedApplication:',
+      selectedApplication?._id
+    );
+
+    if (selectedApplication && applications.length > 0) {
+      const updatedApplication = applications.find(app => app._id === selectedApplication._id);
+      console.log(
+        'Found updated application:',
+        updatedApplication?.status,
+        'vs current:',
+        selectedApplication.status
+      );
+
+      if (
+        updatedApplication &&
+        (updatedApplication.status !== selectedApplication.status ||
+          updatedApplication.verificationStatus !== selectedApplication.verificationStatus ||
+          updatedApplication.verificationNotes !== selectedApplication.verificationNotes)
+      ) {
+        console.log('Updating selectedApplication with fresh data');
+        setSelectedApplication(updatedApplication);
+      }
+    }
+  }, [applications, selectedApplication]);
+
   const handleStatusUpdate = async (applicationId: any, newStatus: any, comments = '') => {
     try {
+      // Get current application to show in confirmation
+      const currentApplication = applications.find(app => app._id === applicationId);
+      const applicationName =
+        currentApplication?.shopName || currentApplication?.user?.name || 'this application';
+
+      // Show confirmation dialog
+      const confirmMessage = `Are you sure you want to change ${applicationName}'s status to "${newStatus}"?`;
+      if (!confirm(confirmMessage)) {
+        return;
+      }
+
+      console.log(
+        'Updating status for:',
+        applicationId,
+        'to:',
+        newStatus,
+        'with comments:',
+        comments
+      );
+
       const result = await updateApplicationStatus(applicationId, newStatus, comments);
+      console.log('Update result:', result);
+
       if (result.success) {
-        // Refetch applications to get updated data from backend
+        // Force refetch to ensure we have the latest data
+        console.log('Forcing refetch of applications...');
         await fetchApplications();
 
-        // Update selected application if modal is open
-        if (selectedApplication && selectedApplication._id === applicationId) {
-          setSelectedApplication({
-            ...selectedApplication,
-            status: newStatus,
-            verificationStatus: newStatus,
-            isVerified: newStatus === 'approved',
-            verificationNotes: comments,
-            experience: comments,
-            updatedAt: new Date().toISOString(),
-          });
-        }
-
-        // Show success message
-        alert(result.message || 'Status updated successfully');
+        // Show success toast
+        toast.success(
+          result.message || `Application status updated to "${newStatus}" successfully!`
+        );
       }
     } catch (error) {
       console.error('Error updating application status:', error);
-      alert('Failed to update status. Please try again.');
+      const errorMessage =
+        error.response?.data?.message || 'Failed to update status. Please try again.';
+      toast.error(errorMessage);
     }
   };
 
@@ -265,7 +310,7 @@ const PartnerApplications = () => {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           {/* Table Header */}
-          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_150px] gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 font-semibold text-gray-700 text-sm">
+          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_180px] gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 font-semibold text-gray-700 text-sm">
             <div>Applicant</div>
             <div>Business</div>
             <div>Contact</div>
@@ -289,7 +334,7 @@ const PartnerApplications = () => {
             filteredApplications.map((application: any) => (
               <div
                 key={application._id}
-                className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_150px] gap-4 px-6 py-4 border-b border-gray-200 items-center hover:bg-gray-50 transition-colors"
+                className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_180px] gap-4 px-6 py-4 border-b border-gray-200 items-center hover:bg-gray-50 transition-colors"
               >
                 {/* Applicant */}
                 <div className="flex flex-col gap-1">
@@ -365,7 +410,7 @@ const PartnerApplications = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   <button
                     onClick={() => handleViewDetails(application)}
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition-all hover:scale-105"
@@ -373,24 +418,29 @@ const PartnerApplications = () => {
                   >
                     <Eye size={14} />
                   </button>
-                  {canUpdateStatus(application.status, 'approved') && (
-                    <button
-                      onClick={() => handleStatusUpdate(application._id, 'approved')}
-                      className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition-all hover:scale-105"
-                      title="Approve"
+
+                  {/* Status Change Dropdown */}
+                  <div className="relative">
+                    <select
+                      value={application.status || application.verificationStatus}
+                      onChange={e => handleStatusUpdate(application._id, e.target.value)}
+                      className={`px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors cursor-pointer ${
+                        (application.status || application.verificationStatus) === 'approved'
+                          ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100'
+                          : (application.status || application.verificationStatus) === 'pending'
+                            ? 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                            : (application.status || application.verificationStatus) === 'submitted'
+                              ? 'bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100'
+                              : 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+                      }`}
+                      title="Change Status"
                     >
-                      <CheckCircle size={14} />
-                    </button>
-                  )}
-                  {canUpdateStatus(application.status, 'rejected') && (
-                    <button
-                      onClick={() => handleStatusUpdate(application._id, 'rejected')}
-                      className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-all hover:scale-105"
-                      title="Reject"
-                    >
-                      <XCircle size={14} />
-                    </button>
-                  )}
+                      <option value="pending">Pending</option>
+                      <option value="submitted">Submitted</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             ))
@@ -916,6 +966,36 @@ const PartnerApplications = () => {
             <div className="bg-gray-50 rounded-lg p-6 mt-8">
               <h4 className="font-semibold text-gray-700 mb-4">Review Actions</h4>
 
+              {/* Quick Status Change */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Change Status:
+                </label>
+                <select
+                  value={selectedApplication.status || selectedApplication.verificationStatus}
+                  onChange={e =>
+                    handleStatusUpdate(selectedApplication._id, e.target.value, comment)
+                  }
+                  className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors cursor-pointer ${
+                    (selectedApplication.status || selectedApplication.verificationStatus) ===
+                    'approved'
+                      ? 'bg-green-50 border-green-200 text-green-700'
+                      : (selectedApplication.status || selectedApplication.verificationStatus) ===
+                          'pending'
+                        ? 'bg-gray-50 border-gray-200 text-gray-700'
+                        : (selectedApplication.status || selectedApplication.verificationStatus) ===
+                            'submitted'
+                          ? 'bg-yellow-50 border-yellow-200 text-yellow-700'
+                          : 'bg-red-50 border-red-200 text-red-700'
+                  }`}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="submitted">Submitted</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+
               <textarea
                 placeholder="Add review comments..."
                 value={comment}
@@ -943,7 +1023,7 @@ const PartnerApplications = () => {
                         handleStatusUpdate(selectedApplication._id, 'rejected', comment);
                         // Don't close modal immediately - let user see the updated status
                       } else {
-                        alert('Please provide a reason for rejection');
+                        toast.error('Please provide a reason for rejection');
                       }
                     }}
                     className="px-6 py-3 bg-red-500 text-white rounded-lg font-semibold flex items-center gap-2 hover:bg-red-600 transition-all"

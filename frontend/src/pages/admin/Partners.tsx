@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import useAdminPartners from '../../hooks/useAdminPartners';
 import adminService from '../../services/adminService';
 import {
@@ -225,12 +226,27 @@ const Partners = () => {
 
   const handleStatusChange = async (partnerId: any, newStatus: any) => {
     try {
-      // Use editPartner to update verificationStatus
-      await editPartner(partnerId, { verificationStatus: newStatus });
+      // Get current partner to show in confirmation
+      const currentPartner = partners.find(p => p._id === partnerId);
+      const partnerName = currentPartner?.shopName || currentPartner?.user?.name || 'this partner';
+
+      // Show confirmation dialog
+      const confirmMessage = `Are you sure you want to change ${partnerName}'s status to "${newStatus}"?`;
+      if (!confirm(confirmMessage)) {
+        return;
+      }
+
+      // Use the proper verifyPartner API that updates both isVerified and verificationStatus
+      await adminService.verifyPartner(partnerId, { status: newStatus });
       await fetchPartners(); // Refresh the list
+
+      // Show success message
+      toast.success(`Partner status updated to "${newStatus}" successfully!`);
     } catch (error) {
       console.error('Error updating partner status:', error);
-      alert('Failed to update partner status. Please try again.');
+      const errorMessage =
+        error.response?.data?.message || 'Failed to update partner status. Please try again.';
+      toast.error(errorMessage);
     }
   };
 
@@ -714,24 +730,27 @@ const Partners = () => {
                           >
                             <Edit size={16} />
                           </button>
-                          {partner.verificationStatus === 'pending' && (
-                            <button
-                              onClick={() => handleStatusChange(partner._id, 'approved')}
-                              className="p-2 hover:bg-green-100 rounded-lg transition-colors duration-150 text-green-600 hover:text-green-700"
-                              title="Approve"
+
+                          {/* Status Change Dropdown */}
+                          <div className="relative">
+                            <select
+                              value={partner.verificationStatus}
+                              onChange={e => handleStatusChange(partner._id, e.target.value)}
+                              className={`px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors cursor-pointer ${
+                                partner.verificationStatus === 'approved'
+                                  ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100'
+                                  : partner.verificationStatus === 'pending'
+                                    ? 'bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100'
+                                    : 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+                              }`}
+                              title="Change Status"
                             >
-                              <CheckCircle size={16} />
-                            </button>
-                          )}
-                          {partner.verificationStatus === 'approved' && (
-                            <button
-                              onClick={() => handleStatusChange(partner._id, 'rejected')}
-                              className="p-2 hover:bg-yellow-100 rounded-lg transition-colors duration-150 text-yellow-600 hover:text-yellow-700"
-                              title="Reject"
-                            >
-                              <XCircle size={16} />
-                            </button>
-                          )}
+                              <option value="pending">Pending</option>
+                              <option value="approved">Approved</option>
+                              <option value="rejected">Rejected</option>
+                            </select>
+                          </div>
+
                           <button
                             onClick={() => handleDelete(partner._id)}
                             className="p-2 hover:bg-red-100 rounded-lg transition-colors duration-150 text-red-600 hover:text-red-700"
@@ -1251,7 +1270,7 @@ const Partners = () => {
                   type="text"
                   value={formData.upiId}
                   onChange={e => setFormData({ ...formData, upiId: e.target.value })}
-                  pattern="[a-zA-Z0-9._-]+@[a-zA-Z0-9]+"
+                  pattern="[a-zA-Z0-9.\-_]+@[a-zA-Z0-9]+"
                   placeholder="UPI ID (e.g., user@paytm, phone@ybl, partner@oksbi)"
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
                 />
@@ -1277,10 +1296,7 @@ const Partners = () => {
                       }
                       className="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
                     />
-                    <label
-                      htmlFor="buy-permission"
-                      className="flex-1 cursor-pointer select-none"
-                    >
+                    <label htmlFor="buy-permission" className="flex-1 cursor-pointer select-none">
                       <span className="font-semibold text-gray-900">Buy Module Access</span>
                       <p className="text-sm text-gray-600">
                         Allow partner to access and manage buy orders and related features
@@ -1301,10 +1317,7 @@ const Partners = () => {
                       }
                       className="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
                     />
-                    <label
-                      htmlFor="sell-permission"
-                      className="flex-1 cursor-pointer select-none"
-                    >
+                    <label htmlFor="sell-permission" className="flex-1 cursor-pointer select-none">
                       <span className="font-semibold text-gray-900">Sell Module Access</span>
                       <p className="text-sm text-gray-600">
                         Allow partner to access and manage sell orders and related features
@@ -1564,23 +1577,31 @@ const Partners = () => {
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Module Permissions</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPartner.permissions?.buy ? 'bg-blue-500' : 'bg-gray-300'}`}>
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPartner.permissions?.buy ? 'bg-blue-500' : 'bg-gray-300'}`}
+                    >
                       <span className="text-white font-bold text-sm">₿</span>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Buy Module</p>
-                      <p className={`font-semibold ${selectedPartner.permissions?.buy ? 'text-blue-700' : 'text-gray-500'}`}>
+                      <p
+                        className={`font-semibold ${selectedPartner.permissions?.buy ? 'text-blue-700' : 'text-gray-500'}`}
+                      >
                         {selectedPartner.permissions?.buy ? 'Enabled' : 'Disabled'}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPartner.permissions?.sell ? 'bg-purple-500' : 'bg-gray-300'}`}>
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedPartner.permissions?.sell ? 'bg-purple-500' : 'bg-gray-300'}`}
+                    >
                       <span className="text-white font-bold text-sm">$</span>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Sell Module</p>
-                      <p className={`font-semibold ${selectedPartner.permissions?.sell ? 'text-purple-700' : 'text-gray-500'}`}>
+                      <p
+                        className={`font-semibold ${selectedPartner.permissions?.sell ? 'text-purple-700' : 'text-gray-500'}`}
+                      >
                         {selectedPartner.permissions?.sell ? 'Enabled' : 'Disabled'}
                       </p>
                     </div>
