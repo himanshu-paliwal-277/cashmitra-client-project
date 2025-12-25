@@ -10,13 +10,13 @@ import {
   Search,
   Package,
   AlertCircle,
-  CheckCircle,
   Loader,
   Upload,
   Image as ImageIcon,
   Sparkles,
   Grid,
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { API_BASE_URL } from '../../utils/api';
 import SkeletonLoader from '../../components/customer/common/SkeletonLoader';
 
@@ -30,7 +30,6 @@ const BuyCategories = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({ name: '', superCategory: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [toast, setToast] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [superCategories, setSuperCategories] = useState([]);
@@ -76,24 +75,19 @@ const BuyCategories = () => {
     }
   };
 
-  const showToast = (message: any, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
   const handleCreate = async () => {
     if (!formData.name.trim()) {
-      showToast('Category name is required', 'error');
+      toast.error('Category name is required');
       return;
     }
 
     if (!formData.superCategory) {
-      showToast('Please select a super category', 'error');
+      toast.error('Please select a super category');
       return;
     }
 
     if (!imageFile && !imagePreview) {
-      showToast('Please upload a category image', 'error');
+      toast.error('Please upload a category image');
       return;
     }
 
@@ -126,9 +120,9 @@ const BuyCategories = () => {
       setImagePreview('');
       setShowModal(false);
       await fetchCategories();
-      showToast('Category created successfully');
+      toast.success('Category created successfully');
     } catch (err) {
-      showToast(err.message || 'Failed to create category', 'error');
+      toast.error(err.message || 'Failed to create category');
     } finally {
       setIsSubmitting(false);
     }
@@ -147,12 +141,12 @@ const BuyCategories = () => {
 
   const handleUpdate = async () => {
     if (!formData.name.trim()) {
-      showToast('Category name is required', 'error');
+      toast.error('Category name is required');
       return;
     }
 
     if (!formData.superCategory) {
-      showToast('Please select a super category', 'error');
+      toast.error('Please select a super category');
       return;
     }
 
@@ -186,9 +180,9 @@ const BuyCategories = () => {
       setImagePreview('');
       setShowModal(false);
       await fetchCategories();
-      showToast('Category updated successfully');
+      toast.success('Category updated successfully');
     } catch (err) {
-      showToast(err.message || 'Failed to update category', 'error');
+      toast.error(err.message || 'Failed to update category');
     } finally {
       setIsSubmitting(false);
     }
@@ -202,9 +196,9 @@ const BuyCategories = () => {
     try {
       await adminService.deleteBuyCategory(categoryId);
       await fetchCategories();
-      showToast('Category deleted successfully');
+      toast.success('Category deleted successfully');
     } catch (err) {
-      showToast(err.message || 'Failed to delete category', 'error');
+      toast.error(err.message || 'Failed to delete category');
     }
   };
 
@@ -517,20 +511,6 @@ const BuyCategories = () => {
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Toast Notification */}
-      {toast && (
-        <div
-          className={`fixed top-6 right-6 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl z-50 animate-slideIn ${
-            toast.type === 'success'
-              ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white'
-              : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
-          }`}
-        >
-          {toast.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-          <span className="font-medium">{toast.message}</span>
         </div>
       )}
     </>
