@@ -15,7 +15,9 @@ import {
   Loader2,
   RefreshCw,
 } from 'lucide-react';
+import axios from 'axios';
 import partnerService from '../../services/partnerService';
+import { API_BASE_URL } from '../../utils/api';
 
 interface DocumentData {
   gstCertificate: string;
@@ -96,21 +98,18 @@ function PartnerKYC() {
       const formData = new FormData();
       formData.append('document', file);
 
-      const uploadResponse = await fetch('/api/v1/upload/document', {
-        method: 'POST',
+      const uploadResponse = await axios.post(`${API_BASE_URL}/upload/document`, formData, {
         headers: {
+          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: formData,
       });
 
-      const uploadResult = await uploadResponse.json();
-
-      if (!uploadResult.success) {
-        throw new Error(uploadResult.message || 'Failed to upload file');
+      if (!uploadResponse.data.success) {
+        throw new Error(uploadResponse.data.message || 'Failed to upload file');
       }
 
-      const fileUrl = uploadResult.data.url;
+      const fileUrl = uploadResponse.data.data.url;
 
       const updatedDocuments = {
         ...documents,
