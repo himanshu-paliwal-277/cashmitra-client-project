@@ -98,7 +98,7 @@ const Finance = () => {
       setLoading(true);
       const response = await adminService.getFinancialDashboard();
       // Map backend response to frontend stats
-      const overview = response.overview || {};
+      const overview = response.data?.overview || {};
       setStats({
         totalRevenue: overview.totalRevenue || 0,
         totalCommission: overview.totalCommission || 0,
@@ -132,10 +132,12 @@ const Finance = () => {
         search: searchTerm || undefined,
       };
       const response = await adminService.getFinancialTransactions(params);
-      setTransactions(response.transactions || response.data || []);
-      setTotalPages(response.pagination?.pages || 1);
+      setTransactions(response.data?.transactions || []);
+      setTotalPages(response.data?.pagination?.pages || 1);
     } catch (error) {
       console.error('Error fetching transactions:', error);
+      setTransactions([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -146,8 +148,8 @@ const Finance = () => {
       setLoading(true);
       const response = await adminService.getCommissionSummary();
       // Map backend response to frontend format
-      const totals = response.totals || {};
-      const categoryBreakdown = response.categoryBreakdown || [];
+      const totals = response.data?.totals || {};
+      const categoryBreakdown = response.data?.categoryBreakdown || [];
 
       setCommissionSummary({
         totalCommission: totals.totalCommission || 0,
@@ -161,6 +163,7 @@ const Finance = () => {
       });
     } catch (error) {
       console.error('Error fetching commission summary:', error);
+      setCommissionSummary(null);
     } finally {
       setLoading(false);
     }
@@ -426,24 +429,13 @@ const Finance = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {transactions.map(transaction => (
+                      {(transactions || []).map(transaction => (
                         <tr key={transaction._id} className="hover:bg-gray-50 transition-colors">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
                               <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-700 capitalize">
                                 {transaction.transactionType}
                               </span>
-                              {transaction.source && (
-                                <span
-                                  className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded ${
-                                    transaction.source === 'wallet'
-                                      ? 'bg-green-100 text-green-700'
-                                      : 'bg-gray-100 text-gray-700'
-                                  }`}
-                                >
-                                  {transaction.source}
-                                </span>
-                              )}
                             </div>
                           </td>
                           <td className="px-6 py-4">
@@ -581,7 +573,7 @@ const Finance = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                          {commissionSummary.commissionByPartner.map((item, index) => (
+                          {(commissionSummary?.commissionByPartner || []).map((item, index) => (
                             <tr key={index} className="hover:bg-gray-50 transition-colors">
                               <td className="px-6 py-4">
                                 <div className="font-medium text-gray-900">
