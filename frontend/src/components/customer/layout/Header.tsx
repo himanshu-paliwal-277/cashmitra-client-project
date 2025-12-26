@@ -18,6 +18,7 @@ import {
 import SellPhoneDropdown from './SellPhoneDropdown';
 import PhoneDropdown from './PhoneDropdown';
 import { useAuth } from '../../../contexts/AuthContext';
+import productService from '../../../services/productService';
 
 const MobileCollapsibleNavItem = ({ item, onLinkClick }: any) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -70,13 +71,24 @@ const Header = () => {
   const [openNavDropdown, setOpenNavDropdown] = useState<string | null>(null);
   const [navDropdownTimer, setNavDropdownTimer] = useState<any>(null);
 
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState<any[]>([]);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchTimer, setSearchTimer] = useState<any>(null);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const navDropdownRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const closeAllMenus = () => {
     setIsMobileMenuOpen(false);
     setIsProfileDropdownOpen(false);
     setOpenNavDropdown(null);
+    setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
   };
 
   const handleLinkClick = (path?: string) => {
@@ -95,6 +107,108 @@ const Header = () => {
     closeAllMenus();
   };
 
+  const fetchSearchSuggestions = async (query: string) => {
+    if (!query.trim()) {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+      return;
+    }
+
+    try {
+      setIsSearchLoading(true);
+      const response = await productService.getBuyProducts({
+        search: query,
+        limit: 5,
+        isActive: true,
+      });
+
+      setSearchSuggestions(response.products || []);
+      setShowSuggestions(true);
+      setSelectedSuggestionIndex(-1);
+    } catch (error) {
+      console.error('Error fetching search suggestions:', error);
+      setSearchSuggestions([]);
+    } finally {
+      setIsSearchLoading(false);
+    }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    setSelectedSuggestionIndex(-1);
+
+    // Clear previous timer
+    if (searchTimer) {
+      clearTimeout(searchTimer);
+    }
+
+    const timer = setTimeout(() => {
+      fetchSearchSuggestions(query);
+    }, 300);
+
+    setSearchTimer(timer);
+  };
+
+  const handleSuggestionClick = (product: any) => {
+    navigate(`/buy/product/${product._id}`);
+    setSearchQuery('');
+    setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
+    closeAllMenus();
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (selectedSuggestionIndex >= 0 && searchSuggestions[selectedSuggestionIndex]) {
+      handleSuggestionClick(searchSuggestions[selectedSuggestionIndex]);
+      return;
+    }
+
+    if (searchQuery.trim()) {
+      navigate(`/buy?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+      closeAllMenus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || searchSuggestions.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => (prev < searchSuggestions.length - 1 ? prev + 1 : prev));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => (prev > -1 ? prev - 1 : -1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedSuggestionIndex >= 0 && searchSuggestions[selectedSuggestionIndex]) {
+          handleSuggestionClick(searchSuggestions[selectedSuggestionIndex]);
+        } else {
+          if (searchQuery.trim()) {
+            navigate(`/buy?search=${encodeURIComponent(searchQuery.trim())}`);
+            setSearchQuery('');
+            setShowSuggestions(false);
+            setSelectedSuggestionIndex(-1);
+            closeAllMenus();
+          }
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        break;
+    }
+  };
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -104,10 +218,23 @@ const Header = () => {
       ) {
         setIsProfileDropdownOpen(false);
       }
+
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (searchTimer) {
+        clearTimeout(searchTimer);
+      }
+    };
+  }, [searchTimer]);
 
   // Handlers for hover-based navigation dropdown
   const handleNavMouseEnter = (itemId: string) => {
@@ -165,19 +292,87 @@ const Header = () => {
           </h1>
         </Link>
 
-        {/* Search - Hidden on mobile */}
-        {/* <div className="hidden lg:flex flex-1 max-w-[600px] min-w-[200px]">
-          <div className="relative w-full">
+        {/* Search Bar */}
+        <div ref={searchRef} className="hidden lg:flex flex-1 max-w-[600px] min-w-[200px] relative">
+          <form onSubmit={handleSearchSubmit} className="relative w-full">
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
               <Search size={18} />
             </div>
             <input
               type="text"
-              placeholder="Search for mobiles, accessories & more"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Search for mobiles, tablets, laptops & more"
               className="w-full py-3 pl-11 pr-4 border-[1.5px] border-gray-300 rounded-lg text-sm text-gray-800 bg-gray-50 transition-all focus:outline-none focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 placeholder:text-gray-500"
             />
-          </div>
-        </div> */}
+
+            {/* Search Suggestions Dropdown */}
+            {showSuggestions && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                {isSearchLoading ? (
+                  <div className="p-4 text-center text-gray-500">
+                    <div className="animate-spin inline-block w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full mr-2"></div>
+                    Searching...
+                  </div>
+                ) : searchSuggestions.length > 0 ? (
+                  <>
+                    {searchSuggestions.map((product, index) => (
+                      <button
+                        key={product._id}
+                        onClick={() => handleSuggestionClick(product)}
+                        className={`w-full flex items-center gap-3 p-3 transition-colors text-left border-b border-gray-100 last:border-b-0 ${
+                          selectedSuggestionIndex === index
+                            ? 'bg-green-50 border-green-200'
+                            : 'hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                          {product.images &&
+                          (product.images.main ||
+                            (Array.isArray(product.images) && product.images.length > 0)) ? (
+                            <img
+                              src={product.images.main || product.images[0]}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                              <Package size={16} />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">{product.name}</p>
+                          <p className="text-sm text-gray-500 truncate">
+                            {product.categoryId?.name}
+                          </p>
+                          {product.pricing && (
+                            <p className="text-sm font-semibold text-green-600">
+                              ₹{product.pricing.discountedPrice || product.pricing.mrp}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                    {searchQuery.trim() && (
+                      <button
+                        onClick={handleSearchSubmit}
+                        className="w-full p-3 text-left hover:bg-gray-50 transition-colors border-t border-gray-200 text-green-600 font-medium"
+                      >
+                        View all results for "{searchQuery}"
+                      </button>
+                    )}
+                  </>
+                ) : searchQuery.trim() ? (
+                  <div className="p-4 text-center text-gray-500">
+                    No products found for "{searchQuery}"
+                  </div>
+                ) : null}
+              </div>
+            )}
+          </form>
+        </div>
 
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0 lg:gap-4">
@@ -308,18 +503,62 @@ const Header = () => {
       {isMobileMenuOpen && (
         <div className="fixed top-[57px] lg:top-[73px] left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 p-4 max-h-[calc(100vh-57px)] lg:max-h-[calc(100vh-73px)] overflow-y-auto">
           {/* Mobile Search */}
-          {/* <div className="mb-4 pb-4 border-b border-gray-200">
-            <div className="relative w-full">
+          <div className="mb-4 pb-4 border-b border-gray-200">
+            <form onSubmit={handleSearchSubmit} className="relative w-full">
               <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
                 <Search size={18} />
               </div>
               <input
                 type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Search devices..."
                 className="w-full py-3 pl-11 pr-4 border-[1.5px] border-gray-300 rounded-lg text-sm text-gray-800 bg-gray-50 transition-all focus:outline-none focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 placeholder:text-gray-500"
               />
-            </div>
-          </div> */}
+            </form>
+
+            {/* Mobile Search Suggestions */}
+            {showSuggestions && searchSuggestions.length > 0 && (
+              <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {searchSuggestions.map((product, index) => (
+                  <button
+                    key={product._id}
+                    onClick={() => handleSuggestionClick(product)}
+                    className={`w-full flex items-center gap-3 p-3 transition-colors text-left border-b border-gray-100 last:border-b-0 ${
+                      selectedSuggestionIndex === index
+                        ? 'bg-green-50 border-green-200'
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                      {product.images &&
+                      (product.images.main ||
+                        (Array.isArray(product.images) && product.images.length > 0)) ? (
+                        <img
+                          src={product.images.main || product.images[0]}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <Package size={14} />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate text-sm">{product.name}</p>
+                      {product.pricing && (
+                        <p className="text-xs font-semibold text-green-600">
+                          ₹{product.pricing.discountedPrice || product.pricing.mrp}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Mobile Nav Items */}
           <div className="flex flex-col gap-1 mb-4">

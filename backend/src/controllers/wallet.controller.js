@@ -625,3 +625,248 @@ export async function getPendingPayouts(req, res) {
     });
   }
 }
+
+// Admin endpoints for wallet management
+export async function getAllWallets(req, res) {
+  try {
+    const { page = 1, limit = 10, search } = req.query;
+
+    let partnerQuery = {};
+    if (search) {
+      partnerQuery = {
+        $or: [
+          { shopName: { $regex: search, $options: 'i' } },
+          { shopEmail: { $regex: search, $options: 'i' } },
+        ],
+      };
+    }
+
+    const partners = await Partner.find(partnerQuery).select('_id');
+    const partnerIds = partners.map((p) => p._id);
+
+    const wallets = await Wallet.find({ partner: { $in: partnerIds } })
+      .populate({
+        path: 'partner',
+        select: 'shopName shopEmail phone isVerified user',
+        populate: {
+          path: 'user',
+          select: 'name email',
+        },
+      })
+      .sort({ lastUpdated: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const totalWallets = await Wallet.countDocuments({
+      partner: { $in: partnerIds },
+    });
+
+    // Calculate stats
+    const allWallets = await Wallet.find({ partner: { $in: partnerIds } });
+    const stats = {
+      totalPartners: allWallets.length,
+      totalBalance: allWallets.reduce((sum, wallet) => sum + wallet.balance, 0),
+      totalEarnings: 0,
+      totalWithdrawals: 0,
+    };
+
+    // Calculate earnings and withdrawals from transactions
+    const allTransactions = await Transaction.find({
+      partner: { $in: partnerIds },
+      status: 'completed',
+    });
+
+    stats.totalEarnings = allTransactions
+      .filter((t) =>
+        ['commission', 'wallet_credit'].includes(t.transactionType)
+      )
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+    stats.totalWithdrawals = allTransactions
+      .filter((t) => ['payout', 'wallet_debit'].includes(t.transactionType))
+      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        wallets,
+        stats,
+        totalPages: Math.ceil(totalWallets / limit),
+        currentPage: parseInt(page),
+        totalWallets,
+      },
+    });
+  } catch (error) {
+    console.error('Get all wallets error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+}
+
+export async function addWalletTransaction(req, res) {
+  try {
+    const { partnerId, type, amount, description } = req.body;
+
+    if (!['credit', 'debit'].includes(type)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid transaction type. Must be credit or debit',
+      });
+    }
+
+    if (amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Amount must be greater than 0',
+      });
+    }
+
+    const partner = await Partner.findById(partnerId);
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: 'Partner not found',
+      });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      let wallet = await Wallet.findOne({ partner: partnerId }).session(
+        session
+      );
+      if (!wallet) {
+        wallet = await Wallet.create(
+          [
+            {
+              partner: partnerId,
+              balance: 0,
+            },
+          ],
+          { session }
+        );
+        wallet = wallet[0];
+      }
+
+      // Check if debit would make balance negative
+      if (type === 'debit' && wallet.balance < amount) {
+        await session.abortTransaction();
+        return res.status(400).json({
+          success: false,
+          message: 'Insufficient balance for debit transaction',
+        });
+      }
+
+      const transaction = await Transaction.create(
+        [
+          {
+            transactionType:
+              type === 'credit' ? 'wallet_credit' : 'wallet_debit',
+            amount: type === 'credit' ? amount : -amount,
+            partner: partnerId,
+            paymentMethod: 'System',
+            status: 'completed',
+            description: description || `Admin ${type} transaction`,
+            metadata: {
+              addedBy: req.user._id,
+              addedAt: new Date(),
+            },
+          },
+        ],
+        { session }
+      );
+
+      // Update wallet balance
+      if (type === 'credit') {
+        wallet.balance += amount;
+      } else {
+        wallet.balance -= amount;
+      }
+
+      wallet.transactions.push(transaction[0]._id);
+      wallet.lastUpdated = new Date();
+      await wallet.save({ session });
+
+      await session.commitTransaction();
+
+      // Populate the transaction for response
+      const populatedTransaction = await Transaction.findById(
+        transaction[0]._id
+      ).populate('partner', 'shopName shopEmail');
+
+      res.status(201).json({
+        success: true,
+        message: `${type.charAt(0).toUpperCase() + type.slice(1)} transaction added successfully`,
+        data: {
+          transaction: populatedTransaction,
+          newBalance: wallet.balance,
+        },
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  } catch (error) {
+    console.error('Add wallet transaction error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+}
+
+export async function getWalletTransactions(req, res) {
+  try {
+    const { partnerId } = req.params;
+    const { page = 1, limit = 10, type } = req.query;
+
+    const partner = await Partner.findById(partnerId);
+    if (!partner) {
+      return res.status(404).json({
+        success: false,
+        message: 'Partner not found',
+      });
+    }
+
+    let query = { partner: partnerId };
+    if (type) {
+      if (type === 'credit') {
+        query.transactionType = { $in: ['commission', 'wallet_credit'] };
+      } else if (type === 'debit') {
+        query.transactionType = { $in: ['payout', 'wallet_debit'] };
+      }
+    }
+
+    const transactions = await Transaction.find(query)
+      .populate('order', 'orderType totalAmount')
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const totalTransactions = await Transaction.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        transactions,
+        totalPages: Math.ceil(totalTransactions / limit),
+        currentPage: parseInt(page),
+        totalTransactions,
+      },
+    });
+  } catch (error) {
+    console.error('Get wallet transactions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message,
+    });
+  }
+}

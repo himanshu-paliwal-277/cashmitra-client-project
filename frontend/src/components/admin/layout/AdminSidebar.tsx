@@ -109,15 +109,16 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
       ],
     },
     {
-      title: 'Pricing & Finance',
+      title: 'Finance',
       items: [
-        { to: '/admin/pricing', icon: DollarSign, label: 'Pricing' },
+        // { to: '/admin/pricing', icon: DollarSign, label: 'Pricing' },
         // { to: '/admin/price-table', icon: Table, label: 'Price Table' },
         // { to: '/admin/condition-adjustments', icon: Sliders, label: 'Condition Adjustments' },
         // { to: '/admin/promotions', icon: Gift, label: 'Promotions/Coupons' },
         { to: '/admin/finance', icon: Calculator, label: 'Finance' },
+        { to: '/admin/partner-wallets', icon: Wallet, label: 'Partner Wallets' },
         // { to: '/admin/commission-rules', icon: CreditCard, label: 'Commission Rules' },
-        { to: '/admin/wallet-payouts', icon: Wallet, label: 'Wallet & Payouts' },
+        // { to: '/admin/wallet-payouts', icon: Wallet, label: 'Wallet & Payouts' },
       ],
     },
     {

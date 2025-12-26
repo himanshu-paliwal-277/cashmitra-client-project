@@ -40,11 +40,13 @@ const SellAccessories = lazy(() => import('./pages/customer/sell/SellAccessories
 const SellCategoryHome = lazy(() => import('./pages/customer/sell/SellCategoryHome'));
 
 // Buy Flow Pages (Lazy)
+const BuyHome = lazy(() => import('./pages/customer/buy/BuyHome'));
 const BuySuperCategorySelection = lazy(
   () => import('./pages/customer/buy/BuySuperCategorySelection')
 );
 const BuyCategoryHome = lazy(() => import('./pages/customer/buy/BuyCategoryHome'));
 const BuyProductsPage = lazy(() => import('./pages/customer/buy/BuyProductsPage'));
+const Marketplace = lazy(() => import('./pages/customer/buy/Marketplace'));
 const ProductDetails = lazy(() => import('./pages/customer/buy/ProductDetails'));
 const Cart = lazy(() => import('./pages/customer/buy/Cart'));
 const Checkout = lazy(() => import('./pages/customer/buy/Checkout'));
@@ -92,6 +94,7 @@ const BuyOrders = lazy(() => import('./pages/admin/BuyOrders'));
 const Pricing = lazy(() => import('./pages/admin/Pricing'));
 const Finance = lazy(() => import('./pages/admin/Finance'));
 const PayoutManagement = lazy(() => import('./pages/admin/PayoutManagement'));
+const PartnerWalletManagement = lazy(() => import('./pages/admin/PartnerWalletManagement'));
 const AdminAgentManagement = lazy(() => import('./pages/admin/AgentManagement'));
 const Products = lazy(() => import('./pages/admin/Products'));
 const Categories = lazy(() => import('./pages/admin/Categories'));
@@ -192,13 +195,14 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="users" element={<UserManagement />} />
           <Route path="users/create" element={<CreateUser />} />
           <Route path="users/edit/:userId" element={<EditUser />} />
-          <Route path="pricing" element={<Pricing />} />
-          <Route path="price-table" element={<Pricing />} />
-          <Route path="condition-adjustments" element={<Pricing />} />
-          <Route path="promotions" element={<Pricing />} />
+          {/* <Route path="pricing" element={<Pricing />} /> */}
+          {/* <Route path="price-table" element={<Pricing />} /> */}
+          {/* <Route path="condition-adjustments" element={<Pricing />} /> */}
+          {/* <Route path="promotions" element={<Pricing />} /> */}
           <Route path="finance" element={<Finance />} />
           <Route path="commission-rules" element={<Finance />} />
-          <Route path="wallet-payouts" element={<PayoutManagement />} />
+          <Route path="partner-wallets" element={<PartnerWalletManagement />} />
+          {/* <Route path="wallet-payouts" element={<PayoutManagement />} /> */}
           <Route path="reports" element={<Reports />} />
         </Route>
       </Route>
@@ -268,7 +272,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
         <Route path="/sell-mobile" element={<SellMobileForm />} />
 
         {/* Buy Flow Pages - Public (browsing) and Protected (cart/checkout) */}
-        <Route path="/buy" element={<BuySuperCategorySelection />} />
+        <Route path="/buy" element={<BuyHome />} />
         <Route path="/buy/category/:category" element={<BuyCategoryHome />} />
         <Route path="/buy/:superCategory/:category/products" element={<BuyProductsPage />} />
         <Route path="/buy/product/:productId" element={<ProductDetails />} />

@@ -58,8 +58,9 @@ const Marketplace = () => {
   const [searchParams] = useSearchParams();
   const { addToCart } = useCart();
   const categoryFromUrl = searchParams.get('category');
+  const searchFromUrl = searchParams.get('search');
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchFromUrl || '');
   const [selectedCategory, setSelectedCategory] = useState(categoryFromUrl || 'all');
   const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('popularity');
@@ -107,6 +108,12 @@ const Marketplace = () => {
       setSelectedCategory(categoryFromUrl);
     }
   }, [categoryFromUrl]);
+
+  useEffect(() => {
+    if (searchFromUrl) {
+      setSearchQuery(searchFromUrl);
+    }
+  }, [searchFromUrl]);
 
   useEffect(() => {
     const fetchProducts = async () => {
