@@ -92,4 +92,27 @@ router.put(
   walletController.processPayout
 );
 
+// Admin wallet management routes
+router.get(
+  '/admin/wallets',
+  isAuthenticated,
+  authorize('admin'),
+  walletController.getAllWallets
+);
+
+router.post(
+  '/admin/transactions',
+  isAuthenticated,
+  authorize('admin'),
+  walletController.addWalletTransaction
+);
+
+router.get(
+  '/admin/wallets/:partnerId/transactions',
+  isAuthenticated,
+  authorize('admin'),
+  validateObjectId('partnerId'),
+  walletController.getWalletTransactions
+);
+
 export default router;

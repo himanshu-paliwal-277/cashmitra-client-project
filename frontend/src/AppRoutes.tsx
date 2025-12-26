@@ -94,6 +94,7 @@ const BuyOrders = lazy(() => import('./pages/admin/BuyOrders'));
 const Pricing = lazy(() => import('./pages/admin/Pricing'));
 const Finance = lazy(() => import('./pages/admin/Finance'));
 const PayoutManagement = lazy(() => import('./pages/admin/PayoutManagement'));
+const PartnerWalletManagement = lazy(() => import('./pages/admin/PartnerWalletManagement'));
 const AdminAgentManagement = lazy(() => import('./pages/admin/AgentManagement'));
 const Products = lazy(() => import('./pages/admin/Products'));
 const Categories = lazy(() => import('./pages/admin/Categories'));
@@ -194,13 +195,14 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="users" element={<UserManagement />} />
           <Route path="users/create" element={<CreateUser />} />
           <Route path="users/edit/:userId" element={<EditUser />} />
-          <Route path="pricing" element={<Pricing />} />
-          <Route path="price-table" element={<Pricing />} />
-          <Route path="condition-adjustments" element={<Pricing />} />
-          <Route path="promotions" element={<Pricing />} />
+          {/* <Route path="pricing" element={<Pricing />} /> */}
+          {/* <Route path="price-table" element={<Pricing />} /> */}
+          {/* <Route path="condition-adjustments" element={<Pricing />} /> */}
+          {/* <Route path="promotions" element={<Pricing />} /> */}
           <Route path="finance" element={<Finance />} />
           <Route path="commission-rules" element={<Finance />} />
-          <Route path="wallet-payouts" element={<PayoutManagement />} />
+          <Route path="partner-wallets" element={<PartnerWalletManagement />} />
+          {/* <Route path="wallet-payouts" element={<PayoutManagement />} /> */}
           <Route path="reports" element={<Reports />} />
         </Route>
       </Route>

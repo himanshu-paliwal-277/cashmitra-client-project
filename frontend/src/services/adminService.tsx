@@ -1739,6 +1739,41 @@ class AdminService {
     localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
   }
+
+  // Wallet Management
+  async getAllWallets(params = {}) {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const response = await api.get(`/wallet/admin/wallets?${queryString}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching wallets:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async addWalletTransaction(transactionData: any) {
+    try {
+      const response = await api.post('/wallet/admin/transactions', transactionData);
+      return response.data;
+    } catch (error) {
+      console.error('Error adding wallet transaction:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getWalletTransactions(partnerId: any, params = {}) {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const response = await api.get(
+        `/wallet/admin/wallets/${partnerId}/transactions?${queryString}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching wallet transactions:', error);
+      throw error.response?.data || error;
+    }
+  }
 }
 
 export const adminService = new AdminService();
