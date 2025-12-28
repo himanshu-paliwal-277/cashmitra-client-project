@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { adminService } from '../../services/adminService';
-import styled from 'styled-components';
-import { theme } from '../../utils';
 import {
   ArrowLeft,
   Save,
   Upload,
   X,
-  Image as ImageIcon,
   Trash2,
   AlertCircle,
-  CheckCircle,
   Loader,
   Package,
   Info,
@@ -20,692 +16,17 @@ import {
   Star,
 } from 'lucide-react';
 
-const Container = styled.div`
-  min-height: 100vh;
-  background: ${(props: any) => props.theme?.colors?.background || '#f8fafc'};
-  padding: 2rem;
-`;
-
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-`;
-
-const BackButton = styled.button`
-  background: none;
-  border: 1px solid ${(props: any) => props.theme?.colors?.border || '#e2e8f0'};
-  border-radius: 8px;
-  padding: 0.75rem;
-  cursor: pointer;
-  color: ${(props: any) => props.theme?.colors?.textSecondary || '#64748b'};
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    border-color: ${(props: any) => props.theme?.colors?.primary || '#3b82f6'};
-    color: ${(props: any) => props.theme?.colors?.primary || '#3b82f6'};
-  }
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme?.colors?.text || '#1a202c'};
-  margin: 0;
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  flex-direction: column;
-  gap: 1rem;
-  color: ${(props: any) => props.theme?.colors?.textSecondary || '#64748b'};
-`;
-
-const FormContainer = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme?.colors?.border || '#e2e8f0'};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-`;
-
-const FormHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid ${(props: any) => props.theme?.colors?.border || '#e2e8f0'};
-  background: ${(props: any) => props.theme?.colors?.background || '#f8fafc'};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const FormTitle = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: ${(props: any) => props.theme?.colors?.text || '#1a202c'};
-  margin: 0;
-`;
-
-const DeleteButton = styled.button`
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  &:hover {
-    background: #dc2626;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-`;
-
-const FormBody = styled.div`
-  padding: 2rem;
-`;
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  &.full-width {
-    grid-column: 1 / -1;
-  }
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-  color: ${(props: any) => props.theme?.colors?.text || '#1a202c'};
-  font-size: 0.875rem;
-
-  &.required::after {
-    content: ' *';
-    color: #ef4444;
-  }
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid ${(props: any) => props.theme?.colors?.border || '#e2e8f0'};
-  border-radius: 6px;
-  font-size: 0.875rem;
-  transition: border-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => props.theme?.colors?.primary || '#3b82f6'};
-  }
-
-  &.error {
-    border-color: #ef4444;
-  }
-`;
-
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid ${(props: any) => props.theme?.colors?.border || '#e2e8f0'};
-  border-radius: 6px;
-  font-size: 0.875rem;
-  background: white;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => props.theme?.colors?.primary || '#3b82f6'};
-  }
-
-  &.error {
-    border-color: #ef4444;
-  }
-`;
-
-const TextArea = styled.textarea`
-  padding: 0.75rem;
-  border: 1px solid ${(props: any) => props.theme?.colors?.border || '#e2e8f0'};
-  border-radius: 6px;
-  font-size: 0.875rem;
-  resize: vertical;
-  min-height: 100px;
-  font-family: inherit;
-  transition: border-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => props.theme?.colors?.primary || '#3b82f6'};
-  }
-
-  &.error {
-    border-color: #ef4444;
-  }
-`;
-
-const ErrorMessage = styled.span`
-  color: #ef4444;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-`;
-
-const ImageUploadSection = styled.div`
-  grid-column: 1 / -1;
-  margin-top: 1rem;
-`;
-
-const ImageUploadArea = styled.div`
-  border: 2px dashed ${(props: any) => props.theme?.colors?.border || '#e2e8f0'};
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: ${(props: any) => props.theme?.colors?.primary || '#3b82f6'};
-    background: ${(props: any) => props.theme?.colors?.background || '#f8fafc'};
-  }
-
-  &.dragover {
-    border-color: ${(props: any) => props.theme?.colors?.primary || '#3b82f6'};
-    background: ${(props: any) => props.theme?.colors?.background || '#f8fafc'};
-  }
-`;
-
-const ImageUploadIcon = styled.div`
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: ${(props: any) => props.theme?.colors?.background || '#f8fafc'};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-  color: ${(props: any) => props.theme?.colors?.textSecondary || '#64748b'};
-`;
-
-const ImagePreviewGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-`;
-
-const ImagePreview = styled.div`
-  position: relative;
-  aspect-ratio: 1;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid ${(props: any) => props.theme?.colors?.border || '#e2e8f0'};
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const RemoveImageButton = styled.button`
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s ease;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.9);
-  }
-`;
-
-const FormActions = styled.div`
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  padding: 1.5rem;
-  border-top: 1px solid ${(props: any) => props.theme?.colors?.border || '#e2e8f0'};
-  background: ${(props: any) => props.theme?.colors?.background || '#f8fafc'};
-`;
-
-const Button = styled.button`
-  background: ${(props: any) =>
-    props.variant === 'outline' ? 'transparent' : props.theme?.colors?.primary || '#3b82f6'};
-  color: ${(props: any) =>
-    props.variant === 'outline' ? props.theme?.colors?.primary || '#3b82f6' : 'white'};
-  border: 1px solid ${(props: any) => props.theme?.colors?.primary || '#3b82f6'};
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  &:hover {
-    background: ${(props: any) =>
-      props.variant === 'outline'
-        ? props.theme?.colors?.primary || '#3b82f6'
-        : props.theme?.colors?.primaryDark || '#2563eb'};
-    color: white;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-`;
-
-const LoadingSpinner = styled.div`
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
-const HiddenFileInput = styled.input`
-  display: none;
-`;
-
-const FormTabs = styled.div`
-  display: flex;
-  border-bottom: 1px solid ${theme.colors.border.primary};
-  background: ${theme.colors.grey[50]};
-
-  @media (max-width: 768px) {
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-`;
-
-const Tab = styled.button`
-  flex: 1;
-  padding: ${theme.spacing[4]} ${theme.spacing[6]};
-  background: none;
-  border: none;
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${(props: any) =>
-    props.active ? theme.colors.primary.main : theme.colors.text.secondary};
-  border-bottom: 2px solid
-    ${(props: any) => (props.active ? theme.colors.primary.main : 'transparent')};
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: ${theme.spacing[2]};
-  white-space: nowrap;
-
-  &:hover {
-    color: ${theme.colors.primary.main};
-    background: ${theme.colors.primary[50]};
-  }
-
-  @media (max-width: 768px) {
-    padding: ${theme.spacing[3]} ${theme.spacing[4]};
-    font-size: ${theme.typography.fontSize.sm};
-    min-width: 120px;
-  }
-`;
-
-const FormSection = styled.div`
-  background: ${theme.colors.grey[50]};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[6]};
-  border: 1px solid ${theme.colors.border.primary};
-
-  @media (max-width: 768px) {
-    padding: ${theme.spacing[4]};
-  }
-`;
-
-const SectionTitle = styled.h3`
-  font-size: ${theme.typography.fontSize.lg};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[4]};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
 function EditProduct() {
   const navigate = useNavigate();
   const { productId } = useParams();
 
-  const renderBasicTab = () => (
-    <FormSection>
-      <SectionTitle>
-        <Package size={20} />
-        Basic Information
-      </SectionTitle>
-      <FormGrid>
-        <FormGroup>
-          <Label className="required">Product Name</Label>
-          <Input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            placeholder="Enter product name"
-            className={errors.name ? 'error' : ''}
-          />
-          {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
-        </FormGroup>
-
-        <FormGroup>
-          <Label className="required">Category</Label>
-          <Select
-            name="category"
-            value={formData.category}
-            onChange={handleInputChange}
-            className={errors.category ? 'error' : ''}
-          >
-            <option value="">Select category</option>
-            {categories.map(category => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </Select>
-          {errors.category && <ErrorMessage>{errors.category}</ErrorMessage>}
-        </FormGroup>
-
-        <FormGroup>
-          <Label className="required">Brand</Label>
-          <Input
-            type="text"
-            name="brand"
-            value={formData.brand}
-            onChange={handleInputChange}
-            placeholder="Enter brand name"
-            className={errors.brand ? 'error' : ''}
-          />
-          {errors.brand && <ErrorMessage>{errors.brand}</ErrorMessage>}
-        </FormGroup>
-
-        <FormGroup>
-          <Label>Series</Label>
-          <Input
-            type="text"
-            name="series"
-            value={formData.series}
-            onChange={handleInputChange}
-            placeholder="Enter product series"
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label>Model</Label>
-          <Input
-            type="text"
-            name="model"
-            value={formData.model}
-            onChange={handleInputChange}
-            placeholder="Enter model number"
-          />
-        </FormGroup>
-      </FormGrid>
-    </FormSection>
-  );
-
-  const renderDetailsTab = () => (
-    <FormSection>
-      <SectionTitle>
-        <Info size={20} />
-        Product Details
-      </SectionTitle>
-      <FormGrid>
-        <FormGroup className="full-width">
-          <Label className="required">Description</Label>
-          <TextArea
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            placeholder="Describe the product features, condition, and any important details..."
-            className={errors.description ? 'error' : ''}
-          />
-          {errors.description && <ErrorMessage>{errors.description}</ErrorMessage>}
-        </FormGroup>
-
-        <FormGroup className="full-width">
-          <Label>Specifications</Label>
-          <TextArea
-            name="specifications"
-            value={formData.specifications}
-            onChange={handleInputChange}
-            placeholder="Enter technical specifications (one per line)..."
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label>Warranty</Label>
-          <Input
-            type="text"
-            name="warranty"
-            value={formData.warranty}
-            onChange={handleInputChange}
-            placeholder="e.g., 1 year manufacturer warranty"
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label>Status</Label>
-          <Select name="status" value={formData.status} onChange={handleInputChange}>
-            {statuses.map(status => (
-              <option key={status} value={status}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </option>
-            ))}
-          </Select>
-        </FormGroup>
-      </FormGrid>
-    </FormSection>
-  );
-
-  const renderPricingTab = () => (
-    <FormSection>
-      <SectionTitle>
-        <DollarSign size={20} />
-        Pricing Information
-      </SectionTitle>
-      <FormGrid>
-        <FormGroup>
-          <Label>Base Price (₹)</Label>
-          <Input
-            type="number"
-            name="basePrice"
-            value={formData.basePrice}
-            onChange={handleInputChange}
-            placeholder="Enter base price"
-            min="0"
-            step="0.01"
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label className="required">Price (₹)</Label>
-          <Input
-            type="number"
-            name="price"
-            value={formData.price}
-            onChange={handleInputChange}
-            placeholder="Enter selling price"
-            min="0"
-            step="0.01"
-            className={errors.price ? 'error' : ''}
-          />
-          {errors.price && <ErrorMessage>{errors.price}</ErrorMessage>}
-        </FormGroup>
-
-        <FormGroup>
-          <Label>Original Price (₹)</Label>
-          <Input
-            type="number"
-            name="originalPrice"
-            value={formData.originalPrice}
-            onChange={handleInputChange}
-            placeholder="Enter original price"
-            min="0"
-            step="0.01"
-          />
-        </FormGroup>
-      </FormGrid>
-    </FormSection>
-  );
-
-  const renderConditionTab = () => (
-    <FormSection>
-      <SectionTitle>
-        <Star size={20} />
-        Condition & Quality
-      </SectionTitle>
-      <FormGrid>
-        <FormGroup>
-          <Label className="required">Condition</Label>
-          <Select
-            name="condition"
-            value={formData.condition}
-            onChange={handleInputChange}
-            className={errors.condition ? 'error' : ''}
-          >
-            <option value="">Select condition</option>
-            {conditions.map(condition => (
-              <option key={condition} value={condition}>
-                {condition}
-              </option>
-            ))}
-          </Select>
-          {errors.condition && <ErrorMessage>{errors.condition}</ErrorMessage>}
-        </FormGroup>
-      </FormGrid>
-    </FormSection>
-  );
-
-  const renderImagesTab = () => (
-    <FormSection>
-      <SectionTitle>
-        <Settings size={20} />
-        Product Images
-      </SectionTitle>
-      <div>
-        {/* Existing Images */}
-        {existingImages.length > 0 && (
-          <>
-            <h4 style={{ margin: '1rem 0 0.5rem', fontSize: '0.875rem', color: '#64748b' }}>
-              Current Images
-            </h4>
-            <ImagePreviewGrid>
-              {existingImages.map(image => (
-                <ImagePreview key={image.id}>
-                  <img src={image.url} alt="Product" />
-                  <RemoveImageButton onClick={() => removeExistingImage(image.id)}>
-                    <X size={12} />
-                  </RemoveImageButton>
-                </ImagePreview>
-              ))}
-            </ImagePreviewGrid>
-          </>
-        )}
-
-        {/* New Images Upload */}
-        <ImageUploadArea
-          className={dragOver ? 'dragover' : ''}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={() => document.getElementById('image-upload').click()}
-          style={{ marginTop: existingImages.length > 0 ? '1rem' : '0' }}
-        >
-          <ImageUploadIcon>
-            <Upload size={24} />
-          </ImageUploadIcon>
-          <h4>Add More Images</h4>
-          <p>Drag and drop images here, or click to select files</p>
-          <p style={{ fontSize: '0.75rem', color: '#64748b' }}>
-            Supports: JPG, PNG, GIF (Max 5MB each)
-          </p>
-        </ImageUploadArea>
-
-        <HiddenFileInput
-          id="image-upload"
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleImageSelect}
-        />
-
-        {/* New Images Preview */}
-        {selectedImages.length > 0 && (
-          <>
-            <h4 style={{ margin: '1rem 0 0.5rem', fontSize: '0.875rem', color: '#64748b' }}>
-              New Images
-            </h4>
-            <ImagePreviewGrid>
-              {selectedImages.map(image => (
-                <ImagePreview key={image.id}>
-                  <img src={image.preview} alt="Preview" />
-                  <RemoveImageButton onClick={() => removeImage(image.id)}>
-                    <X size={12} />
-                  </RemoveImageButton>
-                </ImagePreview>
-              ))}
-            </ImagePreviewGrid>
-          </>
-        )}
-      </div>
-    </FormSection>
-  );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<any>({});
   const [activeTab, setActiveTab] = useState('basic');
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [existingImages, setExistingImages] = useState([]);
+  const [selectedImages, setSelectedImages] = useState<any>([]);
+  const [existingImages, setExistingImages] = useState<any>([]);
   const [dragOver, setDragOver] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -740,7 +61,6 @@ function EditProduct() {
   ];
 
   const conditions = ['New', 'Like New', 'Good', 'Fair', 'Poor'];
-
   const statuses = ['pending', 'approved', 'rejected', 'sold'];
 
   useEffect(() => {
@@ -776,7 +96,7 @@ function EditProduct() {
 
         if (product.images && product.images.length > 0) {
           setExistingImages(
-            product.images.map((url, index) => ({
+            product.images.map((url: any, index: any) => ({
               id: `existing-${index}`,
               url: url.trim(),
               isExisting: true,
@@ -786,7 +106,7 @@ function EditProduct() {
       } else {
         throw new Error('Product not found');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching product:', error);
       setErrors({ fetch: 'Failed to load product. Please try again.' });
     } finally {
@@ -803,7 +123,7 @@ function EditProduct() {
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev: any) => ({
         ...prev,
         [name]: '',
       }));
@@ -824,8 +144,8 @@ function EditProduct() {
 
     validFiles.forEach((file: any) => {
       const reader = new FileReader();
-      reader.onload = e => {
-        setSelectedImages(prev => [
+      reader.onload = (e: any) => {
+        setSelectedImages((prev: any) => [
           ...prev,
           {
             file,
@@ -856,15 +176,15 @@ function EditProduct() {
   };
 
   const removeImage = (imageId: any) => {
-    setSelectedImages(prev => prev.filter(img => img.id !== imageId));
+    setSelectedImages((prev: any) => prev.filter((img: any) => img.id !== imageId));
   };
 
   const removeExistingImage = (imageId: any) => {
-    setExistingImages(prev => prev.filter(img => img.id !== imageId));
+    setExistingImages((prev: any) => prev.filter((img: any) => img.id !== imageId));
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: any = {};
     if (!formData.name.trim()) newErrors.name = 'Product name is required';
     if (!formData.description.trim()) newErrors.description = 'Description is required';
     if (!formData.category) newErrors.category = 'Category is required';
@@ -888,10 +208,10 @@ function EditProduct() {
 
     try {
       // First, upload new images if any
-      let newImageUrls = [];
+      let newImageUrls: any = [];
       if (selectedImages.length > 0) {
         const imageFormData = new FormData();
-        selectedImages.forEach(img => {
+        selectedImages.forEach((img: any) => {
           imageFormData.append('images', img.file);
         });
 
@@ -902,7 +222,7 @@ function EditProduct() {
       }
 
       // Combine existing and new image URLs
-      const allImageUrls = [...existingImages.map(img => img.url), ...newImageUrls];
+      const allImageUrls = [...existingImages.map((img: any) => img.url), ...newImageUrls];
 
       // Then update the product
       const productData = {
@@ -926,7 +246,7 @@ function EditProduct() {
       } else {
         throw new Error(response.message || 'Failed to update product');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating product:', error);
       setErrors({ submit: error.message || 'Failed to update product. Please try again.' });
     } finally {
@@ -956,7 +276,7 @@ function EditProduct() {
       } else {
         throw new Error(response.message || 'Failed to delete product');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting product:', error);
       setErrors({ delete: error.message || 'Failed to delete product. Please try again.' });
     } finally {
@@ -964,48 +284,405 @@ function EditProduct() {
     }
   };
 
+  const renderBasicTab = () => (
+    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <Package size={20} />
+        Basic Information
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">
+            Product Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            placeholder="Enter product name"
+            className={`px-3 py-3 border rounded-md text-sm transition-colors focus:outline-none focus:ring-3 focus:ring-blue-100 ${
+              errors.name
+                ? 'border-red-500 focus:border-red-500'
+                : 'border-gray-300 focus:border-blue-500'
+            }`}
+          />
+          {errors.name && <span className="text-red-500 text-xs">{errors.name}</span>}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">
+            Category <span className="text-red-500">*</span>
+          </label>
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleInputChange}
+            className={`px-3 py-3 border rounded-md text-sm bg-white cursor-pointer transition-colors focus:outline-none focus:ring-3 focus:ring-blue-100 ${
+              errors.category
+                ? 'border-red-500 focus:border-red-500'
+                : 'border-gray-300 focus:border-blue-500'
+            }`}
+          >
+            <option value="">Select category</option>
+            {categories.map(category => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+          {errors.category && <span className="text-red-500 text-xs">{errors.category}</span>}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">
+            Brand <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="brand"
+            value={formData.brand}
+            onChange={handleInputChange}
+            placeholder="Enter brand name"
+            className={`px-3 py-3 border rounded-md text-sm transition-colors focus:outline-none focus:ring-3 focus:ring-blue-100 ${
+              errors.brand
+                ? 'border-red-500 focus:border-red-500'
+                : 'border-gray-300 focus:border-blue-500'
+            }`}
+          />
+          {errors.brand && <span className="text-red-500 text-xs">{errors.brand}</span>}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">Series</label>
+          <input
+            type="text"
+            name="series"
+            value={formData.series}
+            onChange={handleInputChange}
+            placeholder="Enter product series"
+            className="px-3 py-3 border border-gray-300 rounded-md text-sm transition-colors focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">Model</label>
+          <input
+            type="text"
+            name="model"
+            value={formData.model}
+            onChange={handleInputChange}
+            placeholder="Enter model number"
+            className="px-3 py-3 border border-gray-300 rounded-md text-sm transition-colors focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderDetailsTab = () => (
+    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <Info size={20} />
+        Product Details
+      </h3>
+      <div className="grid grid-cols-1 gap-4">
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">
+            Description <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder="Describe the product features, condition, and any important details..."
+            className={`px-3 py-3 border rounded-md text-sm resize-y min-h-24 font-inherit transition-colors focus:outline-none focus:ring-3 focus:ring-blue-100 ${
+              errors.description
+                ? 'border-red-500 focus:border-red-500'
+                : 'border-gray-300 focus:border-blue-500'
+            }`}
+          />
+          {errors.description && <span className="text-red-500 text-xs">{errors.description}</span>}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">Specifications</label>
+          <textarea
+            name="specifications"
+            value={formData.specifications}
+            onChange={handleInputChange}
+            placeholder="Enter technical specifications (one per line)..."
+            className="px-3 py-3 border border-gray-300 rounded-md text-sm resize-y min-h-24 font-inherit transition-colors focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2">
+            <label className="font-medium text-gray-900 text-sm">Warranty</label>
+            <input
+              type="text"
+              name="warranty"
+              value={formData.warranty}
+              onChange={handleInputChange}
+              placeholder="e.g., 1 year manufacturer warranty"
+              className="px-3 py-3 border border-gray-300 rounded-md text-sm transition-colors focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="font-medium text-gray-900 text-sm">Status</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              className="px-3 py-3 border border-gray-300 rounded-md text-sm bg-white cursor-pointer transition-colors focus:outline-none focus:border-blue-500"
+            >
+              {statuses.map(status => (
+                <option key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPricingTab = () => (
+    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <DollarSign size={20} />
+        Pricing Information
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">Base Price (₹)</label>
+          <input
+            type="number"
+            name="basePrice"
+            value={formData.basePrice}
+            onChange={handleInputChange}
+            placeholder="Enter base price"
+            min="0"
+            step="0.01"
+            className="px-3 py-3 border border-gray-300 rounded-md text-sm transition-colors focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">
+            Price (₹) <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            name="price"
+            value={formData.price}
+            onChange={handleInputChange}
+            placeholder="Enter selling price"
+            min="0"
+            step="0.01"
+            className={`px-3 py-3 border rounded-md text-sm transition-colors focus:outline-none focus:ring-3 focus:ring-blue-100 ${
+              errors.price
+                ? 'border-red-500 focus:border-red-500'
+                : 'border-gray-300 focus:border-blue-500'
+            }`}
+          />
+          {errors.price && <span className="text-red-500 text-xs">{errors.price}</span>}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">Original Price (₹)</label>
+          <input
+            type="number"
+            name="originalPrice"
+            value={formData.originalPrice}
+            onChange={handleInputChange}
+            placeholder="Enter original price"
+            min="0"
+            step="0.01"
+            className="px-3 py-3 border border-gray-300 rounded-md text-sm transition-colors focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderConditionTab = () => (
+    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <Star size={20} />
+        Condition & Quality
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <label className="font-medium text-gray-900 text-sm">
+            Condition <span className="text-red-500">*</span>
+          </label>
+          <select
+            name="condition"
+            value={formData.condition}
+            onChange={handleInputChange}
+            className={`px-3 py-3 border rounded-md text-sm bg-white cursor-pointer transition-colors focus:outline-none focus:ring-3 focus:ring-blue-100 ${
+              errors.condition
+                ? 'border-red-500 focus:border-red-500'
+                : 'border-gray-300 focus:border-blue-500'
+            }`}
+          >
+            <option value="">Select condition</option>
+            {conditions.map(condition => (
+              <option key={condition} value={condition}>
+                {condition}
+              </option>
+            ))}
+          </select>
+          {errors.condition && <span className="text-red-500 text-xs">{errors.condition}</span>}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderImagesTab = () => (
+    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <Settings size={20} />
+        Product Images
+      </h3>
+      <div>
+        {/* Existing Images */}
+        {existingImages.length > 0 && (
+          <>
+            <h4 className="my-4 mb-2 text-sm text-gray-500">Current Images</h4>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-4">
+              {existingImages.map((image: any) => (
+                <div
+                  key={image.id}
+                  className="relative aspect-square rounded-lg overflow-hidden border border-gray-200"
+                >
+                  <img src={image.url} alt="Product" className="w-full h-full object-cover" />
+                  <button
+                    onClick={() => removeExistingImage(image.id)}
+                    className="absolute top-2 right-2 bg-black bg-opacity-70 text-white border-none rounded-full w-6 h-6 flex items-center justify-center cursor-pointer transition-colors hover:bg-black hover:bg-opacity-90"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* New Images Upload */}
+        <div
+          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+            dragOver
+              ? 'border-blue-500 bg-blue-50'
+              : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50'
+          }`}
+          style={{ marginTop: existingImages.length > 0 ? '1rem' : '0' }}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => document.getElementById('image-upload')?.click()}
+        >
+          <div className="w-15 h-15 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4 text-gray-500">
+            <Upload size={24} />
+          </div>
+          <h4 className="mb-2">Add More Images</h4>
+          <p className="mb-2">Drag and drop images here, or click to select files</p>
+          <p className="text-xs text-gray-500">Supports: JPG, PNG, GIF (Max 5MB each)</p>
+        </div>
+
+        <input
+          id="image-upload"
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={handleImageSelect}
+          className="hidden"
+        />
+
+        {/* New Images Preview */}
+        {selectedImages.length > 0 && (
+          <>
+            <h4 className="my-4 mb-2 text-sm text-gray-500">New Images</h4>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-4">
+              {selectedImages.map((image: any) => (
+                <div
+                  key={image.id}
+                  className="relative aspect-square rounded-lg overflow-hidden border border-gray-200"
+                >
+                  <img src={image.preview} alt="Preview" className="w-full h-full object-cover" />
+                  <button
+                    onClick={() => removeImage(image.id)}
+                    className="absolute top-2 right-2 bg-black bg-opacity-70 text-white border-none rounded-full w-6 h-6 flex items-center justify-center cursor-pointer transition-colors hover:bg-black hover:bg-opacity-90"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
-      <Container>
-        <LoadingContainer>
-          <LoadingSpinner>
+      <div className="min-h-screen bg-slate-50 p-8">
+        <div className="flex items-center justify-center min-h-96 flex-col gap-4 text-gray-500">
+          <div className="animate-spin">
             <Loader size={32} />
-          </LoadingSpinner>
+          </div>
           <p>Loading product...</p>
-        </LoadingContainer>
-      </Container>
+        </div>
+      </div>
     );
   }
+
   if (errors.fetch) {
     return (
-      <Container>
-        <LoadingContainer>
-          <AlertCircle size={32} color="#ef4444" />
+      <div className="min-h-screen bg-slate-50 p-8">
+        <div className="flex items-center justify-center min-h-96 flex-col gap-4 text-gray-500">
+          <AlertCircle size={32} className="text-red-500" />
           <p>{errors.fetch}</p>
-          <Button onClick={() => navigate('/admin/products')}>Back to Products</Button>
-        </LoadingContainer>
-      </Container>
+          <button
+            onClick={() => navigate('/admin/products')}
+            className="px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all duration-200 border-none bg-blue-500 text-white hover:bg-blue-600"
+          >
+            Back to Products
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <BackButton onClick={() => navigate('/admin/products')}>
+    <div className="min-h-screen bg-slate-50 p-8">
+      <div className="flex items-center gap-4 mb-8">
+        <button
+          onClick={() => navigate('/admin/products')}
+          className="bg-transparent border border-gray-300 rounded-lg p-3 cursor-pointer text-gray-500 transition-all duration-200 flex items-center justify-center hover:border-blue-500 hover:text-blue-500"
+        >
           <ArrowLeft size={20} />
-        </BackButton>
-        <Title>Edit Product</Title>
-      </Header>
+        </button>
+        <h1 className="text-2xl font-bold text-gray-900 m-0">Edit Product</h1>
+      </div>
 
-      <FormContainer>
-        <FormHeader>
-          <FormTitle>Product Information</FormTitle>
-          <DeleteButton onClick={handleDelete} disabled={deleting}>
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50">
+          <h2 className="text-lg font-semibold text-gray-900 m-0">Product Information</h2>
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="bg-red-500 text-white border-none px-4 py-2 rounded-md font-medium cursor-pointer transition-all duration-200 flex items-center gap-2 hover:bg-red-600 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
             {deleting ? (
               <>
-                <LoadingSpinner>
+                <div className="animate-spin">
                   <Trash2 size={16} />
-                </LoadingSpinner>
+                </div>
                 Deleting...
               </>
             ) : (
@@ -1014,76 +691,108 @@ function EditProduct() {
                 Delete Product
               </>
             )}
-          </DeleteButton>
-        </FormHeader>
+          </button>
+        </div>
 
-        <FormTabs>
-          <Tab active={activeTab === 'basic'} onClick={() => setActiveTab('basic')} type="button">
+        <div className="flex border-b border-gray-200 bg-gray-50">
+          <button
+            type="button"
+            onClick={() => setActiveTab('basic')}
+            className={`flex-1 px-6 py-4 bg-transparent border-none font-medium cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap ${
+              activeTab === 'basic'
+                ? 'text-blue-500 border-b-2 border-blue-500'
+                : 'text-gray-500 border-b-2 border-transparent hover:text-blue-500 hover:bg-blue-50'
+            }`}
+          >
             <Package size={18} />
             Basic Info
-          </Tab>
-          <Tab
-            active={activeTab === 'details'}
-            onClick={() => setActiveTab('details')}
+          </button>
+          <button
             type="button"
+            onClick={() => setActiveTab('details')}
+            className={`flex-1 px-6 py-4 bg-transparent border-none font-medium cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap ${
+              activeTab === 'details'
+                ? 'text-blue-500 border-b-2 border-blue-500'
+                : 'text-gray-500 border-b-2 border-transparent hover:text-blue-500 hover:bg-blue-50'
+            }`}
           >
             <Info size={18} />
             Details
-          </Tab>
-          <Tab
-            active={activeTab === 'pricing'}
-            onClick={() => setActiveTab('pricing')}
+          </button>
+          <button
             type="button"
+            onClick={() => setActiveTab('pricing')}
+            className={`flex-1 px-6 py-4 bg-transparent border-none font-medium cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap ${
+              activeTab === 'pricing'
+                ? 'text-blue-500 border-b-2 border-blue-500'
+                : 'text-gray-500 border-b-2 border-transparent hover:text-blue-500 hover:bg-blue-50'
+            }`}
           >
             <DollarSign size={18} />
             Pricing
-          </Tab>
-          <Tab
-            active={activeTab === 'condition'}
-            onClick={() => setActiveTab('condition')}
+          </button>
+          <button
             type="button"
+            onClick={() => setActiveTab('condition')}
+            className={`flex-1 px-6 py-4 bg-transparent border-none font-medium cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap ${
+              activeTab === 'condition'
+                ? 'text-blue-500 border-b-2 border-blue-500'
+                : 'text-gray-500 border-b-2 border-transparent hover:text-blue-500 hover:bg-blue-50'
+            }`}
           >
             <Star size={18} />
             Condition
-          </Tab>
-          <Tab active={activeTab === 'images'} onClick={() => setActiveTab('images')} type="button">
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('images')}
+            className={`flex-1 px-6 py-4 bg-transparent border-none font-medium cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap ${
+              activeTab === 'images'
+                ? 'text-blue-500 border-b-2 border-blue-500'
+                : 'text-gray-500 border-b-2 border-transparent hover:text-blue-500 hover:bg-blue-50'
+            }`}
+          >
             <Settings size={18} />
             Images
-          </Tab>
-        </FormTabs>
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit}>
-          <FormBody>
+          <div className="p-8">
             {activeTab === 'basic' && renderBasicTab()}
             {activeTab === 'details' && renderDetailsTab()}
             {activeTab === 'pricing' && renderPricingTab()}
             {activeTab === 'condition' && renderConditionTab()}
             {activeTab === 'images' && renderImagesTab()}
-          </FormBody>
+          </div>
 
-          <FormActions>
+          <div className="flex gap-4 justify-end p-6 border-t border-gray-200 bg-gray-50">
             {(errors.submit || errors.delete) && (
-              <ErrorMessage style={{ marginRight: 'auto' }}>
-                <AlertCircle size={16} style={{ marginRight: '0.5rem' }} />
+              <span className="text-red-500 text-sm mr-auto flex items-center gap-2">
+                <AlertCircle size={16} />
                 {errors.submit || errors.delete}
-              </ErrorMessage>
+              </span>
             )}
 
-            <Button
+            <button
               type="button"
-              variant="outline"
               onClick={() => navigate('/admin/products')}
               disabled={saving || deleting}
+              className="px-6 py-3 rounded-lg font-medium cursor-pointer transition-all duration-200 bg-transparent text-blue-500 border border-blue-500 hover:bg-blue-500 hover:text-white disabled:opacity-60 disabled:cursor-not-allowed"
             >
               Cancel
-            </Button>
+            </button>
 
-            <Button type="submit" disabled={saving || deleting}>
+            <button
+              type="submit"
+              disabled={saving || deleting}
+              className="px-6 py-3 rounded-lg font-medium cursor-pointer transition-all duration-200 border-none bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
               {saving ? (
                 <>
-                  <LoadingSpinner>
+                  <div className="animate-spin">
                     <Save size={20} />
-                  </LoadingSpinner>
+                  </div>
                   Updating...
                 </>
               ) : (
@@ -1092,11 +801,11 @@ function EditProduct() {
                   Update Product
                 </>
               )}
-            </Button>
-          </FormActions>
+            </button>
+          </div>
         </form>
-      </FormContainer>
-    </Container>
+      </div>
+    </div>
   );
 }
 

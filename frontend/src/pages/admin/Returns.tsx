@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import useAdminReturns from '../../hooks/useAdminReturns';
 import {
   RotateCcw,
@@ -22,481 +21,6 @@ import {
   MessageSquare,
   X,
 } from 'lucide-react';
-
-const Container = styled.div`
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-  }
-`;
-
-const FilterSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  min-width: 250px;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const FilterSelect = styled.select`
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  min-width: 150px;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const StatIcon = styled.div`
-  background: ${(props: any) => props.color || '#3b82f6'};
-  color: white;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatContent = styled.div`
-  flex: 1;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const ReturnsContainer = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-
-const ReturnsTable = styled.div`
-  overflow-x: auto;
-`;
-
-const TableHeader = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 150px;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-  font-weight: 600;
-  color: #374151;
-  font-size: 0.875rem;
-`;
-
-const ReturnRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 150px;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  align-items: center;
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: #f9fafb;
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const OrderInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const OrderId = styled.div`
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 0.875rem;
-`;
-
-const OrderDate = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const CustomerInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const CustomerName = styled.div`
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 0.875rem;
-`;
-
-const CustomerContact = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const ProductInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-`;
-
-const ProductName = styled.div`
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 0.875rem;
-`;
-
-const ProductDetails = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-
-  ${(props: any) => {
-    switch (props.status) {
-      case 'requested':
-        return 'background: #fef3c7; color: #92400e;';
-      case 'approved':
-        return 'background: #dbeafe; color: #1e40af;';
-      case 'picked_up':
-        return 'background: #e0e7ff; color: #3730a3;';
-      case 'inspecting':
-        return 'background: #fef3c7; color: #92400e;';
-      case 'completed':
-        return 'background: #dcfce7; color: #166534;';
-      case 'rejected':
-        return 'background: #fee2e2; color: #dc2626;';
-      case 'cancelled':
-        return 'background: #f3f4f6; color: #374151;';
-      default:
-        return 'background: #f3f4f6; color: #374151;';
-    }
-  }}
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const IconButton = styled.button`
-  background: ${(props: any) =>
-    props.primary
-      ? '#3b82f6'
-      : props.danger
-        ? '#ef4444'
-        : props.success
-          ? '#10b981'
-          : props.warning
-            ? '#f59e0b'
-            : '#6b7280'};
-  color: white;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: all 0.2s;
-
-  &:hover {
-    opacity: 0.9;
-    transform: scale(1.05);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  padding: 2rem;
-  max-width: 900px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-
-  &:hover {
-    background: #f3f4f6;
-  }
-`;
-
-const DetailSection = styled.div`
-  margin-bottom: 2rem;
-`;
-
-const DetailGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const DetailItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background: #f9fafb;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-`;
-
-const DetailLabel = styled.span`
-  color: #6b7280;
-  font-weight: 500;
-`;
-
-const DetailValue = styled.span`
-  color: #1f2937;
-  font-weight: 600;
-`;
-
-const TimelineContainer = styled.div`
-  position: relative;
-  padding-left: 2rem;
-`;
-
-const TimelineItem = styled.div`
-  position: relative;
-  padding-bottom: 1.5rem;
-
-  &:before {
-    content: '';
-    position: absolute;
-    left: -2rem;
-    top: 0.5rem;
-    width: 2px;
-    height: calc(100% - 0.5rem);
-    background: #e5e7eb;
-  }
-
-  &:last-child:before {
-    display: none;
-  }
-`;
-
-const TimelineIcon = styled.div`
-  position: absolute;
-  left: -2.5rem;
-  top: 0;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 50%;
-  background: ${(props: any) => props.color || '#6b7280'};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const TimelineContent = styled.div`
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-`;
-
-const TimelineTitle = styled.div`
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-`;
-
-const TimelineDate = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-  margin-bottom: 0.5rem;
-`;
-
-const TimelineDescription = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const ActionSection = styled.div`
-  background: #f9fafb;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  margin-top: 2rem;
-`;
-
-const ActionButtons2 = styled.div`
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-`;
-
-const Button = styled.button`
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  ${(props: any) => {
-    switch (props.variant) {
-      case 'success':
-        return 'background: #10b981; color: white; &:hover { background: #059669; }';
-      case 'danger':
-        return 'background: #ef4444; color: white; &:hover { background: #dc2626; }';
-      case 'warning':
-        return 'background: #f59e0b; color: white; &:hover { background: #d97706; }';
-      case 'primary':
-        return 'background: #3b82f6; color: white; &:hover { background: #2563eb; }';
-      default:
-        return 'background: #f3f4f6; color: #374151; &:hover { background: #e5e7eb; }';
-    }
-  }}
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
 
 const Returns = () => {
   const [returns, setReturns] = useState([]);
@@ -619,79 +143,87 @@ const Returns = () => {
 
   if (loading) {
     return (
-      <Container>
-        <div style={{ textAlign: 'center', padding: '4rem' }}>
-          <RotateCcw size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
+      <div className="bg-slate-50 min-h-screen">
+        <div className="text-center py-16">
+          <RotateCcw size={48} className="text-slate-500 mb-4 mx-auto" />
           <p>Loading returns...</p>
         </div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <Title>
+    <div className="bg-slate-50 min-h-screen">
+      <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
           <RotateCcw size={32} />
           Returns Management
-        </Title>
-        <ActionButton onClick={() => window.print()}>
+        </h1>
+        <button
+          onClick={() => window.print()}
+          className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/40"
+        >
           <Download size={20} />
           Export Report
-        </ActionButton>
-      </Header>
+        </button>
+      </div>
 
-      <StatsGrid>
-        <StatCard>
-          <StatIcon color="#3b82f6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-blue-500 text-white p-4 rounded-xl flex items-center justify-center">
             <RotateCcw size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.total}</StatValue>
-            <StatLabel>Total Returns</StatLabel>
-          </StatContent>
-        </StatCard>
+          </div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-gray-800 mb-1">{stats.total}</div>
+            <div className="text-sm text-slate-500">Total Returns</div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatIcon color="#f59e0b">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-amber-500 text-white p-4 rounded-xl flex items-center justify-center">
             <Clock size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.requested}</StatValue>
-            <StatLabel>Pending Approval</StatLabel>
-          </StatContent>
-        </StatCard>
+          </div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-gray-800 mb-1">{stats.requested}</div>
+            <div className="text-sm text-slate-500">Pending Approval</div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatIcon color="#3b82f6">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-blue-500 text-white p-4 rounded-xl flex items-center justify-center">
             <CheckCircle size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.approved}</StatValue>
-            <StatLabel>Approved</StatLabel>
-          </StatContent>
-        </StatCard>
+          </div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-gray-800 mb-1">{stats.approved}</div>
+            <div className="text-sm text-slate-500">Approved</div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatIcon color="#10b981">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-emerald-500 text-white p-4 rounded-xl flex items-center justify-center">
             <CheckCircle size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.completed}</StatValue>
-            <StatLabel>Completed</StatLabel>
-          </StatContent>
-        </StatCard>
-      </StatsGrid>
+          </div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-gray-800 mb-1">{stats.completed}</div>
+            <div className="text-sm text-slate-500">Completed</div>
+          </div>
+        </div>
+      </div>
 
-      <FilterSection>
-        <SearchInput
+      <div className="bg-white p-6 rounded-xl shadow-sm mb-8 flex gap-4 flex-wrap items-center">
+        <input
           type="text"
           placeholder="Search by order ID, customer, or product..."
           value={searchTerm}
           onChange={(e: any) => setSearchTerm(e.target.value)}
+          className="flex-1 min-w-64 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
         />
 
-        <FilterSelect value={statusFilter} onChange={(e: any) => setStatusFilter(e.target.value)}>
+        <select
+          value={statusFilter}
+          onChange={(e: any) => setStatusFilter(e.target.value)}
+          className="px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white min-w-40 focus:outline-none focus:border-blue-500"
+        >
           <option value="">All Status</option>
           <option value="requested">Requested</option>
           <option value="approved">Approved</option>
@@ -700,25 +232,19 @@ const Returns = () => {
           <option value="completed">Completed</option>
           <option value="rejected">Rejected</option>
           <option value="cancelled">Cancelled</option>
-        </FilterSelect>
+        </select>
 
         <input
           type="date"
           value={dateFilter}
           onChange={e => setDateFilter(e.target.value)}
-          style={{
-            padding: '0.75rem 1rem',
-            border: '1px solid #d1d5db',
-            borderRadius: '0.5rem',
-            fontSize: '0.875rem',
-            background: 'white',
-          }}
+          className="px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white"
         />
-      </FilterSection>
+      </div>
 
-      <ReturnsContainer>
-        <ReturnsTable>
-          <TableHeader>
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="grid grid-cols-7 gap-4 p-6 bg-gray-50 border-b border-gray-200 font-semibold text-gray-700 text-sm">
             <div>Order Details</div>
             <div>Customer</div>
             <div>Product</div>
@@ -726,12 +252,12 @@ const Returns = () => {
             <div>Amount</div>
             <div>Status</div>
             <div>Actions</div>
-          </TableHeader>
+          </div>
 
           {filteredReturns.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '4rem' }}>
-              <RotateCcw size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
-              <p style={{ color: '#6b7280', fontSize: '1.125rem' }}>
+            <div className="text-center py-16">
+              <RotateCcw size={48} className="text-slate-500 mb-4 mx-auto" />
+              <p className="text-slate-500 text-lg">
                 {searchTerm || statusFilter || dateFilter
                   ? 'No returns match your filters'
                   : 'No returns found'}
@@ -739,269 +265,324 @@ const Returns = () => {
             </div>
           ) : (
             filteredReturns.map(returnItem => (
-              <ReturnRow key={returnItem._id}>
-                <OrderInfo>
-                  <OrderId>#{returnItem.orderId}</OrderId>
-                  <OrderDate>{new Date(returnItem.createdAt).toLocaleDateString()}</OrderDate>
-                </OrderInfo>
-
-                <CustomerInfo>
-                  <CustomerName>{returnItem.customer?.name || 'N/A'}</CustomerName>
-                  <CustomerContact>
-                    {returnItem.customer?.phone || returnItem.customer?.email || 'N/A'}
-                  </CustomerContact>
-                </CustomerInfo>
-
-                <ProductInfo>
-                  <ProductName>{returnItem.product?.name || 'N/A'}</ProductName>
-                  <ProductDetails>
-                    {returnItem.product?.brand} • {returnItem.product?.model}
-                  </ProductDetails>
-                </ProductInfo>
-
-                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                  {returnItem.reason || 'Not specified'}
+              <div
+                key={returnItem._id}
+                className="grid grid-cols-7 gap-4 p-6 border-b border-gray-200 items-center transition-all duration-200 hover:bg-gray-50 last:border-b-0"
+              >
+                <div>
+                  <div className="text-sm font-semibold text-gray-800">#{returnItem.orderId}</div>
+                  <div className="text-xs text-slate-500">
+                    {new Date(returnItem.createdAt).toLocaleDateString()}
+                  </div>
                 </div>
 
-                <div style={{ color: '#059669', fontSize: '0.875rem', fontWeight: '600' }}>
+                <div>
+                  <div className="text-sm font-semibold text-gray-800">
+                    {returnItem.customer?.name || 'N/A'}
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    {returnItem.customer?.phone || returnItem.customer?.email || 'N/A'}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold text-gray-800">
+                    {returnItem.product?.name || 'N/A'}
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    {returnItem.product?.brand} • {returnItem.product?.model}
+                  </div>
+                </div>
+
+                <div className="text-slate-500 text-sm">{returnItem.reason || 'Not specified'}</div>
+
+                <div className="text-emerald-600 text-sm font-semibold">
                   ₹{(returnItem.refundAmount || 0).toLocaleString()}
                 </div>
-                <StatusBadge status={returnItem.status}>
+
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${
+                    returnItem.status === 'requested'
+                      ? 'bg-amber-100 text-amber-800'
+                      : returnItem.status === 'approved'
+                        ? 'bg-blue-100 text-blue-800'
+                        : returnItem.status === 'picked_up'
+                          ? 'bg-indigo-100 text-indigo-800'
+                          : returnItem.status === 'inspecting'
+                            ? 'bg-amber-100 text-amber-800'
+                            : returnItem.status === 'completed'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : returnItem.status === 'rejected'
+                                ? 'bg-red-100 text-red-600'
+                                : returnItem.status === 'cancelled'
+                                  ? 'bg-gray-100 text-gray-600'
+                                  : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
                   {getStatusIcon(returnItem.status)}
                   {returnItem.status?.charAt(0)?.toUpperCase() + returnItem.status?.slice(1) ||
                     'Requested'}
-                </StatusBadge>
+                </span>
 
-                <ActionButtons>
-                  <IconButton primary onClick={() => handleViewDetails(returnItem)}>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleViewDetails(returnItem)}
+                    className="bg-blue-500 text-white p-2 rounded-md hover:opacity-90 hover:scale-105 transition-all duration-200 flex items-center justify-center"
+                  >
                     <Eye size={14} />
-                  </IconButton>
+                  </button>
                   {canUpdateStatus(returnItem.status, 'approved') && (
-                    <IconButton
-                      success
+                    <button
                       onClick={() => handleStatusUpdate(returnItem._id, 'approved')}
+                      className="bg-emerald-500 text-white p-2 rounded-md hover:opacity-90 hover:scale-105 transition-all duration-200 flex items-center justify-center"
                     >
                       <CheckCircle size={14} />
-                    </IconButton>
+                    </button>
                   )}
                   {canUpdateStatus(returnItem.status, 'rejected') && (
-                    <IconButton
-                      danger
+                    <button
                       onClick={() => handleStatusUpdate(returnItem._id, 'rejected')}
+                      className="bg-red-500 text-white p-2 rounded-md hover:opacity-90 hover:scale-105 transition-all duration-200 flex items-center justify-center"
                     >
                       <XCircle size={14} />
-                    </IconButton>
+                    </button>
                   )}
                   {canUpdateStatus(returnItem.status, 'picked_up') && (
-                    <IconButton
-                      warning
+                    <button
                       onClick={() => handleStatusUpdate(returnItem._id, 'picked_up')}
+                      className="bg-amber-500 text-white p-2 rounded-md hover:opacity-90 hover:scale-105 transition-all duration-200 flex items-center justify-center"
                     >
                       <Truck size={14} />
-                    </IconButton>
+                    </button>
                   )}
                   {canUpdateStatus(returnItem.status, 'completed') && (
-                    <IconButton
-                      success
+                    <button
                       onClick={() => handleStatusUpdate(returnItem._id, 'completed')}
+                      className="bg-emerald-500 text-white p-2 rounded-md hover:opacity-90 hover:scale-105 transition-all duration-200 flex items-center justify-center"
                     >
                       <CheckCircle size={14} />
-                    </IconButton>
+                    </button>
                   )}
-                </ActionButtons>
-              </ReturnRow>
+                </div>
+              </div>
             ))
           )}
-        </ReturnsTable>
-      </ReturnsContainer>
+        </div>
+      </div>
 
       {showDetailModal && selectedReturn && (
-        <Modal>
-          <ModalContent>
-            <ModalHeader>
-              <ModalTitle>Return Details - #{selectedReturn.orderId}</ModalTitle>
-              <CloseButton onClick={() => setShowDetailModal(false)}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Return Details - #{selectedReturn.orderId}
+              </h2>
+              <button
+                onClick={() => setShowDetailModal(false)}
+                className="p-2 text-slate-500 hover:bg-gray-100 rounded-md"
+              >
                 <X size={20} />
-              </CloseButton>
-            </ModalHeader>
+              </button>
+            </div>
 
-            <DetailSection>
-              <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Return Information</h3>
-              <DetailGrid>
-                <DetailItem>
-                  <Package size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Order ID:</DetailLabel>
-                  <DetailValue>#{selectedReturn.orderId}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <Calendar size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Return Date:</DetailLabel>
-                  <DetailValue>
+            <div className="mb-8">
+              <h3 className="mb-4 text-gray-700 font-semibold">Return Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Package size={16} className="text-slate-500" />
+                  <span className="text-slate-500 font-medium">Order ID:</span>
+                  <span className="text-gray-800 font-semibold">#{selectedReturn.orderId}</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Calendar size={16} className="text-slate-500" />
+                  <span className="text-slate-500 font-medium">Return Date:</span>
+                  <span className="text-gray-800 font-semibold">
                     {new Date(selectedReturn.createdAt).toLocaleDateString()}
-                  </DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <DollarSign size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Refund Amount:</DetailLabel>
-                  <DetailValue>₹{(selectedReturn.refundAmount || 0).toLocaleString()}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <MessageSquare size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Reason:</DetailLabel>
-                  <DetailValue>{selectedReturn.reason || 'Not specified'}</DetailValue>
-                </DetailItem>
-              </DetailGrid>
-            </DetailSection>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <DollarSign size={16} className="text-slate-500" />
+                  <span className="text-slate-500 font-medium">Refund Amount:</span>
+                  <span className="text-gray-800 font-semibold">
+                    ₹{(selectedReturn.refundAmount || 0).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <MessageSquare size={16} className="text-slate-500" />
+                  <span className="text-slate-500 font-medium">Reason:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {selectedReturn.reason || 'Not specified'}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-            <DetailSection>
-              <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Customer Information</h3>
-              <DetailGrid>
-                <DetailItem>
-                  <User size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Name:</DetailLabel>
-                  <DetailValue>{selectedReturn.customer?.name || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <Phone size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Phone:</DetailLabel>
-                  <DetailValue>{selectedReturn.customer?.phone || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <DetailLabel>Email:</DetailLabel>
-                  <DetailValue>{selectedReturn.customer?.email || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <MapPin size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Address:</DetailLabel>
-                  <DetailValue>{selectedReturn.customer?.address || 'N/A'}</DetailValue>
-                </DetailItem>
-              </DetailGrid>
-            </DetailSection>
+            <div className="mb-8">
+              <h3 className="mb-4 text-gray-700 font-semibold">Customer Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <User size={16} className="text-slate-500" />
+                  <span className="text-slate-500 font-medium">Name:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {selectedReturn.customer?.name || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Phone size={16} className="text-slate-500" />
+                  <span className="text-slate-500 font-medium">Phone:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {selectedReturn.customer?.phone || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <span className="text-slate-500 font-medium">Email:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {selectedReturn.customer?.email || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <MapPin size={16} className="text-slate-500" />
+                  <span className="text-slate-500 font-medium">Address:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {selectedReturn.customer?.address || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-            <DetailSection>
-              <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Product Information</h3>
-              <DetailGrid>
-                <DetailItem>
-                  <Package size={16} style={{ color: '#6b7280' }} />
-                  <DetailLabel>Product:</DetailLabel>
-                  <DetailValue>{selectedReturn.product?.name || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <DetailLabel>Brand:</DetailLabel>
-                  <DetailValue>{selectedReturn.product?.brand || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <DetailLabel>Model:</DetailLabel>
-                  <DetailValue>{selectedReturn.product?.model || 'N/A'}</DetailValue>
-                </DetailItem>
-                <DetailItem>
-                  <DetailLabel>Condition:</DetailLabel>
-                  <DetailValue>{selectedReturn.product?.condition || 'N/A'}</DetailValue>
-                </DetailItem>
-              </DetailGrid>
-            </DetailSection>
+            <div className="mb-8">
+              <h3 className="mb-4 text-gray-700 font-semibold">Product Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <Package size={16} className="text-slate-500" />
+                  <span className="text-slate-500 font-medium">Product:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {selectedReturn.product?.name || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <span className="text-slate-500 font-medium">Brand:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {selectedReturn.product?.brand || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <span className="text-slate-500 font-medium">Model:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {selectedReturn.product?.model || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg text-sm">
+                  <span className="text-slate-500 font-medium">Condition:</span>
+                  <span className="text-gray-800 font-semibold">
+                    {selectedReturn.product?.condition || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-            <DetailSection>
-              <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Return Timeline</h3>
-              <TimelineContainer>
-                <TimelineItem>
-                  <TimelineIcon color={getTimelineColor('requested')} />
-                  <TimelineContent>
-                    <TimelineTitle>Return Requested</TimelineTitle>
-                    <TimelineDate>
-                      {new Date(selectedReturn.createdAt).toLocaleString()}
-                    </TimelineDate>
-                    <TimelineDescription>
-                      Customer initiated return request for{' '}
-                      {selectedReturn.reason || 'unspecified reason'}
-                    </TimelineDescription>
-                  </TimelineContent>
-                </TimelineItem>
+            <div className="mb-8">
+              <h3 className="mb-4 text-gray-700 font-semibold">Return Timeline</h3>
+              <div className="relative pl-8">
+                <div
+                  className="absolute left-0 top-2 w-4 h-4 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: getTimelineColor('requested') }}
+                ></div>
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <div className="font-semibold text-gray-800 mb-1">Return Requested</div>
+                  <div className="text-xs text-slate-500 mb-2">
+                    {new Date(selectedReturn.createdAt).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-slate-500">
+                    Customer initiated return request for{' '}
+                    {selectedReturn.reason || 'unspecified reason'}
+                  </div>
+                </div>
                 {selectedReturn.statusHistory?.map((history: any, index: any) => (
-                  <TimelineItem key={index}>
-                    <TimelineIcon color={getTimelineColor(history.status)} />
-                    <TimelineContent>
-                      <TimelineTitle>
+                  <div key={index} className="relative pb-6">
+                    <div
+                      className="absolute left-0 top-2 w-4 h-4 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: getTimelineColor(history.status) }}
+                    ></div>
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <div className="font-semibold text-gray-800 mb-1">
                         Status Updated to{' '}
                         {history.status?.charAt(0)?.toUpperCase() + history.status?.slice(1)}
-                      </TimelineTitle>
-                      <TimelineDate>{new Date(history.updatedAt).toLocaleString()}</TimelineDate>
-                      {history.notes && <TimelineDescription>{history.notes}</TimelineDescription>}
-                    </TimelineContent>
-                  </TimelineItem>
+                      </div>
+                      <div className="text-xs text-slate-500 mb-2">
+                        {new Date(history.updatedAt).toLocaleString()}
+                      </div>
+                      {history.notes && (
+                        <div className="text-sm text-slate-500">{history.notes}</div>
+                      )}
+                    </div>
+                  </div>
                 ))}
-              </TimelineContainer>
-            </DetailSection>
+              </div>
+            </div>
+
             {selectedReturn.notes && (
-              <DetailSection>
-                <h3 style={{ marginBottom: '1rem', color: '#374151' }}>Additional Notes</h3>
-                <div
-                  style={{
-                    padding: '1rem',
-                    background: '#f9fafb',
-                    borderRadius: '0.5rem',
-                    color: '#374151',
-                  }}
-                >
+              <div className="mb-8">
+                <h3 className="mb-4 text-gray-700 font-semibold">Additional Notes</h3>
+                <div className="p-4 bg-gray-50 rounded-lg text-gray-700">
                   {selectedReturn.notes}
                 </div>
-              </DetailSection>
+              </div>
             )}
 
-            <ActionSection>
-              <h4 style={{ marginBottom: '1rem', color: '#374151' }}>Quick Actions</h4>
-              <ActionButtons2>
+            <div className="bg-gray-50 rounded-lg p-6 mt-8">
+              <h4 className="mb-4 text-gray-700 font-semibold">Quick Actions</h4>
+              <div className="flex gap-4 flex-wrap">
                 {canUpdateStatus(selectedReturn.status, 'approved') && (
-                  <Button
-                    variant="success"
+                  <button
                     onClick={() => {
                       handleStatusUpdate(selectedReturn._id, 'approved');
                       setShowDetailModal(false);
                     }}
+                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <CheckCircle size={16} />
                     Approve Return
-                  </Button>
+                  </button>
                 )}
                 {canUpdateStatus(selectedReturn.status, 'picked_up') && (
-                  <Button
-                    variant="warning"
+                  <button
                     onClick={() => {
                       handleStatusUpdate(selectedReturn._id, 'picked_up');
                       setShowDetailModal(false);
                     }}
+                    className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <Truck size={16} />
                     Mark as Picked Up
-                  </Button>
+                  </button>
                 )}
                 {canUpdateStatus(selectedReturn.status, 'inspecting') && (
-                  <Button
-                    variant="warning"
+                  <button
                     onClick={() => {
                       handleStatusUpdate(selectedReturn._id, 'inspecting');
                       setShowDetailModal(false);
                     }}
+                    className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <Package size={16} />
                     Start Inspection
-                  </Button>
+                  </button>
                 )}
                 {canUpdateStatus(selectedReturn.status, 'completed') && (
-                  <Button
-                    variant="success"
+                  <button
                     onClick={() => {
                       handleStatusUpdate(selectedReturn._id, 'completed');
                       setShowDetailModal(false);
                     }}
+                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <CheckCircle size={16} />
                     Complete Return
-                  </Button>
+                  </button>
                 )}
                 {canUpdateStatus(selectedReturn.status, 'rejected') && (
-                  <Button
-                    variant="danger"
+                  <button
                     onClick={() => {
                       const reason = prompt('Please provide a reason for rejection:');
                       if (reason) {
@@ -1009,29 +590,30 @@ const Returns = () => {
                         setShowDetailModal(false);
                       }
                     }}
+                    className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <XCircle size={16} />
                     Reject Return
-                  </Button>
+                  </button>
                 )}
                 {canUpdateStatus(selectedReturn.status, 'cancelled') && (
-                  <Button
-                    variant="danger"
+                  <button
                     onClick={() => {
                       handleStatusUpdate(selectedReturn._id, 'cancelled');
                       setShowDetailModal(false);
                     }}
+                    className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
                   >
                     <AlertTriangle size={16} />
                     Cancel Return
-                  </Button>
+                  </button>
                 )}
-              </ActionButtons2>
-            </ActionSection>
-          </ModalContent>
-        </Modal>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

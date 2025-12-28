@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAgentAuth } from '../../contexts/AgentAuthContext';
 import axios from 'axios';
@@ -13,321 +13,17 @@ import {
   Loader,
   Calendar,
   MapPin,
-} from 'lucide-react';import styled from 'styled-components';
+} from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const API_URL = 'https://cahsifiy-backend.onrender.com/api';
 // const API_URL = 'http://localhost:5000/api';
 
-const DashboardContainer = styled.div`
-  min-height: 100vh;
-  background: #f3f4f6;
-`;
-
-const Header = styled.header`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-`;
-
-const HeaderContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 15px;
-
-  h1 {
-    font-size: 24px;
-    margin: 0;
-  }
-`;
-
-const AgentInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 8px 16px;
-  border-radius: 50px;
-
-  span {
-    font-size: 14px;
-  }
-`;
-
-const LogoutButton = styled.button`
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-`;
-
-const Content = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 30px 20px;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const IconWrapper = styled.div`
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: ${(props: any) => props.background || '#667eea'};
-
-  svg {
-    color: white;
-  }
-`;
-
-const StatInfo = styled.div`
-  flex: 1;
-
-  h3 {
-    font-size: 14px;
-    color: #6b7280;
-    margin: 0 0 8px 0;
-    font-weight: 500;
-  }
-
-  p {
-    font-size: 28px;
-    font-weight: 700;
-    color: #111827;
-    margin: 0;
-  }
-`;
-
-const Section = styled.div`
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 24px;
-`;
-
-const SectionHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-
-  h2 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #111827;
-    margin: 0;
-  }
-`;
-
-const PickupsList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const PickupCard = styled.div`
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-
-  &:hover {
-    border-color: #667eea;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-  }
-`;
-
-const PickupHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: 12px;
-`;
-
-const PickupInfo = styled.div`
-  flex: 1;
-
-  h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #111827;
-    margin: 0 0 8px 0;
-  }
-
-  p {
-    font-size: 14px;
-    color: #6b7280;
-    margin: 4px 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    svg {
-      width: 16px;
-      height: 16px;
-    }
-  }
-`;
-
-const StatusBadge = styled.span`
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  background: ${(props: any) => {
-    switch (props.status) {
-      case 'pending':
-        return '#fef3c7';
-      case 'agent_assigned':
-      case 'agent_on_way':
-        return '#dbeafe';
-      case 'agent_arrived':
-      case 'inspection_in_progress':
-        return '#fce7f3';
-      case 'device_collected':
-        return '#d1fae5';
-      default:
-        return '#e5e7eb';
-    }
-  }};
-  color: ${(props: any) => {
-    switch (props.status) {
-      case 'pending':
-        return '#92400e';
-      case 'agent_assigned':
-      case 'agent_on_way':
-        return '#1e40af';
-      case 'agent_arrived':
-      case 'inspection_in_progress':
-        return '#9f1239';
-      case 'device_collected':
-        return '#065f46';
-      default:
-        return '#374151';
-    }
-  }};
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-  }
-
-  svg {
-    width: 18px;
-    height: 18px;
-  }
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 60px 20px;
-  color: #6b7280;
-
-  svg {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-  }
-
-  h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 8px 0;
-  }
-
-  p {
-    font-size: 14px;
-    margin: 0;
-  }
-`;
-
-const LoadingSpinner = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-
-  svg {
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
 const AgentDashboard = () => {
   const [dashboard, setDashboard] = useState(null);
   const [pickups, setPickups] = useState([]);
-  const [loading, setLoading] = useState(true);  const { agent, logout, getAuthHeader } = useAgentAuth();
+  const [loading, setLoading] = useState(true);
+  const { agent, logout, getAuthHeader } = useAgentAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -344,7 +40,8 @@ const AgentDashboard = () => {
       setDashboard(response.data.data || {});
     } catch (error) {
       console.error('Failed to load dashboard:', error);
-      toast.error('Failed to load dashboard');      setDashboard({}); // Set to empty object on error
+      toast.error('Failed to load dashboard');
+      setDashboard({}); // Set to empty object on error
     }
   };
 
@@ -385,111 +82,170 @@ const AgentDashboard = () => {
     });
   };
 
+  const getStatusBadgeClasses = (status: string) => {
+    const baseClasses = 'px-3 py-1.5 rounded-full text-xs font-semibold';
+    switch (status) {
+      case 'pending':
+        return `${baseClasses} bg-yellow-100 text-yellow-800`;
+      case 'agent_assigned':
+      case 'agent_on_way':
+        return `${baseClasses} bg-blue-100 text-blue-800`;
+      case 'agent_arrived':
+      case 'inspection_in_progress':
+        return `${baseClasses} bg-pink-100 text-pink-800`;
+      case 'device_collected':
+        return `${baseClasses} bg-green-100 text-green-800`;
+      default:
+        return `${baseClasses} bg-gray-100 text-gray-800`;
+    }
+  };
+
   return (
-    <DashboardContainer>
-      <Header>
-        <HeaderContent>
-          <HeaderLeft>
-            <h1>🚗 Agent Dashboard</h1>
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-5 shadow-lg">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold m-0">🚗 Agent Dashboard</h1>
             {agent && (
-              <AgentInfo>
+              <div className="flex items-center gap-3 bg-white bg-opacity-15 px-4 py-2 rounded-full">
                 <User size={18} />
-                <span>{agent.name}</span>
-              </AgentInfo>
+                <span className="text-sm">{agent.name}</span>
+              </div>
             )}
-          </HeaderLeft>
-          <LogoutButton onClick={handleLogout}>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="bg-white bg-opacity-20 border border-white border-opacity-30 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 cursor-pointer text-sm font-semibold transition-all duration-300 hover:bg-white hover:bg-opacity-30"
+          >
             <LogOut size={18} />
             Logout
-          </LogoutButton>
-        </HeaderContent>
-      </Header>
+          </button>
+        </div>
+      </header>
 
-      <Content>
+      <div className="max-w-6xl mx-auto p-8">
         {loading ? (
-          <LoadingSpinner>
-            <Loader size={40} />
-          </LoadingSpinner>
+          <div className="flex justify-center items-center py-10">
+            <Loader size={40} className="animate-spin" />
+          </div>
         ) : (
-          <>            {dashboard && dashboard.summary && (
-              <StatsGrid>
-                <StatCard>
-                  <IconWrapper background="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)">
+          <>
+            {dashboard && dashboard.summary && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                  <div
+                    className="w-15 h-15 rounded-xl flex items-center justify-center text-white"
+                    style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}
+                  >
                     <Clock size={28} />
-                  </IconWrapper>
-                  <StatInfo>
-                    <h3>Pending Pickups</h3>                    <p>{dashboard.summary?.pending || 0}</p>
-                  </StatInfo>
-                </StatCard>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm text-gray-500 mb-2 font-medium">Pending Pickups</h3>
+                    <p className="text-3xl font-bold text-gray-900 m-0">
+                      {dashboard.summary?.pending || 0}
+                    </p>
+                  </div>
+                </div>
 
-                <StatCard>
-                  <IconWrapper background="linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)">
+                <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                  <div
+                    className="w-15 h-15 rounded-xl flex items-center justify-center text-white"
+                    style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}
+                  >
                     <Package size={28} />
-                  </IconWrapper>
-                  <StatInfo>
-                    <h3>In Progress</h3>                    <p>{dashboard.summary?.inProgress || 0}</p>
-                  </StatInfo>
-                </StatCard>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm text-gray-500 mb-2 font-medium">In Progress</h3>
+                    <p className="text-3xl font-bold text-gray-900 m-0">
+                      {dashboard.summary?.inProgress || 0}
+                    </p>
+                  </div>
+                </div>
 
-                <StatCard>
-                  <IconWrapper background="linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                  <div
+                    className="w-15 h-15 rounded-xl flex items-center justify-center text-white"
+                    style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}
+                  >
                     <CheckCircle size={28} />
-                  </IconWrapper>
-                  <StatInfo>
-                    <h3>Completed Today</h3>                    <p>{dashboard.summary?.completed || 0}</p>
-                  </StatInfo>
-                </StatCard>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm text-gray-500 mb-2 font-medium">Completed Today</h3>
+                    <p className="text-3xl font-bold text-gray-900 m-0">
+                      {dashboard.summary?.completed || 0}
+                    </p>
+                  </div>
+                </div>
 
-                <StatCard>
-                  <IconWrapper background="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)">
+                <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
+                  <div
+                    className="w-15 h-15 rounded-xl flex items-center justify-center text-white"
+                    style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}
+                  >
                     <DollarSign size={28} />
-                  </IconWrapper>
-                  <StatInfo>
-                    <h3>Today's Earnings</h3>                    <p>₹{dashboard.summary?.earnings || 0}</p>
-                  </StatInfo>
-                </StatCard>
-              </StatsGrid>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm text-gray-500 mb-2 font-medium">Today's Earnings</h3>
+                    <p className="text-3xl font-bold text-gray-900 m-0">
+                      ₹{dashboard.summary?.earnings || 0}
+                    </p>
+                  </div>
+                </div>
+              </div>
             )}
 
-            <Section>
-              <SectionHeader>
-                <h2>Assigned Pickups</h2>
-              </SectionHeader>
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex justify-between items-center mb-5">
+                <h2 className="text-xl font-bold text-gray-900 m-0">Assigned Pickups</h2>
+              </div>
 
               {pickups.length === 0 ? (
-                <EmptyState>
-                  <Package />
-                  <h3>No Pickups Assigned</h3>
-                  <p>New pickups will appear here once assigned to you</p>
-                </EmptyState>
+                <div className="text-center py-15 text-gray-500">
+                  <Package size={64} className="mx-auto mb-4 opacity-50" />
+                  <h3 className="text-lg font-semibold mb-2">No Pickups Assigned</h3>
+                  <p className="text-sm m-0">New pickups will appear here once assigned to you</p>
+                </div>
               ) : (
-                <PickupsList>
-                  {pickups.map(pickup => (                    <PickupCard key={pickup._id} onClick={() => handlePickupClick(pickup)}>
-                      <PickupHeader>
-                        <PickupInfo>                          <h3>{pickup.productDetails?.name || 'Device Pickup'}</h3>
-                          <p>
-                            <Calendar />                            Scheduled: {formatDate(pickup.scheduledDate)}
+                <div className="flex flex-col gap-4">
+                  {pickups.map(pickup => (
+                    <div
+                      key={pickup._id}
+                      onClick={() => handlePickupClick(pickup)}
+                      className="border-2 border-gray-200 rounded-xl p-5 transition-all duration-300 cursor-pointer hover:border-indigo-500 hover:shadow-md"
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            {pickup.productDetails?.name || 'Device Pickup'}
+                          </h3>
+                          <p className="text-sm text-gray-500 my-1 flex items-center gap-1.5">
+                            <Calendar size={16} />
+                            Scheduled: {formatDate(pickup.scheduledDate)}
                           </p>
-                          <p>
-                            <MapPin />                            {pickup.pickupAddress?.city}, {pickup.pickupAddress?.pincode}
+                          <p className="text-sm text-gray-500 my-1 flex items-center gap-1.5">
+                            <MapPin size={16} />
+                            {pickup.pickupAddress?.city}, {pickup.pickupAddress?.pincode}
                           </p>
-                        </PickupInfo>                        <StatusBadge status={pickup.status}>                          {formatStatus(pickup.status)}
-                        </StatusBadge>
-                      </PickupHeader>                      {pickup.status === 'agent_assigned' && (
-                        <ActionButton>
-                          <Navigation />
+                        </div>
+                        <span className={getStatusBadgeClasses(pickup.status)}>
+                          {formatStatus(pickup.status)}
+                        </span>
+                      </div>
+                      {pickup.status === 'agent_assigned' && (
+                        <button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-none px-5 py-2.5 rounded-lg flex items-center gap-2 cursor-pointer text-sm font-semibold transition-transform duration-200 hover:-translate-y-0.5">
+                          <Navigation size={18} />
                           Start Navigation
-                        </ActionButton>
+                        </button>
                       )}
-                    </PickupCard>
+                    </div>
                   ))}
-                </PickupsList>
+                </div>
               )}
-            </Section>
+            </div>
           </>
         )}
-      </Content>
-    </DashboardContainer>
+      </div>
+    </div>
   );
 };
 

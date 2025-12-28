@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { theme } from '../../utils';
 import { adminService } from '../../services/adminService';
 import {
   FolderTree,
@@ -22,296 +20,6 @@ import {
   Headphones,
   Camera,
 } from 'lucide-react';
-
-const Container = styled.div`
-  background-color: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.lg};
-  box-shadow: ${theme.shadows.sm};
-  overflow: hidden;
-`;
-
-const Header = styled.div`
-  padding: ${theme.spacing[6]};
-  border-bottom: 1px solid ${theme.colors.border.primary};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: ${theme.spacing[4]};
-`;
-
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-`;
-
-const Title = styled.h2`
-  font-size: ${theme.typography.fontSize.xl};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const HeaderRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-`;
-
-const SearchContainer = styled.div`
-  position: relative;
-  width: 300px;
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[3]} ${theme.spacing[10]};
-  border: 1px solid ${theme.colors.border.primary};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.sm};
-  transition: border-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary.main};
-    box-shadow: 0 0 0 3px ${theme.colors.primary[100]};
-  }
-`;
-
-const SearchIcon = styled.div`
-  position: absolute;
-  left: ${theme.spacing[3]};
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${theme.colors.text.secondary};
-`;
-
-const Button = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  background-color: ${(props: any) =>
-    props.variant === 'primary' ? theme.colors.primary.main : 'transparent'};
-  color: ${(props: any) =>
-    props.variant === 'primary' ? theme.colors.white : theme.colors.text.primary};
-  border: 1px solid
-    ${(props: any) =>
-      props.variant === 'primary' ? theme.colors.primary.main : theme.colors.border.primary};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${theme.typography.fontWeight.medium};
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: ${(props: any) =>
-      props.variant === 'primary' ? theme.colors.primary[600] : theme.colors.grey[50]};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const Content = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${theme.spacing[6]};
-  padding: ${theme.spacing[6]};
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Section = styled.div`
-  background-color: ${theme.colors.grey[50]};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[6]};
-`;
-
-const SectionTitle = styled.h3`
-  font-size: ${theme.typography.fontSize.lg};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[4]};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const CategoryTree = styled.div`
-  background-color: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.md};
-  border: 1px solid ${theme.colors.border.primary};
-  max-height: 500px;
-  overflow-y: auto;
-`;
-
-const CategoryItem = styled.div`
-  display: flex;
-  align-items: center;
-  padding: ${theme.spacing[3]};
-  border-bottom: 1px solid ${theme.colors.border.primary};
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: ${theme.colors.grey[50]};
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const CategoryIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: ${theme.borderRadius.md};
-  background-color: ${(props: any) =>
-    props.isParent ? theme.colors.primary[100] : theme.colors.grey[100]};
-  color: ${(props: any) => (props.isParent ? theme.colors.primary.main : theme.colors.grey[600])};
-  margin-right: ${theme.spacing[3]};
-`;
-
-const CategoryContent = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[1]};
-`;
-
-const CategoryName = styled.div`
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${theme.colors.text.primary};
-  font-size: ${theme.typography.fontSize.sm};
-`;
-
-const CategoryInfo = styled.div`
-  font-size: ${theme.typography.fontSize.xs};
-  color: ${theme.colors.text.secondary};
-`;
-
-const CategoryActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-  opacity: 0;
-  transition: opacity 0.2s ease;
-
-  ${CategoryItem}:hover & {
-    opacity: 1;
-  }
-`;
-
-const ActionButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: none;
-  border: none;
-  border-radius: ${theme.borderRadius.sm};
-  cursor: pointer;
-  color: ${theme.colors.text.secondary};
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: ${theme.colors.grey[100]};
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const ExpandButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: ${theme.colors.text.secondary};
-  margin-right: ${theme.spacing[2]};
-
-  &:hover {
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const SubcategoryList = styled.div`
-  margin-left: ${theme.spacing[8]};
-  border-left: 2px solid ${theme.colors.border.primary};
-  padding-left: ${theme.spacing[4]};
-`;
-
-const FormContainer = styled.div`
-  background-color: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.md};
-  border: 1px solid ${theme.colors.border.primary};
-  padding: ${theme.spacing[6]};
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const Label = styled.label`
-  display: block;
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[2]};
-  font-size: ${theme.typography.fontSize.sm};
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: ${theme.spacing[3]};
-  border: 1px solid ${theme.colors.border.primary};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.sm};
-  transition: border-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary.main};
-    box-shadow: 0 0 0 3px ${theme.colors.primary[100]};
-  }
-`;
-
-const Select = styled.select`
-  width: 100%;
-  padding: ${theme.spacing[3]};
-  border: 1px solid ${theme.colors.border.primary};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.sm};
-  background-color: ${theme.colors.white};
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary.main};
-    box-shadow: 0 0 0 3px ${theme.colors.primary[100]};
-  }
-`;
-
-const FormActions = styled.div`
-  display: flex;
-  gap: ${theme.spacing[3]};
-  justify-content: flex-end;
-  margin-top: ${theme.spacing[6]};
-`;
 
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
@@ -428,31 +136,49 @@ const CategoryManagement = () => {
 
     return (
       <div key={category.id}>
-        <CategoryItem style={{ paddingLeft: `${level * 20 + 12}px` }}>
+        <div
+          className="flex items-center p-3 border-b border-gray-200 cursor-pointer transition-colors hover:bg-gray-50 last:border-b-0"
+          style={{ paddingLeft: `${level * 20 + 12}px` }}
+        >
           {hasChildren && (
-            <ExpandButton onClick={() => handleToggleExpand(category.id)}>
+            <button
+              onClick={() => handleToggleExpand(category.id)}
+              className="flex items-center justify-center w-5 h-5 mr-2 text-gray-600 hover:text-gray-900"
+            >
               {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-            </ExpandButton>
+            </button>
           )}
 
-          <CategoryIcon isParent={hasChildren}>{renderCategoryIcon(category.icon)}</CategoryIcon>
+          <div
+            className={`flex items-center justify-center w-8 h-8 rounded-md mr-3 ${
+              hasChildren ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            {renderCategoryIcon(category.icon)}
+          </div>
 
-          <CategoryContent>
-            <CategoryName>{category.name}</CategoryName>
-            <CategoryInfo>
+          <div className="flex-1 flex flex-col gap-1">
+            <div className="font-medium text-gray-900 text-sm">{category.name}</div>
+            <div className="text-xs text-gray-600">
               {category.description} • {children.length} subcategories
-            </CategoryInfo>
-          </CategoryContent>
+            </div>
+          </div>
 
-          <CategoryActions>
-            <ActionButton onClick={() => handleEditCategory(category)}>
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={() => handleEditCategory(category)}
+              className="flex items-center justify-center w-7 h-7 rounded-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+            >
               <Edit size={14} />
-            </ActionButton>
-            <ActionButton onClick={() => handleDeleteCategory(category.id)}>
+            </button>
+            <button
+              onClick={() => handleDeleteCategory(category.id)}
+              className="flex items-center justify-center w-7 h-7 rounded-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+            >
               <Trash2 size={14} />
-            </ActionButton>
-          </CategoryActions>
-        </CategoryItem>
+            </button>
+          </div>
+        </div>
 
         {hasChildren && isExpanded && (
           <div>{children.map(child => renderCategory(child, level + 1))}</div>
@@ -463,98 +189,93 @@ const CategoryManagement = () => {
   const mainCategories = getFilteredCategories().filter(cat => !cat.parentId);
 
   return (
-    <Container>
-      <Header>
-        <HeaderLeft>
-          <Title>
+    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="p-6 border-b border-gray-200 flex justify-between items-center flex-wrap gap-4">
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
             <FolderTree size={24} />
             Category Management
-          </Title>
-        </HeaderLeft>
+          </h2>
+        </div>
 
-        <HeaderRight>
-          <SearchContainer>
-            <SearchIcon>
+        <div className="flex items-center gap-3">
+          <div className="relative w-80">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
               <Search size={16} />
-            </SearchIcon>
-            <SearchInput
+            </div>
+            <input
               type="text"
               placeholder="Search categories..."
               value={searchTerm}
-              onChange={(e: any) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-          </SearchContainer>
+          </div>
 
-          <Button className="bg-green-500" variant="primary" onClick={resetForm}>
+          <button
+            onClick={resetForm}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white border border-blue-500 rounded-md text-sm font-medium cursor-pointer transition-colors hover:bg-blue-600"
+          >
             <Plus size={16} />
             Add Category
-          </Button>
-        </HeaderRight>
-      </Header>
+          </button>
+        </div>
+      </div>
 
-      <Content>
-        <Section>
-          <SectionTitle>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
+        <div className="bg-gray-50 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <FolderTree size={20} />
             Category Hierarchy
-          </SectionTitle>
+          </h3>
 
-          <CategoryTree>
+          <div className="bg-white rounded-md border border-gray-200 max-h-96 overflow-y-auto">
             {loading ? (
-              <div
-                style={{
-                  padding: theme.spacing[6],
-                  textAlign: 'center',
-                  color: theme.colors.text.secondary,
-                }}
-              >
-                Loading categories...
-              </div>
+              <div className="p-6 text-center text-gray-600">Loading categories...</div>
             ) : mainCategories.length === 0 ? (
-              <div
-                style={{
-                  padding: theme.spacing[6],
-                  textAlign: 'center',
-                  color: theme.colors.text.secondary,
-                }}
-              >
-                No categories found
-              </div>
+              <div className="p-6 text-center text-gray-600">No categories found</div>
             ) : (
               mainCategories.map(category => renderCategory(category))
             )}
-          </CategoryTree>
-        </Section>
+          </div>
+        </div>
 
-        <Section>
-          <SectionTitle>{editingCategory ? 'Edit Category' : 'Add New Category'}</SectionTitle>
+        <div className="bg-gray-50 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            {editingCategory ? 'Edit Category' : 'Add New Category'}
+          </h3>
 
-          <FormContainer>
-            <FormGroup>
-              <Label>Category Name</Label>
-              <Input
+          <div className="bg-white rounded-md border border-gray-200 p-6">
+            <div className="mb-4">
+              <label className="block font-medium text-gray-900 mb-2 text-sm">Category Name</label>
+              <input
                 type="text"
                 value={formData.name}
-                onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter category name"
+                className="w-full p-3 border border-gray-300 rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label>Description</Label>
-              <Input
+            <div className="mb-4">
+              <label className="block font-medium text-gray-900 mb-2 text-sm">Description</label>
+              <input
                 type="text"
                 value={formData.description}
-                onChange={(e: any) => setFormData({ ...formData, description: e.target.value })}
+                onChange={e => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Enter category description"
+                className="w-full p-3 border border-gray-300 rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
-            </FormGroup>
+            </div>
 
-            <FormGroup>
-              <Label>Parent Category</Label>
-              <Select
+            <div className="mb-4">
+              <label className="block font-medium text-gray-900 mb-2 text-sm">
+                Parent Category
+              </label>
+              <select
                 value={formData.parentId}
-                onChange={(e: any) => setFormData({ ...formData, parentId: e.target.value })}
+                onChange={e => setFormData({ ...formData, parentId: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-md text-sm bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">None (Main Category)</option>
                 {categories
@@ -564,39 +285,46 @@ const CategoryManagement = () => {
                       {category.name}
                     </option>
                   ))}
-              </Select>
-            </FormGroup>
+              </select>
+            </div>
 
-            <FormGroup>
-              <Label>Icon</Label>
-              <Select
+            <div className="mb-4">
+              <label className="block font-medium text-gray-900 mb-2 text-sm">Icon</label>
+              <select
                 value={formData.icon}
-                onChange={(e: any) => setFormData({ ...formData, icon: e.target.value })}
+                onChange={e => setFormData({ ...formData, icon: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-md text-sm bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {Object.keys(categoryIcons).map(iconName => (
                   <option key={iconName} value={iconName}>
                     {iconName}
                   </option>
                 ))}
-              </Select>
-            </FormGroup>
+              </select>
+            </div>
 
-            <FormActions>
+            <div className="flex gap-3 justify-end mt-6">
               {editingCategory && (
-                <Button className="bg-green-500" onClick={resetForm}>
+                <button
+                  onClick={resetForm}
+                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                >
                   <X size={16} />
                   Cancel
-                </Button>
+                </button>
               )}
-              <Button className="bg-green-500" variant="primary" onClick={handleSaveCategory}>
+              <button
+                onClick={handleSaveCategory}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white border border-blue-500 rounded-md font-medium cursor-pointer transition-colors hover:bg-blue-600"
+              >
                 <Save size={16} />
                 {editingCategory ? 'Update Category' : 'Create Category'}
-              </Button>
-            </FormActions>
-          </FormContainer>
-        </Section>
-      </Content>
-    </Container>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

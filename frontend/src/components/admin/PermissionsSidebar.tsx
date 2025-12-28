@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
 import {
   X,
   Shield,
@@ -29,384 +28,6 @@ import {
 import partnerPermissionService from '../../services/partnerPermissionService';
 import { PARTNER_MENU_ITEMS, PARTNER_ROLE_TEMPLATES } from '../../utils/partnerMenuPermissions';
 import { toast } from 'react-toastify';
-
-const SidebarContainer = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 420px;
-  height: 100vh;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-left: 1px solid #e2e8f0;
-  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
-  transform: translateX(${(props: any) => (props.$isOpen ? '0' : '100%')});
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-`;
-
-const SidebarHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-  }
-`;
-
-const HeaderTitle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const Title = styled.h2`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #64748b;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: #f1f5f9;
-    color: #374151;
-  }
-`;
-
-const SidebarContent = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const PartnerInfo = styled.div`
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border: 1px solid #bae6fd;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const PartnerAvatar = styled.div`
-  width: 2.5rem;
-  height: 2.5rem;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 0.875rem;
-`;
-
-const PartnerDetails = styled.div`
-  flex: 1;
-`;
-
-const PartnerName = styled.div`
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 0.875rem;
-`;
-
-const PartnerRole = styled.div`
-  font-size: 0.75rem;
-  color: #64748b;
-  margin-top: 0.125rem;
-`;
-
-const SearchContainer = styled.div`
-  position: relative;
-  margin-bottom: 1rem;
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-
-  &::placeholder {
-    color: #9ca3af;
-  }
-`;
-
-const SearchIcon = styled.div`
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  display: flex;
-  align-items: center;
-`;
-
-const RoleTemplateSection = styled.div`
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  padding: 1rem;
-`;
-
-const SectionTitle = styled.h3`
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 0.75rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const RoleTemplateGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-`;
-
-const RoleTemplateButton = styled.button`
-  padding: 0.5rem;
-  border: 1px solid ${(props: any) => (props.$isActive ? '#3b82f6' : '#e2e8f0')};
-  border-radius: 0.5rem;
-  background: ${(props: any) => (props.$isActive ? '#eff6ff' : 'white')};
-  color: ${(props: any) => (props.$isActive ? '#3b82f6' : '#64748b')};
-  font-size: 0.75rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
-
-  &:hover {
-    border-color: #3b82f6;
-    background: #f8fafc;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const PermissionsSection = styled.div`
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.75rem;
-  overflow: hidden;
-`;
-
-const PermissionCategory = styled.div`
-  border-bottom: 1px solid #f1f5f9;
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const CategoryHeader = styled.div`
-  padding: 0.875rem 1rem;
-  background: #f8fafc;
-  border-bottom: 1px solid #f1f5f9;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f1f5f9;
-  }
-`;
-
-const CategoryTitle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-`;
-
-const CategoryToggle = styled.div`
-  color: #64748b;
-  transition: transform 0.2s;
-  transform: rotate(${(props: any) => (props.$isExpanded ? '90deg' : '0deg')});
-`;
-
-const PermissionsList = styled.div`
-  display: ${(props: any) => (props.$isExpanded ? 'block' : 'none')};
-`;
-
-const PermissionItem = styled.div`
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #f8fafc;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:hover {
-    background: #fafbfc;
-  }
-`;
-
-const PermissionInfo = styled.div`
-  flex: 1;
-`;
-
-const PermissionName = styled.div`
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-`;
-
-const PermissionDescription = styled.div`
-  font-size: 0.75rem;
-  color: #64748b;
-  margin-top: 0.125rem;
-`;
-
-const PermissionToggle = styled.button`
-  width: 2.5rem;
-  height: 1.25rem;
-  border-radius: 0.625rem;
-  border: none;
-  background: ${(props: any) => (props.$isEnabled ? '#10b981' : '#e5e7eb')};
-  position: relative;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0.125rem;
-    left: ${(props: any) => (props.$isEnabled ? '1.375rem' : '0.125rem')};
-    width: 1rem;
-    height: 1rem;
-    background: white;
-    border-radius: 50%;
-    transition: all 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  padding: 1.5rem;
-  border-top: 1px solid #e2e8f0;
-  background: #fafbfc;
-`;
-
-const ActionButton = styled.button`
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: 1px solid ${(props: any) => (props.$variant === 'primary' ? '#3b82f6' : '#e2e8f0')};
-  border-radius: 0.5rem;
-  background: ${(props: any) => (props.$variant === 'primary' ? '#3b82f6' : 'white')};
-  color: ${(props: any) => (props.$variant === 'primary' ? 'white' : '#374151')};
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-
-  &:hover {
-    background: ${(props: any) => (props.$variant === 'primary' ? '#2563eb' : '#f8fafc')};
-    transform: translateY(-1px);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const StatusIndicator = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  background: ${(props: any) => {
-    switch (props.$status) {
-      case 'success':
-        return '#dcfce7';
-      case 'error':
-        return '#fef2f2';
-      case 'loading':
-        return '#fef3c7';
-      default:
-        return '#f3f4f6';
-    }
-  }};
-  color: ${(props: any) => {
-    switch (props.$status) {
-      case 'success':
-        return '#166534';
-      case 'error':
-        return '#dc2626';
-      case 'loading':
-        return '#d97706';
-      default:
-        return '#374151';
-    }
-  }};
-  margin-bottom: 1rem;
-`;
 
 const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpdate }: any) => {
   const [loading, setLoading] = useState(false);
@@ -582,134 +203,181 @@ const PermissionsSidebar = ({ isOpen, onClose, selectedPartner, onPermissionsUpd
   }
 
   return (
-    <SidebarContainer $isOpen={isOpen}>
-      <SidebarHeader>
-        <HeaderTitle>
+    <div
+      className={`fixed top-0 right-0 w-96 h-screen bg-gradient-to-b from-white to-gray-50 border-l border-gray-200 shadow-xl transform transition-transform duration-300 ease-out z-50 flex flex-col overflow-hidden ${
+        isOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}
+    >
+      <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 flex items-center justify-between relative">
+        <div className="flex items-center gap-3">
           <Shield size={20} />
-          <Title>Partner Permissions</Title>
-        </HeaderTitle>
-        <CloseButton onClick={onClose}>
+          <h2 className="text-lg font-semibold text-gray-900">Partner Permissions</h2>
+        </div>
+        <button
+          onClick={onClose}
+          className="p-2 text-gray-500 hover:bg-gray-200 hover:text-gray-700 rounded-lg transition-colors"
+        >
           <X size={20} />
-        </CloseButton>
-      </SidebarHeader>
+        </button>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+      </div>
 
-      <SidebarContent>
+      <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
         {/* Partner Info */}
-        <PartnerInfo>
-          <PartnerAvatar>
+        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
             {selectedPartner.shopName?.charAt(0) || selectedPartner.name?.charAt(0) || 'P'}
-          </PartnerAvatar>
-          <PartnerDetails>
-            <PartnerName>{selectedPartner.shopName || selectedPartner.name}</PartnerName>
-            <PartnerRole>
+          </div>
+          <div className="flex-1">
+            <div className="font-semibold text-gray-900 text-sm">
+              {selectedPartner.shopName || selectedPartner.name}
+            </div>
+            <div className="text-xs text-gray-600 mt-0.5">
               {PARTNER_ROLE_TEMPLATES[roleTemplate]?.label || 'Basic Partner'}
-            </PartnerRole>
-          </PartnerDetails>
-        </PartnerInfo>
+            </div>
+          </div>
+        </div>
 
         {/* Status Indicator */}
         {status && (
-          <StatusIndicator $status={status.type}>
+          <div
+            className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs font-medium mb-4 ${
+              status.type === 'success'
+                ? 'bg-green-100 text-green-800'
+                : status.type === 'error'
+                  ? 'bg-red-100 text-red-800'
+                  : 'bg-yellow-100 text-yellow-800'
+            }`}
+          >
             {status.type === 'loading' && <RefreshCw size={14} className="animate-spin" />}
             {status.type === 'success' && <CheckCircle size={14} />}
             {status.type === 'error' && <AlertCircle size={14} />}
             {status.message}
-          </StatusIndicator>
+          </div>
         )}
 
         {/* Role Templates */}
-        <RoleTemplateSection>
-          <SectionTitle>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
             <User size={16} />
             Role Templates
-          </SectionTitle>
-          <RoleTemplateGrid>
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
             {Object.entries(PARTNER_ROLE_TEMPLATES).map(([key, template]) => (
-              <RoleTemplateButton
+              <button
                 key={key}
-                $isActive={roleTemplate === key}
                 onClick={() => handleRoleTemplateChange(key)}
                 disabled={loading}
+                className={`p-2 text-xs font-medium rounded-lg transition-colors text-center ${
+                  roleTemplate === key
+                    ? 'border-2 border-blue-500 bg-blue-50 text-blue-600'
+                    : 'border border-gray-300 bg-white text-gray-600 hover:border-blue-500 hover:bg-gray-50'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {template.label}
-              </RoleTemplateButton>
+              </button>
             ))}
-          </RoleTemplateGrid>
-        </RoleTemplateSection>
+          </div>
+        </div>
 
         {/* Search */}
-        <SearchContainer>
-          <SearchIcon>
+        <div className="relative mb-4">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
             <Search size={16} />
-          </SearchIcon>
-          <SearchInput
+          </div>
+          <input
             type="text"
             placeholder="Search permissions..."
             value={searchTerm}
-            onChange={(e: any) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
           />
-        </SearchContainer>
+        </div>
 
         {/* Permissions */}
-        <PermissionsSection>
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           {filteredMenuItems.map(section => {
             const IconComponent = getCategoryIcon(section.section);
             const isExpanded = expandedCategories[section.section];
 
             return (
-              <PermissionCategory key={section.section}>
-                <CategoryHeader onClick={() => toggleCategory(section.section)}>
-                  <CategoryTitle>
+              <div key={section.section} className="border-b border-gray-100 last:border-b-0">
+                <div
+                  onClick={() => toggleCategory(section.section)}
+                  className="px-4 py-3.5 bg-gray-50 border-b border-gray-100 flex items-center justify-between cursor-pointer transition-colors hover:bg-gray-100"
+                >
+                  <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <IconComponent size={16} />
                     {section.section}
-                  </CategoryTitle>
-                  <CategoryToggle $isExpanded={isExpanded}>
+                  </div>
+                  <div
+                    className={`text-gray-500 transition-transform ${
+                      isExpanded ? 'rotate-90' : 'rotate-0'
+                    }`}
+                  >
                     <ChevronRight size={16} />
-                  </CategoryToggle>
-                </CategoryHeader>
+                  </div>
+                </div>
 
-                <PermissionsList $isExpanded={isExpanded}>
-                  {section.items.map(item => {
-                    const permissionData = permissions[item.requiredPermission];
-                    const isEnabled = permissionData?.granted || false;
+                {isExpanded && (
+                  <div>
+                    {section.items.map(item => {
+                      const permissionData = permissions[item.requiredPermission];
+                      const isEnabled = permissionData?.granted || false;
 
-                    return (
-                      <PermissionItem key={item.requiredPermission}>
-                        <PermissionInfo>
-                          <PermissionName>{item.label}</PermissionName>
-                          <PermissionDescription>{item.description}</PermissionDescription>
-                        </PermissionInfo>
-                        <PermissionToggle
-                          $isEnabled={isEnabled}
-                          onClick={() => handlePermissionToggle(item.requiredPermission)}
-                          disabled={loading}
-                        />
-                      </PermissionItem>
-                    );
-                  })}
-                </PermissionsList>
-              </PermissionCategory>
+                      return (
+                        <div
+                          key={item.requiredPermission}
+                          className="px-4 py-3 border-b border-gray-50 last:border-b-0 flex items-center justify-between hover:bg-gray-25"
+                        >
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">{item.label}</div>
+                            <div className="text-xs text-gray-500 mt-0.5">{item.description}</div>
+                          </div>
+                          <button
+                            onClick={() => handlePermissionToggle(item.requiredPermission)}
+                            disabled={loading}
+                            className={`relative w-10 h-5 rounded-full transition-colors ${
+                              isEnabled ? 'bg-green-500' : 'bg-gray-300'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            <div
+                              className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                                isEnabled ? 'translate-x-5' : 'translate-x-0.5'
+                              }`}
+                            ></div>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             );
           })}
-        </PermissionsSection>
-      </SidebarContent>
+        </div>
+      </div>
 
       {/* Action Buttons */}
-      <ActionButtons>
-        <ActionButton onClick={handleResetPermissions} disabled={loading || !hasChanges}>
+      <div className="flex gap-3 p-6 border-t border-gray-200 bg-gray-50">
+        <button
+          onClick={handleResetPermissions}
+          disabled={loading || !hasChanges}
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           <RefreshCw size={16} />
           Reset
-        </ActionButton>
-        <ActionButton
-          $variant="primary"
+        </button>
+        <button
           onClick={handleSavePermissions}
           disabled={loading || !hasChanges}
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
         >
           <Save size={16} />
           Save Changes
-        </ActionButton>
-      </ActionButtons>
-    </SidebarContainer>
+        </button>
+      </div>
+    </div>
   );
 };
 

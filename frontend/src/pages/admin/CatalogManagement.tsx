@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminCatalog } from '../../hooks/useAdminCatalog';
-import { useAdminAuth } from '../../contexts/AdminAuthContext';import styled from 'styled-components';
+import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import {
   Package,
   Plus,
@@ -28,490 +28,15 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
-const CatalogContainer = styled.div`
-  min-height: 100vh;
-  background: ${(props: any) => props.theme?.colors?.background || '#f8fafc'};
-  padding: 2rem;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme?.colors?.text || '#1f2937'};
-  margin: 0;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-`;
-
-const PrimaryButton = styled.button`
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  border: none;
-  padding: 0.875rem 1.75rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  min-height: 44px;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-
-  &:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const Button = styled.button`
-  background: ${(props: any) => {
-    if (props.variant === 'outline') {
-      return 'transparent';
-    }
-    return props.theme?.colors?.primary || '#3B82F6';
-  }};
-  color: ${(props: any) => {
-    if (props.variant === 'outline') {
-      return props.theme?.colors?.primary || '#3B82F6';
-    }
-    return 'white';
-  }};
-  border: 1px solid ${(props: any) => props.theme?.colors?.primary || '#3B82F6'};
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  min-height: 40px;
-
-  &:hover {
-    background: ${(props: any) => {
-      if (props.variant === 'outline') {
-        return props.theme?.colors?.primary || '#3B82F6';
-      }
-      return props.theme?.colors?.primaryDark || '#2563EB';
-    }};
-    color: white;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-`;
-
-const StatHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-`;
-
-const StatIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: ${(props: any) => props.color || props.theme.colors.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const StatInfo = styled.div`
-  text-align: right;
-`;
-
-const StatValue = styled.h3`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: ${(props: any) => props.theme.colors.text};
-  margin-bottom: 0.25rem;
-`;
-
-const StatLabel = styled.p`
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  font-size: 0.875rem;
-  margin: 0;
-`;
-
-const FiltersCard = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const FiltersGrid = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: 1rem;
-  align-items: end;
-`;
-
-const FilterGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-  color: ${(props: any) => props.theme.colors.text};
-  font-size: 0.875rem;
-`;
-
-const SearchInput = styled.input`
-  padding: 0.75rem;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 6px;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => props.theme.colors.primary};
-  }
-`;
-
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 6px;
-  font-size: 0.875rem;
-  background: white;
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: ${(props: any) => props.theme.colors.primary};
-  }
-`;
-
-const ViewToggle = styled.div`
-  display: flex;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 6px;
-  overflow: hidden;
-`;
-
-const ViewButton = styled.button`
-  background: ${(props: any) => props.active ? props.theme.colors.primary : 'white'};
-  color: ${(props: any) => props.active ? 'white' : props.theme.colors.textSecondary};
-  border: none;
-  padding: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${(props: any) => props.active ? props.theme.colors.primaryDark : props.theme.colors.background};
-  }
-`;
-
-const ProductsContainer = styled.div`
-  background: white;
-  border-radius: 12px;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-`;
-
-const ProductsHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid ${(props: any) => props.theme.colors.border};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const ProductsTitle = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-`;
-
-const ProductsGrid = styled.div`
-  display: ${(props: any) => props.view === 'grid' ? 'grid' : 'block'};
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-  padding: 1.5rem;
-`;
-
-const ProductCard = styled.div`
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 8px;
-  overflow: hidden;
-  transition: all 0.2s ease;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-  }
-`;
-
-const ProductImage = styled.div`
-  height: 200px;
-  background: ${(props: any) => props.theme.colors.background};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  position: relative;
-`;
-
-const ProductBadge = styled.span`
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  background: ${(props: any) => {
-    switch (props.status) {
-      case 'active':
-        return '#D1FAE5';
-      case 'inactive':
-        return '#FEE2E2';
-      case 'pending':
-        return '#FEF3C7';
-      default:
-        return '#F3F4F6';
-    }
-  }};
-  color: ${(props: any) => {
-    switch (props.status) {
-      case 'active':
-        return '#065F46';
-      case 'inactive':
-        return '#991B1B';
-      case 'pending':
-        return '#92400E';
-      default:
-        return '#374151';
-    }
-  }};
-`;
-
-const ProductInfo = styled.div`
-  padding: 1rem;
-`;
-
-const ProductTitle = styled.h4`
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-  margin: 0 0 0.5rem 0;
-  font-size: 0.875rem;
-`;
-
-const ProductDetails = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-`;
-
-const ProductPrice = styled.span`
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.primary};
-  font-size: 1rem;
-`;
-
-const ProductRating = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
-const ProductMeta = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  margin-bottom: 1rem;
-`;
-
-const ProductActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-`;
-
-const ActionButton = styled.button`
-  background: none;
-  border: 1px solid ${(props: any) => props.theme.colors.border};
-  border-radius: 4px;
-  padding: 0.5rem;
-  cursor: pointer;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-  transition: all 0.2s ease;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-
-  &:hover {
-    border-color: ${(props: any) => props.theme.colors.primary};
-    color: ${(props: any) => props.theme.colors.primary};
-  }
-`;
-
-const ProductListItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border-bottom: 1px solid ${(props: any) => props.theme.colors.border};
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:hover {
-    background: ${(props: any) => props.theme.colors.background};
-  }
-`;
-
-const ListProductImage = styled.div`
-  width: 60px;
-  height: 60px;
-  background: ${(props: any) => props.theme.colors.background};
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
-const ListProductInfo = styled.div`
-  flex: 1;
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
-  gap: 1rem;
-  align-items: center;
-`;
-
-const ListProductTitle = styled.div`
-  font-weight: 600;
-  color: ${(props: any) => props.theme.colors.text};
-  font-size: 0.875rem;
-`;
-
-const ListProductCategory = styled.div`
-  font-size: 0.75rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  justify-content: center;
-  background: ${(props: any) => {
-    switch (props.status) {
-      case 'active':
-        return '#D1FAE5';
-      case 'inactive':
-        return '#FEE2E2';
-      case 'pending':
-        return '#FEF3C7';
-      default:
-        return '#F3F4F6';
-    }
-  }};
-  color: ${(props: any) => {
-    switch (props.status) {
-      case 'active':
-        return '#065F46';
-      case 'inactive':
-        return '#991B1B';
-      case 'pending':
-        return '#92400E';
-      default:
-        return '#374151';
-    }
-  }};
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 3rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
-const EmptyIcon = styled.div`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: ${(props: any) => props.theme.colors.background};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-  color: ${(props: any) => props.theme.colors.textSecondary};
-`;
-
 function CatalogManagement() {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('name');  const { adminUser } = useAdminAuth();
+  const [sortBy, setSortBy] = useState('name');
+  const adminAuth = useAdminAuth() as any;
+  const adminUser = adminAuth?.adminUser;
   const {
     products: catalogProducts,
     categories,
@@ -528,22 +53,26 @@ function CatalogManagement() {
   const stats = productStats
     ? [
         {
-          label: 'Total Products',          value: productStats.totalProducts?.toLocaleString() || '0',
+          label: 'Total Products',
+          value: productStats.totalProducts?.toLocaleString() || '0',
           icon: <Package size={20} />,
           color: '#3B82F6',
         },
         {
-          label: 'Active Products',          value: productStats.activeProducts?.toLocaleString() || '0',
+          label: 'Active Products',
+          value: productStats.activeProducts?.toLocaleString() || '0',
           icon: <CheckCircle size={20} />,
           color: '#10B981',
         },
         {
-          label: 'Inactive Products',          value: productStats.pendingProducts?.toLocaleString() || '0',
+          label: 'Inactive Products',
+          value: productStats.pendingProducts?.toLocaleString() || '0',
           icon: <Clock size={20} />,
           color: '#F59E0B',
         },
         {
-          label: 'Categories',          value: productStats.categoriesCount?.toLocaleString() || '0',
+          label: 'Categories',
+          value: productStats.categoriesCount?.toLocaleString() || '0',
           icon: <Layers size={20} />,
           color: '#8B5CF6',
         },
@@ -578,7 +107,22 @@ function CatalogManagement() {
   // Use products from hook - format to match API structure
   const products =
     catalogProducts?.length > 0
-      ? catalogProducts.map(product => ({          id: product._id,          name: `${product.brand} ${product.model}`,          category: product.category,          brand: product.brand,          model: product.model,          series: product.series,          price: product.basePrice ? `₹${product.basePrice.toLocaleString()}` : '₹0',          basePrice: product.basePrice,          variant: product.variant,          status: product.isActive ? 'active' : 'inactive',          images: product.images || [],          specifications: product.specifications,          createdAt: product.createdAt,          updatedAt: product.updatedAt,          createdBy: product.createdBy,
+      ? catalogProducts.map(product => ({
+          id: product._id,
+          name: `${product.brand} ${product.model}`,
+          category: product.category,
+          brand: product.brand,
+          model: product.model,
+          series: product.series,
+          price: product.basePrice ? `₹${product.basePrice.toLocaleString()}` : '₹0',
+          basePrice: product.basePrice,
+          variant: product.variant,
+          status: product.isActive ? 'active' : 'inactive',
+          images: product.images || [],
+          specifications: product.specifications,
+          createdAt: product.createdAt,
+          updatedAt: product.updatedAt,
+          createdBy: product.createdBy,
         }))
       : [];
 
@@ -634,71 +178,98 @@ function CatalogManagement() {
     }
   };
 
+  const getStatusBadgeClasses = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'inactive':
+        return 'bg-red-100 text-red-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
-    <CatalogContainer>
-      <Header>
-        <Title>Catalog Management</Title>
-        <HeaderActions>
-          <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing || loading}>
-            {isRefreshing ? (
-              <RefreshCw size={20} className="animate-spin" />
-            ) : (
-              <RefreshCw size={20} />
-            )}
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+        <h1 className="text-3xl font-bold text-gray-900">Catalog Management</h1>
+        <div className="flex gap-4 items-center flex-wrap">
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing || loading}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={20} className={isRefreshing ? 'animate-spin' : ''} />
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
-          </Button>
-          <Button variant="outline">
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
             <Download size={20} />
             Export
-          </Button>
-          <Button variant="outline">
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
             <Upload size={20} />
             Import
-          </Button>
-          <PrimaryButton
+          </button>
+          <button
             onClick={() => {
               console.log('Navigating to create product page...');
               navigate('/admin/products/create');
             }}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transform hover:-translate-y-0.5 transition-all shadow-lg hover:shadow-xl"
           >
             <Plus size={20} />
             Add Product
-          </PrimaryButton>
-        </HeaderActions>
-      </Header>
+          </button>
+        </div>
+      </div>
 
-      <StatsGrid>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((stat, index) => (
-          <StatCard key={index}>
-            <StatHeader>
-              <StatIcon color={stat.color}>{stat.icon}</StatIcon>
-              <StatInfo>
-                <StatValue>{stat.value}</StatValue>
-                <StatLabel>{stat.label}</StatLabel>
-              </StatInfo>
-            </StatHeader>
-          </StatCard>
+          <div key={index} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-start mb-4">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center text-white"
+                style={{ backgroundColor: stat.color }}
+              >
+                {stat.icon}
+              </div>
+              <div className="text-right">
+                <h3 className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</h3>
+                <p className="text-sm text-gray-600">{stat.label}</p>
+              </div>
+            </div>
+          </div>
         ))}
-      </StatsGrid>
+      </div>
 
-      <FiltersCard>
-        <FiltersGrid>
-          <FilterGroup>
-            <Label>Search Products</Label>
-            <SearchInput
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Search Products</label>
+            <input
               type="text"
               placeholder="Search by name, category, or partner..."
               value={searchTerm}
-              onChange={(e: any) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-          </FilterGroup>
+          </div>
 
-          <FilterGroup>
-            <Label>Category</Label>
-            <Select value={categoryFilter} onChange={(e: any) => setCategoryFilter(e.target.value)}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <select
+              value={categoryFilter}
+              onChange={e => setCategoryFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
               <option value="all">All Categories</option>
               {categories && categories.length > 0 ? (
-                categories.map(category => (                  <option key={category.name || category} value={category.name || category}>                    {(category.name || category).charAt(0).toUpperCase() +                      (category.name || category).slice(1)}
+                categories.map(category => (
+                  <option key={category.name || category} value={category.name || category}>
+                    {(category.name || category).charAt(0).toUpperCase() +
+                      (category.name || category).slice(1)}
                   </option>
                 ))
               ) : (
@@ -712,188 +283,244 @@ function CatalogManagement() {
                   <option value="accessories">Accessories</option>
                 </>
               )}
-            </Select>
-          </FilterGroup>
+            </select>
+          </div>
 
-          <FilterGroup>
-            <Label>Status</Label>
-            <Select value={statusFilter} onChange={(e: any) => setStatusFilter(e.target.value)}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
               <option value="all">All Status</option>
               <option value="active">Active</option>
               <option value="pending">Pending</option>
               <option value="inactive">Inactive</option>
-            </Select>
-          </FilterGroup>
+            </select>
+          </div>
 
-          <FilterGroup>
-            <Label>Sort By</Label>
-            <Select value={sortBy} onChange={(e: any) => setSortBy(e.target.value)}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
               <option value="name">Name</option>
               <option value="price">Price</option>
               <option value="rating">Rating</option>
               <option value="date">Date Added</option>
-            </Select>
-          </FilterGroup>
+            </select>
+          </div>
 
-          <FilterGroup>
-            <Label>View</Label>
-            <ViewToggle>
-              <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">View</label>
+            <div className="flex border border-gray-300 rounded-md overflow-hidden">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
                 <Grid size={16} />
-              </ViewButton>
-              <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
                 <List size={16} />
-              </ViewButton>
-            </ViewToggle>
-          </FilterGroup>
-        </FiltersGrid>
-      </FiltersCard>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <ProductsContainer>
-        <ProductsHeader>
-          <ProductsTitle>Products ({filteredProducts.length})</ProductsTitle>
-          <PrimaryButton
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Products ({filteredProducts.length})
+          </h3>
+          <button
             onClick={() => {
               console.log('Navigating to create product page from products section...');
               navigate('/admin/products/create');
             }}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
           >
             <Plus size={16} />
             Add New Product
-          </PrimaryButton>
-        </ProductsHeader>
+          </button>
+        </div>
 
         {loading && !isRefreshing ? (
-          <EmptyState>
-            <EmptyIcon>
-              <RefreshCw size={40} className="animate-spin" />
-            </EmptyIcon>
-            <h4>Loading products...</h4>
+          <div className="text-center py-16 text-gray-600">
+            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <RefreshCw size={40} className="animate-spin text-gray-400" />
+            </div>
+            <h4 className="text-lg font-medium mb-2">Loading products...</h4>
             <p>Please wait while we fetch the product catalog.</p>
-          </EmptyState>
+          </div>
         ) : error ? (
-          <EmptyState>
-            <EmptyIcon>
-              <AlertCircle size={40} />
-            </EmptyIcon>
-            <h4>Error loading products</h4>            <p>{error.message || 'Something went wrong. Please try again.'}</p>
-            <Button variant="outline" onClick={handleRefresh} style={{ marginTop: '1rem' }}>
+          <div className="text-center py-16 text-gray-600">
+            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <AlertCircle size={40} className="text-gray-400" />
+            </div>
+            <h4 className="text-lg font-medium mb-2">Error loading products</h4>
+            <p className="mb-4">{error.message || 'Something went wrong. Please try again.'}</p>
+            <button
+              onClick={handleRefresh}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            >
               Try Again
-            </Button>
-          </EmptyState>
+            </button>
+          </div>
         ) : filteredProducts.length > 0 ? (
-          <ProductsGrid view={viewMode}>
+          <div
+            className={
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6'
+                : 'divide-y divide-gray-200'
+            }
+          >
             {viewMode === 'grid'
               ? filteredProducts.map(product => (
-                  <ProductCard key={product.id}>
-                    <ProductImage>
+                  <div
+                    key={product.id}
+                    className="border border-gray-200 rounded-lg overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1"
+                  >
+                    <div className="h-48 bg-gray-100 flex items-center justify-center relative">
                       {product.images && product.images.length > 0 ? (
                         <img
                           src={product.images[0]}
                           alt={product.name}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          className="w-full h-full object-cover"
                         />
                       ) : (
-                        <Image size={40} />
+                        <Image size={40} className="text-gray-400" />
                       )}
-                      <ProductBadge status={product.status}>
+                      <span
+                        className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium ${getStatusBadgeClasses(
+                          product.status
+                        )}`}
+                      >
                         {product.status?.charAt(0).toUpperCase() + product.status?.slice(1)}
-                      </ProductBadge>
-                    </ProductImage>
-                    <ProductInfo>
-                      <ProductTitle>{product.name}</ProductTitle>
-                      <ProductDetails>
-                        <ProductPrice>{product.price}</ProductPrice>
-                        <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>
+                      </span>
+                    </div>
+                    <div className="p-4">
+                      <h4 className="font-semibold text-gray-900 text-sm mb-2">{product.name}</h4>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-semibold text-blue-600 text-base">
+                          {product.price}
+                        </span>
+                        <div className="text-xs text-gray-500">
                           {product.variant?.ram} / {product.variant?.storage}
                         </div>
-                      </ProductDetails>
-                      <ProductMeta>
+                      </div>
+                      <div className="flex justify-between items-center text-xs text-gray-500 mb-4">
                         <span>{product.category}</span>
                         <span>{product.brand}</span>
-                      </ProductMeta>
-                      <ProductActions>
-                        <ActionButton onClick={() => navigate(`/admin/products/${product.id}`)}>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => navigate(`/admin/products/${product.id}`)}
+                          className="flex-1 flex items-center justify-center gap-1 px-2 py-1 border border-gray-300 rounded text-xs text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-colors"
+                        >
                           <Eye size={14} />
                           View
-                        </ActionButton>
-                        <ActionButton
+                        </button>
+                        <button
                           onClick={() => navigate(`/admin/products/${product.id}/edit`)}
+                          className="flex-1 flex items-center justify-center gap-1 px-2 py-1 border border-gray-300 rounded text-xs text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-colors"
                         >
                           <Edit size={14} />
                           Edit
-                        </ActionButton>
-                        <ActionButton>
+                        </button>
+                        <button className="flex items-center justify-center px-2 py-1 border border-gray-300 rounded text-xs text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-colors">
                           <MoreVertical size={14} />
-                        </ActionButton>
-                      </ProductActions>
-                    </ProductInfo>
-                  </ProductCard>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 ))
               : filteredProducts.map(product => (
-                  <ProductListItem key={product.id}>
-                    <ListProductImage>
+                  <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-gray-50">
+                    <div className="w-15 h-15 bg-gray-100 rounded-lg flex items-center justify-center">
                       {product.images && product.images.length > 0 ? (
                         <img
                           src={product.images[0]}
                           alt={product.name}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            borderRadius: '8px',
-                          }}
+                          className="w-full h-full object-cover rounded-lg"
                         />
                       ) : (
-                        <Image size={24} />
+                        <Image size={24} className="text-gray-400" />
                       )}
-                    </ListProductImage>
-                    <ListProductInfo>
+                    </div>
+                    <div className="flex-1 grid grid-cols-6 gap-4 items-center">
                       <div>
-                        <ListProductTitle>{product.name}</ListProductTitle>
-                        <ListProductCategory>
+                        <div className="font-semibold text-gray-900 text-sm">{product.name}</div>
+                        <div className="text-xs text-gray-500">
                           {product.category} • {product.brand}
-                        </ListProductCategory>
+                        </div>
                       </div>
-                      <div>{product.price}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>
+                      <div className="text-sm font-medium">{product.price}</div>
+                      <div className="text-xs text-gray-500">
                         {product.variant?.ram} / {product.variant?.storage}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>
+                      <div className="text-xs text-gray-500">
                         Created: {new Date(product.createdAt).toLocaleDateString()}
                       </div>
-                      <StatusBadge status={product.status}>
-                        {getStatusIcon(product.status)}
-                        {product.status?.charAt(0).toUpperCase() + product.status?.slice(1)}
-                      </StatusBadge>
-                      <ProductActions>
-                        <ActionButton onClick={() => navigate(`/admin/products/${product.id}`)}>
+                      <div>
+                        <span
+                          className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(
+                            product.status
+                          )}`}
+                        >
+                          {getStatusIcon(product.status)}
+                          {product.status?.charAt(0).toUpperCase() + product.status?.slice(1)}
+                        </span>
+                      </div>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => navigate(`/admin/products/${product.id}`)}
+                          className="p-1 text-gray-600 hover:text-blue-500 transition-colors"
+                        >
                           <Eye size={14} />
-                        </ActionButton>
-                        <ActionButton
+                        </button>
+                        <button
                           onClick={() => navigate(`/admin/products/${product.id}/edit`)}
+                          className="p-1 text-gray-600 hover:text-blue-500 transition-colors"
                         >
                           <Edit size={14} />
-                        </ActionButton>
-                        <ActionButton onClick={() => removeProduct && removeProduct(product.id)}>
+                        </button>
+                        <button
+                          onClick={() => removeProduct && removeProduct(product.id)}
+                          className="p-1 text-gray-600 hover:text-red-500 transition-colors"
+                        >
                           <Trash2 size={14} />
-                        </ActionButton>
-                      </ProductActions>
-                    </ListProductInfo>
-                  </ProductListItem>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 ))}
-          </ProductsGrid>
+          </div>
         ) : (
-          <EmptyState>
-            <EmptyIcon>
-              <Package size={40} />
-            </EmptyIcon>
-            <h4>No products found</h4>
+          <div className="text-center py-16 text-gray-600">
+            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <Package size={40} className="text-gray-400" />
+            </div>
+            <h4 className="text-lg font-medium mb-2">No products found</h4>
             <p>Try adjusting your search criteria or add new products</p>
-          </EmptyState>
+          </div>
         )}
-      </ProductsContainer>
-    </CatalogContainer>
+      </div>
+    </div>
   );
 }
 

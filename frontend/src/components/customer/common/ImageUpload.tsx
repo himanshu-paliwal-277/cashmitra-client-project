@@ -1,193 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
-import styled from 'styled-components';
 import { Upload, X, Image as ImageIcon, Loader, AlertCircle, Check } from 'lucide-react';
 import cloudinaryService from '../../../services/cloudinaryService';
-import { theme } from '../../../utils';
-
-const UploadContainer = styled.div`
-  width: 100%;
-  margin-bottom: 1rem;
-`;
-
-const UploadLabel = styled.label`
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: ${theme.colors.text.primary};
-  margin-bottom: 0.5rem;
-`;
-
-const DropZone = styled.div`
-  border: 2px dashed
-    ${(props: any) =>
-      props.isDragOver
-        ? theme.colors.primary.main
-        : props.hasError
-          ? theme.colors.error.main
-          : theme.colors.border.light};
-  border-radius: 8px;
-  padding: 2rem;
-  text-align: center;
-  background-color: ${(props: any) =>
-    props.isDragOver
-      ? `${theme.colors.primary.main}10`
-      : props.hasError
-        ? `${theme.colors.error.main}10`
-        : theme.colors.background.light};
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-
-  &:hover {
-    border-color: ${theme.colors.primary.main};
-    background-color: ${theme.colors.primary.main}10;
-  }
-`;
-
-const UploadIcon = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
-
-  svg {
-    width: 3rem;
-    height: 3rem;
-    color: ${(props: any) =>
-      props.hasError ? theme.colors.error.main : theme.colors.text.secondary};
-  }
-`;
-
-const UploadText = styled.div`
-  color: ${(props: any) => (props.hasError ? theme.colors.error.main : theme.colors.text.primary)};
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-`;
-
-const UploadSubtext = styled.div`
-  color: ${theme.colors.text.secondary};
-  font-size: 0.875rem;
-`;
-
-const HiddenInput = styled.input`
-  display: none;
-`;
-
-const PreviewContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-`;
-
-const PreviewItem = styled.div`
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: ${theme.colors.background.light};
-  border: 1px solid ${theme.colors.border.light};
-`;
-
-const PreviewImage = styled.img`
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  display: block;
-`;
-
-const PreviewOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: ${(props: any) => (props.show ? 1 : 0)};
-  transition: opacity 0.3s ease;
-`;
-
-const RemoveButton = styled.button`
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background-color: ${theme.colors.error.main};
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 2;
-
-  &:hover {
-    background-color: ${theme.colors.error.dark};
-    transform: scale(1.1);
-  }
-
-  svg {
-    width: 12px;
-    height: 12px;
-  }
-`;
-
-const UploadProgress = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.3);
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: ${(props: any) => props.progress}%;
-    background-color: ${theme.colors.primary.main};
-    transition: width 0.3s ease;
-  }
-`;
-
-const StatusIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg {
-    width: 24px;
-    height: 24px;
-    color: ${(props: any) =>
-      props.status === 'uploading'
-        ? theme.colors.primary.main
-        : props.status === 'success'
-          ? theme.colors.success.main
-          : props.status === 'error'
-            ? theme.colors.error.main
-            : theme.colors.text.secondary};
-  }
-`;
-
-const ErrorMessage = styled.div`
-  color: ${theme.colors.error.main};
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-`;
 
 const ImageUpload = ({
   value = [],
@@ -400,107 +213,139 @@ const ImageUpload = ({
   const canUpload = !disabled && (multiple || value.length === 0);
 
   return (
-    <UploadContainer>
-      <UploadLabel>
+    <div className="w-full mb-4">
+      <label className="block text-sm font-medium text-gray-900 mb-2">
         {label}
-        {required && <span style={{ color: theme.colors.error.main }}> *</span>}
-      </UploadLabel>
+        {required && <span className="text-red-600"> *</span>}
+      </label>
 
       {canUpload && (
-        <DropZone
-          isDragOver={isDragOver}
-          hasError={hasError}
+        <div
+          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-300 relative ${
+            isDragOver
+              ? 'border-blue-600 bg-blue-50'
+              : hasError
+                ? 'border-red-600 bg-red-50'
+                : 'border-gray-300 bg-gray-50 hover:border-blue-600 hover:bg-blue-50'
+          }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={handleClick}
         >
-          <UploadIcon hasError={hasError}>
-            <Upload />
-          </UploadIcon>
-          <UploadText hasError={hasError}>
+          <div className="flex justify-center mb-4">
+            <Upload size={48} className={hasError ? 'text-red-600' : 'text-gray-400'} />
+          </div>
+          <div className={`font-medium mb-2 ${hasError ? 'text-red-600' : 'text-gray-900'}`}>
             {hasError ? 'Please fix the errors below' : 'Drop images here or click to browse'}
-          </UploadText>
-          <UploadSubtext>
+          </div>
+          <div className="text-gray-600 text-sm">
             {multiple ? `Up to ${maxFiles} files` : 'Single file'} • Max{' '}
-            {(maxFileSize / 1024 / 1024).toFixed(0)}MB each •
+            {(maxFileSize / 1024 / 1024).toFixed(0)}MB each •{' '}
             {allowedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}
-          </UploadSubtext>
+          </div>
 
-          <HiddenInput
+          <input
             ref={fileInputRef}
             type="file"
             accept={allowedTypes.join(',')}
             multiple={multiple}
             onChange={handleInputChange}
             disabled={disabled}
+            className="hidden"
           />
-        </DropZone>
+        </div>
       )}
 
       {errors.length > 0 && (
-        <ErrorMessage>
-          <AlertCircle />
+        <div className="text-red-600 text-sm mt-2 flex items-center gap-2">
+          <AlertCircle size={16} />
           <div>
             {errors.map((error, index) => (
               <div key={index}>{error}</div>
             ))}
           </div>
-        </ErrorMessage>
+        </div>
       )}
 
       {(value.length > 0 || uploadingFiles.length > 0) && (
-        <PreviewContainer>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-4 mt-4">
           {/* Uploaded images */}
           {value.map((image, index) => (
-            <PreviewItem key={`uploaded-${index}`}>
-              <PreviewImage
+            <div
+              key={`uploaded-${index}`}
+              className="relative rounded-lg overflow-hidden bg-gray-100 border border-gray-200"
+            >
+              <img
                 src={cloudinaryService.getThumbnailUrl(image.publicId, 120)}
                 alt={`Product ${index + 1}`}
+                className="w-full h-30 object-cover block"
                 onError={(e: any) => {
                   e.target.src = image.url; // Fallback to original URL
                 }}
               />
-              <RemoveButton
+              <button
                 onClick={(e: any) => {
                   e.stopPropagation();
                   removeImage(index);
                 }}
                 title="Remove image"
+                className="absolute top-2 right-2 bg-red-600 text-white border-none rounded-full w-6 h-6 flex items-center justify-center cursor-pointer transition-all duration-300 z-10 hover:bg-red-700 hover:scale-110"
               >
-                <X />
-              </RemoveButton>
-            </PreviewItem>
+                <X size={12} />
+              </button>
+            </div>
           ))}
 
           {/* Uploading files */}
           {uploadingFiles.map(file => (
-            <PreviewItem key={file.id}>
-              <PreviewImage src={file.preview} alt="Uploading..." />
-              <PreviewOverlay show={file.status !== 'success'}>
-                <StatusIcon status={file.status}>
-                  {file.status === 'uploading' && <Loader className="animate-spin" />}
-                  {file.status === 'success' && <Check />}
-                  {file.status === 'error' && <AlertCircle />}
-                </StatusIcon>
-              </PreviewOverlay>
-              {file.status === 'uploading' && <UploadProgress progress={file.progress} />}
+            <div
+              key={file.id}
+              className="relative rounded-lg overflow-hidden bg-gray-100 border border-gray-200"
+            >
+              <img
+                src={file.preview}
+                alt="Uploading..."
+                className="w-full h-30 object-cover block"
+              />
+              <div
+                className={`absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center transition-opacity duration-300 ${
+                  file.status !== 'success' ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                <div className="flex items-center justify-center">
+                  {file.status === 'uploading' && (
+                    <Loader size={24} className="animate-spin text-blue-600" />
+                  )}
+                  {file.status === 'success' && <Check size={24} className="text-green-600" />}
+                  {file.status === 'error' && <AlertCircle size={24} className="text-red-600" />}
+                </div>
+              </div>
+              {file.status === 'uploading' && (
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-white bg-opacity-30">
+                  <div
+                    className="h-full bg-blue-600 transition-all duration-300"
+                    style={{ width: `${file.progress}%` }}
+                  />
+                </div>
+              )}
               {file.status !== 'uploading' && (
-                <RemoveButton
+                <button
                   onClick={(e: any) => {
                     e.stopPropagation();
                     removeUploadingFile(file.id);
                   }}
                   title="Remove"
+                  className="absolute top-2 right-2 bg-red-600 text-white border-none rounded-full w-6 h-6 flex items-center justify-center cursor-pointer transition-all duration-300 z-10 hover:bg-red-700 hover:scale-110"
                 >
-                  <X />
-                </RemoveButton>
+                  <X size={12} />
+                </button>
               )}
-            </PreviewItem>
+            </div>
           ))}
-        </PreviewContainer>
+        </div>
       )}
-    </UploadContainer>
+    </div>
   );
 };
 
