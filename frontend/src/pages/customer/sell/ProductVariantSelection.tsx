@@ -228,12 +228,12 @@ const ProductVariantSelection = ({ onContinue, onBack }: any) => {
           {/* Product Image */}
           <div className="lg:col-span-1 flex justify-center">
             <div className="w-full max-w-sm">
-              <div className="aspect-[3/4] bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex items-center justify-center">
+              <div className="aspect-[3/4] bg-white p-4 rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex items-center justify-center">
                 {product?.images && product.images.length > 0 ? (
                   <img
                     src={product.images[0]}
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain "
                   />
                 ) : (
                   <Package className="w-20 h-20 text-slate-300" />

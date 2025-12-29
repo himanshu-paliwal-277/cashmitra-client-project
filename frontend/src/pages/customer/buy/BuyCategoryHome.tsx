@@ -215,12 +215,12 @@ const BuyCategoryHome = () => {
                     onClick={() => handleCategoryClick(category)}
                     className="bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 hover:scale-105 border border-slate-200 group"
                   >
-                    <div className="w-20 h-20 mx-auto mb-4 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden group-hover:bg-blue-50 transition-colors">
+                    <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center  ">
                       {category.image ? (
                         <img
                           src={category.image}
                           alt={category.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       ) : (
                         <div className="text-slate-600 group-hover:text-blue-600 transition-colors">
@@ -275,15 +275,15 @@ const BuyCategoryHome = () => {
                     className="group relative bg-white rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-slate-200 hover:border-transparent overflow-hidden"
                   >
                     <div
-                      className={`absolute inset-0 bg-gradient-to-br ${bgGradient} opacity-0 group-hover:opacity-10 transition-opacity`}
+                      className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity`}
                     />
                     <div className="relative">
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 bg-white rounded-2xl shadow-lg flex items-center justify-center overflow-hidden group-hover:shadow-xl transition-shadow">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 bg-white  flex items-center justify-center overflow-hidden">
                         {category.image ? (
                           <img
                             src={category.image}
                             alt={category.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain p-1"
                           />
                         ) : (
                           <div className="text-slate-600 group-hover:scale-110 transition-transform">

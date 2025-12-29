@@ -297,6 +297,44 @@ export default {
   					opacity: '1',
   					transform: 'translateY(0)'
   				}
+  			},
+  			fadeInUp: {
+  				from: {
+  					opacity: '0',
+  					transform: 'translateY(30px)'
+  				},
+  				to: {
+  					opacity: '1',
+  					transform: 'translateY(0)'
+  				}
+  			},
+  			slideIn: {
+  				from: {
+  					opacity: '0',
+  					transform: 'translateX(-20px)'
+  				},
+  				to: {
+  					opacity: '1',
+  					transform: 'translateX(0)'
+  				}
+  			},
+  			slideUp: {
+  				from: {
+  					opacity: '0',
+  					transform: 'translateX(-50%) translateY(20px)'
+  				},
+  				to: {
+  					opacity: '1',
+  					transform: 'translateX(-50%) translateY(0)'
+  				}
+  			},
+  			spin: {
+  				from: {
+  					transform: 'rotate(0deg)'
+  				},
+  				to: {
+  					transform: 'rotate(360deg)'
+  				}
   			}
   		},
   		animation: {

@@ -202,7 +202,7 @@ const PriceQuote = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen relative bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header Section */}
       <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-16 px-4 relative overflow-hidden">
         <div className="main-container relative text-center">
@@ -212,7 +212,7 @@ const PriceQuote = () => {
       </div>
 
       {/* Main Content */}
-      <div className="main-container py-10">
+      <div className="main-container  py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Product Section - Left Side */}
           <div className="lg:col-span-2 space-y-6">
@@ -309,7 +309,7 @@ const PriceQuote = () => {
               <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
                 <h3 className="text-xl font-bold text-slate-900 mb-6">Price Breakdown</h3>
 
-                <div className="space-y-4">
+                <div className="space-y-4 ">
                   {sessionData.pricing.breakdown.map((item: any, index: number) => {
                     const isPositive = item.delta > 0;
                     const isNegative = item.delta < 0;
@@ -358,7 +358,7 @@ const PriceQuote = () => {
                   })}
 
                   {/* Final Price Summary */}
-                  <div className="border-t-2 border-slate-200 pt-4 mt-6">
+                  <div className="sticky top-0 border-t-2 border-slate-200 pt-4 mt-6">
                     <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200">
                       <div>
                         <p className="font-bold text-slate-900">Final Device Value</p>
