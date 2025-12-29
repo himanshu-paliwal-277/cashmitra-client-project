@@ -38,6 +38,7 @@ import {
 import { useCart } from '../../../contexts/CartContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import productService from '../../../services/productService';
+import Button from '../../../components/ui/Button';
 
 const ICON_SIZE = 18;
 
@@ -697,7 +698,7 @@ const ProductDetails = () => {
               </h1>
 
               {/* Rating */}
-              <div className="flex items-center gap-3 flex-wrap">
+              {/* <div className="flex items-center gap-3 flex-wrap">
                 <div className="flex items-center gap-1">
                   {renderStars(Math.round(product.rating?.average || 5))}
                 </div>
@@ -712,11 +713,11 @@ const ProductDetails = () => {
                 <span className="text-sm text-gray-600">
                   {product.trustMetrics?.devicesSold || product.soldCount || '500+'} sold
                 </span>
-              </div>
+              </div> */}
             </div>
 
             {/* Price Card */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100 ">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   {discountPct && (
@@ -736,7 +737,7 @@ const ProductDetails = () => {
               </div>
 
               <div className="space-y-3">
-                {product.paymentOptions?.emiAvailable && (
+                {/* {product.paymentOptions?.emiAvailable && (
                   <div className="flex items-center gap-3 text-sm">
                     <CreditCard size={18} className="text-green-600" />
                     <span className="text-gray-700">
@@ -746,7 +747,7 @@ const ProductDetails = () => {
                       View Plans
                     </button>
                   </div>
-                )}
+                )} */}
                 <div className="flex items-center gap-3 text-sm">
                   <Gift size={18} className="text-green-600" />
                   <span className="text-gray-700 font-semibold">
@@ -921,7 +922,7 @@ const ProductDetails = () => {
               </div>
             </div>
             <div className="flex gap-3">
-              <button
+              {/* <button
                 className={`p-3 rounded-lg border-2 transition-all ${
                   isWishlisted
                     ? 'border-green-500 bg-green-50'
@@ -935,7 +936,7 @@ const ProductDetails = () => {
                   fill={isWishlisted ? '#10b981' : 'none'}
                   className={isWishlisted ? 'text-green-600' : 'text-gray-600'}
                 />
-              </button>
+              </button> */}
               <button
                 className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow-md border-2 border-gray-200"
                 onClick={() => addItem(false)}
@@ -975,29 +976,28 @@ const ProductDetails = () => {
                 </span>
                 <div className="flex gap-2">
                   <input
+                    className="w-full sm:w-60 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     value={pincode}
                     onChange={e => setPincode(e.target.value)}
                     placeholder="Enter pincode"
                   />
-                  <button className="btn-sm">Check</button>
+                  {/* <button className="btn-sm">Check</button> */}
+                  <Button>Check</Button>
                 </div>
               </div>
             </div>
-            <div className="row irow">
-              <RotateCcw size={ICON_SIZE} />
-              <div className="flex items-start gap-3">
-                <RotateCcw size={ICON_SIZE} className="text-green-600 mt-1" />
-                <div>
-                  <div className="font-semibold text-gray-900">15-Day Refund</div>
-                  <div className="text-sm text-gray-600">Easy returns & exchanges</div>
-                </div>
+            <div className="flex items-start gap-3">
+              <RotateCcw size={ICON_SIZE} className="text-green-600 mt-1" />
+              <div>
+                <div className="font-semibold text-gray-900">15-Day Refund</div>
+                <div className="text-sm text-gray-600">Easy returns & exchanges</div>
               </div>
-              <div className="flex items-start gap-3">
-                <Shield size={ICON_SIZE} className="text-green-600 mt-1" />
-                <div>
-                  <div className="font-semibold text-gray-900">Secure Packaging</div>
-                  <div className="text-sm text-gray-600">Safe & secure delivery</div>
-                </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <Shield size={ICON_SIZE} className="text-green-600 mt-1" />
+              <div>
+                <div className="font-semibold text-gray-900">Secure Packaging</div>
+                <div className="text-sm text-gray-600">Safe & secure delivery</div>
               </div>
             </div>
           </div>
@@ -1015,7 +1015,7 @@ const ProductDetails = () => {
               >
                 <FileText size={16} /> Specifications
               </button>
-              <button
+              {/* <button
                 className={`flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
                   activeTab === 'reviews'
                     ? 'text-green-600 border-b-2 border-green-600 bg-green-50'
@@ -1024,7 +1024,7 @@ const ProductDetails = () => {
                 onClick={() => setActiveTab('reviews')}
               >
                 <Star size={16} /> Reviews ({product.rating?.totalReviews || 0})
-              </button>
+              </button> */}
               <button
                 className={`flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
                   activeTab === 'warranty'
@@ -1035,7 +1035,7 @@ const ProductDetails = () => {
               >
                 <Shield size={16} /> Warranty
               </button>
-              <button
+              {/* <button
                 className={`flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
                   activeTab === 'offers'
                     ? 'text-green-600 border-b-2 border-green-600 bg-green-50'
@@ -1044,7 +1044,7 @@ const ProductDetails = () => {
                 onClick={() => setActiveTab('offers')}
               >
                 <Gift size={16} /> Offers
-              </button>
+              </button> */}
               <button
                 className={`flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
                   activeTab === 'faq'
@@ -1194,7 +1194,7 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {activeTab === 'reviews' && (
+            {/* {activeTab === 'reviews' && (
               <div className="p-6 space-y-6">
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
                   <div className="text-center">
@@ -1244,7 +1244,7 @@ const ProductDetails = () => {
                   </p>
                 </div>
               </div>
-            )}
+            )} */}
 
             {activeTab === 'warranty' && (
               <div className="p-6 space-y-6">
@@ -1256,18 +1256,18 @@ const ProductDetails = () => {
                       <p className="text-sm text-gray-600">Hardware defects covered</p>
                     </div>
                   </div>
-                  <div className="wcard irow">
+                  <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-100">
                     <Headphones size={22} />
                     <div>
-                      <h4>24/7 Support</h4>
-                      <p>We’re here any time</p>
+                      <h4 className="font-semibold text-gray-900 mb-1">24/7 Support</h4>
+                      <p className="text-sm text-gray-600">We’re here any time</p>
                     </div>
                   </div>
-                  <div className="wcard irow">
+                  <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-100">
                     <RotateCcw size={22} />
                     <div>
-                      <h4>15-Day Refund</h4>
-                      <p>No-hassle returns</p>
+                      <h4 className="font-semibold text-gray-900 mb-1">15-Day Refund</h4>
+                      <p className="text-sm text-gray-600">No-hassle returns</p>
                     </div>
                   </div>
                 </div>
@@ -1309,7 +1309,7 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {activeTab === 'offers' && (
+            {/* {activeTab === 'offers' && (
               <div className="p-6 space-y-4">
                 {product.offers && product.offers.length > 0 ? (
                   product.offers.map((offer: any, index: number) => (
@@ -1329,27 +1329,27 @@ const ProductDetails = () => {
                   </div>
                 )}
               </div>
-            )}
+            )} */}
 
             {activeTab === 'faq' && (
-              <div className="pd__faq">
+              <div className="p-6">
                 <FaqItem
                   open={openKey === 'faq1'}
                   onToggle={() => setOpenKey(openKey === 'faq1' ? '' : 'faq1')}
-                  q="What does “Superb” condition mean?"
-                  a="Minor body marks, flawless screen, fully functional & QC-passed."
+                  q="How are refurbished devices quality tested?"
+                  a="Every device undergoes a rigorous 32-point quality check including hardware diagnostics, screen testing, battery health verification, camera functionality, and software updates to ensure it meets our high standards before being listed for sale."
                 />
                 <FaqItem
                   open={openKey === 'faq2'}
                   onToggle={() => setOpenKey(openKey === 'faq2' ? '' : 'faq2')}
-                  q="Is the warranty transferable?"
-                  a="Yes — remaining warranty follows the device with the original invoice."
+                  q="What is your return and refund policy?"
+                  a="We offer a 15-day return policy from the date of delivery. If you're not satisfied with your purchase, you can return the device in its original condition for a full refund. The device must be undamaged with all original accessories included."
                 />
                 <FaqItem
                   open={openKey === 'faq3'}
                   onToggle={() => setOpenKey(openKey === 'faq3' ? '' : 'faq3')}
-                  q="What’s in the box?"
-                  a="Phone, compatible USB cable and docs. Adapters may vary by availability."
+                  q="What warranty coverage do I get?"
+                  a="All refurbished devices come with up to 12 months warranty covering manufacturing defects and hardware issues. This includes coverage for display, battery, buttons, and internal components. Physical damage and water damage are not covered under warranty."
                 />
 
                 <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
@@ -1360,9 +1360,9 @@ const ProductDetails = () => {
                     <button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-md">
                       <Phone size={16} /> Call Support
                     </button>
-                    <button className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors border-2 border-gray-200 shadow-sm">
+                    {/* <button className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors border-2 border-gray-200 shadow-sm">
                       <HelpCircle size={16} /> Live Chat
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>

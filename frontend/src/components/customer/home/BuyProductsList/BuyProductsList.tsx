@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import './BuyProductsList.css';
 import adminService from '../../../../services/adminService';
@@ -36,9 +36,9 @@ const BuyProductsList = () => {
     <section className="buy-products-section main-container bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       <div className="section-header">
         <h2>Buy Refurbished Devices</h2>
-        <button className="view-all-button">
+        <Link to="/buy" className="view-all-button">
           View All <ArrowRight size={16} />
-        </button>
+        </Link>
       </div>
 
       {loading ? (

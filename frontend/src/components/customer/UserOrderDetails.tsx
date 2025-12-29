@@ -640,8 +640,8 @@ const UserOrderDetails = () => {
                       const commissionRate = order?.commission?.rate || 0;
                       const correctCommissionAmount = correctTotalAmount * commissionRate;
 
-                      // Customer actually pays: correctTotalAmount - correct commission
-                      const customerPayAmount = correctTotalAmount - correctCommissionAmount;
+                      // Customer actually pays the full amount (cashback is commented out, so no deduction)
+                      const customerPayAmount = correctTotalAmount;
 
                       // Use itemsSubtotal as subtotal, calculate taxes as difference
                       const subtotal = itemsSubtotal;
@@ -659,14 +659,15 @@ const UserOrderDetails = () => {
                               <span>{formatCurrency(taxesAndFees)}</span>
                             </div>
                           )}
-                          {correctCommissionAmount > 0 && (
+                          {/* Cashback row - Commented Out */}
+                          {/* {correctCommissionAmount > 0 && (
                             <div className="payment-row">
                               <span>Cashback</span>
                               <span className="text-green-600">
                                 -{formatCurrency(correctCommissionAmount)}
                               </span>
                             </div>
-                          )}
+                          )} */}
                           <div className="payment-row total">
                             <span>You Pay</span>
                             <span>{formatCurrency(customerPayAmount)}</span>
@@ -712,8 +713,8 @@ const UserOrderDetails = () => {
             </div>
           </div>
 
-          {/* Commission Details (if applicable) */}
-          {order?.commission && (
+          {/* Commission Details (Cashback Card) - Commented Out */}
+          {/* {order?.commission && (
             <div className="card">
               <div className="card-header">
                 <Star size={20} />
@@ -734,7 +735,7 @@ const UserOrderDetails = () => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Contact Support */}
           <div className="card">

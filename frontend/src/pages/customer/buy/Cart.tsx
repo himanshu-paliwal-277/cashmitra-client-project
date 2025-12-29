@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Trash2,
   Plus,
   Minus,
   ShoppingBag,
   ArrowRight,
-  Tag,
+  // Tag, // Commented out - was only used for coupon UI
   Shield,
   Truck,
   RotateCcw,
@@ -59,9 +59,9 @@ const Cart = ({ onBack }: any) => {
   const isLoggedIn = !!user;
 
   // ------- Promo (unchanged UI) -------
-  const [promoCode, setPromoCode] = useState('');
-  const [appliedPromo, setAppliedPromo] = useState(null);
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+  // const [promoCode, setPromoCode] = useState('');
+  // const [appliedPromo, setAppliedPromo] = useState(null);
+  // const [isApplyingPromo, setIsApplyingPromo] = useState(false);
   const [localError, setLocalError] = useState(null);
 
   // ------- Addresses like Checkout -------
@@ -140,22 +140,22 @@ const Cart = ({ onBack }: any) => {
   const moveToWishlist = (id: any) => handleRemoveItem(id);
 
   // ------- Promo UI logic (unchanged) -------
-  const applyPromoCode = async () => {
-    setIsApplyingPromo(true);
-    setLocalError(null);
-    try {
-      await new Promise(r => setTimeout(r, 900));
-      if (promoCode.toLowerCase() === 'save10') {
-        setAppliedPromo({ code: 'SAVE10', discount: 10 });
-        setPromoCode('');
-      } else {
-        setLocalError('Invalid promo code. Please try again.');
-      }
-    } finally {
-      setIsApplyingPromo(false);
-    }
-  };
-  const removePromoCode = () => setAppliedPromo(null);
+  // const applyPromoCode = async () => {
+  //   setIsApplyingPromo(true);
+  //   setLocalError(null);
+  //   try {
+  //     await new Promise(r => setTimeout(r, 900));
+  //     if (promoCode.toLowerCase() === 'save10') {
+  //       setAppliedPromo({ code: 'SAVE10', discount: 10 });
+  //       setPromoCode('');
+  //     } else {
+  //       setLocalError('Invalid promo code. Please try again.');
+  //     }
+  //   } finally {
+  //     setIsApplyingPromo(false);
+  //   }
+  // };
+  // const removePromoCode = () => setAppliedPromo(null);
 
   // ------- Price calc (as before) -------
   const subtotal = getCartTotal();
@@ -164,7 +164,8 @@ const Cart = ({ onBack }: any) => {
     0
   );
   const savings = Math.max(originalTotal - subtotal, 0);
-  const promoDiscount = appliedPromo ? Math.round((subtotal * appliedPromo.discount) / 100) : 0;
+  // const promoDiscount = appliedPromo ? Math.round((subtotal * appliedPromo.discount) / 100) : 0;
+  const promoDiscount = 0;
   const shipping = subtotal > 50000 ? 0 : 500;
   const total = subtotal - promoDiscount + shipping;
 
@@ -311,7 +312,7 @@ const Cart = ({ onBack }: any) => {
           )}
 
           {/* Address strip, same style feel as Checkout screenshot */}
-          <div className="addr-strip">
+          {/* <div className="addr-strip">
             <div className="addr-strip__left">
               <div className="pin">
                 <MapPin size={16} />
@@ -343,7 +344,7 @@ const Cart = ({ onBack }: any) => {
                 {addresses.length === 0 ? 'Add Address' : 'Change'}
               </Button>
             </div>
-          </div>
+          </div> */}
 
           <div className="cart-grid">
             {/* LEFT: items */}
@@ -351,51 +352,138 @@ const Cart = ({ onBack }: any) => {
               {sortedCart.map(item => {
                 const id = item.inventoryId || item.productId || item.id;
                 return (
-                  <Card className="item-card" key={id}>
-                    {item.unavailable && (
-                      <div className="item-unavailable">
-                        <span className="dot" />
-                        Item Unavailable
-                      </div>
-                    )}
-
-                    <div className="item">
-                      <div className="item__img">
-                        <img src={item.image} alt={item.name || item.title} className="" />
-                        <div className="assured">
-                          <span className="assured__dot ">ⓒ</span> cashmitra <b>ASSURED</b>
+                  <Link to={`/buy/product/${id}`} key={id}>
+                    <Card className="item-card">
+                      {item.unavailable && (
+                        <div className="item-unavailable">
+                          <span className="dot" />
+                          Item Unavailable
                         </div>
-                      </div>
+                      )}
 
-                      <div className="item__info">
-                        <div className="cond-chip">
-                          {item.condition?.label || item.badge || 'Good'}
+                      <div className="item">
+                        <div className="item__img cursor-pointer">
+                          <img src={item.image} alt={item.name || item.title} className="" />
+                          <div className="assured">
+                            <span className="assured__dot ">ⓒ</span>
+                            {/* cashmitra */} <b>ASSURED</b>
+                          </div>
                         </div>
 
-                        <h3 className="item__title">{item.name || item.title}</h3>
-                        <div className="item__sub">
-                          {item.brand && item.model ? `${item.brand} • ${item.model}` : item.specs}
+                        <div className="item__info cursor-pointer">
+                          <div className="cond-chip">
+                            {item.condition?.label || item.badge || 'Good'}
+                          </div>
+
+                          <h3 className="item__title hover:text-blue-600 transition-colors">
+                            {item.name || item.title}
+                          </h3>
+                          <div className="item__sub">
+                            {item.brand && item.model
+                              ? `${item.brand} • ${item.model}`
+                              : item.specs}
+                          </div>
+
+                          <div className="price-row">
+                            <div className="price-now">₹{(item.price || 0).toLocaleString()}</div>
+                            {item.originalPrice && item.originalPrice !== item.price && (
+                              <div className="price-mrp">
+                                ₹{item.originalPrice.toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="subtle-row">
+                            <Shield size={14} />
+                            <span>12 Months Warranty</span>
+                          </div>
+
+                          {/* Mobile actions */}
+                          <div
+                            className="item__actions item__actions--mobile"
+                            onClick={e => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                          >
+                            <div className="qty">
+                              <button
+                                className="qty__btn"
+                                disabled={item.quantity <= 1}
+                                onClick={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleQuantityChange(id, item.quantity - 1);
+                                }}
+                              >
+                                <Minus size={14} />
+                              </button>
+                              <input
+                                className="qty__input"
+                                type="number"
+                                value={item.quantity}
+                                onChange={e =>
+                                  handleQuantityChange(id, parseInt(e.target.value) || 1)
+                                }
+                                onClick={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                              />
+                              <button
+                                className="qty__btn"
+                                onClick={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleQuantityChange(id, item.quantity + 1);
+                                }}
+                              >
+                                <Plus size={14} />
+                              </button>
+                            </div>
+
+                            <div className="row-gap">
+                              {/* <button
+                              className="ghost-btn"
+                              onClick={() => moveToWishlist(id)}
+                              title="Move to wishlist"
+                            >
+                              <Heart size={16} />
+                              Move to Wishlist
+                            </button> */}
+                              <button
+                                className="ghost-btn danger"
+                                onClick={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleRemoveItem(id);
+                                }}
+                                title="Remove"
+                              >
+                                <Trash2 size={16} />
+                                {/* Remove */}
+                              </button>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="price-row">
-                          <div className="price-now">₹{(item.price || 0).toLocaleString()}</div>
-                          {item.originalPrice && item.originalPrice !== item.price && (
-                            <div className="price-mrp">₹{item.originalPrice.toLocaleString()}</div>
-                          )}
-                        </div>
-
-                        <div className="subtle-row">
-                          <Shield size={14} />
-                          <span>12 Months Warranty</span>
-                        </div>
-
-                        {/* Mobile actions */}
-                        <div className="item__actions item__actions--mobile">
+                        {/* Desktop actions */}
+                        <div
+                          className="item__actions"
+                          onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                        >
                           <div className="qty">
                             <button
                               className="qty__btn"
                               disabled={item.quantity <= 1}
-                              onClick={() => handleQuantityChange(id, item.quantity - 1)}
+                              onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleQuantityChange(id, item.quantity - 1);
+                              }}
                             >
                               <Minus size={14} />
                             </button>
@@ -406,81 +494,49 @@ const Cart = ({ onBack }: any) => {
                               onChange={e =>
                                 handleQuantityChange(id, parseInt(e.target.value) || 1)
                               }
+                              onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
                             />
                             <button
                               className="qty__btn"
-                              onClick={() => handleQuantityChange(id, item.quantity + 1)}
+                              onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleQuantityChange(id, item.quantity + 1);
+                              }}
                             >
                               <Plus size={14} />
                             </button>
                           </div>
 
-                          <div className="row-gap">
-                            <button
-                              className="ghost-btn"
-                              onClick={() => moveToWishlist(id)}
-                              title="Move to wishlist"
-                            >
-                              <Heart size={16} />
-                              Move to Wishlist
-                            </button>
-                            <button
-                              className="ghost-btn danger"
-                              onClick={() => handleRemoveItem(id)}
-                              title="Remove"
-                            >
-                              <Trash2 size={16} />
-                              Remove
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Desktop actions */}
-                      <div className="item__actions">
-                        <div className="qty">
-                          <button
-                            className="qty__btn"
-                            disabled={item.quantity <= 1}
-                            onClick={() => handleQuantityChange(id, item.quantity - 1)}
-                          >
-                            <Minus size={14} />
-                          </button>
-                          <input
-                            className="qty__input"
-                            type="number"
-                            value={item.quantity}
-                            onChange={e => handleQuantityChange(id, parseInt(e.target.value) || 1)}
-                          />
-                          <button
-                            className="qty__btn"
-                            onClick={() => handleQuantityChange(id, item.quantity + 1)}
-                          >
-                            <Plus size={14} />
-                          </button>
-                        </div>
-
-                        <div className="col">
-                          <button
+                          <div className="col">
+                            {/* <button
                             className="ghost-btn"
                             onClick={() => moveToWishlist(id)}
                             title="Move to wishlist"
                           >
                             <Heart size={16} />
                             Move to Wishlist
-                          </button>
-                          <button
-                            className="ghost-btn danger"
-                            onClick={() => handleRemoveItem(id)}
-                            title="Remove"
-                          >
-                            <Trash2 size={16} />
-                            Remove
-                          </button>
+                          </button> */}
+                            <button
+                              className="ghost-btn danger"
+                              onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleRemoveItem(id);
+                              }}
+                              title="Remove"
+                            >
+                              <Trash2 size={16} />
+                              {/* Remove */}
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
+                    </Card>
+                  </Link>
                 );
               })}
             </div>
@@ -489,7 +545,8 @@ const Cart = ({ onBack }: any) => {
             <Card className="summary">
               <h2 className="summary__title">Price Summary</h2>
 
-              <div className="coupon">
+              {/* Coupon Code Section - Commented Out */}
+              {/* <div className="coupon">
                 {appliedPromo ? (
                   <div className="coupon__applied">
                     <div className="left">
@@ -524,7 +581,7 @@ const Cart = ({ onBack }: any) => {
                     </Button>
                   </div>
                 )}
-              </div>
+              </div> */}
 
               <div className="rows">
                 <div className="row">
@@ -537,12 +594,13 @@ const Cart = ({ onBack }: any) => {
                   <span className="green">-₹{savings.toLocaleString()}</span>
                 </div>
 
-                {appliedPromo && (
+                {/* Coupon discount row - Commented Out */}
+                {/* {appliedPromo && (
                   <div className="row">
                     <span>Coupon ({appliedPromo.code})</span>
                     <span className="green">-₹{promoDiscount.toLocaleString()}</span>
                   </div>
-                )}
+                )} */}
 
                 <div className="row">
                   <span>Delivery Charges</span>
@@ -556,7 +614,7 @@ const Cart = ({ onBack }: any) => {
               </div>
 
               <div className="saved-pill">
-                You’ve saved <b>₹{(savings + promoDiscount).toLocaleString()}</b>
+                You've saved <b>₹{savings.toLocaleString()}</b>
               </div>
               <Button
                 variant="primary"
