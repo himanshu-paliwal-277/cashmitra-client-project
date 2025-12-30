@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import { adminService } from '../../services/adminService';
 import cloudinaryService from '../../services/cloudinaryService';
 import gsmarenaService from '../../services/gsmarenaService';
@@ -31,336 +30,20 @@ import {
   Search,
 } from 'lucide-react';
 
-// --------------------------- styled UI ---------------------------
-const Container = styled.div`
-  padding: 2rem;
-  background: #f8fafc;
-  min-height: 100vh;
-`;
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-`;
-const BackButton = styled.button`display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1rem;background:#fff;border:1px solid #e5e7eb;border-radius:0.5rem;color:#6b7280;cursor:pointer;transition:.2s;&:hover{background:#f9fafb;border-color:#d1d5db;}}`;
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-`;
-const FormContainer = styled.div`
-  background: #fff;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-const FormSection = styled.div`
-  padding: 2rem;
-  border-bottom: 1px solid #e5e7eb;
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-const SectionTitle = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
-`;
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-const Label = styled.label`
-  font-weight: 500;
-  color: #374151;
-  font-size: 0.875rem;
-`;
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  transition: 0.2s;
-  &:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
-`;
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: #fff;
-  &:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
-`;
-const TextArea = styled.textarea`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  min-height: 100px;
-  resize: vertical;
-  &:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
-`;
-const ImageUploadContainer = styled.div`
-  border: 2px dashed #d1d5db;
-  border-radius: 0.5rem;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.2s;
-  &:hover {
-    border-color: #10b981;
-    background: #f0fdf4;
-  }
-`;
-const ImagePreview = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-`;
-const ImageItem = styled.div`
-  position: relative;
-  aspect-ratio: 1;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-`;
-const PreviewImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-const RemoveImageButton = styled.button`
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  background: rgba(239, 68, 68, 0.9);
-  color: #fff;
-  border: none;
-  border-radius: 9999px;
-  width: 1.5rem;
-  height: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 0.75rem;
-`;
-const DynamicFieldContainer = styled.div`
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin-top: 1rem;
-`;
-const DynamicFieldHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-`;
-const AddButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: #10b981;
-  color: #fff;
-  border: none;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: 0.2s;
-  &:hover {
-    background: #059669;
-  }
-`;
-const RemoveButton = styled.button`
-  background: #ef4444;
-  color: #fff;
-  border: none;
-  border-radius: 0.375rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  cursor: pointer;
-  &:hover {
-    background: #dc2626;
-  }
-`;
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 1rem;
-  padding: 2rem;
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
-`;
-const SaveButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 2rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #fff;
-  border: none;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-  }
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-const CancelButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 2rem;
-  background: #fff;
-  color: #6b7280;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  &:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
-  }
-`;
-const ErrorMessage = styled.div`
-  color: #ef4444;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-const SuccessMessage = styled.div`
-  color: #10b981;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-const LoadingSpinner = styled.div`
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid #e5e7eb;
-  border-top: 2px solid #10b981;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  @keyframes spin {
-    0% {
-      transform: rotate(0);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
-// Search-specific styled components
-const SearchContainer = styled.div`
-  position: relative;
-`;
-const SearchInput = styled(Input)`
-  padding-right: 2.5rem;
-`;
-const SearchIcon = styled.div`
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6b7280;
-  pointer-events: none;
-`;
-const SearchDropdown = styled.div`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  max-height: 200px;
-  overflow-y: auto;
-`;
-const SearchItem = styled.div`
-  padding: 0.75rem;
-  cursor: pointer;
-  border-bottom: 1px solid #f3f4f6;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  &:hover {
-    background: #f9fafb;
-  }
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-const SearchLoading = styled.div`
-  padding: 1rem;
-  text-align: center;
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-`;
-const SearchError = styled.div`
-  padding: 1rem;
-  text-align: center;
-  color: #ef4444;
-  font-size: 0.875rem;
-`;
-
-// --------------------------- Main Component ---------------------------
 const AddBuyProduct = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [errors, setErrors] = useState({});
+  const [categories, setCategories] = useState<any[]>([]);
+  const [errors, setErrors] = useState<any>({});
   const [success, setSuccess] = useState('');
 
   // Search-related state
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState('');
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
-  const [searchTimeout, setSearchTimeout] = useState(null);
+  const [searchTimeout, setSearchTimeout] = useState<any>(null);
 
   // ====== IMPORTANT: formData matches backend schema ======
   const [formData, setFormData] = useState({
@@ -368,50 +51,38 @@ const AddBuyProduct = () => {
     name: '',
     brand: '',
     isRefurbished: false,
-
-    images: [],
-
+    images: [] as any[],
     badges: {
       qualityChecks: '',
       warranty: '',
       refundPolicy: '',
       assurance: '',
     },
-
     pricing: {
       mrp: '',
       discountedPrice: '',
       discountPercent: '',
     },
-
-    conditionOptions: [], // {label, price}
-
-    variants: [], // {variantId, storage, color, price, stock}
-
-    addOns: [], // {name, cost, description}
-
-    offers: [], // array of {type,value,conditions} (Mixed tolerated)
-
+    conditionOptions: [] as any[], // {label, price}
+    variants: [] as any[], // {variantId, storage, color, price, stock}
+    addOns: [] as any[], // {name, cost, description}
+    offers: [] as any[], // array of {type,value,conditions} (Mixed tolerated)
     rating: {
       average: 0,
       totalReviews: 0,
       breakdown: { '5star': 0, '4star': 0, '3star': 0, '2star': 0, '1star': 0 },
     },
-
-    reviews: [], // {reviewer, rating, date, comment}
-
+    reviews: [] as any[], // {reviewer, rating, date, comment}
     paymentOptions: {
       emiAvailable: false,
-      emiPlans: [], // {months, amountPerMonth}
-      methods: [], // ['UPI','NetBanking','Credit Card',...]
+      emiPlans: [] as any[], // {months, amountPerMonth}
+      methods: [] as any[], // ['UPI','NetBanking','Credit Card',...]
     },
-
     availability: {
       inStock: true,
       deliveryPincode: '',
       estimatedDelivery: '',
     },
-
     topSpecs: {
       screenSize: '',
       chipset: '',
@@ -419,7 +90,6 @@ const AddBuyProduct = () => {
       networkSupport: '',
       simSlots: '',
     },
-
     productDetails: {
       frontCamera: {
         resolution: '',
@@ -437,12 +107,12 @@ const AddBuyProduct = () => {
         flash: '',
         sensor: '',
         ois: '',
-        videoRecording: [], // comma -> array
-        features: [], // comma -> array
+        videoRecording: [] as any[], // comma -> array
+        features: [] as any[], // comma -> array
       },
       networkConnectivity: {
         wifi: '',
-        wifiFeatures: [],
+        wifiFeatures: [] as any[],
         bluetooth: '',
         nfc: '',
         gps: '',
@@ -450,7 +120,7 @@ const AddBuyProduct = () => {
         esim: '',
         audioJack: '',
         has3p5mmJack: false,
-        audioFeatures: [],
+        audioFeatures: [] as any[],
         simSize: '',
         simSlots: '',
         sim1Bands: '',
@@ -458,7 +128,6 @@ const AddBuyProduct = () => {
         networkSupport: '',
       },
       display: {
-        // Updated to include all UI fields
         size: '',
         resolution: '',
         technology: '',
@@ -478,7 +147,7 @@ const AddBuyProduct = () => {
         modelNumber: '',
       },
       memoryStorage: {
-        phoneVariants: [],
+        phoneVariants: [] as any[],
         expandableStorage: false,
         ramType: '',
         storageType: '',
@@ -493,7 +162,6 @@ const AddBuyProduct = () => {
         processTechnology: '',
       },
       battery: {
-        // Updated to match UI
         capacity: '',
         fastCharging: '',
         wirelessCharging: '',
@@ -502,32 +170,27 @@ const AddBuyProduct = () => {
       },
       design: {
         weight: '',
-        dimensions: {}, // Mixed
-        colors: [], // Mixed
+        dimensions: {},
+        colors: [] as any[],
         build: '',
         sarValue: '',
       },
       sensorsMisc: {
         fingerprintScanner: false,
-        sensors: [],
+        sensors: [] as any[],
       },
     },
-
     description: '',
-
     trustMetrics: {
       devicesSold: 0,
       qualityChecks: 0,
     },
-
-    relatedProducts: [], // {id, name, price, image, rating}
-
+    relatedProducts: [] as any[], // {id, name, price, image, rating}
     legal: {
       terms: '',
       privacy: '',
       copyright: '',
     },
-
     isActive: true,
     sortOrder: 0,
   });
@@ -611,18 +274,18 @@ const AddBuyProduct = () => {
   };
 
   // --------------------- cloudinary ---------------------
-  const handleImageUpload = async (e: any) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    const invalid = files.filter(f => !validTypes.includes(f.type));
+    const invalid = files.filter((f: File) => !validTypes.includes(f.type));
     if (invalid.length) {
       setErrors(prev => ({ ...prev, images: 'Only JPEG/PNG/WebP allowed' }));
       return;
     }
     const maxSize = 5 * 1024 * 1024;
-    const oversized = files.filter(f => f.size > maxSize);
+    const oversized = files.filter((f: File) => f.size > maxSize);
     if (oversized.length) {
       setErrors(prev => ({ ...prev, images: 'Each image must be < 5MB' }));
       return;
@@ -630,7 +293,7 @@ const AddBuyProduct = () => {
 
     try {
       const uploaded = await Promise.all(
-        files.map(async file => {
+        files.map(async (file: File) => {
           const r = await cloudinaryService.uploadImage(file, {
             folder: 'products',
             tags: ['product', 'buy-product'],
@@ -649,6 +312,7 @@ const AddBuyProduct = () => {
       setErrors(prev => ({ ...prev, images: 'Failed to upload images' }));
     }
   };
+
   const removeImage = (index: any) => {
     setFormData(prev => {
       const imgs = [...prev.images];
@@ -658,417 +322,15 @@ const AddBuyProduct = () => {
     });
   };
 
-  // --------------------- Product Search Functions ---------------------
-  const handleSearchInput = (e: any) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
-    // Clear previous timeout
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-    }
-
-    if (query.trim().length < 2) {
-      setShowSearchDropdown(false);
-      setSearchResults([]);
-      return;
-    }
-
-    // Debounce search
-    const timeout = setTimeout(() => {
-      performSearch(query);
-    }, 500);
-    setSearchTimeout(timeout);
-  };
-
-  const performSearch = async (query: any) => {
-    setSearchLoading(true);
-    setSearchError('');
-    setShowSearchDropdown(true);
-
-    try {
-      const suggestions = await gsmarenaService.getProductSuggestions(query);
-      setSearchResults(suggestions);
-    } catch (error) {
-      console.error('Search error:', error);
-      setSearchError('Failed to search products. Please try again.');
-      setSearchResults([]);
-    } finally {
-      setSearchLoading(false);
-    }
-  };
-
-  const handleProductSelect = async (productName: any) => {
-    setSearchLoading(true);
-    setShowSearchDropdown(false);
-    setSearchQuery(productName);
-
-    try {
-      const productData = await gsmarenaService.searchProduct(productName);
-
-      if (productData) {
-        // Auto-populate form fields with the retrieved data
-        populateFormWithProductData(productData);
-        setSuccess('Product details loaded successfully! You can edit any field as needed.');
-      } else {
-        throw new Error('No product data received');
-      }
-    } catch (error) {
-      console.error('Product fetch error:', error);
-      let errorMessage = error.message || 'Failed to load product details';
-      if (
-        errorMessage.includes('not found') ||
-        errorMessage.includes('not available') ||
-        errorMessage.includes('not in our database')
-      ) {
-        setSearchError(
-          `Product "${productName}" not found. Please enter details manually or try a similar product.`
-        );
-        setFormData(prev => ({ ...prev, name: productName })); // Fallback to name only
-      } else {
-        setSearchError(errorMessage);
-      }
-    } finally {
-      setSearchLoading(false);
-    }
-  };
-
-  const populateFormWithProductData = (productData: any) => {
-    // Handle phoneVariants - could be string (JS array literal), array of strings, or array of objects
-    let processedPhoneVariants: any = [];
-    const originalPhoneVariants = productData.productDetails?.memoryStorage?.phoneVariants;
-    if (typeof originalPhoneVariants === 'string') {
-      try {
-        // Replace single quotes with double for JSON parsing
-        let jsonStr = originalPhoneVariants
-          .replace(/'/g, '"')
-          .replace(/,\s*]/g, ']') // Fix trailing comma if any
-          .replace(/\s+/g, ' '); // Normalize spaces
-        const parsed = JSON.parse(jsonStr);
-        if (Array.isArray(parsed)) {
-          processedPhoneVariants = parsed
-            .map(v => {
-              if (typeof v === 'object' && v !== null && v.storage) {
-                return v.storage;
-              }
-              return String(v);
-            })
-            .filter(Boolean);
-        }
-      } catch (e) {
-        console.warn('Failed to parse phoneVariants string:', e);
-      }
-    } else if (Array.isArray(originalPhoneVariants)) {
-      processedPhoneVariants = originalPhoneVariants
-        .map(v => {
-          if (typeof v === 'object' && v !== null && v.storage) {
-            return v.storage;
-          }
-          return String(v);
-        })
-        .filter(Boolean);
-    }
-
-    // Handle variants population based on original or processed
-    let processedVariants = formData.variants; // Default to current
-    const originalVariantsData = Array.isArray(originalPhoneVariants) ? originalPhoneVariants : [];
-    if (originalVariantsData.length > 0) {
-      // If original is array of objects or parsable, use for variants with price
-      const variantSource =
-        typeof originalPhoneVariants === 'string'
-          ? JSON.parse(originalPhoneVariants.replace(/'/g, '"')) || []
-          : originalVariantsData;
-      if (Array.isArray(variantSource)) {
-        processedVariants = variantSource.map((v, index) => ({
-          variantId: `var-${index + 1}`,
-          storage: typeof v === 'object' && v !== null ? v.storage || '' : String(v),
-          color: '',
-          price: typeof v === 'object' && v !== null ? v.price || 0 : 0,
-          stock: true,
-        }));
-      }
-    } else if (processedPhoneVariants.length > 0) {
-      // Fallback to processed strings for variants
-      processedVariants = processedPhoneVariants.map((storage, index) => ({
-        variantId: `var-${index + 1}`,
-        storage,
-        color: '',
-        price: 0,
-        stock: true,
-      }));
-    }
-
-    setFormData(prev => ({
-      ...prev,
-      name: productData.name || prev.name,
-      brand: productData.brand || prev.brand,
-      description: productData.description || prev.description,
-      pricing: {
-        ...prev.pricing,
-        mrp: productData.productDetails.general.priceMrp || prev.pricing.mrp,
-      },
-      availability: {
-        ...prev.availability,
-        inStock: productData.availability.inStock,
-        deliveryPincode:
-          productData.availability.deliveryPincode || prev.availability.deliveryPincode,
-        estimatedDelivery:
-          productData.availability.estimatedDelivery || prev.availability.estimatedDelivery,
-      },
-      topSpecs: {
-        ...prev.topSpecs,
-        screenSize: productData.topSpecs.screenSize || prev.topSpecs.screenSize,
-        chipset: productData.topSpecs.chipset || prev.topSpecs.chipset,
-        pixelDensity: productData.topSpecs.pixelDensity || prev.topSpecs.pixelDensity,
-        networkSupport: productData.topSpecs.networkSupport || prev.topSpecs.networkSupport,
-        simSlots: productData.topSpecs.simSlots || prev.topSpecs.simSlots,
-      },
-      productDetails: {
-        ...prev.productDetails,
-        display: {
-          ...prev.productDetails.display,
-          size: productData.productDetails.display.size || prev.productDetails.display.size,
-          resolution:
-            productData.productDetails.display.resolution || prev.productDetails.display.resolution,
-          technology:
-            productData.productDetails.display.technology || prev.productDetails.display.technology,
-          refreshRate:
-            productData.productDetails.display.refreshRate ||
-            prev.productDetails.display.refreshRate,
-          pixelDensity:
-            productData.productDetails.display.pixelDensity ||
-            prev.productDetails.display.pixelDensity,
-          aspectRatio:
-            productData.productDetails.display.aspectRatio ||
-            prev.productDetails.display.aspectRatio,
-          screenToBodyRatio:
-            productData.productDetails.display.screenToBodyRatio ||
-            prev.productDetails.display.screenToBodyRatio,
-          brightness:
-            productData.productDetails.display.brightness || prev.productDetails.display.brightness,
-          protection:
-            productData.productDetails.display.protection || prev.productDetails.display.protection,
-        },
-        performance: {
-          ...prev.productDetails.performance,
-          chipset:
-            productData.productDetails.performance.chipset ||
-            prev.productDetails.performance.chipset,
-          cpu: productData.productDetails.performance.cpu || prev.productDetails.performance.cpu,
-          clockSpeed:
-            productData.productDetails.performance.clockSpeed ||
-            prev.productDetails.performance.clockSpeed,
-          gpu: productData.productDetails.performance.gpu || prev.productDetails.performance.gpu,
-          os: productData.productDetails.performance.os || prev.productDetails.performance.os,
-          architecture:
-            productData.productDetails.performance.architecture ||
-            prev.productDetails.performance.architecture,
-          processTechnology:
-            productData.productDetails.performance.processTechnology ||
-            prev.productDetails.performance.processTechnology,
-        },
-        general: {
-          ...prev.productDetails.general,
-          announcedOn:
-            productData.productDetails.general.announcedOn ||
-            prev.productDetails.general.announcedOn,
-          priceMrp:
-            productData.productDetails.general.priceMrp || prev.productDetails.general.priceMrp,
-          brand: productData.productDetails.general.brand || prev.productDetails.general.brand,
-          marketStatus:
-            productData.productDetails.general.marketStatus ||
-            prev.productDetails.general.marketStatus,
-          priceStatus:
-            productData.productDetails.general.priceStatus ||
-            prev.productDetails.general.priceStatus,
-          modelNumber:
-            productData.productDetails.general.modelNumber ||
-            prev.productDetails.general.modelNumber,
-        },
-        memoryStorage: {
-          ...prev.productDetails.memoryStorage,
-          phoneVariants: processedPhoneVariants,
-          expandableStorage:
-            productData.productDetails.memoryStorage.expandableStorage !== undefined
-              ? productData.productDetails.memoryStorage.expandableStorage
-              : prev.productDetails.memoryStorage.expandableStorage,
-          ramType:
-            productData.productDetails.memoryStorage.ramType ||
-            prev.productDetails.memoryStorage.ramType,
-          storageType:
-            productData.productDetails.memoryStorage.storageType ||
-            prev.productDetails.memoryStorage.storageType,
-        },
-        frontCamera: {
-          ...prev.productDetails.frontCamera,
-          resolution:
-            productData.productDetails.frontCamera.resolution ||
-            prev.productDetails.frontCamera.resolution,
-          setup:
-            productData.productDetails.frontCamera.setup || prev.productDetails.frontCamera.setup,
-          aperture:
-            productData.productDetails.frontCamera.aperture ||
-            prev.productDetails.frontCamera.aperture,
-          flash:
-            productData.productDetails.frontCamera.flash || prev.productDetails.frontCamera.flash,
-          videoRecording:
-            productData.productDetails.frontCamera.videoRecording ||
-            prev.productDetails.frontCamera.videoRecording,
-          type: productData.productDetails.frontCamera.type || prev.productDetails.frontCamera.type,
-          features:
-            productData.productDetails.frontCamera.features ||
-            prev.productDetails.frontCamera.features,
-        },
-        rearCamera: {
-          ...prev.productDetails.rearCamera,
-          setup:
-            productData.productDetails.rearCamera.setup || prev.productDetails.rearCamera.setup,
-          camera1: {
-            ...prev.productDetails.rearCamera.camera1,
-            resolution:
-              productData.productDetails.rearCamera.camera1.resolution ||
-              prev.productDetails.rearCamera.camera1.resolution,
-            aperture:
-              productData.productDetails.rearCamera.camera1.aperture ||
-              prev.productDetails.rearCamera.camera1.aperture,
-            type:
-              productData.productDetails.rearCamera.camera1.type ||
-              prev.productDetails.rearCamera.camera1.type,
-            lens:
-              productData.productDetails.rearCamera.camera1.lens ||
-              prev.productDetails.rearCamera.camera1.lens,
-          },
-          camera2: {
-            ...prev.productDetails.rearCamera.camera2,
-            resolution:
-              productData.productDetails.rearCamera.camera2.resolution ||
-              prev.productDetails.rearCamera.camera2.resolution,
-            aperture:
-              productData.productDetails.rearCamera.camera2.aperture ||
-              prev.productDetails.rearCamera.camera2.aperture,
-            type:
-              productData.productDetails.rearCamera.camera2.type ||
-              prev.productDetails.rearCamera.camera2.type,
-            lens:
-              productData.productDetails.rearCamera.camera2.lens ||
-              prev.productDetails.rearCamera.camera2.lens,
-          },
-          flash:
-            productData.productDetails.rearCamera.flash || prev.productDetails.rearCamera.flash,
-          sensor:
-            productData.productDetails.rearCamera.sensor || prev.productDetails.rearCamera.sensor,
-          ois: productData.productDetails.rearCamera.ois || prev.productDetails.rearCamera.ois,
-          videoRecording:
-            productData.productDetails.rearCamera.videoRecording ||
-            prev.productDetails.rearCamera.videoRecording,
-          features:
-            productData.productDetails.rearCamera.features ||
-            prev.productDetails.rearCamera.features,
-        },
-        battery: {
-          ...prev.productDetails.battery,
-          capacity:
-            productData.productDetails.battery.capacity || prev.productDetails.battery.capacity,
-          fastCharging:
-            productData.productDetails.battery.fastCharging ||
-            prev.productDetails.battery.fastCharging,
-          wirelessCharging:
-            productData.productDetails.battery.wirelessCharging ||
-            prev.productDetails.battery.wirelessCharging,
-          type: productData.productDetails.battery.type || prev.productDetails.battery.type,
-          features:
-            productData.productDetails.battery.features || prev.productDetails.battery.features,
-        },
-        networkConnectivity: {
-          ...prev.productDetails.networkConnectivity,
-          wifi:
-            productData.productDetails.networkConnectivity.wifi ||
-            prev.productDetails.networkConnectivity.wifi,
-          wifiFeatures:
-            productData.productDetails.networkConnectivity.wifiFeatures ||
-            prev.productDetails.networkConnectivity.wifiFeatures,
-          bluetooth:
-            productData.productDetails.networkConnectivity.bluetooth ||
-            prev.productDetails.networkConnectivity.bluetooth,
-          nfc:
-            productData.productDetails.networkConnectivity.nfc ||
-            prev.productDetails.networkConnectivity.nfc,
-          gps:
-            productData.productDetails.networkConnectivity.gps ||
-            prev.productDetails.networkConnectivity.gps,
-          volte:
-            productData.productDetails.networkConnectivity.volte ||
-            prev.productDetails.networkConnectivity.volte,
-          esim:
-            productData.productDetails.networkConnectivity.esim ||
-            prev.productDetails.networkConnectivity.esim,
-          audioJack:
-            productData.productDetails.networkConnectivity.audioJack ||
-            prev.productDetails.networkConnectivity.audioJack,
-          has3p5mmJack:
-            productData.productDetails.networkConnectivity.has3p5mmJack !== undefined
-              ? productData.productDetails.networkConnectivity.has3p5mmJack
-              : prev.productDetails.networkConnectivity.has3p5mmJack,
-          audioFeatures:
-            productData.productDetails.networkConnectivity.audioFeatures ||
-            prev.productDetails.networkConnectivity.audioFeatures,
-          simSize:
-            productData.productDetails.networkConnectivity.simSize ||
-            prev.productDetails.networkConnectivity.simSize,
-          simSlots:
-            productData.productDetails.networkConnectivity.simSlots ||
-            prev.productDetails.networkConnectivity.simSlots,
-          sim1Bands:
-            productData.productDetails.networkConnectivity.sim1Bands ||
-            prev.productDetails.networkConnectivity.sim1Bands,
-          sim2Bands:
-            productData.productDetails.networkConnectivity.sim2Bands ||
-            prev.productDetails.networkConnectivity.sim2Bands,
-          networkSupport:
-            productData.productDetails.networkConnectivity.networkSupport ||
-            prev.productDetails.networkConnectivity.networkSupport,
-        },
-        design: {
-          ...prev.productDetails.design,
-          weight: productData.productDetails.design.weight || prev.productDetails.design.weight,
-          dimensions:
-            productData.productDetails.design.dimensions || prev.productDetails.design.dimensions,
-          colors: productData.productDetails.design.colors || prev.productDetails.design.colors,
-          build: productData.productDetails.design.build || prev.productDetails.design.build,
-          sarValue:
-            productData.productDetails.design.sarValue || prev.productDetails.design.sarValue,
-        },
-        sensorsMisc: {
-          ...prev.productDetails.sensorsMisc,
-          fingerprintScanner:
-            productData.productDetails.sensorsMisc.fingerprintScanner !== undefined
-              ? productData.productDetails.sensorsMisc.fingerprintScanner
-              : prev.productDetails.sensorsMisc.fingerprintScanner,
-          sensors:
-            productData.productDetails.sensorsMisc.sensors ||
-            prev.productDetails.sensorsMisc.sensors,
-        },
-      },
-      variants: processedVariants,
-    }));
-  };
-
-  const handleSearchBlur = () => {
-    // Delay hiding dropdown to allow for click events
-    setTimeout(() => {
-      setShowSearchDropdown(false);
-    }, 200);
-  };
-
   // --------------------- validation ---------------------
   const validateForm = () => {
-    const err = {};
+    const err: any = {};
     if (!formData.categoryId) err.categoryId = 'Category is required';
     if (!formData.name.trim()) err.name = 'Product name is required';
     if (!formData.brand.trim()) err.brand = 'Brand is required';
     if (!formData.description.trim()) err.description = 'Description is required';
-    const mrp = parseFloat(formData.pricing.mrp || 0);
-    const disc = parseFloat(formData.pricing.discountedPrice || 0);
+    const mrp = parseFloat(formData.pricing.mrp || '0');
+    const disc = parseFloat(formData.pricing.discountedPrice || '0');
     if (!(mrp > 0)) err['pricing.mrp'] = 'Valid MRP is required';
     if (disc && disc >= mrp)
       err['pricing.discountedPrice'] = 'Discounted price must be less than MRP';
@@ -1095,9 +357,9 @@ const AddBuyProduct = () => {
           .map(i => (typeof i === 'string' ? i : i.url))
           .filter(Boolean),
         pricing: {
-          mrp: parseFloat(formData.pricing.mrp || 0),
-          discountedPrice: parseFloat(formData.pricing.discountedPrice || 0),
-          discountPercent: parseFloat(formData.pricing.discountPercent || 0),
+          mrp: parseFloat(formData.pricing.mrp || '0'),
+          discountedPrice: parseFloat(formData.pricing.discountedPrice || '0'),
+          discountPercent: parseFloat(formData.pricing.discountPercent || '0'),
         },
         conditionOptions: (formData.conditionOptions || []).map(c => ({
           label: c.label || '',
@@ -1179,7 +441,7 @@ const AddBuyProduct = () => {
               : [],
           },
           memoryStorage: {
-            ...formData.productDetails.memoryStorCashmitra
+            ...formData.productDetails.memoryStorage,
             phoneVariants: Array.isArray(formData.productDetails.memoryStorage.phoneVariants)
               ? formData.productDetails.memoryStorage.phoneVariants.map(v => String(v))
               : [],
@@ -1211,80 +473,6 @@ const AddBuyProduct = () => {
         sortOrder: Number(formData.sortOrder || 0),
       };
 
-      // Reshape images to match exact schema (object wCashmitran, gallery as comma-string, thumbnail)
-      const imageUrls = productData.images;
-      const main = imageUrls[0] || '';
-      const gallery = imageUrls.slice(1).join(',');
-      const thumbnail = imageUrls[imageUrls.length - 1] || '';
-      productData.images = {
-        main,
-        gallery,
-        thumbnail,
-      };
-
-      // Reshape offers to match exact schema (object with exchangeBonus number, bankOffers array of strings)
-      productData.offers = {
-        exchangeBonus: 0,
-        bankOffers: [],
-      };
-      for (let o of formData.offers || []) {
-        const oType = (o.type || '').toLowerCase();
-        const oValue = o.value || o.conditions || '';
-        if (oType.includes('exchange') || oType.includes('bonus')) {
-          productData.offers.exchangeBonus = Number(oValue) || 0;
-        } else if (oType.includes('bank') || oType.includes('offer')) {
-          if (oValue) productData.offers.bankOffers.push(oValue);
-        }
-      }
-
-      // Set badges to match exact schema (defaults if empty)
-      productData.badges = {
-        qualityChecks: formData.badges.qualityChecks || '32-Point Quality Check',
-        warranty: formData.badges.warranty || '6 Months Warranty',
-        refundPolicy: formData.badges.refundPolicy || '7 Days Return',
-        assurance: formData.badges.assurance || 'Cashmitra Assured',
-      };
-
-      // Ensure display.type (map from technology) and features array
-      productData.productDetails.display.type = formData.productDetails.display.technology || '';
-      if (!Array.isArray(productData.productDetails.display.features)) {
-        productData.productDetails.display.features = [];
-      }
-
-      // Ensure battery defaults to match schema
-      productData.productDetails.battery.removable =
-        formData.productDetails.battery.removable ?? false;
-      productData.productDetails.battery.reverseCharging =
-        formData.productDetails.battery.reverseCharging ?? false;
-
-      // Ensure design dimensions object (empty if not set)
-      if (
-        !productData.productDetails.design.dimensions ||
-        typeof productData.productDetails.design.dimensions !== 'object'
-      ) {
-        productData.productDetails.design.dimensions = {
-          height: '',
-          width: '',
-          thickness: '',
-        };
-      }
-
-      // Set memoryStorage.phoneVariants from unique variant storages if empty
-      if (
-        !productData.productDetails.memoryStorage.phoneVariants ||
-        productData.productDetails.memoryStorage.phoneVariants.length === 0
-      ) {
-        const uniqueStorages = [...new Set(formData.variants.map(v => v.storage).filter(Boolean))];
-        productData.productDetails.memoryStorage.phoneVariants = uniqueStorages;
-      }
-
-      // Set legal defaults if empty
-      productData.legal = {
-        terms: formData.legal.terms || 'Standard terms and conditions apply',
-        privacy: formData.legal.privacy || 'Privacy policy compliant',
-        copyright: formData.legal.copyright || '© 2024 Cashmitra. All rights reserved.',
-      };
-
       // Call API
       const response = await adminService.createBuyProduct(productData);
       if (response?.success) {
@@ -1303,51 +491,48 @@ const AddBuyProduct = () => {
   };
 
   const handleCancel = () => navigate('/admin/buy-products');
+
   // --------------------- UI ---------------------
   return (
-    <Container>
-      <Header>
-        <BackButton onClick={handleCancel}>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="flex items-center gap-4 mb-8">
+        <button
+          onClick={handleCancel}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+        >
           <ArrowLeft size={20} />
           Back to Products
-        </BackButton>
-        <Title>Add New Product</Title>
-      </Header>
+        </button>
+        <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
+      </div>
 
       {/* Success Message */}
       {success && (
-        <div
-          style={{
-            marginBottom: '1rem',
-            padding: '1rem',
-            background: '#f0fdf4',
-            border: '1px solid #bbf7d0',
-            borderRadius: '0.5rem',
-          }}
-        >
-          <SuccessMessage>
+        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center gap-2 text-green-800">
             <CheckCircle size={16} />
             {success}
-          </SuccessMessage>
+          </div>
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
-        <FormContainer>
-          {/* Basic */}
-          <FormSection>
-            <SectionTitle>
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          {/* Basic Information */}
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
               <Package size={20} />
               Basic Information
-            </SectionTitle>
-            <FormGrid>
-              <FormGroup>
-                <Label>Category *</Label>
-                <Select
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                <select
                   name="categoryId"
                   value={formData.categoryId}
                   onChange={handleInputChange}
                   required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select Category</option>
                   {categories.map(c => (
@@ -1355,1469 +540,296 @@ const AddBuyProduct = () => {
                       {c.name}
                     </option>
                   ))}
-                </Select>
+                </select>
                 {errors.categoryId && (
-                  <ErrorMessage>
+                  <div className="mt-1 text-red-600 text-sm flex items-center gap-1">
                     <AlertCircle size={16} />
                     {errors.categoryId}
-                  </ErrorMessage>
+                  </div>
                 )}
-              </FormGroup>
-              <FormGroup>
-                <Label>Product Name *</Label>
-                <SearchContainer>
-                  <SearchInput
-                    name="name"
-                    value={searchQuery || formData.name}
-                    onChange={(e: any) => {
-                      handleInputChange(e);
-                      handleSearchInput(e);
-                    }}
-                    onBlur={handleSearchBlur}
-                    placeholder="Search for a product (e.g., iPhone 14 Pro)"
-                    required
-                  />
-                  <SearchIcon>
-                    {searchLoading ? <LoadingSpinner /> : <Search size={16} />}
-                  </SearchIcon>
+              </div>
 
-                  {showSearchDropdown && (
-                    <SearchDropdown>
-                      {searchError ? (
-                        <SearchError>{searchError}</SearchError>
-                      ) : searchResults.length > 0 ? (
-                        searchResults.map((product, index) => (
-                          <SearchItem key={index} onClick={() => handleProductSelect(product)}>
-                            <Search size={14} />
-                            {product}
-                          </SearchItem>
-                        ))
-                      ) : searchQuery && searchQuery.length >= 2 && !searchLoading ? (
-                        <SearchError>No products found. Try a different search term.</SearchError>
-                      ) : null}
-                    </SearchDropdown>
-                  )}
-                </SearchContainer>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Product Name *
+                </label>
+                <input
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  placeholder="Enter product name"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
                 {errors.name && (
-                  <ErrorMessage>
+                  <div className="mt-1 text-red-600 text-sm flex items-center gap-1">
                     <AlertCircle size={16} />
                     {errors.name}
-                  </ErrorMessage>
+                  </div>
                 )}
-              </FormGroup>
-              <FormGroup>
-                <Label>Brand *</Label>
-                <Input
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Brand *</label>
+                <input
                   name="brand"
                   value={formData.brand}
                   onChange={handleInputChange}
                   placeholder="Apple"
                   required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {errors.brand && (
-                  <ErrorMessage>
+                  <div className="mt-1 text-red-600 text-sm flex items-center gap-1">
                     <AlertCircle size={16} />
                     {errors.brand}
-                  </ErrorMessage>
+                  </div>
                 )}
-              </FormGroup>
-              <FormGroup>
-                <Label>
+              </div>
+
+              <div className="flex items-center">
+                <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     name="isRefurbished"
                     checked={formData.isRefurbished}
                     onChange={handleInputChange}
-                    style={{ marginRight: 8 }}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  Refurbished
-                </Label>
-              </FormGroup>
-              <FormGroup>
-                <Label>Sort Order</Label>
-                <Input
+                  <span className="text-sm font-medium text-gray-700">Refurbished</span>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Sort Order</label>
+                <input
                   type="number"
                   name="sortOrder"
                   value={formData.sortOrder}
                   onChange={handleInputChange}
                   placeholder="0"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-              </FormGroup>
-            </FormGrid>
+              </div>
+            </div>
 
-            <FormGroup>
-              <Label>Description *</Label>
-              <TextArea
+            <div className="mt-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+              <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
                 placeholder="Product description"
                 required
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical"
               />
               {errors.description && (
-                <ErrorMessage>
+                <div className="mt-1 text-red-600 text-sm flex items-center gap-1">
                   <AlertCircle size={16} />
                   {errors.description}
-                </ErrorMessage>
+                </div>
               )}
-            </FormGroup>
-          </FormSection>
+            </div>
+          </div>
 
           {/* Images */}
-          <FormSection>
-            <SectionTitle>
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
               <ImageIcon size={20} />
               Product Images
-            </SectionTitle>
-            <FormGroup>
-              <Label>Upload Images</Label>
-              <ImageUploadContainer>
+            </h2>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Upload Images</label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
                 <input
                   type="file"
                   multiple
                   accept="image/*"
                   onChange={handleImageUpload}
-                  style={{ display: 'none' }}
+                  className="hidden"
                   id="image-upload"
                 />
-                <label htmlFor="image-upload" style={{ cursor: 'pointer' }}>
-                  <Upload size={24} style={{ marginBottom: '.5rem' }} />
-                  <div>Click to upload images</div>
-                  <div style={{ fontSize: '.875rem', color: '#6b7280', marginTop: '.25rem' }}>
-                    PNG, JPG, WebP up to 5MB each
-                  </div>
+                <label htmlFor="image-upload" className="cursor-pointer">
+                  <Upload size={24} className="mx-auto mb-2 text-gray-400" />
+                  <div className="text-gray-600">Click to upload images</div>
+                  <div className="text-sm text-gray-500 mt-1">PNG, JPG, WebP up to 5MB each</div>
                 </label>
-              </ImageUploadContainer>
+              </div>
 
               {formData.images.length > 0 && (
-                <ImagePreview>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-4">
                   {formData.images.map((img, i) => (
-                    <ImageItem key={i}>
-                      <PreviewImage src={img.url || img} alt={`Product ${i}`} />
-                      <RemoveImageButton type="button" onClick={() => removeImage(i)}>
+                    <div
+                      key={i}
+                      className="relative aspect-square border border-gray-200 rounded-lg overflow-hidden"
+                    >
+                      <img
+                        src={img.url || img}
+                        alt={`Product ${i}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                      >
                         <X size={12} />
-                      </RemoveImageButton>
-                    </ImageItem>
+                      </button>
+                    </div>
                   ))}
-                </ImagePreview>
+                </div>
               )}
               {errors.images && (
-                <ErrorMessage>
+                <div className="mt-2 text-red-600 text-sm flex items-center gap-1">
                   <AlertCircle size={16} />
                   {errors.images}
-                </ErrorMessage>
+                </div>
               )}
-            </FormGroup>
-          </FormSection>
+            </div>
+          </div>
 
           {/* Pricing */}
-          <FormSection>
-            <SectionTitle>
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
               <DollarSign size={20} />
               Pricing
-            </SectionTitle>
-            <FormGrid>
-              <FormGroup>
-                <Label>MRP *</Label>
-                <Input
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">MRP *</label>
+                <input
                   type="number"
                   name="pricing.mrp"
                   value={formData.pricing.mrp}
                   onChange={handleInputChange}
                   placeholder="129900"
                   required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {errors['pricing.mrp'] && (
-                  <ErrorMessage>
+                  <div className="mt-1 text-red-600 text-sm flex items-center gap-1">
                     <AlertCircle size={16} />
                     {errors['pricing.mrp']}
-                  </ErrorMessage>
+                  </div>
                 )}
-              </FormGroup>
-              <FormGroup>
-                <Label>Discounted Price</Label>
-                <Input
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Discounted Price
+                </label>
+                <input
                   type="number"
                   name="pricing.discountedPrice"
                   value={formData.pricing.discountedPrice}
                   onChange={handleInputChange}
                   placeholder="119900"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {errors['pricing.discountedPrice'] && (
-                  <ErrorMessage>
+                  <div className="mt-1 text-red-600 text-sm flex items-center gap-1">
                     <AlertCircle size={16} />
                     {errors['pricing.discountedPrice']}
-                  </ErrorMessage>
+                  </div>
                 )}
-              </FormGroup>
-              <FormGroup>
-                <Label>Discount %</Label>
-                <Input
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Discount %</label>
+                <input
                   type="number"
                   name="pricing.discountPercent"
                   value={formData.pricing.discountPercent}
                   onChange={handleInputChange}
                   placeholder="8"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-              </FormGroup>
-            </FormGrid>
-          </FormSection>
+              </div>
+            </div>
+          </div>
 
           {/* Condition Options */}
-          <FormSection>
-            <SectionTitle>
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
               <Settings size={20} />
               Condition Options
-            </SectionTitle>
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <Label>Conditions</Label>
-                <AddButton
+            </h2>
+            <div className="border border-gray-200 rounded-lg p-4">
+              <div className="flex justify-between items-center mb-4">
+                <label className="text-sm font-medium text-gray-700">Conditions</label>
+                <button
                   type="button"
                   onClick={() => handleArrayAdd('conditionOptions', { label: '', price: '' })}
+                  className="flex items-center gap-2 px-3 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition-colors"
                 >
                   <Plus size={16} />
                   Add
-                </AddButton>
-              </DynamicFieldHeader>
+                </button>
+              </div>
               {formData.conditionOptions.map((c, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    border: '1px solid #e5e7eb',
-                    borderRadius: 8,
-                    padding: 12,
-                    marginBottom: 12,
-                  }}
-                >
-                  <FormGrid>
-                    <FormGroup>
-                      <Label>Label</Label>
-                      <Select
+                <div key={idx} className="border border-gray-200 rounded-lg p-3 mb-3 last:mb-0">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
+                      <select
                         value={c.label}
-                        onChange={(e: any) => handleArrayUpdate('conditionOptions', idx, {
-                          ...c,
-                          label: e.target.value,
-                        })
+                        onChange={e =>
+                          handleArrayUpdate('conditionOptions', idx, {
+                            ...c,
+                            label: e.target.value,
+                          })
                         }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="">Select</option>
                         <option value="Fair">Fair</option>
                         <option value="Good">Good</option>
                         <option value="Superb">Superb</option>
-                      </Select>
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Price</Label>
-                      <Input
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                      <input
                         type="number"
                         value={c.price}
-                        onChange={(e: any) => handleArrayUpdate('conditionOptions', idx, {
-                          ...c,
-                          price: e.target.value,
-                        })
+                        onChange={e =>
+                          handleArrayUpdate('conditionOptions', idx, {
+                            ...c,
+                            price: e.target.value,
+                          })
                         }
                         placeholder="115000"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
-                    </FormGroup>
-                  </FormGrid>
-                  <RemoveButton
+                    </div>
+                  </div>
+                  <button
                     type="button"
                     onClick={() => handleArrayRemove('conditionOptions', idx)}
-                    style={{ marginTop: 8 }}
+                    className="mt-2 px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors"
                   >
                     Remove
-                  </RemoveButton>
+                  </button>
                 </div>
               ))}
-            </DynamicFieldContainer>
+            </div>
             {errors.conditionOptions && (
-              <ErrorMessage>
+              <div className="mt-2 text-red-600 text-sm flex items-center gap-1">
                 <AlertCircle size={16} />
                 {errors.conditionOptions}
-              </ErrorMessage>
+              </div>
             )}
-          </FormSection>
+          </div>
+        </div>
 
-          {/* Variants */}
-          <FormSection>
-            <SectionTitle>
-              <Settings size={20} />
-              Variants
-            </SectionTitle>
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <Label>Variants</Label>
-                <AddButton
-                  type="button"
-                  onClick={() =>
-                    handleArrayAdd('variants', {
-                      variantId: '',
-                      storage: '',
-                      color: '',
-                      price: '',
-                      stock: false,
-                    })
-                  }
-                >
-                  <Plus size={16} />
-                  Add
-                </AddButton>
-              </DynamicFieldHeader>
-              {formData.variants.map((v, i) => (
-                <div
-                  key={i}
-                  style={{
-                    border: '1px solid #e5e7eb',
-                    borderRadius: 8,
-                    padding: 12,
-                    marginBottom: 12,
-                  }}
-                >
-                  <FormGrid>
-                    <FormGroup>
-                      <Label>Variant ID</Label>
-                      <Input
-                        value={v.variantId}
-                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, variantId: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Storage</Label>
-                      <Input
-                        value={v.storage}
-                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, storage: e.target.value })
-                        }
-                        placeholder="128GB"
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Color</Label>
-                      <Input
-                        value={v.color}
-                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, color: e.target.value })
-                        }
-                        placeholder="Deep Purple"
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Price</Label>
-                      <Input
-                        type="number"
-                        value={v.price}
-                        onChange={(e: any) => handleArrayUpdate('variants', i, { ...v, price: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>
-                        <input
-                          type="checkbox"
-                          checked={!!v.stock}
-                          onChange={e =>
-                            handleArrayUpdate('variants', i, { ...v, stock: e.target.checked })
-                          }
-                          style={{ marginRight: 8 }}
-                        />
-                        In Stock
-                      </Label>
-                    </FormGroup>
-                  </FormGrid>
-                  <RemoveButton
-                    type="button"
-                    onClick={() => handleArrayRemove('variants', i)}
-                    style={{ marginTop: 8 }}
-                  >
-                    Remove
-                  </RemoveButton>
-                </div>
-              ))}
-            </DynamicFieldContainer>
-          </FormSection>
-
-          {/* Add-Ons */}
-          <FormSection>
-            <SectionTitle>
-              <Settings size={20} />
-              Add-ons
-            </SectionTitle>
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <Label>Add-ons</Label>
-                <AddButton
-                  type="button"
-                  onClick={() => handleArrayAdd('addOns', { name: '', cost: '', description: '' })}
-                >
-                  <Plus size={16} />
-                  Add
-                </AddButton>
-              </DynamicFieldHeader>
-              {formData.addOns.map((a, i) => (
-                <div
-                  key={i}
-                  style={{
-                    border: '1px solid #e5e7eb',
-                    borderRadius: 8,
-                    padding: 12,
-                    marginBottom: 12,
-                  }}
-                >
-                  <FormGrid>
-                    <FormGroup>
-                      <Label>Name</Label>
-                      <Input
-                        value={a.name}
-                        onChange={(e: any) => handleArrayUpdate('addOns', i, { ...a, name: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Cost</Label>
-                      <Input
-                        type="number"
-                        value={a.cost}
-                        onChange={(e: any) => handleArrayUpdate('addOns', i, { ...a, cost: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                  </FormGrid>
-                  <FormGroup>
-                    <Label>Description</Label>
-                    <TextArea
-                      value={a.description}
-                      onChange={(e: any) => handleArrayUpdate('addOns', i, { ...a, description: e.target.value })
-                      }
-                      rows={2}
-                    />
-                  </FormGroup>
-                  <RemoveButton
-                    type="button"
-                    onClick={() => handleArrayRemove('addOns', i)}
-                    style={{ marginTop: 8 }}
-                  >
-                    Remove
-                  </RemoveButton>
-                </div>
-              ))}
-            </DynamicFieldContainer>
-          </FormSection>
-
-          {/* Offers */}
-          <FormSection>
-            <SectionTitle>
-              <Info size={20} />
-              Offers
-            </SectionTitle>
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <Label>Offers</Label>
-                <AddButton
-                  type="button"
-                  onClick={() => handleArrayAdd('offers', { type: '', value: '', conditions: '' })}
-                >
-                  <Plus size={16} />
-                  Add
-                </AddButton>
-              </DynamicFieldHeader>
-              {formData.offers.map((o, i) => (
-                <div
-                  key={i}
-                  style={{
-                    border: '1px solid #e5e7eb',
-                    borderRadius: 8,
-                    padding: 12,
-                    marginBottom: 12,
-                  }}
-                >
-                  <FormGrid>
-                    <FormGroup>
-                      <Label>Type</Label>
-                      <Input
-                        value={o.type}
-                        onChange={(e: any) => handleArrayUpdate('offers', i, { ...o, type: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Value</Label>
-                      <Input
-                        value={o.value}
-                        onChange={(e: any) => handleArrayUpdate('offers', i, { ...o, value: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Conditions</Label>
-                      <Input
-                        value={o.conditions}
-                        onChange={(e: any) => handleArrayUpdate('offers', i, { ...o, conditions: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                  </FormGrid>
-                  <RemoveButton
-                    type="button"
-                    onClick={() => handleArrayRemove('offers', i)}
-                    style={{ marginTop: 8 }}
-                  >
-                    Remove
-                  </RemoveButton>
-                </div>
-              ))}
-            </DynamicFieldContainer>
-          </FormSection>
-
-          {/* Rating & Reviews */}
-          <FormSection>
-            <SectionTitle>
-              <Star size={20} />
-              Rating & Reviews
-            </SectionTitle>
-            <FormGrid>
-              <FormGroup>
-                <Label>Average</Label>
-                <Input
-                  type="number"
-                  name="rating.average"
-                  value={formData.rating.average}
-                  onChange={handleInputChange}
-                  step="0.1"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Total Reviews</Label>
-                <Input
-                  type="number"
-                  name="rating.totalReviews"
-                  value={formData.rating.totalReviews}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-            </FormGrid>
-            <FormGrid>
-              {['5star', '4star', '3star', '2star', '1star'].map(k => (
-                <FormGroup key={k}>
-                  <Label>{k.toUpperCase()}</Label>
-                  <Input
-                    type="number"
-                    value={formData.rating.breakdown[k]}
-                    onChange={(e: any) => setFormData(prev => ({
-                      ...prev,
-                      rating: {
-                        ...prev.rating,
-                        breakdown: { ...prev.rating.breakdown, [k]: e.target.value },
-                      },
-                    }))
-                    }
-                  />
-                </FormGroup>
-              ))}
-            </FormGrid>
-
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <Label>Reviews</Label>
-                <AddButton
-                  type="button"
-                  onClick={() =>
-                    handleArrayAdd('reviews', { reviewer: '', rating: '', date: '', comment: '' })
-                  }
-                >
-                  <Plus size={16} />
-                  Add
-                </AddButton>
-              </DynamicFieldHeader>
-              {formData.reviews.map((r, i) => (
-                <div
-                  key={i}
-                  style={{
-                    border: '1px solid #e5e7eb',
-                    borderRadius: 8,
-                    padding: 12,
-                    marginBottom: 12,
-                  }}
-                >
-                  <FormGrid>
-                    <FormGroup>
-                      <Label>Reviewer</Label>
-                      <Input
-                        value={r.reviewer}
-                        onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, reviewer: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Rating</Label>
-                      <Input
-                        type="number"
-                        value={r.rating}
-                        onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, rating: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Date</Label>
-                      <Input
-                        type="date"
-                        value={r.date}
-                        onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, date: e.target.value })
-                        }
-                      />
-                    </FormGroup>
-                  </FormGrid>
-                  <FormGroup>
-                    <Label>Comment</Label>
-                    <TextArea
-                      rows={2}
-                      value={r.comment}
-                      onChange={(e: any) => handleArrayUpdate('reviews', i, { ...r, comment: e.target.value })
-                      }
-                    />
-                  </FormGroup>
-                  <RemoveButton
-                    type="button"
-                    onClick={() => handleArrayRemove('reviews', i)}
-                    style={{ marginTop: 8 }}
-                  >
-                    Remove
-                  </RemoveButton>
-                </div>
-              ))}
-            </DynamicFieldContainer>
-          </FormSection>
-
-          {/* Payment Options */}
-          <FormSection>
-            <SectionTitle>
-              <CreditCard size={20} />
-              Payment Options
-            </SectionTitle>
-            <FormGrid>
-              <FormGroup>
-                <Label>
-                  <input
-                    type="checkbox"
-                    name="paymentOptions.emiAvailable"
-                    checked={formData.paymentOptions.emiAvailable}
-                    onChange={handleInputChange}
-                    style={{ marginRight: 8 }}
-                  />
-                  EMI Available
-                </Label>
-              </FormGroup>
-            </FormGrid>
-
-            <DynamicFieldContainer>
-              <DynamicFieldHeader>
-                <Label>EMI Plans</Label>
-                <AddButton
-                  type="button"
-                  onClick={() =>
-                    handleArrayAdd('paymentOptions.emiPlans', { months: '', amountPerMonth: '' })
-                  }
-                >
-                  <Plus size={16} />
-                  Add Plan
-                </AddButton>
-              </DynamicFieldHeader>
-              {(formData.paymentOptions.emiPlans || []).map((p, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))',
-                    gap: '1rem',
-                    marginBottom: 12,
-                  }}
-                >
-                  <FormGroup>
-                    <Label>Months</Label>
-                    <Input
-                      type="number"
-                      value={p.months}
-                      onChange={(e: any) => handleArrayUpdate('paymentOptions.emiPlans', i, {
-                        ...p,
-                        months: e.target.value,
-                      })
-                      }
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label>Amount / Month</Label>
-                    <Input
-                      type="number"
-                      value={p.amountPerMonth}
-                      onChange={(e: any) => handleArrayUpdate('paymentOptions.emiPlans', i, {
-                        ...p,
-                        amountPerMonth: e.target.value,
-                      })
-                      }
-                    />
-                  </FormGroup>
-                  <div style={{ alignSelf: 'end' }}>
-                    <RemoveButton
-                      type="button"
-                      onClick={() => handleArrayRemove('paymentOptions.emiPlans', i)}
-                    >
-                      Remove
-                    </RemoveButton>
-                  </div>
-                </div>
-              ))}
-            </DynamicFieldContainer>
-
-            <FormGroup style={{ marginTop: 12 }}>
-              <Label>Payment Methods (comma separated, e.g. UPI, NetBanking, Credit Card)</Label>
-              <Input
-                value={(formData.paymentOptions.methods || []).join(', ')}
-                onChange={(e: any) => setFormData(prev => ({
-                  ...prev,
-                  paymentOptions: {
-                    ...prev.paymentOptions,
-                    methods: e.target.value
-                      .split(',')
-                      .map((s: any) => s.trim())
-                      .filter(Boolean),
-                  },
-                }))
-                }
-                placeholder="UPI, NetBanking, Credit Card"
-              />
-            </FormGroup>
-          </FormSection>
-
-          {/* Availability */}
-          <FormSection>
-            <SectionTitle>
-              <Truck size={20} />
-              Availability & Delivery
-            </SectionTitle>
-            <FormGrid>
-              <FormGroup>
-                <Label>
-                  <input
-                    type="checkbox"
-                    name="availability.inStock"
-                    checked={formData.availability.inStock}
-                    onChange={handleInputChange}
-                    style={{ marginRight: 8 }}
-                  />
-                  In Stock
-                </Label>
-              </FormGroup>
-              <FormGroup>
-                <Label>Delivery Pincode</Label>
-                <Input
-                  name="availability.deliveryPincode"
-                  value={formData.availability.deliveryPincode}
-                  onChange={handleInputChange}
-                  placeholder="110001"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Estimated Delivery</Label>
-                <Input
-                  name="availability.estimatedDelivery"
-                  value={formData.availability.estimatedDelivery}
-                  onChange={handleInputChange}
-                  placeholder="2-3 days"
-                />
-              </FormGroup>
-            </FormGrid>
-          </FormSection>
-
-          {/* Top Specs */}
-          <FormSection>
-            <SectionTitle>
-              <Star size={20} />
-              Top Specs
-            </SectionTitle>
-            <FormGrid>
-              <FormGroup>
-                <Label>Screen Size</Label>
-                <Input
-                  name="topSpecs.screenSize"
-                  value={formData.topSpecs.screenSize}
-                  onChange={handleInputChange}
-                  placeholder="6.1 inches"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Chipset</Label>
-                <Input
-                  name="topSpecs.chipset"
-                  value={formData.topSpecs.chipset}
-                  onChange={handleInputChange}
-                  placeholder="A16 Bionic"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Pixel Density</Label>
-                <Input
-                  name="topSpecs.pixelDensity"
-                  value={formData.topSpecs.pixelDensity}
-                  onChange={handleInputChange}
-                  placeholder="460 ppi"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Network Support</Label>
-                <Input
-                  name="topSpecs.networkSupport"
-                  value={formData.topSpecs.networkSupport}
-                  onChange={handleInputChange}
-                  placeholder="5G, 4G, 3G, 2G"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>SIM Slots</Label>
-                <Input
-                  name="topSpecs.simSlots"
-                  value={formData.topSpecs.simSlots}
-                  onChange={handleInputChange}
-                  placeholder="Dual SIM"
-                />
-              </FormGroup>
-            </FormGrid>
-          </FormSection>
-
-          {/* Technical Specs (subset) */}
-          <FormSection>
-            <SectionTitle>
-              <Settings size={20} />
-              Technical Specifications
-            </SectionTitle>
-
-            {/* Display */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-              >
-                <Monitor size={16} />
-                Display
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Size</Label>
-                  <Input
-                    name="productDetails.display.size"
-                    value={formData.productDetails.display.size}
-                    onChange={handleInputChange}
-                    placeholder="6.1 inches"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Resolution</Label>
-                  <Input
-                    name="productDetails.display.resolution"
-                    value={formData.productDetails.display.resolution}
-                    onChange={handleInputChange}
-                    placeholder="2556 x 1179"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Technology</Label>
-                  <Input
-                    name="productDetails.display.technology"
-                    value={formData.productDetails.display.technology}
-                    onChange={handleInputChange}
-                    placeholder="Super Retina XDR OLED"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Refresh Rate</Label>
-                  <Input
-                    name="productDetails.display.refreshRate"
-                    value={formData.productDetails.display.refreshRate}
-                    onChange={handleInputChange}
-                    placeholder="120Hz"
-                  />
-                </FormGroup>
-              </FormGrid>
-            </div>
-
-            {/* Performance / General */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-              >
-                <Cpu size={16} />
-                Performance & General
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>OS</Label>
-                  <Input
-                    name="productDetails.performance.os"
-                    value={formData.productDetails.performance.os}
-                    onChange={handleInputChange}
-                    placeholder="iOS 16"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Chipset</Label>
-                  <Input
-                    name="productDetails.performance.chipset"
-                    value={formData.productDetails.performance.chipset}
-                    onChange={handleInputChange}
-                    placeholder="A16 Bionic"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>CPU</Label>
-                  <Input
-                    name="productDetails.performance.cpu"
-                    value={formData.productDetails.performance.cpu}
-                    onChange={handleInputChange}
-                    placeholder="Hexa-core"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>GPU</Label>
-                  <Input
-                    name="productDetails.performance.gpu"
-                    value={formData.productDetails.performance.gpu}
-                    onChange={handleInputChange}
-                    placeholder="Apple 5-core"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Announced On</Label>
-                  <Input
-                    name="productDetails.general.announcedOn"
-                    value={formData.productDetails.general.announcedOn}
-                    onChange={handleInputChange}
-                    placeholder="2022-09-07"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Model Number</Label>
-                  <Input
-                    name="productDetails.general.modelNumber"
-                    value={formData.productDetails.general.modelNumber}
-                    onChange={handleInputChange}
-                    placeholder="A2890"
-                  />
-                </FormGroup>
-              </FormGrid>
-            </div>
-
-            {/* Camera */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-              >
-                <Camera size={16} />
-                Cameras
-              </h3>
-              <h4 style={{ margin: '0 0 .5rem' }}>Front</h4>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Resolution</Label>
-                  <Input
-                    name="productDetails.frontCamera.resolution"
-                    value={formData.productDetails.frontCamera.resolution}
-                    onChange={handleInputChange}
-                    placeholder="12MP"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Setup</Label>
-                  <Input
-                    name="productDetails.frontCamera.setup"
-                    value={formData.productDetails.frontCamera.setup}
-                    onChange={handleInputChange}
-                    placeholder="Single"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Aperture</Label>
-                  <Input
-                    name="productDetails.frontCamera.aperture"
-                    value={formData.productDetails.frontCamera.aperture}
-                    onChange={handleInputChange}
-                    placeholder="f/2.2"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Flash</Label>
-                  <Input
-                    name="productDetails.frontCamera.flash"
-                    value={formData.productDetails.frontCamera.flash}
-                    onChange={handleInputChange}
-                    placeholder="Retina Flash"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Video Recording (comma)</Label>
-                  <Input
-                    value={(formData.productDetails.frontCamera.videoRecording || []).join(', ')}
-                    onChange={(e: any) => handleCommaInput('productDetails.frontCamera.videoRecording', e.target.value)
-                    }
-                    placeholder="4K@60fps, 1080p@240fps"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Type</Label>
-                  <Input
-                    name="productDetails.frontCamera.type"
-                    value={formData.productDetails.frontCamera.type}
-                    onChange={handleInputChange}
-                    placeholder="Wide"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Features (comma)</Label>
-                  <Input
-                    value={(formData.productDetails.frontCamera.features || []).join(', ')}
-                    onChange={(e: any) => handleCommaInput('productDetails.frontCamera.features', e.target.value)
-                    }
-                    placeholder="Night Mode, Deep Fusion"
-                  />
-                </FormGroup>
-              </FormGrid>
-
-              <h4 style={{ margin: '1rem 0 .5rem' }}>Rear</h4>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Setup</Label>
-                  <Input
-                    name="productDetails.rearCamera.setup"
-                    value={formData.productDetails.rearCamera.setup}
-                    onChange={handleInputChange}
-                    placeholder="Triple"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Cam1 Resolution</Label>
-                  <Input
-                    name="productDetails.rearCamera.camera1.resolution"
-                    value={formData.productDetails.rearCamera.camera1.resolution}
-                    onChange={handleInputChange}
-                    placeholder="48MP"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Cam1 Aperture</Label>
-                  <Input
-                    name="productDetails.rearCamera.camera1.aperture"
-                    value={formData.productDetails.rearCamera.camera1.aperture}
-                    onChange={handleInputChange}
-                    placeholder="f/1.78"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Cam1 Type</Label>
-                  <Input
-                    name="productDetails.rearCamera.camera1.type"
-                    value={formData.productDetails.rearCamera.camera1.type}
-                    onChange={handleInputChange}
-                    placeholder="Main"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Cam1 Lens</Label>
-                  <Input
-                    name="productDetails.rearCamera.camera1.lens"
-                    value={formData.productDetails.rearCamera.camera1.lens}
-                    onChange={handleInputChange}
-                    placeholder="Wide"
-                  />
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>Cam2 Resolution</Label>
-                  <Input
-                    name="productDetails.rearCamera.camera2.resolution"
-                    value={formData.productDetails.rearCamera.camera2.resolution}
-                    onChange={handleInputChange}
-                    placeholder="12MP"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Cam2 Aperture</Label>
-                  <Input
-                    name="productDetails.rearCamera.camera2.aperture"
-                    value={formData.productDetails.rearCamera.camera2.aperture}
-                    onChange={handleInputChange}
-                    placeholder="f/2.8"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Cam2 Type</Label>
-                  <Input
-                    name="productDetails.rearCamera.camera2.type"
-                    value={formData.productDetails.rearCamera.camera2.type}
-                    onChange={handleInputChange}
-                    placeholder="Telephoto"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Cam2 Lens</Label>
-                  <Input
-                    name="productDetails.rearCamera.camera2.lens"
-                    value={formData.productDetails.rearCamera.camera2.lens}
-                    onChange={handleInputChange}
-                    placeholder="3x Optical"
-                  />
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>Flash</Label>
-                  <Input
-                    name="productDetails.rearCamera.flash"
-                    value={formData.productDetails.rearCamera.flash}
-                    onChange={handleInputChange}
-                    placeholder="Dual-LED"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Sensor</Label>
-                  <Input
-                    name="productDetails.rearCamera.sensor"
-                    value={formData.productDetails.rearCamera.sensor}
-                    onChange={handleInputChange}
-                    placeholder="Quad-pixel"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>OIS</Label>
-                  <Input
-                    name="productDetails.rearCamera.ois"
-                    value={formData.productDetails.rearCamera.ois}
-                    onChange={handleInputChange}
-                    placeholder="Sensor-shift OIS"
-                  />
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>Video Recording (comma)</Label>
-                  <Input
-                    value={(formData.productDetails.rearCamera.videoRecording || []).join(', ')}
-                    onChange={(e: any) => handleCommaInput('productDetails.rearCamera.videoRecording', e.target.value)
-                    }
-                    placeholder="4K@60fps, ProRes"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Features (comma)</Label>
-                  <Input
-                    value={(formData.productDetails.rearCamera.features || []).join(', ')}
-                    onChange={(e: any) => handleCommaInput('productDetails.rearCamera.features', e.target.value)
-                    }
-                    placeholder="Night Mode, Macro"
-                  />
-                </FormGroup>
-              </FormGrid>
-            </div>
-
-            {/* Connectivity */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-              >
-                <Wifi size={16} />
-                Connectivity
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Wi-Fi</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.wifi"
-                    value={formData.productDetails.networkConnectivity.wifi}
-                    onChange={handleInputChange}
-                    placeholder="Wi-Fi 6"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Wi-Fi Features (comma)</Label>
-                  <Input
-                    value={(formData.productDetails.networkConnectivity.wifiFeatures || []).join(
-                      ', '
-                    )}
-                    onChange={(e: any) => handleCommaInput(
-                      'productDetails.networkConnectivity.wifiFeatures',
-                      e.target.value
-                    )
-                    }
-                    placeholder="Hotspot, Wi-Fi Calling"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Bluetooth</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.bluetooth"
-                    value={formData.productDetails.networkConnectivity.bluetooth}
-                    onChange={handleInputChange}
-                    placeholder="5.3"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>NFC</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.nfc"
-                    value={formData.productDetails.networkConnectivity.nfc}
-                    onChange={handleInputChange}
-                    placeholder="Yes"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>GPS</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.gps"
-                    value={formData.productDetails.networkConnectivity.gps}
-                    onChange={handleInputChange}
-                    placeholder="A-GPS, GLONASS..."
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>VoLTE</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.volte"
-                    value={formData.productDetails.networkConnectivity.volte}
-                    onChange={handleInputChange}
-                    placeholder="Yes"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>eSIM</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.esim"
-                    value={formData.productDetails.networkConnectivity.esim}
-                    onChange={handleInputChange}
-                    placeholder="Supported"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Audio Jack</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.audioJack"
-                    value={formData.productDetails.networkConnectivity.audioJack}
-                    onChange={handleInputChange}
-                    placeholder="No"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>
-                    <input
-                      type="checkbox"
-                      name="productDetails.networkConnectivity.has3p5mmJack"
-                      checked={formData.productDetails.networkConnectivity.has3p5mmJack}
-                      onChange={handleInputChange}
-                      style={{ marginRight: 8 }}
-                    />
-                    Has 3.5mm Jack
-                  </Label>
-                </FormGroup>
-                <FormGroup>
-                  <Label>Audio Features (comma)</Label>
-                  <Input
-                    value={(formData.productDetails.networkConnectivity.audioFeatures || []).join(
-                      ', '
-                    )}
-                    onChange={(e: any) => handleCommaInput(
-                      'productDetails.networkConnectivity.audioFeatures',
-                      e.target.value
-                    )
-                    }
-                    placeholder="Spatial Audio, Dolby Atmos"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>SIM Size</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.simSize"
-                    value={formData.productDetails.networkConnectivity.simSize}
-                    onChange={handleInputChange}
-                    placeholder="Nano + eSIM"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>SIM Slots</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.simSlots"
-                    value={formData.productDetails.networkConnectivity.simSlots}
-                    onChange={handleInputChange}
-                    placeholder="Dual SIM"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>SIM1 Bands</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.sim1Bands"
-                    value={formData.productDetails.networkConnectivity.sim1Bands}
-                    onChange={handleInputChange}
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>SIM2 Bands</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.sim2Bands"
-                    value={formData.productDetails.networkConnectivity.sim2Bands}
-                    onChange={handleInputChange}
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Network Support</Label>
-                  <Input
-                    name="productDetails.networkConnectivity.networkSupport"
-                    value={formData.productDetails.networkConnectivity.networkSupport}
-                    onChange={handleInputChange}
-                    placeholder="5G SA/NSA"
-                  />
-                </FormGroup>
-              </FormGrid>
-            </div>
-
-            {/* Battery (subset) */}
-            <div>
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-              >
-                <Battery size={16} />
-                Battery (optional)
-              </h3>
-              <FormGrid>
-                <FormGroup>
-                  <Label>Capacity</Label>
-                  <Input
-                    name="productDetails.battery.capacity"
-                    value={formData.productDetails.battery.capacity}
-                    onChange={handleInputChange}
-                    placeholder="3200mAh"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Fast Charging</Label>
-                  <Input
-                    name="productDetails.battery.fastCharging"
-                    value={formData.productDetails.battery.fastCharging}
-                    onChange={handleInputChange}
-                    placeholder="20W"
-                  />
-                </FormGroup>
-                <FormGroup>
-                  <Label>Wireless Charging</Label>
-                  <Input
-                    name="productDetails.battery.wirelessCharging"
-                    value={formData.productDetails.battery.wirelessCharging}
-                    onChange={handleInputChange}
-                    placeholder="15W MagSafe"
-                  />
-                </FormGroup>
-              </FormGrid>
-            </div>
-          </FormSection>
-
-          {/* Trust & Legal */}
-          <FormSection>
-            <SectionTitle>
-              <Shield size={20} />
-              Trust & Legal
-            </SectionTitle>
-            <FormGrid>
-              <FormGroup>
-                <Label>Devices Sold</Label>
-                <Input
-                  type="number"
-                  name="trustMetrics.devicesSold"
-                  value={formData.trustMetrics.devicesSold}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Quality Checks (count)</Label>
-                <Input
-                  type="number"
-                  name="trustMetrics.qualityChecks"
-                  value={formData.trustMetrics.qualityChecks}
-                  onChange={handleInputChange}
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Terms</Label>
-                <Input
-                  name="legal.terms"
-                  value={formData.legal.terms}
-                  onChange={handleInputChange}
-                  placeholder="Standard terms apply"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Privacy</Label>
-                <Input
-                  name="legal.privacy"
-                  value={formData.legal.privacy}
-                  onChange={handleInputChange}
-                  placeholder="Privacy policy..."
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>Copyright</Label>
-                <Input
-                  name="legal.copyright"
-                  value={formData.legal.copyright}
-                  onChange={handleInputChange}
-                  placeholder="© 2025"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label>
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={formData.isActive}
-                    onChange={handleInputChange}
-                    style={{ marginRight: 8 }}
-                  />
-                  Active Product
-                </Label>
-              </FormGroup>
-            </FormGrid>
-          </FormSection>
-        </FormContainer>
-
-        <ActionButtons>
-          <SaveButton type="submit" disabled={loading}>
+        <div className="flex gap-4 p-6 bg-gray-50 border-t border-gray-200 mt-8">
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transform hover:-translate-y-0.5 transition-all shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+          >
             {loading ? (
               <>
-                <LoadingSpinner />
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 Creating Product...
               </>
             ) : (
@@ -2826,30 +838,34 @@ const AddBuyProduct = () => {
                 Create Product
               </>
             )}
-          </SaveButton>
-          <CancelButton type="button" onClick={handleCancel}>
+          </button>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="flex items-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+          >
             <X size={20} />
             Cancel
-          </CancelButton>
-        </ActionButtons>
+          </button>
+        </div>
         {errors.submit && (
-          <div style={{ padding: '1rem 2rem' }}>
-            <ErrorMessage>
+          <div className="p-4">
+            <div className="text-red-600 text-sm flex items-center gap-1">
               <AlertCircle size={16} />
               {errors.submit}
-            </ErrorMessage>
+            </div>
           </div>
         )}
         {success && (
-          <div style={{ padding: '1rem 2rem' }}>
-            <SuccessMessage>
+          <div className="p-4">
+            <div className="text-green-600 text-sm flex items-center gap-1">
               <CheckCircle size={16} />
               {success}
-            </SuccessMessage>
+            </div>
           </div>
         )}
       </form>
-    </Container>
+    </div>
   );
 };
 

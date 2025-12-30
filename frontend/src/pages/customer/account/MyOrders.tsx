@@ -12,6 +12,9 @@ import {
   Calendar,
   ArrowRight,
   Check,
+  MapPin,
+  CreditCard,
+  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import useUserOrders from '../../../hooks/useUserOrders';
@@ -23,26 +26,26 @@ const statusIcon = (status, order = null) => {
 
   switch ((actualStatus || '').toLowerCase()) {
     case 'delivered':
-      return <CheckCircle size={16} />;
+      return <CheckCircle size={18} />;
     case 'shipped':
-      return <Truck size={16} />;
+      return <Truck size={18} />;
     case 'processing':
     case 'pending':
-      return <Clock size={16} />;
+      return <Clock size={18} />;
     case 'confirmed':
-      return <Check size={16} />;
+      return <Check size={18} />;
     case 'draft':
-      return <Clock size={16} />;
+      return <Clock size={18} />;
     case 'picked_up':
-      return <Truck size={16} />;
+      return <Truck size={18} />;
     case 'paid':
-      return <CheckCircle size={16} />;
+      return <CheckCircle size={18} />;
     case 'cancelled':
-      return <X size={16} />;
+      return <X size={18} />;
     case 'awaiting_partner':
-      return <Search size={16} />;
+      return <Search size={18} />;
     default:
-      return <Package size={16} />;
+      return <Package size={18} />;
   }
 };
 
@@ -65,33 +68,8 @@ const getCustomerPaymentAmount = order => {
     return order.quoteAmount || 0;
   }
 
-  // For buy orders, try to get the actual product price (MRP or discounted price)
-  // If not available, fall back to totalAmount minus commission
-  let customerAmount = 0;
-
-  if (order.items && order.items.length > 0) {
-    customerAmount = order.items.reduce((total, item) => {
-      const product = item.product;
-      const quantity = item.quantity || 1;
-
-      // Try to get the actual price customer pays (discounted price or MRP)
-      let itemPrice = 0;
-      if (product?.pricing) {
-        itemPrice = product.pricing.discountedPrice || product.pricing.mrp || 0;
-      }
-
-      return total + itemPrice * quantity;
-    }, 0);
-  }
-
-  // If we couldn't calculate from items, use totalAmount minus commission
-  if (customerAmount === 0) {
-    const totalAmount = order.totalAmount || 0;
-    const commissionAmount = order.commission?.amount || 0;
-    customerAmount = totalAmount - commissionAmount;
-  }
-
-  return customerAmount;
+  // For buy orders, use the totalAmount which now includes condition pricing
+  return order.totalAmount || 0;
 };
 
 const statusLabel = (status, order = null) => {
@@ -185,67 +163,59 @@ const MyOrders = () => {
     const actualStatus = order ? getActualStatus(order) : status;
 
     const statusClasses = {
-      delivered: 'text-emerald-900 bg-emerald-50 border-emerald-200',
-      shipped: 'text-blue-900 bg-indigo-50 border-blue-200',
-      processing: 'text-amber-900 bg-amber-50 border-amber-300',
-      pending: 'text-amber-900 bg-amber-50 border-amber-300',
-      confirmed: 'text-cyan-900 bg-cyan-50 border-cyan-200',
-      draft: 'text-gray-900 bg-gray-50 border-gray-200',
-      picked_up: 'text-blue-900 bg-indigo-50 border-blue-200',
-      paid: 'text-emerald-900 bg-emerald-50 border-emerald-200',
-      cancelled: 'text-red-900 bg-red-50 border-red-200',
-      awaiting_partner: 'text-purple-900 bg-purple-50 border-purple-200',
+      delivered: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+      shipped: 'text-blue-700 bg-blue-50 border-blue-200',
+      processing: 'text-amber-700 bg-amber-50 border-amber-200',
+      pending: 'text-orange-700 bg-orange-50 border-orange-200',
+      confirmed: 'text-cyan-700 bg-cyan-50 border-cyan-200',
+      draft: 'text-gray-700 bg-gray-50 border-gray-200',
+      picked_up: 'text-indigo-700 bg-indigo-50 border-indigo-200',
+      paid: 'text-green-700 bg-green-50 border-green-200',
+      cancelled: 'text-red-700 bg-red-50 border-red-200',
+      awaiting_partner: 'text-purple-700 bg-purple-50 border-purple-200',
     };
     return statusClasses[actualStatus] || 'bg-gray-50 border-gray-200 text-gray-600';
   };
 
   return (
     <div
-      className="min-h-screen py-10"
+      className="min-h-screen py-12"
       style={{
-        background: `radial-gradient(1000px 700px at 10% -10%, rgba(37, 99, 235, 0.07), transparent 45%), radial-gradient(800px 600px at 110% 10%, rgba(22, 163, 74, 0.05), transparent 45%), #fff`,
+        background: `radial-gradient(1000px 700px at 10% -10%, rgba(37, 99, 235, 0.05), transparent 45%), radial-gradient(800px 600px at 110% 10%, rgba(22, 163, 74, 0.04), transparent 45%), #fafafa`,
       }}
     >
       <div className="main-container">
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 mb-7">
+        <div className="flex items-center justify-between gap-4 mb-8">
           <div>
             <h1
-              className="m-0 text-gray-900 font-bold"
-              style={{ fontSize: 'clamp(1.6rem, 2.2vw, 2rem)' }}
+              className="m-0 text-gray-900 font-bold tracking-tight"
+              style={{ fontSize: 'clamp(1.75rem, 2.5vw, 2.25rem)' }}
             >
               My Orders
             </h1>
-            <p className="mt-1 mb-0 text-gray-600">Simple overview of your orders</p>
+            <p className="mt-2 mb-0 text-gray-500 text-base">Track and manage your orders</p>
           </div>
-          <button
-            className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed"
-            onClick={fetchOrders}
-            disabled={loading}
-          >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-            <span>{loading ? 'Loading...' : 'Refresh'}</span>
-          </button>
         </div>
 
         {/* Filters */}
-        <div className="bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-[18px] p-3 shadow-[0_10px_25px_rgba(2,6,23,0.06)] mb-7">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_180px_180px] gap-4">
-            <div className="flex items-center border-2 border-gray-200 rounded-xl bg-white overflow-hidden">
-              <div className="grid place-items-center w-10 h-10 text-gray-400">
-                <Search size={16} />
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_200px_200px] gap-3">
+            <div className="flex items-center border border-gray-300 rounded-xl bg-white overflow-hidden focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+              <div className="grid place-items-center w-11 h-11 text-gray-400">
+                <Search size={18} />
               </div>
               <input
                 type="text"
-                className="flex-1 h-10 border-none outline-none px-3 bg-transparent text-gray-900 placeholder:text-gray-400"
-                placeholder="Search by ID, brand, model…"
+                className="flex-1 h-11 border-none outline-none px-3 bg-transparent text-gray-900 placeholder:text-gray-400"
+                placeholder="Search orders..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
 
             <select
-              className="h-10 w-full border-2 border-gray-200 rounded-xl px-2.5 bg-white text-gray-900 outline-none transition-all duration-150 focus:border-blue-600/60 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.16)]"
+              className="h-11 w-full border border-gray-300 rounded-xl px-3 bg-white text-gray-900 outline-none transition-all duration-150 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
               aria-label="Filter by status"
@@ -255,16 +225,13 @@ const MyOrders = () => {
               <option value="awaiting_partner">Finding Partner</option>
               <option value="processing">Processing</option>
               <option value="confirmed">Confirmed</option>
-              <option value="draft">Draft</option>
-              <option value="picked_up">Picked Up</option>
-              <option value="paid">Paid</option>
               <option value="shipped">Shipped</option>
               <option value="delivered">Delivered</option>
               <option value="cancelled">Cancelled</option>
             </select>
 
             <select
-              className="h-10 w-full border-2 border-gray-200 rounded-xl px-2.5 bg-white text-gray-900 outline-none transition-all duration-150 focus:border-blue-600/60 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.16)]"
+              className="h-11 w-full border border-gray-300 rounded-xl px-3 bg-white text-gray-900 outline-none transition-all duration-150 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               value={timeFilter}
               onChange={e => setTimeFilter(e.target.value)}
               aria-label="Filter by time"
@@ -279,22 +246,22 @@ const MyOrders = () => {
 
         {/* Content */}
         {loading ? (
-          <div className="text-center border border-dashed border-gray-200 rounded-2xl py-8 px-4 bg-gradient-to-b from-white to-gray-50 text-gray-600">
-            <div className="w-[86px] h-[86px] animate-spin mx-auto mb-3 rounded-full grid place-items-center bg-gray-100 text-gray-600 border border-dashed border-gray-200">
-              <RefreshCw size={40} />
+          <div className="text-center border border-gray-200 rounded-2xl py-12 px-4 bg-white text-gray-600">
+            <div className="w-20 h-20 animate-spin mx-auto mb-4 rounded-full grid place-items-center bg-gray-50 text-blue-600 border-2 border-blue-200 border-t-transparent">
+              <RefreshCw size={32} />
             </div>
-            <h3 className="my-1 text-gray-900 font-bold">Loading Orders…</h3>
-            <p className="my-1 mb-4">Fetching your latest updates.</p>
+            <h3 className="my-1 text-gray-900 font-bold text-lg">Loading Orders</h3>
+            <p className="my-1 mb-4 text-gray-500">Please wait while we fetch your orders...</p>
           </div>
         ) : error ? (
-          <div className="text-center border border-dashed border-gray-200 rounded-2xl py-8 px-4 bg-gradient-to-b from-white to-gray-50 text-gray-600">
-            <div className="w-[86px] h-[86px] mx-auto mb-3 rounded-full grid place-items-center bg-gray-100 text-gray-600 border border-dashed border-gray-200">
-              <X size={40} />
+          <div className="text-center border border-red-200 rounded-2xl py-12 px-4 bg-red-50 text-gray-600">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full grid place-items-center bg-red-100 text-red-600 border-2 border-red-200">
+              <X size={32} />
             </div>
-            <h3 className="my-1 text-gray-900 font-bold">Error Loading Orders</h3>
-            <p className="my-1 mb-4">{error}</p>
+            <h3 className="my-1 text-gray-900 font-bold text-lg">Error Loading Orders</h3>
+            <p className="my-1 mb-6 text-gray-600">{error}</p>
             <button
-              className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50 no-underline"
+              className="inline-flex items-center gap-2 border border-gray-300 bg-white text-gray-900 px-4 py-2.5 rounded-xl font-medium cursor-pointer transition-all duration-150 hover:bg-gray-50 hover:border-gray-400"
               onClick={fetchOrders}
             >
               <RefreshCw size={18} />
@@ -302,26 +269,26 @@ const MyOrders = () => {
             </button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center border border-dashed border-gray-200 rounded-2xl py-8 px-4 bg-gradient-to-b from-white to-gray-50 text-gray-600">
-            <div className="w-[86px] h-[86px] mx-auto mb-3 rounded-full grid place-items-center bg-gray-100 text-gray-600 border border-dashed border-gray-200">
-              <Package size={40} />
+          <div className="text-center border border-gray-200 rounded-2xl py-12 px-4 bg-white text-gray-600">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full grid place-items-center bg-gray-50 text-gray-400 border-2 border-gray-200">
+              <Package size={32} />
             </div>
-            <h3 className="my-1 text-gray-900 font-bold">No Orders Found</h3>
-            <p className="my-1 mb-4">
+            <h3 className="my-1 text-gray-900 font-bold text-lg">No Orders Found</h3>
+            <p className="my-1 mb-6 text-gray-500">
               {searchTerm || statusFilter !== 'all'
                 ? 'No orders match your current filters.'
                 : "You haven't placed any orders yet."}
             </p>
             <a
-              href="/"
-              className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3.5 py-2 rounded-xl cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)] hover:bg-gray-50 no-underline"
+              href="/buy"
+              className="inline-flex items-center gap-2 border border-blue-600 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium cursor-pointer transition-all duration-150 hover:bg-blue-700 hover:border-blue-700 no-underline shadow-sm"
             >
               <span>Start Shopping</span>
               <ArrowRight size={18} />
             </a>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5">
+          <div className="grid grid-cols-1 gap-4">
             {filtered.map(order => {
               const created = order?.createdAt
                 ? new Date(order.createdAt).toLocaleDateString('en-IN', {
@@ -337,58 +304,71 @@ const MyOrders = () => {
               return (
                 <div
                   key={order._id}
-                  className="bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-2xl shadow-[0_10px_25px_rgba(2,6,23,0.06)] overflow-hidden"
+                  className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group"
                 >
-                  {/* Simplified header */}
-                  <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-200">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500">#{order._id?.slice(-8)}</span>
-                      <span className="text-xs text-gray-500">{created}</span>
-                      <span
-                        className={`inline-flex items-center gap-1 border px-2 py-1 rounded-full text-xs font-medium ${getStatusClasses(status, order)}`}
-                      >
-                        {statusIcon(status, order)} {statusLabel(status, order)}
-                      </span>
+                  {/* Header with order info and status */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                          Order
+                        </span>
+                        <span className="font-mono text-sm font-semibold text-gray-900">
+                          #{order._id?.slice(-8)}
+                        </span>
+                      </div>
+                      <div className="hidden sm:block w-px h-4 bg-gray-300" />
+                      <div className="flex items-center gap-1.5 text-gray-500 text-sm">
+                        <Calendar size={14} />
+                        <span>{created}</span>
+                      </div>
                     </div>
 
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-gray-900">
-                        ₹{Number(getCustomerPaymentAmount(order)).toLocaleString()}
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`inline-flex items-center gap-1.5 border px-3 py-1.5 rounded-full text-sm font-semibold ${getStatusClasses(status, order)}`}
+                      >
+                        {statusIcon(status, order)}
+                        <span>{statusLabel(status, order)}</span>
+                      </span>
                     </div>
                   </div>
 
-                  {/* Simplified content: Items and essential info */}
-                  <div className="p-4">
-                    {/* Items Section */}
-                    <div className="mb-4">
-                      <div className="grid gap-3">
-                        {order.orderType === 'sell' ? (
-                          // Sell order - single device from session
-                          <div className="flex gap-3">
-                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex-none">
-                              <img
-                                src={
-                                  order?.sessionId?.productId?.images?.[0] ||
-                                  '/placeholder-phone.jpg'
-                                }
-                                alt={order?.sessionId?.productId?.name || 'Device'}
-                                loading="lazy"
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="text-gray-900 font-semibold text-sm">
-                                {order?.sessionId?.productId?.name || 'Device'}
-                              </div>
-                              <div className="text-gray-500 text-xs mt-1">
-                                Order: {order.orderNumber || order._id?.slice(-6)}
-                              </div>
+                  {/* Order Items */}
+                  <div className="px-5 py-4">
+                    <div className="space-y-3">
+                      {order.orderType === 'sell' ? (
+                        // Sell order - single device from session
+                        <div className="flex gap-4 items-start">
+                          <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 bg-gray-50 flex-none shadow-sm">
+                            <img
+                              src={
+                                order?.sessionId?.productId?.images?.[0] || '/placeholder-phone.jpg'
+                              }
+                              alt={order?.sessionId?.productId?.name || 'Device'}
+                              loading="lazy"
+                              className="w-full h-full object-contain p-1"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-gray-900 font-semibold text-base mb-1 line-clamp-1">
+                              {order?.sessionId?.productId?.name || 'Device'}
+                            </h3>
+                            <p className="text-gray-500 text-sm">
+                              {order.orderType === 'sell' ? 'Selling Device' : 'Buying Device'}
+                            </p>
+                            <div className="flex items-baseline gap-2 mt-2">
+                              <span className="text-2xl font-bold text-gray-900">
+                                ₹{Number(getCustomerPaymentAmount(order)).toLocaleString()}
+                              </span>
+                              <span className="text-sm text-gray-500">Total Amount</span>
                             </div>
                           </div>
-                        ) : (
-                          // Buy order - multiple items
-                          (order.items || []).map((it, idx) => {
+                        </div>
+                      ) : (
+                        // Buy order - multiple items
+                        <>
+                          {(order.items || []).map((it, idx) => {
                             // Handle images - can be array or object with main/gallery/thumbnail
                             let imageUrl = '/placeholder-image.jpg';
                             if (it?.product?.images) {
@@ -404,69 +384,89 @@ const MyOrders = () => {
                             }
 
                             return (
-                              <div className="flex gap-3" key={idx}>
-                                <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex-none">
+                              <div className="flex gap-4 items-start" key={idx}>
+                                <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 bg-gray-50 flex-none shadow-sm">
                                   <img
                                     src={imageUrl}
                                     alt={it?.product?.name || 'Product'}
                                     loading="lazy"
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-contain p-1"
                                   />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <div className="text-gray-900 font-semibold text-sm">
+                                  <h3 className="text-gray-900 font-semibold text-base mb-1 line-clamp-1">
                                     {it?.product?.brand || ''} {it?.product?.name || ''}
-                                  </div>
-                                  <div className="text-gray-500 text-xs mt-1">
-                                    Quantity: {it?.quantity || 1}
-                                  </div>
+                                  </h3>
+                                  <p className="text-gray-500 text-sm">Qty: {it?.quantity || 1}</p>
+                                  {idx === 0 && (
+                                    <div className="flex items-baseline gap-2 mt-2">
+                                      <span className="text-2xl font-bold text-gray-900">
+                                        ₹{Number(getCustomerPaymentAmount(order)).toLocaleString()}
+                                      </span>
+                                      <span className="text-sm text-gray-500">Total Amount</span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             );
-                          })
-                        )}
-                      </div>
+                          })}
+                        </>
+                      )}
                     </div>
+                  </div>
 
-                    {/* Essential Info Row */}
-                    <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-100">
-                      <div>
-                        <div className="text-xs text-gray-500 mb-1">Payment</div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {order.orderType === 'sell' ? order?.payment?.method || '—' : payMethod}
+                  {/* Order Details Grid */}
+                  <div className="px-5 pb-4">
+                    <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                      <div className="flex items-start gap-2">
+                        <CreditCard size={16} className="text-gray-400 mt-0.5" />
+                        <div>
+                          <div className="text-xs text-gray-500 mb-0.5">Payment Method</div>
+                          <div className="text-sm font-medium text-gray-900 capitalize">
+                            {order.orderType === 'sell'
+                              ? order?.payment?.method || 'N/A'
+                              : payMethod}
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <div className="text-xs text-gray-500 mb-1">
-                          {order.orderType === 'sell' ? 'Pickup' : 'Delivery'}
-                        </div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {order.orderType === 'sell'
-                            ? `${order?.pickup?.address?.city || '—'}, ${order?.pickup?.address?.state || '—'}`
-                            : `${address.city || '—'}, ${address.state || '—'}`}
+                      <div className="flex items-start gap-2">
+                        <MapPin size={16} className="text-gray-400 mt-0.5" />
+                        <div>
+                          <div className="text-xs text-gray-500 mb-0.5">
+                            {order.orderType === 'sell' ? 'Pickup Location' : 'Delivery Address'}
+                          </div>
+                          <div className="text-sm font-medium text-gray-900 line-clamp-1">
+                            {order.orderType === 'sell'
+                              ? `${order?.pickup?.address?.city || 'N/A'}, ${order?.pickup?.address?.state || ''}`
+                              : `${address.city || 'N/A'}, ${address.state || ''}`}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Simplified Actions */}
-                  <div className="flex flex-wrap gap-2 border-t border-gray-200 px-4 pt-3 pb-3">
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2 border-t border-gray-100 bg-gray-50 px-5 py-3">
                     <Link
                       to={`/account/orders/${order._id}`}
-                      className="inline-flex items-center gap-2 border border-gray-200 bg-white text-gray-900 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-all duration-150 hover:border-blue-600/35 hover:bg-gray-50 no-underline"
+                      className="inline-flex items-center gap-2 border border-gray-300 bg-white text-gray-900 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-150 hover:bg-gray-50 hover:border-gray-400 no-underline group"
                     >
-                      <Eye size={14} />
+                      <Eye size={16} />
                       <span>View Details</span>
+                      {/* <ChevronRight
+                        size={16}
+                        className="opacity-0 -ml-1 group-hover:opacity-100 group-hover:ml-0 transition-all"
+                      /> */}
                     </Link>
 
                     {order.orderType === 'buy' && status === 'shipped' && (
                       <button
-                        className="inline-flex items-center gap-2 border border-blue-600/35 bg-blue-50 text-blue-900 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-all duration-150 hover:bg-blue-100"
-                        onClick={() => toast.success('Order tracking feature coming soon!')}
+                        className="inline-flex items-center gap-2 border border-blue-600 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-150 hover:bg-blue-100"
+                        onClick={() => toast.info('Order tracking feature coming soon!')}
                         title="Coming soon"
                       >
-                        <Truck size={14} />
-                        <span>Track</span>
+                        <Truck size={16} />
+                        <span>Track Order</span>
                       </button>
                     )}
 
@@ -474,14 +474,14 @@ const MyOrders = () => {
                       status === 'confirmed' ||
                       getActualStatus(order) === 'awaiting_partner') && (
                       <button
-                        className="inline-flex items-center gap-2 border border-red-600/35 bg-red-50 text-red-900 px-3 py-1.5 rounded-lg text-sm cursor-pointer transition-all duration-150 hover:bg-red-100"
+                        className="inline-flex items-center gap-2 border border-red-600 bg-red-50 text-red-700 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-150 hover:bg-red-100"
                         onClick={() => {
                           setSelectedOrderId(order._id);
                           setCancelDialogOpen(true);
                         }}
                       >
-                        <X size={14} />
-                        <span>Cancel</span>
+                        <X size={16} />
+                        <span>Cancel Order</span>
                       </button>
                     )}
                   </div>

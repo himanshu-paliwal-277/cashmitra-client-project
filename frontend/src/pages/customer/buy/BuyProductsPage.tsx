@@ -190,13 +190,13 @@ const BuyProductsPage = () => {
             </p>
           </div>
 
-          <button
+          {/* <button
             onClick={() => navigate(`/buy/category/${superCategory}`)}
             className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <ArrowLeft size={16} />
             Back to {superCategory}
-          </button>
+          </button> */}
         </div>
 
         {/* Filters and Search */}
@@ -257,7 +257,7 @@ const BuyProductsPage = () => {
             className={
               viewMode === 'grid'
                 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-                : 'space-y-4'
+                : 'flex flex-col gap-4 w-full bg-white'
             }
           >
             {products.map(product => {

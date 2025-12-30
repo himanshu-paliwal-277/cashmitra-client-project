@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';import styled from 'styled-components';
+import React, { useState, useEffect } from 'react';
 import useAdminInventoryApproval from '../../hooks/useAdminInventoryApproval';
 import {
   Package,
@@ -33,453 +33,6 @@ import {
   MessageSquare,
   Send,
 } from 'lucide-react';
-
-const Container = styled.div`
-  padding: 2rem;
-  background-color: #f8fafc;
-  min-height: 100vh;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-`;
-
-const ActionButton = styled.button`
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-  }
-`;
-
-const FilterSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  min-width: 250px;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const FilterSelect = styled.select`
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  min-width: 150px;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-`;
-
-const StatCard = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const StatIcon = styled.div`
-  background: ${(props: any) => props.color || '#3b82f6'};
-  color: white;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatContent = styled.div`
-  flex: 1;
-`;
-
-const StatValue = styled.div`
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-`;
-
-const InventoryContainer = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-
-const InventoryList = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const InventoryItem = styled.div`
-  border-bottom: 1px solid #e5e7eb;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f9fafb;
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const ItemHeader = styled.div`
-  padding: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-`;
-
-const ItemInfo = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex: 1;
-`;
-
-const DeviceImage = styled.img`
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-`;
-
-const DeviceDetails = styled.div`
-  flex: 1;
-`;
-
-const DeviceName = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0 0 0.25rem 0;
-`;
-
-const DeviceSpecs = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 0.5rem;
-`;
-
-const PartnerInfo = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-
-const StatusBadge = styled.span`
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-
-  ${(props: any) => {
-    switch (props.status) {
-      case 'pending':
-        return 'background: #fef3c7; color: #92400e;';
-      case 'approved':
-        return 'background: #dcfce7; color: #166534;';
-      case 'rejected':
-        return 'background: #fee2e2; color: #dc2626;';
-      case 'under_review':
-        return 'background: #dbeafe; color: #1e40af;';
-      default:
-        return 'background: #f3f4f6; color: #374151;';
-    }
-  }}
-`;
-
-const PriceInfo = styled.div`
-  text-align: right;
-  margin-right: 1rem;
-`;
-
-const Price = styled.div`
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1f2937;
-`;
-
-const PriceLabel = styled.div`
-  font-size: 0.75rem;
-  color: #6b7280;
-`;
-
-const ExpandButton = styled.button`
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-`;
-
-const ItemDetails = styled.div`
-  padding: 0 1.5rem 1.5rem 1.5rem;
-  border-top: 1px solid #f3f4f6;
-  background: #f9fafb;
-`;
-
-const DetailsGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
-`;
-
-const DetailSection = styled.div`
-  background: white;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-`;
-
-const SectionTitle = styled.h4`
-  font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 1rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const SpecsList = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-`;
-
-const SpecItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem;
-  background: #f9fafb;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-`;
-
-const SpecLabel = styled.span`
-  color: #6b7280;
-  font-weight: 500;
-`;
-
-const SpecValue = styled.span`
-  color: #1f2937;
-  font-weight: 600;
-`;
-
-const ImageGallery = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 0.75rem;
-  margin-top: 1rem;
-`;
-
-const GalleryImage = styled.img`
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 0.375rem;
-  border: 1px solid #e5e7eb;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-`;
-
-const ActionBtn = styled.button`
-  background: ${(props: any) => {
-    if (props.approve) return 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-    if (props.reject) return 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-    if (props.review) return 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
-    return 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)';
-  }};
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  padding: 2rem;
-  max-width: 600px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-
-  &:hover {
-    background: #f3f4f6;
-  }
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  min-height: 120px;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  resize: vertical;
-
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 4rem;
-  color: #6b7280;
-`;
 
 const InventoryApproval = () => {
   const [inventory, setInventory] = useState([]);
@@ -518,7 +71,8 @@ const InventoryApproval = () => {
   const handleItemAction = async () => {
     if (!selectedItem || !actionType) return;
 
-    try {      await updateInventoryStatus(selectedItem._id, actionType, actionNotes);
+    try {
+      await updateInventoryStatus(selectedItem._id, actionType, actionNotes);
 
       setShowActionModal(false);
       setSelectedItem(null);
@@ -561,357 +115,472 @@ const InventoryApproval = () => {
   };
 
   const filteredInventory = inventory.filter(item => {
-    const matchesSearch =      item.deviceName?.toLowerCase().includes(searchTerm.toLowerCase()) ||      item.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||      item.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||      item.partner?.businessName?.toLowerCase().includes(searchTerm.toLowerCase());    const matchesStatus = !statusFilter || item.status === statusFilter;    const matchesCategory = !categoryFilter || item.category === categoryFilter;
+    const matchesSearch =
+      item.deviceName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.partner?.businessName?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = !statusFilter || item.status === statusFilter;
+    const matchesCategory = !categoryFilter || item.category === categoryFilter;
 
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
   if (loading) {
     return (
-      <Container>
-        <div style={{ textAlign: 'center', padding: '4rem' }}>
-          <Package size={48} style={{ color: '#6b7280', marginBottom: '1rem' }} />
+      <div className="p-8 bg-slate-50 min-h-screen">
+        <div className="text-center py-16">
+          <Package size={48} className="text-slate-500 mb-4 mx-auto" />
           <p>Loading inventory submissions...</p>
         </div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <Title>
+    <div className="p-8 bg-slate-50 min-h-screen">
+      <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
           <Package size={32} />
           Inventory Approval
-        </Title>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <ActionButton onClick={() => fetchInventory()}>
+        </h1>
+        <div className="flex gap-4">
+          <button
+            onClick={() => fetchInventory()}
+            className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/40"
+          >
             <RefreshCw size={20} />
             Refresh
-          </ActionButton>
-          <ActionButton onClick={() => window.print()}>
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/40"
+          >
             <Download size={20} />
             Export
-          </ActionButton>
+          </button>
         </div>
-      </Header>
+      </div>
 
-      <StatsGrid>
-        <StatCard>
-          <StatIcon color="#3b82f6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-blue-500 text-white p-4 rounded-xl flex items-center justify-center">
             <Package size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.total}</StatValue>
-            <StatLabel>Total Submissions</StatLabel>
-          </StatContent>
-        </StatCard>
+          </div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-gray-800 mb-1">{stats.total}</div>
+            <div className="text-sm text-slate-500">Total Submissions</div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatIcon color="#f59e0b">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-amber-500 text-white p-4 rounded-xl flex items-center justify-center">
             <Clock size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.pending}</StatValue>
-            <StatLabel>Pending Review</StatLabel>
-          </StatContent>
-        </StatCard>
+          </div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-gray-800 mb-1">{stats.pending}</div>
+            <div className="text-sm text-slate-500">Pending Review</div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatIcon color="#10b981">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-emerald-500 text-white p-4 rounded-xl flex items-center justify-center">
             <CheckCircle size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.approved}</StatValue>
-            <StatLabel>Approved</StatLabel>
-          </StatContent>
-        </StatCard>
+          </div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-gray-800 mb-1">{stats.approved}</div>
+            <div className="text-sm text-slate-500">Approved</div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatIcon color="#ef4444">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-red-500 text-white p-4 rounded-xl flex items-center justify-center">
             <XCircle size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.rejected}</StatValue>
-            <StatLabel>Rejected</StatLabel>
-          </StatContent>
-        </StatCard>
+          </div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-gray-800 mb-1">{stats.rejected}</div>
+            <div className="text-sm text-slate-500">Rejected</div>
+          </div>
+        </div>
 
-        <StatCard>
-          <StatIcon color="#8b5cf6">
+        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center gap-4">
+          <div className="bg-purple-500 text-white p-4 rounded-xl flex items-center justify-center">
             <AlertTriangle size={24} />
-          </StatIcon>
-          <StatContent>
-            <StatValue>{stats.underReview}</StatValue>
-            <StatLabel>Under Review</StatLabel>
-          </StatContent>
-        </StatCard>
-      </StatsGrid>
+          </div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-gray-800 mb-1">{stats.underReview}</div>
+            <div className="text-sm text-slate-500">Under Review</div>
+          </div>
+        </div>
+      </div>
 
-      <FilterSection>
-        <SearchInput
+      <div className="bg-white p-6 rounded-xl shadow-sm mb-8 flex gap-4 flex-wrap items-center">
+        <input
           type="text"
           placeholder="Search by device name, brand, model, or partner..."
           value={searchTerm}
           onChange={(e: any) => setSearchTerm(e.target.value)}
+          className="flex-1 min-w-64 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
         />
 
-        <FilterSelect value={statusFilter} onChange={(e: any) => setStatusFilter(e.target.value)}>
+        <select
+          value={statusFilter}
+          onChange={(e: any) => setStatusFilter(e.target.value)}
+          className="px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white min-w-40 focus:outline-none focus:border-blue-500"
+        >
           <option value="">All Status</option>
           <option value="pending">Pending</option>
           <option value="under_review">Under Review</option>
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
-        </FilterSelect>
+        </select>
 
-        <FilterSelect value={categoryFilter} onChange={(e: any) => setCategoryFilter(e.target.value)}>
+        <select
+          value={categoryFilter}
+          onChange={(e: any) => setCategoryFilter(e.target.value)}
+          className="px-4 py-3 border border-gray-300 rounded-lg text-sm bg-white min-w-40 focus:outline-none focus:border-blue-500"
+        >
           <option value="">All Categories</option>
           <option value="smartphone">Smartphones</option>
           <option value="laptop">Laptops</option>
           <option value="tablet">Tablets</option>
           <option value="smartwatch">Smartwatches</option>
           <option value="headphones">Headphones</option>
-        </FilterSelect>
-      </FilterSection>
+        </select>
+      </div>
 
-      <InventoryContainer>
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         {filteredInventory.length === 0 ? (
-          <EmptyState>
-            <Package size={48} style={{ marginBottom: '1rem' }} />
-            <p style={{ fontSize: '1.125rem' }}>
+          <div className="text-center py-16 text-slate-500">
+            <Package size={48} className="mb-4 mx-auto" />
+            <p className="text-lg">
               {searchTerm || statusFilter || categoryFilter
                 ? 'No inventory items match your filters'
                 : 'No inventory submissions found'}
             </p>
-          </EmptyState>
+          </div>
         ) : (
-          <InventoryList>
-            {filteredInventory.map(item => (              <InventoryItem key={item._id}>                <ItemHeader onClick={() => toggleItemExpansion(item._id)}>
-                  <ItemInfo>
-                    <DeviceImage                      src={item.images?.[0] || '/api/placeholder/60/60'}                      alt={item.deviceName}
+          <div className="flex flex-col">
+            {filteredInventory.map(item => (
+              <div
+                key={item._id}
+                className="border-b border-gray-200 transition-all duration-200 hover:bg-gray-50 last:border-b-0"
+              >
+                <div
+                  className="p-6 flex justify-between items-center cursor-pointer"
+                  onClick={() => toggleItemExpansion(item._id)}
+                >
+                  <div className="flex gap-4 items-center flex-1">
+                    <img
+                      src={item.images?.[0] || '/api/placeholder/60/60'}
+                      alt={item.deviceName}
+                      className="w-15 h-15 object-cover rounded-lg border border-gray-200"
                       onError={(e: any) => {
                         e.target.src = '/api/placeholder/60/60';
                       }}
                     />
-                    <DeviceDetails>                      <DeviceName>{item.deviceName || 'Unknown Device'}</DeviceName>
-                      <DeviceSpecs>                        {item.brand} {item.model} • {item.storage} • {item.condition}
-                      </DeviceSpecs>
-                      <PartnerInfo>
-                        <User size={14} />                        {item.partner?.businessName || 'Unknown Partner'}
-                        <MapPin size={14} style={{ marginLeft: '0.5rem' }} />                        {item.partner?.city || 'Unknown Location'}
-                      </PartnerInfo>
-                    </DeviceDetails>
-                  </ItemInfo>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-800 mb-1">
+                        {item.deviceName || 'Unknown Device'}
+                      </h3>
+                      <div className="text-sm text-slate-500 mb-2">
+                        {item.brand} {item.model} • {item.storage} • {item.condition}
+                      </div>
+                      <div className="text-sm text-slate-500 flex items-center gap-1">
+                        <User size={14} />
+                        {item.partner?.businessName || 'Unknown Partner'}
+                        <MapPin size={14} className="ml-2" />
+                        {item.partner?.city || 'Unknown Location'}
+                      </div>
+                    </div>
+                  </div>
 
-                  <PriceInfo>                    <Price>₹{(item.proposedPrice || 0).toLocaleString()}</Price>
-                    <PriceLabel>Proposed Price</PriceLabel>
-                  </PriceInfo>                  <StatusBadge status={item.status}>                    {getStatusIcon(item.status)}                    {item.status?.replace('_', ' ')?.charAt(0)?.toUpperCase() +                      item.status?.replace('_', ' ')?.slice(1) || 'Pending'}
-                  </StatusBadge>
+                  <div className="text-right mr-4">
+                    <div className="text-xl font-bold text-gray-800">
+                      ₹{(item.proposedPrice || 0).toLocaleString()}
+                    </div>
+                    <div className="text-xs text-slate-500">Proposed Price</div>
+                  </div>
 
-                  <ExpandButton>                    {expandedItems.has(item._id) ? (
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${
+                      item.status === 'pending'
+                        ? 'bg-amber-100 text-amber-800'
+                        : item.status === 'approved'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : item.status === 'rejected'
+                            ? 'bg-red-100 text-red-600'
+                            : item.status === 'under_review'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {getStatusIcon(item.status)}
+                    {item.status?.replace('_', ' ')?.charAt(0)?.toUpperCase() +
+                      item.status?.replace('_', ' ')?.slice(1) || 'Pending'}
+                  </span>
+
+                  <button className="p-2 text-slate-500 hover:bg-gray-100 hover:text-gray-700 rounded-md transition-all duration-200 ml-4">
+                    {expandedItems.has(item._id) ? (
                       <ChevronUp size={20} />
                     ) : (
                       <ChevronDown size={20} />
                     )}
-                  </ExpandButton>
-                </ItemHeader>                {expandedItems.has(item._id) && (
-                  <ItemDetails>
-                    <DetailsGrid>
-                      <DetailSection>
-                        <SectionTitle>
+                  </button>
+                </div>
+
+                {expandedItems.has(item._id) && (
+                  <div className="px-6 pb-6 border-t border-gray-100 bg-gray-50">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+                      <div className="bg-white p-6 rounded-lg border border-gray-200">
+                        <h4 className="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
                           <Smartphone size={16} />
                           Device Specifications
-                        </SectionTitle>
-                        <SpecsList>
-                          <SpecItem>
-                            <SpecLabel>Brand:</SpecLabel>                            <SpecValue>{item.brand || 'N/A'}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Model:</SpecLabel>                            <SpecValue>{item.model || 'N/A'}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Storage:</SpecLabel>                            <SpecValue>{item.storage || 'N/A'}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>RAM:</SpecLabel>                            <SpecValue>{item.ram || 'N/A'}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Color:</SpecLabel>                            <SpecValue>{item.color || 'N/A'}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Condition:</SpecLabel>                            <SpecValue>{item.condition || 'N/A'}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Battery Health:</SpecLabel>                            <SpecValue>{item.batteryHealth || 'N/A'}%</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>IMEI:</SpecLabel>                            <SpecValue>{item.imei || 'N/A'}</SpecValue>
-                          </SpecItem>
-                        </SpecsList>
-                      </DetailSection>
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Brand:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.brand || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Model:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.model || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Storage:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.storage || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">RAM:</span>
+                            <span className="text-gray-800 font-semibold">{item.ram || 'N/A'}</span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Color:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.color || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Condition:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.condition || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Battery Health:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.batteryHealth || 'N/A'}%
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">IMEI:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.imei || 'N/A'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
 
-                      <DetailSection>
-                        <SectionTitle>
+                      <div className="bg-white p-6 rounded-lg border border-gray-200">
+                        <h4 className="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
                           <DollarSign size={16} />
                           Pricing & Submission
-                        </SectionTitle>
-                        <SpecsList>
-                          <SpecItem>
-                            <SpecLabel>Proposed Price:</SpecLabel>                            <SpecValue>₹{(item.proposedPrice || 0).toLocaleString()}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Market Price:</SpecLabel>                            <SpecValue>₹{(item.marketPrice || 0).toLocaleString()}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Submitted:</SpecLabel>                            <SpecValue>{new Date(item.createdAt).toLocaleDateString()}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Quantity:</SpecLabel>                            <SpecValue>{item.quantity || 1}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Category:</SpecLabel>                            <SpecValue>{item.category || 'N/A'}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Warranty:</SpecLabel>                            <SpecValue>{item.warranty || 'No'}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Box Available:</SpecLabel>                            <SpecValue>{item.hasBox ? 'Yes' : 'No'}</SpecValue>
-                          </SpecItem>
-                          <SpecItem>
-                            <SpecLabel>Accessories:</SpecLabel>                            <SpecValue>{item.hasAccessories ? 'Yes' : 'No'}</SpecValue>
-                          </SpecItem>
-                        </SpecsList>
-                      </DetailSection>
-                    </DetailsGrid>                    {item.description && (
-                      <DetailSection style={{ marginBottom: '1.5rem' }}>
-                        <SectionTitle>
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Proposed Price:</span>
+                            <span className="text-gray-800 font-semibold">
+                              ₹{(item.proposedPrice || 0).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Market Price:</span>
+                            <span className="text-gray-800 font-semibold">
+                              ₹{(item.marketPrice || 0).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Submitted:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {new Date(item.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Quantity:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.quantity || 1}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Category:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.category || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Warranty:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.warranty || 'No'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Box Available:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.hasBox ? 'Yes' : 'No'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-2 bg-gray-50 rounded-md text-sm">
+                            <span className="text-slate-500 font-medium">Accessories:</span>
+                            <span className="text-gray-800 font-semibold">
+                              {item.hasAccessories ? 'Yes' : 'No'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {item.description && (
+                      <div className="bg-white p-6 rounded-lg border border-gray-200 mb-6">
+                        <h4 className="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
                           <FileText size={16} />
                           Description
-                        </SectionTitle>
-                        <div
-                          style={{
-                            padding: '1rem',
-                            background: '#f9fafb',
-                            borderRadius: '0.375rem',
-                            color: '#374151',
-                          }}
-                        >                          {item.description}
+                        </h4>
+                        <div className="p-4 bg-gray-50 rounded-md text-gray-700">
+                          {item.description}
                         </div>
-                      </DetailSection>
-                    )}                    {item.images && item.images.length > 0 && (
-                      <DetailSection style={{ marginBottom: '1.5rem' }}>
-                        <SectionTitle>
-                          <ImageIcon size={16} />                          Device Images ({item.images.length})
-                        </SectionTitle>
-                        <ImageGallery>                          {item.images.map((image: any, index: any) => (
-                            <GalleryImage
+                      </div>
+                    )}
+
+                    {item.images && item.images.length > 0 && (
+                      <div className="bg-white p-6 rounded-lg border border-gray-200 mb-6">
+                        <h4 className="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                          <ImageIcon size={16} />
+                          Device Images ({item.images.length})
+                        </h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 mt-4">
+                          {item.images.map((image: any, index: any) => (
+                            <img
                               key={index}
                               src={image}
                               alt={`Device ${index + 1}`}
+                              className="w-full h-25 object-cover rounded-md border border-gray-200 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg"
                               onError={(e: any) => {
                                 e.target.src = '/api/placeholder/100/100';
                               }}
                             />
                           ))}
-                        </ImageGallery>
-                      </DetailSection>
-                    )}                    {item.notes && (
-                      <DetailSection style={{ marginBottom: '1.5rem' }}>
-                        <SectionTitle>
-                          <MessageSquare size={16} />
-                          Partner Notes
-                        </SectionTitle>
-                        <div
-                          style={{
-                            padding: '1rem',
-                            background: '#f9fafb',
-                            borderRadius: '0.375rem',
-                            color: '#374151',
-                          }}
-                        >                          {item.notes}
                         </div>
-                      </DetailSection>
+                      </div>
                     )}
 
-                    <ActionButtons>                      {item.status === 'pending' && (
+                    {item.notes && (
+                      <div className="bg-white p-6 rounded-lg border border-gray-200 mb-6">
+                        <h4 className="text-base font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                          <MessageSquare size={16} />
+                          Partner Notes
+                        </h4>
+                        <div className="p-4 bg-gray-50 rounded-md text-gray-700">{item.notes}</div>
+                      </div>
+                    )}
+
+                    <div className="flex gap-3 justify-end mt-6 pt-6 border-t border-gray-200">
+                      {item.status === 'pending' && (
                         <>
-                          <ActionBtn review onClick={() => openActionModal(item, 'under_review')}>
+                          <button
+                            onClick={() => openActionModal(item, 'under_review')}
+                            className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                          >
                             <Eye size={16} />
                             Mark Under Review
-                          </ActionBtn>
-                          <ActionBtn approve onClick={() => openActionModal(item, 'approved')}>
+                          </button>
+                          <button
+                            onClick={() => openActionModal(item, 'approved')}
+                            className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                          >
                             <Check size={16} />
                             Approve
-                          </ActionBtn>
-                          <ActionBtn reject onClick={() => openActionModal(item, 'rejected')}>
+                          </button>
+                          <button
+                            onClick={() => openActionModal(item, 'rejected')}
+                            className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                          >
                             <X size={16} />
                             Reject
-                          </ActionBtn>
+                          </button>
                         </>
-                      )}                      {item.status === 'under_review' && (
+                      )}
+                      {item.status === 'under_review' && (
                         <>
-                          <ActionBtn approve onClick={() => openActionModal(item, 'approved')}>
+                          <button
+                            onClick={() => openActionModal(item, 'approved')}
+                            className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                          >
                             <Check size={16} />
                             Approve
-                          </ActionBtn>
-                          <ActionBtn reject onClick={() => openActionModal(item, 'rejected')}>
+                          </button>
+                          <button
+                            onClick={() => openActionModal(item, 'rejected')}
+                            className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                          >
                             <X size={16} />
                             Reject
-                          </ActionBtn>
+                          </button>
                         </>
-                      )}                      {(item.status === 'approved' || item.status === 'rejected') && (
-                        <ActionBtn onClick={() => openActionModal(item, 'pending')}>
+                      )}
+                      {(item.status === 'approved' || item.status === 'rejected') && (
+                        <button
+                          onClick={() => openActionModal(item, 'pending')}
+                          className="bg-gradient-to-r from-slate-500 to-slate-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                        >
                           <RefreshCw size={16} />
                           Reset to Pending
-                        </ActionBtn>
+                        </button>
                       )}
-                    </ActionButtons>
-                  </ItemDetails>
+                    </div>
+                  </div>
                 )}
-              </InventoryItem>
+              </div>
             ))}
-          </InventoryList>
+          </div>
         )}
-      </InventoryContainer>
+      </div>
 
       {showActionModal && selectedItem && (
-        <Modal>
-          <ModalContent>
-            <ModalHeader>
-              <ModalTitle>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
                 {actionType === 'approved' && 'Approve Inventory Item'}
                 {actionType === 'rejected' && 'Reject Inventory Item'}
                 {actionType === 'under_review' && 'Mark Under Review'}
                 {actionType === 'pending' && 'Reset to Pending'}
-              </ModalTitle>
-              <CloseButton onClick={() => setShowActionModal(false)}>
+              </h2>
+              <button
+                onClick={() => setShowActionModal(false)}
+                className="p-2 text-slate-500 hover:bg-gray-100 rounded-md"
+              >
                 <X size={20} />
-              </CloseButton>
-            </ModalHeader>
+              </button>
+            </div>
 
-            <div style={{ marginBottom: '1.5rem' }}>
-              <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
+            <div className="mb-6">
+              <p className="text-slate-500 mb-4">
                 You are about to {actionType.replace('_', ' ')} the inventory item:
               </p>
-              <div
-                style={{
-                  padding: '1rem',
-                  background: '#f9fafb',
-                  borderRadius: '0.5rem',
-                  marginBottom: '1rem',
-                }}
-              >                <strong>{selectedItem.deviceName}</strong>
-                <br />                {selectedItem.brand} {selectedItem.model} • ₹                {(selectedItem.proposedPrice || 0).toLocaleString()}
+              <div className="p-4 bg-gray-50 rounded-lg mb-4">
+                <strong>{selectedItem.deviceName}</strong>
+                <br />
+                {selectedItem.brand} {selectedItem.model} • ₹
+                {(selectedItem.proposedPrice || 0).toLocaleString()}
               </div>
 
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '0.5rem',
-                  fontWeight: '500',
-                  color: '#374151',
-                }}
-              >
+              <label className="block mb-2 font-medium text-gray-700">
                 {actionType === 'approved'
                   ? 'Approval Notes (Optional):'
                   : actionType === 'rejected'
@@ -920,33 +589,45 @@ const InventoryApproval = () => {
                       ? 'Review Notes (Optional):'
                       : 'Reset Notes (Optional):'}
               </label>
-              <TextArea
+              <textarea
                 value={actionNotes}
                 onChange={(e: any) => setActionNotes(e.target.value)}
                 placeholder={`Enter ${actionType === 'rejected' ? 'reason for rejection' : 'notes'} here...`}
                 required={actionType === 'rejected'}
+                className="w-full min-h-32 px-3 py-2 border border-gray-300 rounded-lg text-sm resize-vertical focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <ActionBtn onClick={() => setShowActionModal(false)}>Cancel</ActionBtn>
-              <ActionBtn
-                approve={actionType === 'approved'}
-                reject={actionType === 'rejected'}
-                review={actionType === 'under_review'}
+            <div className="flex gap-4 justify-end">
+              <button
+                onClick={() => setShowActionModal(false)}
+                className="bg-gradient-to-r from-slate-500 to-slate-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                Cancel
+              </button>
+              <button
                 onClick={handleItemAction}
                 disabled={actionType === 'rejected' && !actionNotes.trim()}
+                className={`px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
+                  actionType === 'approved'
+                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
+                    : actionType === 'rejected'
+                      ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
+                      : actionType === 'under_review'
+                        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white'
+                        : 'bg-gradient-to-r from-slate-500 to-slate-600 text-white'
+                }`}
               >
                 <Send size={16} />
                 Confirm{' '}
                 {actionType.replace('_', ' ').charAt(0).toUpperCase() +
                   actionType.replace('_', ' ').slice(1)}
-              </ActionBtn>
+              </button>
             </div>
-          </ModalContent>
-        </Modal>
+          </div>
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

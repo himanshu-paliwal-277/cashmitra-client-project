@@ -168,7 +168,7 @@ const AppRoutes = ({ sellFlowData, updateSellFlowData }: AppRoutesProps) => {
           <Route path="sell-configuration" element={<SellConfigurationManagement />} />
           <Route path="sell-orders" element={<SellOrders />} />
           <Route path="sell-orders-management" element={<SellOrdersManagement />} />
-          <Route path="leads" element={<Leads />} />
+          {/* <Route path="leads" element={<Leads />} /> */}
           <Route path="buy-super-categories" element={<SuperCategoryManagement />} />
           <Route path="buy-categories" element={<BuyCategories />} />
           <Route path="buy-products" element={<BuyProducts />} />

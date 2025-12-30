@@ -6,8 +6,6 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import styled from 'styled-components';
-import { theme } from '../../utils';
 import useSellOrders from '../../hooks/useSellOrders';
 import {
   Search,
@@ -54,633 +52,6 @@ import {
   X,
 } from 'lucide-react';
 
-const Container = styled.div`
-  padding: ${theme.spacing[6]};
-  max-width: 1400px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: between;
-  align-items: flex-start;
-  gap: ${theme.spacing[6]};
-  margin-bottom: ${theme.spacing[8]};
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    flex-direction: column;
-    gap: ${theme.spacing[4]};
-  }
-`;
-
-const HeaderLeft = styled.div`
-  flex: 1;
-`;
-
-const Title = styled.h1`
-  font-size: ${theme.typography.fontSize['3xl']};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.text.primary};
-  margin: 0 0 ${theme.spacing[2]} 0;
-`;
-
-const Subtitle = styled.p`
-  font-size: ${theme.typography.fontSize.lg};
-  color: ${theme.colors.text.secondary};
-  margin: 0;
-`;
-
-const HeaderRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    width: 100%;
-    justify-content: space-between;
-  }
-`;
-
-const ActionButton = styled.button`
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: ${(props: any) =>
-    props.variant === 'primary' ? 'none' : `1px solid ${theme.colors.grey[300]}`};
-  border-radius: ${theme.borderRadius.md};
-  background: ${(props: any) => {
-    switch (props.variant) {
-      case 'primary':
-        return theme.colors.primary.main;
-      case 'danger':
-        return theme.colors.error.main;
-      default:
-        return 'white';
-    }
-  }};
-  color: ${(props: any) => {
-    switch (props.variant) {
-      case 'primary':
-        return 'white';
-      case 'danger':
-        return 'white';
-      default:
-        return theme.colors.text.primary;
-    }
-  }};
-  font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${theme.typography.fontWeight.medium};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  transition: all ${theme.transitions.duration.normal};
-
-  &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: ${theme.shadows.md};
-    background: ${(props: any) => {
-      switch (props.variant) {
-        case 'primary':
-          return theme.colors.primary[600];
-        case 'danger':
-          return theme.colors.error[600];
-        default:
-          return theme.colors.grey[50];
-      }
-    }};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: ${theme.spacing[6]};
-  margin-bottom: ${theme.spacing[8]};
-`;
-
-const StatCard = styled.div`
-  background: white;
-  border: 1px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[6]};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[4]};
-  transition: all ${theme.transitions.duration.normal};
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${theme.shadows.lg};
-    border-color: ${theme.colors.primary[200]};
-  }
-`;
-
-const StatIcon = styled.div`
-  width: 60px;
-  height: 60px;
-  background: ${(props: any) => {
-    switch (props.type) {
-      case 'total':
-        return theme.colors.primary[50];
-      case 'pending':
-        return theme.colors.warning[50];
-      case 'completed':
-        return theme.colors.success[50];
-      case 'revenue':
-        return theme.colors.accent[50];
-      default:
-        return theme.colors.grey[50];
-    }
-  }};
-  border-radius: ${theme.borderRadius.lg};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${(props: any) => {
-    switch (props.type) {
-      case 'total':
-        return theme.colors.primary.main;
-      case 'pending':
-        return theme.colors.warning.main;
-      case 'completed':
-        return theme.colors.success.main;
-      case 'revenue':
-        return theme.colors.accent.main;
-      default:
-        return theme.colors.text.secondary;
-    }
-  }};
-`;
-
-const StatContent = styled.div`
-  flex: 1;
-`;
-
-const StatValue = styled.div`
-  font-size: ${theme.typography.fontSize['2xl']};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const StatLabel = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const StatChange = styled.div`
-  font-size: ${theme.typography.fontSize.xs};
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${(props: any) => (props.positive ? theme.colors.success.main : theme.colors.error.main)};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-`;
-
-const FiltersCard = styled.div`
-  background: white;
-  border: 1px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[6]};
-  margin-bottom: ${theme.spacing[6]};
-`;
-
-const FiltersRow = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: ${theme.spacing[4]};
-  align-items: end;
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: 1fr 1fr;
-    gap: ${theme.spacing[3]};
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const FilterGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[2]};
-`;
-
-const FilterLabel = styled.label`
-  font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${theme.typography.fontWeight.medium};
-  color: ${theme.colors.text.primary};
-`;
-
-const FilterInput = styled.input`
-  padding: ${theme.spacing[3]};
-  border: 1px solid ${theme.colors.grey[300]};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.sm};
-  transition: all ${theme.transitions.duration.normal};
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary.main};
-    box-shadow: 0 0 0 3px ${theme.colors.primary[100]};
-  }
-
-  &::placeholder {
-    color: ${theme.colors.text.secondary};
-  }
-`;
-
-const FilterSelect = styled.select`
-  padding: ${theme.spacing[3]};
-  border: 1px solid ${theme.colors.grey[300]};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.sm};
-  background: white;
-  cursor: pointer;
-  transition: all ${theme.transitions.duration.normal};
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary.main};
-    box-shadow: 0 0 0 3px ${theme.colors.primary[100]};
-  }
-`;
-
-const ViewControls = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: ${theme.spacing[6]};
-  padding: ${theme.spacing[4]} 0;
-  border-bottom: 1px solid ${theme.colors.grey[200]};
-`;
-
-const ViewToggle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const ViewButton = styled.button`
-  padding: ${theme.spacing[2]};
-  border: 1px solid ${theme.colors.grey[300]};
-  border-radius: ${theme.borderRadius.md};
-  background: ${(props: any) => (props.active ? theme.colors.primary.main : 'white')};
-  color: ${(props: any) => (props.active ? 'white' : theme.colors.text.secondary)};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all ${theme.transitions.duration.normal};
-
-  &:hover:not(:disabled) {
-    background: ${(props: any) =>
-      props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
-  }
-`;
-
-const SortControls = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-`;
-
-const SortSelect = styled.select`
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  border: 1px solid ${theme.colors.grey[300]};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.sm};
-  background: white;
-  cursor: pointer;
-`;
-
-const OrdersGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: ${theme.spacing[6]};
-  margin-bottom: ${theme.spacing[8]};
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const OrderCard = styled.div`
-  background: white;
-  border: 1px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.lg};
-  overflow: hidden;
-  transition: all ${theme.transitions.duration.normal};
-  cursor: pointer;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${theme.shadows.lg};
-    border-color: ${theme.colors.primary[200]};
-  }
-`;
-
-const OrderHeader = styled.div`
-  padding: ${theme.spacing[4]} ${theme.spacing[5]};
-  background: ${theme.colors.grey[50]};
-  border-bottom: 1px solid ${theme.colors.grey[200]};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const OrderId = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const OrderStatus = styled.div`
-  padding: ${theme.spacing[1]} ${theme.spacing[3]};
-  border-radius: ${theme.borderRadius.full};
-  font-size: ${theme.typography.fontSize.xs};
-  font-weight: ${theme.typography.fontWeight.medium};
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: ${(props: any) => {
-    switch (props.status) {
-      case 'pending':
-        return theme.colors.warning[100];
-      case 'confirmed':
-        return theme.colors.primary[100];
-      case 'picked_up':
-        return theme.colors.info[100];
-      case 'inspected':
-        return theme.colors.secondary[100];
-      case 'completed':
-        return theme.colors.success[100];
-      case 'cancelled':
-        return theme.colors.error[100];
-      default:
-        return theme.colors.grey[100];
-    }
-  }};
-  color: ${(props: any) => {
-    switch (props.status) {
-      case 'pending':
-        return theme.colors.warning[700];
-      case 'confirmed':
-        return theme.colors.primary[700];
-      case 'picked_up':
-        return theme.colors.info[700];
-      case 'inspected':
-        return theme.colors.secondary[700];
-      case 'completed':
-        return theme.colors.success[700];
-      case 'cancelled':
-        return theme.colors.error[700];
-      default:
-        return theme.colors.grey[700];
-    }
-  }};
-`;
-
-const OrderContent = styled.div`
-  padding: ${theme.spacing[5]};
-`;
-
-const OrderInfo = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const InfoItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const InfoIcon = styled.div`
-  color: ${theme.colors.primary.main};
-  flex-shrink: 0;
-`;
-
-const DeviceInfo = styled.div`
-  background: ${theme.colors.grey[50]};
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const DeviceName = styled.div`
-  font-size: ${theme.typography.fontSize.base};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[1]};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const DeviceDetails = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const PriceInfo = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: ${theme.spacing[3]} 0;
-  border-top: 1px solid ${theme.colors.grey[200]};
-`;
-
-const PriceLabel = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const PriceValue = styled.div`
-  font-size: ${theme.typography.fontSize.lg};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${theme.colors.accent.main};
-`;
-
-const OrderActions = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: ${theme.spacing[4]} ${theme.spacing[5]};
-  background: ${theme.colors.grey[50]};
-  border-top: 1px solid ${theme.colors.grey[200]};
-`;
-
-const ActionGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const ActionIcon = styled.button`
-  padding: ${theme.spacing[2]};
-  border: 1px solid ${theme.colors.grey[300]};
-  border-radius: ${theme.borderRadius.md};
-  background: white;
-  color: ${theme.colors.text.secondary};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all ${theme.transitions.duration.normal};
-
-  &:hover:not(:disabled) {
-    background: ${theme.colors.grey[50]};
-    color: ${theme.colors.primary.main};
-    border-color: ${theme.colors.primary[200]};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const OrdersList = styled.div`
-  background: white;
-  border: 1px solid ${theme.colors.grey[200]};
-  border-radius: ${theme.borderRadius.lg};
-  overflow: hidden;
-`;
-
-const OrdersTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-const TableHeader = styled.thead`
-  background: ${theme.colors.grey[50]};
-`;
-
-const TableRow = styled.tr`
-  border-bottom: 1px solid ${theme.colors.grey[200]};
-  transition: all ${theme.transitions.duration.normal};
-
-  &:hover {
-    background: ${theme.colors.grey[25]};
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const TableHeaderCell = styled.th`
-  padding: ${theme.spacing[4]} ${theme.spacing[5]};
-  text-align: left;
-  font-size: ${theme.typography.fontSize.sm};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  border-bottom: 1px solid ${theme.colors.grey[200]};
-`;
-
-const TableCell = styled.td`
-  padding: ${theme.spacing[4]} ${theme.spacing[5]};
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-  vertical-align: top;
-`;
-
-const Pagination = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: ${theme.spacing[6]} 0;
-`;
-
-const PaginationInfo = styled.div`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const PaginationControls = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const PaginationButton = styled.button`
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  border: 1px solid ${theme.colors.grey[300]};
-  border-radius: ${theme.borderRadius.md};
-  background: ${(props: any) => (props.active ? theme.colors.primary.main : 'white')};
-  color: ${(props: any) => (props.active ? 'white' : theme.colors.text.primary)};
-  font-size: ${theme.typography.fontSize.sm};
-  cursor: pointer;
-  transition: all ${theme.transitions.duration.normal};
-
-  &:hover:not(:disabled) {
-    background: ${(props: any) =>
-      props.active ? theme.colors.primary[600] : theme.colors.grey[50]};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const LoadingSpinner = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: ${theme.spacing[12]};
-  color: ${theme.colors.primary.main};
-`;
-
-const EmptyState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: ${theme.spacing[12]};
-  text-align: center;
-`;
-
-const EmptyIcon = styled.div`
-  width: 80px;
-  height: 80px;
-  background: ${theme.colors.grey[100]};
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.text.secondary};
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const EmptyTitle = styled.h3`
-  font-size: ${theme.typography.fontSize.lg};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0 0 ${theme.spacing[2]} 0;
-`;
-
-const EmptyDescription = styled.p`
-  font-size: ${theme.typography.fontSize.base};
-  color: ${theme.colors.text.secondary};
-  margin: 0;
-  max-width: 400px;
-`;
-
 const SellOrdersManagement = () => {
   const {
     orders,
@@ -688,13 +59,13 @@ const SellOrdersManagement = () => {
     error,
     pagination,
     statistics,
-    fetchOrders,
-    fetchOrderById,
+    getAllOrders,
+    getOrder,
     updateOrderStatus,
     assignStaff,
     updatePickupDetails,
     deleteOrder,
-    fetchStatistics,
+    getOrderStatistics,
   } = useSellOrders();
 
   // Local state
@@ -719,8 +90,8 @@ const SellOrdersManagement = () => {
       limit: 12,
     };
 
-    fetchOrders(filters);
-    fetchStatistics();
+    getAllOrders(currentPage, 12, filters);
+    getOrderStatistics();
   }, [
     searchTerm,
     statusFilter,
@@ -728,8 +99,8 @@ const SellOrdersManagement = () => {
     sortBy,
     sortOrder,
     currentPage,
-    fetchOrders,
-    fetchStatistics,
+    getAllOrders,
+    getOrderStatistics,
   ]);
 
   // Filter and sort orders
@@ -762,11 +133,9 @@ const SellOrdersManagement = () => {
       dateRange: dateFilter !== 'all' ? dateFilter : undefined,
       sortBy,
       sortOrder,
-      page: currentPage,
-      limit: 12,
     };
-    fetchOrders(filters);
-    fetchStatistics();
+    getAllOrders(currentPage, 12, filters);
+    getOrderStatistics();
   };
 
   const handleStatusUpdate = async (orderId: any, newStatus: any) => {
@@ -840,103 +209,114 @@ const SellOrdersManagement = () => {
     }).format(price);
   };
 
-  const getStatusColor = (status: any) => {
-    switch (status) {
-      case 'pending':
-        return theme.colors.warning.main;
-      case 'confirmed':
-        return theme.colors.primary.main;
-      case 'picked_up':
-        return theme.colors.info.main;
-      case 'inspected':
-        return theme.colors.secondary.main;
-      case 'completed':
-        return theme.colors.success.main;
-      case 'cancelled':
-        return theme.colors.error.main;
-      default:
-        return theme.colors.grey.main;
-    }
-  };
-
   const renderOrderCard = (order: any) => (
-    <OrderCard key={order._id}>
-      <OrderHeader>
-        <OrderId>
+    <div
+      key={order._id}
+      className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:shadow-lg hover:border-blue-200"
+    >
+      <div className="p-5 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+        <div className="text-sm font-semibold text-gray-800 flex items-center gap-2">
           <FileText size={16} />#{order._id.slice(-8)}
-        </OrderId>
-        <OrderStatus status={order.status}>{order.status.replace('_', ' ')}</OrderStatus>
-      </OrderHeader>
+        </div>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
+            order.status === 'pending'
+              ? 'bg-amber-100 text-amber-700'
+              : order.status === 'confirmed'
+                ? 'bg-blue-100 text-blue-700'
+                : order.status === 'picked_up'
+                  ? 'bg-indigo-100 text-indigo-700'
+                  : order.status === 'inspected'
+                    ? 'bg-purple-100 text-purple-700'
+                    : order.status === 'completed'
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : order.status === 'cancelled'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-gray-100 text-gray-700'
+          }`}
+        >
+          {order.status.replace('_', ' ')}
+        </span>
+      </div>
 
-      <OrderContent>
-        <OrderInfo>
-          <InfoItem>
-            <InfoIcon>
-              <User size={16} />
-            </InfoIcon>
+      <div className="p-5">
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <User size={16} className="text-blue-500" />
             {order.customerInfo?.fullName || 'N/A'}
-          </InfoItem>
-          <InfoItem>
-            <InfoIcon>
-              <Phone size={16} />
-            </InfoIcon>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <Phone size={16} className="text-blue-500" />
             {order.customerInfo?.phone || 'N/A'}
-          </InfoItem>
-          <InfoItem>
-            <InfoIcon>
-              <Calendar size={16} />
-            </InfoIcon>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <Calendar size={16} className="text-blue-500" />
             {formatDate(order.createdAt)}
-          </InfoItem>
-          <InfoItem>
-            <InfoIcon>
-              <Truck size={16} />
-            </InfoIcon>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <Truck size={16} className="text-blue-500" />
             {order.pickup?.method === 'home_pickup' ? 'Home Pickup' : 'Store Drop'}
-          </InfoItem>
-        </OrderInfo>
+          </div>
+        </div>
 
-        <DeviceInfo>
-          <DeviceName>
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <div className="text-base font-semibold text-gray-800 mb-1 flex items-center gap-2">
             <Smartphone size={18} />
             {order.deviceInfo?.name || 'Device'}
-          </DeviceName>
-          <DeviceDetails>
+          </div>
+          <div className="text-sm text-slate-500">
             {order.deviceInfo?.variant &&
               `${order.deviceInfo.variant.storage} • ${order.deviceInfo.variant.color}`}
-          </DeviceDetails>
-        </DeviceInfo>
+          </div>
+        </div>
 
-        <PriceInfo>
-          <PriceLabel>Final Price</PriceLabel>
-          <PriceValue>{formatPrice(order.finalPrice || 0)}</PriceValue>
-        </PriceInfo>
-      </OrderContent>
+        <div className="flex justify-between items-center py-3 border-t border-gray-200">
+          <div className="text-sm text-slate-500">Final Price</div>
+          <div className="text-lg font-bold text-emerald-600">
+            {formatPrice(order.finalPrice || 0)}
+          </div>
+        </div>
+      </div>
 
-      <OrderActions>
-        <ActionGroup>
-          <ActionIcon onClick={() => console.log('View order:', order._id)}>
+      <div className="flex justify-between items-center p-5 bg-gray-50 border-t border-gray-200">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => console.log('View order:', order._id)}
+            className="p-2 border border-gray-300 rounded-lg bg-white text-slate-500 hover:bg-gray-50 hover:text-blue-500 hover:border-blue-200 transition-all duration-200"
+          >
             <Eye size={16} />
-          </ActionIcon>
-          <ActionIcon onClick={() => console.log('Edit order:', order._id)}>
+          </button>
+          <button
+            onClick={() => console.log('Edit order:', order._id)}
+            className="p-2 border border-gray-300 rounded-lg bg-white text-slate-500 hover:bg-gray-50 hover:text-blue-500 hover:border-blue-200 transition-all duration-200"
+          >
             <Edit size={16} />
-          </ActionIcon>
-          <ActionIcon onClick={() => handleDeleteOrder(order._id)}>
+          </button>
+          <button
+            onClick={() => handleDeleteOrder(order._id)}
+            className="p-2 border border-gray-300 rounded-lg bg-white text-slate-500 hover:bg-gray-50 hover:text-blue-500 hover:border-blue-200 transition-all duration-200"
+          >
             <Trash2 size={16} />
-          </ActionIcon>
-        </ActionGroup>
-        <ActionGroup>
-          <ActionIcon onClick={() => console.log('More actions:', order._id)}>
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => console.log('More actions:', order._id)}
+            className="p-2 border border-gray-300 rounded-lg bg-white text-slate-500 hover:bg-gray-50 hover:text-blue-500 hover:border-blue-200 transition-all duration-200"
+          >
             <MoreVertical size={16} />
-          </ActionIcon>
-        </ActionGroup>
-      </OrderActions>
-    </OrderCard>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 
   const renderOrderRow = (order: any) => (
-    <TableRow key={order._id}>
-      <TableCell>
+    <tr
+      key={order._id}
+      className="border-b border-gray-200 transition-all duration-200 hover:bg-gray-25"
+    >
+      <td className="p-5">
         <input
           type="checkbox"
           checked={selectedOrders.includes(order._id)}
@@ -948,163 +328,218 @@ const SellOrdersManagement = () => {
             }
           }}
         />
-      </TableCell>
-      <TableCell>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      </td>
+      <td className="p-5">
+        <div className="flex items-center gap-2">
           <FileText size={16} />#{order._id.slice(-8)}
         </div>
-      </TableCell>
-      <TableCell>{order.customerInfo?.fullName || 'N/A'}</TableCell>
-      <TableCell>{order.deviceInfo?.name || 'Device'}</TableCell>
-      <TableCell>
-        <OrderStatus status={order.status}>{order.status.replace('_', ' ')}</OrderStatus>
-      </TableCell>
-      <TableCell>{formatPrice(order.finalPrice || 0)}</TableCell>
-      <TableCell>{formatDate(order.createdAt)}</TableCell>
-      <TableCell>
-        <ActionGroup>
-          <ActionIcon onClick={() => console.log('View order:', order._id)}>
+      </td>
+      <td className="p-5 text-sm text-slate-500">{order.customerInfo?.fullName || 'N/A'}</td>
+      <td className="p-5 text-sm text-slate-500">{order.deviceInfo?.name || 'Device'}</td>
+      <td className="p-5">
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
+            order.status === 'pending'
+              ? 'bg-amber-100 text-amber-700'
+              : order.status === 'confirmed'
+                ? 'bg-blue-100 text-blue-700'
+                : order.status === 'picked_up'
+                  ? 'bg-indigo-100 text-indigo-700'
+                  : order.status === 'inspected'
+                    ? 'bg-purple-100 text-purple-700'
+                    : order.status === 'completed'
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : order.status === 'cancelled'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-gray-100 text-gray-700'
+          }`}
+        >
+          {order.status.replace('_', ' ')}
+        </span>
+      </td>
+      <td className="p-5 text-sm text-slate-500">{formatPrice(order.finalPrice || 0)}</td>
+      <td className="p-5 text-sm text-slate-500">{formatDate(order.createdAt)}</td>
+      <td className="p-5">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => console.log('View order:', order._id)}
+            className="p-2 border border-gray-300 rounded-lg bg-white text-slate-500 hover:bg-gray-50 hover:text-blue-500 hover:border-blue-200 transition-all duration-200"
+          >
             <Eye size={16} />
-          </ActionIcon>
-          <ActionIcon onClick={() => console.log('Edit order:', order._id)}>
+          </button>
+          <button
+            onClick={() => console.log('Edit order:', order._id)}
+            className="p-2 border border-gray-300 rounded-lg bg-white text-slate-500 hover:bg-gray-50 hover:text-blue-500 hover:border-blue-200 transition-all duration-200"
+          >
             <Edit size={16} />
-          </ActionIcon>
-          <ActionIcon onClick={() => handleDeleteOrder(order._id)}>
+          </button>
+          <button
+            onClick={() => handleDeleteOrder(order._id)}
+            className="p-2 border border-gray-300 rounded-lg bg-white text-slate-500 hover:bg-gray-50 hover:text-blue-500 hover:border-blue-200 transition-all duration-200"
+          >
             <Trash2 size={16} />
-          </ActionIcon>
-        </ActionGroup>
-      </TableCell>
-    </TableRow>
+          </button>
+        </div>
+      </td>
+    </tr>
   );
 
   if (loading && !orders) {
     return (
-      <Container>
-        <LoadingSpinner>
-          <RefreshCw size={24} className="animate-spin" />
-        </LoadingSpinner>
-      </Container>
+      <div className="p-24 max-w-7xl mx-auto">
+        <div className="flex justify-center items-center">
+          <RefreshCw size={24} className="animate-spin text-blue-500" />
+        </div>
+      </div>
     );
   }
 
   return (
-    <Container>
-      <Header>
-        <HeaderLeft>
-          <Title>Sell Orders Management</Title>
-          <Subtitle>Manage and track all sell orders from customers</Subtitle>
-        </HeaderLeft>
-        <HeaderRight>
-          <ActionButton onClick={handleRefresh} disabled={loading}>
+    <div className="p-24 max-w-7xl mx-auto">
+      <div className="flex justify-between items-start gap-24 mb-32 lg:flex-row flex-col lg:gap-16">
+        <div className="flex-1">
+          <h1 className="text-3xl font-bold text-gray-800 mb-8">Sell Orders Management</h1>
+          <p className="text-lg text-slate-500">Manage and track all sell orders from customers</p>
+        </div>
+        <div className="flex items-center gap-12 sm:w-auto w-full sm:justify-start justify-between">
+          <button
+            onClick={handleRefresh}
+            disabled={loading}
+            className="px-12 py-12 border border-gray-300 rounded-lg bg-white text-gray-800 font-medium flex items-center gap-8 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          >
             <RefreshCw size={16} />
             Refresh
-          </ActionButton>
-          <ActionButton onClick={() => handleBulkAction('export')}>
+          </button>
+          <button
+            onClick={() => handleBulkAction('export')}
+            className="px-12 py-12 bg-blue-500 text-white rounded-lg font-medium flex items-center gap-8 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:bg-blue-600"
+          >
             <Download size={16} />
             Export
-          </ActionButton>
+          </button>
           {selectedOrders.length > 0 && (
-            <ActionButton variant="danger" onClick={() => handleBulkAction('delete')}>
+            <button
+              onClick={() => handleBulkAction('delete')}
+              className="px-12 py-12 bg-red-500 text-white rounded-lg font-medium flex items-center gap-8 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:bg-red-600"
+            >
               <Trash2 size={16} />
               Delete ({selectedOrders.length})
-            </ActionButton>
+            </button>
           )}
-        </HeaderRight>
-      </Header>
+        </div>
+      </div>
 
       {statistics && (
-        <StatsGrid>
-          <StatCard>
-            <StatIcon type="total">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-24 mb-32">
+          <div className="bg-white border border-gray-200 rounded-xl p-24 flex items-center gap-16 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-blue-200">
+            <div className="w-15 h-15 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500">
               <ShoppingBag size={24} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{statistics.totalOrders || 0}</StatValue>
-              <StatLabel>Total Orders</StatLabel>
-              <StatChange positive={statistics.ordersGrowth >= 0}>
+            </div>
+            <div className="flex-1">
+              <div className="text-2xl font-bold text-gray-800 mb-4">
+                {statistics.totalOrders || 0}
+              </div>
+              <div className="text-sm text-slate-500 mb-4">Total Orders</div>
+              <div
+                className={`text-xs font-medium flex items-center gap-4 ${statistics.ordersGrowth >= 0 ? 'text-emerald-500' : 'text-red-500'}`}
+              >
                 {statistics.ordersGrowth >= 0 ? (
                   <TrendingUp size={12} />
                 ) : (
                   <TrendingDown size={12} />
                 )}
                 {Math.abs(statistics.ordersGrowth || 0)}% from last month
-              </StatChange>
-            </StatContent>
-          </StatCard>
+              </div>
+            </div>
+          </div>
 
-          <StatCard>
-            <StatIcon type="pending">
+          <div className="bg-white border border-gray-200 rounded-xl p-24 flex items-center gap-16 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-amber-200">
+            <div className="w-15 h-15 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500">
               <Clock size={24} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{statistics.pendingOrders || 0}</StatValue>
-              <StatLabel>Pending Orders</StatLabel>
-              <StatChange positive={statistics.pendingGrowth <= 0}>
+            </div>
+            <div className="flex-1">
+              <div className="text-2xl font-bold text-gray-800 mb-4">
+                {statistics.pendingOrders || 0}
+              </div>
+              <div className="text-sm text-slate-500 mb-4">Pending Orders</div>
+              <div
+                className={`text-xs font-medium flex items-center gap-4 ${statistics.pendingGrowth <= 0 ? 'text-emerald-500' : 'text-red-500'}`}
+              >
                 {statistics.pendingGrowth <= 0 ? (
                   <TrendingDown size={12} />
                 ) : (
                   <TrendingUp size={12} />
                 )}
                 {Math.abs(statistics.pendingGrowth || 0)}% from last month
-              </StatChange>
-            </StatContent>
-          </StatCard>
+              </div>
+            </div>
+          </div>
 
-          <StatCard>
-            <StatIcon type="completed">
+          <div className="bg-white border border-gray-200 rounded-xl p-24 flex items-center gap-16 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-200">
+            <div className="w-15 h-15 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500">
               <CheckCircle size={24} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{statistics.completedOrders || 0}</StatValue>
-              <StatLabel>Completed Orders</StatLabel>
-              <StatChange positive={statistics.completedGrowth >= 0}>
+            </div>
+            <div className="flex-1">
+              <div className="text-2xl font-bold text-gray-800 mb-4">
+                {statistics.completedOrders || 0}
+              </div>
+              <div className="text-sm text-slate-500 mb-4">Completed Orders</div>
+              <div
+                className={`text-xs font-medium flex items-center gap-4 ${statistics.completedGrowth >= 0 ? 'text-emerald-500' : 'text-red-500'}`}
+              >
                 {statistics.completedGrowth >= 0 ? (
                   <TrendingUp size={12} />
                 ) : (
                   <TrendingDown size={12} />
                 )}
                 {Math.abs(statistics.completedGrowth || 0)}% from last month
-              </StatChange>
-            </StatContent>
-          </StatCard>
+              </div>
+            </div>
+          </div>
 
-          <StatCard>
-            <StatIcon type="revenue">
+          <div className="bg-white border border-gray-200 rounded-xl p-24 flex items-center gap-16 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-200">
+            <div className="w-15 h-15 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500">
               <DollarSign size={24} />
-            </StatIcon>
-            <StatContent>
-              <StatValue>{formatPrice(statistics.totalRevenue || 0)}</StatValue>
-              <StatLabel>Total Revenue</StatLabel>
-              <StatChange positive={statistics.revenueGrowth >= 0}>
+            </div>
+            <div className="flex-1">
+              <div className="text-2xl font-bold text-gray-800 mb-4">
+                {formatPrice(statistics.totalRevenue || 0)}
+              </div>
+              <div className="text-sm text-slate-500 mb-4">Total Revenue</div>
+              <div
+                className={`text-xs font-medium flex items-center gap-4 ${statistics.revenueGrowth >= 0 ? 'text-emerald-500' : 'text-red-500'}`}
+              >
                 {statistics.revenueGrowth >= 0 ? (
                   <TrendingUp size={12} />
                 ) : (
                   <TrendingDown size={12} />
                 )}
                 {Math.abs(statistics.revenueGrowth || 0)}% from last month
-              </StatChange>
-            </StatContent>
-          </StatCard>
-        </StatsGrid>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
-      <FiltersCard>
-        <FiltersRow>
-          <FilterGroup>
-            <FilterLabel>Search Orders</FilterLabel>
-            <FilterInput
+      <div className="bg-white border border-gray-200 rounded-xl p-24 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-16 items-end">
+          <div className="flex flex-col gap-8">
+            <label className="text-sm font-medium text-gray-800">Search Orders</label>
+            <input
               type="text"
               placeholder="Search by order ID, customer name, email, phone, or device..."
               value={searchTerm}
               onChange={(e: any) => setSearchTerm(e.target.value)}
+              className="px-12 py-12 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
             />
-          </FilterGroup>
+          </div>
 
-          <FilterGroup>
-            <FilterLabel>Status</FilterLabel>
-            <FilterSelect
+          <div className="flex flex-col gap-8">
+            <label className="text-sm font-medium text-gray-800">Status</label>
+            <select
               value={statusFilter}
               onChange={(e: any) => setStatusFilter(e.target.value)}
+              className="px-12 py-12 border border-gray-300 rounded-lg text-sm bg-white cursor-pointer transition-all duration-200 focus:outline-none focus:border-blue-500"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -1113,29 +548,34 @@ const SellOrdersManagement = () => {
               <option value="inspected">Inspected</option>
               <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>
-            </FilterSelect>
-          </FilterGroup>
+            </select>
+          </div>
 
-          <FilterGroup>
-            <FilterLabel>Date Range</FilterLabel>
-            <FilterSelect value={dateFilter} onChange={(e: any) => setDateFilter(e.target.value)}>
+          <div className="flex flex-col gap-8">
+            <label className="text-sm font-medium text-gray-800">Date Range</label>
+            <select
+              value={dateFilter}
+              onChange={(e: any) => setDateFilter(e.target.value)}
+              className="px-12 py-12 border border-gray-300 rounded-lg text-sm bg-white cursor-pointer transition-all duration-200 focus:outline-none focus:border-blue-500"
+            >
               <option value="all">All Time</option>
               <option value="today">Today</option>
               <option value="week">This Week</option>
               <option value="month">This Month</option>
               <option value="quarter">This Quarter</option>
-            </FilterSelect>
-          </FilterGroup>
+            </select>
+          </div>
 
-          <FilterGroup>
-            <FilterLabel>Sort By</FilterLabel>
-            <FilterSelect
+          <div className="flex flex-col gap-8">
+            <label className="text-sm font-medium text-gray-800">Sort By</label>
+            <select
               value={`${sortBy}-${sortOrder}`}
               onChange={(e: any) => {
                 const [field, order] = e.target.value.split('-');
                 setSortBy(field);
                 setSortOrder(order);
               }}
+              className="px-12 py-12 border border-gray-300 rounded-lg text-sm bg-white cursor-pointer transition-all duration-200 focus:outline-none focus:border-blue-500"
             >
               <option value="createdAt-desc">Newest First</option>
               <option value="createdAt-asc">Oldest First</option>
@@ -1143,71 +583,68 @@ const SellOrdersManagement = () => {
               <option value="finalPrice-asc">Price: Low to High</option>
               <option value="status-asc">Status A-Z</option>
               <option value="customerInfo.fullName-asc">Customer A-Z</option>
-            </FilterSelect>
-          </FilterGroup>
+            </select>
+          </div>
 
-          <ActionButton onClick={handleRefresh} disabled={loading}>
-            <Search size={16} />
-          </ActionButton>
-        </FiltersRow>
-      </FiltersCard>
-
-      <ViewControls>
-        <ViewToggle>
-          <ViewButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
-            <Grid size={16} />
-          </ViewButton>
-          <ViewButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
-            <List size={16} />
-          </ViewButton>
-        </ViewToggle>
-
-        <SortControls>
-          <span
-            style={{ fontSize: theme.typography.fontSize.sm, color: theme.colors.text.secondary }}
+          <button
+            onClick={handleRefresh}
+            disabled={loading}
+            className="px-12 py-12 bg-blue-500 text-white rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {filteredOrders.length} orders found
-          </span>
-        </SortControls>
-      </ViewControls>
+            <Search size={16} />
+          </button>
+        </div>
+      </div>
+
+      <div className="flex justify-between items-center mb-24 py-16 border-b border-gray-200">
+        <div className="flex items-center gap-8">
+          <button
+            onClick={() => setViewMode('grid')}
+            className={`p-8 border border-gray-300 rounded-lg transition-all duration-200 ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'bg-white text-slate-500 hover:bg-gray-50'}`}
+          >
+            <Grid size={16} />
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            className={`p-8 border border-gray-300 rounded-lg transition-all duration-200 ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'bg-white text-slate-500 hover:bg-gray-50'}`}
+          >
+            <List size={16} />
+          </button>
+        </div>
+
+        <div className="text-sm text-slate-500">{filteredOrders.length} orders found</div>
+      </div>
 
       {error && (
-        <div
-          style={{
-            padding: theme.spacing[4],
-            background: theme.colors.error[50],
-            border: `1px solid ${theme.colors.error[200]}`,
-            borderRadius: theme.borderRadius.md,
-            color: theme.colors.error[700],
-            marginBottom: theme.spacing[6],
-          }}
-        >
+        <div className="p-16 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-24">
           {error}
         </div>
       )}
 
       {filteredOrders.length === 0 ? (
-        <EmptyState>
-          <EmptyIcon>
+        <div className="flex flex-col items-center justify-center py-48 text-center">
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-slate-500 mb-16">
             <ShoppingBag size={32} />
-          </EmptyIcon>
-          <EmptyTitle>No Orders Found</EmptyTitle>
-          <EmptyDescription>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-8">No Orders Found</h3>
+          <p className="text-base text-slate-500 max-w-md">
             {searchTerm || statusFilter !== 'all' || dateFilter !== 'all'
               ? 'No orders match your current filters. Try adjusting your search criteria.'
               : 'No sell orders have been placed yet. Orders will appear here once customers start selling their devices.'}
-          </EmptyDescription>
-        </EmptyState>
+          </p>
+        </div>
       ) : (
         <>
           {viewMode === 'grid' ? (
-            <OrdersGrid>{filteredOrders.map(renderOrderCard)}</OrdersGrid>
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-24 mb-32">
+              {filteredOrders.map(renderOrderCard)}
+            </div>
           ) : (
-            <OrdersList>
-              <OrdersTable>
-                <TableHeader>
-                  <TableRow>
-                    <TableHeaderCell>
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <table className="w-full border-collapse">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="p-20 text-left text-sm font-semibold text-gray-800 border-b border-gray-200">
                       <input
                         type="checkbox"
                         checked={selectedOrders.length === filteredOrders.length}
@@ -1219,59 +656,74 @@ const SellOrdersManagement = () => {
                           }
                         }}
                       />
-                    </TableHeaderCell>
-                    <TableHeaderCell>Order ID</TableHeaderCell>
-                    <TableHeaderCell>Customer</TableHeaderCell>
-                    <TableHeaderCell>Device</TableHeaderCell>
-                    <TableHeaderCell>Status</TableHeaderCell>
-                    <TableHeaderCell>Price</TableHeaderCell>
-                    <TableHeaderCell>Date</TableHeaderCell>
-                    <TableHeaderCell>Actions</TableHeaderCell>
-                  </TableRow>
-                </TableHeader>
+                    </th>
+                    <th className="p-20 text-left text-sm font-semibold text-gray-800 border-b border-gray-200">
+                      Order ID
+                    </th>
+                    <th className="p-20 text-left text-sm font-semibold text-gray-800 border-b border-gray-200">
+                      Customer
+                    </th>
+                    <th className="p-20 text-left text-sm font-semibold text-gray-800 border-b border-gray-200">
+                      Device
+                    </th>
+                    <th className="p-20 text-left text-sm font-semibold text-gray-800 border-b border-gray-200">
+                      Status
+                    </th>
+                    <th className="p-20 text-left text-sm font-semibold text-gray-800 border-b border-gray-200">
+                      Price
+                    </th>
+                    <th className="p-20 text-left text-sm font-semibold text-gray-800 border-b border-gray-200">
+                      Date
+                    </th>
+                    <th className="p-20 text-left text-sm font-semibold text-gray-800 border-b border-gray-200">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
                 <tbody>{filteredOrders.map(renderOrderRow)}</tbody>
-              </OrdersTable>
-            </OrdersList>
+              </table>
+            </div>
           )}
 
           {pagination && pagination.totalPages > 1 && (
-            <Pagination>
-              <PaginationInfo>
+            <div className="flex justify-between items-center py-24">
+              <div className="text-sm text-slate-500">
                 Showing {(currentPage - 1) * 12 + 1} to{' '}
-                {Math.min(currentPage * 12, pagination.totalItems)} of {pagination.totalItems}{' '}
-                orders
-              </PaginationInfo>
-              <PaginationControls>
-                <PaginationButton
+                {Math.min(currentPage * 12, pagination.total)} of {pagination.total} orders
+              </div>
+              <div className="flex items-center gap-8">
+                <button
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage === 1}
+                  className="px-12 py-8 border border-gray-300 rounded-lg bg-white text-gray-800 text-sm cursor-pointer transition-all duration-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft size={16} />
-                </PaginationButton>
+                </button>
                 {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                   const page = i + 1;
                   return (
-                    <PaginationButton
+                    <button
                       key={page}
-                      active={page === currentPage}
                       onClick={() => setCurrentPage(page)}
+                      className={`px-12 py-8 border border-gray-300 rounded-lg text-sm cursor-pointer transition-all duration-200 ${page === currentPage ? 'bg-blue-500 text-white' : 'bg-white text-gray-800 hover:bg-gray-50'}`}
                     >
                       {page}
-                    </PaginationButton>
+                    </button>
                   );
                 })}
-                <PaginationButton
+                <button
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage === pagination.totalPages}
+                  className="px-12 py-8 border border-gray-300 rounded-lg bg-white text-gray-800 text-sm cursor-pointer transition-all duration-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ChevronRight size={16} />
-                </PaginationButton>
-              </PaginationControls>
-            </Pagination>
+                </button>
+              </div>
+            </div>
           )}
         </>
       )}
-    </Container>
+    </div>
   );
 };
 

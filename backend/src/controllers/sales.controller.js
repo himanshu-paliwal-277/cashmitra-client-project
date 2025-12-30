@@ -17,7 +17,14 @@ export var createOrder = asyncHandler(async (req, res) => {
     console.log('Converted items object to array:', req.body.items);
   }
 
-  const { items, shippingAddress, paymentMethod, couponCode } = req.body;
+  const {
+    items,
+    shippingAddress,
+    paymentMethod,
+    couponCode,
+    deliveryOption,
+    deliveryFee,
+  } = req.body;
   const userId = req.user.id;
 
   if (!items || items.length === 0) {
@@ -29,7 +36,13 @@ export var createOrder = asyncHandler(async (req, res) => {
   let orderPartnerId = null;
 
   for (const item of items) {
-    const { inventoryId, quantity } = item;
+    const { inventoryId, quantity, selectedCondition } = item;
+
+    console.log('Processing item:', {
+      inventoryId,
+      quantity,
+      selectedCondition,
+    });
 
     const product = await BuyProduct.findById(inventoryId);
     console.log('product: ', product);
@@ -55,22 +68,38 @@ export var createOrder = asyncHandler(async (req, res) => {
       );
     }
 
-    const itemTotal = product.pricing.mrp * quantity;
+    // Calculate price including condition price
+    const basePrice = product.pricing.discountedPrice || product.pricing.mrp;
+    const conditionPrice = selectedCondition?.price || 0;
+    const finalPrice = basePrice + conditionPrice;
+    const itemTotal = finalPrice * quantity;
+
+    console.log('Price calculation:', {
+      basePrice,
+      conditionPrice,
+      finalPrice,
+      quantity,
+      itemTotal,
+    });
+
     totalAmount += itemTotal;
 
     const processedItem = {
       product: inventoryId,
       quantity,
-      unitPrice: product.pricing.mrp,
-      totalPrice: itemTotal,
-      condition: 'good',
+      price: finalPrice, // Store the final price including condition adjustments
+      condition: selectedCondition?.label || 'good',
     };
 
     processedItems.push(processedItem);
   }
 
+  // Add delivery fee to total amount
+  const finalDeliveryFee = deliveryFee || 0;
+  totalAmount += finalDeliveryFee;
+
   const commissionRate = 0.1;
-  const totalCommission = totalAmount * commissionRate;
+  const totalCommission = (totalAmount - finalDeliveryFee) * commissionRate; // Commission only on product amount, not delivery
   // const partnerAmount = totalAmount - totalCommission;
 
   let discountAmount = 0;
@@ -97,6 +126,8 @@ export var createOrder = asyncHandler(async (req, res) => {
     shippingDetails: {
       address: shippingAddress,
       status: 'pending',
+      deliveryOption: deliveryOption || 'standard',
+      deliveryFee: finalDeliveryFee,
     },
     status: 'pending',
     metadata: {

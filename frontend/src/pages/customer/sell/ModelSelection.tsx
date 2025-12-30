@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { theme } from '../../../utils';
 import Button from '../../../components/ui/Button';
 import Card from '../../../components/ui/Card';
 import Input from '../../../components/ui/Input';
@@ -21,245 +19,6 @@ import {
   Camera,
   Loader,
 } from 'lucide-react';
-
-const PageContainer = styled.div`
-  min-height: calc(100vh - 72px);
-  background: ${theme.colors.background.paper};
-  padding: ${theme.spacing[8]} 0;
-`;
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 ${theme.spacing[4]};
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    padding: 0 ${theme.spacing[6]};
-  }
-
-  @media (min-width: ${theme.breakpoints.lg}) {
-    padding: 0 ${theme.spacing[8]};
-  }
-`;
-
-const Breadcrumb = styled.nav`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  margin-bottom: ${theme.spacing[8]};
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const BreadcrumbLink = styled.a`
-  color: ${theme.colors.primary.main};
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const BreadcrumbSeparator = styled.span`
-  color: ${theme.colors.text.hint};
-`;
-
-const PageHeader = styled.div`
-  text-align: center;
-  margin-bottom: ${theme.spacing[8]};
-`;
-
-const BrandInfo = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: ${theme.spacing[3]};
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const BrandLogo = styled.div`
-  width: 48px;
-  height: 48px;
-  background: ${(props: any) => props.bgColor || theme.colors.grey[100]};
-  border-radius: ${theme.borderRadius.lg};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: ${theme.typography.fontSize.lg};
-  font-weight: ${theme.typography.fontWeight.bold};
-  color: ${(props: any) => props.textColor || theme.colors.text.primary};
-`;
-
-const PageTitle = styled.h1`
-  font-size: ${theme.typography.fontSize['3xl']};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[3]};
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    font-size: ${theme.typography.fontSize['2xl']};
-  }
-`;
-
-const PageSubtitle = styled.p`
-  font-size: ${theme.typography.fontSize.base};
-  color: ${theme.colors.text.secondary};
-  max-width: 500px;
-  margin: 0 auto;
-`;
-
-const SearchSection = styled.div`
-  max-width: 500px;
-  margin: 0 auto ${theme.spacing[8]};
-`;
-
-const ModelGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[8]};
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const ModelCard = styled(Card)`
-  cursor: pointer;
-  transition: all ${theme.transitions.duration.normal} ${theme.transitions.easing.easeInOut};
-  border: 2px solid transparent;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${theme.shadows.lg};
-    border-color: ${theme.colors.primary.main};
-  }
-
-  &.selected {
-    border-color: ${theme.colors.primary.main};
-    background: ${theme.colors.primary[50]};
-  }
-`;
-
-const ModelHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: ${theme.spacing[3]};
-`;
-
-const ModelName = styled.h3`
-  font-size: ${theme.typography.fontSize.lg};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-  flex: 1;
-`;
-
-const ModelYear = styled.span`
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-  background: ${theme.colors.grey[100]};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.md};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-`;
-
-const ModelSpecs = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${theme.spacing[2]};
-  margin-bottom: ${theme.spacing[3]};
-`;
-
-const SpecItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-  font-size: ${theme.typography.fontSize.sm};
-  color: ${theme.colors.text.secondary};
-
-  svg {
-    color: ${theme.colors.primary.main};
-  }
-`;
-
-const PriceRange = styled.div`
-  background: ${theme.colors.accent[50]};
-  border: 1px solid ${theme.colors.accent[200]};
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing[3]};
-  text-align: center;
-`;
-
-const PriceLabel = styled.div`
-  font-size: ${theme.typography.fontSize.xs};
-  color: ${theme.colors.text.secondary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const PriceValue = styled.div`
-  font-size: ${theme.typography.fontSize.lg};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.accent.main};
-`;
-
-const PopularBadge = styled.div`
-  position: absolute;
-  top: ${theme.spacing[3]};
-  right: ${theme.spacing[3]};
-  background: ${theme.colors.warning.main};
-  color: white;
-  font-size: ${theme.typography.fontSize.xs};
-  font-weight: ${theme.typography.fontWeight.medium};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-`;
-
-const SectionTitle = styled.h2`
-  font-size: ${theme.typography.fontSize.xl};
-  font-weight: ${theme.typography.fontWeight.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[4]};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const NavigationButtons = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: ${theme.spacing[4]};
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    flex-direction: column;
-
-    > * {
-      width: 100%;
-    }
-  }
-`;
-
-const BackButton = styled(Button)`
-  @media (max-width: ${theme.breakpoints.sm}) {
-    order: 2;
-  }
-`;
-
-const NextButton = styled(Button)`
-  @media (max-width: ${theme.breakpoints.sm}) {
-    order: 1;
-  }
-`;
 
 const ModelSelection = ({ onModelSelect, onBack }: any) => {
   const location = useLocation();
@@ -351,157 +110,170 @@ const ModelSelection = ({ onModelSelect, onBack }: any) => {
 
   if (loading) {
     return (
-      <PageContainer>
-        <Container>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '400px',
-            }}
-          >
+      <div className="min-h-[calc(100vh-72px)] bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center min-h-[400px]">
             <Loader size={48} className="animate-spin" />
           </div>
-        </Container>
-      </PageContainer>
+        </div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <PageContainer>
-        <Container>
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <p style={{ color: theme.colors.error.main }}>Error loading models: {error}</p>
+      <div className="min-h-[calc(100vh-72px)] bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-8">
+            <p className="text-red-600">Error loading models: {error}</p>
             <Button onClick={() => window.location.reload()}>Retry</Button>
           </div>
-        </Container>
-      </PageContainer>
+        </div>
+      </div>
     );
   }
 
   const renderModelCard = (model: any) => (
-    <ModelCard
+    <Card
       key={model._id}
       onClick={() => handleModelClick(model)}
-      className={selectedModel?._id === model._id ? 'selected' : ''}
-      style={{ position: 'relative' }}
+      className={`cursor-pointer transition-all duration-200 ease-in-out border-2 relative hover:-translate-y-0.5 hover:shadow-lg hover:border-blue-600 ${
+        selectedModel?._id === model._id ? 'border-blue-600 bg-blue-50' : 'border-transparent'
+      }`}
     >
       {model.popular && (
-        <PopularBadge>
+        <div className="absolute top-3 right-3 bg-yellow-500 text-white text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1">
           <Star size={12} fill="currentColor" />
           Popular
-        </PopularBadge>
+        </div>
       )}
       <Card.Body>
-        <ModelHeader>
-          <ModelName>{model.model}</ModelName>
-          <ModelYear>
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="text-lg font-semibold text-gray-900 m-0 flex-1">{model.model}</h3>
+          <span className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded-md flex items-center gap-1">
             <Calendar size={14} />
             {model.year || 'Latest'}
-          </ModelYear>
-        </ModelHeader>
+          </span>
+        </div>
 
-        <ModelSpecs>
-          <SpecItem>
-            <HardDrive size={16} />
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <HardDrive size={16} className="text-blue-600" />
             {model.storage || 'N/A'}
-          </SpecItem>
-          <SpecItem>
-            <Cpu size={16} />
+          </div>
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <Cpu size={16} className="text-blue-600" />
             {model.ram || 'N/A'}
-          </SpecItem>
-          <SpecItem>
-            <Camera size={16} />
+          </div>
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <Camera size={16} className="text-blue-600" />
             {model.camera || 'N/A'}
-          </SpecItem>
-          <SpecItem>
-            <Smartphone size={16} />
+          </div>
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <Smartphone size={16} className="text-blue-600" />
             {model.processor || 'N/A'}
-          </SpecItem>
-        </ModelSpecs>
+          </div>
+        </div>
 
-        <PriceRange>
-          <PriceLabel>Expected Price Range</PriceLabel>
-          <PriceValue>
+        <div className="bg-green-50 border border-green-200 rounded-md p-3 text-center">
+          <div className="text-xs text-gray-600 mb-1">Expected Price Range</div>
+          <div className="text-lg font-semibold text-green-600">
             {formatPrice(model.minPrice || 0)} - {formatPrice(model.maxPrice || 0)}
-          </PriceValue>
-        </PriceRange>
+          </div>
+        </div>
       </Card.Body>
-    </ModelCard>
+    </Card>
   );
 
   return (
-    <PageContainer>
-      <Container>
+    <div className="min-h-[calc(100vh-72px)] bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <Breadcrumb>
-          <BreadcrumbLink href="/">
+        <nav className="flex items-center gap-2 mb-8 text-sm text-gray-600">
+          <a
+            href="/"
+            className="text-blue-600 no-underline flex items-center gap-1 hover:underline"
+          >
             <Home size={16} />
             Home
-          </BreadcrumbLink>
-          <BreadcrumbSeparator>/</BreadcrumbSeparator>
-          <BreadcrumbLink href="/sell">Sell Device</BreadcrumbLink>
-          <BreadcrumbSeparator>/</BreadcrumbSeparator>
-          <BreadcrumbLink href={`/sell/brand?category=${categoryId}`}>
+          </a>
+          <span className="text-gray-400">/</span>
+          <a href="/sell" className="text-blue-600 no-underline hover:underline">
+            Sell Device
+          </a>
+          <span className="text-gray-400">/</span>
+          <a
+            href={`/sell/brand?category=${categoryId}`}
+            className="text-blue-600 no-underline hover:underline"
+          >
             {selectedCategory?.name || 'Category'}
-          </BreadcrumbLink>
-          <BreadcrumbSeparator>/</BreadcrumbSeparator>
+          </a>
+          <span className="text-gray-400">/</span>
           <span>{selectedBrand?.name}</span>
-        </Breadcrumb>
+        </nav>
 
         {/* Page Header */}
-        <PageHeader>
-          <BrandInfo>
-            <BrandLogo bgColor={selectedBrand?.bgColor} textColor={selectedBrand?.textColor}>
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div
+              className="w-12 h-12 rounded-lg flex items-center justify-center text-lg font-bold"
+              style={{
+                backgroundColor: selectedBrand?.bgColor || '#f3f4f6',
+                color: selectedBrand?.textColor || '#111827',
+              }}
+            >
               {selectedBrand?.logo}
-            </BrandLogo>
-            <div>
-              <PageTitle>Select your {selectedBrand?.name} model</PageTitle>
             </div>
-          </BrandInfo>
-          <PageSubtitle>Choose the exact model to get the most accurate price quote</PageSubtitle>
-        </PageHeader>
+            <div>
+              <h1 className="text-3xl md:text-2xl font-semibold text-gray-900 mb-3">
+                Select your {selectedBrand?.name} model
+              </h1>
+            </div>
+          </div>
+          <p className="text-base text-gray-600 max-w-lg mx-auto">
+            Choose the exact model to get the most accurate price quote
+          </p>
+        </div>
 
         {/* Search */}
-        <SearchSection>
+        <div className="max-w-lg mx-auto mb-8">
           <Input
             placeholder={`Search ${selectedBrand?.name} models...`}
             leftIcon={<Search size={20} />}
             value={searchQuery}
             onChange={(e: any) => setSearchQuery(e.target.value)}
           />
-        </SearchSection>
+        </div>
 
         {/* Popular Models */}
         {!searchQuery && popularModels.length > 0 && (
-          <div style={{ marginBottom: theme.spacing[8] }}>
-            <SectionTitle>⭐ Popular Models</SectionTitle>
-            <ModelGrid>{popularModels.map(renderModelCard)}</ModelGrid>
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              ⭐ Popular Models
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              {popularModels.map(renderModelCard)}
+            </div>
           </div>
         )}
 
         {/* All Models */}
-        <div style={{ marginBottom: theme.spacing[8] }}>
-          <SectionTitle>
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
             {searchQuery
               ? `Search Results (${allModels.length})`
               : `📱 All ${selectedBrand?.name} Models`}
-          </SectionTitle>
-          <ModelGrid>{allModels.map(renderModelCard)}</ModelGrid>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {allModels.map(renderModelCard)}
+          </div>
 
           {allModels.length === 0 && (
             <Card>
               <Card.Body>
-                <div style={{ textAlign: 'center', padding: theme.spacing[8] }}>
+                <div className="text-center py-8">
                   <p>No models found matching "{searchQuery}"</p>
-                  <p
-                    style={{
-                      color: theme.colors.text.secondary,
-                      fontSize: theme.typography.fontSize.sm,
-                    }}
-                  >
+                  <p className="text-gray-600 text-sm">
                     Try a different search term or contact support if your model is not listed.
                   </p>
                 </div>
@@ -511,22 +283,28 @@ const ModelSelection = ({ onModelSelect, onBack }: any) => {
         </div>
 
         {/* Navigation */}
-        <NavigationButtons>
-          <BackButton variant="secondary" leftIcon={<ArrowLeft size={20} />} onClick={handleBack}>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <Button
+            variant="secondary"
+            leftIcon={<ArrowLeft size={20} />}
+            onClick={handleBack}
+            className="w-full sm:w-auto sm:order-1"
+          >
             Back to Brands
-          </BackButton>
+          </Button>
 
-          <NextButton
+          <Button
             variant="primary"
             rightIcon={<ArrowRight size={20} />}
             disabled={!selectedModel}
             onClick={handleNext}
+            className="w-full sm:w-auto sm:order-2"
           >
             Continue with {selectedModel?.name || 'Selected Model'}
-          </NextButton>
-        </NavigationButtons>
-      </Container>
-    </PageContainer>
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -11,6 +11,10 @@ const cartItemSchema = new mongoose.Schema({
     required: true,
     min: 1,
   },
+  selectedCondition: {
+    label: String,
+    price: Number,
+  },
   addedAt: {
     type: Date,
     default: Date.now,

@@ -181,7 +181,7 @@ const SavedAddresses = () => {
         </header>
 
         {loading ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-5">
+          <div className="grid sm:grid-cols-4 grid-cols-1 gap-5">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
@@ -195,7 +195,7 @@ const SavedAddresses = () => {
             ))}
           </div>
         ) : addresses?.length > 0 ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(340px,1fr))] gap-5">
+          <div className="grid sm:grid-cols-4 grid-cols-1 gap-5">
             {addresses.map(address => {
               const id = address._id || address.id;
               const type = address.addressType || address.type || 'home';
@@ -349,7 +349,7 @@ const SavedAddresses = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label
                       htmlFor="fullName"
@@ -398,7 +398,7 @@ const SavedAddresses = () => {
                   <span>Contact Information</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                   <div className="flex flex-col gap-1.5">
                     <label
                       htmlFor="phone"
@@ -476,7 +476,7 @@ const SavedAddresses = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
                   <div className="flex flex-col gap-1.5">
                     <label
                       htmlFor="city"

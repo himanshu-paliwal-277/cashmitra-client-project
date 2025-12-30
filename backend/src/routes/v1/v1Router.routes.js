@@ -10,6 +10,7 @@ import buyProductRoutes from './buyProduct.routes.js';
 import buySuperCategoryRoutes from './buySuperCategory.routes.js';
 import categoryRoutes from './category.routes.js';
 import contactRoutes from './contact.routes.js';
+import deliveryRoutes from './delivery.routes.js';
 import financeRoutes from './finance.routes.js';
 import partnerRoutes from './partner.routes.js';
 import partnerPermissionRoutes from './partnerPermission.routes.js';
@@ -54,6 +55,7 @@ router.use('/sales', salesRoutes);
 router.use('/wallet', walletRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/contact', contactRoutes);
+router.use('/delivery', deliveryRoutes);
 
 router.use('/sell-products', sellProductRoutes);
 router.use('/sell-questions', sellQuestionRoutes);

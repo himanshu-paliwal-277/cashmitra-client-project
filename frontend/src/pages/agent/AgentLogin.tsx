@@ -2,137 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAgentAuth } from '../../contexts/AgentAuthContext';
 import { Mail, Lock, LogIn, Loader } from 'lucide-react';
-import styled from 'styled-components';
-
-const LoginContainer = styled.div`
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
-`;
-
-const LoginCard = styled.div`
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  padding: 40px;
-  width: 100%;
-  max-width: 450px;
-`;
-
-const Logo = styled.div`
-  text-align: center;
-  margin-bottom: 30px;
-
-  h1 {
-    color: #667eea;
-    font-size: 32px;
-    font-weight: 700;
-    margin: 0 0 10px 0;
-  }
-
-  p {
-    color: #6b7280;
-    font-size: 16px;
-    margin: 0;
-  }
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-const Label = styled.label`
-  font-size: 14px;
-  font-weight: 600;
-  color: #374151;
-`;
-
-const InputWrapper = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-
-  svg {
-    position: absolute;
-    left: 12px;
-    color: #9ca3af;
-  }
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 12px 12px 12px 40px;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
-  font-size: 15px;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  }
-
-  &::placeholder {
-    color: #9ca3af;
-  }
-`;
-
-const Button = styled.button`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 14px;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 10px;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  background: #fee2e2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
 
 const AgentLogin = () => {
   const [formData, setFormData] = useState({
@@ -174,26 +43,28 @@ const AgentLogin = () => {
   };
 
   return (
-    <LoginContainer>
-      <LoginCard>
-        <Logo>
-          <h1>🚗 Cashmitra Agent</h1>
-          <p>Welcome back! Please login to continue</p>
-        </Logo>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 p-5">
+      <div className="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-indigo-500 text-3xl font-bold mb-2">🚗 Cashmitra Agent</h1>
+          <p className="text-gray-500 text-base">Welcome back! Please login to continue</p>
+        </div>
 
-        <Form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {error && (
-            <ErrorMessage>
+            <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm flex items-center gap-2">
               <span>⚠️</span>
               {error}
-            </ErrorMessage>
+            </div>
           )}
 
-          <FormGroup>
-            <Label htmlFor="email">Email Address</Label>
-            <InputWrapper>
-              <Mail size={20} />
-              <Input
+          <div className="flex flex-col gap-2">
+            <label htmlFor="email" className="text-sm font-semibold text-gray-700">
+              Email Address
+            </label>
+            <div className="relative flex items-center">
+              <Mail size={20} className="absolute left-3 text-gray-400" />
+              <input
                 type="email"
                 id="email"
                 name="email"
@@ -202,15 +73,18 @@ const AgentLogin = () => {
                 onChange={handleChange}
                 disabled={loading}
                 autoComplete="email"
+                className="w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl text-base transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-100 placeholder-gray-400"
               />
-            </InputWrapper>
-          </FormGroup>
+            </div>
+          </div>
 
-          <FormGroup>
-            <Label htmlFor="password">Password</Label>
-            <InputWrapper>
-              <Lock size={20} />
-              <Input
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password" className="text-sm font-semibold text-gray-700">
+              Password
+            </label>
+            <div className="relative flex items-center">
+              <Lock size={20} className="absolute left-3 text-gray-400" />
+              <input
                 type="password"
                 id="password"
                 name="password"
@@ -219,14 +93,19 @@ const AgentLogin = () => {
                 onChange={handleChange}
                 disabled={loading}
                 autoComplete="current-password"
+                className="w-full pl-10 pr-3 py-3 border-2 border-gray-200 rounded-xl text-base transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-3 focus:ring-indigo-100 placeholder-gray-400"
               />
-            </InputWrapper>
-          </FormGroup>
+            </div>
+          </div>
 
-          <Button type="submit" disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-none py-4 rounded-xl text-base font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 mt-3 hover:transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/30 active:transform-none disabled:opacity-60 disabled:cursor-not-allowed"
+          >
             {loading ? (
               <>
-                <Loader size={20} className="spin" />
+                <Loader size={20} className="animate-spin" />
                 Logging in...
               </>
             ) : (
@@ -235,10 +114,10 @@ const AgentLogin = () => {
                 Login
               </>
             )}
-          </Button>
-        </Form>
-      </LoginCard>
-    </LoginContainer>
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 

@@ -1,7 +1,6 @@
 // PickupBooking.jsx - Updated with booking- prefixed classNames and no navbar
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './PickupBooking.css';
 import sellService from '../../../services/sellService';
 import {
   MapPin,
@@ -398,61 +397,68 @@ const PickupBooking = () => {
   const totalPrice = getTotalAmount();
 
   return (
-    <div className="booking-pickup-booking-page">
-      <div className="booking-main-content">
-        <div className="booking-steps-section">
-          <h1 className="booking-page-title">You're almost done</h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#667eea] to-[#764ba2] py-10 relative">
+      <div className="flex max-w-[1400px] mx-auto px-5 py-5 gap-[30px] relative z-[1] lg:flex-col lg:px-4">
+        <div className="flex-1 animate-[fadeInUp_0.6s_ease-out]">
+          <h1 className="text-[32px] font-bold text-white mb-3 [text-shadow:0_2px_4px_rgba(0,0,0,0.1)] tracking-[-0.5px]">
+            You're almost done
+          </h1>
 
-          <div className="booking-step-indicator">
-            <div className={`booking-step-item ${currentStep >= 1 ? 'active' : ''}`}>
-              <div className="booking-step-number">
+          <div className="flex items-center gap-3 mb-8 p-6 bg-white/10 backdrop-blur-[10px] rounded-2xl border border-white/20">
+            <div
+              className={`flex flex-col items-center gap-2 relative flex-1 ${currentStep >= 1 ? 'after:bg-gradient-to-r after:from-[#00c853] after:to-white/30' : 'after:bg-white/30'} after:content-[''] after:absolute after:top-5 after:left-[calc(50%+24px)] after:w-[calc(100%-48px)] after:h-0.5 after:z-0 last:after:hidden`}
+            >
+              <div
+                className={`w-10 h-10 rounded-full ${currentStep >= 1 ? 'bg-gradient-to-br from-[#00c853] to-[#00e676] text-white shadow-[0_4px_12px_rgba(0,200,83,0.4)] scale-110' : 'bg-white/20 text-white'} flex items-center justify-center font-bold text-base border-2 ${currentStep >= 1 ? 'border-transparent' : 'border-white/30'} transition-all duration-300 z-[1]`}
+              >
                 {currentStep > 1 ? <Check size={20} /> : '1'}
               </div>
-              <div className="booking-step-label">Address</div>
+              <div className="text-[13px] font-semibold text-white text-center [text-shadow:0_1px_2px_rgba(0,0,0,0.1)]">
+                Address
+              </div>
             </div>
-            <div className={`booking-step-item ${currentStep >= 2 ? 'active' : ''}`}>
-              <div className="booking-step-number">
+            <div
+              className={`flex flex-col items-center gap-2 relative flex-1 ${currentStep >= 2 ? 'after:bg-gradient-to-r after:from-[#00c853] after:to-white/30' : 'after:bg-white/30'} after:content-[''] after:absolute after:top-5 after:left-[calc(50%+24px)] after:w-[calc(100%-48px)] after:h-0.5 after:z-0 last:after:hidden`}
+            >
+              <div
+                className={`w-10 h-10 rounded-full ${currentStep >= 2 ? 'bg-gradient-to-br from-[#00c853] to-[#00e676] text-white shadow-[0_4px_12px_rgba(0,200,83,0.4)] scale-110' : 'bg-white/20 text-white'} flex items-center justify-center font-bold text-base border-2 ${currentStep >= 2 ? 'border-transparent' : 'border-white/30'} transition-all duration-300 z-[1]`}
+              >
                 {currentStep > 2 ? <Check size={20} /> : '2'}
               </div>
-              <div className="booking-step-label">Pickup Slot</div>
+              <div className="text-[13px] font-semibold text-white text-center [text-shadow:0_1px_2px_rgba(0,0,0,0.1)]">
+                Pickup Slot
+              </div>
             </div>
-            <div className={`booking-step-item ${currentStep >= 3 ? 'active' : ''}`}>
-              <div className="booking-step-number">3</div>
-              <div className="booking-step-label">Payment</div>
+            <div
+              className={`flex flex-col items-center gap-2 relative flex-1 after:content-[''] after:absolute after:top-5 after:left-[calc(50%+24px)] after:w-[calc(100%-48px)] after:h-0.5 after:z-0 last:after:hidden`}
+            >
+              <div
+                className={`w-10 h-10 rounded-full ${currentStep >= 3 ? 'bg-gradient-to-br from-[#00c853] to-[#00e676] text-white shadow-[0_4px_12px_rgba(0,200,83,0.4)] scale-110' : 'bg-white/20 text-white'} flex items-center justify-center font-bold text-base border-2 ${currentStep >= 3 ? 'border-transparent' : 'border-white/30'} transition-all duration-300 z-[1]`}
+              >
+                3
+              </div>
+              <div className="text-[13px] font-semibold text-white text-center [text-shadow:0_1px_2px_rgba(0,0,0,0.1)]">
+                Payment
+              </div>
             </div>
           </div>
 
-          <div className="booking-step-content">
+          <div className="bg-white border-0 rounded-[20px] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.15)] animate-[slideIn_0.4s_ease-out]">
             {currentStep === 1 && (
-              <div className="booking-address-fields">
-                <div
-                  style={{
-                    backgroundColor: '#e3f2fd',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    marginBottom: '20px',
-                    border: '1px solid #bbdefb',
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: '14px',
-                      color: '#1565c0',
-                      margin: 0,
-                      fontWeight: '500',
-                    }}
-                  >
+              <div className="flex flex-col gap-5">
+                <div className="bg-[#e3f2fd] p-3 rounded-lg mb-5 border border-[#bbdefb]">
+                  <p className="text-sm text-[#1565c0] m-0 font-medium">
                     📝 Please fill all required fields marked with{' '}
-                    <span style={{ color: '#dc3545' }}>*</span> to proceed
+                    <span className="text-[#dc3545]">*</span> to proceed
                   </p>
                 </div>
-                <div className="booking-input-group">
-                  <label className="booking-input-label">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
                     Enter Pincode
                     <span className="text-red-500 relative top-[-2px]">*</span>
                   </label>
                   <input
-                    className="booking-styled-input"
+                    className="border-2 border-[#e8ecf1] rounded-xl py-3.5 px-4 text-[15px] bg-[#f8f9fa] transition-all duration-300 focus:outline-none focus:border-[#667eea] focus:bg-white focus:shadow-[0_0_0_4px_rgba(102,126,234,0.1)] focus:-translate-y-px placeholder:text-[#adb5bd]"
                     placeholder="Enter 6-digit pincode (e.g., 110001)"
                     value={formData.pincode}
                     onChange={e => handleInputChange('pincode', e.target.value)}
@@ -460,70 +466,72 @@ const PickupBooking = () => {
                   />
                 </div>
 
-                <div className="booking-input-group">
-                  <label className="booking-input-label">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
                     Flat No/Office <span className="text-red-500 relative top-[-2px]">*</span>
                   </label>
                   <input
-                    className="booking-styled-input"
+                    className="border-2 border-[#e8ecf1] rounded-xl py-3.5 px-4 text-[15px] bg-[#f8f9fa] transition-all duration-300 focus:outline-none focus:border-[#667eea] focus:bg-white focus:shadow-[0_0_0_4px_rgba(102,126,234,0.1)] focus:-translate-y-px placeholder:text-[#adb5bd]"
                     placeholder="Flat No/Office"
                     value={formData.flatNo}
                     onChange={e => handleInputChange('flatNo', e.target.value)}
                   />
                 </div>
 
-                <div className="booking-input-group">
-                  <label className="booking-input-label">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
                     Locality/Area/Street <span className="text-red-500 relative top-[-2px]">*</span>
                   </label>
                   <input
-                    className="booking-styled-input"
+                    className="border-2 border-[#e8ecf1] rounded-xl py-3.5 px-4 text-[15px] bg-[#f8f9fa] transition-all duration-300 focus:outline-none focus:border-[#667eea] focus:bg-white focus:shadow-[0_0_0_4px_rgba(102,126,234,0.1)] focus:-translate-y-px placeholder:text-[#adb5bd]"
                     placeholder="Locality/Area/Street"
                     value={formData.locality}
                     onChange={e => handleInputChange('locality', e.target.value)}
                   />
                 </div>
 
-                <div className="booking-input-group">
-                  <label className="booking-input-label">Landmark (optional)</label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
+                    Landmark (optional)
+                  </label>
                   <input
-                    className="booking-styled-input"
+                    className="border-2 border-[#e8ecf1] rounded-xl py-3.5 px-4 text-[15px] bg-[#f8f9fa] transition-all duration-300 focus:outline-none focus:border-[#667eea] focus:bg-white focus:shadow-[0_0_0_4px_rgba(102,126,234,0.1)] focus:-translate-y-px placeholder:text-[#adb5bd]"
                     placeholder="Landmark (optional)"
                     value={formData.landmark}
                     onChange={e => handleInputChange('landmark', e.target.value)}
                   />
                 </div>
 
-                <div className="booking-input-group">
-                  <label className="booking-input-label">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
                     City <span className="text-red-500 relative top-[-2px]">*</span>
                   </label>
                   <input
-                    className="booking-styled-input"
+                    className="border-2 border-[#e8ecf1] rounded-xl py-3.5 px-4 text-[15px] bg-[#f8f9fa] transition-all duration-300 focus:outline-none focus:border-[#667eea] focus:bg-white focus:shadow-[0_0_0_4px_rgba(102,126,234,0.1)] focus:-translate-y-px placeholder:text-[#adb5bd]"
                     placeholder="City"
                     value={formData.city}
                     onChange={e => handleInputChange('city', e.target.value)}
                   />
                 </div>
 
-                <div className="booking-input-group">
-                  <label className="booking-input-label">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
                     State <span className="text-red-500 relative top-[-2px]">*</span>
                   </label>
                   <input
-                    className="booking-styled-input"
+                    className="border-2 border-[#e8ecf1] rounded-xl py-3.5 px-4 text-[15px] bg-[#f8f9fa] transition-all duration-300 focus:outline-none focus:border-[#667eea] focus:bg-white focus:shadow-[0_0_0_4px_rgba(102,126,234,0.1)] focus:-translate-y-px placeholder:text-[#adb5bd]"
                     placeholder="State"
                     value={formData.state}
                     onChange={e => handleInputChange('state', e.target.value)}
                   />
                 </div>
 
-                <div className="booking-input-group">
-                  <label className="booking-input-label">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
                     Full Name <span className="text-red-500 relative top-[-2px]">*</span>
                   </label>
                   <input
-                    className="booking-styled-input"
+                    className="border-2 border-[#e8ecf1] rounded-xl py-3.5 px-4 text-[15px] bg-[#f8f9fa] transition-all duration-300 focus:outline-none focus:border-[#667eea] focus:bg-white focus:shadow-[0_0_0_4px_rgba(102,126,234,0.1)] focus:-translate-y-px placeholder:text-[#adb5bd]"
                     placeholder="Enter your full name"
                     value={formData.fullName}
                     onChange={e => handleInputChange('fullName', e.target.value)}
@@ -532,10 +540,12 @@ const PickupBooking = () => {
                   />
                 </div>
 
-                <div className="booking-input-group">
-                  <label className="booking-input-label">Alternate number (optional)</label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
+                    Alternate number (optional)
+                  </label>
                   <input
-                    className="booking-styled-input"
+                    className="border-2 border-[#e8ecf1] rounded-xl py-3.5 px-4 text-[15px] bg-[#f8f9fa] transition-all duration-300 focus:outline-none focus:border-[#667eea] focus:bg-white focus:shadow-[0_0_0_4px_rgba(102,126,234,0.1)] focus:-translate-y-px placeholder:text-[#adb5bd]"
                     placeholder="Alternate number (optional)"
                     value={formData.alternateNumber}
                     onChange={e => handleInputChange('alternateNumber', e.target.value)}
@@ -543,46 +553,18 @@ const PickupBooking = () => {
                 </div>
 
                 {/* Location Section */}
-                <div
-                  className="booking-location-section"
-                  style={{
-                    marginTop: '20px',
-                    padding: '16px',
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: '8px',
-                    border: '1px solid #e9ecef',
-                  }}
-                >
-                  <div
-                    className="booking-input-label"
-                    style={{
-                      marginBottom: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                    }}
-                  >
-                    <MapPin size={18} style={{ color: '#dc3545' }} />
+                <div className="mt-5 p-4 bg-[#f8f9fa] rounded-lg border border-[#e9ecef]">
+                  <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
+                    <MapPin size={18} className="text-[#dc3545]" />
                     Location Coordinates <span className="text-red-500 relative top-[-2px]">*</span>
                   </div>
 
-                  <div
-                    style={{
-                      backgroundColor: '#e3f2fd',
-                      padding: '12px',
-                      borderRadius: '6px',
-                      marginBottom: '16px',
-                      border: '1px solid #bbdefb',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'start', gap: '8px' }}>
-                      <AlertCircle
-                        size={16}
-                        style={{ color: '#1976d2', marginTop: '2px', flexShrink: 0 }}
-                      />
-                      <div style={{ fontSize: '13px', color: '#1565c0' }}>
-                        <p style={{ fontWeight: '500', margin: '0 0 4px 0' }}>Location Required</p>
-                        <p style={{ margin: 0, lineHeight: '1.4' }}>
+                  <div className="bg-[#e3f2fd] p-3 rounded-md mb-4 border border-[#bbdefb]">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle size={16} className="text-[#1976d2] mt-0.5 shrink-0" />
+                      <div className="text-[13px] text-[#1565c0]">
+                        <p className="font-medium m-0 mb-1">Location Required</p>
+                        <p className="m-0 leading-[1.4]">
                           We need your exact location to assign the nearest partner for pickup.
                           Click "Get Current Location" for automatic detection.
                         </p>
@@ -594,27 +576,7 @@ const PickupBooking = () => {
                     type="button"
                     onClick={handleGetCurrentLocation}
                     disabled={gettingLocation}
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '12px 16px',
-                      backgroundColor: gettingLocation
-                        ? '#6c757d'
-                        : formData.latitude && formData.longitude
-                          ? '#28a745'
-                          : '#007bff',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: gettingLocation ? 'not-allowed' : 'pointer',
-                      marginBottom: '16px',
-                      transition: 'background-color 0.2s',
-                    }}
+                    className={`w-full flex items-center justify-center gap-2 py-3 px-4 ${gettingLocation ? 'bg-[#6c757d] cursor-not-allowed' : formData.latitude && formData.longitude ? 'bg-[#28a745]' : 'bg-[#007bff]'} text-white border-0 rounded-md text-sm font-medium ${!gettingLocation && 'cursor-pointer'} mb-4 transition-colors duration-200`}
                   >
                     <Navigation size={16} />
                     {gettingLocation
@@ -626,57 +588,23 @@ const PickupBooking = () => {
 
                   {/* Show coordinates when captured */}
                   {formData.latitude && formData.longitude && (
-                    <div
-                      style={{
-                        backgroundColor: '#d4edda',
-                        border: '1px solid #c3e6cb',
-                        borderRadius: '6px',
-                        padding: '12px',
-                        marginBottom: '12px',
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                          marginBottom: '8px',
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: '20px',
-                            height: '20px',
-                            backgroundColor: '#28a745',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <Check size={12} style={{ color: 'white' }} />
+                    <div className="bg-[#d4edda] border border-[#c3e6cb] rounded-md p-3 mb-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-5 h-5 bg-[#28a745] rounded-full flex items-center justify-center">
+                          <Check size={12} className="text-white" />
                         </div>
-                        <span style={{ fontSize: '14px', fontWeight: '500', color: '#155724' }}>
+                        <span className="text-sm font-medium text-[#155724]">
                           Location Captured Successfully
                         </span>
                       </div>
-                      <div style={{ fontSize: '12px', color: '#155724', fontFamily: 'monospace' }}>
+                      <div className="text-xs text-[#155724] font-mono">
                         Lat: {formData.latitude}, Lng: {formData.longitude}
                       </div>
                       <button
                         type="button"
                         onClick={handleGetCurrentLocation}
                         disabled={gettingLocation}
-                        style={{
-                          marginTop: '8px',
-                          padding: '4px 8px',
-                          fontSize: '12px',
-                          backgroundColor: 'transparent',
-                          color: '#155724',
-                          border: '1px solid #155724',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                        }}
+                        className="mt-2 py-1 px-2 text-xs bg-transparent text-[#155724] border border-[#155724] rounded cursor-pointer"
                       >
                         Update Location
                       </button>
@@ -684,34 +612,14 @@ const PickupBooking = () => {
                   )}
 
                   {locationError && (
-                    <div
-                      style={{
-                        backgroundColor: '#f8d7da',
-                        border: '1px solid #f5c6cb',
-                        borderRadius: '6px',
-                        padding: '8px 12px',
-                        marginTop: '12px',
-                      }}
-                    >
-                      <p style={{ fontSize: '13px', color: '#721c24', margin: 0 }}>
-                        {locationError}
-                      </p>
+                    <div className="bg-[#f8d7da] border border-[#f5c6cb] rounded-md p-2 px-3 mt-3">
+                      <p className="text-[13px] text-[#721c24] m-0">{locationError}</p>
                     </div>
                   )}
 
                   {!formData.latitude && !formData.longitude && (
-                    <div
-                      style={{
-                        marginTop: '12px',
-                        padding: '8px',
-                        backgroundColor: '#fff3cd',
-                        border: '1px solid #ffeaa7',
-                        borderRadius: '6px',
-                      }}
-                    >
-                      <p
-                        style={{ fontSize: '11px', color: '#856404', margin: 0, lineHeight: '1.4' }}
-                      >
+                    <div className="mt-3 p-2 bg-[#fff3cd] border border-[#ffeaa7] rounded-md">
+                      <p className="text-[11px] text-[#856404] m-0 leading-[1.4]">
                         <strong>Note:</strong> Location access is required for pickup service.
                         Please allow location permissions when prompted by your browser.
                       </p>
@@ -719,37 +627,40 @@ const PickupBooking = () => {
                   )}
                 </div>
 
-                <div className="booking-save-as-group">
-                  <div className="booking-save-as-label">Save As</div>
-                  <label className="booking-radio-option">
+                <div className="flex items-center gap-4 mt-2 p-5 bg-[#f8f9fa] rounded-xl">
+                  <div className="text-sm font-semibold text-[#2c3e50]">Save As</div>
+                  <label className="flex items-center gap-2 cursor-pointer py-2 px-4 rounded-lg transition-colors duration-200 font-medium text-[#495057] hover:bg-[rgba(102,126,234,0.1)]">
                     <input
                       type="radio"
                       name="saveAs"
                       value="Home"
                       checked={formData.saveAs === 'Home'}
                       onChange={e => handleInputChange('saveAs', e.target.value)}
+                      className="m-0 w-[18px] h-[18px] cursor-pointer accent-[#667eea]"
                     />
                     <Home size={16} />
                     Home
                   </label>
-                  <label className="booking-radio-option">
+                  <label className="flex items-center gap-2 cursor-pointer py-2 px-4 rounded-lg transition-colors duration-200 font-medium text-[#495057] hover:bg-[rgba(102,126,234,0.1)]">
                     <input
                       type="radio"
                       name="saveAs"
                       value="Office"
                       checked={formData.saveAs === 'Office'}
                       onChange={e => handleInputChange('saveAs', e.target.value)}
+                      className="m-0 w-[18px] h-[18px] cursor-pointer accent-[#667eea]"
                     />
                     <Building2 size={16} />
                     Office
                   </label>
-                  <label className="booking-radio-option">
+                  <label className="flex items-center gap-2 cursor-pointer py-2 px-4 rounded-lg transition-colors duration-200 font-medium text-[#495057] hover:bg-[rgba(102,126,234,0.1)]">
                     <input
                       type="radio"
                       name="saveAs"
                       value="Other"
                       checked={formData.saveAs === 'Other'}
                       onChange={e => handleInputChange('saveAs', e.target.value)}
+                      className="m-0 w-[18px] h-[18px] cursor-pointer accent-[#667eea]"
                     />
                     <MapPin size={16} />
                     Other
@@ -759,43 +670,41 @@ const PickupBooking = () => {
             )}
 
             {currentStep === 2 && (
-              <div className="booking-pickup-section">
-                <div className="booking-input-label">
-                  <Calendar
-                    size={18}
-                    style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }}
-                  />
+              <div className="flex flex-col gap-6">
+                <div className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
+                  <Calendar size={18} className="inline mr-2 align-middle" />
                   Please select your preferable pickup date
                 </div>
 
-                <div className="booking-pickup-dates">
+                <div className="grid grid-cols-5 gap-3 mb-6 md:grid-cols-3">
                   {pickupDates.map(date => (
                     <button
                       key={date.fullDate}
-                      className={`booking-date-button ${formData.selectedDate === date.fullDate ? 'selected' : ''}`}
+                      className={`py-4 px-3 ${formData.selectedDate === date.fullDate ? 'bg-white border-[#667eea] text-[#667eea] shadow-[0_4px_12px_rgba(102,126,234,0.2)] -translate-y-0.5 before:opacity-[0.05]' : 'bg-[#f8f9fa] border-[#e8ecf1] text-[#495057]'} border-2 rounded-[14px] cursor-pointer text-sm flex flex-col items-center transition-all duration-300 relative overflow-hidden hover:border-[#667eea] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(102,126,234,0.15)] before:content-[''] before:absolute before:inset-0 before:bg-gradient-to-br before:from-[#667eea] before:to-[#764ba2] before:opacity-0 before:transition-opacity before:duration-300`}
                       onClick={() => handleDateSelect(date)}
                     >
-                      <div className="booking-day-name">{date.dayName}</div>
-                      <div className="booking-day-num">{date.dayNum}</div>
+                      <div
+                        className={`text-xs font-semibold ${formData.selectedDate === date.fullDate ? 'text-[#667eea]' : 'text-[#868e96]'} mb-1.5 uppercase tracking-[0.5px] relative z-[1]`}
+                      >
+                        {date.dayName}
+                      </div>
+                      <div className="text-xl font-bold relative z-[1]">{date.dayNum}</div>
                     </button>
                   ))}
                 </div>
 
                 {selectedDateInfo && (
-                  <div className="booking-input-label">
-                    <Clock
-                      size={18}
-                      style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }}
-                    />
+                  <div className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
+                    <Clock size={18} className="inline mr-2 align-middle" />
                     Your availability on that day
                   </div>
                 )}
 
-                <div className="booking-time-slots">
+                <div className="grid grid-cols-2 gap-4">
                   {timeSlots.map(slot => (
                     <button
                       key={slot.id}
-                      className={`booking-time-slot-button ${formData.selectedTime === slot.id ? 'selected' : ''}`}
+                      className={`py-5 px-4 ${formData.selectedTime === slot.id ? 'bg-gradient-to-br from-[#667eea] to-[#764ba2] border-[#667eea] text-white shadow-[0_4px_16px_rgba(102,126,234,0.3)] -translate-y-0.5' : 'bg-[#f8f9fa] border-[#e8ecf1] text-[#495057]'} border-2 rounded-[14px] cursor-pointer flex flex-col items-center justify-center gap-2 text-sm font-semibold transition-all duration-300 hover:border-[#667eea] hover:bg-white hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(102,126,234,0.15)]`}
                       onClick={() => handleTimeSelect(slot.id)}
                     >
                       <Clock size={20} />
@@ -807,49 +716,44 @@ const PickupBooking = () => {
             )}
 
             {currentStep === 3 && (
-              <div className="booking-payment-section">
-                <div className="booking-payment-group">
-                  <div className="booking-input-label">
-                    <Wallet
-                      size={18}
-                      style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }}
-                    />
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-3">
+                  <div className="text-sm font-semibold text-[#2c3e50] tracking-[0.3px]">
+                    <Wallet size={18} className="inline mr-2 align-middle" />
                     Select payment mode now and pay
                   </div>
 
                   {paymentOptions.map(option => (
                     <label
                       key={option.id}
-                      className={`booking-payment-option ${formData.paymentType === option.id ? 'selected' : ''}`}
+                      className={`flex items-center gap-4 p-4 ${formData.paymentType === option.id ? 'border-[#667eea] bg-gradient-to-br from-[rgba(102,126,234,0.05)] to-[rgba(118,75,162,0.05)] shadow-[0_4px_16px_rgba(102,126,234,0.15)]' : 'border-[#e8ecf1] bg-[#f8f9fa]'} border-2 rounded-[14px] cursor-pointer transition-all duration-300 hover:border-[#667eea] hover:bg-white hover:translate-x-1 hover:shadow-[0_4px_12px_rgba(102,126,234,0.1)]`}
                     >
                       <input
                         type="radio"
                         name="payment"
                         checked={formData.paymentType === option.id}
                         onChange={() => handlePaymentSelect(option.id)}
+                        className="m-0 w-5 h-5 cursor-pointer accent-[#667eea]"
                       />
-                      <div className="booking-payment-icon">{option.icon}</div>
-                      <div className="booking-payment-details">
-                        <div className="booking-payment-title">{option.label}</div>
+                      <div className="w-12 h-12 bg-gradient-to-br from-[#667eea] to-[#764ba2] rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-[0_4px_12px_rgba(102,126,234,0.3)]">
+                        {option.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-base font-semibold text-[#2c3e50] mb-1">
+                          {option.label}
+                        </div>
                         {option.description && (
-                          <div className="booking-extra-info">{option.description}</div>
+                          <div className="text-[13px] text-[#6c757d] font-medium">
+                            {option.description}
+                          </div>
                         )}
                       </div>
                     </label>
                   ))}
                 </div>
 
-                <div className="booking-payment-note">
-                  <div
-                    style={{
-                      fontSize: '13px',
-                      color: '#6c757d',
-                      padding: '12px',
-                      background: '#f8f9fa',
-                      borderRadius: '8px',
-                      borderLeft: '3px solid #667eea',
-                    }}
-                  >
+                <div className="mt-2">
+                  <div className="text-[13px] text-[#6c757d] p-3 bg-[#f8f9fa] rounded-lg border-l-[3px] border-l-[#667eea]">
                     💡 <strong>Secure Payment:</strong> All payment methods are safe and secure. For
                     COD, please keep exact amount ready during pickup.
                   </div>
@@ -860,12 +764,18 @@ const PickupBooking = () => {
 
           {/* Edit buttons for completed steps */}
           {currentStep > 1 && (
-            <div className="booking-edit-buttons">
-              <button className="booking-edit-btn" onClick={() => handleEdit(1)}>
+            <div className="flex gap-3 mt-5">
+              <button
+                className="bg-white/20 text-white border-2 border-white/30 py-2.5 px-5 text-sm font-semibold rounded-[10px] cursor-pointer backdrop-blur-[10px] transition-all duration-300 hover:bg-white/30 hover:border-white/50 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
+                onClick={() => handleEdit(1)}
+              >
                 Edit Address
               </button>
               {currentStep > 2 && (
-                <button className="booking-edit-btn" onClick={() => handleEdit(2)}>
+                <button
+                  className="bg-white/20 text-white border-2 border-white/30 py-2.5 px-5 text-sm font-semibold rounded-[10px] cursor-pointer backdrop-blur-[10px] transition-all duration-300 hover:bg-white/30 hover:border-white/50 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
+                  onClick={() => handleEdit(2)}
+                >
                   Edit Pickup
                 </button>
               )}
@@ -873,11 +783,11 @@ const PickupBooking = () => {
           )}
         </div>
 
-        <div className="booking-price-summary-section">
-          <div className="booking-device-preview">
-            <Smartphone size={24} style={{ color: '#667eea', marginBottom: '12px' }} />
+        <div className="flex-[0_0_380px] flex flex-col gap-5 animate-[fadeInUp_0.6s_ease-out_0.2s_both] lg:flex-1">
+          <div className="bg-white border-0 rounded-[20px] p-7 text-center shadow-[0_10px_40px_rgba(0,0,0,0.1)] relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-[#667eea] before:to-[#764ba2]">
+            <Smartphone size={24} className="text-[#667eea] mb-3" />
             <img
-              className="booking-device-image"
+              className="w-[140px] h-[280px] object-contain rounded-xl my-0 mx-auto mb-4 [filter:drop-shadow(0_8px_16px_rgba(0,0,0,0.1))]"
               src={
                 product?.data?.images?.[0] ||
                 product?.images?.[0] ||
@@ -885,36 +795,36 @@ const PickupBooking = () => {
               }
               alt={deviceName}
             />
-            <div className="booking-device-name">
+            <div className="text-[17px] font-bold text-[#2c3e50] mb-2 tracking-[-0.3px]">
               {deviceName} ({variantLabel})
             </div>
           </div>
 
-          <div className="booking-price-summary">
-            <div className="booking-price-title">Price Summary</div>
+          <div className="bg-white border-0 rounded-[20px] p-7 shadow-[0_10px_40px_rgba(0,0,0,0.1)]">
+            <div className="text-lg font-bold mb-5 text-[#2c3e50] tracking-[-0.3px]">
+              Price Summary
+            </div>
 
-            <div className="booking-price-row">
-              <span className="booking-label">Base Price</span>
-              <span className="booking-value">
+            <div className="flex justify-between items-center py-3 text-sm border-b border-[#f1f3f5]">
+              <span className="text-[#6c757d] font-medium">Base Price</span>
+              <span className="font-semibold text-[#2c3e50]">
                 {formatPrice(priceData?.quotedPrice || priceData?.basePrice || 1200)}
               </span>
             </div>
 
-            <div className="booking-price-row">
-              <span className="booking-label">Pickup charges</span>
-              <span className="booking-value">Free ₹0</span>
+            <div className="flex justify-between items-center py-3 text-sm border-b border-[#f1f3f5]">
+              <span className="text-[#6c757d] font-medium">Pickup charges</span>
+              <span className="font-semibold text-[#2c3e50]">Free ₹0</span>
             </div>
 
-            <div className="booking-price-row">
-              <span className="booking-label">Processing Fee</span>
-              <span className="booking-value" style={{ color: '#dc3545' }}>
-                - ₹49
-              </span>
+            <div className="flex justify-between items-center py-3 text-sm border-b-0">
+              <span className="text-[#6c757d] font-medium">Processing Fee</span>
+              <span className="font-semibold text-[#dc3545]">- ₹49</span>
             </div>
 
-            <div className="booking-total-row">
-              <span className="booking-label">You'll Receive</span>
-              <span className="booking-value">
+            <div className="border-t-2 border-t-[#e8ecf1] pt-4 mt-3 text-base flex justify-between items-center">
+              <span className="font-bold text-[#2c3e50]">You'll Receive</span>
+              <span className="font-bold text-2xl bg-gradient-to-br from-[#00c853] to-[#00e676] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">
                 {formatPrice(
                   Math.max((priceData?.quotedPrice || priceData?.basePrice || 1200) - 49, 0)
                 )}
@@ -922,38 +832,19 @@ const PickupBooking = () => {
             </div>
 
             {Math.max((priceData?.quotedPrice || priceData?.basePrice || 1200) - 49, 0) === 0 && (
-              <div
-                style={{
-                  fontSize: '12px',
-                  color: '#dc3545',
-                  marginTop: '8px',
-                  padding: '8px',
-                  backgroundColor: '#f8d7da',
-                  borderRadius: '4px',
-                  border: '1px solid #f5c6cb',
-                }}
-              >
+              <div className="text-xs text-[#dc3545] mt-2 p-2 bg-[#f8d7da] rounded border border-[#f5c6cb]">
                 ⚠️ Processing fee exceeds device value
               </div>
             )}
 
             <button
-              className={`booking-continue-btn ${!formData.paymentType && currentStep === 3 ? 'disabled' : ''} ${isSubmitting ? 'loading' : ''}`}
+              className={`${!formData.paymentType && currentStep === 3 ? 'bg-gradient-to-br from-[#adb5bd] to-[#ced4da] cursor-not-allowed shadow-none' : isSubmitting ? 'opacity-80 cursor-not-allowed' : ''} ${!(!formData.paymentType && currentStep === 3) && !isSubmitting ? 'bg-gradient-to-br from-[#00c853] to-[#00e676] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(0,200,83,0.4)]' : 'bg-gradient-to-br from-[#00c853] to-[#00e676]'} text-white py-4 px-6 text-base font-bold rounded-xl border-0 w-full cursor-pointer flex items-center justify-center gap-2.5 mt-5 shadow-[0_8px_20px_rgba(0,200,83,0.3)] transition-all duration-300 tracking-[0.3px]`}
               onClick={handleContinue}
               disabled={isSubmitting || (!formData.paymentType && currentStep === 3)}
             >
               {isSubmitting ? (
                 <>
-                  <div
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      border: '3px solid rgba(255,255,255,0.3)',
-                      borderTop: '3px solid white',
-                      borderRadius: '50%',
-                      animation: 'spin 0.8s linear infinite',
-                    }}
-                  />
+                  <div className="w-5 h-5 border-[3px] border-white/30 border-t-white rounded-full animate-[spin_0.8s_linear_infinite]" />
                   Processing...
                 </>
               ) : (
@@ -976,7 +867,11 @@ const PickupBooking = () => {
         </div>
       </div>
 
-      {submitError && <div className="booking-error-message">{submitError}</div>}
+      {submitError && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gradient-to-br from-[#ff6b6b] to-[#ee5a6f] text-white text-sm font-semibold py-4 px-6 rounded-xl shadow-[0_8px_24px_rgba(255,107,107,0.4)] z-[1000] animate-[slideUp_0.3s_ease-out]">
+          {submitError}
+        </div>
+      )}
     </div>
   );
 };

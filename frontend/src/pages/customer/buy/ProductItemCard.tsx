@@ -98,16 +98,16 @@ const ProductItemCard: React.FC<ProductItemCardProps> = ({
           {productTitle}
         </h3>
 
-        <p className="text-sm text-slate-600 mb-3">
+        {/* <p className="text-sm text-slate-600 mb-3">
           {variant?.storage && `${variant.storage}`}
           {variant?.color && ` • ${variant.color}`}
           {product.brand && ` • ${product.brand}`}
-        </p>
+        </p> */}
 
-        <div className="flex items-center gap-2 mb-4">
+        {/* <div className="flex items-center gap-2 mb-4">
           <div className="flex gap-0.5">{renderStars(rating)}</div>
           <span className="text-xs text-slate-600">({reviewCount})</span>
-        </div>
+        </div> */}
 
         <div className="flex items-center justify-between mb-4">
           <div>

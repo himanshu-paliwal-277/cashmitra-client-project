@@ -34,10 +34,13 @@ import {
   Percent,
   Plus,
   Minus,
+  Calendar,
 } from 'lucide-react';
 import { useCart } from '../../../contexts/CartContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import productService from '../../../services/productService';
+import deliveryService from '../../../services/deliveryService';
+import Button from '../../../components/ui/Button';
 
 const ICON_SIZE = 18;
 
@@ -61,6 +64,12 @@ const ProductDetails = () => {
   const [activeTab, setActiveTab] = useState('specs');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [pincode, setPincode] = useState('');
+  const [deliveryEstimate, setDeliveryEstimate] = useState({
+    loading: false,
+    checked: false,
+    data: null,
+    error: null,
+  });
 
   // Single-open accordion key
   const [openKey, setOpenKey] = useState('display');
@@ -87,7 +96,10 @@ const ProductDetails = () => {
 
         setProduct(data);
         if (data.variants?.length) setSelectedVariant(data.variants[0]);
-        if (data.conditionOptions?.length) setSelectedCondition(data.conditionOptions[0]);
+        if (data.conditionOptions?.length) {
+          console.log('ProductDetails - Setting initial condition:', data.conditionOptions[0]);
+          setSelectedCondition(data.conditionOptions[0]);
+        }
         if (data.storageOptions?.length) setSelectedStorage(data.storageOptions[0]);
         if (data.colorOptions?.length) setSelectedColor(data.colorOptions[0]);
       } catch (e) {
@@ -413,13 +425,13 @@ const ProductDetails = () => {
 
     const imageArray = getImageArray();
     const calculatedPrice =
-      selectedVariant?.price ||
-      product.pricing?.discountedPrice ||
-      product.pricing?.mrp ||
-      product.minPrice ||
-      product.maxPrice ||
-      product.price ||
-      0;
+      (selectedVariant?.price ||
+        product.pricing?.discountedPrice ||
+        product.pricing?.mrp ||
+        product.minPrice ||
+        product.maxPrice ||
+        product.price ||
+        0) + (selectedCondition?.price || 0);
 
     // Debug: Log price calculation details
     console.log('Price Calculation Debug:', {
@@ -439,18 +451,18 @@ const ProductDetails = () => {
       _id: product._id,
       name: productName,
       price:
-        selectedVariant?.price ||
-        product.pricing?.discountedPrice ||
-        product.pricing?.mrp ||
-        product.minPrice ||
-        product.maxPrice ||
-        product.price ||
-        0,
+        (selectedVariant?.price ||
+          product.pricing?.discountedPrice ||
+          product.pricing?.mrp ||
+          product.minPrice ||
+          product.maxPrice ||
+          product.price ||
+          0) + (selectedCondition?.price || 0),
       image: productImage, // For checkout compatibility
       images: imageArray, // Full image array
       brand: product.brand || 'Unknown Brand',
       model: product.model || product.series || 'Unknown Model',
-      condition: selectedCondition,
+      condition: selectedCondition || product.conditionOptions?.[0] || null, // Fallback to first condition
       inventoryId: product.inventoryId || product._id,
       variant: selectedVariant,
       storage: selectedStorage,
@@ -476,7 +488,54 @@ const ProductDetails = () => {
       });
     } else {
       // For Add to Cart: Add to cart normally
+      console.log('ProductDetails - About to call addToCart with:', {
+        productData,
+        selectedCondition,
+        quantity,
+      });
       addToCart(productData, quantity);
+    }
+  };
+
+  const handleCheckDelivery = async () => {
+    if (!pincode.trim()) {
+      setDeliveryEstimate(prev => ({
+        ...prev,
+        error: 'Please enter a pincode',
+      }));
+      return;
+    }
+
+    if (!deliveryService.validatePincode(pincode)) {
+      setDeliveryEstimate(prev => ({
+        ...prev,
+        error: 'Please enter a valid 6-digit pincode',
+      }));
+      return;
+    }
+
+    setDeliveryEstimate(prev => ({
+      ...prev,
+      loading: true,
+      error: null,
+    }));
+
+    try {
+      const estimate = await deliveryService.checkDeliveryTime(product._id, pincode);
+      setDeliveryEstimate({
+        loading: false,
+        checked: true,
+        data: estimate,
+        error: null,
+      });
+    } catch (error) {
+      console.error('Delivery check error:', error);
+      setDeliveryEstimate({
+        loading: false,
+        checked: false,
+        data: null,
+        error: error.message || 'Failed to check delivery. Please try again.',
+      });
     }
   };
 
@@ -533,12 +592,12 @@ const ProductDetails = () => {
     );
   }
   const priceNow =
-    product.pricing?.discountedPrice ||
-    selectedVariant?.price ||
-    product.minPrice ||
-    product.maxPrice ||
-    product.price ||
-    0;
+    (product.pricing?.discountedPrice ||
+      selectedVariant?.price ||
+      product.minPrice ||
+      product.maxPrice ||
+      product.price ||
+      0) + (selectedCondition?.price || 0);
   const mrp = product.pricing?.mrp || product.originalPrice || null;
   const discountPct = mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
   const productName = getProductName();
@@ -697,7 +756,7 @@ const ProductDetails = () => {
               </h1>
 
               {/* Rating */}
-              <div className="flex items-center gap-3 flex-wrap">
+              {/* <div className="flex items-center gap-3 flex-wrap">
                 <div className="flex items-center gap-1">
                   {renderStars(Math.round(product.rating?.average || 5))}
                 </div>
@@ -712,11 +771,11 @@ const ProductDetails = () => {
                 <span className="text-sm text-gray-600">
                   {product.trustMetrics?.devicesSold || product.soldCount || '500+'} sold
                 </span>
-              </div>
+              </div> */}
             </div>
 
             {/* Price Card */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100 ">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   {discountPct && (
@@ -736,7 +795,7 @@ const ProductDetails = () => {
               </div>
 
               <div className="space-y-3">
-                {product.paymentOptions?.emiAvailable && (
+                {/* {product.paymentOptions?.emiAvailable && (
                   <div className="flex items-center gap-3 text-sm">
                     <CreditCard size={18} className="text-green-600" />
                     <span className="text-gray-700">
@@ -746,7 +805,7 @@ const ProductDetails = () => {
                       View Plans
                     </button>
                   </div>
-                )}
+                )} */}
                 <div className="flex items-center gap-3 text-sm">
                   <Gift size={18} className="text-green-600" />
                   <span className="text-gray-700 font-semibold">
@@ -835,7 +894,22 @@ const ProductDetails = () => {
                       onClick={() => setSelectedCondition(c)}
                     >
                       <span className="font-semibold text-gray-900">{c.label}</span>
-                      <span className="text-sm text-gray-600">₹{c.price?.toLocaleString()}</span>
+                      <span className="text-sm text-gray-600">
+                        ₹
+                        {(
+                          (product.pricing?.discountedPrice ||
+                            product.pricing?.mrp ||
+                            product.minPrice ||
+                            product.maxPrice ||
+                            product.price ||
+                            0) + (c.price || 0)
+                        ).toLocaleString()}
+                        {c.price !== 0 && (
+                          <span className="ml-1 text-xs">
+                            ({c.price > 0 ? '+' : ''}₹{c.price})
+                          </span>
+                        )}
+                      </span>
                     </button>
                   );
                 })}
@@ -921,7 +995,7 @@ const ProductDetails = () => {
               </div>
             </div>
             <div className="flex gap-3">
-              <button
+              {/* <button
                 className={`p-3 rounded-lg border-2 transition-all ${
                   isWishlisted
                     ? 'border-green-500 bg-green-50'
@@ -935,7 +1009,7 @@ const ProductDetails = () => {
                   fill={isWishlisted ? '#10b981' : 'none'}
                   className={isWishlisted ? 'text-green-600' : 'text-gray-600'}
                 />
-              </button>
+              </button> */}
               <button
                 className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors shadow-md border-2 border-gray-200"
                 onClick={() => addItem(false)}
@@ -973,31 +1047,97 @@ const ProductDetails = () => {
                 <span className="font-semibold text-gray-900 block mb-2">
                   Check delivery to your pincode
                 </span>
-                <div className="flex gap-2">
+                <div className="flex gap-2 mb-3">
                   <input
+                    className="w-full sm:w-60 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     value={pincode}
-                    onChange={e => setPincode(e.target.value)}
+                    onChange={e => {
+                      setPincode(e.target.value);
+                      // Clear previous results when user types
+                      if (deliveryEstimate.checked || deliveryEstimate.error) {
+                        setDeliveryEstimate(prev => ({
+                          ...prev,
+                          checked: false,
+                          data: null,
+                          error: null,
+                        }));
+                      }
+                    }}
                     placeholder="Enter pincode"
+                    maxLength={6}
+                    disabled={deliveryEstimate.loading}
                   />
-                  <button className="btn-sm">Check</button>
+                  <Button
+                    onClick={handleCheckDelivery}
+                    disabled={deliveryEstimate.loading || !pincode.trim()}
+                    className="whitespace-nowrap"
+                  >
+                    {deliveryEstimate.loading ? (
+                      <>
+                        <RefreshCw size={16} className="animate-spin mr-2" />
+                        Checking...
+                      </>
+                    ) : (
+                      'Check'
+                    )}
+                  </Button>
                 </div>
+
+                {/* Delivery Results */}
+                {deliveryEstimate.error && (
+                  <div className="flex items-center gap-2 text-red-600 text-sm">
+                    <X size={16} />
+                    <span>{deliveryEstimate.error}</span>
+                  </div>
+                )}
+
+                {deliveryEstimate.checked && deliveryEstimate.data && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2 text-green-700 font-semibold mb-2">
+                      <Check size={16} />
+                      <span>Delivery Available</span>
+                    </div>
+                    <div className="space-y-1 text-sm text-gray-700">
+                      <div className="flex items-center gap-2">
+                        <Truck size={14} />
+                        <span>
+                          Delivered in {deliveryEstimate.data.estimatedDays} business days
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar size={14} />
+                        <span>
+                          Expected by{' '}
+                          {deliveryService.formatDeliveryDateRange(
+                            deliveryEstimate.data.deliveryDate.earliest,
+                            deliveryEstimate.data.deliveryDate.latest
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin size={14} />
+                        <span>
+                          From {deliveryEstimate.data.partnerLocation.city},{' '}
+                          {deliveryEstimate.data.partnerLocation.state}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="row irow">
-              <RotateCcw size={ICON_SIZE} />
-              <div className="flex items-start gap-3">
-                <RotateCcw size={ICON_SIZE} className="text-green-600 mt-1" />
-                <div>
-                  <div className="font-semibold text-gray-900">15-Day Refund</div>
-                  <div className="text-sm text-gray-600">Easy returns & exchanges</div>
-                </div>
+            <div className="flex items-start gap-3">
+              <RotateCcw size={ICON_SIZE} className="text-green-600 mt-1" />
+              <div>
+                <div className="font-semibold text-gray-900">15-Day Refund</div>
+                <div className="text-sm text-gray-600">Easy returns & exchanges</div>
               </div>
-              <div className="flex items-start gap-3">
-                <Shield size={ICON_SIZE} className="text-green-600 mt-1" />
-                <div>
-                  <div className="font-semibold text-gray-900">Secure Packaging</div>
-                  <div className="text-sm text-gray-600">Safe & secure delivery</div>
-                </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <Shield size={ICON_SIZE} className="text-green-600 mt-1" />
+              <div>
+                <div className="font-semibold text-gray-900">Secure Packaging</div>
+                <div className="text-sm text-gray-600">Safe & secure delivery</div>
               </div>
             </div>
           </div>
@@ -1015,7 +1155,7 @@ const ProductDetails = () => {
               >
                 <FileText size={16} /> Specifications
               </button>
-              <button
+              {/* <button
                 className={`flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
                   activeTab === 'reviews'
                     ? 'text-green-600 border-b-2 border-green-600 bg-green-50'
@@ -1024,7 +1164,7 @@ const ProductDetails = () => {
                 onClick={() => setActiveTab('reviews')}
               >
                 <Star size={16} /> Reviews ({product.rating?.totalReviews || 0})
-              </button>
+              </button> */}
               <button
                 className={`flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
                   activeTab === 'warranty'
@@ -1035,7 +1175,7 @@ const ProductDetails = () => {
               >
                 <Shield size={16} /> Warranty
               </button>
-              <button
+              {/* <button
                 className={`flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
                   activeTab === 'offers'
                     ? 'text-green-600 border-b-2 border-green-600 bg-green-50'
@@ -1044,7 +1184,7 @@ const ProductDetails = () => {
                 onClick={() => setActiveTab('offers')}
               >
                 <Gift size={16} /> Offers
-              </button>
+              </button> */}
               <button
                 className={`flex items-center gap-2 px-6 py-4 font-semibold transition-colors whitespace-nowrap ${
                   activeTab === 'faq'
@@ -1194,7 +1334,7 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {activeTab === 'reviews' && (
+            {/* {activeTab === 'reviews' && (
               <div className="p-6 space-y-6">
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
                   <div className="text-center">
@@ -1244,7 +1384,7 @@ const ProductDetails = () => {
                   </p>
                 </div>
               </div>
-            )}
+            )} */}
 
             {activeTab === 'warranty' && (
               <div className="p-6 space-y-6">
@@ -1256,18 +1396,18 @@ const ProductDetails = () => {
                       <p className="text-sm text-gray-600">Hardware defects covered</p>
                     </div>
                   </div>
-                  <div className="wcard irow">
+                  <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-100">
                     <Headphones size={22} />
                     <div>
-                      <h4>24/7 Support</h4>
-                      <p>We’re here any time</p>
+                      <h4 className="font-semibold text-gray-900 mb-1">24/7 Support</h4>
+                      <p className="text-sm text-gray-600">We’re here any time</p>
                     </div>
                   </div>
-                  <div className="wcard irow">
+                  <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-100">
                     <RotateCcw size={22} />
                     <div>
-                      <h4>15-Day Refund</h4>
-                      <p>No-hassle returns</p>
+                      <h4 className="font-semibold text-gray-900 mb-1">15-Day Refund</h4>
+                      <p className="text-sm text-gray-600">No-hassle returns</p>
                     </div>
                   </div>
                 </div>
@@ -1309,7 +1449,7 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {activeTab === 'offers' && (
+            {/* {activeTab === 'offers' && (
               <div className="p-6 space-y-4">
                 {product.offers && product.offers.length > 0 ? (
                   product.offers.map((offer: any, index: number) => (
@@ -1329,27 +1469,27 @@ const ProductDetails = () => {
                   </div>
                 )}
               </div>
-            )}
+            )} */}
 
             {activeTab === 'faq' && (
-              <div className="pd__faq">
+              <div className="p-6">
                 <FaqItem
                   open={openKey === 'faq1'}
                   onToggle={() => setOpenKey(openKey === 'faq1' ? '' : 'faq1')}
-                  q="What does “Superb” condition mean?"
-                  a="Minor body marks, flawless screen, fully functional & QC-passed."
+                  q="How are refurbished devices quality tested?"
+                  a="Every device undergoes a rigorous 32-point quality check including hardware diagnostics, screen testing, battery health verification, camera functionality, and software updates to ensure it meets our high standards before being listed for sale."
                 />
                 <FaqItem
                   open={openKey === 'faq2'}
                   onToggle={() => setOpenKey(openKey === 'faq2' ? '' : 'faq2')}
-                  q="Is the warranty transferable?"
-                  a="Yes — remaining warranty follows the device with the original invoice."
+                  q="What is your return and refund policy?"
+                  a="We offer a 15-day return policy from the date of delivery. If you're not satisfied with your purchase, you can return the device in its original condition for a full refund. The device must be undamaged with all original accessories included."
                 />
                 <FaqItem
                   open={openKey === 'faq3'}
                   onToggle={() => setOpenKey(openKey === 'faq3' ? '' : 'faq3')}
-                  q="What’s in the box?"
-                  a="Phone, compatible USB cable and docs. Adapters may vary by availability."
+                  q="What warranty coverage do I get?"
+                  a="All refurbished devices come with up to 12 months warranty covering manufacturing defects and hardware issues. This includes coverage for display, battery, buttons, and internal components. Physical damage and water damage are not covered under warranty."
                 />
 
                 <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
@@ -1360,9 +1500,9 @@ const ProductDetails = () => {
                     <button className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-md">
                       <Phone size={16} /> Call Support
                     </button>
-                    <button className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors border-2 border-gray-200 shadow-sm">
+                    {/* <button className="inline-flex items-center gap-2 px-4 py-2 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors border-2 border-gray-200 shadow-sm">
                       <HelpCircle size={16} /> Live Chat
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>

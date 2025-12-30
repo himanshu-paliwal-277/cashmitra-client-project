@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Trash2,
   Plus,
   Minus,
   ShoppingBag,
   ArrowRight,
-  Tag,
+  // Tag, // Commented out - was only used for coupon UI
   Shield,
   Truck,
   RotateCcw,
@@ -27,7 +27,6 @@ import { useAuth } from '../../../contexts/AuthContext';
 import useUserAddresses from '../../../hooks/useUserAddresses';
 import api from '../../../services/api';
 
-import './cart.css';
 import { toast } from 'react-toastify';
 
 const Cart = ({ onBack }: any) => {
@@ -59,9 +58,9 @@ const Cart = ({ onBack }: any) => {
   const isLoggedIn = !!user;
 
   // ------- Promo (unchanged UI) -------
-  const [promoCode, setPromoCode] = useState('');
-  const [appliedPromo, setAppliedPromo] = useState(null);
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+  // const [promoCode, setPromoCode] = useState('');
+  // const [appliedPromo, setAppliedPromo] = useState(null);
+  // const [isApplyingPromo, setIsApplyingPromo] = useState(false);
   const [localError, setLocalError] = useState(null);
 
   // ------- Addresses like Checkout -------
@@ -120,53 +119,56 @@ const Cart = ({ onBack }: any) => {
   }, [user]);
 
   // ------- Quantity / remove -------
-  const handleQuantityChange = async (id: any, q: any) => {
+  const handleQuantityChange = async (item: any, q: any) => {
     if (q < 1) return;
     try {
       setLocalError(null);
-      await updateQuantity(id, q);
+      await updateQuantity(item.productId, q, item.condition);
     } catch {
       setLocalError('Failed to update quantity. Please try again.');
     }
   };
-  const handleRemoveItem = async (id: any) => {
+  const handleRemoveItem = async (item: any) => {
     try {
       setLocalError(null);
-      await removeFromCart(id);
+      await removeFromCart(item.productId, item.condition);
     } catch {
       setLocalError('Failed to remove item. Please try again.');
     }
   };
-  const moveToWishlist = (id: any) => handleRemoveItem(id);
+  const moveToWishlist = (item: any) => handleRemoveItem(item);
 
   // ------- Promo UI logic (unchanged) -------
-  const applyPromoCode = async () => {
-    setIsApplyingPromo(true);
-    setLocalError(null);
-    try {
-      await new Promise(r => setTimeout(r, 900));
-      if (promoCode.toLowerCase() === 'save10') {
-        setAppliedPromo({ code: 'SAVE10', discount: 10 });
-        setPromoCode('');
-      } else {
-        setLocalError('Invalid promo code. Please try again.');
-      }
-    } finally {
-      setIsApplyingPromo(false);
-    }
-  };
-  const removePromoCode = () => setAppliedPromo(null);
+  // const applyPromoCode = async () => {
+  //   setIsApplyingPromo(true);
+  //   setLocalError(null);
+  //   try {
+  //     await new Promise(r => setTimeout(r, 900));
+  //     if (promoCode.toLowerCase() === 'save10') {
+  //       setAppliedPromo({ code: 'SAVE10', discount: 10 });
+  //       setPromoCode('');
+  //     } else {
+  //       setLocalError('Invalid promo code. Please try again.');
+  //     }
+  //   } finally {
+  //     setIsApplyingPromo(false);
+  //   }
+  // };
+  // const removePromoCode = () => setAppliedPromo(null);
 
-  // ------- Price calc (as before) -------
+  // ------- Price calc with free delivery in cart -------
   const subtotal = getCartTotal();
   const originalTotal = (cartItems || []).reduce(
     (sum: any, item: any) => sum + (item.originalPrice || item.price) * item.quantity,
     0
   );
   const savings = Math.max(originalTotal - subtotal, 0);
-  const promoDiscount = appliedPromo ? Math.round((subtotal * appliedPromo.discount) / 100) : 0;
-  const shipping = subtotal > 50000 ? 0 : 500;
-  const total = subtotal - promoDiscount + shipping;
+  // const promoDiscount = appliedPromo ? Math.round((subtotal * appliedPromo.discount) / 100) : 0;
+  const promoDiscount = 0;
+
+  // Use same delivery options as checkout page
+  const deliveryFee = 0; // Show free delivery in cart, user can choose delivery option in checkout
+  const total = subtotal - promoDiscount + deliveryFee;
 
   const features = [
     { icon: Shield, text: '32 Points Quality Checks' },
@@ -206,28 +208,36 @@ const Cart = ({ onBack }: any) => {
   // ------- Login Required UI -------
   if (!isLoggedIn) {
     return (
-      <div className="cart-page">
-        <header className="cart-header">
-          <div className="main-container cart-header__inner">
-            <button className="back-btn" onClick={handleBack}>
+      <div className="min-h-screen bg-[#f7f8fa] text-[#0f172a]">
+        <header className="bg-white border-b border-[#e6e8ee]">
+          <div className=" mx-auto px-4 h-[68px] flex items-center justify-between">
+            <button
+              className="inline-flex items-center gap-2 bg-none border-none text-[#0ea5e9] font-semibold cursor-pointer hover:underline"
+              onClick={handleBack}
+            >
               <ArrowLeft size={16} />
               Continue Shopping
             </button>
-            <h1 className="cart-title">
+            <h1 className="flex items-center gap-2.5 text-xl font-extrabold text-[#0f172a]">
               <ShoppingBag size={22} />
-              Shopping Cart <span className="chip">{getCartItemsCount()}</span>
+              Shopping Cart{' '}
+              <span className="bg-[#eaf6ff] text-[#0ea5e9] px-2.5 py-1 rounded-full text-xs font-bold">
+                {getCartItemsCount()}
+              </span>
             </h1>
           </div>
         </header>
 
-        <section className="cart-body">
-          <div className="main-container">
-            <div className="empty-card">
-              <div className="empty-card__icon">
+        <section className="py-6 pb-8">
+          <div className=" mx-auto px-4">
+            <div className="bg-white border border-[#e6e8ee] rounded-[14px] p-10 text-center">
+              <div className="w-[82px] h-[82px] mx-auto mb-3.5 grid place-items-center bg-[#f1f5f9] text-[#6b7280] rounded-full">
                 <Shield size={48} className="text-blue-500" />
               </div>
-              <h2>Login Required</h2>
-              <p>Please login to view your cart and proceed with checkout.</p>
+              <h2 className="my-1.5 text-[22px] font-extrabold">Login Required</h2>
+              <p className="text-[#6b7280] mb-4">
+                Please login to view your cart and proceed with checkout.
+              </p>
               <div className="flex gap-3 justify-center mt-6">
                 <Button
                   variant="primary"
@@ -250,28 +260,34 @@ const Cart = ({ onBack }: any) => {
   // ------- Empty cart UI -------
   if (!cartItems || cartItems.length === 0) {
     return (
-      <div className="cart-page">
-        <header className="cart-header">
-          <div className="main-container cart-header__inner">
-            <button className="back-btn" onClick={handleBack}>
+      <div className="min-h-screen bg-[#f7f8fa] text-[#0f172a]">
+        <header className="bg-white border-b border-[#e6e8ee]">
+          <div className=" mx-auto px-4 h-[68px] flex items-center justify-between">
+            <button
+              className="inline-flex items-center gap-2 bg-none border-none text-[#0ea5e9] font-semibold cursor-pointer hover:underline"
+              onClick={handleBack}
+            >
               <ArrowLeft size={16} />
               Continue Shopping
             </button>
-            <h1 className="cart-title">
+            <h1 className="flex items-center gap-2.5 text-xl font-extrabold text-[#0f172a]">
               <ShoppingBag size={22} />
-              Shopping Cart <span className="chip">0</span>
+              Shopping Cart{' '}
+              <span className="bg-[#eaf6ff] text-[#0ea5e9] px-2.5 py-1 rounded-full text-xs font-bold">
+                0
+              </span>
             </h1>
           </div>
         </header>
 
-        <section className="cart-body">
-          <div className="main-container">
-            <div className="empty-card">
-              <div className="empty-card__icon">
+        <section className="py-6 pb-8">
+          <div className=" mx-auto px-4">
+            <div className="bg-white border border-[#e6e8ee] rounded-[14px] p-10 text-center">
+              <div className="w-[82px] h-[82px] mx-auto mb-3.5 grid place-items-center bg-[#f1f5f9] text-[#6b7280] rounded-full">
                 <ShoppingBag size={38} />
               </div>
-              <h2>Your cart is empty</h2>
-              <p>Looks like you haven’t added any items yet.</p>
+              <h2 className="my-1.5 text-[22px] font-extrabold">Your cart is empty</h2>
+              <p className="text-[#6b7280] mb-4">Looks like you haven't added any items yet.</p>
               <Button className="bg-green-500" variant="primary" size="lg" onClick={handleBack}>
                 Start Shopping
               </Button>
@@ -286,32 +302,38 @@ const Cart = ({ onBack }: any) => {
   const activeAddress = addresses.find(a => (a._id || a.id) === selectedAddress);
 
   return (
-    <div className="cart-page">
-      <header className="cart-header">
-        <div className="main-container cart-header__inner">
-          <button className="back-btn" onClick={handleBack}>
+    <div className="min-h-screen bg-[#f7f8fa] text-[#0f172a]">
+      <header className="bg-white border-b border-[#e6e8ee]">
+        <div className="max-w-[1200px] mx-auto px-4 h-[68px] flex items-center justify-between">
+          <button
+            className="inline-flex items-center gap-2 bg-none border-none text-[#0ea5e9] font-semibold cursor-pointer hover:underline"
+            onClick={handleBack}
+          >
             <ArrowLeft size={16} />
             Continue Shopping
           </button>
 
-          <h1 className="cart-title">
+          <h1 className="flex items-center gap-2.5 text-xl font-extrabold text-[#0f172a]">
             <ShoppingBag size={22} />
-            Shopping Cart <span className="chip">{getCartItemsCount()}</span>
+            Shopping Cart{' '}
+            <span className="bg-[#eaf6ff] text-[#0ea5e9] px-2.5 py-1 rounded-full text-xs font-bold">
+              {getCartItemsCount()}
+            </span>
           </h1>
         </div>
       </header>
 
-      <section className="cart-body">
-        <div className="main-container">
+      <section className="py-6 pb-8">
+        <div className="max-w-[1200px] mx-auto px-4">
           {(error || localError) && (
-            <div className="alert error">
+            <div className="flex items-center gap-2 px-3.5 py-3 rounded-[10px] mb-4 font-semibold bg-[#ffecec] text-[#ef4444] border border-[#fecaca]">
               <AlertCircle size={18} />
               <span>{error || localError}</span>
             </div>
           )}
 
           {/* Address strip, same style feel as Checkout screenshot */}
-          <div className="addr-strip">
+          {/* <div className="addr-strip">
             <div className="addr-strip__left">
               <div className="pin">
                 <MapPin size={16} />
@@ -343,153 +365,199 @@ const Cart = ({ onBack }: any) => {
                 {addresses.length === 0 ? 'Add Address' : 'Change'}
               </Button>
             </div>
-          </div>
+          </div> */}
 
-          <div className="cart-grid">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.9fr_1fr] gap-6">
             {/* LEFT: items */}
-            <div className="cart-items">
+            <div className="flex flex-col gap-3">
               {sortedCart.map(item => {
                 const id = item.inventoryId || item.productId || item.id;
                 return (
-                  <Card className="item-card" key={id}>
-                    {item.unavailable && (
-                      <div className="item-unavailable">
-                        <span className="dot" />
-                        Item Unavailable
-                      </div>
-                    )}
-
-                    <div className="item">
-                      <div className="item__img">
-                        <img src={item.image} alt={item.name || item.title} className="" />
-                        <div className="assured">
-                          <span className="assured__dot ">ⓒ</span> cashmitra <b>ASSURED</b>
+                  <Link to={`/buy/product/${id}`} key={id}>
+                    <Card className="p-3.5 rounded-[14px] border border-[#e6e8ee] bg-white hover:shadow-[0_8px_22px_rgba(0,0,0,0.06)]">
+                      {item.unavailable && (
+                        <div className="bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca] rounded-[10px] px-3 py-2.5 font-extrabold flex gap-2 items-center mb-2.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444] inline-block" />
+                          Item Unavailable
                         </div>
-                      </div>
+                      )}
 
-                      <div className="item__info">
-                        <div className="cond-chip">
-                          {item.condition?.label || item.badge || 'Good'}
-                        </div>
-
-                        <h3 className="item__title">{item.name || item.title}</h3>
-                        <div className="item__sub">
-                          {item.brand && item.model ? `${item.brand} • ${item.model}` : item.specs}
+                      <div className="grid grid-cols-[120px_1fr_auto] gap-3.5 items-start sm:grid-cols-[90px_1fr]">
+                        <div className="relative w-[120px] h-[120px] rounded-[10px] overflow-hidden bg-[#f7f8fa] flex items-center justify-center cursor-pointer sm:w-[90px] sm:h-[90px]">
+                          <img
+                            src={item.image}
+                            alt={item.name || item.title}
+                            className="w-full h-full object-contain"
+                          />
+                          <div className="absolute top-0.5 left-0.5 bg-[#0f172a] text-[#e5feff] text-[10px] font-extrabold px-1 py-1 rounded-lg inline-flex items-center gap-1.5">
+                            <span className="grid place-items-center w-[18px] h-[18px] bg-[#e0f2fe] text-[#0ea5e9] rounded-full font-black">
+                              ⓒ
+                            </span>
+                            {/* cashmitra */} <b>ASSURED</b>
+                          </div>
                         </div>
 
-                        <div className="price-row">
-                          <div className="price-now">₹{(item.price || 0).toLocaleString()}</div>
-                          {item.originalPrice && item.originalPrice !== item.price && (
-                            <div className="price-mrp">₹{item.originalPrice.toLocaleString()}</div>
-                          )}
+                        <div className="cursor-pointer">
+                          <div className="inline-block bg-[#dcfce7] text-[#16a34a] px-2 py-1 rounded-lg text-xs font-extrabold mb-1">
+                            {item.condition?.label || item.badge || 'Good'}
+                          </div>
+
+                          <h3 className="font-extrabold text-base my-0.5 text-[#0f172a] leading-tight hover:text-blue-600 transition-colors">
+                            {item.name || item.title}
+                          </h3>
+                          <div className="text-[#64748b] text-[13px] mb-2">
+                            {item.brand && item.model && item.model !== item.name
+                              ? `${item.brand} • ${item.model}`
+                              : item.brand || item.specs}
+                          </div>
+
+                          <div className="flex items-baseline gap-2.5 mb-1.5">
+                            <div className="font-black text-lg text-[#111827]">
+                              ₹{(item.price || 0).toLocaleString()}
+                            </div>
+                            {item.originalPrice && item.originalPrice !== item.price && (
+                              <div className="text-[#9ca3af] line-through font-bold text-xs">
+                                ₹{item.originalPrice.toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-1.5 text-[#6b7280] text-xs">
+                            <Shield size={14} />
+                            <span>12 Months Warranty</span>
+                          </div>
+
+                          {/* Mobile actions */}
+                          <div
+                            className="flex gap-3 mt-2 sm:flex"
+                            onClick={e => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                          >
+                            <div className="flex items-center border border-[#e6e8ee] rounded-[10px] overflow-hidden h-9">
+                              <button
+                                className="w-9 h-9 grid place-items-center bg-white border-none cursor-pointer hover:bg-[#f3f4f6] disabled:opacity-45 disabled:cursor-not-allowed"
+                                disabled={item.quantity <= 1}
+                                onClick={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleQuantityChange(item, item.quantity - 1);
+                                }}
+                              >
+                                <Minus size={14} />
+                              </button>
+                              <input
+                                className="w-11 h-9 border-none text-center font-bold text-[#111827] focus:outline-none"
+                                type="number"
+                                value={item.quantity}
+                                onChange={e =>
+                                  handleQuantityChange(item, parseInt(e.target.value) || 1)
+                                }
+                                onClick={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                              />
+                              <button
+                                className="w-9 h-9 grid place-items-center bg-white border-none cursor-pointer hover:bg-[#f3f4f6]"
+                                onClick={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleQuantityChange(item, item.quantity + 1);
+                                }}
+                              >
+                                <Plus size={14} />
+                              </button>
+                            </div>
+
+                            <div className="flex gap-3 items-center flex-wrap">
+                              <button
+                                className="inline-flex items-center gap-2 bg-white border-none text-[#ef4444] font-bold px-2.5 py-2 rounded-lg cursor-pointer hover:bg-[#fee2e2]"
+                                onClick={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleRemoveItem(item);
+                                }}
+                                title="Remove"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="subtle-row">
-                          <Shield size={14} />
-                          <span>12 Months Warranty</span>
-                        </div>
-
-                        {/* Mobile actions */}
-                        <div className="item__actions item__actions--mobile">
-                          <div className="qty">
+                        {/* Desktop actions */}
+                        {/* <div
+                          className="flex items-center gap-4"
+                          onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                        >
+                          <div className="flex items-center border border-[#e6e8ee] rounded-[10px] overflow-hidden h-9">
                             <button
-                              className="qty__btn"
+                              className="w-9 h-9 grid place-items-center bg-white border-none cursor-pointer hover:bg-[#f3f4f6] disabled:opacity-45 disabled:cursor-not-allowed"
                               disabled={item.quantity <= 1}
-                              onClick={() => handleQuantityChange(id, item.quantity - 1)}
+                              onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleQuantityChange(item, item.quantity - 1);
+                              }}
                             >
                               <Minus size={14} />
                             </button>
                             <input
-                              className="qty__input"
+                              className="w-11 h-9 border-none text-center font-bold text-[#111827] focus:outline-none"
                               type="number"
                               value={item.quantity}
                               onChange={e =>
-                                handleQuantityChange(id, parseInt(e.target.value) || 1)
+                                handleQuantityChange(item, parseInt(e.target.value) || 1)
                               }
+                              onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
                             />
                             <button
-                              className="qty__btn"
-                              onClick={() => handleQuantityChange(id, item.quantity + 1)}
+                              className="w-9 h-9 grid place-items-center bg-white border-none cursor-pointer hover:bg-[#f3f4f6]"
+                              onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleQuantityChange(item, item.quantity + 1);
+                              }}
                             >
                               <Plus size={14} />
                             </button>
                           </div>
 
-                          <div className="row-gap">
+                          <div className="flex flex-col gap-1.5 items-end">
                             <button
-                              className="ghost-btn"
-                              onClick={() => moveToWishlist(id)}
-                              title="Move to wishlist"
-                            >
-                              <Heart size={16} />
-                              Move to Wishlist
-                            </button>
-                            <button
-                              className="ghost-btn danger"
-                              onClick={() => handleRemoveItem(id)}
+                              className="inline-flex items-center gap-2 bg-white border-none text-[#ef4444] font-bold px-2.5 py-2 rounded-lg cursor-pointer hover:bg-[#fee2e2]"
+                              onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleRemoveItem(item);
+                              }}
                               title="Remove"
                             >
                               <Trash2 size={16} />
-                              Remove
                             </button>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
-
-                      {/* Desktop actions */}
-                      <div className="item__actions">
-                        <div className="qty">
-                          <button
-                            className="qty__btn"
-                            disabled={item.quantity <= 1}
-                            onClick={() => handleQuantityChange(id, item.quantity - 1)}
-                          >
-                            <Minus size={14} />
-                          </button>
-                          <input
-                            className="qty__input"
-                            type="number"
-                            value={item.quantity}
-                            onChange={e => handleQuantityChange(id, parseInt(e.target.value) || 1)}
-                          />
-                          <button
-                            className="qty__btn"
-                            onClick={() => handleQuantityChange(id, item.quantity + 1)}
-                          >
-                            <Plus size={14} />
-                          </button>
-                        </div>
-
-                        <div className="col">
-                          <button
-                            className="ghost-btn"
-                            onClick={() => moveToWishlist(id)}
-                            title="Move to wishlist"
-                          >
-                            <Heart size={16} />
-                            Move to Wishlist
-                          </button>
-                          <button
-                            className="ghost-btn danger"
-                            onClick={() => handleRemoveItem(id)}
-                            title="Remove"
-                          >
-                            <Trash2 size={16} />
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
+                    </Card>
+                  </Link>
                 );
               })}
             </div>
 
             {/* RIGHT: summary */}
-            <Card className="summary">
-              <h2 className="summary__title">Price Summary</h2>
+            <Card className="sticky top-4 p-4 rounded-[14px] border border-[#e6e8ee] bg-white">
+              <h2 className="text-lg font-extrabold my-0.5 mb-3">Price Summary</h2>
 
-              <div className="coupon">
+              {/* Coupon Code Section - Commented Out */}
+              {/* <div className="coupon">
                 {appliedPromo ? (
                   <div className="coupon__applied">
                     <div className="left">
@@ -524,45 +592,50 @@ const Cart = ({ onBack }: any) => {
                     </Button>
                   </div>
                 )}
-              </div>
+              </div> */}
 
-              <div className="rows">
-                <div className="row">
-                  <span>Price ({getCartItemsCount()} items)</span>
-                  <span>₹{subtotal.toLocaleString()}</span>
+              <div className="border-t border-b border-[#e6e8ee]">
+                <div className="flex items-center justify-between py-2.5 font-bold text-[#111827]">
+                  <span className="text-[#6b7280] font-bold">
+                    Price ({getCartItemsCount()} items)
+                  </span>
+                  <span>₹{originalTotal.toLocaleString()}</span>
                 </div>
 
-                <div className="row">
-                  <span>Discount</span>
-                  <span className="green">-₹{savings.toLocaleString()}</span>
+                <div className="flex items-center justify-between py-2.5 font-bold text-[#111827] border-t border-[#f1f2f6]">
+                  <span className="text-[#6b7280] font-bold">Discount</span>
+                  <span className="text-[#16a34a]">-₹{savings.toLocaleString()}</span>
                 </div>
 
-                {appliedPromo && (
-                  <div className="row">
-                    <span>Coupon ({appliedPromo.code})</span>
-                    <span className="green">-₹{promoDiscount.toLocaleString()}</span>
+                {/* Coupon discount row - Commented Out */}
+                {/* {appliedPromo && (
+                  <div className="flex items-center justify-between py-2.5 font-bold text-[#111827] border-t border-[#f1f2f6]">
+                    <span className="text-[#6b7280] font-bold">Coupon ({appliedPromo.code})</span>
+                    <span className="text-[#16a34a]">-₹{promoDiscount.toLocaleString()}</span>
                   </div>
-                )}
+                )} */}
 
-                <div className="row">
-                  <span>Delivery Charges</span>
-                  <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
+                <div className="flex items-center justify-between py-2.5 font-bold text-[#111827] border-t border-[#f1f2f6]">
+                  <span className="text-[#6b7280] font-bold">Delivery Charges</span>
+                  <span>{deliveryFee === 0 ? 'Free' : `₹${deliveryFee}`}</span>
                 </div>
 
-                <div className="row total">
-                  <span>Total Amount</span>
-                  <span>₹{total.toLocaleString()}</span>
+                <div className="flex items-center justify-between py-2.5 font-bold text-[#111827] border-t border-[#f1f2f6]">
+                  <span className="text-base">Total Amount</span>
+                  <span className="text-base text-[#0ea5e9] font-black">
+                    ₹{total.toLocaleString()}
+                  </span>
                 </div>
               </div>
 
-              <div className="saved-pill">
-                You’ve saved <b>₹{(savings + promoDiscount).toLocaleString()}</b>
+              <div className="my-3 mb-2 inline-flex items-center gap-1.5 bg-[#eaffeb] text-[#16a34a] border border-[#bbf7d0] px-2.5 py-2 rounded-full font-extrabold text-[13px]">
+                You've saved <b>₹{savings.toLocaleString()}</b>
               </div>
               <Button
                 variant="primary"
                 size="lg"
                 fullWidth
-                className="place-order"
+                className="mt-2"
                 onClick={handleProceedToCheckout}
                 disabled={!activeAddress}
               >
@@ -570,23 +643,26 @@ const Cart = ({ onBack }: any) => {
                 <ArrowRight size={18} />
               </Button>
 
-              <div className="divider" />
+              <div className="h-px bg-[#e6e8ee] my-4" />
 
-              <div className="features">
+              <div className="grid grid-cols-3 gap-2.5 max-[420px]:grid-cols-1">
                 {features.map((f, i) => {
                   const Icon = f.icon;
                   return (
-                    <div className="feature" key={i}>
-                      <div className="feature__icon">
+                    <div
+                      className="flex items-center gap-2 bg-white p-2 px-1.5 rounded-[10px]"
+                      key={i}
+                    >
+                      <div className="w-8 h-8 rounded-full grid place-items-center bg-[#eaf6ff] text-[#0ea5e9]">
                         <Icon size={16} />
                       </div>
-                      <div className="feature__text">{f.text}</div>
+                      <div className="text-xs text-[#6b7280] font-bold">{f.text}</div>
                     </div>
                   );
                 })}
               </div>
 
-              <div className="payment-safe">
+              <div className="mt-2.5 text-xs text-[#6b7280] flex items-center gap-2 justify-center">
                 <span className="shield">🛡️</span> Your payment is 100% safe with us
               </div>
             </Card>
@@ -596,31 +672,40 @@ const Cart = ({ onBack }: any) => {
 
       {/* ADD ADDRESS MODAL (same look/fields as your Checkout) */}
       {showAddressForm && (
-        <div className="addr-modal-overlay" onClick={closeAddressModal}>
-          <div className="addr-modal" onClick={e => e.stopPropagation()}>
-            <div className="addr-modal-head">
-              <h3>Add New Address</h3>
-              <button className="addr-close" onClick={closeAddressModal}>
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={closeAddressModal}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+              <h3 className="text-xl font-bold m-0">Add New Address</h3>
+              <button
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-2xl leading-none"
+                onClick={closeAddressModal}
+              >
                 ×
               </button>
             </div>
 
-            <form className="addr-form" onSubmit={handleSaveAddress}>
+            <form className="p-6 space-y-6" onSubmit={handleSaveAddress}>
               {/* Basic */}
-              <div className="form-section">
-                <div className="section-title">
-                  <span className="section-ico">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
+                  <span className="flex items-center justify-center">
                     <MapPin size={16} />
                   </span>
                   <span>Basic Information</span>
                 </div>
 
-                <div className="form-group">
-                  <label className="label">
-                    Address Title <span className="req">*</span>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Address Title <span className="text-red-500">*</span>
                   </label>
                   <input
-                    className="input"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                     placeholder="e.g., Home, Office"
                     value={addrForm.title}
@@ -628,13 +713,13 @@ const Cart = ({ onBack }: any) => {
                   />
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="label">
-                      Full Name <span className="req">*</span>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="input"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                       placeholder="Enter full name"
                       value={addrForm.fullName}
@@ -642,12 +727,12 @@ const Cart = ({ onBack }: any) => {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="label">
-                      Address Type <span className="req">*</span>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Address Type <span className="text-red-500">*</span>
                     </label>
                     <select
-                      className="select"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                       required
                       value={addrForm.addressType}
                       onChange={e => handleAddr('addressType', e.target.value)}
@@ -661,21 +746,21 @@ const Cart = ({ onBack }: any) => {
               </div>
 
               {/* Contact */}
-              <div className="form-section">
-                <div className="section-title">
-                  <span className="section-ico">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
+                  <span className="flex items-center justify-center">
                     <Shield size={16} />
                   </span>
                   <span>Contact Information</span>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="label">
-                      Phone Number <span className="req">*</span>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Phone Number <span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="input"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       type="tel"
                       required
                       pattern="[0-9]{10}"
@@ -685,10 +770,10 @@ const Cart = ({ onBack }: any) => {
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="label">Email</label>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Email</label>
                     <input
-                      className="input"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       type="email"
                       placeholder="(optional)"
                       value={addrForm.email}
@@ -699,20 +784,20 @@ const Cart = ({ onBack }: any) => {
               </div>
 
               {/* Address */}
-              <div className="form-section">
-                <div className="section-title">
-                  <span className="section-ico">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-gray-700 font-semibold mb-3">
+                  <span className="flex items-center justify-center">
                     <MapPin size={16} />
                   </span>
                   <span>Address Details</span>
                 </div>
 
-                <div className="form-group">
-                  <label className="label">
-                    Street Address <span className="req">*</span>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Street Address <span className="text-red-500">*</span>
                   </label>
                   <input
-                    className="input"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                     placeholder="House/Flat, Building, Street"
                     value={addrForm.street}
@@ -720,35 +805,35 @@ const Cart = ({ onBack }: any) => {
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="label">Address Line 2</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Address Line 2</label>
                   <input
-                    className="input"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Area / Landmark (optional)"
                     value={addrForm.addressLine2}
                     onChange={e => handleAddr('addressLine2', e.target.value)}
                   />
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="label">
-                      City <span className="req">*</span>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      City <span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="input"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                       value={addrForm.city}
                       onChange={e => handleAddr('city', e.target.value)}
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="label">
-                      State <span className="req">*</span>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      State <span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="input"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                       value={addrForm.state}
                       onChange={e => handleAddr('state', e.target.value)}
@@ -756,12 +841,12 @@ const Cart = ({ onBack }: any) => {
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="label">
-                    Pincode <span className="req">*</span>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Pincode <span className="text-red-500">*</span>
                   </label>
                   <input
-                    className="input"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                     pattern="[0-9]{6}"
                     maxLength={6}
@@ -772,24 +857,31 @@ const Cart = ({ onBack }: any) => {
                 </div>
               </div>
 
-              <div className="checkbox-row">
+              <div className="flex items-center gap-2">
                 <input
                   id="isDefault"
-                  className="checkbox"
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   type="checkbox"
                   checked={addrForm.isDefault}
                   onChange={e => handleAddr('isDefault', e.target.checked)}
                 />
-                <label htmlFor="isDefault" className="checkbox-label">
+                <label htmlFor="isDefault" className="text-sm text-gray-700 cursor-pointer">
                   Set as default address
                 </label>
               </div>
 
-              <div className="addr-actions">
-                <button type="button" className="btn ghost" onClick={closeAddressModal}>
+              <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  className="px-6 py-2 border border-gray-300 rounded-lg font-medium hover:bg-gray-50"
+                  onClick={closeAddressModal}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn primary">
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+                >
                   Save Address
                 </button>
               </div>

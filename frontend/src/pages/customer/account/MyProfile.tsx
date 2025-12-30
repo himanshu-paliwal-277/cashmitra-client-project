@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { User, Mail, Phone, MapPin, Calendar, Camera, Edit3, Save, X, Shield } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { User, Mail, Phone, /* MapPin, Calendar, Camera, */ Edit3, Save, X, Shield } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
 import useUserProfile from '../../../hooks/useUserProfile';
@@ -14,27 +14,29 @@ const MyProfile = () => {
     name: '',
     email: '',
     phone: '',
-    dateOfBirth: '',
-    address: '',
+    // dateOfBirth: '', // Commented out - Date of Birth field removed
+    // address: '', // Commented out - Address field removed
   });
 
-  const formatAddress = address => {
-    if (!address) return '';
-    if (typeof address === 'string') return address;
+  // Commented out - not needed without Address field
+  // const formatAddress = address => {
+  //   if (!address) return '';
+  //   if (typeof address === 'string') return address;
 
-    return `${address.street || ''}, ${address.city || ''}, ${address.state || ''} ${address.pincode || ''}, ${address.country || ''}`
-      .replace(/^,\s*|,\s*,/g, ',')
-      .replace(/^,\s*|,\s*$/g, '');
-  };
+  //   return `${address.street || ''}, ${address.city || ''}, ${address.state || ''} ${address.pincode || ''}, ${address.country || ''}`
+  //     .replace(/^,\s*|,\s*,/g, ',')
+  //     .replace(/^,\s*|,\s*$/g, '');
+  // };
 
-  const formatDateForInput = date => {
-    if (!date) return '';
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  // Commented out - not needed without Date of Birth field
+  // const formatDateForInput = date => {
+  //   if (!date) return '';
+  //   const d = new Date(date);
+  //   const year = d.getFullYear();
+  //   const month = String(d.getMonth() + 1).padStart(2, '0');
+  //   const day = String(d.getDate()).padStart(2, '0');
+  //   return `${year}-${month}-${day}`;
+  // };
 
   useEffect(() => {
     if (profileData) {
@@ -42,8 +44,8 @@ const MyProfile = () => {
         name: profileData.name || '',
         email: profileData.email || '',
         phone: profileData.phone || '',
-        dateOfBirth: formatDateForInput(profileData.dateOfBirth),
-        address: formatAddress(profileData.address),
+        // dateOfBirth: formatDateForInput(profileData.dateOfBirth), // Commented out
+        // address: formatAddress(profileData.address), // Commented out
       });
     }
   }, [profileData]);
@@ -54,8 +56,8 @@ const MyProfile = () => {
         name: profileData.name || '',
         email: profileData.email || '',
         phone: profileData.phone || '',
-        dateOfBirth: formatDateForInput(profileData.dateOfBirth),
-        address: formatAddress(profileData.address),
+        // dateOfBirth: formatDateForInput(profileData.dateOfBirth), // Commented out
+        // address: formatAddress(profileData.address), // Commented out
       });
     }
     setIsEditing(true);
@@ -79,8 +81,8 @@ const MyProfile = () => {
         name: profileData.name || '',
         email: profileData.email || '',
         phone: profileData.phone || '',
-        dateOfBirth: formatDateForInput(profileData.dateOfBirth),
-        address: formatAddress(profileData.address),
+        // dateOfBirth: formatDateForInput(profileData.dateOfBirth), // Commented out
+        // address: formatAddress(profileData.address), // Commented out
       });
     }
     setIsEditing(false);
@@ -130,12 +132,13 @@ const MyProfile = () => {
                 >
                   {initials}
                 </div>
-                <button
+                {/* Camera button for profile photo upload - Commented Out */}
+                {/* <button
                   className="absolute bottom-1.5 right-1.5 w-11 h-11 rounded-full border-2 border-white bg-indigo-50 text-blue-900 grid place-items-center cursor-pointer transition-all duration-150 shadow-[0_10px_25px_rgba(2,6,23,0.06)] hover:bg-indigo-100 hover:shadow-[0_0_0_3px_rgba(37,99,235,0.16)]"
                   aria-label="Upload avatar"
                 >
                   <Camera size={16} />
-                </button>
+                </button> */}
               </div>
 
               <h2 className="mt-1 mb-0 text-center text-gray-900 text-2xl font-bold">
@@ -239,7 +242,8 @@ const MyProfile = () => {
                   )}
                 </div>
 
-                <div className="flex flex-col gap-2">
+                {/* Date of Birth Field - Commented Out */}
+                {/* <div className="flex flex-col gap-2">
                   <label className="flex items-center gap-1.5 text-gray-900 font-bold text-[0.95rem]">
                     <Calendar size={16} />
                     Date of Birth
@@ -265,9 +269,10 @@ const MyProfile = () => {
                           : 'Not provided'}
                     </div>
                   )}
-                </div>
+                </div> */}
 
-                <div className="md:col-span-2 flex flex-col gap-2">
+                {/* Address Field - Commented Out */}
+                {/* <div className="md:col-span-2 flex flex-col gap-2">
                   <label className="flex items-center gap-1.5 text-gray-900 font-bold text-[0.95rem]">
                     <MapPin size={16} />
                     Address
@@ -287,7 +292,7 @@ const MyProfile = () => {
                         : formatAddress(profileData?.address) || 'Not provided'}
                     </div>
                   )}
-                </div>
+                </div> */}
               </div>
 
               {isEditing && (

@@ -1289,6 +1289,111 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   </div>
                 </div>
 
+                {/* Condition Options */}
+                <div className="mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Shield className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">Condition Options</h3>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                      Price adjustments for different conditions
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    {formData.conditionOptions?.map((condition: any, index: number) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 border border-gray-200 rounded-lg"
+                      >
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Condition Label
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g., Excellent, Good, Fair"
+                            value={condition.label || ''}
+                            onChange={e => {
+                              const newConditions = [...formData.conditionOptions];
+                              newConditions[index] = { ...condition, label: e.target.value };
+                              setFormData((prev: any) => ({
+                                ...prev,
+                                conditionOptions: newConditions,
+                              }));
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Price Adjustment (₹)
+                          </label>
+                          <input
+                            type="number"
+                            placeholder="0 for no change, negative for discount"
+                            value={condition.price || ''}
+                            onChange={e => {
+                              const newConditions = [...formData.conditionOptions];
+                              newConditions[index] = {
+                                ...condition,
+                                price: parseFloat(e.target.value) || 0,
+                              };
+                              setFormData((prev: any) => ({
+                                ...prev,
+                                conditionOptions: newConditions,
+                              }));
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            {condition.price > 0 && `+₹${condition.price} (Premium)`}
+                            {condition.price < 0 && `₹${Math.abs(condition.price)} discount`}
+                            {condition.price === 0 && 'No price change'}
+                          </p>
+                        </div>
+                        <div className="flex items-end">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newConditions = formData.conditionOptions.filter(
+                                (_: any, i: number) => i !== index
+                              );
+                              setFormData((prev: any) => ({
+                                ...prev,
+                                conditionOptions: newConditions,
+                              }));
+                            }}
+                            className="w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center justify-center gap-2"
+                            disabled={formData.conditionOptions.length <= 1}
+                          >
+                            <X size={16} />
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          conditionOptions: [...prev.conditionOptions, { label: '', price: 0 }],
+                        }))
+                      }
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
+                    >
+                      <Plus size={16} />
+                      Add Condition Option
+                    </button>
+                  </div>
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-blue-800 text-sm">
+                      💡 <strong>Condition Options:</strong> These allow customers to choose
+                      different product conditions with corresponding price adjustments. Use
+                      positive values for premium conditions and negative values for discounts.
+                    </p>
+                  </div>
+                </div>
+
                 {/* Technical Specifications */}
                 <div className="mb-6">
                   <div className="flex items-center gap-3 mb-6">

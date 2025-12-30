@@ -335,12 +335,6 @@ const UserOrderDetails = () => {
                               <div className="price">
                                 {formatCurrency(
                                   item.price ||
-                                    item.unitPrice ||
-                                    item.totalPrice ||
-                                    // Customer pays the discounted price
-                                    product?.pricing?.discountedPrice ||
-                                    product?.pricing?.mrp ||
-                                    // Fallback: calculate from total amount
                                     (order?.totalAmount && order.items
                                       ? order.totalAmount / order.items.length
                                       : 0)
@@ -349,15 +343,9 @@ const UserOrderDetails = () => {
                               {(() => {
                                 const actualPrice =
                                   item.price ||
-                                  item.unitPrice ||
-                                  item.totalPrice ||
-                                  // Customer pays the discounted price
-                                  product?.pricing?.discountedPrice ||
-                                  product?.pricing?.mrp ||
                                   (order?.totalAmount && order.items
                                     ? order.totalAmount / order.items.length
                                     : 0);
-
                                 const originalPrice = product?.pricing?.mrp || product?.basePrice;
 
                                 return (
@@ -618,34 +606,10 @@ const UserOrderDetails = () => {
                 ) : (
                   <>
                     {(() => {
-                      // Calculate subtotal from items
-                      const itemsSubtotal =
-                        order?.items?.reduce((total: number, item: any) => {
-                          const product = item.product;
-                          const itemPrice =
-                            item.price ||
-                            item.unitPrice ||
-                            item.totalPrice ||
-                            // Customer pays the discounted price
-                            product?.pricing?.discountedPrice ||
-                            product?.pricing?.mrp ||
-                            0;
-                          return total + itemPrice * (item.quantity || 1);
-                        }, 0) || 0;
-
-                      // Use calculated itemsSubtotal as the correct total (not the backend totalAmount which is wrong)
-                      const correctTotalAmount = itemsSubtotal;
-
-                      // Calculate commission based on correct total amount, not backend's wrong amount
-                      const commissionRate = order?.commission?.rate || 0;
-                      const correctCommissionAmount = correctTotalAmount * commissionRate;
-
-                      // Customer actually pays: correctTotalAmount - correct commission
-                      const customerPayAmount = correctTotalAmount - correctCommissionAmount;
-
-                      // Use itemsSubtotal as subtotal, calculate taxes as difference
-                      const subtotal = itemsSubtotal;
-                      const taxesAndFees = Math.max(0, customerPayAmount - subtotal);
+                      // Use the totalAmount from the order which now includes condition pricing
+                      const totalAmount = order?.totalAmount || 0;
+                      const deliveryFee = order?.shippingDetails?.deliveryFee || 0;
+                      const subtotal = totalAmount - deliveryFee;
 
                       return (
                         <>
@@ -653,23 +617,15 @@ const UserOrderDetails = () => {
                             <span>Subtotal</span>
                             <span>{formatCurrency(subtotal)}</span>
                           </div>
-                          {taxesAndFees > 0 && (
+                          {deliveryFee > 0 && (
                             <div className="payment-row">
-                              <span>Taxes & Fees</span>
-                              <span>{formatCurrency(taxesAndFees)}</span>
-                            </div>
-                          )}
-                          {correctCommissionAmount > 0 && (
-                            <div className="payment-row">
-                              <span>Cashback</span>
-                              <span className="text-green-600">
-                                -{formatCurrency(correctCommissionAmount)}
-                              </span>
+                              <span>Delivery Fee</span>
+                              <span>{formatCurrency(deliveryFee)}</span>
                             </div>
                           )}
                           <div className="payment-row total">
                             <span>You Pay</span>
-                            <span>{formatCurrency(customerPayAmount)}</span>
+                            <span>{formatCurrency(totalAmount)}</span>
                           </div>
                         </>
                       );
@@ -712,8 +668,8 @@ const UserOrderDetails = () => {
             </div>
           </div>
 
-          {/* Commission Details (if applicable) */}
-          {order?.commission && (
+          {/* Commission Details (Cashback Card) - Commented Out */}
+          {/* {order?.commission && (
             <div className="card">
               <div className="card-header">
                 <Star size={20} />
@@ -734,7 +690,7 @@ const UserOrderDetails = () => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Contact Support */}
           <div className="card">

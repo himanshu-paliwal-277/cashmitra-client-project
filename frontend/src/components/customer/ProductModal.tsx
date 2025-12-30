@@ -1,286 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { useState, useEffect } from 'react';
 import { adminService } from '../../services/adminService';
-import { X, Upload, Star, Plus, Trash2, Save, AlertCircle, Image as ImageIcon } from 'lucide-react';
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-`;
-
-const ModalContainer = styled.div`
-  background: white;
-  border-radius: 0.75rem;
-  width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-`;
-
-const ModalHeader = styled.div`
-  padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  background: white;
-  z-index: 10;
-`;
-
-const ModalTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-`;
-
-const ModalBody = styled.div`
-  padding: 1.5rem;
-`;
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  &.full-width {
-    grid-column: 1 / -1;
-  }
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-  color: #374151;
-  font-size: 0.875rem;
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
-
-  &:disabled {
-    background: #f9fafb;
-    color: #6b7280;
-  }
-`;
-
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
-`;
-
-const TextArea = styled.textarea`
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  min-height: 100px;
-  resize: vertical;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
-`;
-
-const ImageUploadSection = styled.div`
-  border: 2px dashed #d1d5db;
-  border-radius: 0.5rem;
-  padding: 2rem;
-  text-align: center;
-  transition: all 0.2s;
-  cursor: pointer;
-
-  &:hover {
-    border-color: #10b981;
-    background: #f0fdf4;
-  }
-
-  &.dragover {
-    border-color: #10b981;
-    background: #f0fdf4;
-  }
-`;
-
-const ImagePreviewGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-`;
-
-const ImagePreview = styled.div`
-  position: relative;
-  aspect-ratio: 1;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-`;
-
-const PreviewImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
-const RemoveImageButton = styled.button`
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  background: rgba(239, 68, 68, 0.9);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 12px;
-
-  &:hover {
-    background: rgba(239, 68, 68, 1);
-  }
-`;
-
-const RatingSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const StarButton = styled.button`
-  background: none;
-  border: none;
-  color: ${(props: any) => (props.filled ? '#fbbf24' : '#d1d5db')};
-  cursor: pointer;
-  padding: 0.25rem;
-  transition: all 0.2s;
-
-  &:hover {
-    color: #fbbf24;
-    transform: scale(1.1);
-  }
-`;
-
-const ErrorMessage = styled.div`
-  color: #ef4444;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`;
-
-const ModalFooter = styled.div`
-  padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  position: sticky;
-  bottom: 0;
-  background: white;
-`;
-
-const Button = styled.button`
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s;
-
-  &.primary {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    border: none;
-
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-  }
-
-  &.secondary {
-    background: #f3f4f6;
-    color: #374151;
-    border: 1px solid #d1d5db;
-
-    &:hover {
-      background: #e5e7eb;
-    }
-  }
-`;
+import { X, Save, AlertCircle, Image as ImageIcon, Star } from 'lucide-react';
 
 const ProductModal = ({ isOpen, onClose, product, onSave }: any) => {
   const [formData, setFormData] = useState({
@@ -306,7 +26,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }: any) => {
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<any>({});
   const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => {
@@ -430,7 +150,7 @@ const ProductModal = ({ isOpen, onClose, product, onSave }: any) => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: any = {};
 
     if (!formData.name.trim()) {
       newErrors.name = 'Product name is required';
@@ -468,7 +188,9 @@ const ProductModal = ({ isOpen, onClose, product, onSave }: any) => {
       if (processedData.pricing.mrp && processedData.pricing.discountedPrice) {
         const mrp = parseFloat(processedData.pricing.mrp);
         const discounted = parseFloat(processedData.pricing.discountedPrice);
-        processedData.pricing.discountPercent = Math.round(((mrp - discounted) / mrp) * 100);
+        processedData.pricing.discountPercent = Math.round(
+          ((mrp - discounted) / mrp) * 100
+        ).toString();
       }
 
       if (product) {
@@ -490,55 +212,66 @@ const ProductModal = ({ isOpen, onClose, product, onSave }: any) => {
   if (!isOpen) return null;
 
   return (
-    <ModalOverlay onClick={(e: any) => e.target === e.currentTarget && onClose()}>
-      <ModalContainer>
-        <ModalHeader>
-          <ModalTitle>{product ? 'Edit Product' : 'Add New Product'}</ModalTitle>
-          <CloseButton onClick={onClose}>
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      onClick={(e: any) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
+          <h2 className="text-2xl font-semibold text-gray-800 m-0">
+            {product ? 'Edit Product' : 'Add New Product'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="bg-none border-none text-gray-500 cursor-pointer p-2 rounded-md transition-all duration-200 hover:bg-gray-100 hover:text-gray-700"
+          >
             <X size={20} />
-          </CloseButton>
-        </ModalHeader>
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit}>
-          <ModalBody>
-            <FormGrid>
-              <FormGroup>
-                <Label>Product Name *</Label>
-                <Input
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="flex flex-col gap-2">
+                <label className="font-medium text-gray-700 text-sm">Product Name *</label>
+                <input
                   type="text"
                   value={formData.name}
                   onChange={(e: any) => handleInputChange('name', e.target.value)}
                   placeholder="Enter product name"
+                  className="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-green-500 focus:ring-3 focus:ring-green-100 disabled:bg-gray-50 disabled:text-gray-500"
                 />
                 {errors.name && (
-                  <ErrorMessage>
+                  <div className="text-red-500 text-sm mt-1 flex items-center gap-1">
                     <AlertCircle size={14} />
                     {errors.name}
-                  </ErrorMessage>
+                  </div>
                 )}
-              </FormGroup>
+              </div>
 
-              <FormGroup>
-                <Label>Brand *</Label>
-                <Input
+              <div className="flex flex-col gap-2">
+                <label className="font-medium text-gray-700 text-sm">Brand *</label>
+                <input
                   type="text"
                   value={formData.brand}
                   onChange={(e: any) => handleInputChange('brand', e.target.value)}
                   placeholder="Enter brand name"
+                  className="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-green-500 focus:ring-3 focus:ring-green-100 disabled:bg-gray-50 disabled:text-gray-500"
                 />
                 {errors.brand && (
-                  <ErrorMessage>
+                  <div className="text-red-500 text-sm mt-1 flex items-center gap-1">
                     <AlertCircle size={14} />
                     {errors.brand}
-                  </ErrorMessage>
+                  </div>
                 )}
-              </FormGroup>
+              </div>
 
-              <FormGroup>
-                <Label>Category *</Label>
-                <Select
+              <div className="flex flex-col gap-2">
+                <label className="font-medium text-gray-700 text-sm">Category *</label>
+                <select
                   value={formData.categoryId}
                   onChange={(e: any) => handleInputChange('categoryId', e.target.value)}
+                  className="p-3 border border-gray-300 rounded-lg text-sm bg-white transition-all duration-200 focus:outline-none focus:border-green-500 focus:ring-3 focus:ring-green-100"
                 >
                   <option value="">Select a category</option>
                   {categories.map(category => (
@@ -546,42 +279,43 @@ const ProductModal = ({ isOpen, onClose, product, onSave }: any) => {
                       {category.name}
                     </option>
                   ))}
-                </Select>
+                </select>
                 {errors.categoryId && (
-                  <ErrorMessage>
+                  <div className="text-red-500 text-sm mt-1 flex items-center gap-1">
                     <AlertCircle size={14} />
                     {errors.categoryId}
-                  </ErrorMessage>
+                  </div>
                 )}
-              </FormGroup>
+              </div>
 
-              <FormGroup>
-                <Label>
+              <div className="flex flex-col gap-2">
+                <label className="font-medium text-gray-700 text-sm">
                   <input
                     type="checkbox"
                     checked={formData.isRefurbished}
                     onChange={e => handleInputChange('isRefurbished', e.target.checked)}
-                    style={{ marginRight: '0.5rem' }}
+                    className="mr-2"
                   />
                   Refurbished Product
-                </Label>
-              </FormGroup>
+                </label>
+              </div>
 
-              <FormGroup>
-                <Label>MRP (₹)</Label>
-                <Input
+              <div className="flex flex-col gap-2">
+                <label className="font-medium text-gray-700 text-sm">MRP (₹)</label>
+                <input
                   type="number"
                   value={formData.pricing.mrp}
                   onChange={(e: any) => handleInputChange('pricing.mrp', e.target.value)}
                   placeholder="Enter MRP"
                   min="0"
                   step="0.01"
+                  className="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-green-500 focus:ring-3 focus:ring-green-100 disabled:bg-gray-50 disabled:text-gray-500"
                 />
-              </FormGroup>
+              </div>
 
-              <FormGroup>
-                <Label>Discounted Price (₹)</Label>
-                <Input
+              <div className="flex flex-col gap-2">
+                <label className="font-medium text-gray-700 text-sm">Discounted Price (₹)</label>
+                <input
                   type="number"
                   value={formData.pricing.discountedPrice}
                   onChange={(e: any) =>
@@ -590,63 +324,70 @@ const ProductModal = ({ isOpen, onClose, product, onSave }: any) => {
                   placeholder="Enter discounted price"
                   min="0"
                   step="0.01"
+                  className="p-3 border border-gray-300 rounded-lg text-sm transition-all duration-200 focus:outline-none focus:border-green-500 focus:ring-3 focus:ring-green-100 disabled:bg-gray-50 disabled:text-gray-500"
                 />
                 {errors['pricing.discountedPrice'] && (
-                  <ErrorMessage>
+                  <div className="text-red-500 text-sm mt-1 flex items-center gap-1">
                     <AlertCircle size={14} />
                     {errors['pricing.discountedPrice']}
-                  </ErrorMessage>
+                  </div>
                 )}
-              </FormGroup>
+              </div>
 
-              <FormGroup>
-                <Label>Stock Status</Label>
-                <Select
-                  value={formData.availability.inStock}
+              <div className="flex flex-col gap-2">
+                <label className="font-medium text-gray-700 text-sm">Stock Status</label>
+                <select
+                  value={formData.availability.inStock ? 'true' : 'false'}
                   onChange={(e: any) =>
                     handleInputChange('availability.inStock', e.target.value === 'true')
                   }
+                  className="p-3 border border-gray-300 rounded-lg text-sm bg-white transition-all duration-200 focus:outline-none focus:border-green-500 focus:ring-3 focus:ring-green-100"
                 >
                   <option value="true">In Stock</option>
                   <option value="false">Out of Stock</option>
-                </Select>
-              </FormGroup>
+                </select>
+              </div>
 
-              <FormGroup>
-                <Label>Rating</Label>
-                <RatingSection>
+              <div className="flex flex-col gap-2">
+                <label className="font-medium text-gray-700 text-sm">Rating</label>
+                <div className="flex items-center gap-2">
                   {[1, 2, 3, 4, 5].map(star => (
-                    <StarButton
+                    <button
                       key={star}
                       type="button"
-                      filled={star <= formData.rating.average}
                       onClick={() => setRating(star)}
+                      className={`bg-none border-none cursor-pointer p-1 transition-all duration-200 hover:scale-110 ${
+                        star <= formData.rating.average ? 'text-yellow-400' : 'text-gray-300'
+                      } hover:text-yellow-400`}
                     >
                       <Star
                         size={20}
                         fill={star <= formData.rating.average ? 'currentColor' : 'none'}
                       />
-                    </StarButton>
+                    </button>
                   ))}
-                  <span style={{ marginLeft: '0.5rem', color: '#6b7280' }}>
-                    {formData.rating.average}/5
-                  </span>
-                </RatingSection>
-              </FormGroup>
+                  <span className="ml-2 text-gray-500">{formData.rating.average}/5</span>
+                </div>
+              </div>
 
-              <FormGroup className="full-width">
-                <Label>Description</Label>
-                <TextArea
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
+                <label className="font-medium text-gray-700 text-sm">Description</label>
+                <textarea
                   value={formData.description}
                   onChange={(e: any) => handleInputChange('description', e.target.value)}
                   placeholder="Enter product description"
+                  className="p-3 border border-gray-300 rounded-lg text-sm min-h-[100px] resize-y transition-all duration-200 focus:outline-none focus:border-green-500 focus:ring-3 focus:ring-green-100"
                 />
-              </FormGroup>
+              </div>
 
-              <FormGroup className="full-width">
-                <Label>Product Images</Label>
-                <ImageUploadSection
-                  className={dragOver ? 'dragover' : ''}
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
+                <label className="font-medium text-gray-700 text-sm">Product Images</label>
+                <div
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 cursor-pointer ${
+                    dragOver
+                      ? 'border-green-500 bg-green-50'
+                      : 'border-gray-300 hover:border-green-500 hover:bg-green-50'
+                  }`}
                   onDrop={handleDrop}
                   onDragOver={(e: any) => {
                     e.preventDefault();
@@ -655,57 +396,72 @@ const ProductModal = ({ isOpen, onClose, product, onSave }: any) => {
                   onDragLeave={() => setDragOver(false)}
                   onClick={() => document.getElementById('image-upload').click()}
                 >
-                  <ImageIcon size={48} color="#6b7280" />
-                  <p style={{ margin: '1rem 0 0.5rem 0', color: '#374151' }}>
-                    Drop images here or click to upload
-                  </p>
-                  <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>
-                    PNG, JPG, GIF up to 10MB
-                  </p>
+                  <ImageIcon size={48} className="text-gray-500 mx-auto mb-4" />
+                  <p className="m-0 mb-2 text-gray-700">Drop images here or click to upload</p>
+                  <p className="m-0 text-gray-500 text-sm">PNG, JPG, GIF up to 10MB</p>
                   <input
                     id="image-upload"
                     type="file"
                     multiple
                     accept="image/*"
                     onChange={handleFileSelect}
-                    style={{ display: 'none' }}
+                    className="hidden"
                   />
-                </ImageUploadSection>
+                </div>
 
                 {formData.images.length > 0 && (
-                  <ImagePreviewGrid>
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-4 mt-4">
                     {formData.images.map((image, index) => (
-                      <ImagePreview key={index}>
-                        <PreviewImage src={image} alt={`Product ${index + 1}`} />
-                        <RemoveImageButton type="button" onClick={() => removeImage(index)}>
+                      <div
+                        key={index}
+                        className="relative aspect-square rounded-lg overflow-hidden border border-gray-200"
+                      >
+                        <img
+                          src={image}
+                          alt={`Product ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-1 right-1 bg-red-500 bg-opacity-90 text-white border-none rounded-full w-6 h-6 flex items-center justify-center cursor-pointer text-xs hover:bg-red-600"
+                        >
                           <X size={12} />
-                        </RemoveImageButton>
-                      </ImagePreview>
+                        </button>
+                      </div>
                     ))}
-                  </ImagePreviewGrid>
+                  </div>
                 )}
-              </FormGroup>
-            </FormGrid>
+              </div>
+            </div>
             {errors.submit && (
-              <ErrorMessage style={{ marginTop: '1rem' }}>
+              <div className="text-red-500 text-sm mt-4 flex items-center gap-2">
                 <AlertCircle size={16} />
                 {errors.submit}
-              </ErrorMessage>
+              </div>
             )}
-          </ModalBody>
+          </div>
 
-          <ModalFooter>
-            <Button type="button" className="bg-green-500" onClick={onClose}>
+          <div className="p-6 border-t border-gray-200 flex justify-end gap-3 sticky bottom-0 bg-white">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-3 rounded-lg font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+            >
               Cancel
-            </Button>
-            <Button type="submit" className="bg-green-500" disabled={loading}>
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-3 rounded-lg font-medium cursor-pointer flex items-center gap-2 transition-all duration-200 bg-gradient-to-r from-green-500 to-green-600 text-white border-none hover:-translate-y-0.5 hover:shadow-lg hover:shadow-green-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+            >
               <Save size={16} />
               {loading ? 'Saving...' : 'Save Product'}
-            </Button>
-          </ModalFooter>
+            </button>
+          </div>
         </form>
-      </ModalContainer>
-    </ModalOverlay>
+      </div>
+    </div>
   );
 };
 

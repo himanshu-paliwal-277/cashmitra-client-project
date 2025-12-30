@@ -280,7 +280,7 @@ const Header = () => {
   return (
     <>
       {/* Top Bar - Sticky */}
-      <div className="bg-white w-full main-container shadow-sm flex justify-between items-center gap-4 py-3 lg:gap-6 lg:py-4 md:gap-3 sticky top-0 z-[10] border-b border-gray-200">
+      <div className="bg-white w-full main-container shadow-sm flex justify-between items-center gap-4 py-3 lg:gap-6 lg:py-4 md:gap-3 sticky top-0 z-50 border-b border-gray-200">
         {/* Logo */}
         <Link
           to="/"
@@ -501,7 +501,7 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed top-[57px] lg:top-[73px] left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40 p-4 max-h-[calc(100vh-57px)] lg:max-h-[calc(100vh-73px)] overflow-y-auto">
+        <div className="fixed top-[57px] lg:top-[73px] left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 p-4 max-h-[calc(100vh-57px)] lg:max-h-[calc(100vh-73px)] overflow-y-auto">
           {/* Mobile Search */}
           <div className="mb-4 pb-4 border-b border-gray-200">
             <form onSubmit={handleSearchSubmit} className="relative w-full">

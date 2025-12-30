@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import './BuyProductsList.css';
 import adminService from '../../../../services/adminService';
 import ProductCard from './ProductCard';
 
@@ -33,42 +32,48 @@ const BuyProductsList = () => {
   };
 
   return (
-    <section className="buy-products-section main-container bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-      <div className="section-header">
-        <h2>Buy Refurbished Devices</h2>
-        <button className="view-all-button">
+    <section className="pt-[45px] pb-[45px] text-[#111827] main-container bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+      <div className="flex items-center justify-between mb-3.5">
+        <h2 className="text-[28px] font-extrabold text-[#0f172a] m-0">Buy Refurbished Devices</h2>
+        <Link
+          to="/buy"
+          className="inline-flex items-center gap-1.5 bg-none border-none text-[#0ea5e9] font-semibold cursor-pointer"
+        >
           View All <ArrowRight size={16} />
-        </button>
+        </Link>
       </div>
 
       {loading ? (
-        <div className="loading-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-[18px]">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div className="product-card-skeleton" key={i}>
-              <div className="skeleton-image" />
-              <div className="skeleton-content">
-                <div className="skeleton-line short" />
-                <div className="skeleton-line medium" />
-                <div className="skeleton-line long" />
+            <div className="border border-[#e5e7eb] rounded-xl px-3.5 pb-3.5 pt-2.5" key={i}>
+              <div className="h-[190px] rounded-xl bg-[linear-gradient(90deg,#f1f5f9_25%,#e2e8f0_37%,#f1f5f9_63%)] bg-[length:400%_100%] animate-[shimmer_1.2s_infinite]" />
+              <div className="pt-2.5">
+                <div className="h-3 rounded-md bg-[#e5e7eb] my-2 w-[45%]" />
+                <div className="h-3 rounded-md bg-[#e5e7eb] my-2 w-[70%]" />
+                <div className="h-3 rounded-md bg-[#e5e7eb] my-2 w-[90%]" />
               </div>
             </div>
           ))}
         </div>
       ) : error ? (
-        <div className="error-state">
+        <div className="text-center py-6">
           <h3>Oops! Something went wrong</h3>
           <p>{error}</p>
-          <button onClick={fetchProducts} className="retry-button">
+          <button
+            onClick={fetchProducts}
+            className="mt-2.5 bg-[#1d4ed8] text-white border-none rounded-lg px-3 py-2 font-bold cursor-pointer"
+          >
             Try Again
           </button>
         </div>
       ) : products.length === 0 ? (
-        <div className="empty-state">
+        <div className="text-center py-6">
           <h3>No products available</h3>
           <p>Check back later for amazing deals on refurbished devices!</p>
         </div>
       ) : (
-        <div className="products-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-[18px]">
           {products.map(p => (
             <ProductCard key={p._id} product={p} onClick={handleProductClick} />
           ))}
