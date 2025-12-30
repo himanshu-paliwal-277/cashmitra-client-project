@@ -34,10 +34,12 @@ import {
   Percent,
   Plus,
   Minus,
+  Calendar,
 } from 'lucide-react';
 import { useCart } from '../../../contexts/CartContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import productService from '../../../services/productService';
+import deliveryService from '../../../services/deliveryService';
 import Button from '../../../components/ui/Button';
 
 const ICON_SIZE = 18;
@@ -62,6 +64,12 @@ const ProductDetails = () => {
   const [activeTab, setActiveTab] = useState('specs');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [pincode, setPincode] = useState('');
+  const [deliveryEstimate, setDeliveryEstimate] = useState({
+    loading: false,
+    checked: false,
+    data: null,
+    error: null,
+  });
 
   // Single-open accordion key
   const [openKey, setOpenKey] = useState('display');
@@ -486,6 +494,48 @@ const ProductDetails = () => {
         quantity,
       });
       addToCart(productData, quantity);
+    }
+  };
+
+  const handleCheckDelivery = async () => {
+    if (!pincode.trim()) {
+      setDeliveryEstimate(prev => ({
+        ...prev,
+        error: 'Please enter a pincode',
+      }));
+      return;
+    }
+
+    if (!deliveryService.validatePincode(pincode)) {
+      setDeliveryEstimate(prev => ({
+        ...prev,
+        error: 'Please enter a valid 6-digit pincode',
+      }));
+      return;
+    }
+
+    setDeliveryEstimate(prev => ({
+      ...prev,
+      loading: true,
+      error: null,
+    }));
+
+    try {
+      const estimate = await deliveryService.checkDeliveryTime(product._id, pincode);
+      setDeliveryEstimate({
+        loading: false,
+        checked: true,
+        data: estimate,
+        error: null,
+      });
+    } catch (error) {
+      console.error('Delivery check error:', error);
+      setDeliveryEstimate({
+        loading: false,
+        checked: false,
+        data: null,
+        error: error.message || 'Failed to check delivery. Please try again.',
+      });
     }
   };
 
@@ -997,16 +1047,83 @@ const ProductDetails = () => {
                 <span className="font-semibold text-gray-900 block mb-2">
                   Check delivery to your pincode
                 </span>
-                <div className="flex gap-2">
+                <div className="flex gap-2 mb-3">
                   <input
                     className="w-full sm:w-60 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     value={pincode}
-                    onChange={e => setPincode(e.target.value)}
+                    onChange={e => {
+                      setPincode(e.target.value);
+                      // Clear previous results when user types
+                      if (deliveryEstimate.checked || deliveryEstimate.error) {
+                        setDeliveryEstimate(prev => ({
+                          ...prev,
+                          checked: false,
+                          data: null,
+                          error: null,
+                        }));
+                      }
+                    }}
                     placeholder="Enter pincode"
+                    maxLength={6}
+                    disabled={deliveryEstimate.loading}
                   />
-                  {/* <button className="btn-sm">Check</button> */}
-                  <Button>Check</Button>
+                  <Button
+                    onClick={handleCheckDelivery}
+                    disabled={deliveryEstimate.loading || !pincode.trim()}
+                    className="whitespace-nowrap"
+                  >
+                    {deliveryEstimate.loading ? (
+                      <>
+                        <RefreshCw size={16} className="animate-spin mr-2" />
+                        Checking...
+                      </>
+                    ) : (
+                      'Check'
+                    )}
+                  </Button>
                 </div>
+
+                {/* Delivery Results */}
+                {deliveryEstimate.error && (
+                  <div className="flex items-center gap-2 text-red-600 text-sm">
+                    <X size={16} />
+                    <span>{deliveryEstimate.error}</span>
+                  </div>
+                )}
+
+                {deliveryEstimate.checked && deliveryEstimate.data && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2 text-green-700 font-semibold mb-2">
+                      <Check size={16} />
+                      <span>Delivery Available</span>
+                    </div>
+                    <div className="space-y-1 text-sm text-gray-700">
+                      <div className="flex items-center gap-2">
+                        <Truck size={14} />
+                        <span>
+                          Delivered in {deliveryEstimate.data.estimatedDays} business days
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar size={14} />
+                        <span>
+                          Expected by{' '}
+                          {deliveryService.formatDeliveryDateRange(
+                            deliveryEstimate.data.deliveryDate.earliest,
+                            deliveryEstimate.data.deliveryDate.latest
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin size={14} />
+                        <span>
+                          From {deliveryEstimate.data.partnerLocation.city},{' '}
+                          {deliveryEstimate.data.partnerLocation.state}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex items-start gap-3">
