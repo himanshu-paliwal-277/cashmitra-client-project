@@ -68,33 +68,8 @@ const getCustomerPaymentAmount = order => {
     return order.quoteAmount || 0;
   }
 
-  // For buy orders, try to get the actual product price (MRP or discounted price)
-  // If not available, fall back to totalAmount minus commission
-  let customerAmount = 0;
-
-  if (order.items && order.items.length > 0) {
-    customerAmount = order.items.reduce((total, item) => {
-      const product = item.product;
-      const quantity = item.quantity || 1;
-
-      // Try to get the actual price customer pays (discounted price or MRP)
-      let itemPrice = 0;
-      if (product?.pricing) {
-        itemPrice = product.pricing.discountedPrice || product.pricing.mrp || 0;
-      }
-
-      return total + itemPrice * quantity;
-    }, 0);
-  }
-
-  // If we couldn't calculate from items, use totalAmount minus commission
-  if (customerAmount === 0) {
-    const totalAmount = order.totalAmount || 0;
-    const commissionAmount = order.commission?.amount || 0;
-    customerAmount = totalAmount - commissionAmount;
-  }
-
-  return customerAmount;
+  // For buy orders, use the totalAmount which now includes condition pricing
+  return order.totalAmount || 0;
 };
 
 const statusLabel = (status, order = null) => {

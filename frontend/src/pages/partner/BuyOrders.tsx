@@ -476,21 +476,7 @@ const BuyOrders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      ₹
-                      {(() => {
-                        // Calculate correct total from discounted prices
-                        const correctTotal = order.items.reduce((total, item) => {
-                          const itemPrice =
-                            item.price ||
-                            item.unitPrice ||
-                            item.totalPrice ||
-                            item.product.pricing?.discountedPrice ||
-                            item.product.pricing?.mrp ||
-                            0;
-                          return total + itemPrice * item.quantity;
-                        }, 0);
-                        return correctTotal.toLocaleString();
-                      })()}
+                      ₹{order.totalAmount.toLocaleString()}
                     </div>
                     <div className="text-sm text-gray-500">
                       {order.paymentMethod || order.paymentDetails?.method || 'N/A'}
@@ -698,9 +684,11 @@ const BuyOrderDetailsModal: React.FC<BuyOrderDetailsModalProps> = ({
     return '/placeholder-product.jpg';
   };
 
-  const canAcceptReject = order.partnerAssignment?.response?.status === 'pending' && order.status !== 'cancelled';
+  const canAcceptReject =
+    order.partnerAssignment?.response?.status === 'pending' && order.status !== 'cancelled';
   const canUpdateStatus =
-    (order.partnerAssignment?.response?.status === 'accepted' || order.status === 'confirmed') && order.status !== 'cancelled';
+    (order.partnerAssignment?.response?.status === 'accepted' || order.status === 'confirmed') &&
+    order.status !== 'cancelled';
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -833,8 +821,6 @@ const BuyOrderDetailsModal: React.FC<BuyOrderDetailsModalProps> = ({
                       ₹
                       {(
                         item.price ||
-                        item.unitPrice ||
-                        item.totalPrice ||
                         item.product.pricing?.discountedPrice ||
                         item.product.pricing?.mrp ||
                         0
@@ -849,21 +835,7 @@ const BuyOrderDetailsModal: React.FC<BuyOrderDetailsModalProps> = ({
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold">Total Amount:</span>
                 <span className="text-xl font-bold text-blue-600">
-                  ₹
-                  {(() => {
-                    // Calculate correct total from discounted prices
-                    const correctTotal = order.items.reduce((total, item) => {
-                      const itemPrice =
-                        item.price ||
-                        item.unitPrice ||
-                        item.totalPrice ||
-                        item.product.pricing?.discountedPrice ||
-                        item.product.pricing?.mrp ||
-                        0;
-                      return total + itemPrice * item.quantity;
-                    }, 0);
-                    return correctTotal.toLocaleString();
-                  })()}
+                  ₹{order.totalAmount.toLocaleString()}
                 </span>
               </div>
             </div>

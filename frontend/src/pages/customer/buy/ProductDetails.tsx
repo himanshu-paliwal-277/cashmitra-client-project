@@ -88,7 +88,10 @@ const ProductDetails = () => {
 
         setProduct(data);
         if (data.variants?.length) setSelectedVariant(data.variants[0]);
-        if (data.conditionOptions?.length) setSelectedCondition(data.conditionOptions[0]);
+        if (data.conditionOptions?.length) {
+          console.log('ProductDetails - Setting initial condition:', data.conditionOptions[0]);
+          setSelectedCondition(data.conditionOptions[0]);
+        }
         if (data.storageOptions?.length) setSelectedStorage(data.storageOptions[0]);
         if (data.colorOptions?.length) setSelectedColor(data.colorOptions[0]);
       } catch (e) {
@@ -414,13 +417,13 @@ const ProductDetails = () => {
 
     const imageArray = getImageArray();
     const calculatedPrice =
-      selectedVariant?.price ||
-      product.pricing?.discountedPrice ||
-      product.pricing?.mrp ||
-      product.minPrice ||
-      product.maxPrice ||
-      product.price ||
-      0;
+      (selectedVariant?.price ||
+        product.pricing?.discountedPrice ||
+        product.pricing?.mrp ||
+        product.minPrice ||
+        product.maxPrice ||
+        product.price ||
+        0) + (selectedCondition?.price || 0);
 
     // Debug: Log price calculation details
     console.log('Price Calculation Debug:', {
@@ -440,18 +443,18 @@ const ProductDetails = () => {
       _id: product._id,
       name: productName,
       price:
-        selectedVariant?.price ||
-        product.pricing?.discountedPrice ||
-        product.pricing?.mrp ||
-        product.minPrice ||
-        product.maxPrice ||
-        product.price ||
-        0,
+        (selectedVariant?.price ||
+          product.pricing?.discountedPrice ||
+          product.pricing?.mrp ||
+          product.minPrice ||
+          product.maxPrice ||
+          product.price ||
+          0) + (selectedCondition?.price || 0),
       image: productImage, // For checkout compatibility
       images: imageArray, // Full image array
       brand: product.brand || 'Unknown Brand',
       model: product.model || product.series || 'Unknown Model',
-      condition: selectedCondition,
+      condition: selectedCondition || product.conditionOptions?.[0] || null, // Fallback to first condition
       inventoryId: product.inventoryId || product._id,
       variant: selectedVariant,
       storage: selectedStorage,
@@ -477,6 +480,11 @@ const ProductDetails = () => {
       });
     } else {
       // For Add to Cart: Add to cart normally
+      console.log('ProductDetails - About to call addToCart with:', {
+        productData,
+        selectedCondition,
+        quantity,
+      });
       addToCart(productData, quantity);
     }
   };
@@ -534,12 +542,12 @@ const ProductDetails = () => {
     );
   }
   const priceNow =
-    product.pricing?.discountedPrice ||
-    selectedVariant?.price ||
-    product.minPrice ||
-    product.maxPrice ||
-    product.price ||
-    0;
+    (product.pricing?.discountedPrice ||
+      selectedVariant?.price ||
+      product.minPrice ||
+      product.maxPrice ||
+      product.price ||
+      0) + (selectedCondition?.price || 0);
   const mrp = product.pricing?.mrp || product.originalPrice || null;
   const discountPct = mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
   const productName = getProductName();
@@ -836,7 +844,22 @@ const ProductDetails = () => {
                       onClick={() => setSelectedCondition(c)}
                     >
                       <span className="font-semibold text-gray-900">{c.label}</span>
-                      <span className="text-sm text-gray-600">₹{c.price?.toLocaleString()}</span>
+                      <span className="text-sm text-gray-600">
+                        ₹
+                        {(
+                          (product.pricing?.discountedPrice ||
+                            product.pricing?.mrp ||
+                            product.minPrice ||
+                            product.maxPrice ||
+                            product.price ||
+                            0) + (c.price || 0)
+                        ).toLocaleString()}
+                        {c.price !== 0 && (
+                          <span className="ml-1 text-xs">
+                            ({c.price > 0 ? '+' : ''}₹{c.price})
+                          </span>
+                        )}
+                      </span>
                     </button>
                   );
                 })}

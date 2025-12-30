@@ -34,8 +34,8 @@ interface CartContextType {
   loading: boolean;
   error: string | null;
   addToCart: (product: any, quantity?: number) => Promise<{ success: boolean; error?: string }>;
-  removeFromCart: (productId: string) => Promise<void>;
-  updateQuantity: (productId: string, quantity: number) => Promise<void>;
+  removeFromCart: (productId: string, condition?: any) => Promise<void>;
+  updateQuantity: (productId: string, quantity: number, condition?: any) => Promise<void>;
   clearCart: () => Promise<void>;
   getCartTotal: () => number;
   getCartItemsCount: () => number;
@@ -138,6 +138,7 @@ export const CartProvider = ({ children }: any) => {
             inventoryId: item.productId, // Use productId as inventoryId for consistency
             quantity: item.quantity,
             price: item.price,
+            originalPrice: item.originalPrice, // Add originalPrice for discount calculation
             subtotal: item.subtotal,
             product: item.product,
             partner: item.partner,
@@ -152,6 +153,7 @@ export const CartProvider = ({ children }: any) => {
 
             brand: item.product?.brand,
             model: item.product?.model,
+            condition: item.product?.condition, // Map condition object
             variant: item.product?.variant,
             images: item.product?.images || [],
             shopName: item.partner?.shopName,
@@ -192,6 +194,7 @@ export const CartProvider = ({ children }: any) => {
                 inventoryId: item.productId,
                 quantity: item.quantity,
                 price: item.price,
+                originalPrice: item.originalPrice, // Add originalPrice for discount calculation
                 subtotal: item.subtotal,
                 product: item.product,
                 partner: item.partner,
@@ -203,6 +206,7 @@ export const CartProvider = ({ children }: any) => {
                     : item.product?.name || 'Unknown Product',
                 brand: item.product?.brand,
                 model: item.product?.model,
+                condition: item.product?.condition, // Map condition object
                 variant: item.product?.variant,
                 images: item.product?.images || [],
                 shopName: item.partner?.shopName,
@@ -281,58 +285,154 @@ export const CartProvider = ({ children }: any) => {
   };
 
   const addToCart = async (product: any, quantity = 1) => {
-    console.log('product: ', product);
+    console.log('CartContext - addToCart called with product:', product);
+    console.log('CartContext - product.condition:', product.condition);
+
     try {
       setLoading(true);
       setError(null);
-      const existingItemIndex = cartItems.findIndex(item => item.productId === product._id);
 
-      let updatedCart;
-      let isNewItem = false;
+      // Update server if user is logged in
+      if (user) {
+        console.log('CartContext - User is logged in, syncing to server');
+        const token = getAuthToken();
+        if (token) {
+          console.log('CartContext - Token available, sending to backend');
+          try {
+            console.log('CartContext - Sending to backend:', {
+              productId: product._id,
+              quantity: quantity,
+              selectedCondition: product.condition,
+            });
 
-      if (existingItemIndex >= 0) {
-        // Update existing item and move to front
-        const updatedItem = {
-          ...cartItems[existingItemIndex],
-          quantity: cartItems[existingItemIndex].quantity + quantity,
-          inventoryId:
-            cartItems[existingItemIndex].inventoryId || cartItems[existingItemIndex].productId, // Ensure inventoryId exists
-          addedAt: new Date().toISOString(), // Update timestamp
-        };
-        const otherItems = cartItems.filter((_, index) => index !== existingItemIndex);
-        updatedCart = [updatedItem, ...otherItems]; // Move updated item to front
+            const requestBody = {
+              productId: product._id,
+              quantity: quantity,
+              selectedCondition: product.condition,
+            };
 
-        // Show toast for quantity update
-        toast.success(
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🛒</span>
-            <div>
-              <div className="font-semibold">{product.name}</div>
-              <div className="text-sm opacity-80">Quantity updated to {updatedItem.quantity}</div>
-            </div>
-          </div>,
-          {
-            className: 'bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0',
+            console.log('CartContext - Request body before JSON.stringify:', requestBody);
+            console.log('CartContext - product.condition:', product.condition);
+
+            const response = await fetch(`${API_BASE_URL}/buy/cart`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(requestBody),
+            });
+
+            console.log('CartContext - Response status:', response.status);
+            const responseData = await response.json();
+            console.log('CartContext - Response data:', responseData);
+
+            if (response.ok) {
+              // Update local state with server response
+              const serverCartItems = responseData.cart || [];
+              const transformedServerItems = serverCartItems.map((item: any) => {
+                let imageUrl = '/placeholder-phone.jpg';
+                if (item.product?.images) {
+                  if (Array.isArray(item.product.images)) {
+                    imageUrl = item.product.images[0] || '/placeholder-phone.jpg';
+                  } else if (typeof item.product.images === 'object') {
+                    imageUrl =
+                      item.product.images.main ||
+                      item.product.images.gallery ||
+                      item.product.images.thumbnail ||
+                      '/placeholder-phone.jpg';
+                  }
+                }
+
+                return {
+                  productId: item.productId,
+                  inventoryId: item.productId,
+                  quantity: item.quantity,
+                  price: item.price,
+                  originalPrice: item.originalPrice,
+                  subtotal: item.subtotal,
+                  product: item.product,
+                  partner: item.partner,
+                  isAvailable: item.isAvailable,
+                  image: imageUrl,
+                  name:
+                    item.product?.brand && item.product?.model
+                      ? `${item.product.brand} ${item.product.model}`
+                      : item.product?.name || 'Unknown Product',
+                  brand: item.product?.brand,
+                  model: item.product?.model,
+                  condition: item.product?.condition,
+                  variant: item.product?.variant,
+                  images: item.product?.images || [],
+                  shopName: item.partner?.shopName,
+                  addedAt: item.addedAt,
+                };
+              });
+
+              setCartItems(transformedServerItems);
+
+              // Show success toast
+              toast.success(
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🛒</span>
+                  <div>
+                    <div className="font-semibold">{product.name}</div>
+                    <div className="text-sm opacity-80">Added to cart successfully!</div>
+                  </div>
+                </div>,
+                {
+                  className: 'bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0',
+                }
+              );
+
+              return { success: true };
+            } else {
+              throw new Error(responseData.message || 'Failed to add to cart');
+            }
+          } catch (serverError) {
+            console.error('Failed to sync item to server:', serverError);
+            throw serverError;
           }
-        );
+        }
       } else {
-        // Add new item
-        isNewItem = true;
-        const cartItem = {
-          productId: product._id,
-          inventoryId: product.inventoryId || product._id, // Use inventoryId if available, fallback to productId
-          name: product.name,
-          price: product.price,
-          image: product.images?.[0] || '',
-          quantity,
-          brand: product.brand,
-          model: product.model,
-          condition: product.condition,
-          addedAt: new Date().toISOString(), // Add timestamp for ordering
-        };
-        updatedCart = [cartItem, ...cartItems]; // Add to beginning for most recent first
+        // User not logged in - update local state only
+        const existingItemIndex = cartItems.findIndex(
+          item =>
+            item.productId === product._id &&
+            JSON.stringify(item.condition) === JSON.stringify(product.condition)
+        );
 
-        // Show toast for new item
+        let updatedCart;
+
+        if (existingItemIndex >= 0) {
+          // Update existing item
+          const updatedItem = {
+            ...cartItems[existingItemIndex],
+            quantity: cartItems[existingItemIndex].quantity + quantity,
+            addedAt: new Date().toISOString(),
+          };
+          const otherItems = cartItems.filter((_, index) => index !== existingItemIndex);
+          updatedCart = [updatedItem, ...otherItems];
+        } else {
+          // Add new item
+          const cartItem = {
+            productId: product._id,
+            inventoryId: product.inventoryId || product._id,
+            name: product.name,
+            price: product.price,
+            image: product.images?.[0] || '',
+            quantity,
+            brand: product.brand,
+            model: product.model,
+            condition: product.condition,
+            addedAt: new Date().toISOString(),
+          };
+          updatedCart = [cartItem, ...cartItems];
+        }
+
+        setCartItems(updatedCart);
+
+        // Show success toast
         toast.success(
           <div className="flex items-center gap-2">
             <span className="text-lg">🛒</span>
@@ -345,35 +445,10 @@ export const CartProvider = ({ children }: any) => {
             className: 'bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0',
           }
         );
+
+        return { success: true };
       }
-
-      setCartItems(updatedCart);
-
-      // Update server if user is logged in
-      if (user) {
-        const token = getAuthToken();
-        if (token) {
-          // Only add the new/updated item to server, not the entire cart
-          try {
-            await fetch(`${API_BASE_URL}/buy/cart`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                productId: product._id,
-                quantity: quantity,
-              }),
-            });
-          } catch (serverError) {
-            console.warn('Failed to sync item to server:', serverError);
-          }
-        }
-      }
-
-      return { success: true };
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message);
       toast.error(
         <div className="flex items-center gap-2">
@@ -393,19 +468,38 @@ export const CartProvider = ({ children }: any) => {
     }
   };
 
-  const removeFromCart = async (productId: any) => {
+  const removeFromCart = async (productId: any, condition?: any) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Find the item to get its inventoryId
-      const itemToRemove = cartItems.find(item => item.productId === productId);
+      // Find the item to remove based on productId and condition
+      const itemToRemove = cartItems.find(item => {
+        if (condition !== undefined) {
+          return (
+            item.productId === productId &&
+            JSON.stringify(item.condition) === JSON.stringify(condition)
+          );
+        } else {
+          return item.productId === productId;
+        }
+      });
+
       if (!itemToRemove) {
         throw new Error('Item not found in cart');
       }
 
-      // Update local state first
-      const updatedCart = cartItems.filter(item => item.productId !== productId);
+      // Update local state first - remove only the specific item
+      const updatedCart = cartItems.filter(item => {
+        if (condition !== undefined) {
+          return !(
+            item.productId === productId &&
+            JSON.stringify(item.condition) === JSON.stringify(condition)
+          );
+        } else {
+          return item.productId !== productId;
+        }
+      });
       setCartItems(updatedCart);
 
       // Show success toast
@@ -475,28 +569,45 @@ export const CartProvider = ({ children }: any) => {
     }
   };
 
-  const updateQuantity = async (productId: any, quantity: any) => {
+  const updateQuantity = async (productId: any, quantity: any, condition?: any) => {
     try {
       setLoading(true);
       setError(null);
 
       if (quantity <= 0) {
-        await removeFromCart(productId);
+        await removeFromCart(productId, condition);
         return;
       }
 
-      // Find the item to get its inventoryId
-      const itemToUpdate = cartItems.find(item => item.productId === productId);
+      // Find the item to update based on productId and condition
+      const itemToUpdate = cartItems.find(item => {
+        if (condition !== undefined) {
+          return (
+            item.productId === productId &&
+            JSON.stringify(item.condition) === JSON.stringify(condition)
+          );
+        } else {
+          return item.productId === productId;
+        }
+      });
+
       if (!itemToUpdate) {
         throw new Error('Item not found in cart');
       }
 
-      // Update local state first
-      const updatedCart = cartItems.map(item =>
-        item.productId === productId
-          ? { ...item, quantity, inventoryId: item.inventoryId || item.productId }
-          : item
-      );
+      // Update local state first - update only the specific item
+      const updatedCart = cartItems.map(item => {
+        if (condition !== undefined) {
+          return item.productId === productId &&
+            JSON.stringify(item.condition) === JSON.stringify(condition)
+            ? { ...item, quantity, inventoryId: item.inventoryId || item.productId }
+            : item;
+        } else {
+          return item.productId === productId
+            ? { ...item, quantity, inventoryId: item.inventoryId || item.productId }
+            : item;
+        }
+      });
       setCartItems(updatedCart);
 
       // Update server if user is logged in

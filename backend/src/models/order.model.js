@@ -95,6 +95,15 @@ const orderSchema = new mongoose.Schema(
         type: String,
         enum: ['Cashmitra Logistics', 'Shop Delivery', 'Pickup'],
       },
+      deliveryOption: {
+        type: String,
+        enum: ['standard', 'express', 'priority'],
+        default: 'standard',
+      },
+      deliveryFee: {
+        type: Number,
+        default: 0,
+      },
       estimatedDelivery: Date,
       deliveredAt: Date,
     },

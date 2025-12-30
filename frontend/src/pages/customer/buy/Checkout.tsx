@@ -211,7 +211,11 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
         const inventoryId = item.inventoryId || item.productId;
         if (!inventoryId)
           throw new Error(`Invalid item: missing inventoryId for ${item.name || 'unknown item'}`);
-        return { inventoryId, quantity: parseInt(String(item.quantity)) || 1 };
+        return {
+          inventoryId,
+          quantity: parseInt(String(item.quantity)) || 1,
+          selectedCondition: item.condition || null,
+        };
       });
 
       const orderData = {
@@ -224,6 +228,8 @@ const Checkout = ({ onBack, onOrderComplete }: any) => {
           phone: formatPhoneForValidation(selectedAddressObj.phone),
         },
         paymentMethod: selectedPayment,
+        deliveryOption: selectedDelivery,
+        deliveryFee: deliveryFee,
       };
 
       const response = await api.post('/sales/orders', orderData);

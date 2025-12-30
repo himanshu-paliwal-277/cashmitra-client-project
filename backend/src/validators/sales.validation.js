@@ -17,6 +17,13 @@ export const createOrderSchema = {
               .number()
               .int()
               .min(1, 'Quantity must be a positive integer'),
+            selectedCondition: z
+              .object({
+                label: z.string(),
+                price: z.number(),
+                _id: z.string().optional(),
+              })
+              .optional(),
           })
         )
         .min(1, 'Items must be a non-empty array'),
@@ -29,6 +36,13 @@ export const createOrderSchema = {
             .number()
             .int()
             .min(1, 'Quantity must be a positive integer'),
+          selectedCondition: z
+            .object({
+              label: z.string(),
+              price: z.number(),
+              _id: z.string().optional(),
+            })
+            .optional(),
         })
       ),
     ]),
@@ -43,6 +57,15 @@ export const createOrderSchema = {
       errorMap: () => ({ message: 'Valid payment method is required' }),
     }),
     couponCode: z.string().optional(),
+    deliveryOption: z
+      .enum(['standard', 'express', 'priority'], {
+        errorMap: () => ({ message: 'Valid delivery option is required' }),
+      })
+      .optional(),
+    deliveryFee: z
+      .number()
+      .min(0, 'Delivery fee must be non-negative')
+      .optional(),
   }),
 };
 

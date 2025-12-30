@@ -10,6 +10,13 @@ export const addToCartSchema = {
       .string()
       .regex(/^[0-9a-fA-F]{24}$/, 'Valid product ID is required'),
     quantity: z.number().int().min(1, 'Quantity must be at least 1'),
+    selectedCondition: z
+      .object({
+        label: z.string(),
+        price: z.number(),
+        _id: z.string().optional(),
+      })
+      .optional(),
   }),
 };
 

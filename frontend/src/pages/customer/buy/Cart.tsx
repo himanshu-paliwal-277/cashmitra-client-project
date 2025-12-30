@@ -119,24 +119,24 @@ const Cart = ({ onBack }: any) => {
   }, [user]);
 
   // ------- Quantity / remove -------
-  const handleQuantityChange = async (id: any, q: any) => {
+  const handleQuantityChange = async (item: any, q: any) => {
     if (q < 1) return;
     try {
       setLocalError(null);
-      await updateQuantity(id, q);
+      await updateQuantity(item.productId, q, item.condition);
     } catch {
       setLocalError('Failed to update quantity. Please try again.');
     }
   };
-  const handleRemoveItem = async (id: any) => {
+  const handleRemoveItem = async (item: any) => {
     try {
       setLocalError(null);
-      await removeFromCart(id);
+      await removeFromCart(item.productId, item.condition);
     } catch {
       setLocalError('Failed to remove item. Please try again.');
     }
   };
-  const moveToWishlist = (id: any) => handleRemoveItem(id);
+  const moveToWishlist = (item: any) => handleRemoveItem(item);
 
   // ------- Promo UI logic (unchanged) -------
   // const applyPromoCode = async () => {
@@ -156,7 +156,7 @@ const Cart = ({ onBack }: any) => {
   // };
   // const removePromoCode = () => setAppliedPromo(null);
 
-  // ------- Price calc (as before) -------
+  // ------- Price calc with free delivery in cart -------
   const subtotal = getCartTotal();
   const originalTotal = (cartItems || []).reduce(
     (sum: any, item: any) => sum + (item.originalPrice || item.price) * item.quantity,
@@ -165,8 +165,10 @@ const Cart = ({ onBack }: any) => {
   const savings = Math.max(originalTotal - subtotal, 0);
   // const promoDiscount = appliedPromo ? Math.round((subtotal * appliedPromo.discount) / 100) : 0;
   const promoDiscount = 0;
-  const shipping = subtotal > 50000 ? 0 : 500;
-  const total = subtotal - promoDiscount + shipping;
+
+  // Use same delivery options as checkout page
+  const deliveryFee = 0; // Show free delivery in cart, user can choose delivery option in checkout
+  const total = subtotal - promoDiscount + deliveryFee;
 
   const features = [
     { icon: Shield, text: '32 Points Quality Checks' },
@@ -404,9 +406,9 @@ const Cart = ({ onBack }: any) => {
                             {item.name || item.title}
                           </h3>
                           <div className="text-[#64748b] text-[13px] mb-2">
-                            {item.brand && item.model
+                            {item.brand && item.model && item.model !== item.name
                               ? `${item.brand} • ${item.model}`
-                              : item.specs}
+                              : item.brand || item.specs}
                           </div>
 
                           <div className="flex items-baseline gap-2.5 mb-1.5">
@@ -440,7 +442,7 @@ const Cart = ({ onBack }: any) => {
                                 onClick={e => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  handleQuantityChange(id, item.quantity - 1);
+                                  handleQuantityChange(item, item.quantity - 1);
                                 }}
                               >
                                 <Minus size={14} />
@@ -450,7 +452,7 @@ const Cart = ({ onBack }: any) => {
                                 type="number"
                                 value={item.quantity}
                                 onChange={e =>
-                                  handleQuantityChange(id, parseInt(e.target.value) || 1)
+                                  handleQuantityChange(item, parseInt(e.target.value) || 1)
                                 }
                                 onClick={e => {
                                   e.preventDefault();
@@ -462,7 +464,7 @@ const Cart = ({ onBack }: any) => {
                                 onClick={e => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  handleQuantityChange(id, item.quantity + 1);
+                                  handleQuantityChange(item, item.quantity + 1);
                                 }}
                               >
                                 <Plus size={14} />
@@ -475,7 +477,7 @@ const Cart = ({ onBack }: any) => {
                                 onClick={e => {
                                   e.preventDefault();
                                   e.stopPropagation();
-                                  handleRemoveItem(id);
+                                  handleRemoveItem(item);
                                 }}
                                 title="Remove"
                               >
@@ -500,7 +502,7 @@ const Cart = ({ onBack }: any) => {
                               onClick={e => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                handleQuantityChange(id, item.quantity - 1);
+                                handleQuantityChange(item, item.quantity - 1);
                               }}
                             >
                               <Minus size={14} />
@@ -510,7 +512,7 @@ const Cart = ({ onBack }: any) => {
                               type="number"
                               value={item.quantity}
                               onChange={e =>
-                                handleQuantityChange(id, parseInt(e.target.value) || 1)
+                                handleQuantityChange(item, parseInt(e.target.value) || 1)
                               }
                               onClick={e => {
                                 e.preventDefault();
@@ -522,7 +524,7 @@ const Cart = ({ onBack }: any) => {
                               onClick={e => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                handleQuantityChange(id, item.quantity + 1);
+                                handleQuantityChange(item, item.quantity + 1);
                               }}
                             >
                               <Plus size={14} />
@@ -535,7 +537,7 @@ const Cart = ({ onBack }: any) => {
                               onClick={e => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                handleRemoveItem(id);
+                                handleRemoveItem(item);
                               }}
                               title="Remove"
                             >
@@ -597,7 +599,7 @@ const Cart = ({ onBack }: any) => {
                   <span className="text-[#6b7280] font-bold">
                     Price ({getCartItemsCount()} items)
                   </span>
-                  <span>₹{subtotal.toLocaleString()}</span>
+                  <span>₹{originalTotal.toLocaleString()}</span>
                 </div>
 
                 <div className="flex items-center justify-between py-2.5 font-bold text-[#111827] border-t border-[#f1f2f6]">
@@ -615,7 +617,7 @@ const Cart = ({ onBack }: any) => {
 
                 <div className="flex items-center justify-between py-2.5 font-bold text-[#111827] border-t border-[#f1f2f6]">
                   <span className="text-[#6b7280] font-bold">Delivery Charges</span>
-                  <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
+                  <span>{deliveryFee === 0 ? 'Free' : `₹${deliveryFee}`}</span>
                 </div>
 
                 <div className="flex items-center justify-between py-2.5 font-bold text-[#111827] border-t border-[#f1f2f6]">

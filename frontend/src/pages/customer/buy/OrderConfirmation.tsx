@@ -232,13 +232,7 @@ const OrderConfirmation = ({ orderData = null, onContinueShopping = null, onGoHo
                         <span>Qty: {item.quantity || 1}</span>
                       </div>
                       <div className="text-lg font-bold text-gray-900">
-                        {formatCurrency(
-                          item.price
-                            ? item.price * (item.quantity || 1)
-                            : order?.totalAmount
-                              ? order.totalAmount / (order.items?.length || 1)
-                              : 0
-                        )}
+                        {formatCurrency(item.price || 0)}
                       </div>
                     </div>
                   </div>
@@ -249,6 +243,38 @@ const OrderConfirmation = ({ orderData = null, onContinueShopping = null, onGoHo
                   <p className="text-base font-medium">No items found</p>
                 </div>
               )}
+            </div>
+
+            {/* Order Summary */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(
+                        order?.items?.reduce((sum, item) => sum + item.price * item.quantity, 0) ||
+                          0
+                      )}
+                    </span>
+                  </div>
+                  {order?.shippingDetails?.deliveryFee > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">Delivery Fee</span>
+                      <span className="font-medium text-gray-900">
+                        {formatCurrency(order.shippingDetails.deliveryFee)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center pt-3 border-t border-blue-200">
+                    <span className="text-lg font-semibold text-gray-900">Total Amount</span>
+                    <span className="text-xl font-bold text-blue-600">
+                      {formatCurrency(order?.totalAmount || 0)}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

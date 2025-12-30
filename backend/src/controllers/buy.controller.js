@@ -114,8 +114,22 @@ export const getProductDetails = async (req, res) => {
 
 export const addToCart = async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
+    const { productId, quantity, selectedCondition } = req.body;
     const userId = req.user.id;
+
+    console.log('AddToCart - Received data:', {
+      productId,
+      quantity,
+      selectedCondition,
+    });
+    console.log(
+      'AddToCart - selectedCondition type:',
+      typeof selectedCondition
+    );
+    console.log(
+      'AddToCart - selectedCondition JSON:',
+      JSON.stringify(selectedCondition)
+    );
 
     const product = await BuyProduct.findById(productId);
     if (!product) {
@@ -132,8 +146,26 @@ export const addToCart = async (req, res) => {
     }
 
     const existingItemIndex = cart.items.findIndex(
-      (item) => item.productId.toString() === productId
+      (item) =>
+        item.productId.toString() === productId &&
+        JSON.stringify(item.selectedCondition) ===
+          JSON.stringify(selectedCondition)
     );
+
+    // If adding an item with a condition, remove any existing items with null condition for the same product
+    if (selectedCondition) {
+      const nullConditionIndex = cart.items.findIndex(
+        (item) =>
+          item.productId.toString() === productId && !item.selectedCondition
+      );
+      if (nullConditionIndex !== -1) {
+        console.log(
+          'Removing existing item with null condition for product:',
+          productId
+        );
+        cart.items.splice(nullConditionIndex, 1);
+      }
+    }
 
     if (existingItemIndex !== -1) {
       cart.items[existingItemIndex].quantity += quantity;
@@ -141,10 +173,16 @@ export const addToCart = async (req, res) => {
       cart.items.push({
         productId,
         quantity,
+        selectedCondition: selectedCondition || null,
       });
     }
 
     await cart.save();
+
+    console.log(
+      'AddToCart - Cart saved, items:',
+      JSON.stringify(cart.items, null, 2)
+    );
 
     const cartItemsPromises = cart.items.map(async (item) => {
       const product = await BuyProduct.findById(item.productId);
@@ -153,17 +191,38 @@ export const addToCart = async (req, res) => {
         return null;
       }
 
+      // Calculate price including condition price
+      const basePrice = product.pricing.discountedPrice || product.pricing.mrp;
+      const conditionPrice = item.selectedCondition?.price || 0;
+      const finalPrice = basePrice + conditionPrice;
+
       return {
         productId: item.productId,
         quantity: item.quantity,
-        price: product.pricing.discountedPrice || product.pricing.mrp,
-        subtotal:
-          (product.pricing.discountedPrice || product.pricing.mrp) *
-          item.quantity,
+        price: finalPrice,
+        originalPrice: product.pricing.mrp + conditionPrice,
+        subtotal: finalPrice * item.quantity,
         product: {
           brand: product.brand,
           name: product.name,
+          model:
+            product.model && product.model !== product.name
+              ? product.model
+              : null, // Only include model if different from name
           images: product.images,
+          pricing: {
+            mrp: product.pricing.mrp,
+            discountedPrice: product.pricing.discountedPrice,
+            discountPercent: product.pricing.discountPercent,
+          },
+          condition: item.selectedCondition ||
+            product.conditionOptions?.[0] || {
+              label: 'Good',
+              price: 0,
+            }, // Use selected condition or default
+          variant: product.variants?.[0] || null, // Use first variant or null
+          conditionOptions: product.conditionOptions,
+          variants: product.variants,
         },
         isAvailable: product.availability.inStock,
         addedAt: item.addedAt,
@@ -203,17 +262,38 @@ export const getCart = async (req, res) => {
         return null;
       }
 
+      // Calculate price including condition price
+      const basePrice = product.pricing.discountedPrice || product.pricing.mrp;
+      const conditionPrice = item.selectedCondition?.price || 0;
+      const finalPrice = basePrice + conditionPrice;
+
       return {
         productId: item.productId,
         quantity: item.quantity,
-        price: product.pricing.discountedPrice || product.pricing.mrp,
-        subtotal:
-          (product.pricing.discountedPrice || product.pricing.mrp) *
-          item.quantity,
+        price: finalPrice,
+        originalPrice: product.pricing.mrp + conditionPrice,
+        subtotal: finalPrice * item.quantity,
         product: {
           brand: product.brand,
           name: product.name,
+          model:
+            product.model && product.model !== product.name
+              ? product.model
+              : null, // Only include model if different from name
           images: product.images,
+          pricing: {
+            mrp: product.pricing.mrp,
+            discountedPrice: product.pricing.discountedPrice,
+            discountPercent: product.pricing.discountPercent,
+          },
+          condition: item.selectedCondition ||
+            product.conditionOptions?.[0] || {
+              label: 'Good',
+              price: 0,
+            }, // Use selected condition or default
+          variant: product.variants?.[0] || null, // Use first variant or null
+          conditionOptions: product.conditionOptions,
+          variants: product.variants,
         },
         isAvailable: product.availability.inStock,
         addedAt: item.addedAt,
