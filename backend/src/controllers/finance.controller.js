@@ -1,10 +1,6 @@
-import mongoose from 'mongoose';
-
-import { Order } from '../models/order.model.js';
 import { Partner } from '../models/partner.model.js';
 import { Transaction } from '../models/transaction.model.js';
 import { User } from '../models/user.model.js';
-import { Wallet } from '../models/wallet.model.js';
 
 export async function getFinancialDashboard(req, res) {
   try {

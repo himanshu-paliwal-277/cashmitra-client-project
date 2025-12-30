@@ -1,6 +1,5 @@
 import { BuyProduct } from '../models/buyProduct.model.js';
 import { Partner } from '../models/partner.model.js';
-import geocodingService from '../utils/geocoding.utils.js';
 
 const pincodeStateMap = {
   // Maharashtra
@@ -23,7 +22,6 @@ const pincodeStateMap = {
   63: 'TN',
   // Telangana
   50: 'TG',
-  51: 'TG',
   // Gujarat
   36: 'GJ',
   37: 'GJ',
@@ -77,10 +75,6 @@ const pincodeStateMap = {
   78: 'AS',
   // Bihar
   80: 'BR',
-  81: 'BR',
-  82: 'BR',
-  83: 'BR',
-  84: 'BR',
   85: 'BR',
   // Jharkhand
   81: 'JH',
@@ -140,8 +134,6 @@ const majorCities = {
   360: { city: 'Rajkot', state: 'GJ' },
   // Kalyan-Dombivali
   421: { city: 'Kalyan', state: 'MH' },
-  // Vasai-Virar
-  401: { city: 'Vasai', state: 'MH' },
   // Varanasi
   221: { city: 'Varanasi', state: 'UP' },
   // Srinagar
@@ -152,8 +144,6 @@ const majorCities = {
   826: { city: 'Dhanbad', state: 'JH' },
   // Amritsar
   143: { city: 'Amritsar', state: 'PB' },
-  // Navi Mumbai
-  400: { city: 'Navi Mumbai', state: 'MH' },
   // Allahabad
   211: { city: 'Allahabad', state: 'UP' },
   // Ranchi
@@ -192,8 +182,6 @@ const majorCities = {
   243: { city: 'Bareilly', state: 'UP' },
   // Mysore
   570: { city: 'Mysore', state: 'KA' },
-  // Tiruppur
-  641: { city: 'Tiruppur', state: 'TN' },
   // Gurgaon
   122: { city: 'Gurgaon', state: 'HR' },
   // Aligarh
@@ -208,8 +196,6 @@ const majorCities = {
   506: { city: 'Warangal', state: 'TG' },
   // Guntur
   522: { city: 'Guntur', state: 'AP' },
-  // Bhiwandi
-  421: { city: 'Bhiwandi', state: 'MH' },
   // Saharanpur
   247: { city: 'Saharanpur', state: 'UP' },
   // Gorakhpur
@@ -236,10 +222,6 @@ const majorCities = {
   248: { city: 'Dehradun', state: 'UK' },
   // Durgapur
   713: { city: 'Durgapur', state: 'WB' },
-  // Asansol
-  713: { city: 'Asansol', state: 'WB' },
-  // Nanded-Waghala
-  431: { city: 'Nanded', state: 'MH' },
   // Kolhapur
   416: { city: 'Kolhapur', state: 'MH' },
   // Ajmer
@@ -250,26 +232,18 @@ const majorCities = {
   361: { city: 'Jamnagar', state: 'GJ' },
   // Ujjain
   456: { city: 'Ujjain', state: 'MP' },
-  // Loni
-  201: { city: 'Loni', state: 'UP' },
   // Siliguri
   734: { city: 'Siliguri', state: 'WB' },
   // Jhansi
   284: { city: 'Jhansi', state: 'UP' },
-  // Ulhasnagar
-  421: { city: 'Ulhasnagar', state: 'MH' },
   // Nellore
   524: { city: 'Nellore', state: 'AP' },
   // Jammu
   180: { city: 'Jammu', state: 'JK' },
-  // Sangli-Miraj & Kupwad
-  416: { city: 'Sangli', state: 'MH' },
   // Belgaum
   590: { city: 'Belgaum', state: 'KA' },
   // Mangalore
   575: { city: 'Mangalore', state: 'KA' },
-  // Ambattur
-  600: { city: 'Ambattur', state: 'TN' },
   // Tirunelveli
   627: { city: 'Tirunelveli', state: 'TN' },
   // Malegaon
@@ -280,8 +254,6 @@ const majorCities = {
   425: { city: 'Jalgaon', state: 'MH' },
   // Udaipur
   313: { city: 'Udaipur', state: 'RJ' },
-  // Maheshtala
-  700: { city: 'Maheshtala', state: 'WB' },
 };
 
 export const validatePincode = (pincode) => {
