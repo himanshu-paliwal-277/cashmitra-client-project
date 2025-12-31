@@ -4,6 +4,32 @@ import { useAuth } from '../../../contexts/AuthContext';
 import Button from '../../ui/Button';
 import Input from '../../ui/Input';
 import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle } from 'lucide-react';
+import * as yup from 'yup';
+import { toast } from 'react-toastify';
+
+// Validation schema matching backend requirements
+const signupSchema = yup.object().shape({
+  name: yup.string().trim().required('Name is required'),
+  email: yup.string().email('Please include a valid email').required('Email is required'),
+  phone: yup
+    .string()
+    .test('is-valid-phone', 'Please include a valid 10-digit phone number', function (value) {
+      // If phone is provided, it must be exactly 10 digits
+      if (!value || value.trim() === '') {
+        return true; // Optional field
+      }
+      return /^[0-9]{10}$/.test(value);
+    }),
+  password: yup
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .matches(
+      /^(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/,
+      'Password must include lowercase, number, and special character'
+    )
+    .required('Password is required'),
+  agreeToTerms: yup.boolean().oneOf([true], 'You must agree to the terms and conditions'),
+});
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -14,19 +40,42 @@ const Signup = () => {
     agreeToTerms: false,
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [validationErrors, setValidationErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState<any>({});
   const [passwordStrength, setPasswordStrength] = useState(0);
   const { signup, loading, error, clearError } = useAuth();
   const navigate = useNavigate();
 
   const calculatePasswordStrength = (password: any) => {
+    if (!password) return 0;
+
+    // Check minimum length requirement
+    const hasMinLength = password.length >= 8;
+    const hasLowercase = /[a-z]/.test(password);
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
+
+    // Backend requires: lowercase, number, and special character (minimum)
+    const meetsBackendRequirements = hasMinLength && hasLowercase && hasNumber && hasSpecialChar;
+
+    // Calculate strength based on criteria met
     let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-    return Math.min(strength, 4);
+    if (hasMinLength) strength++;
+    if (hasLowercase) strength++;
+    if (hasUppercase) strength++;
+    if (hasNumber) strength++;
+    if (hasSpecialChar) strength++;
+
+    // If doesn't meet backend requirements, cap strength at 2 (Fair)
+    if (!meetsBackendRequirements) {
+      return Math.min(strength, 2);
+    }
+
+    // If meets all 5 criteria, return 4 (Strong)
+    if (strength === 5) return 4;
+
+    // If meets backend requirements but missing uppercase, return 3 (Good)
+    return 3;
   };
 
   const getPasswordStrengthText = (strength: any) => {
@@ -74,38 +123,19 @@ const Signup = () => {
     }
   };
 
-  const validateForm = () => {
-    const errors = {};
-
-    if (!formData.name.trim()) {
-      errors.name = 'Name is required';
+  const validateForm = async () => {
+    try {
+      await signupSchema.validate(formData, { abortEarly: false });
+      return {};
+    } catch (err: any) {
+      const errors: any = {};
+      err.inner.forEach((error: any) => {
+        if (error.path) {
+          errors[error.path] = error.message;
+        }
+      });
+      return errors;
     }
-
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData.phone) {
-      errors.phone = 'Phone number is required';
-    } else if (!/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/\s/g, ''))) {
-      errors.phone = 'Please enter a valid phone number';
-    }
-
-    if (!formData.password) {
-      errors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      errors.password = 'Password must be at least 8 characters';
-    } else if (passwordStrength < 3) {
-      errors.password = 'Password is too weak. Please use a stronger password';
-    }
-
-    if (!formData.agreeToTerms) {
-      errors.agreeToTerms = 'You must agree to the terms and conditions';
-    }
-
-    return errors;
   };
 
   const handleChange = (e: any) => {
@@ -133,23 +163,56 @@ const Signup = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    const errors = validateForm();
+    const errors = await validateForm();
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
+      // Show first error as toast
+      const firstError = Object.values(errors)[0];
+      toast.error(firstError as string);
       return;
     }
 
-    const userData = {
+    // Prepare user data - omit phone if empty to match backend's optional validation
+    const userData: any = {
       name: formData.name.trim(),
-      email: formData.email.trim(),
-      phone: formData.phone.trim(),
+      email: formData.email.trim().toLowerCase(),
       password: formData.password,
     };
+
+    // Only include phone if it's not empty
+    if (formData.phone.trim()) {
+      userData.phone = formData.phone.trim();
+    }
 
     const result = await signup(userData);
 
     if (result.success) {
+      toast.success('Account created successfully!');
       navigate('/', { replace: true });
+    } else {
+      // Handle API validation errors
+      if (result.error) {
+        // Check if error contains validation errors array
+        try {
+          const errorData = JSON.parse(result.error);
+          if (errorData.errors && Array.isArray(errorData.errors)) {
+            // Set field-specific errors
+            const fieldErrors: any = {};
+            errorData.errors.forEach((err: any) => {
+              if (err.field) {
+                fieldErrors[err.field] = err.message;
+                toast.error(err.message);
+              }
+            });
+            setValidationErrors(fieldErrors);
+          } else {
+            toast.error(result.error);
+          }
+        } catch {
+          // If not JSON, just show the error message
+          toast.error(result.error);
+        }
+      }
     }
   };
 
@@ -210,13 +273,12 @@ const Signup = () => {
             <Input
               type="tel"
               name="phone"
-              placeholder="Enter your phone number"
+              placeholder="Enter your phone number (optional)"
               value={formData.phone}
               onChange={handleChange}
               error={validationErrors.phone}
               leftIcon={<Phone size={20} />}
               autoComplete="tel"
-              required
             />
 
             <div className="relative">
@@ -249,8 +311,13 @@ const Signup = () => {
                       style={{ width: `${(passwordStrength / 4) * 100}%` }}
                     />
                   </div>
-                  <div className={`text-xs ${getPasswordStrengthTextColor(passwordStrength)}`}>
-                    {getPasswordStrengthText(passwordStrength)}
+                  <div className="flex items-center justify-between">
+                    <div className={`text-xs ${getPasswordStrengthTextColor(passwordStrength)}`}>
+                      {getPasswordStrengthText(passwordStrength)}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Required: 8+ chars, lowercase, number, special char
+                    </div>
                   </div>
                 </div>
               )}

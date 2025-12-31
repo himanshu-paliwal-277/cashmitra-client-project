@@ -138,6 +138,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const data = await response.json();
 
       if (!response.ok) {
+        // Handle validation errors
+        if (data.errors && Array.isArray(data.errors)) {
+          // Return the full response data for field-specific errors
+          const errorMessage = data.message || 'Validation failed';
+          setError(errorMessage);
+          return { success: false, error: JSON.stringify(data) };
+        }
         throw new Error(data.message || 'Signup failed');
       }
 
