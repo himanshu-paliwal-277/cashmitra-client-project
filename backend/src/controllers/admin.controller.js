@@ -241,10 +241,15 @@ export const createPartner = async (req, res) => {
     console.log('📝 Permission types - buy:', typeof permissions?.buy, 'sell:', typeof permissions?.sell);
     console.log('📝 Full request body:', req.body);
 
+    // ==========================================
+    // STEP 1: VALIDATE ALL CONDITIONS BEFORE ANY DB WRITES
+    // ==========================================
+
     let user;
     let isNewUser = false;
 
     if (userId) {
+      // Scenario A: Using existing user
       user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
@@ -257,6 +262,7 @@ export const createPartner = async (req, res) => {
           .json({ message: 'User already has a partner profile' });
       }
     } else {
+      // Scenario B: Creating new user - validate user fields
       if (!name || !email || !phone || !password) {
         return res.status(400).json({
           message:
@@ -271,6 +277,21 @@ export const createPartner = async (req, res) => {
           .json({ message: 'User with this email already exists' });
       }
 
+      isNewUser = true;
+    }
+
+    // CRITICAL: Validate GST BEFORE creating any database records
+    const existingGST = await Partner.findOne({ gstNumber });
+    if (existingGST) {
+      return res.status(400).json({ message: 'GST number already exists' });
+    }
+
+    // ==========================================
+    // STEP 2: ALL VALIDATIONS PASSED - CREATE RECORDS
+    // ==========================================
+
+    // Create new user if needed
+    if (isNewUser) {
       user = await User.create({
         name,
         email,
@@ -278,12 +299,6 @@ export const createPartner = async (req, res) => {
         password,
         role: 'partner',
       });
-      isNewUser = true;
-    }
-
-    const existingGST = await Partner.findOne({ gstNumber });
-    if (existingGST) {
-      return res.status(400).json({ message: 'GST number already exists' });
     }
 
     const partner = await Partner.create({

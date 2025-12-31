@@ -71,9 +71,16 @@ export const createPartnerSchema = {
         .optional(),
       upiId: z
         .string()
-        .regex(
-          /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/,
-          'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)'
+        .refine(
+          (val) => {
+            // Allow empty string or undefined (optional field)
+            if (!val || val.trim() === '') return true;
+            // If provided, must match UPI format
+            return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/.test(val);
+          },
+          {
+            message: 'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)',
+          }
         )
         .optional(),
       permissions: z
@@ -131,9 +138,16 @@ export const updatePartnerSchema = {
       .optional(),
     upiId: z
       .string()
-      .regex(
-        /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/,
-        'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)'
+      .refine(
+        (val) => {
+          // Allow empty string or undefined (optional field)
+          if (!val || val.trim() === '') return true;
+          // If provided, must match UPI format
+          return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/.test(val);
+        },
+        {
+          message: 'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)',
+        }
       )
       .optional(),
     verificationStatus: z

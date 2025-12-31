@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import * as yup from 'yup';
 import useAdminPartners from '../../hooks/useAdminPartners';
 import adminService from '../../services/adminService';
 import {
@@ -33,6 +34,91 @@ import {
   Loader2,
 } from 'lucide-react';
 
+// Validation schema matching backend requirements
+const createPartnerSchema = yup.object().shape({
+  // User details (required when creating new partner, i.e., when userId is not provided)
+  name: yup.string().when('userId', {
+    is: (val: string) => !val || val.trim() === '',
+    then: schema =>
+      schema
+        .min(2, 'Name must be between 2 and 100 characters')
+        .max(100)
+        .required('Name is required when creating new partner'),
+    otherwise: schema => schema.optional(),
+  }),
+  email: yup.string().when('userId', {
+    is: (val: string) => !val || val.trim() === '',
+    then: schema =>
+      schema
+        .email('Valid email is required')
+        .required('Email is required when creating new partner'),
+    otherwise: schema => schema.optional(),
+  }),
+  phone: yup.string().when('userId', {
+    is: (val: string) => !val || val.trim() === '',
+    then: schema =>
+      schema
+        .min(10, 'Valid phone number is required')
+        .required('Phone is required when creating new partner'),
+    otherwise: schema => schema.optional(),
+  }),
+  password: yup.string().when('userId', {
+    is: (val: string) => !val || val.trim() === '',
+    then: schema =>
+      schema
+        .min(6, 'Password must be at least 6 characters long')
+        .required('Password is required when creating new partner'),
+    otherwise: schema => schema.optional(),
+  }),
+  // Partner details (always required)
+  shopName: yup
+    .string()
+    .trim()
+    .min(2, 'Shop name must be between 2 and 100 characters')
+    .max(100)
+    .required('Shop name is required'),
+  shopAddress: yup.object().shape({
+    street: yup
+      .string()
+      .min(1, 'Street address is required')
+      .required('Street address is required'),
+    city: yup.string().min(1, 'City is required').required('City is required'),
+    state: yup.string().min(1, 'State is required').required('State is required'),
+    pincode: yup.string().length(6, 'Pincode must be 6 digits').required('Pincode is required'),
+  }),
+  shopEmail: yup.string().email('Valid shop email is required').required('Shop email is required'),
+  shopPhone: yup
+    .string()
+    .min(10, 'Phone number must be at least 10 digits')
+    .required('Shop phone is required'),
+  gstNumber: yup
+    .string()
+    .length(15, 'GST number should be of 15 digits')
+    .required('GST number is required'),
+  upiId: yup
+    .string()
+    .test(
+      'is-valid-upi',
+      'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)',
+      function (value) {
+        // If UPI ID is not provided or empty, it's valid (optional field)
+        if (!value || value.trim() === '') {
+          return true;
+        }
+        // If provided, must match the UPI format
+        return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/.test(value);
+      }
+    )
+    .optional(),
+  permissions: yup
+    .object()
+    .shape({
+      buy: yup.boolean(),
+      sell: yup.boolean(),
+    })
+    .optional(),
+});
+
 const Partners = () => {
   const navigate = useNavigate();
   const [partners, setPartners] = useState([]);
@@ -48,6 +134,7 @@ const Partners = () => {
 
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<any>({});
   const [walletAmount, setWalletAmount] = useState('');
   const [walletAction, setWalletAction] = useState('add'); // 'add' or 'subtract'
   const [walletReason, setWalletReason] = useState('');
@@ -126,12 +213,39 @@ const Partners = () => {
     });
   }, [hookPartners, hookLoading]);
 
+  const validateForm = async () => {
+    try {
+      await createPartnerSchema.validate(formData, { abortEarly: false });
+      return {};
+    } catch (err: any) {
+      const errors: any = {};
+      err.inner.forEach((error: any) => {
+        if (error.path) {
+          errors[error.path] = error.message;
+        }
+      });
+      return errors;
+    }
+  };
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setSubmitError('');
+    setValidationErrors({});
     setSubmitting(true);
 
     try {
+      // Validate form with Yup
+      const errors = await validateForm();
+      if (Object.keys(errors).length > 0) {
+        setValidationErrors(errors);
+        // Show first error as toast
+        const firstError = Object.values(errors)[0];
+        toast.error(firstError as string);
+        setSubmitting(false);
+        return;
+      }
+
       // Clean up the form data - remove empty strings for optional fields
       const cleanedData = {
         ...formData,
@@ -171,19 +285,31 @@ const Partners = () => {
 
       // Only close modal if successful
       if (result && result.success !== false) {
+        toast.success(
+          editingPartner ? 'Partner updated successfully!' : 'Partner created successfully!'
+        );
         setShowModal(false);
         setEditingPartner(null);
         resetForm();
+        setValidationErrors({});
       } else {
-        // Handle validation errors or other errors
-        let errorMessage = result?.message || 'Failed to save partner. Please check all fields.';
-
-        // If there are validation errors, format them nicely
+        // Handle validation errors or other errors from API
         if (result?.errors && Array.isArray(result.errors)) {
-          errorMessage = result.errors.map((e: any) => `${e.field}: ${e.message}`).join('\n');
+          // Set field-specific errors
+          const fieldErrors: any = {};
+          result.errors.forEach((err: any) => {
+            if (err.field) {
+              fieldErrors[err.field] = err.message;
+              toast.error(err.message);
+            }
+          });
+          setValidationErrors(fieldErrors);
+        } else {
+          const errorMessage =
+            result?.message || 'Failed to save partner. Please check all fields.';
+          setSubmitError(errorMessage);
+          toast.error(errorMessage);
         }
-
-        setSubmitError(errorMessage);
       }
     } catch (error: any) {
       console.error('Error saving partner:', error);
@@ -196,16 +322,26 @@ const Partners = () => {
 
         // Handle validation errors (array of field errors)
         if (responseData.errors && Array.isArray(responseData.errors)) {
-          errorMessage = responseData.errors.map((e: any) => `${e.field}: ${e.message}`).join('\n');
+          const fieldErrors: any = {};
+          responseData.errors.forEach((e: any) => {
+            if (e.field) {
+              fieldErrors[e.field] = e.message;
+              toast.error(e.message);
+            }
+          });
+          setValidationErrors(fieldErrors);
+          errorMessage = 'Validation failed. Please check the form fields.';
         }
         // Handle single error message
         else if (responseData.message) {
           errorMessage = responseData.message;
+          toast.error(errorMessage);
         }
       }
       // Handle network/other errors
       else if (error?.message) {
         errorMessage = error.message;
+        toast.error(errorMessage);
       }
 
       setSubmitError(errorMessage);
@@ -473,16 +609,16 @@ const Partners = () => {
     return matchesSearch && matchesStatus;
   });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 flex items-center justify-center p-8">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="text-blue-600 animate-spin" size={48} />
-          <p className="text-gray-700 font-semibold text-lg">Loading partners...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/30 flex items-center justify-center p-8">
+  //       <div className="flex flex-col items-center gap-4">
+  //         <Loader2 className="text-blue-600 animate-spin" size={48} />
+  //         <p className="text-gray-700 font-semibold text-lg">Loading partners...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
@@ -782,7 +918,7 @@ const Partners = () => {
             className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200">
+            <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 border-b border-gray-200">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-2xl font-bold text-gray-900">
                   {editingPartner ? 'Edit Partner' : 'Add New Partner'}
@@ -956,11 +1092,23 @@ const Partners = () => {
                         <input
                           type="tel"
                           value={formData.phone}
-                          onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                          onChange={e => {
+                            setFormData({ ...formData, phone: e.target.value });
+                            if (validationErrors.phone) {
+                              setValidationErrors({ ...validationErrors, phone: '' });
+                            }
+                          }}
                           required
                           placeholder="Enter phone number"
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                          className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 ${
+                            validationErrors.phone
+                              ? 'border-red-500 focus:ring-red-500'
+                              : 'border-gray-200 focus:ring-blue-500'
+                          }`}
                         />
+                        {validationErrors.phone && (
+                          <p className="text-sm text-red-500 mt-1">{validationErrors.phone}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -1116,17 +1264,31 @@ const Partners = () => {
                       <input
                         type="text"
                         value={formData.shopAddress.pincode}
-                        onChange={e =>
+                        onChange={e => {
                           setFormData({
                             ...formData,
                             shopAddress: { ...formData.shopAddress, pincode: e.target.value },
-                          })
-                        }
+                          });
+                          if (validationErrors['shopAddress.pincode']) {
+                            const newErrors = { ...validationErrors };
+                            delete newErrors['shopAddress.pincode'];
+                            setValidationErrors(newErrors);
+                          }
+                        }}
                         required
                         placeholder="6-digit pincode"
                         maxLength={6}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 ${
+                          validationErrors['shopAddress.pincode']
+                            ? 'border-red-500 focus:ring-red-500'
+                            : 'border-gray-200 focus:ring-blue-500'
+                        }`}
                       />
+                      {validationErrors['shopAddress.pincode'] && (
+                        <p className="text-sm text-red-500 mt-1">
+                          {validationErrors['shopAddress.pincode']}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1140,11 +1302,23 @@ const Partners = () => {
                   <input
                     type="tel"
                     value={formData.shopPhone}
-                    onChange={e => setFormData({ ...formData, shopPhone: e.target.value })}
+                    onChange={e => {
+                      setFormData({ ...formData, shopPhone: e.target.value });
+                      if (validationErrors.shopPhone) {
+                        setValidationErrors({ ...validationErrors, shopPhone: '' });
+                      }
+                    }}
                     required
                     placeholder="Shop phone number"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 ${
+                      validationErrors.shopPhone
+                        ? 'border-red-500 focus:ring-red-500'
+                        : 'border-gray-200 focus:ring-blue-500'
+                    }`}
                   />
+                  {validationErrors.shopPhone && (
+                    <p className="text-sm text-red-500 mt-1">{validationErrors.shopPhone}</p>
+                  )}
                 </div>
 
                 <div>
@@ -1154,11 +1328,23 @@ const Partners = () => {
                   <input
                     type="email"
                     value={formData.shopEmail}
-                    onChange={e => setFormData({ ...formData, shopEmail: e.target.value })}
+                    onChange={e => {
+                      setFormData({ ...formData, shopEmail: e.target.value });
+                      if (validationErrors.shopEmail) {
+                        setValidationErrors({ ...validationErrors, shopEmail: '' });
+                      }
+                    }}
                     required
                     placeholder="Shop email address"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 ${
+                      validationErrors.shopEmail
+                        ? 'border-red-500 focus:ring-red-500'
+                        : 'border-gray-200 focus:ring-blue-500'
+                    }`}
                   />
+                  {validationErrors.shopEmail && (
+                    <p className="text-sm text-red-500 mt-1">{validationErrors.shopEmail}</p>
+                  )}
                 </div>
               </div>
 
@@ -1169,12 +1355,24 @@ const Partners = () => {
                 <input
                   type="text"
                   value={formData.gstNumber}
-                  onChange={e => setFormData({ ...formData, gstNumber: e.target.value })}
+                  onChange={e => {
+                    setFormData({ ...formData, gstNumber: e.target.value });
+                    if (validationErrors.gstNumber) {
+                      setValidationErrors({ ...validationErrors, gstNumber: '' });
+                    }
+                  }}
                   required
                   placeholder="15-digit GST number"
                   maxLength={15}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200 ${
+                    validationErrors.gstNumber
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-200 focus:ring-blue-500'
+                  }`}
                 />
+                {validationErrors.gstNumber && (
+                  <p className="text-sm text-red-500 mt-1">{validationErrors.gstNumber}</p>
+                )}
               </div>
 
               <div>
