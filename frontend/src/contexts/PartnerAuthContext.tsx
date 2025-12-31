@@ -2,9 +2,55 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { API_BASE_URL } from '../utils/api';
 
-const PartnerAuthContext = createContext();
+interface Partner {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  isVerified?: boolean;
+  kycStatus?: string;
+  documentsStatus?: string;
+  profileComplete?: boolean;
+}
 
-export const usePartnerAuth = () => {
+interface Permissions {
+  buy: boolean;
+  sell: boolean;
+}
+
+interface VerificationStatus {
+  isVerified: boolean;
+  kycStatus: string;
+  documentsStatus: string;
+  profileComplete: boolean;
+}
+
+interface PartnerAuthContextType {
+  // State
+  partner: Partner | null;
+  permissions: Permissions;
+  loading: boolean;
+
+  // Auth methods
+  login: (credentials: any) => Promise<{ success: boolean; partner?: any; message?: string }>;
+  logout: () => void;
+  isAuthenticated: () => boolean;
+  updateProfile: (
+    profileData: any
+  ) => Promise<{ success: boolean; partner?: any; message?: string }>;
+
+  // Permission methods
+  hasPermission: (permissionName: string) => boolean;
+  refreshPermissions: () => Promise<void>;
+
+  // Verification methods
+  getVerificationStatus: () => VerificationStatus;
+  needsVerification: () => boolean;
+}
+
+const PartnerAuthContext = createContext<PartnerAuthContextType | undefined>(undefined);
+
+export const usePartnerAuth = (): PartnerAuthContextType => {
   const context = useContext(PartnerAuthContext);
   if (!context) {
     throw new Error('usePartnerAuth must be used within a PartnerAuthProvider');
@@ -12,10 +58,14 @@ export const usePartnerAuth = () => {
   return context;
 };
 
-export const PartnerAuthProvider = ({ children }: any) => {
-  const [partner, setPartner] = useState(null);
-  const [permissions, setPermissions] = useState({ buy: false, sell: false });
-  const [loading, setLoading] = useState(true);
+interface PartnerAuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const PartnerAuthProvider: React.FC<PartnerAuthProviderProps> = ({ children }) => {
+  const [partner, setPartner] = useState<Partner | null>(null);
+  const [permissions, setPermissions] = useState<Permissions>({ buy: false, sell: false });
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Initialize auth state from localStorage
   useEffect(() => {
@@ -48,7 +98,7 @@ export const PartnerAuthProvider = ({ children }: any) => {
   }, []);
 
   // Fetch partner permissions
-  const fetchPartnerPermissions = async (partnerId: any) => {
+  const fetchPartnerPermissions = async (partnerId: string): Promise<void> => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/partner-permissions`, {
@@ -77,7 +127,9 @@ export const PartnerAuthProvider = ({ children }: any) => {
   };
 
   // Partner login
-  const login = async (credentials: any) => {
+  const login = async (
+    credentials: any
+  ): Promise<{ success: boolean; partner?: any; message?: string }> => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/auth/partner/login`, {
@@ -116,7 +168,7 @@ export const PartnerAuthProvider = ({ children }: any) => {
   };
 
   // Partner logout
-  const logout = () => {
+  const logout = (): void => {
     localStorage.removeItem('token');
     localStorage.removeItem('userData');
     setPartner(null);
@@ -125,14 +177,16 @@ export const PartnerAuthProvider = ({ children }: any) => {
   };
 
   // Check if partner has specific permission
-  const hasPermission = (permissionName: any) => {
+  const hasPermission = (permissionName: string): boolean => {
     if (permissionName === 'buy') return permissions.buy;
     if (permissionName === 'sell') return permissions.sell;
     return false;
   };
 
   // Update partner profile
-  const updateProfile = async (profileData: any) => {
+  const updateProfile = async (
+    profileData: any
+  ): Promise<{ success: boolean; partner?: any; message?: string }> => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/partners/profile`, {
@@ -164,19 +218,19 @@ export const PartnerAuthProvider = ({ children }: any) => {
   };
 
   // Refresh permissions (useful after admin updates)
-  const refreshPermissions = async () => {
+  const refreshPermissions = async (): Promise<void> => {
     if (partner?._id) {
       await fetchPartnerPermissions(partner._id);
     }
   };
 
   // Check if partner is authenticated
-  const isAuthenticated = () => {
+  const isAuthenticated = (): boolean => {
     return !!partner && !!localStorage.getItem('token');
   };
 
   // Get partner's verification status
-  const getVerificationStatus = () => {
+  const getVerificationStatus = (): VerificationStatus => {
     return {
       isVerified: partner?.isVerified || false,
       kycStatus: partner?.kycStatus || 'pending',
@@ -186,12 +240,12 @@ export const PartnerAuthProvider = ({ children }: any) => {
   };
 
   // Check if partner needs to complete verification
-  const needsVerification = () => {
+  const needsVerification = (): boolean => {
     const status = getVerificationStatus();
     return !status.isVerified || status.kycStatus !== 'approved' || !status.profileComplete;
   };
 
-  const value = {
+  const value: PartnerAuthContextType = {
     // State
     partner,
     permissions,

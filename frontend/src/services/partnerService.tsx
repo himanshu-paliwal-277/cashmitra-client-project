@@ -449,6 +449,53 @@ class PartnerService {
       throw error.response?.data || error;
     }
   }
+
+  // Wallet Recharge
+  async createRechargeRequest(data: { amount: number; screenshot: string }) {
+    try {
+      const response = await api.post('/wallet-recharge/request', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating recharge request:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getRechargeRequests(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.status) queryParams.append('status', params.status);
+
+      const response = await api.get(`/wallet-recharge/requests?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching recharge requests:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getBankConfig() {
+    try {
+      const response = await api.get('/wallet-recharge/bank-config');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching bank config:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  // Wallet Balance
+  async getWalletBalance() {
+    try {
+      const response = await api.get('/wallet');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching wallet balance:', error);
+      throw error.response?.data || error;
+    }
+  }
 }
 
 export const partnerService = new PartnerService();

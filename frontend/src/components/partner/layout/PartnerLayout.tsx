@@ -1,6 +1,7 @@
 import { Suspense, useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { usePartnerAuth } from '../../../contexts/PartnerAuthContext';
+import { WalletProvider } from '../../../contexts/WalletContext';
 import { PageLoader } from '../../customer/common/PageLoader';
 import PartnerHeader from './PartnerHeader';
 import PartnerSideBar from './PartnerSideBar';
@@ -53,31 +54,33 @@ const PartnerLayout = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
-      {/* Header */}
-      <PartnerHeader partner={partner} onToggleSidebar={toggleSidebar} onLogout={handleLogout} />
+    <WalletProvider>
+      <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
+        {/* Header */}
+        <PartnerHeader partner={partner} onToggleSidebar={toggleSidebar} onLogout={handleLogout} />
 
-      {/* Content Area with Sidebar */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <PartnerSideBar isOpen={sidebarOpen} onClose={closeSidebar} />
+        {/* Content Area with Sidebar */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Sidebar */}
+          <PartnerSideBar isOpen={sidebarOpen} onClose={closeSidebar} />
 
-        {/* Overlay for mobile */}
-        {sidebarOpen && (
-          <div className="fixed inset-0 bg-black/50 z-[999] lg:hidden" onClick={closeSidebar} />
-        )}
+          {/* Overlay for mobile */}
+          {sidebarOpen && (
+            <div className="fixed inset-0 bg-black/50 z-[999] lg:hidden" onClick={closeSidebar} />
+          )}
 
-        {/* Main Content */}
-        <main className="flex-1 flex flex-col overflow-hidden bg-slate-50">
-          {/* Page Content */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 lg:p-8">
-            <Suspense fallback={<PageLoader text="Loading page..." />}>
-              <Outlet />
-            </Suspense>
-          </div>
-        </main>
+          {/* Main Content */}
+          <main className="flex-1 flex flex-col overflow-hidden bg-slate-50">
+            {/* Page Content */}
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 lg:p-8">
+              <Suspense fallback={<PageLoader text="Loading page..." />}>
+                <Outlet />
+              </Suspense>
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </WalletProvider>
   );
 };
 

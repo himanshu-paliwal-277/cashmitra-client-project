@@ -1,4 +1,12 @@
-import { LayoutDashboard, Package, ShoppingCart, UserCheck, Users, Smartphone } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  UserCheck,
+  Users,
+  Smartphone,
+  Wallet,
+} from 'lucide-react';
 import PartnerSideBarItem from './PartnerSideBarItem';
 import { useLocation } from 'react-router-dom';
 import { usePartnerAuth } from '../../../contexts/PartnerAuthContext';
@@ -35,6 +43,10 @@ const PartnerSideBar = ({ isOpen, onClose }: PartnerSideBarProps) => {
         { to: '/partner/buy-orders', icon: ShoppingCart, label: 'Buy Orders', permission: 'buy' },
         { to: '/partner/sell-orders', icon: Smartphone, label: 'Sell Orders', permission: 'sell' },
       ],
+    },
+    {
+      title: 'Wallet & Finance',
+      items: [{ to: '/partner/wallet-recharge', icon: Wallet, label: 'Wallet Recharge' }],
     },
     {
       title: 'Team Management',

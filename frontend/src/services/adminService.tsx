@@ -1774,6 +1774,61 @@ class AdminService {
       throw error.response?.data || error;
     }
   }
+
+  // Wallet Recharge Management
+  async getRechargeRequests(params: any = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params.page) queryParams.append('page', params.page);
+      if (params.limit) queryParams.append('limit', params.limit);
+      if (params.status) queryParams.append('status', params.status);
+      if (params.partnerId) queryParams.append('partnerId', params.partnerId);
+
+      const response = await api.get(`/wallet-recharge/admin/requests?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching recharge requests:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async processRechargeRequest(
+    requestId: string,
+    data: { status: 'approved' | 'rejected'; adminNotes?: string }
+  ) {
+    try {
+      const response = await api.put(`/wallet-recharge/admin/requests/${requestId}/process`, data);
+      return response.data;
+    } catch (error) {
+      console.error('Error processing recharge request:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async getBankConfig() {
+    try {
+      const response = await api.get('/wallet-recharge/admin/bank-config');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching bank config:', error);
+      throw error.response?.data || error;
+    }
+  }
+
+  async updateBankConfig(data: {
+    bankName: string;
+    accountNumber: string;
+    ifscCode: string;
+    accountHolderName: string;
+  }) {
+    try {
+      const response = await api.put('/wallet-recharge/admin/bank-config', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating bank config:', error);
+      throw error.response?.data || error;
+    }
+  }
 }
 
 export const adminService = new AdminService();

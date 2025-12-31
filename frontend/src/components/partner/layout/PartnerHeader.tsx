@@ -1,4 +1,6 @@
-import { Menu, Bell, LogOut } from 'lucide-react';
+import { Menu, Bell, LogOut, Wallet } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useWallet } from '../../../contexts/WalletContext';
 
 interface PartnerHeaderProps {
   partner: any;
@@ -7,6 +9,12 @@ interface PartnerHeaderProps {
 }
 
 const PartnerHeader = ({ partner, onToggleSidebar, onLogout }: PartnerHeaderProps) => {
+  const navigate = useNavigate();
+  const { balance: walletBalance, loading: loadingBalance } = useWallet();
+
+  const handleWalletClick = () => {
+    navigate('/partner/wallet-recharge');
+  };
   return (
     <header className="sticky top-0 z-[10] bg-white border-b border-slate-200 shadow-sm shrink-0">
       <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex justify-between items-center gap-2 sm:gap-4">
@@ -34,6 +42,22 @@ const PartnerHeader = ({ partner, onToggleSidebar, onLogout }: PartnerHeaderProp
 
         {/* Right Section */}
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
+          {/* Wallet Balance */}
+          <button
+            onClick={handleWalletClick}
+            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 hover:border-green-300 transition-colors"
+            title="Click to manage wallet"
+          >
+            <Wallet className="w-4 h-4 text-green-600" />
+            <div className="text-sm font-semibold text-green-700">
+              {loadingBalance ? (
+                <div className="w-12 h-4 bg-green-200 animate-pulse rounded"></div>
+              ) : (
+                `₹${walletBalance.toLocaleString()}`
+              )}
+            </div>
+          </button>
+
           {/* Notification Bell */}
           <button
             className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg transition-colors relative hidden sm:block"

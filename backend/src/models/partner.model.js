@@ -107,8 +107,31 @@ const partnerSchema = new mongoose.Schema(
       },
       transactions: [
         {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Transaction',
+          type: {
+            type: String,
+            enum: ['credit', 'debit'],
+            required: true,
+          },
+          amount: {
+            type: Number,
+            required: true,
+          },
+          description: {
+            type: String,
+            required: true,
+          },
+          timestamp: {
+            type: Date,
+            default: Date.now,
+          },
+          reference: {
+            type: mongoose.Schema.Types.ObjectId,
+            refPath: 'referenceModel',
+          },
+          referenceModel: {
+            type: String,
+            enum: ['WalletRechargeRequest', 'Order', 'SellOrder'],
+          },
         },
       ],
     },

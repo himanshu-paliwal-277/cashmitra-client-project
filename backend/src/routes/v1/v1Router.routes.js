@@ -31,6 +31,7 @@ import uploadRoutes from './upload.routes.js';
 import userRoutes from './user.routes.js';
 import vendorRoutes from './vendor.routes.js';
 import walletRoutes from './wallet.routes.js';
+import walletRechargeRoutes from './walletRecharge.routes.js';
 
 const router = express.Router();
 
@@ -53,6 +54,7 @@ router.use('/sell', sellRoutes);
 router.use('/buy', buyRoutes);
 router.use('/sales', salesRoutes);
 router.use('/wallet', walletRoutes);
+router.use('/wallet-recharge', walletRechargeRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/contact', contactRoutes);
 router.use('/delivery', deliveryRoutes);

@@ -116,6 +116,7 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }: AdminSidebarProps) => {
         // { to: '/admin/condition-adjustments', icon: Sliders, label: 'Condition Adjustments' },
         // { to: '/admin/promotions', icon: Gift, label: 'Promotions/Coupons' },
         { to: '/admin/finance', icon: Calculator, label: 'Finance' },
+        { to: '/admin/recharge-requests', icon: CreditCard, label: 'Recharge Requests' },
         { to: '/admin/partner-wallets', icon: Wallet, label: 'Partner Wallets' },
         // { to: '/admin/commission-rules', icon: CreditCard, label: 'Commission Rules' },
         // { to: '/admin/wallet-payouts', icon: Wallet, label: 'Wallet & Payouts' },
