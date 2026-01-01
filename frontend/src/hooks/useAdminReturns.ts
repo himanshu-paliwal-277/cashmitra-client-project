@@ -51,7 +51,8 @@ const useAdminReturns = () => {
           processing: statusCounts.processing || 0,
         });
       }
-    } catch (err) {      setError(err.message || 'Failed to fetch returns');
+    } catch (err) {
+      setError(err.message || 'Failed to fetch returns');
       console.error('Error fetching returns:', err);
     } finally {
       setLoading(false);
@@ -65,16 +66,23 @@ const useAdminReturns = () => {
       setError(null);
       try {
         const response = await adminService.updateReturnStatus(returnId, status, notes);
-        if (response.success) {          setReturns(prev =>
-            prev.map(returnItem =>              returnItem.id === returnId                ? { ...returnItem, status, notes, updatedAt: new Date().toISOString() }
+        if (response.success) {
+          setReturns(prev =>
+            prev.map(returnItem =>
+              returnItem.id === returnId
+                ? { ...returnItem, status, notes, updatedAt: new Date().toISOString() }
                 : returnItem
             )
           );
 
           // Update stats
-          setStats(prev => {            const oldReturn = returns.find(r => r.id === returnId);            if (oldReturn && oldReturn.status !== status) {
+          setStats(prev => {
+            const oldReturn = returns.find(r => r.id === returnId);
+            if (oldReturn && oldReturn.status !== status) {
               return {
-                ...prev,                [oldReturn.status]: Math.max(0, prev[oldReturn.status] - 1),                [status]: prev[status] + 1,
+                ...prev,
+                [oldReturn.status]: Math.max(0, prev[oldReturn.status] - 1),
+                [status]: prev[status] + 1,
               };
             }
             return prev;
@@ -83,8 +91,10 @@ const useAdminReturns = () => {
           return { success: true, message: response.message };
         }
         throw new Error('Failed to update return status');
-      } catch (err) {        setError(err.message || 'Failed to update return status');
-        console.error('Error updating return status:', err);        return { success: false, error: err.message };
+      } catch (err) {
+        setError(err.message || 'Failed to update return status');
+        console.error('Error updating return status:', err);
+        return { success: false, error: err.message };
       } finally {
         setLoading(false);
       }
@@ -145,7 +155,8 @@ const useAdminReturns = () => {
 
   // Get return by ID
   const getReturnById = useCallback(
-    (returnId: any) => {      return returns.find(returnItem => returnItem.id === returnId);
+    (returnId: any) => {
+      return returns.find(returnItem => returnItem.id === returnId);
     },
     [returns]
   );

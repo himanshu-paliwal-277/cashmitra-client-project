@@ -1,4 +1,4 @@
-import dotenv from 'dotenv'; 
+import dotenv from 'dotenv';
 
 import connectDB from '../config/dbConfig.js';
 import { Partner } from '../models/partner.model.js';

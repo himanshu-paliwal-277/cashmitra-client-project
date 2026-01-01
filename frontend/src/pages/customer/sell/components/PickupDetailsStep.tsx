@@ -1,7 +1,4 @@
-const PickupDetailsStep = ({
-  formData,
-  setFormData
-}: any) => {
+const PickupDetailsStep = ({ formData, setFormData }: any) => {
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
       <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">Pickup Details</h2>
@@ -51,7 +48,8 @@ const PickupDetailsStep = ({
           <textarea
             value={formData.address}
             onChange={e => setFormData({ ...formData, address: e.target.value })}
-            placeholder="Enter complete address"            rows="3"
+            placeholder="Enter complete address"
+            rows="3"
             className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>

@@ -123,7 +123,8 @@ const KYC = () => {
   const handleInputChange = (section: any, field: any, value: any) => {
     setFormData(prev => ({
       ...prev,
-      [section]: {        ...prev[section],
+      [section]: {
+        ...prev[section],
         [field]: value,
       },
     }));
@@ -304,7 +305,8 @@ const KYC = () => {
                 type="text"
                 value={formData.contactInfo.pincode}
                 onChange={e => handleInputChange('contactInfo', 'pincode', e.target.value)}
-                placeholder="Enter PIN code"                maxLength="6"
+                placeholder="Enter PIN code"
+                maxLength="6"
                 className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
@@ -538,11 +540,14 @@ const KYC = () => {
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                {(() => {                  const CurrentStepIcon = steps[currentStep - 1].icon;
+                {(() => {
+                  const CurrentStepIcon = steps[currentStep - 1].icon;
                   return <CurrentStepIcon className="w-6 h-6" />;
                 })()}
               </div>
-              <div>                <h3 className="text-xl font-bold text-white">{steps[currentStep - 1].title}</h3>                <p className="text-blue-100 text-sm">{steps[currentStep - 1].description}</p>
+              <div>
+                <h3 className="text-xl font-bold text-white">{steps[currentStep - 1].title}</h3>
+                <p className="text-blue-100 text-sm">{steps[currentStep - 1].description}</p>
               </div>
             </div>
           </div>

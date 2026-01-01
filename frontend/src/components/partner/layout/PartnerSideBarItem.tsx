@@ -10,7 +10,14 @@ interface PartnerSidebarItemProps {
   onClick?: () => void;
 }
 
-const PartnerSidebarItem = ({ to, icon: Icon, label, isOpen, isActive, onClick }: PartnerSidebarItemProps) => {
+const PartnerSidebarItem = ({
+  to,
+  icon: Icon,
+  label,
+  isOpen,
+  isActive,
+  onClick,
+}: PartnerSidebarItemProps) => {
   return (
     <Link
       to={to}

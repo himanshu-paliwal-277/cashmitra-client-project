@@ -1,15 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Save,
-  X,
-  Search,
-  Loader,
-  Sparkles,
-  Layers,
-} from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, Search, Loader, Sparkles, Layers } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 import SkeletonLoader from '../../components/customer/common/SkeletonLoader';

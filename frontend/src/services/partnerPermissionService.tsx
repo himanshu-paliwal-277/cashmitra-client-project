@@ -4,7 +4,12 @@ class PartnerPermissionService {
   // Get all partners with their permissions
   async getAllPartners(filters = {}) {
     try {
-      const params = new URLSearchParams();      if (filters.search) params.append('search', filters.search);      if (filters.roleTemplate) params.append('roleTemplate', filters.roleTemplate);      if (filters.isActive !== undefined) params.append('isActive', filters.isActive);      if (filters.page) params.append('page', filters.page);      if (filters.limit) params.append('limit', filters.limit);
+      const params = new URLSearchParams();
+      if (filters.search) params.append('search', filters.search);
+      if (filters.roleTemplate) params.append('roleTemplate', filters.roleTemplate);
+      if (filters.isActive !== undefined) params.append('isActive', filters.isActive);
+      if (filters.page) params.append('page', filters.page);
+      if (filters.limit) params.append('limit', filters.limit);
 
       const response = await api.get(`/partner-permissions/admin?${params}`);
       return response.data;
@@ -171,7 +176,12 @@ class PartnerPermissionService {
   // Get permission audit log for a partner
   async getPermissionAuditLog(partnerId: any, filters = {}) {
     try {
-      const params = new URLSearchParams();      if (filters.startDate) params.append('startDate', filters.startDate);      if (filters.endDate) params.append('endDate', filters.endDate);      if (filters.action) params.append('action', filters.action);      if (filters.page) params.append('page', filters.page);      if (filters.limit) params.append('limit', filters.limit);
+      const params = new URLSearchParams();
+      if (filters.startDate) params.append('startDate', filters.startDate);
+      if (filters.endDate) params.append('endDate', filters.endDate);
+      if (filters.action) params.append('action', filters.action);
+      if (filters.page) params.append('page', filters.page);
+      if (filters.limit) params.append('limit', filters.limit);
 
       const response = await api.get(`/partner-permissions/admin/${partnerId}/audit-log?${params}`);
       return response.data;
@@ -184,7 +194,10 @@ class PartnerPermissionService {
   // Export partner permissions data
   async exportPartnerPermissions(format = 'csv', filters = {}) {
     try {
-      const params = new URLSearchParams();      if (filters.search) params.append('search', filters.search);      if (filters.role) params.append('role', filters.role);      if (filters.status) params.append('status', filters.status);
+      const params = new URLSearchParams();
+      if (filters.search) params.append('search', filters.search);
+      if (filters.role) params.append('role', filters.role);
+      if (filters.status) params.append('status', filters.status);
       params.append('format', format);
 
       const response = await api.get(`/partner-permissions/admin/export?${params}`, {
@@ -326,7 +339,11 @@ class PartnerPermissionService {
   // Get pending permission reviews
   async getPendingReviews(filters = {}) {
     try {
-      const params = new URLSearchParams();      if (filters.priority) params.append('priority', filters.priority);      if (filters.dueDate) params.append('dueDate', filters.dueDate);      if (filters.page) params.append('page', filters.page);      if (filters.limit) params.append('limit', filters.limit);
+      const params = new URLSearchParams();
+      if (filters.priority) params.append('priority', filters.priority);
+      if (filters.dueDate) params.append('dueDate', filters.dueDate);
+      if (filters.page) params.append('page', filters.page);
+      if (filters.limit) params.append('limit', filters.limit);
 
       const response = await api.get(`/admin/permission-reviews/pending?${params}`);
       return response.data;

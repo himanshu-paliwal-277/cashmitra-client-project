@@ -99,7 +99,8 @@ export var getProduct = asyncHandler(async (req, res) => {
 });
 
 export var updateProduct = asyncHandler(async (req, res) => {
-  const { name, categoryId, images, variants, tags, status, seriesId } = req.body;
+  const { name, categoryId, images, variants, tags, status, seriesId } =
+    req.body;
 
   const product = await SellProduct.findById(req.params.id);
   if (!product) {

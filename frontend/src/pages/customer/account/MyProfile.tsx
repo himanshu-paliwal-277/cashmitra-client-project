@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
-import { User, Mail, Phone, /* MapPin, Calendar, Camera, */ Edit3, Save, X, Shield } from 'lucide-react';
+import {
+  User,
+  Mail,
+  Phone,
+  /* MapPin, Calendar, Camera, */ Edit3,
+  Save,
+  X,
+  Shield,
+} from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
 import useUserProfile from '../../../hooks/useUserProfile';

@@ -177,7 +177,9 @@ function Payouts() {
     }
 
     if (payoutForm.amount < (analytics.payoutSettings?.minimumPayoutAmount || 1000)) {
-      toast.error(`Minimum payout amount is ₹${analytics.payoutSettings?.minimumPayoutAmount || 1000}`);
+      toast.error(
+        `Minimum payout amount is ₹${analytics.payoutSettings?.minimumPayoutAmount || 1000}`
+      );
       return;
     }
 

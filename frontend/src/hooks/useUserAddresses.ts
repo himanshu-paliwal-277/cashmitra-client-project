@@ -14,7 +14,8 @@ const useUserAddresses = () => {
       const response = await api.get('/user/addresses');
       setAddresses(response.data);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch addresses');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch addresses');
       throw err;
     } finally {
       setLoading(false);
@@ -26,9 +27,11 @@ const useUserAddresses = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.post('/user/addresses', addressData);      setAddresses(prev => [...prev, response.data]);
+      const response = await api.post('/user/addresses', addressData);
+      setAddresses(prev => [...prev, response.data]);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to add address');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to add address');
       throw err;
     } finally {
       setLoading(false);
@@ -40,10 +43,13 @@ const useUserAddresses = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.put(`/user/addresses/${addressId}`, addressData);      setAddresses(prev =>        prev.map(addr => ((addr._id || addr.id) === addressId ? response.data : addr))
+      const response = await api.put(`/user/addresses/${addressId}`, addressData);
+      setAddresses(prev =>
+        prev.map(addr => ((addr._id || addr.id) === addressId ? response.data : addr))
       );
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to update address');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update address');
       throw err;
     } finally {
       setLoading(false);
@@ -55,9 +61,11 @@ const useUserAddresses = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.delete(`/user/addresses/${addressId}`);      setAddresses(prev => prev.filter(addr => (addr._id || addr.id) !== addressId));
+      const response = await api.delete(`/user/addresses/${addressId}`);
+      setAddresses(prev => prev.filter(addr => (addr._id || addr.id) !== addressId));
       return true;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to delete address');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete address');
       throw err;
     } finally {
       setLoading(false);
@@ -69,12 +77,16 @@ const useUserAddresses = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.put(`/user/addresses/${addressId}/default`);      setAddresses(prev =>
-        prev.map(addr => ({          ...addr,          isDefault: addr.id === addressId,
+      const response = await api.put(`/user/addresses/${addressId}/default`);
+      setAddresses(prev =>
+        prev.map(addr => ({
+          ...addr,
+          isDefault: addr.id === addressId,
         }))
       );
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to set default address');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to set default address');
       throw err;
     } finally {
       setLoading(false);

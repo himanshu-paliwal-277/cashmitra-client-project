@@ -144,7 +144,9 @@ export const getAllPartners = async (req, res) => {
     const partnersWithWallet = await Promise.all(
       partners.map(async (partner) => {
         const wallet = await Wallet.findOne({ partner: partner._id });
-        const permissions = await PartnerPermission.findOne({ partner: partner._id });
+        const permissions = await PartnerPermission.findOne({
+          partner: partner._id,
+        });
         const partnerObj = partner.toObject();
 
         if (wallet) {
@@ -238,7 +240,12 @@ export const createPartner = async (req, res) => {
     } = req.body;
 
     console.log('📝 Creating partner with permissions:', permissions);
-    console.log('📝 Permission types - buy:', typeof permissions?.buy, 'sell:', typeof permissions?.sell);
+    console.log(
+      '📝 Permission types - buy:',
+      typeof permissions?.buy,
+      'sell:',
+      typeof permissions?.sell
+    );
     console.log('📝 Full request body:', req.body);
 
     // ==========================================
@@ -404,7 +411,7 @@ export const updatePartner = async (req, res) => {
     // Extract permissions before deleting
     const permissions = updateData.permissions;
 
-    console.log("permissions from frontend:", permissions);
+    console.log('permissions from frontend:', permissions);
 
     delete updateData.user;
     delete updateData._id;
@@ -433,8 +440,16 @@ export const updatePartner = async (req, res) => {
 
     // Update partner permissions if provided
     if (permissions !== undefined) {
-      console.log('📝 Updating partner permissions received from frontend:', permissions);
-      console.log('📝 Permission types - buy:', typeof permissions.buy, 'sell:', typeof permissions.sell);
+      console.log(
+        '📝 Updating partner permissions received from frontend:',
+        permissions
+      );
+      console.log(
+        '📝 Permission types - buy:',
+        typeof permissions.buy,
+        'sell:',
+        typeof permissions.sell
+      );
 
       let partnerPermissions = await PartnerPermission.findOne({ partner: id });
 
@@ -449,7 +464,10 @@ export const updatePartner = async (req, res) => {
         };
         console.log('📝 Creating new permissions with data:', permData);
         partnerPermissions = await PartnerPermission.create(permData);
-        console.log('✅ Permissions created in DB:', partnerPermissions.toObject());
+        console.log(
+          '✅ Permissions created in DB:',
+          partnerPermissions.toObject()
+        );
       } else {
         // Update existing permissions
         if (permissions.buy !== undefined) {
@@ -460,9 +478,17 @@ export const updatePartner = async (req, res) => {
         }
         partnerPermissions.updatedBy = req.user._id;
 
-        console.log('📝 Before save - buy:', partnerPermissions.buy, 'sell:', partnerPermissions.sell);
+        console.log(
+          '📝 Before save - buy:',
+          partnerPermissions.buy,
+          'sell:',
+          partnerPermissions.sell
+        );
         await partnerPermissions.save();
-        console.log('✅ Permissions updated in DB:', partnerPermissions.toObject());
+        console.log(
+          '✅ Permissions updated in DB:',
+          partnerPermissions.toObject()
+        );
       }
     }
 

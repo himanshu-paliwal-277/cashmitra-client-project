@@ -24,7 +24,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       hasUser: !!user,
       hasToken: !!token,
       userRole: user?.role,
-      path: location.pathname
+      path: location.pathname,
     });
   }, [loading, user, token, location.pathname]);
 

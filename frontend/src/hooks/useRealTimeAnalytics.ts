@@ -16,7 +16,8 @@ const useRealTimeAnalytics = (timeRange = '7d', options = {}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // WebSocket connection  const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
+  // WebSocket connection
+  const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
 
   const handleWebSocketMessage = useCallback((data: any) => {
     if (data.type === 'analyticsUpdate') {
@@ -59,7 +60,8 @@ const useRealTimeAnalytics = (timeRange = '7d', options = {}) => {
           throw new Error(result.message || 'Failed to fetch analytics');
         }
       } catch (err) {
-        console.error('Error fetching analytics:', err);        setError(err.message);
+        console.error('Error fetching analytics:', err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }

@@ -456,7 +456,9 @@ function Orders() {
       // Handle inventory validation errors specifically
       if (error.message && error.message.includes('Missing or insufficient inventory')) {
         setShowResponseModal(false);
-        toast.error(`${error.message}\n\nPlease check your inventory and add the missing products first.`);
+        toast.error(
+          `${error.message}\n\nPlease check your inventory and add the missing products first.`
+        );
         // Show inventory check modal to guide user
         handleCheckMissingInventory(selectedOrder);
       } else {

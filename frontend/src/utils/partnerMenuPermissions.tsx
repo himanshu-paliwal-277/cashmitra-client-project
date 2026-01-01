@@ -433,9 +433,11 @@ export const filterMenuItemsByPermissions = (menuItems: any, permissions: any) =
 
   return menuItems
     .map((section: any) => ({
-    ...section,
-    items: section.items.filter((item: any) => hasMenuPermission(permissions, item.requiredPermission))
-  }))
+      ...section,
+      items: section.items.filter((item: any) =>
+        hasMenuPermission(permissions, item.requiredPermission)
+      ),
+    }))
     .filter((section: any) => section.items.length > 0);
 };
 
@@ -523,7 +525,8 @@ export const isMenuItemAccessible = (permissions: any, permissionName: any) => {
  * @param {string} roleTemplate - Partner's role template
  * @returns {Object} Business limits
  */
-export const getBusinessLimits = (permissions: any, roleTemplate: any) => {  const template = PARTNER_ROLE_TEMPLATES[roleTemplate];
+export const getBusinessLimits = (permissions: any, roleTemplate: any) => {
+  const template = PARTNER_ROLE_TEMPLATES[roleTemplate];
   if (!template) return {};
 
   return template.limits;
@@ -535,7 +538,8 @@ export const getBusinessLimits = (permissions: any, roleTemplate: any) => {  co
  * @param {string} roleTemplate - Partner's role template
  * @returns {Object} Available features
  */
-export const getAvailableFeatures = (permissions: any, roleTemplate: any) => {  const template = PARTNER_ROLE_TEMPLATES[roleTemplate];
+export const getAvailableFeatures = (permissions: any, roleTemplate: any) => {
+  const template = PARTNER_ROLE_TEMPLATES[roleTemplate];
   if (!template) return {};
 
   return template.features;
@@ -555,7 +559,8 @@ export const canPerformAction = (businessLimits: any, action: any, currentCount 
     addInventory: businessLimits.maxInventoryItems,
     processTransaction: businessLimits.maxMonthlyTransactions,
     requestPayout: businessLimits.maxPayoutAmount,
-  };  const limit = actionLimits[action];
+  };
+  const limit = actionLimits[action];
   if (limit === undefined || limit === -1) return true; // No limit or unlimited
 
   return currentCount < limit;

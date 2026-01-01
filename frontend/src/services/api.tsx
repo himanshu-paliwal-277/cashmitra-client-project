@@ -30,7 +30,11 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       const message = error.response?.data?.message;
 
-      if (message === 'Invalid token' || message === 'Token expired' || message === 'Not authorized, token failed') {
+      if (
+        message === 'Invalid token' ||
+        message === 'Token expired' ||
+        message === 'Not authorized, token failed'
+      ) {
         console.log('Auth token invalid - clearing and redirecting to login');
         localStorage.removeItem('token');
         localStorage.removeItem('userData');

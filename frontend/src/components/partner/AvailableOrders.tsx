@@ -143,7 +143,9 @@ const AvailableOrders: React.FC = () => {
         setOrders(prev => prev.filter(order => order._id !== orderId));
 
         // Show success message
-        toast.success('Order claimed successfully! You can now manage it in your "My Orders" section.');
+        toast.success(
+          'Order claimed successfully! You can now manage it in your "My Orders" section.'
+        );
       }
     } catch (err: any) {
       console.error('Error claiming order:', err);

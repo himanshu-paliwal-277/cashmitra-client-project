@@ -2,7 +2,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import useWebSocket from './useWebSocket';
 
 const useRealTimeOrders = (orderType = 'all', options = {}) => {
-  const {    pollingInterval = 5000,    enableWebSocket = true,    maxRetries = 3,    autoStart = true,    onUpdate = null,    onError = null,    filters = {},
+  const {
+    pollingInterval = 5000,
+    enableWebSocket = true,
+    maxRetries = 3,
+    autoStart = true,
+    onUpdate = null,
+    onError = null,
+    filters = {},
   } = options;
 
   const [orders, setOrders] = useState([]);
@@ -28,16 +35,20 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
   const retryCountRef = useRef(0);
   const mountedRef = useRef(true);
 
-  // WebSocket connection  const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
+  // WebSocket connection
+  const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
 
   const handleWebSocketMessage = useCallback((data: any) => {
     if (data.type === 'orderUpdate') {
       setOrders(prevOrders => {
-        const updatedOrders = [...prevOrders];        const existingIndex = updatedOrders.findIndex(order => order._id === data.order._id);
+        const updatedOrders = [...prevOrders];
+        const existingIndex = updatedOrders.findIndex(order => order._id === data.order._id);
 
-        if (existingIndex >= 0) {          updatedOrders[existingIndex] = data.order;
+        if (existingIndex >= 0) {
+          updatedOrders[existingIndex] = data.order;
         } else {
-          // Add new order to the beginning          updatedOrders.unshift(data.order);
+          // Add new order to the beginning
+          updatedOrders.unshift(data.order);
         }
 
         return updatedOrders;
@@ -47,7 +58,8 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
       if (data.statistics) {
         setStatistics(data.statistics);
       }
-    } else if (data.type === 'orderDeleted') {      setOrders(prevOrders => prevOrders.filter(order => order._id !== data.orderId));
+    } else if (data.type === 'orderDeleted') {
+      setOrders(prevOrders => prevOrders.filter(order => order._id !== data.orderId));
     }
   }, []);
 
@@ -58,7 +70,8 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
 
   // Cleanup function
   const cleanup = useCallback(() => {
-    if (wsRef.current) {      wsRef.current.close();
+    if (wsRef.current) {
+      wsRef.current.close();
       wsRef.current = null;
     }
     if (pollingRef.current) {
@@ -80,7 +93,8 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
     };
 
     ordersData.forEach((order: any) => {
-      if (stats.hasOwnProperty(order.status)) {        stats[order.status]++;
+      if (stats.hasOwnProperty(order.status)) {
+        stats[order.status]++;
       }
     });
 
@@ -92,7 +106,9 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
     (newOrders: any) => {
       if (!mountedRef.current) return;
 
-      setOrders(newOrders);      setStatistics(calculateStats(newOrders));      setLastUpdated(new Date().toISOString());
+      setOrders(newOrders);
+      setStatistics(calculateStats(newOrders));
+      setLastUpdated(new Date().toISOString());
       setError(null);
       retryCountRef.current = 0;
 
@@ -127,7 +143,9 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
         setError(null);
 
         const queryParams = new URLSearchParams({
-          type: orderType,          limit: options.limit || 50,          page: params.page || 1,
+          type: orderType,
+          limit: options.limit || 50,
+          page: params.page || 1,
           ...params,
         });
 
@@ -152,11 +170,13 @@ const useRealTimeOrders = (orderType = 'all', options = {}) => {
           throw new Error(result.message || 'Failed to fetch orders');
         }
       } catch (err) {
-        console.error('Error fetching orders:', err);        setError(err.message);
+        console.error('Error fetching orders:', err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
-    },    [orderType, options.limit]
+    },
+    [orderType, options.limit]
   );
 
   // Subscribe to real-time updates

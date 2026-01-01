@@ -16,7 +16,8 @@ export const useAdminCatalog = () => {
   const [totalProducts, setTotalProducts] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [productStats, setProductStats] = useState(null);  const { getAuthHeader } = useAdminAuth();
+  const [productStats, setProductStats] = useState(null);
+  const { getAuthHeader } = useAdminAuth();
 
   const fetchProducts = useCallback(async (params = {}) => {
     setLoading(true);
@@ -30,20 +31,24 @@ export const useAdminCatalog = () => {
 
       // Set categories if available in the response (from filters)
       if (response.filters?.categories) {
-        setCategories(response.filters.categories.map((cat: any) => ({
-          name: cat
-        })));
+        setCategories(
+          response.filters.categories.map((cat: any) => ({
+            name: cat,
+          }))
+        );
       }
 
       // Set product stats based on API response structure
-      setProductStats({        totalProducts: response.pagination?.totalItems || response.totalProducts || 0,
+      setProductStats({
+        totalProducts: response.pagination?.totalItems || response.totalProducts || 0,
         activeProducts: response.products?.filter((p: any) => p.isActive === true)?.length || 0,
         pendingProducts: response.products?.filter((p: any) => p.isActive === false)?.length || 0,
         categoriesCount: response.filters?.categories?.length || 0,
       });
 
       return response;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch products');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch products');
       throw err;
     } finally {
       setLoading(false);
@@ -56,7 +61,8 @@ export const useAdminCatalog = () => {
     try {
       const response = await getProductById(id);
       return response.product;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch product');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch product');
       throw err;
     } finally {
       setLoading(false);
@@ -72,7 +78,8 @@ export const useAdminCatalog = () => {
         // Refresh products list after adding
         fetchProducts();
         return response;
-      } catch (err) {        setError(err.response?.data?.message || 'Failed to add product');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to add product');
         throw err;
       } finally {
         setLoading(false);
@@ -86,10 +93,13 @@ export const useAdminCatalog = () => {
     setError(null);
     try {
       const response = await updateProduct(id, productData);
-      // Update the product in the local state      setProducts(prevProducts =>        prevProducts.map(product => (product._id === id ? { ...product, ...productData } : product))
+      // Update the product in the local state
+      setProducts(prevProducts =>
+        prevProducts.map(product => (product._id === id ? { ...product, ...productData } : product))
       );
       return response;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to update product');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update product');
       throw err;
     } finally {
       setLoading(false);
@@ -101,9 +111,11 @@ export const useAdminCatalog = () => {
     setError(null);
     try {
       const response = await deleteProduct(id);
-      // Remove the product from the local state      setProducts(prevProducts => prevProducts.filter(product => product._id !== id));
+      // Remove the product from the local state
+      setProducts(prevProducts => prevProducts.filter(product => product._id !== id));
       return response;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to delete product');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete product');
       throw err;
     } finally {
       setLoading(false);

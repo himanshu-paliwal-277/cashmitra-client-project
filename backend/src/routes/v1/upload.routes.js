@@ -119,7 +119,8 @@ router.post(
       const dataURI = `data:${req.file.mimetype};base64,${base64String}`;
 
       // Determine resource type based on mimetype
-      const resourceType = req.file.mimetype === 'application/pdf' ? 'raw' : 'image';
+      const resourceType =
+        req.file.mimetype === 'application/pdf' ? 'raw' : 'image';
 
       const result = await cloudinary.uploader.upload(dataURI, {
         folder: 'kyc-documents',

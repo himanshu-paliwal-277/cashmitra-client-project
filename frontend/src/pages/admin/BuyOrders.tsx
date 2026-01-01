@@ -164,7 +164,9 @@ const BuyOrders = () => {
         // Refresh orders after update
         fetchOrders(pagination.currentPage, statusFilter, searchTerm);
         setShowPartnerModal(false);
-        toast.success('Partner assigned successfully! Partner will be notified to accept or reject the order.');
+        toast.success(
+          'Partner assigned successfully! Partner will be notified to accept or reject the order.'
+        );
       }
     } catch (err: any) {
       console.error('Failed to assign partner', err);

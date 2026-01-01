@@ -6,12 +6,15 @@ const useWebSocket = (url: any, options = {}) => {
   const [error, setError] = useState(null);
   const [lastMessage, setLastMessage] = useState(null);
   const reconnectTimeoutRef = useRef(null);
-  const reconnectAttemptsRef = useRef(0);  const maxReconnectAttempts = options.maxReconnectAttempts || 5;  const reconnectInterval = options.reconnectInterval || 3000;
+  const reconnectAttemptsRef = useRef(0);
+  const maxReconnectAttempts = options.maxReconnectAttempts || 5;
+  const reconnectInterval = options.reconnectInterval || 3000;
 
   const connect = useCallback(() => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {        setError('No authentication token found');
+      if (!token) {
+        setError('No authentication token found');
         return;
       }
 
@@ -38,7 +41,9 @@ const useWebSocket = (url: any, options = {}) => {
           const data = JSON.parse(event.data);
           setLastMessage(data);
 
-          // Handle different message types          if (options.onMessage) {            options.onMessage(data);
+          // Handle different message types
+          if (options.onMessage) {
+            options.onMessage(data);
           }
         } catch (err) {
           console.error('Error parsing WebSocket message:', err);
@@ -55,18 +60,23 @@ const useWebSocket = (url: any, options = {}) => {
           reconnectAttemptsRef.current += 1;
           console.log(
             `Attempting to reconnect... (${reconnectAttemptsRef.current}/${maxReconnectAttempts})`
-          );          reconnectTimeoutRef.current = setTimeout(() => {
+          );
+          reconnectTimeoutRef.current = setTimeout(() => {
             connect();
           }, reconnectInterval);
-        } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {          setError('Maximum reconnection attempts reached');
+        } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+          setError('Maximum reconnection attempts reached');
         }
       };
 
       ws.onerror = error => {
-        console.error('WebSocket error:', error);        setError('WebSocket connection error');
-      };      setSocket(ws);
+        console.error('WebSocket error:', error);
+        setError('WebSocket connection error');
+      };
+      setSocket(ws);
     } catch (err) {
-      console.error('Error creating WebSocket connection:', err);      setError('Failed to create WebSocket connection');
+      console.error('Error creating WebSocket connection:', err);
+      setError('Failed to create WebSocket connection');
     }
   }, [url, maxReconnectAttempts, reconnectInterval, options]);
 
@@ -75,7 +85,8 @@ const useWebSocket = (url: any, options = {}) => {
       clearTimeout(reconnectTimeoutRef.current);
     }
 
-    if (socket) {      socket.close(1000, 'Manual disconnect');
+    if (socket) {
+      socket.close(1000, 'Manual disconnect');
     }
 
     setSocket(null);
@@ -86,10 +97,12 @@ const useWebSocket = (url: any, options = {}) => {
   const sendMessage = useCallback(
     (message: any) => {
       if (socket && isConnected) {
-        try {          socket.send(JSON.stringify(message));
+        try {
+          socket.send(JSON.stringify(message));
           return true;
         } catch (err) {
-          console.error('Error sending WebSocket message:', err);          setError('Failed to send message');
+          console.error('Error sending WebSocket message:', err);
+          setError('Failed to send message');
           return false;
         }
       }
@@ -118,13 +131,15 @@ const useWebSocket = (url: any, options = {}) => {
     [sendMessage]
   );
 
-  useEffect(() => {    if (options.autoConnect !== false) {
+  useEffect(() => {
+    if (options.autoConnect !== false) {
       connect();
     }
 
     return () => {
       disconnect();
-    };  }, [connect, disconnect, options.autoConnect]);
+    };
+  }, [connect, disconnect, options.autoConnect]);
 
   return {
     socket,

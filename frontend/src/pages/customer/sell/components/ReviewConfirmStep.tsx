@@ -1,11 +1,6 @@
 import { AlertCircle } from 'lucide-react';
 
-const ReviewConfirmStep = ({
-  formData,
-  estimatedPrice,
-  paymentMethods,
-  error
-}: any) => {
+const ReviewConfirmStep = ({ formData, estimatedPrice, paymentMethods, error }: any) => {
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-200">
       <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">Review & Confirm</h2>

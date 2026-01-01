@@ -6,7 +6,7 @@ const NavigationButtons = ({
   isSubmitting,
   handleBack,
   handleNext,
-  handleSubmit
+  handleSubmit,
 }: any) => {
   return (
     <div className="flex gap-4 mt-8">

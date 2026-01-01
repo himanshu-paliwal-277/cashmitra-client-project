@@ -1,9 +1,6 @@
 import { CheckCircle } from 'lucide-react';
 
-const StepIndicator = ({
-  steps,
-  currentStep
-}: any) => {
+const StepIndicator = ({ steps, currentStep }: any) => {
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center">

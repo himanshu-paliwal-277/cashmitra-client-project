@@ -16,10 +16,7 @@ export default function Loader({ size = 'lg', text, fullScreen = false }: Loader
 
   const content = (
     <div className="flex flex-col items-center justify-center gap-4">
-      <Loader2
-        className={`${sizeClasses[size]} animate-spin text-primary-600`}
-        strokeWidth={2}
-      />
+      <Loader2 className={`${sizeClasses[size]} animate-spin text-primary-600`} strokeWidth={2} />
       {text && <p className="text-sm text-gray-600">{text}</p>}
     </div>
   );

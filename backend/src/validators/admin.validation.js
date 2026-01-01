@@ -79,14 +79,19 @@ export const createPartnerSchema = {
             return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/.test(val);
           },
           {
-            message: 'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)',
+            message:
+              'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)',
           }
         )
         .optional(),
       permissions: z
         .object({
-          buy: z.boolean({ invalid_type_error: 'Buy permission must be a boolean' }),
-          sell: z.boolean({ invalid_type_error: 'Sell permission must be a boolean' }),
+          buy: z.boolean({
+            invalid_type_error: 'Buy permission must be a boolean',
+          }),
+          sell: z.boolean({
+            invalid_type_error: 'Sell permission must be a boolean',
+          }),
         })
         .optional(),
     })
@@ -124,8 +129,14 @@ export const updatePartnerSchema = {
       })
       .optional(),
     shopEmail: z.string().email('Valid email is required').optional(),
-    shopPhone: z.string().min(10, 'Phone number must be at least 10 digits').optional(),
-    gstNumber: z.string().length(15, 'GST number should be of 15 digits').optional(),
+    shopPhone: z
+      .string()
+      .min(10, 'Phone number must be at least 10 digits')
+      .optional(),
+    gstNumber: z
+      .string()
+      .length(15, 'GST number should be of 15 digits')
+      .optional(),
     shopLogo: z.string().optional(),
     shopImages: z.array(z.string()).optional(),
     bankDetails: z
@@ -146,7 +157,8 @@ export const updatePartnerSchema = {
           return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/.test(val);
         },
         {
-          message: 'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)',
+          message:
+            'UPI ID must be in format: username@provider (e.g., user@paytm, phone@ybl)',
         }
       )
       .optional(),
@@ -160,8 +172,12 @@ export const updatePartnerSchema = {
       .optional(),
     permissions: z
       .object({
-        buy: z.boolean({ invalid_type_error: 'Buy permission must be a boolean' }),
-        sell: z.boolean({ invalid_type_error: 'Sell permission must be a boolean' }),
+        buy: z.boolean({
+          invalid_type_error: 'Buy permission must be a boolean',
+        }),
+        sell: z.boolean({
+          invalid_type_error: 'Sell permission must be a boolean',
+        }),
       })
       .optional(),
   }),

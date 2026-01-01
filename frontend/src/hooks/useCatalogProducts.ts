@@ -19,10 +19,12 @@ const useCatalogProducts = (page = 1, limit = 10) => {
         setProducts(response.data.products || []);
         setTotalPages(response.data.totalPages || 0);
         setTotalProducts(response.data.totalProducts || 0);
-      } else {        setError('Failed to fetch catalog products');
+      } else {
+        setError('Failed to fetch catalog products');
       }
     } catch (err) {
-      console.error('Error fetching catalog products:', err);      setError(err.response?.data?.message || 'Failed to fetch catalog products');
+      console.error('Error fetching catalog products:', err);
+      setError(err.response?.data?.message || 'Failed to fetch catalog products');
     } finally {
       setLoading(false);
     }

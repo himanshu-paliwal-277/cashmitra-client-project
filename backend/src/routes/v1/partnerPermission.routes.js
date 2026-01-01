@@ -19,7 +19,7 @@ router.get(
 // Admin routes - get partner permissions by ID
 router.get(
   '/admin/:partnerId',
-  isAuthenticated,  
+  isAuthenticated,
   authorize('admin'),
   partnerPermissionController.getPartnerPermissionsById
 );

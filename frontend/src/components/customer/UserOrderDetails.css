@@ -1,5 +1,3 @@
-
-
 /* Header Styles */
 
 .back-button {
@@ -662,7 +660,6 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-
   .header {
     flex-direction: column;
     align-items: flex-start;

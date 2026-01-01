@@ -15,7 +15,8 @@ const useUserWallet = () => {
       const response = await api.get('/user/wallet');
       setWallet(response.data);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch wallet details');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch wallet details');
       throw err;
     } finally {
       setLoading(false);
@@ -34,7 +35,8 @@ const useUserWallet = () => {
       const response = await api.get(url);
       setTransactions(response.data);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch transactions');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch transactions');
       throw err;
     } finally {
       setLoading(false);
@@ -52,13 +54,17 @@ const useUserWallet = () => {
       });
 
       // Update wallet balance
-      setWallet(prev => ({        ...prev,        balance: prev.balance + amount,
+      setWallet(prev => ({
+        ...prev,
+        balance: prev.balance + amount,
       }));
 
-      // Add transaction to list      setTransactions(prev => [response.data.transaction, ...prev]);
+      // Add transaction to list
+      setTransactions(prev => [response.data.transaction, ...prev]);
 
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to add money to wallet');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to add money to wallet');
       throw err;
     } finally {
       setLoading(false);
@@ -76,13 +82,17 @@ const useUserWallet = () => {
       });
 
       // Update wallet balance
-      setWallet(prev => ({        ...prev,        balance: prev.balance - amount,
+      setWallet(prev => ({
+        ...prev,
+        balance: prev.balance - amount,
       }));
 
-      // Add transaction to list      setTransactions(prev => [response.data.transaction, ...prev]);
+      // Add transaction to list
+      setTransactions(prev => [response.data.transaction, ...prev]);
 
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to withdraw money');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to withdraw money');
       throw err;
     } finally {
       setLoading(false);
@@ -101,13 +111,17 @@ const useUserWallet = () => {
       });
 
       // Update wallet balance
-      setWallet(prev => ({        ...prev,        balance: prev.balance - amount,
+      setWallet(prev => ({
+        ...prev,
+        balance: prev.balance - amount,
       }));
 
-      // Add transaction to list      setTransactions(prev => [response.data.transaction, ...prev]);
+      // Add transaction to list
+      setTransactions(prev => [response.data.transaction, ...prev]);
 
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to transfer money');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to transfer money');
       throw err;
     } finally {
       setLoading(false);
@@ -121,7 +135,8 @@ const useUserWallet = () => {
     try {
       const response = await api.get(`/user/wallet/transactions/${transactionId}`);
       return response.data;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to fetch transaction details');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch transaction details');
       throw err;
     } finally {
       setLoading(false);
@@ -149,7 +164,8 @@ const useUserWallet = () => {
       window.URL.revokeObjectURL(url);
 
       return true;
-    } catch (err) {      setError(err.response?.data?.message || 'Failed to download statement');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to download statement');
       throw err;
     } finally {
       setLoading(false);

@@ -180,10 +180,7 @@ class SellService {
   async updateSellOrderStatus(orderId: any, status: any) {
     try {
       // Token is automatically added by axios interceptor
-      const response = await api.put(
-        `/sell/update-status/${orderId}`,
-        { status }
-      );
+      const response = await api.put(`/sell/update-status/${orderId}`, { status });
       return response.data;
     } catch (error) {
       console.error('Error updating sell order status:', error);

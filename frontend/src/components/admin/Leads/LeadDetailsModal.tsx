@@ -6,15 +6,7 @@
  */
 
 import { cn } from '../../../utils/utils';
-import {
-  Package,
-  User,
-  Mail,
-  Phone,
-  Calendar,
-  X,
-  ArrowRight,
-} from 'lucide-react';
+import { Package, User, Mail, Phone, Calendar, X, ArrowRight } from 'lucide-react';
 
 interface LeadDetailsModalProps {
   lead: any;

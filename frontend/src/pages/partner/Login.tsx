@@ -135,9 +135,7 @@ const PartnerLogin = () => {
                   }`}
                 />
               </div>
-              {errors.email && (
-                <p className="text-red-600 text-sm mt-1">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
             </div>
 
             {/* Password Field */}
@@ -164,9 +162,7 @@ const PartnerLogin = () => {
                   }`}
                 />
               </div>
-              {errors.password && (
-                <p className="text-red-600 text-sm mt-1">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password}</p>}
             </div>
 
             {/* Submit Button */}

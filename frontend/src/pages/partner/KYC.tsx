@@ -596,7 +596,7 @@ function PartnerKYC() {
         <div className="mb-4 flex justify-center items-center">{statusInfo.icon}</div>
         <h2 className="text-2xl font-bold text-slate-900 mb-2">{statusInfo.title}</h2>
         <p className="text-slate-600 mb-4">{statusInfo.description}</p>
-        
+
         {getVerificationStatus() === 'rejected' && (
           <>
             {profile?.verificationNotes && (

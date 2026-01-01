@@ -1,8 +1,8 @@
-import { Partner } from '../models/partner.model.js';
-import { Wallet } from '../models/wallet.model.js';
-import { Transaction } from '../models/transaction.model.js';
-import { WalletRechargeRequest } from '../models/walletRechargeRequest.model.js';
 import { BankConfig } from '../models/bankConfig.model.js';
+import { Partner } from '../models/partner.model.js';
+import { Transaction } from '../models/transaction.model.js';
+import { Wallet } from '../models/wallet.model.js';
+import { WalletRechargeRequest } from '../models/walletRechargeRequest.model.js';
 import ApiError from '../utils/apiError.js';
 import { sanitizeData } from '../utils/security.utils.js';
 
