@@ -264,7 +264,7 @@ const PartnerWalletManagement = () => {
   }
 
   return (
-    <div className="p-4 lg:p-6 max-w-7xl mx-auto">
+    <div className="">
       {/* Header */}
       <div className="mb-6 lg:mb-8">
         <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">

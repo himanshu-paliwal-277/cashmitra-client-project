@@ -211,7 +211,7 @@ const RechargeRequests: React.FC = () => {
   const pendingCount = requests.filter(r => r.status === 'pending').length;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className=" ">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Wallet Recharge Management</h1>
         <p className="text-gray-600">

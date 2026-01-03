@@ -309,7 +309,7 @@ const Header = () => {
 
             {/* Search Suggestions Dropdown */}
             {showSuggestions && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-b-lg shadow-lg z-50 max-h-80 overflow-y-auto">
                 {isSearchLoading ? (
                   <div className="p-4 text-center text-gray-500">
                     <div className="animate-spin inline-block w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full mr-2"></div>
@@ -327,14 +327,14 @@ const Header = () => {
                             : 'hover:bg-gray-50'
                         }`}
                       >
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                        <div className="w-10 h-10  rounded-lg flex-shrink-0 overflow-hidden">
                           {product.images &&
                           (product.images.main ||
                             (Array.isArray(product.images) && product.images.length > 0)) ? (
                             <img
                               src={product.images.main || product.images[0]}
                               alt={product.name}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -344,25 +344,25 @@ const Header = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-gray-900 truncate">{product.name}</p>
-                          <p className="text-sm text-gray-500 truncate">
+                          {/* <p className="text-sm text-gray-500 truncate">
                             {product.categoryId?.name}
                           </p>
                           {product.pricing && (
                             <p className="text-sm font-semibold text-green-600">
                               ₹{product.pricing.discountedPrice || product.pricing.mrp}
                             </p>
-                          )}
+                          )} */}
                         </div>
                       </button>
                     ))}
-                    {searchQuery.trim() && (
+                    {/* {searchQuery.trim() && (
                       <button
                         onClick={handleSearchSubmit}
                         className="w-full p-3 text-left hover:bg-gray-50 transition-colors border-t border-gray-200 text-green-600 font-medium"
                       >
                         View all results for "{searchQuery}"
                       </button>
-                    )}
+                    )} */}
                   </>
                 ) : searchQuery.trim() ? (
                   <div className="p-4 text-center text-gray-500">
