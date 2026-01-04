@@ -41,7 +41,9 @@
       "Bash(python3:*)",
       "Bash(for file in components/admin/EditUser.tsx components/admin/CreateUser.tsx components/partner/AvailableOrders.tsx components/partner/ClaimedOrders.tsx pages/partner/Payouts.tsx pages/partner/Orders.tsx pages/partner/Inventory.tsx pages/partner/AgentManagement.tsx pages/admin/AgentManagement.tsx pages/admin/UserManagement.tsx pages/admin/Partners.tsx pages/admin/BuyOrders.tsx pages/admin/SellOrders.tsx pages/admin/PartnerPermissions.tsx pages/admin/PayoutManagement.tsx pages/admin/PickupManagement.tsx pages/admin/Pricing.tsx pages/admin/SellSessionsManagement.tsx pages/customer/account/MyOrders.tsx pages/customer/buy/Cart.tsx pages/customer/buy/Checkout.tsx pages/admin/SellAccessoriesManagement.tsx pages/admin/SuperCategoryForm.tsx pages/admin/SuperCategoryManagement.tsx pages/admin/SellSuperCategoryManagement.tsx hooks/useAdminPartnerApplications.ts)",
       "Bash(do echo \"✓ $file\")",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx prettier:*)"
     ],
     "deny": [],
     "ask": []

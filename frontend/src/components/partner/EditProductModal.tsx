@@ -63,6 +63,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
       condition: 'New',
       quantity: '',
       originalPrice: '',
+      imeiNumber: '',
       warranty: {
         available: false,
         durationMonths: '',
@@ -266,6 +267,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
           condition: product.stock?.condition || 'New',
           quantity: product.stock?.quantity?.toString() || '',
           originalPrice: product.stock?.originalPrice?.toString() || '',
+          imeiNumber: product.stock?.imeiNumber || '',
           warranty: {
             available: product.stock?.warranty?.available || false,
             durationMonths: product.stock?.warranty?.durationMonths?.toString() || '',
@@ -1148,6 +1150,24 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         step="0.01"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
+                    </div>
+                  </div>
+
+                  {/* IMEI Number Field */}
+                  <div className="mt-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        IMEI Number
+                      </label>
+                      <input
+                        type="text"
+                        name="stock.imeiNumber"
+                        value={formData.stock.imeiNumber || ''}
+                        onChange={handleInputChange}
+                        placeholder="Enter IMEI number"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Optional: Product's IMEI number</p>
                     </div>
                   </div>
 

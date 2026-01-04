@@ -56,6 +56,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
       condition: 'New',
       quantity: '',
       originalPrice: '',
+      imeiNumber: '',
       warranty: {
         available: false,
         durationMonths: '',
@@ -506,6 +507,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
         condition: 'New',
         quantity: '',
         originalPrice: '',
+        imeiNumber: '',
         warranty: {
           available: false,
           durationMonths: '',
@@ -755,7 +757,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                 </div>
               </div>
 
-              {formData.superCategoryId && (
+              {/* {formData.superCategoryId && (
                 <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-green-800 text-sm">
                     ✅ Super Category:{' '}
@@ -772,19 +774,19 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                     )}
                   </p>
                 </div>
-              )}
+              )} */}
 
-              {!formData.categoryId && (
+              {/* {!formData.categoryId && (
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-blue-800 text-sm">
                     👆 Please select a super category and category above to continue with product
                     details.
                   </p>
                 </div>
-              )}
+              )} */}
 
               {/* Form Completion Progress */}
-              {formData.categoryId && (
+              {/* {formData.categoryId && (
                 <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                   <h4 className="text-sm font-semibold text-gray-900 mb-2">
                     Required Fields Progress
@@ -860,7 +862,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                     </p>
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* Product Details - Only show when category is selected */}
@@ -1110,9 +1112,9 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         required
                       >
                         <option value="New">New</option>
-                        <option value="Like New">Like New</option>
+                        {/* <option value="Like New">Like New</option>
                         <option value="Good">Good</option>
-                        <option value="Fair">Fair</option>
+                        <option value="Fair">Fair</option> */}
                         <option value="Refurbished">Refurbished</option>
                       </select>
                     </div>
@@ -1138,6 +1140,22 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
+                        IMEI Number
+                      </label>
+                      <input
+                        type="text"
+                        name="stock.imeiNumber"
+                        value={formData.stock.imeiNumber || ''}
+                        onChange={handleInputChange}
+                        placeholder="Enter IMEI number"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Optional: Product's IMEI number</p>
+                    </div>
+                  </div>
+
+                  {/* <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         Original Price (if used)
                       </label>
                       <input
@@ -1150,7 +1168,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Warranty Section */}
                   <div className="mt-4">
@@ -1244,7 +1262,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                 </div>
 
                 {/* Key Features */}
-                <div className="mb-6">
+                {/* <div className="mb-6">
                   <div className="flex items-center gap-3 mb-4">
                     <Star className="w-5 h-5 text-blue-600" />
                     <h3 className="text-lg font-semibold text-gray-900">Key Features</h3>
@@ -1288,7 +1306,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       Add Feature
                     </button>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Technical Specifications */}
                 <div className="mb-6">
@@ -1742,37 +1760,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Dimensions (H x W x T)
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            name="productDetails.design.dimensions.height"
-                            value={formData.productDetails.design.dimensions.height}
-                            onChange={handleInputChange}
-                            placeholder="160.7"
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                          <input
-                            type="text"
-                            name="productDetails.design.dimensions.width"
-                            value={formData.productDetails.design.dimensions.width}
-                            onChange={handleInputChange}
-                            placeholder="78.1"
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                          <input
-                            type="text"
-                            name="productDetails.design.dimensions.thickness"
-                            value={formData.productDetails.design.dimensions.thickness}
-                            onChange={handleInputChange}
-                            placeholder="7.85"
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-                      </div>
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Material
@@ -1797,6 +1785,37 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                           onChange={handleInputChange}
                           placeholder="IP68"
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Dimensions (H x W x T)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          name="productDetails.design.dimensions.height"
+                          value={formData.productDetails.design.dimensions.height}
+                          onChange={handleInputChange}
+                          placeholder="160.7"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        <input
+                          type="text"
+                          name="productDetails.design.dimensions.width"
+                          value={formData.productDetails.design.dimensions.width}
+                          onChange={handleInputChange}
+                          placeholder="78.1"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        <input
+                          type="text"
+                          name="productDetails.design.dimensions.thickness"
+                          value={formData.productDetails.design.dimensions.thickness}
+                          onChange={handleInputChange}
+                          placeholder="7.85"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
                     </div>
