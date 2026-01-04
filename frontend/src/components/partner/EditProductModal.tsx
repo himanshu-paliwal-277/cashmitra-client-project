@@ -88,8 +88,8 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     // Condition options for different states
     conditionOptions: [
       { label: 'Excellent', price: 0 },
-      { label: 'Good', price: -1000 },
-      { label: 'Fair', price: -2000 },
+      { label: 'Good', price: 0 },
+      { label: 'Fair', price: 0 },
     ],
 
     // Key specifications (will be converted to object in backend)
@@ -835,7 +835,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 </div>
               </div>
 
-              {formData.superCategoryId && (
+              {/* {formData.superCategoryId && (
                 <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-green-800 text-sm">
                     ✅ Super Category:{' '}
@@ -852,7 +852,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     )}
                   </p>
                 </div>
-              )}
+              )} */}
 
               {!formData.categoryId && (
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -1111,9 +1111,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         required
                       >
                         <option value="New">New</option>
-                        <option value="Like New">Like New</option>
-                        <option value="Good">Good</option>
-                        <option value="Fair">Fair</option>
+                        {/* <option value="Like New">Like New</option> */}
+                        {/* <option value="Good">Good</option> */}
+                        {/* <option value="Fair">Fair</option> */}
                         <option value="Refurbished">Refurbished</option>
                       </select>
                     </div>
@@ -1137,7 +1137,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       )}
                     </div>
 
-                    <div>
+                    {/* <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Original Price (if used)
                       </label>
@@ -1150,7 +1150,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         step="0.01"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* IMEI Number Field */}
@@ -1263,7 +1263,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 </div>
 
                 {/* Key Features */}
-                <div className="mb-6">
+                {/* <div className="mb-6">
                   <div className="flex items-center gap-3 mb-4">
                     <Star className="w-5 h-5 text-blue-600" />
                     <h3 className="text-lg font-semibold text-gray-900">Key Features</h3>
@@ -1307,7 +1307,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       Add Feature
                     </button>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Condition Options */}
                 <div className="mb-6">
@@ -1315,7 +1315,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     <Shield className="w-5 h-5 text-blue-600" />
                     <h3 className="text-lg font-semibold text-gray-900">Condition Options</h3>
                     <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                      Price adjustments for different conditions
+                      Set prices for different product conditions
                     </span>
                   </div>
                   <div className="space-y-3">
@@ -1345,11 +1345,11 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Price Adjustment (₹)
+                            Price for this Condition (₹)
                           </label>
                           <input
                             type="number"
-                            placeholder="0 for no change, negative for discount"
+                            placeholder="Enter actual price"
                             value={condition.price || ''}
                             onChange={e => {
                               const newConditions = [...formData.conditionOptions];
@@ -1362,13 +1362,14 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                                 conditionOptions: newConditions,
                               }));
                             }}
+                            min="0"
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          <p className="text-xs text-gray-500 mt-1">
-                            {condition.price > 0 && `+₹${condition.price} (Premium)`}
-                            {condition.price < 0 && `₹${Math.abs(condition.price)} discount`}
-                            {condition.price === 0 && 'No price change'}
-                          </p>
+                          {/* <p className="text-xs text-gray-500 mt-1">
+                            {condition.price > 0
+                              ? `Final price: ₹${condition.price.toLocaleString()}`
+                              : 'Enter the selling price'}
+                          </p> */}
                         </div>
                         <div className="flex items-end">
                           <button
@@ -1407,9 +1408,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   </div>
                   <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-blue-800 text-sm">
-                      💡 <strong>Condition Options:</strong> These allow customers to choose
-                      different product conditions with corresponding price adjustments. Use
-                      positive values for premium conditions and negative values for discounts.
+                      💡 <strong>Condition Options:</strong> Set specific prices for each product
+                      condition. Customers will see these exact prices when selecting different
+                      conditions.
                     </p>
                   </div>
                 </div>

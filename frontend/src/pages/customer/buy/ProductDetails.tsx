@@ -450,14 +450,14 @@ const ProductDetails = () => {
     const productData = {
       _id: product._id,
       name: productName,
-      price:
-        (selectedVariant?.price ||
-          product.pricing?.discountedPrice ||
-          product.pricing?.mrp ||
-          product.minPrice ||
-          product.maxPrice ||
-          product.price ||
-          0) + (selectedCondition?.price || 0),
+      price: selectedCondition?.price ||
+        selectedVariant?.price ||
+        product.pricing?.discountedPrice ||
+        product.pricing?.mrp ||
+        product.minPrice ||
+        product.maxPrice ||
+        product.price ||
+        0,
       image: productImage, // For checkout compatibility
       images: imageArray, // Full image array
       brand: product.brand || 'Unknown Brand',
@@ -592,12 +592,13 @@ const ProductDetails = () => {
     );
   }
   const priceNow =
-    (product.pricing?.discountedPrice ||
-      selectedVariant?.price ||
-      product.minPrice ||
-      product.maxPrice ||
-      product.price ||
-      0) + (selectedCondition?.price || 0);
+    selectedCondition?.price ||
+    selectedVariant?.price ||
+    product.pricing?.discountedPrice ||
+    product.minPrice ||
+    product.maxPrice ||
+    product.price ||
+    0;
   const mrp = product.pricing?.mrp || product.originalPrice || null;
   const discountPct = mrp && priceNow < mrp ? Math.round(((mrp - priceNow) / mrp) * 100) : null;
   const productName = getProductName();
@@ -895,20 +896,7 @@ const ProductDetails = () => {
                     >
                       <span className="font-semibold text-gray-900">{c.label}</span>
                       <span className="text-sm text-gray-600">
-                        ₹
-                        {(
-                          (product.pricing?.discountedPrice ||
-                            product.pricing?.mrp ||
-                            product.minPrice ||
-                            product.maxPrice ||
-                            product.price ||
-                            0) + (c.price || 0)
-                        ).toLocaleString()}
-                        {c.price !== 0 && (
-                          <span className="ml-1 text-xs">
-                            ({c.price > 0 ? '+' : ''}₹{c.price})
-                          </span>
-                        )}
+                        ₹{(c.price || 0).toLocaleString()}
                       </span>
                     </button>
                   );
