@@ -17,6 +17,8 @@ import {
   Palette,
   Shield,
   Star,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import partnerService from '../../services/partnerService';
@@ -33,6 +35,35 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
   const [superCategories, setSuperCategories] = useState([]);
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState<any>({});
+
+  // Accordion state - sections with required fields open by default
+  const [openSections, setOpenSections] = useState({
+    categorySelection: true, // Has required fields
+    basicInfo: true, // Has required fields
+    images: true, // Has required fields
+    pricing: true, // Has required fields
+    stock: true, // Has required fields
+    availability: false,
+    variants: false,
+    addOns: false,
+    conditionOptions: false,
+    topSpecs: false,
+    display: false,
+    performance: false,
+    camera: false,
+    battery: false,
+    connectivity: false,
+    storage: false,
+    design: false,
+    sensors: false,
+    trustMetrics: false,
+    badges: false,
+    paymentOptions: false,
+  });
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
 
   // Enhanced form data for partner product creation
   const [formData, setFormData] = useState<any>({
@@ -701,12 +732,28 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
           {/* Form */}
           <form onSubmit={handleSubmit} className="px-6">
             {/* Category Selection */}
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Package className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-semibold text-gray-900">Category Selection</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('categorySelection')}
+                className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <Package className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Category Selection <span className="text-red-500">*</span>
+                  </h3>
+                </div>
+                {openSections.categorySelection ? (
+                  <ChevronUp className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+
+              {openSections.categorySelection && (
+                <div className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Super Category <span className="text-red-500">*</span>
@@ -863,18 +910,36 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                   </div>
                 </div>
               )} */}
+                </div>
+              )}
             </div>
 
             {/* Product Details - Only show when category is selected */}
             {formData.categoryId && (
               <>
                 {/* Basic Information */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('basicInfo')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Basic Information <span className="text-red-500">*</span>
+                      </h3>
+                    </div>
+                    {openSections.basicInfo ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.basicInfo && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Product Name <span className="text-red-500">*</span>
@@ -965,14 +1030,32 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       <p className="text-red-500 text-sm mt-1">{errors.description}</p>
                     )}
                   </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Images */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Camera className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Product Images</h3>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('images')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Camera className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Product Images <span className="text-red-500">*</span>
+                      </h3>
+                    </div>
+                    {openSections.images ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.images && (
+                    <div className="p-4">
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                     <input
                       type="file"
@@ -1009,14 +1092,32 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                     </div>
                   )}
                   {errors.images && <p className="text-red-500 text-sm mt-2">{errors.images}</p>}
+                    </div>
+                  )}
                 </div>
 
                 {/* Pricing */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Pricing</h3>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('pricing')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <DollarSign className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Pricing <span className="text-red-500">*</span>
+                      </h3>
+                    </div>
+                    {openSections.pricing ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.pricing && (
+                    <div className="p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1091,15 +1192,33 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       )}
                     </p>
                   </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Stock & Condition */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Stock & Condition</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('stock')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Stock & Condition <span className="text-red-500">*</span>
+                      </h3>
+                    </div>
+                    {openSections.stock ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.stock && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Condition <span className="text-red-500">*</span>
@@ -1223,15 +1342,31 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       )}
                     </div>
                   </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Availability */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Availability</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('availability')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Availability</h3>
+                    </div>
+                    {openSections.availability ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.availability && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
@@ -1258,7 +1393,9 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Key Features */}
@@ -1308,22 +1445,27 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                   </div>
                 </div> */}
 
-                {/* Technical Specifications */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Monitor className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Technical Specifications
-                    </h3>
-                  </div>
+                {/* Display */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('display')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Monitor className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Display</h3>
+                    </div>
+                    {openSections.display ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
 
-                  {/* Display */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Monitor size={16} />
-                      Display
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {openSections.display && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Screen Size
@@ -1403,15 +1545,31 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         />
                       </div>
                     </div>
-                  </div>
+                      </div>
+                  )}
+                </div>
 
-                  {/* Performance */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Cpu size={16} />
-                      Performance
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Performance */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('performance')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Cpu className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Performance</h3>
+                    </div>
+                    {openSections.performance ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.performance && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Processor
@@ -1463,15 +1621,31 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         />
                       </div>
                     </div>
-                  </div>
+                      </div>
+                  )}
+                </div>
 
-                  {/* Memory & Storage */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <HardDrive size={16} />
-                      Memory & Storage
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Memory & Storage */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('storage')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <HardDrive className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Memory & Storage</h3>
+                    </div>
+                    {openSections.storage ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.storage && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">RAM</label>
                         <input
@@ -1524,15 +1698,31 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         </div>
                       )}
                     </div>
-                  </div>
+                      </div>
+                  )}
+                </div>
 
-                  {/* Camera */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Camera size={16} />
-                      Camera
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Camera */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('camera')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Camera className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Camera</h3>
+                    </div>
+                    {openSections.camera ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.camera && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Rear Camera (Primary)
@@ -1573,15 +1763,31 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         />
                       </div>
                     </div>
-                  </div>
+                      </div>
+                  )}
+                </div>
 
-                  {/* Battery */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Battery size={16} />
-                      Battery
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Battery */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('battery')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Battery className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Battery</h3>
+                    </div>
+                    {openSections.battery ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.battery && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Battery Capacity
@@ -1654,15 +1860,31 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         </label>
                       </div>
                     </div>
-                  </div>
+                      </div>
+                  )}
+                </div>
 
-                  {/* Network & Connectivity */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Wifi size={16} />
-                      Network & Connectivity
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Network & Connectivity */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('connectivity')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Wifi className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Network & Connectivity</h3>
+                    </div>
+                    {openSections.connectivity ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.connectivity && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">SIM</label>
                         <input
@@ -1738,15 +1960,31 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         </label>
                       </div>
                     </div>
-                  </div>
+                      </div>
+                  )}
+                </div>
 
-                  {/* Design */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Palette size={16} />
-                      Design
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Design */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('design')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Palette className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Design</h3>
+                    </div>
+                    {openSections.design ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.design && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Weight
@@ -1819,16 +2057,31 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         />
                       </div>
                     </div>
-                  </div>
+                      </div>
+                  )}
                 </div>
 
                 {/* Product Variants */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Product Variants</h3>
-                  </div>
-                  <div className="space-y-3">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('variants')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Product Variants</h3>
+                    </div>
+                    {openSections.variants ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.variants && (
+                    <div className="p-4">
+                      <div className="space-y-3">
                     {formData.variants?.map((variant: any, index: number) => (
                       <div
                         key={index}
@@ -1913,16 +2166,32 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       <Plus size={16} />
                       Add Variant
                     </button>
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Add-ons & Accessories */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Plus className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Add-ons & Accessories</h3>
-                  </div>
-                  <div className="space-y-3">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('addOns')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Plus className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Add-ons & Accessories</h3>
+                    </div>
+                    {openSections.addOns ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.addOns && (
+                    <div className="p-4">
+                      <div className="space-y-3">
                     {formData.addOns?.map((addon: any, index: number) => (
                       <div
                         key={index}
@@ -1988,19 +2257,32 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       <Plus size={16} />
                       Add Accessory
                     </button>
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Condition Options */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Condition Options</h3>
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                      Set prices for different product conditions
-                    </span>
-                  </div>
-                  <div className="space-y-3">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('conditionOptions')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Condition Options</h3>
+                    </div>
+                    {openSections.conditionOptions ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.conditionOptions && (
+                    <div className="p-4">
+                      <div className="space-y-3">
                     {formData.conditionOptions?.map((condition: any, index: number) => (
                       <div
                         key={index}
@@ -2092,16 +2374,32 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       different product conditions with corresponding price adjustments. Use
                       positive values for premium conditions and negative values for discounts.
                     </p>
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Sensors & Features */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Monitor className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Sensors & Features</h3>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('sensors')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Monitor className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Sensors & Features</h3>
+                    </div>
+                    {openSections.sensors ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.sensors && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -2182,16 +2480,32 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       />
                       <span className="text-sm text-gray-700">3.5mm Audio Jack</span>
                     </label>
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Payment Options */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Payment Options</h3>
-                  </div>
-                  <div className="space-y-4">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('paymentOptions')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <DollarSign className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Payment Options</h3>
+                    </div>
+                    {openSections.paymentOptions ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.paymentOptions && (
+                    <div className="p-4">
+                      <div className="space-y-4">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -2232,17 +2546,31 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                       </div>
                     </div>
                   </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Product Badges */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Star className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Product Badges & Certifications
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('badges')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Star className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Product Badges & Certifications</h3>
+                    </div>
+                    {openSections.badges ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.badges && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Quality Checks Badge
@@ -2295,16 +2623,32 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Trust & Legal */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Trust & Legal</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('trustMetrics')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Trust & Legal</h3>
+                    </div>
+                    {openSections.trustMetrics ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.trustMetrics && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Warranty
@@ -2343,7 +2687,9 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({ isOpen, onClose
                         <span className="text-sm text-gray-700">Certified Authentic Product</span>
                       </label>
                     </div>
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </>
             )}

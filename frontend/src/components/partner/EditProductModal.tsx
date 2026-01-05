@@ -17,6 +17,8 @@ import {
   Palette,
   Shield,
   Star,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import partnerService from '../../services/partnerService';
@@ -40,6 +42,35 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState<any>({});
   const [success, setSuccess] = useState('');
+
+  // Accordion state - sections with required fields open by default
+  const [openSections, setOpenSections] = useState({
+    categorySelection: true, // Has required fields
+    basicInfo: true, // Has required fields
+    images: true, // Has required fields
+    pricing: true, // Has required fields
+    stock: true, // Has required fields
+    availability: false,
+    variants: false,
+    addOns: false,
+    conditionOptions: false,
+    topSpecs: false,
+    display: false,
+    performance: false,
+    camera: false,
+    battery: false,
+    connectivity: false,
+    storage: false,
+    design: false,
+    sensors: false,
+    trustMetrics: false,
+    badges: false,
+    paymentOptions: false,
+  });
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
 
   // Enhanced form data for partner product editing
   const [formData, setFormData] = useState<any>({
@@ -779,12 +810,28 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
           {/* Form */}
           <form onSubmit={handleSubmit} className="px-6">
             {/* Category Selection */}
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Package className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-semibold text-gray-900">Category Selection</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('categorySelection')}
+                className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <Package className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Category Selection <span className="text-red-500">*</span>
+                  </h3>
+                </div>
+                {openSections.categorySelection ? (
+                  <ChevronUp className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+
+              {openSections.categorySelection && (
+                <div className="p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Super Category <span className="text-red-500">*</span>
@@ -835,31 +882,33 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 </div>
               </div>
 
-              {/* {formData.superCategoryId && (
-                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-green-800 text-sm">
-                    ✅ Super Category:{' '}
-                    <strong>
-                      {superCategories.find((sc: any) => sc._id === formData.superCategoryId)?.name}
-                    </strong>
-                    {formData.categoryId && (
-                      <span className="ml-4">
-                        | Category:{' '}
+                  {/* {formData.superCategoryId && (
+                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-green-800 text-sm">
+                        ✅ Super Category:{' '}
                         <strong>
-                          {categories.find((c: any) => c._id === formData.categoryId)?.name}
+                          {superCategories.find((sc: any) => sc._id === formData.superCategoryId)?.name}
                         </strong>
-                      </span>
-                    )}
-                  </p>
-                </div>
-              )} */}
+                        {formData.categoryId && (
+                          <span className="ml-4">
+                            | Category:{' '}
+                            <strong>
+                              {categories.find((c: any) => c._id === formData.categoryId)?.name}
+                            </strong>
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  )} */}
 
-              {!formData.categoryId && (
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-blue-800 text-sm">
-                    👆 Please select a super category and category above to continue with product
-                    details.
-                  </p>
+                  {!formData.categoryId && (
+                    <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-blue-800 text-sm">
+                        👆 Please select a super category and category above to continue with product
+                        details.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -868,12 +917,28 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
             {formData.categoryId && (
               <>
                 {/* Basic Information */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('basicInfo')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Basic Information <span className="text-red-500">*</span>
+                      </h3>
+                    </div>
+                    {openSections.basicInfo ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.basicInfo && (
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Product Name <span className="text-red-500">*</span>
@@ -947,31 +1012,49 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      placeholder="Enter detailed product description..."
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                    {errors.description && (
-                      <p className="text-red-500 text-sm mt-1">{errors.description}</p>
-                    )}
-                  </div>
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Description <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          name="description"
+                          value={formData.description}
+                          onChange={handleInputChange}
+                          placeholder="Enter detailed product description..."
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                        {errors.description && (
+                          <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Images */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Camera className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Product Images</h3>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('images')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Camera className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Product Images <span className="text-red-500">*</span>
+                      </h3>
+                    </div>
+                    {openSections.images ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.images && (
+                    <div className="p-4">
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                     <input
                       type="file"
@@ -987,35 +1070,53 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       <p className="text-sm text-gray-500">PNG, JPG up to 5MB each</p>
                     </label>
                   </div>
-                  {formData.images && formData.images.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                      {formData.images.map((image: string, index: number) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={image}
-                            alt={`Product ${index + 1}`}
-                            className="w-full h-32 object-cover rounded-lg border border-gray-200"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleImageRemove(index)}
-                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
-                          >
-                            <X size={14} />
-                          </button>
+                      {formData.images && formData.images.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                          {formData.images.map((image: string, index: number) => (
+                            <div key={index} className="relative">
+                              <img
+                                src={image}
+                                alt={`Product ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleImageRemove(index)}
+                                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
+                      {errors.images && <p className="text-red-500 text-sm mt-2">{errors.images}</p>}
                     </div>
                   )}
-                  {errors.images && <p className="text-red-500 text-sm mt-2">{errors.images}</p>}
                 </div>
 
                 {/* Pricing */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Pricing</h3>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('pricing')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <DollarSign className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Pricing <span className="text-red-500">*</span>
+                      </h3>
+                    </div>
+                    {openSections.pricing ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.pricing && (
+                    <div className="p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1073,31 +1174,49 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Pricing Help Text */}
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-blue-800 text-sm">
-                      💡 <strong>Auto-calculation:</strong> The discount percentage is automatically
-                      calculated when you enter both MRP and discounted price.
-                      {formData.pricing.mrp && formData.pricing.discountedPrice && (
-                        <span className="block mt-1">
-                          Current: ₹{formData.pricing.discountedPrice} (₹
-                          {(
-                            parseFloat(formData.pricing.mrp) -
-                            parseFloat(formData.pricing.discountedPrice)
-                          ).toFixed(2)}{' '}
-                          off from ₹{formData.pricing.mrp})
-                        </span>
-                      )}
-                    </p>
-                  </div>
+                      {/* Pricing Help Text */}
+                      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-blue-800 text-sm">
+                          💡 <strong>Auto-calculation:</strong> The discount percentage is automatically
+                          calculated when you enter both MRP and discounted price.
+                          {formData.pricing.mrp && formData.pricing.discountedPrice && (
+                            <span className="block mt-1">
+                              Current: ₹{formData.pricing.discountedPrice} (₹
+                              {(
+                                parseFloat(formData.pricing.mrp) -
+                                parseFloat(formData.pricing.discountedPrice)
+                              ).toFixed(2)}{' '}
+                              off from ₹{formData.pricing.mrp})
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Stock & Condition */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Stock & Condition</h3>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('stock')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Stock & Condition <span className="text-red-500">*</span>
+                      </h3>
+                    </div>
+                    {openSections.stock ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.stock && (
+                    <div className="p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1224,14 +1343,30 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       )}
                     </div>
                   </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Availability */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Availability</h3>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('availability')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Package className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Availability</h3>
+                    </div>
+                    {openSections.availability ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.availability && (
+                    <div className="p-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="flex items-center gap-2 cursor-pointer">
@@ -1260,6 +1395,8 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       />
                     </div>
                   </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Key Features */}
@@ -1310,14 +1447,28 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 </div> */}
 
                 {/* Condition Options */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Condition Options</h3>
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                      Set prices for different product conditions
-                    </span>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('conditionOptions')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Condition Options</h3>
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                        Set prices for different product conditions
+                      </span>
+                    </div>
+                    {openSections.conditionOptions ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.conditionOptions && (
+                    <div className="p-4">
                   <div className="space-y-3">
                     {formData.conditionOptions?.map((condition: any, index: number) => (
                       <div
@@ -1405,31 +1556,38 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       <Plus size={16} />
                       Add Condition Option
                     </button>
-                  </div>
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-blue-800 text-sm">
-                      💡 <strong>Condition Options:</strong> Set specific prices for each product
-                      condition. Customers will see these exact prices when selecting different
-                      conditions.
-                    </p>
-                  </div>
+                      </div>
+                      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-blue-800 text-sm">
+                          💡 <strong>Condition Options:</strong> Set specific prices for each product
+                          condition. Customers will see these exact prices when selecting different
+                          conditions.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Technical Specifications */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Monitor className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Technical Specifications
-                    </h3>
-                  </div>
+                {/* Display */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('display')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Monitor className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Display</h3>
+                    </div>
+                    {openSections.display ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
 
-                  {/* Display */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Monitor size={16} />
-                      Display
-                    </h4>
+                  {openSections.display && (
+                    <div className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1510,14 +1668,30 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         />
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Performance */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Cpu size={16} />
-                      Performance
-                    </h4>
+                {/* Performance */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('performance')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Cpu className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Performance</h3>
+                    </div>
+                    {openSections.performance ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.performance && (
+                    <div className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1570,14 +1744,30 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         />
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Memory & Storage */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <HardDrive size={16} />
-                      Memory & Storage
-                    </h4>
+                {/* Memory & Storage */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('storage')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <HardDrive className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Memory & Storage</h3>
+                    </div>
+                    {openSections.storage ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.storage && (
+                    <div className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">RAM</label>
@@ -1631,14 +1821,30 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         </div>
                       )}
                     </div>
-                  </div>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Camera */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Camera size={16} />
-                      Camera
-                    </h4>
+                {/* Camera */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('camera')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Camera className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Camera</h3>
+                    </div>
+                    {openSections.camera ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.camera && (
+                    <div className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1680,14 +1886,30 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         />
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Battery */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Battery size={16} />
-                      Battery
-                    </h4>
+                {/* Battery */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('battery')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Battery className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Battery</h3>
+                    </div>
+                    {openSections.battery ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.battery && (
+                    <div className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1761,14 +1983,30 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         </label>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Network & Connectivity */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Wifi size={16} />
-                      Network & Connectivity
-                    </h4>
+                {/* Network & Connectivity */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('connectivity')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Wifi className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Network & Connectivity</h3>
+                    </div>
+                    {openSections.connectivity ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.connectivity && (
+                    <div className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">SIM</label>
@@ -1845,14 +2083,30 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         </label>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Design */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                      <Palette size={16} />
-                      Design
-                    </h4>
+                {/* Design */}
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('design')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Palette className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Design</h3>
+                    </div>
+                    {openSections.design ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.design && (
+                    <div className="p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1925,15 +2179,30 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         />
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Sensors & Features */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Monitor className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Sensors & Features</h3>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('sensors')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Monitor className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Sensors & Features</h3>
+                    </div>
+                    {openSections.sensors ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.sensors && (
+                    <div className="p-4">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -2015,15 +2284,31 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       />
                       <span className="text-sm text-gray-700">3.5mm Audio Jack</span>
                     </label>
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Payment Options */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Payment Options</h3>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('paymentOptions')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <DollarSign className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Payment Options</h3>
+                    </div>
+                    {openSections.paymentOptions ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.paymentOptions && (
+                    <div className="p-4">
                   <div className="space-y-4">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -2063,18 +2348,34 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                           </label>
                         ))}
                       </div>
+                      </div>
                     </div>
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Product Badges */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Star className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Product Badges & Certifications
-                    </h3>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('badges')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Star className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Product Badges & Certifications
+                      </h3>
+                    </div>
+                    {openSections.badges ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.badges && (
+                    <div className="p-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -2128,15 +2429,31 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Trust & Legal */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">Trust & Legal</h3>
-                  </div>
+                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('trustMetrics')}
+                    className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Trust & Legal</h3>
+                    </div>
+                    {openSections.trustMetrics ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </button>
+
+                  {openSections.trustMetrics && (
+                    <div className="p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -2176,7 +2493,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                         <span className="text-sm text-gray-700">Certified Authentic Product</span>
                       </label>
                     </div>
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </>
             )}
