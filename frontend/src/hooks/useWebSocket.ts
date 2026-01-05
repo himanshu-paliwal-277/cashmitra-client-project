@@ -12,7 +12,11 @@ const useWebSocket = (url: any, options = {}) => {
 
   const connect = useCallback(() => {
     try {
-      const token = localStorage.getItem('adminToken') || localStorage.getItem('partnerToken') || localStorage.getItem('customerToken') || localStorage.getItem('agentToken');
+      const token =
+        localStorage.getItem('adminToken') ||
+        localStorage.getItem('partnerToken') ||
+        localStorage.getItem('customerToken') ||
+        localStorage.getItem('agentToken');
       if (!token) {
         setError('No authentication token found');
         return;

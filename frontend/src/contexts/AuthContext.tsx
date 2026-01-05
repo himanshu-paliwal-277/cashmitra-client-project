@@ -1,7 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { API_BASE_URL } from '../utils/api';
-import { decodeToken, getRoleFromToken, isTokenExpired, getRoleFromPath, getStorageKeys } from '../utils/jwt.utils';
+import {
+  decodeToken,
+  getRoleFromToken,
+  isTokenExpired,
+  getRoleFromPath,
+  getStorageKeys,
+} from '../utils/jwt.utils';
 
 // Define types
 interface User {

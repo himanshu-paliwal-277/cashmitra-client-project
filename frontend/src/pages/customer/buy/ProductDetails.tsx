@@ -450,7 +450,8 @@ const ProductDetails = () => {
     const productData = {
       _id: product._id,
       name: productName,
-      price: selectedCondition?.price ||
+      price:
+        selectedCondition?.price ||
         selectedVariant?.price ||
         product.pricing?.discountedPrice ||
         product.pricing?.mrp ||
@@ -880,7 +881,9 @@ const ProductDetails = () => {
           {/* Condition with Variants (RAM, Storage, Color, Stock) */}
           {product.conditionOptions?.length ? (
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Select Condition & Variant</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                Select Condition & Variant
+              </h4>
               <div className="flex flex-wrap gap-3">
                 {product.conditionOptions.map((c: any, i: any) => {
                   const active = selectedCondition?.label === c.label;
@@ -892,8 +895,8 @@ const ProductDetails = () => {
                         active
                           ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
                           : outOfStock
-                          ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
-                          : 'border-gray-200 hover:border-green-300 bg-white'
+                            ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                            : 'border-gray-200 hover:border-green-300 bg-white'
                       }`}
                       onClick={() => !outOfStock && setSelectedCondition(c)}
                       disabled={outOfStock}
@@ -923,7 +926,9 @@ const ProductDetails = () => {
                         )}
                         <div className="flex justify-between pt-1 border-t border-gray-200">
                           <span>Stock:</span>
-                          <span className={`font-medium ${outOfStock ? 'text-red-600' : 'text-green-600'}`}>
+                          <span
+                            className={`font-medium ${outOfStock ? 'text-red-600' : 'text-green-600'}`}
+                          >
                             {outOfStock ? 'Out of Stock' : `${c.stock} available`}
                           </span>
                         </div>
